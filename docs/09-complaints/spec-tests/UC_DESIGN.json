@@ -1,0 +1,416 @@
+[
+  {
+    "test_id": "UC-CMS-001",
+    "source_id": "UC-CMS-001 Main Success Flow",
+    "purpose": "Validate Submit Complaint main success flow",
+    "preconditions": "User / Complainant is an authorized CMS user; mandatory fields and attachment constraints are available to CMS.",
+    "action_or_input": "1. User / Complainant opens the complaint submission function. | 2. Enters complaint category/type, complaint description, and other mandatory complaint information. | 3. Attaches supporting evidence if applicable. | 4. CMS validates mandatory complaint fields. | 5. CMS validates accepted attachment constraints. | 6. CMS accepts the submission, records submission date/time, and generates a unique complaint identifier. | 7. CMS provides submission confirmation and triggers the complaint-submission email notification event.",
+    "expected_result": "Complaint is registered with identifier, category/type, description, submission date/time, and submission confirmation/notification event recorded.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-002",
+    "source_id": "UC-CMS-001 Alternative 1",
+    "purpose": "Validate documented alternative for Submit Complaint",
+    "preconditions": "User / Complainant is an authorized CMS user; mandatory fields and attachment constraints are available to CMS.",
+    "action_or_input": "- If mandatory fields are incomplete, CMS does not accept the submission and asks the User / Complainant to correct the submission.",
+    "expected_result": "Submission or attachment is not accepted as specified; no accepted record is created for a rejected submission.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-003",
+    "source_id": "UC-CMS-001 Alternative 2",
+    "purpose": "Validate documented alternative for Submit Complaint",
+    "preconditions": "User / Complainant is an authorized CMS user; mandatory fields and attachment constraints are available to CMS.",
+    "action_or_input": "If an attachment violates accepted constraints, Field Content CMS does not accept the attachment until corrected or removed.",
+    "expected_result": "Attachment is not accepted until corrected or removed.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-004",
+    "source_id": "UC-CMS-002 Main Success Flow",
+    "purpose": "Validate Track Submitted Complaint Status and History main success flow",
+    "preconditions": "At least one complaint submitted by the User / Complainant exists in CMS.",
+    "action_or_input": "1. User / Complainant opens complaint tracking. | 2. CMS lists the User / Complainant's submitted complaints. | 3. User / Complainant selects a complaint. | 4. CMS displays current complaint status and complaint history for the selected complaint.",
+    "expected_result": "User / Complainant has viewed status/history information; no lifecycle state is changed.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-005",
+    "source_id": "UC-CMS-002 Alternative 1",
+    "purpose": "Validate documented alternative for Track Submitted Complaint Status and History",
+    "preconditions": "At least one complaint submitted by the User / Complainant exists in CMS.",
+    "action_or_input": "- If no submitted complaint exists, CMS shows that there is no complaint history for the User / Complainant.",
+    "expected_result": "If no submitted complaint exists, CMS shows that there is no complaint history for the User / Complainant.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-006",
+    "source_id": "UC-CMS-003 Main Success Flow",
+    "purpose": "Validate Review Assigned Complaints main success flow",
+    "preconditions": "Complaint Handler role is active and assigned complaints exist or may exist.",
+    "action_or_input": "1. Complaint Handler opens assigned complaints list. | 2. CMS displays complaints assigned for handling. | 3. Complaint Handler reviews complaint details, status, history, assignment, priority, and available attachments where present. Field Content",
+    "expected_result": "Complaint Handler has reviewed assigned complaint information; no state change is required by this use case.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-007",
+    "source_id": "UC-CMS-003 Alternative 1",
+    "purpose": "Validate documented alternative for Review Assigned Complaints",
+    "preconditions": "Complaint Handler role is active and assigned complaints exist or may exist.",
+    "action_or_input": "- If no assigned complaints exist, CMS shows an empty assigned-complaint list.",
+    "expected_result": "If no assigned complaints exist, CMS shows an empty assigned-complaint list.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-008",
+    "source_id": "UC-CMS-004 Main Success Flow",
+    "purpose": "Validate Assign, Categorize, and Prioritize Complaint main success flow",
+    "preconditions": "A submitted complaint exists and the Complaint Handler role is active.",
+    "action_or_input": "1. Complaint Handler selects a submitted complaint. | 2. Complaint Handler manually assigns the complaint for operational handling. | 3. Complaint Handler categorizes the complaint by complaint category/type. | 4. Complaint Handler assigns priority as Low, Medium, or High. | 5. CMS records assignment and priority information for downstream handling, reminders, and escalation.",
+    "expected_result": "Complaint has assignment, category/type, and priority information recorded for handling, reminders, and escalation.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-009",
+    "source_id": "UC-CMS-004 Alternative 1",
+    "purpose": "Validate documented alternative for Assign, Categorize, and Prioritize Complaint",
+    "preconditions": "A submitted complaint exists and the Complaint Handler role is active.",
+    "action_or_input": "- If required assignment, category/type, or priority information is not supplied, CMS keeps the complaint from completing this operation until corrected.",
+    "expected_result": "If required assignment, category/type, or priority information is not supplied, CMS keeps the complaint from completing this operation until corrected.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-010",
+    "source_id": "UC-CMS-005 Main Success Flow",
+    "purpose": "Validate Update Complaint Progress main success flow",
+    "preconditions": "Complaint is assigned for handling and is within the complaint lifecycle.",
+    "action_or_input": "1. Complaint Handler opens the complaint. | 2. Complaint Handler enters a progress update. | 3. CMS records the Field Content progress update and maintains progress history. | 4. CMS triggers a status-update notification only where an independently supported status update event applies.",
+    "expected_result": "Complaint progress history is updated. No generic lifecycle-state change is inferred from a progress entry.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-011",
+    "source_id": "UC-CMS-005 Alternative 1",
+    "purpose": "Validate documented alternative for Update Complaint Progress",
+    "preconditions": "Complaint is assigned for handling and is within the complaint lifecycle.",
+    "action_or_input": "- If the progress update is incomplete or invalid for the current state, CMS does not record the update until corrected.",
+    "expected_result": "If the progress update is incomplete or invalid for the current state, CMS does not record the update until corrected.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-012",
+    "source_id": "UC-CMS-006 Main Success Flow",
+    "purpose": "Validate Resolve or Reject Complaint main success flow",
+    "preconditions": "Complaint is assigned for handling and is not already closed.",
+    "action_or_input": "1. Complaint Handler opens the complaint. | 2. Selects Resolution or Rejection. | 3. For Resolution, records resolution details. | 4. For Rejection, records rejection details/reason. | 5. CMS updates status to Resolved or Rejected according to the supported outcome. | 6. CMS records the outcome/status update and triggers the corresponding resolution or rejection email notification event.",
+    "expected_result": "Complaint outcome and status are recorded; User / Complainant is notified.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-013",
+    "source_id": "UC-CMS-006 Alternative 1",
+    "purpose": "Validate documented alternative for Resolve or Reject Complaint",
+    "preconditions": "Complaint is assigned for handling and is not already closed.",
+    "action_or_input": "- If resolution details are missing for a resolved complaint, CMS does not mark the complaint Resolved.",
+    "expected_result": "If resolution details are missing for a resolved complaint, CMS does not mark the complaint Resolved.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-014",
+    "source_id": "UC-CMS-006 Alternative 2",
+    "purpose": "Validate documented alternative for Resolve or Reject Complaint",
+    "preconditions": "Complaint is assigned for handling and is not already closed.",
+    "action_or_input": "If rejection details or reason information are missing for a rejected complaint, CMS does not mark the complaint Rejected.",
+    "expected_result": "If rejection details or reason information are missing for a rejected complaint, CMS does not mark the complaint Rejected.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-015",
+    "source_id": "UC-CMS-007 Main Success Flow",
+    "purpose": "Validate Verify Resolved Complaint for Closure (User / Complainant) main success flow",
+    "preconditions": "Complaint is Resolved; applicable closure process identifies User / Complainant verification.",
+    "action_or_input": "1. User / Complainant opens the resolved complaint. | 2. Reviews resolution details. | 3. Records successful verification. | 4. CMS records closure and updates status to Closed.",
+    "expected_result": "Resolved complaint is Closed after successful required User / Complainant verification.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-016",
+    "source_id": "UC-CMS-007 Alternative 1",
+    "purpose": "Validate documented alternative for Verify Resolved Complaint for Closure (User / Complainant)",
+    "preconditions": "Complaint is Resolved; applicable closure process identifies User / Complainant verification.",
+    "action_or_input": "If verification is not recorded/successful, CMS does not close the complaint under this verification-required path.",
+    "expected_result": "If verification is not recorded/successful, CMS does not close the complaint under this verification-required path.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-017",
+    "source_id": "UC-CMS-008 Main Success Flow",
+    "purpose": "Validate Request Complaint Reopening main success flow",
+    "preconditions": "Complaint is Closed and belongs to the User / Complainant.",
+    "action_or_input": "1. User / Complainant opens the closed complaint. | 2. Submits a reopening request. | 3. CMS records the reopening request and makes it available for Complaint Supervisor review.",
+    "expected_result": "A reopening request is recorded while the complaint remains Closed pending review.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-018",
+    "source_id": "UC-CMS-008 Alternative 1",
+    "purpose": "Validate documented alternative for Request Complaint Reopening",
+    "preconditions": "Complaint is Closed and belongs to the User / Complainant.",
+    "action_or_input": "If the complaint is not Closed, CMS does not process the action as a reopening request.",
+    "expected_result": "If the complaint is not Closed, CMS does not process the action as a reopening request.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-019",
+    "source_id": "UC-CMS-009 Main Success Flow",
+    "purpose": "Validate Submit Feedback main success flow",
+    "preconditions": "Complaint is resolved or closed.",
+    "action_or_input": "1. User / Complainant opens feedback submission. | 2. Enters feedback. | 3. CMS records feedback for authorized review. | 4. CMS triggers a feedback-related email notification event where applicable.",
+    "expected_result": "Feedback is stored and available to authorized reviewers.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-020",
+    "source_id": "UC-CMS-009 Alternative 1",
+    "purpose": "Validate documented alternative for Submit Feedback",
+    "preconditions": "Complaint is resolved or closed.",
+    "action_or_input": "- If the complaint is neither resolved nor closed, CMS does not treat the feedback as post-resolution/closure feedback.",
+    "expected_result": "If the complaint is neither resolved nor closed, CMS does not treat the feedback as post-resolution/closure feedback.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-021",
+    "source_id": "UC-CMS-010 Main Success Flow",
+    "purpose": "Validate Review Submitted Feedback main success flow",
+    "preconditions": "Submitted feedback exists.",
+    "action_or_input": "1. Actor opens feedback review function. | 2. CMS displays submitted feedback. | 3. Actor reviews feedback content.",
+    "expected_result": "Feedback is reviewed; no complaint lifecycle transition is implied.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-022",
+    "source_id": "UC-CMS-010 Alternative 1",
+    "purpose": "Validate documented alternative for Review Submitted Feedback",
+    "preconditions": "Submitted feedback exists.",
+    "action_or_input": "- If no feedback exists, CMS shows an empty feedback list.",
+    "expected_result": "If no feedback exists, CMS shows an empty feedback list.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-023",
+    "source_id": "UC-CMS-011 Main Success Flow",
+    "purpose": "Validate Manually Escalate Unresolved Complaint main success flow",
+    "preconditions": "Complaint remains unresolved and is within active handling.",
+    "action_or_input": "1. Complaint Handler opens an unresolved complaint. | 2. Initiates manual escalation. | 3. CMS records escalation status. | 4. CMS triggers the complaint-escalation email notification event. Field Content",
+    "expected_result": "Complaint escalation status is recorded.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-024",
+    "source_id": "UC-CMS-011 Alternative 1",
+    "purpose": "Validate documented alternative for Manually Escalate Unresolved Complaint",
+    "preconditions": "Complaint remains unresolved and is within active handling.",
+    "action_or_input": "- If the complaint is already resolved, rejected, or closed, CMS does not treat it as an unresolved complaint for manual escalation.",
+    "expected_result": "If the complaint is already resolved, rejected, or closed, CMS does not treat it as an unresolved complaint for manual escalation.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-025",
+    "source_id": "UC-CMS-012 Main Success Flow",
+    "purpose": "Validate Monitor Escalated Complaints main success flow",
+    "preconditions": "One or more complaints may have recorded escalation status; Complaint Supervisor role is active.",
+    "action_or_input": "1. Complaint Supervisor opens escalated-complaint monitoring. | 2. CMS displays escalated complaints and their recorded escalation status. | 3. Complaint Supervisor reviews the displayed escalation information.",
+    "expected_result": "Complaint Supervisor has reviewed escalated complaint information; no complaint lifecycle or escalation state is changed by this use case.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-026",
+    "source_id": "UC-CMS-012 Alternative 1",
+    "purpose": "Validate documented alternative for Monitor Escalated Complaints",
+    "preconditions": "One or more complaints may have recorded escalation status; Complaint Supervisor role is active.",
+    "action_or_input": "- If no escalated complaints exist, CMS shows no escalated complaint entries.",
+    "expected_result": "If no escalated complaints exist, CMS shows no escalated complaint entries.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-027",
+    "source_id": "UC-CMS-013 Main Success Flow",
+    "purpose": "Validate Publish Complaint-Related Announcement main success flow",
+    "preconditions": "Actor is an active Complaint Handler or Complaint Supervisor.",
+    "action_or_input": "1. Authorized Complaint Handler or Complaint Supervisor opens announcement publishing. | 2. Enters complaint-related announcement content. | 3. CMS publishes the announcement. | 4. CMS triggers the announcement-related Field Content email notification event where CMS is configured to notify Users / Complainants.",
+    "expected_result": "Announcement is published and notification may be triggered according to CMS configuration.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-028",
+    "source_id": "UC-CMS-013 Alternative 1",
+    "purpose": "Validate documented alternative for Publish Complaint-Related Announcement",
+    "preconditions": "Actor is an active Complaint Handler or Complaint Supervisor.",
+    "action_or_input": "- If actor is not Complaint Handler or Complaint Supervisor, CMS does not allow announcement publication.",
+    "expected_result": "If actor is not Complaint Handler or Complaint Supervisor, CMS does not allow announcement publication.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-029",
+    "source_id": "UC-CMS-014 Main Success Flow",
+    "purpose": "Validate View Complaint-Related Announcements main success flow",
+    "preconditions": "User / Complainant has access to CMS.",
+    "action_or_input": "1. User / Complainant opens announcement view. | 2. CMS displays complaint-related announcements.",
+    "expected_result": "User / Complainant has viewed announcements.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-030",
+    "source_id": "UC-CMS-014 Alternative 1",
+    "purpose": "Validate documented alternative for View Complaint-Related Announcements",
+    "preconditions": "User / Complainant has access to CMS.",
+    "action_or_input": "- If no announcement exists, CMS shows no announcement entries.",
+    "expected_result": "If no announcement exists, CMS shows no announcement entries.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-031",
+    "source_id": "UC-CMS-015 Main Success Flow",
+    "purpose": "Validate Generate Operational Complaint Reports main success flow",
+    "preconditions": "Complaint Handler role is active.",
+    "action_or_input": "1. Complaint Handler opens reporting function. | 2. Complaint Handler selects operational report parameters available within CMS. | 3. CMS generates the operational complaint report.",
+    "expected_result": "Operational complaint report is available to Complaint Handler. Field Content",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-032",
+    "source_id": "UC-CMS-015 Alternative 1",
+    "purpose": "Validate documented alternative for Generate Operational Complaint Reports",
+    "preconditions": "Complaint Handler role is active.",
+    "action_or_input": "- If no data matches selected parameters, CMS generates an empty/no-data result.",
+    "expected_result": "If no data matches selected parameters, CMS generates an empty/no-data result.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-033",
+    "source_id": "UC-CMS-016 Main Success Flow",
+    "purpose": "Validate View Complaint and Escalation Summaries main success flow",
+    "preconditions": "Complaint Supervisor role is active.",
+    "action_or_input": "1. Complaint Supervisor opens complaint summary view. | 2. CMS displays complaint summaries. | 3. Complaint Supervisor opens escalation summary view. | 4. CMS displays escalation summaries.",
+    "expected_result": "Complaint Supervisor has viewed available summaries.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-034",
+    "source_id": "UC-CMS-016 Alternative 1",
+    "purpose": "Validate documented alternative for View Complaint and Escalation Summaries",
+    "preconditions": "Complaint Supervisor role is active.",
+    "action_or_input": "- If no data exists, CMS displays empty/no-data summary.",
+    "expected_result": "If no data exists, CMS displays empty/no-data summary.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-035",
+    "source_id": "UC-CMS-017 Main Success Flow",
+    "purpose": "Validate View CMS Reports and Analytics main success flow",
+    "preconditions": "System Admin role is active.",
+    "action_or_input": "1. System Admin opens CMS reporting/analytics view. | 2. CMS displays complaint reports available within CMS. | 3. CMS displays analytics available within CMS.",
+    "expected_result": "System Admin has viewed reports/analytics available within CMS; no routine complaint operation is performed.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-036",
+    "source_id": "UC-CMS-017 Alternative 1",
+    "purpose": "Validate documented alternative for View CMS Reports and Analytics",
+    "preconditions": "System Admin role is active.",
+    "action_or_input": "- If analytics/report data is unavailable, CMS displays empty/no-data result.",
+    "expected_result": "If analytics/report data is unavailable, CMS displays empty/no-data result.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-037",
+    "source_id": "UC-CMS-018 Main Success Flow",
+    "purpose": "Validate Manage CMS Roles main success flow",
+    "preconditions": "Target institutional users exist outside CMS; CMS role-management function is available.",
+    "action_or_input": "1. System Admin selects an existing institutional user for Complaint Handler role assignment and specified duration. | 2. System Admin selects an existing institutional user for Complaint Supervisor role assignment and specified duration. | 3. System Admin performs mid-cycle reassignment when required. | 4. CMS enforces exactly one active Complaint Handler and exactly one active Complaint Supervisor role-holder at a time within CMS.",
+    "expected_result": "CMS-specific Complaint Handler and Complaint Supervisor role assignments are recorded for specified duration.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-038",
+    "source_id": "UC-CMS-018 Alternative 1",
+    "purpose": "Validate documented alternative for Manage CMS Roles",
+    "preconditions": "Target institutional users exist outside CMS; CMS role-management function is available.",
+    "action_or_input": "- If assignment would violate active-role cardinality, CMS does not complete the role assignment until corrected.",
+    "expected_result": "If assignment would violate active-role cardinality, CMS does not complete the role assignment until corrected.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-039",
+    "source_id": "UC-CMS-019 Main Success Flow",
+    "purpose": "Validate Verify Resolved Complaint for Closure (Complaint main success flow",
+    "preconditions": "Complaint is Resolved; applicable closure process identifies Complaint Supervisor verification.",
+    "action_or_input": "1. Complaint Supervisor opens the resolved complaint. | 2. Reviews resolution details. | 3. Records successful verification. | 4. CMS records closure and updates status to Closed.",
+    "expected_result": "Resolved complaint is Closed after successful required Complaint Supervisor verification.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-040",
+    "source_id": "UC-CMS-019 Alternative 1",
+    "purpose": "Validate documented alternative for Verify Resolved Complaint for Closure (Complaint",
+    "preconditions": "Complaint is Resolved; applicable closure process identifies Complaint Supervisor verification.",
+    "action_or_input": "If verification is not recorded/successful, CMS does not close the complaint under this verification-required path.",
+    "expected_result": "If verification is not recorded/successful, CMS does not close the complaint under this verification-required path.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-041",
+    "source_id": "UC-CMS-020 Main Success Flow",
+    "purpose": "Validate Review Complaint Reopening Request main success flow",
+    "preconditions": "Complaint is Closed; a valid reopening request is recorded.",
+    "action_or_input": "1. Complaint Supervisor opens the reopening request. | 2. Reviews the request. | 3. Records approval or denial. | 4. CMS records the reopening outcome. | 5. If approved, CMS reopens the complaint and updates status accordingly. | 6. CMS triggers the reopening-outcome email notification event where applicable.",
+    "expected_result": "Outcome is recorded; denied complaints remain Closed; approved complaints are reopened with status updated according to policy.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-042",
+    "source_id": "UC-CMS-020 Alternative 1",
+    "purpose": "Validate documented alternative for Review Complaint Reopening Request",
+    "preconditions": "Complaint is Closed; a valid reopening request is recorded.",
+    "action_or_input": "If denied, the complaint remains Closed and the denial outcome is recorded.",
+    "expected_result": "If denied, the complaint remains Closed and the denial outcome is recorded.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-043",
+    "source_id": "UC-CMS-021 Main Success Flow",
+    "purpose": "Validate Trigger Pre-Breach SLA Reminder main success flow",
+    "preconditions": "Complaint remains unresolved; complaint priority is associated with an applicable SLA timeline; applicable SLA values are available to CMS but are not specified in this baseline.",
+    "action_or_input": "1. The configured time/SLA condition is reached for an unresolved complaint. | 2. CMS evaluates the complaint against its applicable priority-SLA association. | 3. CMS triggers the pre-breach reminder notification event.",
+    "expected_result": "The reminder notification trigger has been issued; complaint lifecycle and escalation status are unchanged by this use case.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-044",
+    "source_id": "UC-CMS-021 Alternative 1",
+    "purpose": "Validate documented alternative for Trigger Pre-Breach SLA Reminder",
+    "preconditions": "Complaint remains unresolved; complaint priority is associated with an applicable SLA timeline; applicable SLA values are available to CMS but are not specified in this baseline.",
+    "action_or_input": "- If the complaint is already resolved, no pre-breach reminder is triggered for that resolved complaint.",
+    "expected_result": "If the complaint is already resolved, no pre-breach reminder is triggered for that resolved complaint.",
+    "test_type": "use-case alternative"
+  },
+  {
+    "test_id": "UC-CMS-045",
+    "source_id": "UC-CMS-022 Main Success Flow",
+    "purpose": "Validate Automatically Escalate Complaint on SLA Breach main success flow",
+    "preconditions": "Complaint remains unresolved; complaint priority is associated with an applicable SLA timeline; complaint has not already been escalated for the same active condition.",
+    "action_or_input": "1. The applicable SLA breach condition occurs while the complaint remains unresolved. | 2. CMS evaluates the complaint against the applicable SLA condition. | 3. CMS records automatic escalation and updates escalation status. | 4. CMS triggers the complaint-escalation email notification event.",
+    "expected_result": "Complaint escalation status records automatic escalation; the escalated complaint is available for Complaint Supervisor monitoring.",
+    "test_type": "use-case main flow"
+  },
+  {
+    "test_id": "UC-CMS-046",
+    "source_id": "UC-CMS-022 Alternative 1",
+    "purpose": "Validate documented alternative for Automatically Escalate Complaint on SLA Breach",
+    "preconditions": "Complaint remains unresolved; complaint priority is associated with an applicable SLA timeline; complaint has not already been escalated for the same active condition.",
+    "action_or_input": "- If the complaint has been resolved before the breach condition is processed, automatic escalation is not performed.",
+    "expected_result": "If the complaint has been resolved before the breach condition is processed, automatic escalation is not performed.",
+    "test_type": "use-case alternative"
+  }
+]
