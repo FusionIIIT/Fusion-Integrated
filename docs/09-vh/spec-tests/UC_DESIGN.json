@@ -1,0 +1,452 @@
+[
+  {
+    "test_id": "UC-001-MAIN",
+    "source_id": "UC-VH-001 Main Flow",
+    "purpose": "Exercise the main success flow for Submit Online Booking Request.",
+    "preconditions": "Indenter is an authorized IIITDM community member. Required booking information is available.",
+    "action_or_input": "1. Indenter opens the online booking requisition. 2. Indenter enters visitor details, visit purpose, visitor category, stay duration/timings, number of rooms/occupants, and billing responsibility. 3. VHMS validates required fields and the permitted billing-responsibility values. 4. Indenter submits the requisition. 5. VHMS records the booking and sets status to Pending. 6. Successful submission raises the booking-submission event handled by UC-VH-023.",
+    "expected_result": "Booking request exists in Pending state and is available for Caretaker review.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-001-ALT-01",
+    "source_id": "UC-VH-001 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Submit Online Booking Request.",
+    "preconditions": "Indenter is an authorized IIITDM community member. Required booking information is available.",
+    "action_or_input": "1. If required information is incomplete, the request is not submitted until the information is completed.",
+    "expected_result": "1. If required information is incomplete, the request is not submitted until the information is completed.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-001-ALT-02",
+    "source_id": "UC-VH-001 Alternative Flow 2",
+    "purpose": "Exercise the specified alternative flow for Submit Online Booking Request.",
+    "preconditions": "Indenter is an authorized IIITDM community member. Required booking information is available.",
+    "action_or_input": "2. If billing responsibility is outside the permitted values, the request is not submitted until corrected.",
+    "expected_result": "2. If billing responsibility is outside the permitted values, the request is not submitted until corrected.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-002-MAIN",
+    "source_id": "UC-VH-002 Main Flow",
+    "purpose": "Exercise the main success flow for Track, View, and Print Booking Details.",
+    "preconditions": "At least one booking has been submitted by the Indenter.",
+    "action_or_input": "1. Indenter opens own booking records. 2. VHMS displays status and history for the Indenter's submitted bookings. 3. Indenter selects a booking. 4. VHMS displays booking and confirmation details available for that booking. 5. Indenter requests printable output where required. 6. VHMS provides printable booking/confirmation details.",
+    "expected_result": "Requested booking information is displayed and can be printed.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-002-ALT-01",
+    "source_id": "UC-VH-002 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Track, View, and Print Booking Details.",
+    "preconditions": "At least one booking has been submitted by the Indenter.",
+    "action_or_input": "1. If no submitted booking exists, VHMS indicates that no booking record is available.",
+    "expected_result": "1. If no submitted booking exists, VHMS indicates that no booking record is available.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-003-MAIN",
+    "source_id": "UC-VH-003 Main Flow",
+    "purpose": "Exercise the main success flow for Review and Route Booking Request.",
+    "preconditions": "Booking request exists in Pending state.",
+    "action_or_input": "1. Caretaker opens a pending booking request. 2. VHMS displays booking details and available room-availability information. 3. Caretaker reviews the request and checks availability. 4. Caretaker records one of the supported outcomes: Reject or Forward to VH In-Charge. 5. VHMS records the decision and updates the booking state/history. 6. If the outcome is Reject, the final-decision event invokes UC-VH-023.",
+    "expected_result": "Booking is either Rejected or Forwarded.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-003-ALT-01",
+    "source_id": "UC-VH-003 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Review and Route Booking Request.",
+    "preconditions": "Booking request exists in Pending state.",
+    "action_or_input": "1. Reject: booking becomes Rejected and processing ends.",
+    "expected_result": "1. Reject: booking becomes Rejected and processing ends.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-003-ALT-02",
+    "source_id": "UC-VH-003 Alternative Flow 2",
+    "purpose": "Exercise the specified alternative flow for Review and Route Booking Request.",
+    "preconditions": "Booking request exists in Pending state.",
+    "action_or_input": "2. Forward: booking becomes Forwarded and is made available to the VH In-Charge.",
+    "expected_result": "2. Forward: booking becomes Forwarded and is made available to the VH In-Charge.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-004-MAIN",
+    "source_id": "UC-VH-004 Main Flow",
+    "purpose": "Exercise the main success flow for Approve or Reject Forwarded Booking Request.",
+    "preconditions": "A booking request exists in Forwarded state.",
+    "action_or_input": "1. VH In-Charge opens a forwarded booking request. 2. VHMS displays the request and Caretaker review information. 3. VH In-Charge records Approve or Reject. 4. VHMS records the final decision and updates the booking state to Approved or Rejected. 5. The final-decision event invokes UC-VH-023.",
+    "expected_result": "Forwarded booking has a final Approved or Rejected state; the final-decision event is available to UC-VH-023.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-004-ALT-01",
+    "source_id": "UC-VH-004 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Approve or Reject Forwarded Booking Request.",
+    "preconditions": "A booking request exists in Forwarded state.",
+    "action_or_input": "1. Approve: booking becomes Approved.",
+    "expected_result": "1. Approve: booking becomes Approved.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-004-ALT-02",
+    "source_id": "UC-VH-004 Alternative Flow 2",
+    "purpose": "Exercise the specified alternative flow for Approve or Reject Forwarded Booking Request.",
+    "preconditions": "A booking request exists in Forwarded state.",
+    "action_or_input": "2. Reject: booking becomes Rejected.",
+    "expected_result": "2. Reject: booking becomes Rejected.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-005-MAIN",
+    "source_id": "UC-VH-005 Main Flow",
+    "purpose": "Exercise the main success flow for Record Offline Booking.",
+    "preconditions": "Sufficient booking information is available to create the record.",
+    "action_or_input": "1. Caretaker opens offline booking entry. 2. Caretaker records the telephonic or walk-in booking details. 3. VHMS marks the booking as Offline. 4. VHMS places the booking in Pending state for the same approval routing and availability checking used for booking requests. 5. VHMS preserves the offline designation for audit and reporting.",
+    "expected_result": "Offline booking is recorded, flagged Offline, and Pending for review/routing.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-005-ALT-01",
+    "source_id": "UC-VH-005 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Record Offline Booking.",
+    "preconditions": "Sufficient booking information is available to create the record.",
+    "action_or_input": "1. If required information is incomplete, the offline record is not routed until the information is completed.",
+    "expected_result": "1. If required information is incomplete, the offline record is not routed until the information is completed.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-006-MAIN",
+    "source_id": "UC-VH-006 Main Flow",
+    "purpose": "Exercise the main success flow for Request Booking Modification.",
+    "preconditions": "Booking exists and arrival has not occurred.",
+    "action_or_input": "1. Indenter opens an existing booking. 2. Indenter enters the requested modification. 3. Indenter submits the modification request. 4. VHMS records the modification request. 5. Recording the request raises a modification-update event handled by UC-VH-023.",
+    "expected_result": "Modification request is recorded.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-006-ALT-01",
+    "source_id": "UC-VH-006 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Request Booking Modification.",
+    "preconditions": "Booking exists and arrival has not occurred.",
+    "action_or_input": "1. If arrival has already occurred, this pre-arrival modification use case does not apply.",
+    "expected_result": "1. If arrival has already occurred, this pre-arrival modification use case does not apply.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-007-MAIN",
+    "source_id": "UC-VH-007 Main Flow",
+    "purpose": "Exercise the main success flow for Request Booking Cancellation.",
+    "preconditions": "Booking exists and cancellation is requested before arrival.",
+    "action_or_input": "1. Indenter opens the booking and requests cancellation. 2. VHMS records the cancellation request. 3. VHMS determines the applicable cancellation-charge case from the stated schedule. 4. VHMS records the calculated charge information with the cancellation request. 5. Recording the request raises a cancellation-update event handled by UC-VH-023.",
+    "expected_result": "Cancellation request and applicable charge information are recorded for Caretaker review/confirmation.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-007-ALT-01",
+    "source_id": "UC-VH-007 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Request Booking Cancellation.",
+    "preconditions": "Booking exists and cancellation is requested before arrival.",
+    "action_or_input": "1. As stated, cancellation exactly 7 days before arrival carries no charge.",
+    "expected_result": "1. As stated, cancellation exactly 7 days before arrival carries no charge.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-007-ALT-02",
+    "source_id": "UC-VH-007 Alternative Flow 2",
+    "purpose": "Exercise the specified alternative flow for Request Booking Cancellation.",
+    "preconditions": "Booking exists and cancellation is requested before arrival.",
+    "action_or_input": "2. Cancellation within 7 days, excluding the explicitly separate same-day case, carries 25% of one-day room rent.",
+    "expected_result": "2. Cancellation within 7 days, excluding the explicitly separate same-day case, carries 25% of one-day room rent.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-007-ALT-03",
+    "source_id": "UC-VH-007 Alternative Flow 3",
+    "purpose": "Exercise the specified alternative flow for Request Booking Cancellation.",
+    "preconditions": "Booking exists and cancellation is requested before arrival.",
+    "action_or_input": "3. Same-day cancellation carries 50% of one-day room rent.",
+    "expected_result": "3. Same-day cancellation carries 50% of one-day room rent.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-008-MAIN",
+    "source_id": "UC-VH-008 Main Flow",
+    "purpose": "Exercise the main success flow for Allot Rooms and Maintain Room/Occupancy Records.",
+    "preconditions": "Booking is Approved.",
+    "action_or_input": "1. Caretaker opens an approved booking awaiting room allotment. 2. Caretaker selects room allotment details. 3. VHMS records Single or Double occupancy as applicable. 4. VHMS records Suite or Non-suite room type as applicable. 5. VHMS records the room allotment.",
+    "expected_result": "Approved booking has recorded room allotment and room/occupancy information.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-008-ALT-01",
+    "source_id": "UC-VH-008 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Allot Rooms and Maintain Room/Occupancy Records.",
+    "preconditions": "Booking is Approved.",
+    "action_or_input": "1. If the booking is not Approved, room allotment is not permitted.",
+    "expected_result": "1. If the booking is not Approved, room allotment is not permitted.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-009-MAIN",
+    "source_id": "UC-VH-009 Main Flow",
+    "purpose": "Exercise the main success flow for Record Guest Check-In.",
+    "preconditions": "Approved/allotted booking exists.",
+    "action_or_input": "1. Caretaker opens the guest stay record. 2. Caretaker records the guest check-in time. 3. VHMS updates the stay record.",
+    "expected_result": "Guest stay has a recorded check-in time.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-011-MAIN",
+    "source_id": "UC-VH-011 Main Flow",
+    "purpose": "Exercise the main success flow for Maintain Visitor Category and Tariff Configuration.",
+    "preconditions": "An authorized configuration actor exists; the PS does not identify which actor owns this function.",
+    "action_or_input": "1. Authorized configuration actor records visitor category/tariff information. 2. Actor records category-specific tariff values. 3. Actor records occupancy-specific tariff values. 4. Actor records effective-from dates. 5. VHMS preserves historical generated/finalized bills from later tariff changes.",
+    "expected_result": "Tariff configuration is recorded without retroactively changing historical bills.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-012-MAIN",
+    "source_id": "UC-VH-012 Main Flow",
+    "purpose": "Exercise the main success flow for Manage Mess and Meal Bookings.",
+    "preconditions": "Guest stay record exists.",
+    "action_or_input": "1. Caretaker opens the guest stay and records a meal booking. 2. Caretaker selects Full-day, Individual meal, or Add-on as applicable. 3. For Individual meal, VHMS accepts Breakfast, Lunch, or Dinner. 4. For Add-on, VHMS accepts Tea or Milk. 5. VHMS links the meal booking to the guest stay duration. 6. VHMS makes the meal booking available to billing.",
+    "expected_result": "Meal booking is recorded, linked to the stay, and available for bill calculation.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-012-ALT-01",
+    "source_id": "UC-VH-012 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Manage Mess and Meal Bookings.",
+    "preconditions": "Guest stay record exists.",
+    "action_or_input": "1. A meal booking outside the recorded guest stay duration is not linked to that stay.",
+    "expected_result": "1. A meal booking outside the recorded guest stay duration is not linked to that stay.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-013-MAIN",
+    "source_id": "UC-VH-013 Main Flow",
+    "purpose": "Exercise the main success flow for Generate Bill and Record Offline Settlement.",
+    "preconditions": "Applicable booking/stay information exists. Tariff, meal, and cancellation-charge data exist where applicable.",
+    "action_or_input": "1. Caretaker opens bill generation for the booking/stay. 2. VHMS selects the applicable tariff from recorded category, occupancy, and effective-from information. 3. VHMS calculates room-rent, meal-consumption, and applicable cancellation-charge components. 4. VHMS records billing responsibility. 5. Caretaker records offline cash-settlement information after offline payment. 6. VHMS preserves the billing record as immutable audit history once generated/finalized as applicable.",
+    "expected_result": "Bill and offline settlement information are recorded in VHMS.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-013-ALT-01",
+    "source_id": "UC-VH-013 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Generate Bill and Record Offline Settlement.",
+    "preconditions": "Applicable booking/stay information exists. Tariff, meal, and cancellation-charge data exist where applicable.",
+    "action_or_input": "1. For a recorded no-show, the applicable 50% of one-day room-rent rule is used as a cancellation-charge component.",
+    "expected_result": "1. For a recorded no-show, the applicable 50% of one-day room-rent rule is used as a cancellation-charge component.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-013-ALT-02",
+    "source_id": "UC-VH-013 Alternative Flow 2",
+    "purpose": "Exercise the specified alternative flow for Generate Bill and Record Offline Settlement.",
+    "preconditions": "Applicable booking/stay information exists. Tariff, meal, and cancellation-charge data exist where applicable.",
+    "action_or_input": "2. Later tariff changes do not alter historical generated/finalized bills.",
+    "expected_result": "2. Later tariff changes do not alter historical generated/finalized bills.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-014-MAIN",
+    "source_id": "UC-VH-014 Main Flow",
+    "purpose": "Exercise the main success flow for Maintain Inventory Records and Thresholds.",
+    "preconditions": "Caretaker has VHMS inventory access.",
+    "action_or_input": "1. Caretaker creates or updates an inventory item record. 2. Caretaker records item description/type. 3. Caretaker records current quantity. 4. Caretaker records the minimum threshold level. 5. VHMS compares current quantity with the threshold. 6. When quantity is below threshold, VHMS records the threshold alert and triggers the corresponding notification event.",
+    "expected_result": "Inventory record and any threshold alert are recorded.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-015-MAIN",
+    "source_id": "UC-VH-015 Main Flow",
+    "purpose": "Exercise the main success flow for Review and Approve Inventory Replenishment Requirement.",
+    "preconditions": "Inventory replenishment requirement exists.",
+    "action_or_input": "1. VH In-Charge opens recorded replenishment requirements. 2. VHMS displays the requirement and related inventory/threshold information. 3. VH In-Charge reviews the requirement. 4. VH In-Charge records approval of the requirement.",
+    "expected_result": "Approval of the recorded requirement is stored in VHMS.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-015-EXC-01",
+    "source_id": "UC-VH-015 Exception Flow 1",
+    "purpose": "Exercise the specified exception flow for Review and Approve Inventory Replenishment Requirement.",
+    "preconditions": "Inventory replenishment requirement exists.",
+    "action_or_input": "The PS does not specify who creates the replenishment-requirement record, nor does it specify a rejection outcome.",
+    "expected_result": "The PS does not specify who creates the replenishment-requirement record, nor does it specify a rejection outcome.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "UC-017-MAIN",
+    "source_id": "UC-VH-017 Main Flow",
+    "purpose": "Exercise the main success flow for Generate or View VH In-Charge Reports.",
+    "preconditions": "Relevant VHMS records exist.",
+    "action_or_input": "1. VH In-Charge opens reports. 2. VHMS provides booking summary information. 3. VHMS provides category-wise occupancy information. 4. VHMS provides revenue and billing summaries based on VHMS billing records. 5. VHMS provides inventory usage information.",
+    "expected_result": "Requested listed report information is available.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-017-EXC-01",
+    "source_id": "UC-VH-017 Exception Flow 1",
+    "purpose": "Exercise the specified exception flow for Generate or View VH In-Charge Reports.",
+    "preconditions": "Relevant VHMS records exist.",
+    "action_or_input": "Analytics beyond the listed reports are not implied.",
+    "expected_result": "Analytics beyond the listed reports are not implied.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "UC-018-MAIN",
+    "source_id": "UC-VH-018 Main Flow",
+    "purpose": "Exercise the main success flow for Generate or View Caretaker Reports.",
+    "preconditions": "Relevant VHMS records exist.",
+    "action_or_input": "1. Caretaker opens operational reports. 2. VHMS provides daily occupancy information. 3. VHMS provides upcoming arrivals/departures information. 4. VHMS provides pending-approval information. 5. VHMS provides no-show and overstay logs.",
+    "expected_result": "Requested listed report information is available.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-018-EXC-01",
+    "source_id": "UC-VH-018 Exception Flow 1",
+    "purpose": "Exercise the specified exception flow for Generate or View Caretaker Reports.",
+    "preconditions": "Relevant VHMS records exist.",
+    "action_or_input": "Analytics beyond the listed reports are not implied.",
+    "expected_result": "Analytics beyond the listed reports are not implied.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "UC-019-MAIN",
+    "source_id": "UC-VH-019 Main Flow",
+    "purpose": "Exercise the main success flow for Reassign VHMS Operational Role and Transfer Records.",
+    "preconditions": "The PS requires time-bound reassignment behavior but does not identify the actor who performs or authorizes role assignment.",
+    "action_or_input": "1. Authorized role-assignment authority records a VHMS role reassignment. 2. VHMS enforces exactly one active Caretaker and exactly one active VH In-Charge. 3. VHMS applies the reassignment immediately. 4. VHMS transfers pending records to the newly assigned role holder. 5. VHMS transfers ongoing records to the newly assigned role holder.",
+    "expected_result": "New role holder has the pending/ongoing VHMS records associated with the reassigned role.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-020-MAIN",
+    "source_id": "UC-VH-020 Main Flow",
+    "purpose": "Exercise the main success flow for Review and Confirm Booking Cancellation.",
+    "preconditions": "Cancellation request and charge case have been recorded.",
+    "action_or_input": "1. Caretaker opens the cancellation request. 2. Caretaker reviews the request and recorded applicable charge. 3. Caretaker confirms the cancellation. 4. VHMS records the cancellation outcome. 5. VHMS adjusts billing information according to the confirmed cancellation and applicable charge. 6. The confirmed cancellation raises an update event handled by UC-VH-023.",
+    "expected_result": "Booking cancellation is confirmed and billing information is adjusted.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-020-EXC-01",
+    "source_id": "UC-VH-020 Exception Flow 1",
+    "purpose": "Exercise the specified exception flow for Review and Confirm Booking Cancellation.",
+    "preconditions": "Cancellation request and charge case have been recorded.",
+    "action_or_input": "The PS does not specify a Caretaker rejection outcome for cancellation.",
+    "expected_result": "The PS does not specify a Caretaker rejection outcome for cancellation.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "UC-021-MAIN",
+    "source_id": "UC-VH-021 Main Flow",
+    "purpose": "Exercise the main success flow for Record Guest Check-Out and Bill Verification.",
+    "preconditions": "Guest stay exists; check-in has been recorded.",
+    "action_or_input": "1. Caretaker opens the guest stay record. 2. Caretaker records the guest check-out time. 3. Where applicable, Caretaker records guest bill-verification information arising from the external checkout interaction. 4. VHMS updates the stay/checkout record.",
+    "expected_result": "Check-out time and applicable bill-verification information are recorded.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-021-EXC-01",
+    "source_id": "UC-VH-021 Exception Flow 1",
+    "purpose": "Exercise the specified exception flow for Record Guest Check-Out and Bill Verification.",
+    "preconditions": "Guest stay exists; check-in has been recorded.",
+    "action_or_input": "Direct visitor login/access is not part of this use case.",
+    "expected_result": "Direct visitor login/access is not part of this use case.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "UC-022-MAIN",
+    "source_id": "UC-VH-022 Main Flow",
+    "purpose": "Exercise the main success flow for Record Confirmed Booking Modification Outcome.",
+    "preconditions": "A modification request exists. The confirming actor/process is not identified in the PS.",
+    "action_or_input": "1. Authorized/established confirming authority records the confirmed modification outcome. 2. VHMS updates the booking information represented by the confirmed outcome. 3. VHMS adjusts billing information according to that confirmed outcome. 4. The confirmed outcome raises a modification-update event handled by UC-VH-023.",
+    "expected_result": "Confirmed modification outcome and corresponding billing adjustment are recorded.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-023-MAIN",
+    "source_id": "UC-VH-023 Main Flow",
+    "purpose": "Exercise the main success flow for Generate Booking Lifecycle Notifications.",
+    "preconditions": "The corresponding booking event exists and the information needed to identify the applicable notification context is recorded.",
+    "action_or_input": "1. VHMS receives the recorded booking lifecycle event. / 2. VHMS identifies the notification type required by the event. / 3. VHMS prepares the system-generated email notification using recorded booking information. / 4. For final approval/rejection and submitted-booking updates, VHMS addresses the notification to the Indenter as supported by the PS. / 5. VHMS records/initiates the notification event without modeling central email delivery infrastructure as part of VHMS.",
+    "expected_result": "Required VHMS booking-lifecycle notification event is recorded/initiated for delivery.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-023-ALT-01",
+    "source_id": "UC-VH-023 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Generate Booking Lifecycle Notifications.",
+    "preconditions": "The corresponding booking event exists and the information needed to identify the applicable notification context is recorded.",
+    "action_or_input": "1. For generic booking-submission notification, the PS requires the notification but does not state the recipient; the implementation/configuration must not invent a recipient in this specification.",
+    "expected_result": "1. For generic booking-submission notification, the PS requires the notification but does not state the recipient; the implementation/configuration must not invent a recipient in this specification.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-023-ALT-02",
+    "source_id": "UC-VH-023 Alternative Flow 2",
+    "purpose": "Exercise the specified alternative flow for Generate Booking Lifecycle Notifications.",
+    "preconditions": "The corresponding booking event exists and the information needed to identify the applicable notification context is recorded.",
+    "action_or_input": "2. Different modification/cancellation update events use the same event-triggered service with event-specific content.",
+    "expected_result": "2. Different modification/cancellation update events use the same event-triggered service with event-specific content.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-024-MAIN",
+    "source_id": "UC-VH-024 Main Flow",
+    "purpose": "Exercise the main success flow for Generate Stay Reminders and Exception Alerts.",
+    "preconditions": "A booking/stay record contains the applicable scheduled arrival/departure or approved-duration information.",
+    "action_or_input": "1. The relevant time condition is reached. / 2. VHMS evaluates the recorded stay status against the condition. / 3. For a no-show condition, VHMS generates and records the no-show alert. / 4. For an overstay condition, VHMS generates and records the overstay/delayed-checkout alert. / 5. For configured check-in/check-out reminder events, VHMS triggers the required system-generated email reminder. / 6. VHMS makes the resulting alert/reminder information available to the appropriate recorded recipient/context without treating time or System as a UC actor.",
+    "expected_result": "Applicable reminder or stay-exception alert is recorded/initiated.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-024-ALT-01",
+    "source_id": "UC-VH-024 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Generate Stay Reminders and Exception Alerts.",
+    "preconditions": "A booking/stay record contains the applicable scheduled arrival/departure or approved-duration information.",
+    "action_or_input": "1. If check-in has already been recorded, the no-show branch does not execute.",
+    "expected_result": "1. If check-in has already been recorded, the no-show branch does not execute.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-024-ALT-02",
+    "source_id": "UC-VH-024 Alternative Flow 2",
+    "purpose": "Exercise the specified alternative flow for Generate Stay Reminders and Exception Alerts.",
+    "preconditions": "A booking/stay record contains the applicable scheduled arrival/departure or approved-duration information.",
+    "action_or_input": "2. If checkout has been recorded within the approved stay duration, the overstay branch does not execute.",
+    "expected_result": "2. If checkout has been recorded within the approved stay duration, the overstay branch does not execute.",
+    "test_type": "alternative"
+  },
+  {
+    "test_id": "UC-024-EXC-01",
+    "source_id": "UC-VH-024 Exception Flow 1",
+    "purpose": "Exercise the specified exception flow for Generate Stay Reminders and Exception Alerts.",
+    "preconditions": "A booking/stay record contains the applicable scheduled arrival/departure or approved-duration information.",
+    "action_or_input": "The PS does not define the exact reminder schedule or all email-recipient details; these are not invented.",
+    "expected_result": "The PS does not define the exact reminder schedule or all email-recipient details; these are not invented.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "UC-025-MAIN",
+    "source_id": "UC-VH-025 Main Flow",
+    "purpose": "Exercise the main success flow for Generate Inventory Threshold Alert and Notification.",
+    "preconditions": "The inventory item has a current quantity and minimum threshold recorded in VHMS.",
+    "action_or_input": "1. VHMS evaluates current quantity against the recorded minimum threshold after the inventory record is stored/updated. / 2. If current quantity is below threshold, VHMS records an inventory threshold alert. / 3. VHMS triggers the corresponding system-generated email notification to the Caretaker. / 4. VHMS retains the alert for operational follow-up.",
+    "expected_result": "Below-threshold condition has a recorded alert and corresponding notification event.",
+    "test_type": "success"
+  },
+  {
+    "test_id": "UC-025-ALT-01",
+    "source_id": "UC-VH-025 Alternative Flow 1",
+    "purpose": "Exercise the specified alternative flow for Generate Inventory Threshold Alert and Notification.",
+    "preconditions": "The inventory item has a current quantity and minimum threshold recorded in VHMS.",
+    "action_or_input": "1. If current quantity is at or above the threshold, no threshold alert is generated.",
+    "expected_result": "1. If current quantity is at or above the threshold, no threshold alert is generated.",
+    "test_type": "alternative"
+  }
+]
