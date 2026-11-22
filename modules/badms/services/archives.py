@@ -53,7 +53,7 @@ def classify(*, request_id: int, actor, classification: str) -> ArchiveRequest:
     AuditEvent.objects.create(
         actor_user_id=actor.user_id, department=row.department,
         action="archive.classify", object_type="archive_request",
-        object_id=str(row.pk), outcome=row.status,
+        object_id=str(row.pk), outcome=row.status[:40],
         details={"classification": classification})
     if classification == "Sensitive":
         notifications.enqueue(settings.BADMS_IT_SECURITY_EMAILS,

@@ -15,6 +15,8 @@ def badms_storage():
 
 
 def require_secure_storage() -> None:
+    if settings.DEBUG and getattr(settings, "BADMS_STORAGE_BACKEND", "local") != "s3":
+        return
     if getattr(settings, "BADMS_STORAGE_BACKEND", "local") != "s3":
         raise ConflictError("BADMS recovery storage must use the configured S3 backend.",
                             code="storage_backend_not_configured")

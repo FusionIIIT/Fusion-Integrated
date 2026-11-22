@@ -13,10 +13,26 @@ from modules.badms.models import (
 )
 
 
+class OwnersField(serializers.Field):
+    def to_internal_value(self, data):
+        if isinstance(data, list):
+            return data
+        if isinstance(data, str):
+            import json
+            try:
+                parsed = json.loads(data)
+                if isinstance(parsed, list):
+                    return parsed
+                return [str(parsed)]
+            except Exception:
+                return [p.strip() for p in data.split(",") if p.strip()]
+        raise serializers.ValidationError("Value must be a list or string.")
+
+
 class ArchiveCreateSerializer(serializers.Serializer):
     file_name = serializers.CharField(max_length=255)
     file_date = serializers.DateField()
-    owners = serializers.JSONField()
+    owners = OwnersField()
     file_type = serializers.CharField(max_length=80)
     reason = serializers.CharField(max_length=4000)
     initial_classification = serializers.ChoiceField(

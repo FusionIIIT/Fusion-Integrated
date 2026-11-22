@@ -393,8 +393,8 @@ class BackupScheduleCollectionView(APIView):
     def get(self, request):
         actor = request.principal
         rows = BackupSchedule.objects.all()
-        if not actor.has_permission("badms.schedule.global.manage"):
-            if actor.has_permission("badms.schedule.local.manage"):
+        if not actor.has_permission("badms.schedule_global.manage"):
+            if actor.has_permission("badms.schedule_local.manage"):
                 rows = rows.filter(scope="local")
             else:
                 raise PermissionDeniedError("You do not have permission to view schedules.")
