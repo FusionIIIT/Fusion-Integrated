@@ -1,0 +1,245 @@
+[
+  {
+    "test_id": "UC-TEST-001",
+    "source_id": "UC-SA-001 Main Flow",
+    "purpose": "Execute Create Basic User",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "Provide valid user details and user_type STUDENT",
+    "expected_result": "User created in ACTIVE state",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-002",
+    "source_id": "UC-SA-002 Main Flow",
+    "purpose": "Execute View User Profile",
+    "preconditions": "User exists in system",
+    "action_or_input": "Fetch user profile by user_id",
+    "expected_result": "User profile returned with all current attributes",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-003",
+    "source_id": "UC-SA-003 Main Flow",
+    "purpose": "Execute Update User Profile",
+    "preconditions": "User exists in system",
+    "action_or_input": "Update department and batch",
+    "expected_result": "User profile updated and audit logged",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-004",
+    "source_id": "UC-SA-004 Main Flow",
+    "purpose": "Execute Deactivate User",
+    "preconditions": "User is ACTIVE",
+    "action_or_input": "Submit deactivation with valid reason and step-up auth",
+    "expected_result": "User status becomes DEACTIVATED",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-005",
+    "source_id": "UC-SA-005 Main Flow",
+    "purpose": "Execute Reactivate User",
+    "preconditions": "User is DEACTIVATED",
+    "action_or_input": "Submit reactivation with valid reason",
+    "expected_result": "User status restored to ACTIVE",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-006",
+    "source_id": "UC-SA-006 Main Flow",
+    "purpose": "Execute Bulk Create Users",
+    "preconditions": "Valid CSV provided",
+    "action_or_input": "POST /users/bulk-create/ with batch of users",
+    "expected_result": "Bulk creation succeeds with report",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-007",
+    "source_id": "UC-SA-007 Main Flow",
+    "purpose": "Execute Bulk User Status Update",
+    "preconditions": "Target users exist",
+    "action_or_input": "POST /users/bulk-status/ with DEACTIVATED",
+    "expected_result": "Target users updated to DEACTIVATED",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-008",
+    "source_id": "UC-SA-008 Main Flow",
+    "purpose": "Execute Assign Role",
+    "preconditions": "Eligible user exists",
+    "action_or_input": "Assign additional role with valid dates",
+    "expected_result": "Role assigned in ACTIVE or SCHEDULED status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-009",
+    "source_id": "UC-SA-009 Main Flow",
+    "purpose": "Execute Reassign Role",
+    "preconditions": "Active role assignment exists",
+    "action_or_input": "Reassign role with handover summary",
+    "expected_result": "Old role revoked, new role assigned to successor",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-010",
+    "source_id": "UC-SA-010 Main Flow",
+    "purpose": "Execute Revoke Role",
+    "preconditions": "Active role exists",
+    "action_or_input": "Revoke role with reason",
+    "expected_result": "Role status changed to REVOKED",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-011",
+    "source_id": "UC-SA-011 Main Flow",
+    "purpose": "Execute Extend Role Validity",
+    "preconditions": "Active role exists",
+    "action_or_input": "Extend role validity to future date",
+    "expected_result": "Role valid_to extended",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-012",
+    "source_id": "UC-SA-012 Main Flow",
+    "purpose": "Execute View Role Metadata",
+    "preconditions": "Role assignments exist",
+    "action_or_input": "List and filter role assignments",
+    "expected_result": "Role metadata and holders returned",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-013",
+    "source_id": "UC-SA-013 Main Flow",
+    "purpose": "Execute Switch Active Role",
+    "preconditions": "User holds multiple valid roles",
+    "action_or_input": "Select active role context",
+    "expected_result": "Session context switches to selected active role",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-014",
+    "source_id": "UC-SA-014 Main Flow",
+    "purpose": "Execute Access Module by Active Role",
+    "preconditions": "Active role selected",
+    "action_or_input": "Request module resource",
+    "expected_result": "Authorized if active role has permission, denied otherwise",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-015",
+    "source_id": "UC-SA-015 Main Flow",
+    "purpose": "Execute Archive User (BW-SA-08 Transition 1)",
+    "preconditions": "User DEACTIVATED > 30 days",
+    "action_or_input": "Submit user archival",
+    "expected_result": "User transitions to ARCHIVED_REVERSIBLE with 90-day expiry",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-016",
+    "source_id": "UC-SA-016 Main Flow",
+    "purpose": "Execute Archive Historical Data",
+    "preconditions": "Inactive dataset meets retention threshold",
+    "action_or_input": "Archive historical records with backup reference",
+    "expected_result": "Historical archive created",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-017",
+    "source_id": "UC-SA-017 Main Flow",
+    "purpose": "Execute Search and View Archived Records",
+    "preconditions": "Archived records exist",
+    "action_or_input": "Query archive records with filters",
+    "expected_result": "Read-only archive records returned",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-018",
+    "source_id": "UC-SA-018 Main Flow",
+    "purpose": "Execute Restore Archived User within window",
+    "preconditions": "User in ARCHIVED_REVERSIBLE within 90 days",
+    "action_or_input": "Submit user restoration",
+    "expected_result": "User restored to ACTIVE status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-019",
+    "source_id": "UC-SA-018 Alternative A1",
+    "purpose": "Execute Restore Archived User after window expiry (BW-SA-08)",
+    "preconditions": "User in ARCHIVED_REVERSIBLE with expired window",
+    "action_or_input": "Submit user restoration",
+    "expected_result": "Action refused with 409 and user finalized as ARCHIVED_PERMANENT",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-020",
+    "source_id": "UC-SA-019 Main Flow",
+    "purpose": "Execute Restore Archived Historical Data",
+    "preconditions": "Archived dataset exists",
+    "action_or_input": "Submit historical dataset restoration",
+    "expected_result": "Dataset restored to active system",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-021",
+    "source_id": "UC-SA-020 Main Flow",
+    "purpose": "Execute Generate and Export Archive Report",
+    "preconditions": "Archive records exist",
+    "action_or_input": "Export archive status report",
+    "expected_result": "200 OK returning report payload",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-022",
+    "source_id": "UC-SA-021 Main Flow",
+    "purpose": "Execute Export Archived Data for External Storage",
+    "preconditions": "Archived records exist",
+    "action_or_input": "Download export archive payload",
+    "expected_result": "Archived dataset exported",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-023",
+    "source_id": "UC-SA-022 Main Flow",
+    "purpose": "Execute Request Permanent Data Purge",
+    "preconditions": "Archived data is retention-expired",
+    "action_or_input": "Submit purge request with reason",
+    "expected_result": "Purge request created in REQUESTED status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-024",
+    "source_id": "UC-SA-023 Main Flow",
+    "purpose": "Execute Authorize Permanent Data Purge",
+    "preconditions": "Purge request in REQUESTED status",
+    "action_or_input": "IT Head approves purge request",
+    "expected_result": "Request AUTHORIZED and data permanently PURGED",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-025",
+    "source_id": "UC-SA-024 Main Flow",
+    "purpose": "Execute View Audit Log",
+    "preconditions": "Audit logs exist",
+    "action_or_input": "Query audit logs by actor and event",
+    "expected_result": "Immutable audit log list returned",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-026",
+    "source_id": "UC-SA-025 Main Flow",
+    "purpose": "Execute Generate Audit Report",
+    "preconditions": "Audit logs exist",
+    "action_or_input": "Export compliance audit log report",
+    "expected_result": "Audit log export data returned",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-027",
+    "source_id": "UC-SA-026 Main Flow",
+    "purpose": "Execute View Super Admin Dashboard",
+    "preconditions": "System records exist",
+    "action_or_input": "GET /superadmin/dashboard/",
+    "expected_result": "Dashboard summary metrics returned",
+    "test_type": "functional"
+  }
+]

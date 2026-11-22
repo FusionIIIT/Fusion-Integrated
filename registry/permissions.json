@@ -278,6 +278,245 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "superadmin": {
+      "grants": {
+        "Director": [
+          "superadmin.audit_log.view",
+          "superadmin.purge.approve"
+        ],
+        "IT Head": [
+          "superadmin.audit_log.view",
+          "superadmin.purge.approve"
+        ],
+        "Super Admin": [
+          "superadmin.archive.create",
+          "superadmin.archive.export",
+          "superadmin.archive.restore",
+          "superadmin.archive.view",
+          "superadmin.audit_log.export",
+          "superadmin.audit_log.view",
+          "superadmin.purge.create",
+          "superadmin.role.assign",
+          "superadmin.role.revoke",
+          "superadmin.role.update",
+          "superadmin.role.view",
+          "superadmin.system_config.update",
+          "superadmin.system_config.view",
+          "superadmin.user.create",
+          "superadmin.user.delete",
+          "superadmin.user.export",
+          "superadmin.user.import",
+          "superadmin.user.restore",
+          "superadmin.user.update",
+          "superadmin.user.view"
+        ],
+        "iam_admin": [
+          "superadmin.archive.create",
+          "superadmin.archive.export",
+          "superadmin.archive.restore",
+          "superadmin.archive.view",
+          "superadmin.audit_log.export",
+          "superadmin.audit_log.view",
+          "superadmin.purge.create",
+          "superadmin.role.assign",
+          "superadmin.role.revoke",
+          "superadmin.role.update",
+          "superadmin.role.view",
+          "superadmin.system_config.update",
+          "superadmin.system_config.view",
+          "superadmin.user.create",
+          "superadmin.user.delete",
+          "superadmin.user.export",
+          "superadmin.user.import",
+          "superadmin.user.restore",
+          "superadmin.user.update",
+          "superadmin.user.view"
+        ],
+        "super_admin": [
+          "superadmin.archive.create",
+          "superadmin.archive.export",
+          "superadmin.archive.restore",
+          "superadmin.archive.view",
+          "superadmin.audit_log.export",
+          "superadmin.audit_log.view",
+          "superadmin.purge.create",
+          "superadmin.role.assign",
+          "superadmin.role.revoke",
+          "superadmin.role.update",
+          "superadmin.role.view",
+          "superadmin.system_config.update",
+          "superadmin.system_config.view",
+          "superadmin.user.create",
+          "superadmin.user.delete",
+          "superadmin.user.export",
+          "superadmin.user.import",
+          "superadmin.user.restore",
+          "superadmin.user.update",
+          "superadmin.user.view"
+        ]
+      },
+      "module_grants": [
+        "Director",
+        "IT Head",
+        "Super Admin",
+        "iam_admin",
+        "super_admin"
+      ],
+      "nav": {
+        "base_path": "/superadmin",
+        "icon": "ShieldCheck",
+        "items": [
+          {
+            "code": "superadmin.dashboard",
+            "icon": "ChartBar",
+            "label": "Dashboard",
+            "required_permission": "superadmin.user.view",
+            "sort_order": 10,
+            "to": "/superadmin/dashboard"
+          },
+          {
+            "code": "superadmin.users",
+            "icon": "Users",
+            "label": "User Accounts",
+            "required_permission": "superadmin.user.view",
+            "sort_order": 20,
+            "to": "/superadmin/users"
+          },
+          {
+            "code": "superadmin.roles",
+            "icon": "IdentificationBadge",
+            "label": "Role Assignments",
+            "required_permission": "superadmin.role.view",
+            "sort_order": 30,
+            "to": "/superadmin/roles"
+          },
+          {
+            "code": "superadmin.archive",
+            "icon": "Archive",
+            "label": "Archive & Restoration",
+            "required_permission": "superadmin.archive.view",
+            "sort_order": 40,
+            "to": "/superadmin/archive"
+          },
+          {
+            "code": "superadmin.purge",
+            "icon": "Trash",
+            "label": "Purge Authorizations",
+            "required_permission": "superadmin.purge.approve",
+            "sort_order": 50,
+            "to": "/superadmin/purge"
+          },
+          {
+            "code": "superadmin.audit",
+            "icon": "Scroll",
+            "label": "Audit Logs",
+            "required_permission": "superadmin.audit_log.view",
+            "sort_order": 60,
+            "to": "/superadmin/audit"
+          },
+          {
+            "code": "superadmin.config",
+            "icon": "GearSix",
+            "label": "System Policy",
+            "required_permission": "superadmin.system_config.view",
+            "sort_order": 70,
+            "to": "/superadmin/config"
+          }
+        ],
+        "label": "Super Admin",
+        "nav_section": "Administration",
+        "sort_order": 1,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "superadmin.user.view",
+          "label": "View user accounts and profiles"
+        },
+        {
+          "code": "superadmin.user.create",
+          "label": "Create new basic user accounts"
+        },
+        {
+          "code": "superadmin.user.update",
+          "label": "Update user profiles and statuses"
+        },
+        {
+          "code": "superadmin.user.delete",
+          "label": "Deactivate user accounts"
+        },
+        {
+          "code": "superadmin.user.restore",
+          "label": "Reactivate or restore user accounts"
+        },
+        {
+          "code": "superadmin.user.import",
+          "label": "Bulk import user accounts from CSV"
+        },
+        {
+          "code": "superadmin.user.export",
+          "label": "Export user account directories"
+        },
+        {
+          "code": "superadmin.role.view",
+          "label": "Inspect role definitions and assignments"
+        },
+        {
+          "code": "superadmin.role.assign",
+          "label": "Assign or reassign roles to users"
+        },
+        {
+          "code": "superadmin.role.revoke",
+          "label": "Revoke held role assignments"
+        },
+        {
+          "code": "superadmin.role.update",
+          "label": "Extend validity of active role assignments"
+        },
+        {
+          "code": "superadmin.archive.view",
+          "label": "Search and inspect archived records"
+        },
+        {
+          "code": "superadmin.archive.create",
+          "label": "Archive deactivated users or historical data"
+        },
+        {
+          "code": "superadmin.archive.restore",
+          "label": "Restore reversible archived users or data"
+        },
+        {
+          "code": "superadmin.archive.export",
+          "label": "Export archive status reports"
+        },
+        {
+          "code": "superadmin.purge.create",
+          "label": "Request permanent data purge"
+        },
+        {
+          "code": "superadmin.purge.approve",
+          "label": "Authorize permanent data purge (IT Head)"
+        },
+        {
+          "code": "superadmin.audit_log.view",
+          "label": "Inspect security and audit event logs"
+        },
+        {
+          "code": "superadmin.audit_log.export",
+          "label": "Export compliance audit reports"
+        },
+        {
+          "code": "superadmin.system_config.view",
+          "label": "View system parameter configurations"
+        },
+        {
+          "code": "superadmin.system_config.update",
+          "label": "Update system parameter policies"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",

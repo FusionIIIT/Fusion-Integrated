@@ -1,0 +1,245 @@
+[
+  {
+    "test_id": "BR-TEST-001",
+    "source_id": "BR-SA-001 condition-true",
+    "purpose": "Enforce Institute Identity uniqueness",
+    "preconditions": "User with institute_id exists",
+    "action_or_input": "Attempt duplicate institute_id creation",
+    "expected_result": "Refused with duplicate error",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-TEST-002",
+    "source_id": "BR-SA-002 condition-true",
+    "purpose": "Enforce Institute Email domain restriction",
+    "preconditions": "Valid email format",
+    "action_or_input": "Validate @iiitdmj.ac.in email",
+    "expected_result": "Validation passes",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-003",
+    "source_id": "BR-SA-002 condition-false",
+    "purpose": "Reject non-institutional email domain",
+    "preconditions": "Public email format",
+    "action_or_input": "Validate @gmail.com email",
+    "expected_result": "ValidationDomainError raised",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TEST-004",
+    "source_id": "BR-SA-003 condition-true",
+    "purpose": "Validate user-type specific required data",
+    "preconditions": "Student user type",
+    "action_or_input": "Ensure program and batch are provided",
+    "expected_result": "Validation passes",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-005",
+    "source_id": "BR-SA-004 condition-true",
+    "purpose": "Validate user archival eligibility threshold",
+    "preconditions": "Deactivated user",
+    "action_or_input": "Verify min 30 days elapsed since deactivation",
+    "expected_result": "Eligible for archival",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-006",
+    "source_id": "BR-SA-005 condition-true",
+    "purpose": "Allow restoration within reversibility window",
+    "preconditions": "ARCHIVED_REVERSIBLE user",
+    "action_or_input": "Restore within 90 days of archival",
+    "expected_result": "Restoration successful, status ACTIVE",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-007",
+    "source_id": "BR-SA-005 condition-false",
+    "purpose": "Refuse restoration after reversibility window expiry (BW-SA-08)",
+    "preconditions": "ARCHIVED_REVERSIBLE user",
+    "action_or_input": "Attempt restoration after 90 days past archival",
+    "expected_result": "Restoration refused; status finalized to ARCHIVED_PERMANENT",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-008",
+    "source_id": "BR-SA-006 condition-true",
+    "purpose": "Allow multiple non-conflicting concurrent roles",
+    "preconditions": "User holds Advisor role",
+    "action_or_input": "Assign Course Instructor role",
+    "expected_result": "Both roles active simultaneously",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-009",
+    "source_id": "BR-SA-007 condition-true",
+    "purpose": "Prevent dual occupancy of singular roles",
+    "preconditions": "Dean role held by User A",
+    "action_or_input": "Attempt to assign Dean to User B",
+    "expected_result": "Refused with singular role conflict",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TEST-010",
+    "source_id": "BR-SA-008 condition-true",
+    "purpose": "Validate role assignment validity dates",
+    "preconditions": "valid_from and valid_to provided",
+    "action_or_input": "valid_from <= valid_to",
+    "expected_result": "Dates accepted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-011",
+    "source_id": "BR-SA-009 condition-true",
+    "purpose": "Automatic activation of scheduled future-dated roles",
+    "preconditions": "Role in SCHEDULED status",
+    "action_or_input": "Celery task runs at valid_from",
+    "expected_result": "Role transitions to ACTIVE",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-012",
+    "source_id": "BR-SA-009 condition-true-expiry",
+    "purpose": "Automatic expiry of elapsed time-bound roles",
+    "preconditions": "Role in ACTIVE status",
+    "action_or_input": "Celery task runs after valid_to",
+    "expected_result": "Role transitions to EXPIRED",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-013",
+    "source_id": "BR-SA-010 condition-false",
+    "purpose": "Reject student assignment to governance roles",
+    "preconditions": "Student user",
+    "action_or_input": "Attempt assigning Dean role",
+    "expected_result": "Refused with policy violation",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TEST-014",
+    "source_id": "BR-SA-011 condition-false",
+    "purpose": "Validate and reject conflicting role assignments",
+    "preconditions": "User holds Exam Officer",
+    "action_or_input": "Attempt assigning Student Welfare role",
+    "expected_result": "Refused with conflict of interest",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-TEST-015",
+    "source_id": "BR-SA-012 condition-true",
+    "purpose": "Enforce handover record on role reassignment",
+    "preconditions": "Active role assignment",
+    "action_or_input": "Reassign role to successor",
+    "expected_result": "Handover record created and old role revoked",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-016",
+    "source_id": "BR-SA-013 condition-true",
+    "purpose": "Grant previous role holder read-only audit access",
+    "preconditions": "Handover completed",
+    "action_or_input": "Query records created during tenure",
+    "expected_result": "Read-only access permitted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-017",
+    "source_id": "BR-SA-014 condition-true",
+    "purpose": "Allow emergency role revocation",
+    "preconditions": "Active role assignment",
+    "action_or_input": "Execute immediate role revocation",
+    "expected_result": "Role status changed to REVOKED",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-018",
+    "source_id": "BR-SA-015 condition-true",
+    "purpose": "Account deactivation cascades to role suspension",
+    "preconditions": "User with active roles",
+    "action_or_input": "Deactivate user account",
+    "expected_result": "All held active roles revoked/suspended",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-019",
+    "source_id": "BR-SA-016 condition-true",
+    "purpose": "Allow extension of active role validity",
+    "preconditions": "Active role assignment",
+    "action_or_input": "Submit extension before valid_to",
+    "expected_result": "New valid_to saved",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-020",
+    "source_id": "BR-SA-017 condition-true",
+    "purpose": "Validate historical data archival eligibility",
+    "preconditions": "Inactive records",
+    "action_or_input": "Check retention threshold met",
+    "expected_result": "Records eligible for archive",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-021",
+    "source_id": "BR-SA-018 condition-true",
+    "purpose": "Require verified snapshot backup before archival",
+    "preconditions": "Dataset for archival",
+    "action_or_input": "Verify backup reference exists",
+    "expected_result": "Archival permitted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-022",
+    "source_id": "BR-SA-019 condition-true",
+    "purpose": "Enforce archive retention period before purge",
+    "preconditions": "Archived record",
+    "action_or_input": "Calculate purge_eligible_at based on retention_days",
+    "expected_result": "purge_eligible_at correctly set >= 365 days",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-023",
+    "source_id": "BR-SA-020 condition-true",
+    "purpose": "Archived records are strictly read-only",
+    "preconditions": "Archived dataset",
+    "action_or_input": "Attempt mutation of archived payload",
+    "expected_result": "Direct modification prevented",
+    "test_type": "security"
+  },
+  {
+    "test_id": "BR-TEST-024",
+    "source_id": "BR-SA-021 condition-true",
+    "purpose": "Permanent purge permitted only after retention expiry",
+    "preconditions": "Archived dataset",
+    "action_or_input": "Validate purge eligibility",
+    "expected_result": "Permitted only if purge_eligible_at <= now",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-025",
+    "source_id": "BR-SA-022 condition-true",
+    "purpose": "Enforce separation of duties for permanent purge",
+    "preconditions": "Purge request",
+    "action_or_input": "Requester and authorizer compared",
+    "expected_result": "Dual authorization satisfied only if users differ",
+    "test_type": "security"
+  },
+  {
+    "test_id": "BR-TEST-026",
+    "source_id": "BR-SA-025 condition-true",
+    "purpose": "Audit logs are append-only and immutable",
+    "preconditions": "Audit log entry",
+    "action_or_input": "Attempt update or delete on audit log",
+    "expected_result": "Action blocked with ImmutableRecordError",
+    "test_type": "security"
+  },
+  {
+    "test_id": "BR-TEST-027",
+    "source_id": "BR-SA-035 condition-true",
+    "purpose": "Permitted system configuration boundary",
+    "preconditions": "Config parameter",
+    "action_or_input": "Create versioned parameter entry",
+    "expected_result": "New version active, history preserved",
+    "test_type": "functional"
+  }
+]

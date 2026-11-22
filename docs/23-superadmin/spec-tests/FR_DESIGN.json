@@ -1,0 +1,290 @@
+[
+  {
+    "test_id": "FR-TEST-001",
+    "source_id": "CFR-SA-001",
+    "purpose": "Verify creation of a basic Student user account",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "Provide valid user_id, institute_id, email, type STUDENT, program, batch",
+    "expected_result": "User account created with ACTIVE status and baseline profile",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-002",
+    "source_id": "CFR-SA-001",
+    "purpose": "Verify creation of a basic Faculty user account",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "Provide valid user_id, institute_id, email, type FACULTY, department",
+    "expected_result": "Faculty account created with ACTIVE status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-003",
+    "source_id": "CFR-SA-001",
+    "purpose": "Verify creation of a basic Staff user account",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "Provide valid user_id, institute_id, email, type STAFF, department",
+    "expected_result": "Staff account created with ACTIVE status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-004",
+    "source_id": "CFR-SA-001-N1",
+    "purpose": "Refuse user creation with non-institutional email",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "Provide email with public domain (e.g. user@gmail.com)",
+    "expected_result": "Action refused with 400 validation error",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-TEST-005",
+    "source_id": "CFR-SA-001-N2",
+    "purpose": "Refuse user creation with duplicate institute_id",
+    "preconditions": "User with institute_id exists",
+    "action_or_input": "Attempt to create another user with same institute_id",
+    "expected_result": "Action refused with 400/409 duplicate identifier error",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-TEST-006",
+    "source_id": "CFR-SA-002",
+    "purpose": "View user profile data by user_id",
+    "preconditions": "User account exists",
+    "action_or_input": "GET /users/{user_id}/",
+    "expected_result": "200 OK returning full profile metadata",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-007",
+    "source_id": "CFR-SA-002-U1",
+    "purpose": "Update editable profile fields for existing user",
+    "preconditions": "User account exists",
+    "action_or_input": "PATCH /users/{user_id}/ with department or program",
+    "expected_result": "200 OK returning updated profile fields",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-008",
+    "source_id": "CFR-SA-002-N1",
+    "purpose": "Refuse update to immutable identity fields",
+    "preconditions": "User account exists",
+    "action_or_input": "Attempt to modify institute_id or user_id",
+    "expected_result": "Immutable fields remain untouched and unchanged",
+    "test_type": "security"
+  },
+  {
+    "test_id": "FR-TEST-009",
+    "source_id": "CFR-SA-003-D1",
+    "purpose": "Deactivate an active user account",
+    "preconditions": "User account is ACTIVE",
+    "action_or_input": "POST /users/{user_id}/deactivate/ with reason and step-up auth",
+    "expected_result": "Status changes to DEACTIVATED with timestamp and audit entry",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-010",
+    "source_id": "CFR-SA-003-R1",
+    "purpose": "Reactivate a deactivated user account",
+    "preconditions": "User account is DEACTIVATED",
+    "action_or_input": "POST /users/{user_id}/reactivate/ with justification",
+    "expected_result": "Status changes back to ACTIVE with audit entry",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-011",
+    "source_id": "CFR-SA-003-N1",
+    "purpose": "Refuse deactivation without step-up authentication",
+    "preconditions": "User is ACTIVE; no step-up auth",
+    "action_or_input": "POST /users/{user_id}/deactivate/ without step-up token",
+    "expected_result": "Action refused with 403 step_up_auth_required",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-TEST-012",
+    "source_id": "CFR-SA-004-B1",
+    "purpose": "Bulk create users from CSV batch",
+    "preconditions": "Valid CSV with student rows",
+    "action_or_input": "POST /users/bulk-create/ with batch of 5 records",
+    "expected_result": "All 5 accounts created; summary reports 5 successes, 0 errors",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-013",
+    "source_id": "CFR-SA-004-B2",
+    "purpose": "Bulk status update for user accounts",
+    "preconditions": "Target accounts are ACTIVE",
+    "action_or_input": "POST /users/bulk-status/ with list of user_ids to DEACTIVATED",
+    "expected_result": "Target accounts transitioned to DEACTIVATED; batch logged",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-014",
+    "source_id": "CFR-SA-004-N1",
+    "purpose": "Refuse bulk batch exceeding maximum limit",
+    "preconditions": "Batch size 501 (limit 500)",
+    "action_or_input": "POST /users/bulk-create/ with 501 records",
+    "expected_result": "Action refused with 400 validation error",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-TEST-015",
+    "source_id": "CFR-SA-005",
+    "purpose": "Inspect role definitions and assignment metadata",
+    "preconditions": "Role assignments exist in DB",
+    "action_or_input": "GET /roles/ with filters",
+    "expected_result": "200 OK returning role assignments and metadata",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-016",
+    "source_id": "CFR-SA-006-A1",
+    "purpose": "Assign additional role with validity dates",
+    "preconditions": "Eligible faculty user",
+    "action_or_input": "POST /roles/ with role_name, valid_from, valid_to",
+    "expected_result": "Role assignment created in ACTIVE/SCHEDULED status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-017",
+    "source_id": "CFR-SA-006-N1",
+    "purpose": "Refuse singular role assignment when already occupied",
+    "preconditions": "Singular role Dean actively held by User A",
+    "action_or_input": "Attempt to assign Dean to User B",
+    "expected_result": "Refused with 409 singular role conflict",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-TEST-018",
+    "source_id": "CFR-SA-007",
+    "purpose": "Reassign existing role with handover transfer",
+    "preconditions": "Active role assignment held by User A",
+    "action_or_input": "POST /roles/{id}/reassign/ with successor User B and summary",
+    "expected_result": "Old role revoked, new role assigned, handover logged",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-019",
+    "source_id": "CFR-SA-008-R1",
+    "purpose": "Revoke held additional role",
+    "preconditions": "Active role assignment exists",
+    "action_or_input": "POST /roles/{id}/revoke/ with reason",
+    "expected_result": "Role status changed to REVOKED",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-020",
+    "source_id": "CFR-SA-009-E1",
+    "purpose": "Extend validity of active role assignment",
+    "preconditions": "Active role nearing expiry",
+    "action_or_input": "POST /roles/{id}/extend/ with new valid_to and justification",
+    "expected_result": "Role validity extended with updated valid_to timestamp",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-021",
+    "source_id": "CFR-SA-010",
+    "purpose": "Enforce access boundary by active role permissions",
+    "preconditions": "User holds multiple roles",
+    "action_or_input": "Switch active role and query endpoints",
+    "expected_result": "Access granted only to endpoints authorized for active role",
+    "test_type": "security"
+  },
+  {
+    "test_id": "FR-TEST-022",
+    "source_id": "CFR-SA-011-A1",
+    "purpose": "Archive eligible deactivated user",
+    "preconditions": "User DEACTIVATED > 30 days",
+    "action_or_input": "POST /users/{user_id}/archive/ with reason",
+    "expected_result": "Status transitions to ARCHIVED_REVERSIBLE; reversibility_expires_at set",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-023",
+    "source_id": "CFR-SA-011-N1",
+    "purpose": "Refuse archival of active user account",
+    "preconditions": "User is ACTIVE",
+    "action_or_input": "Attempt to archive user directly",
+    "expected_result": "Refused with 409 invalid state transition",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-TEST-024",
+    "source_id": "CFR-SA-012-R1",
+    "purpose": "Restore archived user within reversibility window",
+    "preconditions": "User is ARCHIVED_REVERSIBLE within 90 days",
+    "action_or_input": "POST /users/{user_id}/restore/ with reason",
+    "expected_result": "User status restored to ACTIVE; restoration audit logged",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-025",
+    "source_id": "CFR-SA-012-E1",
+    "purpose": "Refuse restoration of expired reversible user (BW-SA-08)",
+    "preconditions": "User is ARCHIVED_REVERSIBLE with past reversibility_expires_at",
+    "action_or_input": "POST /users/{user_id}/restore/ with reason",
+    "expected_result": "Refused with 409 conflict and user committed to ARCHIVED_PERMANENT",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-026",
+    "source_id": "CFR-SA-013",
+    "purpose": "Archive historical inactive dataset",
+    "preconditions": "Historical dataset with retention threshold met",
+    "action_or_input": "POST /archive/ with payload and backup_reference",
+    "expected_result": "Historical archive record created with retention schedule",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-027",
+    "source_id": "CFR-SA-014",
+    "purpose": "Search and export archived records",
+    "preconditions": "Archived records exist",
+    "action_or_input": "GET /archive/export/",
+    "expected_result": "200 OK returning read-only archive dataset",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-028",
+    "source_id": "CFR-SA-015",
+    "purpose": "Restore archived historical dataset",
+    "preconditions": "Archived dataset exists",
+    "action_or_input": "POST /archive/{id}/restore/ with authorization",
+    "expected_result": "Historical dataset restored to active state",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-029",
+    "source_id": "CFR-SA-016-P1",
+    "purpose": "Request permanent data purge",
+    "preconditions": "Archived record eligible for purge",
+    "action_or_input": "POST /purge/requests/ with archive_id and reason",
+    "expected_result": "Purge request created with REQUESTED status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-030",
+    "source_id": "CFR-SA-016-A1",
+    "purpose": "Dual-authorize permanent data purge by IT Head",
+    "preconditions": "Purge request in REQUESTED status",
+    "action_or_input": "POST /purge/requests/{id}/authorize/ by IT Head",
+    "expected_result": "Purge authorized; archive record permanently purged",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-031",
+    "source_id": "CFR-SA-017",
+    "purpose": "Maintain append-only immutable audit log evidence",
+    "preconditions": "Administrative actions executed",
+    "action_or_input": "Inspect AuditLogRecord entries",
+    "expected_result": "Audit entries immutable; deletion or update raises error",
+    "test_type": "security"
+  },
+  {
+    "test_id": "FR-TEST-032",
+    "source_id": "CFR-SA-023",
+    "purpose": "Configure versioned permitted system parameters",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "POST /config/ with parameter_key and JSON value",
+    "expected_result": "New versioned policy parameter record created; previous closed",
+    "test_type": "functional"
+  }
+]

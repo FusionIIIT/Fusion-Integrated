@@ -38,3 +38,29 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `superadmin`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `superadmin.user.view` | View user accounts and profiles | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.user.create` | Create new basic user accounts | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.user.update` | Update user profiles and statuses | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.user.delete` | Deactivate user accounts | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.user.restore` | Reactivate or restore user accounts | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.user.import` | Bulk import user accounts from CSV | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.user.export` | Export user account directories | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.role.view` | Inspect role definitions and assignments | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.role.assign` | Assign or reassign roles to users | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.role.revoke` | Revoke held role assignments | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.role.update` | Extend validity of active role assignments | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.archive.view` | Search and inspect archived records | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.archive.create` | Archive deactivated users or historical data | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.archive.restore` | Restore reversible archived users or data | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.archive.export` | Export archive status reports | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.purge.create` | Request permanent data purge | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.purge.approve` | Authorize permanent data purge (IT Head) | `Director`, `IT Head` |
+| `superadmin.audit_log.view` | Inspect security and audit event logs | `Director`, `IT Head`, `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.audit_log.export` | Export compliance audit reports | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.system_config.view` | View system parameter configurations | `Super Admin`, `iam_admin`, `super_admin` |
+| `superadmin.system_config.update` | Update system parameter policies | `Super Admin`, `iam_admin`, `super_admin` |
