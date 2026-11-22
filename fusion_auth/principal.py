@@ -4,9 +4,12 @@ Called `principal`, not `user`, deliberately: there is no Django user behind
 it. It is a value object built from what IAM said, and it is what every
 permission check reads.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
+
+from django.conf import settings
 
 from fusion_auth.client import IamSession
 
@@ -24,6 +27,9 @@ class Principal:
     #: Built by the IAM so one sidebar can span every Fusion app.
     navigation: tuple[dict, ...] = ()
     email: str = ""
+    department: str = ""
+    department_assignments: tuple[dict, ...] = ()
+    department_contexts: tuple[dict, ...] = ()
 
     # DRF pokes at these on request.user
     is_authenticated: bool = True
@@ -31,11 +37,23 @@ class Principal:
 
     @classmethod
     def from_session(cls, s: IamSession) -> Principal:
+        department = s.department or getattr(settings, "DEPT_DEMO_USER_DEPARTMENTS", {}).get(
+            s.user_id, ""
+        )
         return cls(
-            user_id=s.user_id, username=s.username, display_name=s.display_name,
-            kind=s.kind, active_role=s.active_role, roles=s.roles,
-            permissions=s.permissions, modules=s.modules, email=s.email,
+            user_id=s.user_id,
+            username=s.username,
+            display_name=s.display_name,
+            kind=s.kind,
+            active_role=s.active_role,
+            roles=s.roles,
+            permissions=s.permissions,
+            modules=s.modules,
+            email=s.email,
+            department=department,
             navigation=s.navigation,
+            department_assignments=s.department_assignments,
+            department_contexts=s.department_contexts,
         )
 
     def has_permission(self, code: str) -> bool:

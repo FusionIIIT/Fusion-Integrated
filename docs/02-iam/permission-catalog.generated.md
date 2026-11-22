@@ -7,6 +7,37 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `dept`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `dept.announcement.view` | View relevant announcements | `Dept_Admin`, `HOD`, `Professor`, `Student`, `faculty`, `student` |
+| `dept.announcement.create` | Publish announcements | `Dept_Admin`, `HOD`, `Professor`, `faculty` |
+| `dept.announcement.update` | Maintain active announcements | `HOD` |
+| `dept.stock_item.view` | View inventory | `Dept_Admin`, `HOD`, `Professor`, `faculty` |
+| `dept.stock_item.create` | Record inventory additions | `Dept_Admin` |
+| `dept.stock_item.update` | Manage inventory items | `Dept_Admin` |
+| `dept.stock_request.view` | View own or scoped stock requests | `Dept_Admin`, `HOD`, `Professor`, `faculty` |
+| `dept.stock_request.create` | Request stock | `Professor`, `faculty` |
+| `dept.stock_request.approve` | Approve or reject requests | `HOD` |
+| `dept.stock_request.update` | Issue or cancel approved requests | `Dept_Admin` |
+| `dept.feedback.view` | View own or scoped confidential feedback | `Dept_Admin`, `HOD`, `Professor`, `Student`, `faculty`, `student` |
+| `dept.feedback.create` | Submit feedback | `Professor`, `Student`, `faculty`, `student` |
+| `dept.feedback.review` | Review and resolve feedback | `Dept_Admin`, `HOD` |
+| `dept.profile.view` | View permitted department profiles | `Dept_Admin`, `HOD`, `Professor`, `Student`, `faculty`, `student` |
+| `dept.profile.update` | Maintain DEPT profile details | `Dept_Admin` |
+| `dept.timetable.view` | View academic timetable | `Dept_Admin`, `HOD`, `Professor`, `Student`, `faculty`, `student` |
+| `dept.timetable.create` | Create timetable entries | `Dept_Admin` |
+| `dept.timetable.update` | Update timetable entries | `Dept_Admin` |
+| `dept.resource.view` | View lab resources | `Dept_Admin`, `HOD`, `Professor`, `faculty` |
+| `dept.resource.create` | Create lab resource profiles | `Dept_Admin` |
+| `dept.resource.update` | Update lab resource profiles | `Dept_Admin` |
+| `dept.department.view` | View department information | `Dept_Admin`, `HOD`, `Professor`, `Student`, `faculty`, `student` |
+| `dept.department.update` | Update department information | `Dept_Admin` |
+| `dept.department.approve` | Approve official department changes | `HOD` |
+| `dept.notification.view` | View personal notifications | `Dept_Admin`, `HOD`, `Professor`, `Student`, `faculty`, `student` |
+| `dept.notification.update` | Mark personal notifications read | `Dept_Admin`, `HOD`, `Professor`, `Student`, `faculty`, `student` |
+
 ## `directory`
 
 | Code | What it allows | Held by |

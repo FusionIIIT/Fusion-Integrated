@@ -46,6 +46,3786 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ok'
           description: ''
+  /api/v1/dept/academic-info/:
+    get:
+      operationId: api_v1_dept_academic_info_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_academic_info_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_academic_info_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_academic_info_destroy
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/academic-info/{id}/:
+    get:
+      operationId: api_v1_dept_academic_info_id_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_academic_info_id_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_academic_info_id_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_academic_info_id_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/academic-info/{id}/{action}/:
+    get:
+      operationId: api_v1_dept_academic_info_id_action_retrieve
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_academic_info_id_action_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_academic_info_id_action_partial_update
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_academic_info_id_action_destroy
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/announcements/:
+    get:
+      operationId: api_v1_dept_announcements_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_announcements_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_announcements_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_announcements_destroy
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/announcements/{id}/:
+    get:
+      operationId: api_v1_dept_announcements_id_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_announcements_id_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_announcements_id_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_announcements_id_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/announcements/{id}/{action}/:
+    get:
+      operationId: api_v1_dept_announcements_id_action_retrieve
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_announcements_id_action_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_announcements_id_action_partial_update
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_announcements_id_action_destroy
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/details/:
+    get:
+      operationId: api_v1_dept_details_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_details_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_details_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_details_destroy
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/details/{id}/:
+    get:
+      operationId: api_v1_dept_details_id_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_details_id_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_details_id_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_details_id_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/details/{id}/{action}/:
+    get:
+      operationId: api_v1_dept_details_id_action_retrieve
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_details_id_action_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_details_id_action_partial_update
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_details_id_action_destroy
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/feedback/:
+    get:
+      operationId: api_v1_dept_feedback_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_feedback_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_feedback_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_feedback_destroy
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/feedback/{id}/:
+    get:
+      operationId: api_v1_dept_feedback_id_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_feedback_id_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_feedback_id_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_feedback_id_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/feedback/{id}/{action}/:
+    get:
+      operationId: api_v1_dept_feedback_id_action_retrieve
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_feedback_id_action_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_feedback_id_action_partial_update
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_feedback_id_action_destroy
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/inventory/:
+    get:
+      operationId: api_v1_dept_inventory_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_inventory_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_inventory_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_inventory_destroy
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/inventory/{id}/:
+    get:
+      operationId: api_v1_dept_inventory_id_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_inventory_id_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_inventory_id_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_inventory_id_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/inventory/{id}/{action}/:
+    get:
+      operationId: api_v1_dept_inventory_id_action_retrieve
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_inventory_id_action_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_inventory_id_action_partial_update
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_inventory_id_action_destroy
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/notifications/:
+    get:
+      operationId: api_v1_dept_notifications_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_notifications_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_notifications_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_notifications_destroy
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/notifications/{id}/:
+    get:
+      operationId: api_v1_dept_notifications_id_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_notifications_id_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_notifications_id_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_notifications_id_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/notifications/{id}/{action}/:
+    get:
+      operationId: api_v1_dept_notifications_id_action_retrieve
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_notifications_id_action_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_notifications_id_action_partial_update
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_notifications_id_action_destroy
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/profiles/:
+    get:
+      operationId: api_v1_dept_profiles_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_profiles_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_profiles_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_profiles_destroy
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/profiles/{id}/:
+    get:
+      operationId: api_v1_dept_profiles_id_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_profiles_id_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_profiles_id_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_profiles_id_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/profiles/{id}/{action}/:
+    get:
+      operationId: api_v1_dept_profiles_id_action_retrieve
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_profiles_id_action_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_profiles_id_action_partial_update
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_profiles_id_action_destroy
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/resources/:
+    get:
+      operationId: api_v1_dept_resources_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_resources_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_resources_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_resources_destroy
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/resources/{id}/:
+    get:
+      operationId: api_v1_dept_resources_id_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_resources_id_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_resources_id_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_resources_id_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/resources/{id}/{action}/:
+    get:
+      operationId: api_v1_dept_resources_id_action_retrieve
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_resources_id_action_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_resources_id_action_partial_update
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_resources_id_action_destroy
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/stock-requests/:
+    get:
+      operationId: api_v1_dept_stock_requests_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_stock_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_stock_requests_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_stock_requests_destroy
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/stock-requests/{id}/:
+    get:
+      operationId: api_v1_dept_stock_requests_id_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_stock_requests_id_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_stock_requests_id_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_stock_requests_id_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/stock-requests/{id}/{action}/:
+    get:
+      operationId: api_v1_dept_stock_requests_id_action_retrieve
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_stock_requests_id_action_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_stock_requests_id_action_partial_update
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_stock_requests_id_action_destroy
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/timetable/:
+    get:
+      operationId: api_v1_dept_timetable_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_timetable_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_timetable_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_timetable_destroy
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/timetable/{id}/:
+    get:
+      operationId: api_v1_dept_timetable_id_retrieve
+      parameters:
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_timetable_id_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_timetable_id_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_timetable_id_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
+  /api/v1/dept/timetable/{id}/{action}/:
+    get:
+      operationId: api_v1_dept_timetable_id_action_retrieve
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: department_code
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ScopedList:
+                  value:
+                    results: []
+                  summary: Scoped list
+          description: ''
+    post:
+      operationId: api_v1_dept_timetable_id_action_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              RequestBody:
+                value:
+                  department_code: CSE
+                  title: Lab closure notice
+                summary: Request body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    patch:
+      operationId: api_v1_dept_timetable_id_action_partial_update
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+            examples:
+              UpdateBody:
+                value:
+                  title: Updated notice
+                summary: Update body
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    delete:
+      operationId: api_v1_dept_timetable_id_action_destroy
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          content:
+            application/json:
+              schema: null
+          description: ''
   /api/v1/directory/users:
     get:
       operationId: v1_directory_users_retrieve
@@ -2315,6 +6095,38 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DepartmentAssignment:
+      type: object
+      properties:
+        department_code:
+          type: string
+        department_name:
+          type: string
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        starts_on:
+          type: string
+          format: date
+        ends_on:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - department_code
+      - department_name
+      - ends_on
+      - role
+      - starts_on
+    DepartmentContext:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+      required:
+      - code
+      - name
     Detail:
       type: object
       properties:
@@ -3466,6 +7278,14 @@ components:
       - message
       - reason
       - route
+    RoleEnum:
+      enum:
+      - HOD
+      - Dept_Admin
+      type: string
+      description: |-
+        * `HOD` - HOD
+        * `Dept_Admin` - Dept_Admin
     RoundOutcome:
       type: object
       properties:
@@ -3610,6 +7430,14 @@ components:
           type: array
           items:
             type: string
+        department_assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepartmentAssignment'
+        department_contexts:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepartmentContext'
         permissions:
           type: array
           items:
@@ -3627,6 +7455,8 @@ components:
       required:
       - active_role
       - csrf_token
+      - department_assignments
+      - department_contexts
       - modules
       - navigation
       - permissions
@@ -3649,7 +7479,10 @@ components:
             format: email
           - type: string
             maxLength: 0
+        department:
+          type: string
       required:
+      - department
       - display_name
       - email
       - id

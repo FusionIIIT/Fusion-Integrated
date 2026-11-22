@@ -3,6 +3,7 @@
 Plural by signature on purpose: there is no get_user(id), because a singular
 lookup is what gets called inside a loop.
 """
+
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -10,7 +11,7 @@ from dataclasses import dataclass
 
 from fusion_auth.client import IamUnavailable, get_client
 from modules.directory.models import UserRef
-from modules.directory.services.sync import ensure_users_cached
+from modules.directory.services.sync import ensure_department_users_cached, ensure_users_cached
 
 
 @dataclass(frozen=True)
@@ -31,10 +32,17 @@ class UserDTO:
 
 def _to_dto(r: UserRef) -> UserDTO:
     return UserDTO(
-        user_id=r.user_id, username=r.username, display_name=r.display_name,
-        kind=r.kind, email=r.email, department=r.department,
-        programme=r.programme, discipline=r.discipline, batch_year=r.batch_year,
-        resume_link=r.resume_link, profile_completed=r.profile_completed,
+        user_id=r.user_id,
+        username=r.username,
+        display_name=r.display_name,
+        kind=r.kind,
+        email=r.email,
+        department=r.department,
+        programme=r.programme,
+        discipline=r.discipline,
+        batch_year=r.batch_year,
+        resume_link=r.resume_link,
+        profile_completed=r.profile_completed,
     )
 
 
@@ -50,26 +58,48 @@ def get_users(user_ids: Sequence[int]) -> dict[int, UserDTO]:
 
 def user_ids_in_discipline(discipline: str) -> list[int]:
     return list(
-        UserRef.objects.filter(discipline=discipline, kind="student", is_active=True)
-        .values_list("user_id", flat=True)
+        UserRef.objects.filter(discipline=discipline, kind="student", is_active=True).values_list(
+            "user_id", flat=True
+        )
     )
+
+
+def users_in_department(
+    *,
+    department: str | Sequence[str],
+    kinds: Sequence[str] = (),
+    programme: str = "",
+    batch_year: int | None = None,
+) -> list[int]:
+    """Return active users in a department for audience fan-out."""
+    departments = (department,) if isinstance(department, str) else tuple(department)
+    departments = tuple(value.strip() for value in departments if value and value.strip())
+    ensure_department_users_cached(departments, kinds)
+    qs = UserRef.objects.filter(department__in=departments, is_active=True)
+    if kinds:
+        qs = qs.filter(kind__in=tuple(kinds))
+    if programme:
+        qs = qs.filter(programme=programme)
+    if batch_year is not None:
+        qs = qs.filter(batch_year=batch_year)
+    return list(qs.order_by("user_id").values_list("user_id", flat=True))
 
 
 def get_employees() -> list[UserDTO]:
     """Everyone on the payroll: faculty and staff, not students."""
     return [
         _to_dto(r)
-        for r in UserRef.objects.filter(
-            kind__in=("faculty", "staff"), is_active=True
-        ).order_by("user_id")
+        for r in UserRef.objects.filter(kind__in=("faculty", "staff"), is_active=True).order_by(
+            "user_id"
+        )
     ]
 
 
 def held_employee_ids() -> set[int]:
     return set(
-        UserRef.objects.filter(
-            kind__in=("faculty", "staff"), is_active=True
-        ).values_list("user_id", flat=True)
+        UserRef.objects.filter(kind__in=("faculty", "staff"), is_active=True).values_list(
+            "user_id", flat=True
+        )
     )
 
 

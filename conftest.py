@@ -1,5 +1,6 @@
 """Shared fixtures. `stub_iam` replaces the IAM client with an in-memory fake,
 so the suite runs with no network and no Fusion_System_Administrator."""
+
 import sys
 
 import pytest
@@ -19,13 +20,14 @@ class FakeIam:
         self.employees = None
         self.standings = standings or {}
         self.calls = []
-        self.login_result = "tok-123"      # override per test
+        self.login_result = "tok-123"  # override per test
         self.login_error = None
         self.login_client_ip = None
         self.standings_error = None
         self.directory_error = None
         self.directory = {"count": 0, "limit": 50, "offset": 0, "results": []}
         self.filters = {"disciplines": [], "batch_years": [], "programmes": []}
+        self.department_appointments = {}
 
     def login(self, username, password, client_ip=None):
         self.calls.append(("login", username))
@@ -51,8 +53,18 @@ class FakeIam:
 
     def employee_page(self, *, limit=500, offset=0):
         rows = self._employees()
-        return {"count": len(rows), "limit": limit, "offset": offset,
-                "results": rows[offset:offset + limit]}
+        return {
+            "count": len(rows),
+            "limit": limit,
+            "offset": offset,
+            "results": rows[offset : offset + limit],
+        }
+
+    def iter_department_users(self, *, department, kind, page_size=500):
+        return iter(
+            user for user in self.users.values()
+            if user.department.casefold() == department.casefold() and user.kind == kind
+        )
 
     def count_employees(self):
         return len(self._employees())
@@ -65,8 +77,8 @@ class FakeIam:
         if self.employees is not None:
             return list(self.employees)
         from modules.directory.models import UserRef
-        return list(UserRef.objects.filter(
-            kind__in=("faculty", "staff"), is_active=True))
+
+        return list(UserRef.objects.filter(kind__in=("faculty", "staff"), is_active=True))
 
     def academic_directory(self, **filters):
         self.calls.append(("academic_directory", tuple(sorted(filters.items()))))
@@ -80,6 +92,10 @@ class FakeIam:
             raise self.directory_error
         return self.filters
 
+    def get_department_appointments(self, department_code):
+        self.calls.append(("get_department_appointments", department_code))
+        return list(self.department_appointments.get(department_code, []))
+
     def get_academic_standings(self, user_ids):
         """A student absent from `standings` has no declared result, which is
         what the eligibility engine must fail closed on."""
@@ -90,12 +106,29 @@ class FakeIam:
         return {i: self.standings[i] for i in ids if i in self.standings}
 
 
-def make_session(user_id=1001, permissions=(), modules=(), kind="student",
-                 roles=("student",), active_role="student"):
+def make_session(
+    user_id=1001,
+    permissions=(),
+    modules=(),
+    kind="student",
+    roles=("student",),
+    active_role="student",
+    department_assignments=(),
+    department_contexts=(),
+    department="",
+):
     return IamSession(
-        user_id=user_id, username=f"u{user_id}", display_name=f"User {user_id}",
-        kind=kind, active_role=active_role, roles=tuple(roles),
-        permissions=frozenset(permissions), modules=tuple(modules),
+        user_id=user_id,
+        username=f"u{user_id}",
+        display_name=f"User {user_id}",
+        kind=kind,
+        active_role=active_role,
+        roles=tuple(roles),
+        permissions=frozenset(permissions),
+        modules=tuple(modules),
+        department_assignments=tuple(department_assignments),
+        department_contexts=tuple(department_contexts),
+        department=department,
     )
 
 
@@ -145,6 +178,12 @@ def stub_iam(monkeypatch):
 @pytest.fixture
 def user_ref():
     def _make(user_id, name="Asha Verma", kind="student", discipline="CSE"):
-        return UserRef(user_id=user_id, username=f"u{user_id}", display_name=name,
-                       kind=kind, discipline=discipline)
+        return UserRef(
+            user_id=user_id,
+            username=f"u{user_id}",
+            display_name=name,
+            kind=kind,
+            discipline=discipline,
+        )
+
     return _make
