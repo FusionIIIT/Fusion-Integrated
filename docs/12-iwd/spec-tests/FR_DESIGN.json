@@ -1,0 +1,56 @@
+[
+  {
+    "test_id": "test_fr_01_submit_valid_complaint",
+    "source_id": "AFR-IWD-001 submission",
+    "purpose": "Verify employee can submit a maintenance complaint with title, description, location and category.",
+    "preconditions": "Employee is authenticated.",
+    "action_or_input": "POST /api/iwd/complaints/ with valid fields.",
+    "expected_result": "HTTP 201 Created, status ASSIGNED.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "test_fr_02_refuse_short_title",
+    "source_id": "AFR-IWD-002 validation",
+    "purpose": "Verify rejection when submitting complaint with title shorter than 3 chars.",
+    "preconditions": "Employee is authenticated.",
+    "action_or_input": "POST /api/iwd/complaints/ with title 'Hi'.",
+    "expected_result": "HTTP 400 Bad Request, validation error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "test_fr_03_refuse_short_description",
+    "source_id": "AFR-IWD-003 validation",
+    "purpose": "Verify rejection when submitting complaint with description shorter than 5 chars.",
+    "preconditions": "Employee is authenticated.",
+    "action_or_input": "POST /api/iwd/complaints/ with description 'Leak'.",
+    "expected_result": "HTTP 400 Bad Request.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "test_fr_04_auto_assignment_civil",
+    "source_id": "AFR-IWD-005 assignment-civil",
+    "purpose": "Verify automatic assignment to Civil Engineer when category is CIVIL.",
+    "preconditions": "Valid complaint submitted with category CIVIL.",
+    "action_or_input": "POST /api/iwd/complaints/ with category CIVIL.",
+    "expected_result": "HTTP 201, assigned_engineer_id set to civil engineer.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "test_fr_05_auto_assignment_electrical",
+    "source_id": "AFR-IWD-006 assignment-electrical",
+    "purpose": "Verify automatic assignment to Electrical Engineer when category is ELECTRICAL.",
+    "preconditions": "Valid complaint submitted with category ELECTRICAL.",
+    "action_or_input": "POST /api/iwd/complaints/ with category ELECTRICAL.",
+    "expected_result": "HTTP 201, assigned_engineer_id set to electrical engineer.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "test_fr_06_non_employee_cannot_submit",
+    "source_id": "AFR-IWD-060 active-role-submission",
+    "purpose": "Verify non-employee cannot submit complaints under employee endpoint.",
+    "preconditions": "User authenticated as auditor or director.",
+    "action_or_input": "POST /api/iwd/complaints/ with X-Role: auditor.",
+    "expected_result": "HTTP 403 Forbidden.",
+    "test_type": "authorization"
+  }
+]

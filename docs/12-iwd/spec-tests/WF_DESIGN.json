@@ -1,0 +1,47 @@
+[
+  {
+    "test_id": "test_wf_01_complaint_intake_and_assessment",
+    "source_id": "BW-IWD-01 intake-assess",
+    "purpose": "Move complaint through SUBMITTED -> ASSIGNED -> ASSESSED.",
+    "preconditions": "Employee submits valid complaint.",
+    "action_or_input": "Submit complaint -> Create estimate.",
+    "expected_result": "Complaint ends in ASSESSED status.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "test_wf_02_low_cost_approval_route",
+    "source_id": "BW-IWD-02 low-cost-approval",
+    "purpose": "Complete low-cost workflow to ESTIMATE_APPROVED.",
+    "preconditions": "Assessed complaint with cost < 25,000.",
+    "action_or_input": "Admin approves estimate.",
+    "expected_result": "Complaint status transitions to ESTIMATE_APPROVED.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "test_wf_09_work_execution_verification_success",
+    "source_id": "BW-IWD-09 execution-verification",
+    "purpose": "Work passes physical verification and reaches RESOLVED.",
+    "preconditions": "Complaint in IN_PROGRESS.",
+    "action_or_input": "POST /api/iwd/complaints/<id>/verify/ with passed=True.",
+    "expected_result": "Complaint status transitions to RESOLVED.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "test_wf_10_rework_one_traversal",
+    "source_id": "BW-IWD-10 rework-traversal",
+    "purpose": "Verify rework increments rework_count and keeps complaint in IN_PROGRESS.",
+    "preconditions": "Complaint in IN_PROGRESS.",
+    "action_or_input": "Physical verification fails (passed=False).",
+    "expected_result": "Rework count == 1, status IN_PROGRESS.",
+    "test_type": "state-transition"
+  },
+  {
+    "test_id": "test_wf_11_billing_audit_settlement",
+    "source_id": "BW-IWD-11 settlement-flow",
+    "purpose": "Complete sequence: Submit bill -> Auditor verify -> Director approve -> Accounts settle.",
+    "preconditions": "Complaint in RESOLVED state.",
+    "action_or_input": "Submit bill -> audit_verify -> director_approve -> settle.",
+    "expected_result": "FinalBill status SETTLED_BY_ACCOUNTS, complaint CLOSED.",
+    "test_type": "state-transition"
+  }
+]

@@ -63,6 +63,660 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/iwd/bills/:
+    get:
+      operationId: v1_iwd_bills_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFinalBillList'
+          description: ''
+    post:
+      operationId: v1_iwd_bills_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalBill'
+          description: ''
+  /api/v1/iwd/bills/{id}/:
+    get:
+      operationId: v1_iwd_bills_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this final bill.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalBill'
+          description: ''
+    put:
+      operationId: v1_iwd_bills_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this final bill.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalBill'
+          description: ''
+    patch:
+      operationId: v1_iwd_bills_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this final bill.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFinalBill'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFinalBill'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFinalBill'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalBill'
+          description: ''
+    delete:
+      operationId: v1_iwd_bills_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this final bill.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/iwd/bills/{id}/audit-verify/:
+    post:
+      operationId: v1_iwd_bills_audit_verify_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this final bill.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalBill'
+          description: ''
+  /api/v1/iwd/bills/{id}/director-approve/:
+    post:
+      operationId: v1_iwd_bills_director_approve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this final bill.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalBill'
+          description: ''
+  /api/v1/iwd/bills/{id}/settle/:
+    post:
+      operationId: v1_iwd_bills_settle_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this final bill.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalBill'
+          description: ''
+  /api/v1/iwd/complaints/:
+    get:
+      operationId: v1_iwd_complaints_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedComplaintList'
+          description: ''
+    post:
+      operationId: v1_iwd_complaints_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+  /api/v1/iwd/complaints/{id}/:
+    get:
+      operationId: v1_iwd_complaints_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this complaint.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+    put:
+      operationId: v1_iwd_complaints_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this complaint.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+    patch:
+      operationId: v1_iwd_complaints_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this complaint.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedComplaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedComplaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedComplaint'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+    delete:
+      operationId: v1_iwd_complaints_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this complaint.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/iwd/complaints/{id}/verify/:
+    post:
+      operationId: v1_iwd_complaints_verify_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this complaint.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+  /api/v1/iwd/estimates/:
+    get:
+      operationId: v1_iwd_estimates_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEstimateList'
+          description: ''
+    post:
+      operationId: v1_iwd_estimates_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
+  /api/v1/iwd/estimates/{id}/:
+    get:
+      operationId: v1_iwd_estimates_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this estimate.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
+    put:
+      operationId: v1_iwd_estimates_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this estimate.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
+    patch:
+      operationId: v1_iwd_estimates_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this estimate.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEstimate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEstimate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEstimate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
+    delete:
+      operationId: v1_iwd_estimates_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this estimate.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/iwd/estimates/{id}/approve/:
+    post:
+      operationId: v1_iwd_estimates_approve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this estimate.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
+  /api/v1/iwd/estimates/{id}/reject/:
+    post:
+      operationId: v1_iwd_estimates_reject_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this estimate.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2082,6 +2736,14 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - CIVIL
+      - ELECTRICAL
+      type: string
+      description: |-
+        * `CIVIL` - Civil Infrastructure
+        * `ELECTRICAL` - Electrical Infrastructure
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2262,6 +2924,88 @@ components:
         * `prospect` - Prospect
         * `active` - Active
         * `blacklisted` - Blacklisted
+    Complaint:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        requester_id:
+          type: string
+          maxLength: 64
+        department:
+          type: string
+          maxLength: 128
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        location:
+          type: string
+          maxLength: 255
+        urgency:
+          $ref: '#/components/schemas/UrgencyEnum'
+        remarks:
+          type: string
+        assigned_engineer_id:
+          type: string
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ComplaintStatusEnum'
+          readOnly: true
+        fast_tracked:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_engineer_id
+      - category
+      - created_at
+      - department
+      - description
+      - fast_tracked
+      - id
+      - location
+      - requester_id
+      - status
+      - title
+      - updated_at
+    ComplaintStatusEnum:
+      enum:
+      - SUBMITTED
+      - ASSIGNED
+      - ASSESSED
+      - ESTIMATE_APPROVED
+      - IN_PROGRESS
+      - COMPLETED
+      - VERIFIED
+      - RESOLVED
+      - REJECTED
+      - CLOSED
+      type: string
+      description: |-
+        * `SUBMITTED` - Submitted
+        * `ASSIGNED` - Assigned to Engineer
+        * `ASSESSED` - Assessed & Estimated
+        * `ESTIMATE_APPROVED` - Estimate Approved
+        * `IN_PROGRESS` - Execution in Progress
+        * `COMPLETED` - Work Completed
+        * `VERIFIED` - Physically Verified
+        * `RESOLVED` - Resolved
+        * `REJECTED` - Rejected
+        * `CLOSED` - Closed
     ConductIncident:
       type: object
       properties:
@@ -2315,6 +3059,16 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CostBandEnum:
+      enum:
+      - LOW
+      - MID
+      - HIGH
+      type: string
+      description: |-
+        * `LOW` - Below Rs. 25,000
+        * `MID` - Rs. 25,000 to Rs. 2.5 Lakh
+        * `HIGH` - Above Rs. 2.5 Lakh
     Detail:
       type: object
       properties:
@@ -2407,6 +3161,102 @@ components:
       - season_decision
       - semester
       - standing
+    Estimate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        engineer_id:
+          type: string
+          maxLength: 64
+        time_days:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          description: Estimated completion time in days
+        material_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        labor_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        other_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        total_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        cost_band:
+          allOf:
+          - $ref: '#/components/schemas/CostBandEnum'
+          readOnly: true
+        committee_reviewed:
+          type: boolean
+        committee_remarks:
+          type: string
+        forwarded_to_director:
+          type: boolean
+        director_sanction_reference:
+          type: string
+          maxLength: 128
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EstimateStatusEnum'
+          readOnly: true
+        rejection_reason:
+          type: string
+        approved_by_id:
+          type: string
+          readOnly: true
+        approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        complaint:
+          type: integer
+      required:
+      - approved_at
+      - approved_by_id
+      - complaint
+      - cost_band
+      - created_at
+      - engineer_id
+      - id
+      - status
+      - time_days
+      - total_cost
+      - updated_at
+    EstimateStatusEnum:
+      enum:
+      - DRAFT
+      - PENDING_COMMITTEE
+      - PENDING_APPROVAL
+      - APPROVED
+      - REJECTED
+      - FORWARDED_TO_DIRECTOR
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `PENDING_COMMITTEE` - Pending Committee Review
+        * `PENDING_APPROVAL` - Pending Approval
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `FORWARDED_TO_DIRECTOR` - Forwarded to Director
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +3273,61 @@ components:
       - fee_reference
       - season
       - user_id
+    FinalBill:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        bill_number:
+          type: string
+          maxLength: 64
+        submitted_by_id:
+          type: string
+          maxLength: 64
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        auditor_id:
+          type: string
+          maxLength: 64
+        auditor_verified:
+          type: boolean
+          readOnly: true
+        auditor_remarks:
+          type: string
+        director_approved:
+          type: boolean
+          readOnly: true
+        director_remarks:
+          type: string
+        settlement_status:
+          allOf:
+          - $ref: '#/components/schemas/SettlementStatusEnum'
+          readOnly: true
+        settled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        complaint:
+          type: integer
+      required:
+      - auditor_verified
+      - bill_number
+      - complaint
+      - created_at
+      - director_approved
+      - id
+      - settled_at
+      - settlement_status
+      - submitted_by_id
+      - total_amount
     IncidentRecorded:
       type: object
       properties:
@@ -2943,6 +3848,63 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedComplaintList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Complaint'
+    PaginatedEstimateList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Estimate'
+    PaginatedFinalBillList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinalBill'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -3000,6 +3962,163 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedComplaint:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        requester_id:
+          type: string
+          maxLength: 64
+        department:
+          type: string
+          maxLength: 128
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        location:
+          type: string
+          maxLength: 255
+        urgency:
+          $ref: '#/components/schemas/UrgencyEnum'
+        remarks:
+          type: string
+        assigned_engineer_id:
+          type: string
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ComplaintStatusEnum'
+          readOnly: true
+        fast_tracked:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedEstimate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        engineer_id:
+          type: string
+          maxLength: 64
+        time_days:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          description: Estimated completion time in days
+        material_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        labor_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        other_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        total_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        cost_band:
+          allOf:
+          - $ref: '#/components/schemas/CostBandEnum'
+          readOnly: true
+        committee_reviewed:
+          type: boolean
+        committee_remarks:
+          type: string
+        forwarded_to_director:
+          type: boolean
+        director_sanction_reference:
+          type: string
+          maxLength: 128
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EstimateStatusEnum'
+          readOnly: true
+        rejection_reason:
+          type: string
+        approved_by_id:
+          type: string
+          readOnly: true
+        approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        complaint:
+          type: integer
+    PatchedFinalBill:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        bill_number:
+          type: string
+          maxLength: 64
+        submitted_by_id:
+          type: string
+          maxLength: 64
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        auditor_id:
+          type: string
+          maxLength: 64
+        auditor_verified:
+          type: boolean
+          readOnly: true
+        auditor_remarks:
+          type: string
+        director_approved:
+          type: boolean
+          readOnly: true
+        director_remarks:
+          type: string
+        settlement_status:
+          allOf:
+          - $ref: '#/components/schemas/SettlementStatusEnum'
+          readOnly: true
+        settled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        complaint:
+          type: integer
     PatchedJobPosting:
       type: object
       properties:
@@ -3655,6 +4774,20 @@ components:
       - id
       - kind
       - username
+    SettlementStatusEnum:
+      enum:
+      - SUBMITTED
+      - AUDITOR_VERIFIED
+      - DIRECTOR_APPROVED
+      - SETTLED_BY_ACCOUNTS
+      - REJECTED
+      type: string
+      description: |-
+        * `SUBMITTED` - Submitted by Engineer
+        * `AUDITOR_VERIFIED` - Auditor Verified
+        * `DIRECTOR_APPROVED` - Director Approved
+        * `SETTLED_BY_ACCOUNTS` - Settled by Accounts
+        * `REJECTED` - Audit Rejected
     SourceEnum:
       enum:
       - campus
@@ -3769,6 +4902,14 @@ components:
       - application_id
       - redacted
       - results
+    UrgencyEnum:
+      enum:
+      - NORMAL
+      - URGENT
+      type: string
+      description: |-
+        * `NORMAL` - Normal Priority
+        * `URGENT` - Urgent Priority
     UserRef:
       type: object
       properties:

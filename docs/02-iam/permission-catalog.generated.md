@@ -13,6 +13,17 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `iwd`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `iwd.complaint.view` | View maintenance complaints | `Dean Academic`, `acadadmin`, `student` |
+| `iwd.complaint.create` | Submit maintenance complaints | `acadadmin`, `student` |
+| `iwd.complaint.manage` | Manage complaints and estimates | `acadadmin` |
+| `iwd.complaint.approve` | Approve works and estimates | `Dean Academic` |
+| `iwd.complaint.audit` | Audit and verify final bills | _service only_ |
+| `iwd.complaint.settle` | Settle payment accounts | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

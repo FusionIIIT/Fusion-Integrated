@@ -1,0 +1,38 @@
+[
+  {
+    "test_id": "test_uc_001_submit_maintenance_complaint_main_flow",
+    "source_id": "UC-IWD-001 Main Flow",
+    "purpose": "Execute full complaint intake use case.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit complaint with title 'AC not cooling', location 'Room 201'.",
+    "expected_result": "HTTP 201, complaint created, auto-assigned, audit log written.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "test_uc_015_estimate_preparation_main_flow",
+    "source_id": "UC-IWD-015 Main Flow",
+    "purpose": "Engineer prepares and submits cost and time estimate.",
+    "preconditions": "Assigned complaint in ASSIGNED state.",
+    "action_or_input": "Create estimate with materials=5000, labor=2000, time=3 days.",
+    "expected_result": "HTTP 200/201, complaint status ASSESSED, estimate PENDING_APPROVAL.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "test_uc_041_mid_range_hod_approval_flow",
+    "source_id": "UC-IWD-041 Main Flow",
+    "purpose": "Department Head reviews and approves mid-range estimate after committee.",
+    "preconditions": "Mid-range estimate with committee_reviewed=True.",
+    "action_or_input": "POST /api/iwd/estimates/<id>/approve/ with X-Role: hod.",
+    "expected_result": "HTTP 200 OK, estimate status APPROVED, complaint ESTIMATE_APPROVED.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "test_uc_041_hod_rejection_alternative_flow",
+    "source_id": "UC-IWD-041 Alternative A1",
+    "purpose": "Department Head rejects mid-range estimate with reason.",
+    "preconditions": "Mid-range estimate pending review.",
+    "action_or_input": "POST /api/iwd/estimates/<id>/reject/ with reason 'Budget exceeded'.",
+    "expected_result": "HTTP 200 OK, estimate status REJECTED, reason persisted.",
+    "test_type": "alternative"
+  }
+]
