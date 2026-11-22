@@ -1,0 +1,911 @@
+[
+  {
+    "test_id": "UC-001-MAIN",
+    "source_id": "MMS-UC-001 Main Flow",
+    "purpose": "Verify the main success scenario for Assign/Reassign MMS Operational Roles.",
+    "preconditions": "Mess Admin is authorized for MMS role assignment; employee identity exists in institutional master data.",
+    "action_or_input": "1. Mess Admin opens role management. | 2. MMS displays the current active Caretaker and Warden assignments. | 3. Mess Admin selects an institute employee, role, and specified duration. | 4. MMS enforces role cardinality and records the assignment or reassignment. | 5. For a mid-cycle reassignment, MMS makes the change immediately effective from the recorded reassignment time and transfers pending Caretaker-owned request visibility/actionability to the newly assigned Caretaker.",
+    "expected_result": "Exactly one active Caretaker and one active Warden remain active; Mess Admin remains blocked from operational data.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-001-ALT-A1",
+    "source_id": "MMS-UC-001 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Assign/Reassign MMS Operational Roles.",
+    "preconditions": "Mess Admin is authorized for MMS role assignment; employee identity exists in institutional master data.",
+    "action_or_input": "If the requested assignment would violate the exactly-one-active-role constraint for its effective period, MMS prevents the conflicting assignment.",
+    "expected_result": "If the requested assignment would violate the exactly-one-active-role constraint for its effective period, MMS prevents the conflicting assignment.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-001-ALT-A2",
+    "source_id": "MMS-UC-001 Alternative Flow A2",
+    "purpose": "Verify the explicitly specified alternative flow A2 for Assign/Reassign MMS Operational Roles.",
+    "preconditions": "Mess Admin is authorized for MMS role assignment; employee identity exists in institutional master data.",
+    "action_or_input": "If required employee identity data is unavailable from institutional master data, MMS does not record the assignment.",
+    "expected_result": "If required employee identity data is unavailable from institutional master data, MMS does not record the assignment.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-001-EXC",
+    "source_id": "MMS-UC-001 Exception Flow",
+    "purpose": "Verify the exception guarantee for Assign/Reassign MMS Operational Roles.",
+    "preconditions": "Mess Admin is authorized for MMS role assignment; employee identity exists in institutional master data.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-002-MAIN",
+    "source_id": "MMS-UC-002 Main Flow",
+    "purpose": "Verify the main success scenario for Open Registration Window.",
+    "preconditions": "Caretaker is active for the period.",
+    "action_or_input": "1. Caretaker opens registration-window setup. | 2. Caretaker identifies the mess cycle or designated period and the registration window. | 3. MMS records the window as open. | 4. MMS permits Student registration submissions for the open window.",
+    "expected_result": "Registration window is open for the configured period.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-002-ALT-A1",
+    "source_id": "MMS-UC-002 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Open Registration Window.",
+    "preconditions": "Caretaker is active for the period.",
+    "action_or_input": "If required window information is missing, MMS does not open the window and requests correction.",
+    "expected_result": "If required window information is missing, MMS does not open the window and requests correction.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-002-EXC",
+    "source_id": "MMS-UC-002 Exception Flow",
+    "purpose": "Verify the exception guarantee for Open Registration Window.",
+    "preconditions": "Caretaker is active for the period.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-003-MAIN",
+    "source_id": "MMS-UC-003 Main Flow",
+    "purpose": "Verify the main success scenario for Submit Registration Request.",
+    "preconditions": "Student is authenticated; registration window is open.",
+    "action_or_input": "1. Student opens mess registration.2. System displays the active registration window.3. Student enters required registration details.4. Student submits the request.5. System validates that the window is open.6. System records the request as Pending.7. System sends submission notification to the Student.",
+    "expected_result": "Registration request is pending Caretaker decision; Student can track status/history.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-003-ALT-A1",
+    "source_id": "MMS-UC-003 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Submit Registration Request.",
+    "preconditions": "Student is authenticated; registration window is open.",
+    "action_or_input": "If no window is open, system prevents submission.",
+    "expected_result": "If no window is open, system prevents submission.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-003-ALT-A2",
+    "source_id": "MMS-UC-003 Alternative Flow A2",
+    "purpose": "Verify the explicitly specified alternative flow A2 for Submit Registration Request.",
+    "preconditions": "Student is authenticated; registration window is open.",
+    "action_or_input": "If required details are missing, system asks for correction.",
+    "expected_result": "If required details are missing, system asks for correction.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-003-EXC",
+    "source_id": "MMS-UC-003 Exception Flow",
+    "purpose": "Verify the exception guarantee for Submit Registration Request.",
+    "preconditions": "Student is authenticated; registration window is open.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-004-MAIN",
+    "source_id": "MMS-UC-004 Main Flow",
+    "purpose": "Verify the main success scenario for Review Registration Request.",
+    "preconditions": "A registration request exists in Pending status.",
+    "action_or_input": "1. Caretaker views pending registration requests.2. Caretaker selects a request.3. System displays submitted details and request history.4. Caretaker approves or rejects the request.5. System records the decision and updates status.6. System sends decision notification to the Student.",
+    "expected_result": "Request is Approved or Rejected; decision is visible to Student and available for Warden oversight.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-004-ALT-A1",
+    "source_id": "MMS-UC-004 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Review Registration Request.",
+    "preconditions": "A registration request exists in Pending status.",
+    "action_or_input": "If request is no longer pending, system prevents duplicate decision.",
+    "expected_result": "If request is no longer pending, system prevents duplicate decision.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-004-EXC",
+    "source_id": "MMS-UC-004 Exception Flow",
+    "purpose": "Verify the exception guarantee for Review Registration Request.",
+    "preconditions": "A registration request exists in Pending status.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-005-MAIN",
+    "source_id": "MMS-UC-005 Main Flow",
+    "purpose": "Verify the main success scenario for Submit Deregistration Request.",
+    "preconditions": "Student is currently registered for mess service.",
+    "action_or_input": "1. Student opens deregistration request.2. System displays current registration status.3. Student confirms deregistration request.4. System records the request as Pending.5. System sends submission notification to the Student.",
+    "expected_result": "Deregistration request is pending Caretaker decision.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-005-ALT-A1",
+    "source_id": "MMS-UC-005 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Submit Deregistration Request.",
+    "preconditions": "Student is currently registered for mess service.",
+    "action_or_input": "If Student is not currently registered, system prevents request submission.",
+    "expected_result": "If Student is not currently registered, system prevents request submission.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-005-EXC",
+    "source_id": "MMS-UC-005 Exception Flow",
+    "purpose": "Verify the exception guarantee for Submit Deregistration Request.",
+    "preconditions": "Student is currently registered for mess service.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-006-MAIN",
+    "source_id": "MMS-UC-006 Main Flow",
+    "purpose": "Verify the main success scenario for Review Deregistration Request.",
+    "preconditions": "A deregistration request exists in Pending status.",
+    "action_or_input": "1. Caretaker views pending deregistration requests.2. Caretaker selects a request.3. MMS displays request details and history.4. Caretaker approves or rejects the request.5. MMS records the decision immediately and triggers the decision notification to the Student.6. If approved, the request enters an Approved — Awaiting Effective Date state; the next-calendar-day service effect is handled by MMS-UC-027.",
+    "expected_result": "Request is Approved — Awaiting Effective Date or Rejected; a rejected Student remains registered, while an approved request awaits the next-calendar-day system transition.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-006-ALT-A1",
+    "source_id": "MMS-UC-006 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Review Deregistration Request.",
+    "preconditions": "A deregistration request exists in Pending status.",
+    "action_or_input": "If request is no longer pending, system prevents duplicate decision.",
+    "expected_result": "If request is no longer pending, system prevents duplicate decision.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-006-EXC",
+    "source_id": "MMS-UC-006 Exception Flow",
+    "purpose": "Verify the exception guarantee for Review Deregistration Request.",
+    "preconditions": "A deregistration request exists in Pending status.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-007-MAIN",
+    "source_id": "MMS-UC-007 Main Flow",
+    "purpose": "Verify the main success scenario for View Operational Student Requests for Oversight.",
+    "preconditions": "One or more operational student requests exist in MMS.",
+    "action_or_input": "1. Warden opens the operational-request oversight view. | 2. MMS displays request records permitted for supervisory oversight, including registration and deregistration requests and other operational student requests where represented. | 3. Warden views or filters request details. | 4. MMS does not expose approval, rejection, registration, deregistration, or other operational decision actions to the Warden.",
+    "expected_result": "Warden obtains oversight information; no operational request state is changed.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-007-ALT-A1",
+    "source_id": "MMS-UC-007 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for View Operational Student Requests for Oversight.",
+    "preconditions": "One or more operational student requests exist in MMS.",
+    "action_or_input": "If the Warden attempts a decision action through any exposed path, MMS blocks the action.",
+    "expected_result": "If the Warden attempts a decision action through any exposed path, MMS blocks the action.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-007-EXC",
+    "source_id": "MMS-UC-007 Exception Flow",
+    "purpose": "Verify the exception guarantee for View Operational Student Requests for Oversight.",
+    "preconditions": "One or more operational student requests exist in MMS.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-008-MAIN",
+    "source_id": "MMS-UC-008 Main Flow",
+    "purpose": "Verify the main success scenario for Publish or Update Weekly Menu.",
+    "preconditions": "Caretaker is active.",
+    "action_or_input": "1. Caretaker opens weekly menu.2. System displays day-wise and meal-wise structure.3. Caretaker adds, modifies, or deletes menu items.4. System validates menu structure.5. Caretaker publishes or updates the menu.6. System sends menu-update notifications to Students.",
+    "expected_result": "Weekly menu is published/updated and visible to authorized viewers.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-008-ALT-A1",
+    "source_id": "MMS-UC-008 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Publish or Update Weekly Menu.",
+    "preconditions": "Caretaker is active.",
+    "action_or_input": "If structure is incomplete or invalid, system asks for correction.",
+    "expected_result": "If structure is incomplete or invalid, system asks for correction.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-008-EXC",
+    "source_id": "MMS-UC-008 Exception Flow",
+    "purpose": "Verify the exception guarantee for Publish or Update Weekly Menu.",
+    "preconditions": "Caretaker is active.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-009-MAIN",
+    "source_id": "MMS-UC-009 Main Flow",
+    "purpose": "Verify the main success scenario for View Weekly Menu.",
+    "preconditions": "Weekly menu exists or view is available.",
+    "action_or_input": "1. Authorized actor opens the weekly menu. | 2. MMS displays the day-wise breakfast, lunch, and dinner menu. | 3. Actor views menu details.",
+    "expected_result": "Actor views the available weekly menu.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-009-ALT-A1",
+    "source_id": "MMS-UC-009 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for View Weekly Menu.",
+    "preconditions": "Weekly menu exists or view is available.",
+    "action_or_input": "Mess Admin menu visibility is not fixed here because the frozen PS is internally inconsistent on that point; see ISS-MMS-012.",
+    "expected_result": "Mess Admin menu visibility is not fixed here because the frozen PS is internally inconsistent on that point; see ISS-MMS-012.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-009-EXC",
+    "source_id": "MMS-UC-009 Exception Flow",
+    "purpose": "Verify the exception guarantee for View Weekly Menu.",
+    "preconditions": "Weekly menu exists or view is available.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-010-MAIN",
+    "source_id": "MMS-UC-010 Main Flow",
+    "purpose": "Verify the main success scenario for Review, Finalize, and Publish Monthly Bills.",
+    "preconditions": "MMS-UC-030 has generated the monthly bills for the applicable calendar-month billing cycle.",
+    "action_or_input": "1. Caretaker opens the generated monthly bills.2. MMS displays the generated bill details and computation results.3. Caretaker reviews the bills.4. Caretaker finalizes the bills.5. Caretaker publishes the finalized bills.6. MMS makes published bills available to Students and triggers the bill-publication notification.",
+    "expected_result": "Finalized monthly bills are visible to Students.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-010-ALT-A1",
+    "source_id": "MMS-UC-010 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Review, Finalize, and Publish Monthly Bills.",
+    "preconditions": "MMS-UC-030 has generated the monthly bills for the applicable calendar-month billing cycle.",
+    "action_or_input": "If the Caretaker does not finalize a generated bill, MMS does not publish that bill.",
+    "expected_result": "If the Caretaker does not finalize a generated bill, MMS does not publish that bill.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-010-EXC",
+    "source_id": "MMS-UC-010 Exception Flow",
+    "purpose": "Verify the exception guarantee for Review, Finalize, and Publish Monthly Bills.",
+    "preconditions": "MMS-UC-030 has generated the monthly bills for the applicable calendar-month billing cycle.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-011-MAIN",
+    "source_id": "MMS-UC-011 Main Flow",
+    "purpose": "Verify the main success scenario for View Monthly Bills and Outstanding Balances.",
+    "preconditions": "Student has bill or balance information in MMS.",
+    "action_or_input": "1. Student opens billing section.2. System displays monthly bills.3. System displays outstanding balance.4. Student views bill details.",
+    "expected_result": "Student obtains actor-visible billing information.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-011-ALT-A1",
+    "source_id": "MMS-UC-011 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for View Monthly Bills and Outstanding Balances.",
+    "preconditions": "Student has bill or balance information in MMS.",
+    "action_or_input": "If no bill exists for a month, system displays no bill for that month.",
+    "expected_result": "If no bill exists for a month, system displays no bill for that month.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-011-EXC",
+    "source_id": "MMS-UC-011 Exception Flow",
+    "purpose": "Verify the exception guarantee for View Monthly Bills and Outstanding Balances.",
+    "preconditions": "Student has bill or balance information in MMS.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-012-MAIN",
+    "source_id": "MMS-UC-012 Main Flow",
+    "purpose": "Verify the main success scenario for Submit Feedback.",
+    "preconditions": "Student is authenticated.",
+    "action_or_input": "1. Student opens feedback form.2. Student enters text feedback.3. Student submits feedback.4. System stores the feedback entry.",
+    "expected_result": "Feedback is stored for Caretaker and Warden monitoring/reporting.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-012-ALT-A1",
+    "source_id": "MMS-UC-012 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Submit Feedback.",
+    "preconditions": "Student is authenticated.",
+    "action_or_input": "If feedback text is empty, system asks for text input.",
+    "expected_result": "If feedback text is empty, system asks for text input.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-012-EXC",
+    "source_id": "MMS-UC-012 Exception Flow",
+    "purpose": "Verify the exception guarantee for Submit Feedback.",
+    "preconditions": "Student is authenticated.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-013-MAIN",
+    "source_id": "MMS-UC-013 Main Flow",
+    "purpose": "Verify the main success scenario for View Feedback.",
+    "preconditions": "Feedback entries exist.",
+    "action_or_input": "1. Actor opens feedback list.2. System displays feedback entries according to role access.3. Actor reviews entries.",
+    "expected_result": "Actor views stored feedback.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-013-ALT-A1",
+    "source_id": "MMS-UC-013 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for View Feedback.",
+    "preconditions": "Feedback entries exist.",
+    "action_or_input": "If no feedback exists, system displays empty feedback list.",
+    "expected_result": "If no feedback exists, system displays empty feedback list.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-013-EXC",
+    "source_id": "MMS-UC-013 Exception Flow",
+    "purpose": "Verify the exception guarantee for View Feedback.",
+    "preconditions": "Feedback entries exist.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-014-MAIN",
+    "source_id": "MMS-UC-014 Main Flow",
+    "purpose": "Verify the main success scenario for Submit Rebate Request.",
+    "preconditions": "Student is registered for mess service.",
+    "action_or_input": "1. Student opens rebate request form.2. System displays required fields: reason, explanation where applicable, start date, and end date.3. Student enters request details.4. System validates minimum duration, lead time, and non-overlap.5. System records valid request as Pending.6. System sends submission notification to Student.",
+    "expected_result": "Rebate request is pending Caretaker decision and trackable by Student.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-014-ALT-A1",
+    "source_id": "MMS-UC-014 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Submit Rebate Request.",
+    "preconditions": "Student is registered for mess service.",
+    "action_or_input": "If duration is below three days, system rejects submission.",
+    "expected_result": "If duration is below three days, system rejects submission.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-014-ALT-A2",
+    "source_id": "MMS-UC-014 Alternative Flow A2",
+    "purpose": "Verify the explicitly specified alternative flow A2 for Submit Rebate Request.",
+    "preconditions": "Student is registered for mess service.",
+    "action_or_input": "If start date is less than one calendar day ahead, system rejects submission.",
+    "expected_result": "If start date is less than one calendar day ahead, system rejects submission.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-014-ALT-A3",
+    "source_id": "MMS-UC-014 Alternative Flow A3",
+    "purpose": "Verify the explicitly specified alternative flow A3 for Submit Rebate Request.",
+    "preconditions": "Student is registered for mess service.",
+    "action_or_input": "If request overlaps another rebate request, system rejects submission.",
+    "expected_result": "If request overlaps another rebate request, system rejects submission.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-014-EXC",
+    "source_id": "MMS-UC-014 Exception Flow",
+    "purpose": "Verify the exception guarantee for Submit Rebate Request.",
+    "preconditions": "Student is registered for mess service.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-015-MAIN",
+    "source_id": "MMS-UC-015 Main Flow",
+    "purpose": "Verify the main success scenario for Review Rebate Request.",
+    "preconditions": "A rebate request exists in Pending status.",
+    "action_or_input": "1. Caretaker opens a Pending rebate request. | 2. MMS displays the submitted reason and requested dates. | 3. Caretaker may modify the dates before approval where permitted by external mess policy. | 4. Caretaker approves or rejects the request. | 5. MMS records Approved or Rejected status. | 6. For approval, MMS uses the approved dates for automatic billing adjustment. | 7. MMS triggers the decision notification to the Student.",
+    "expected_result": "Rebate is Approved or Rejected; approved rebates adjust monthly billing.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-015-ALT-A1",
+    "source_id": "MMS-UC-015 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Review Rebate Request.",
+    "preconditions": "A rebate request exists in Pending status.",
+    "action_or_input": "If request is no longer pending, system prevents duplicate decision.",
+    "expected_result": "If request is no longer pending, system prevents duplicate decision.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-015-EXC",
+    "source_id": "MMS-UC-015 Exception Flow",
+    "purpose": "Verify the exception guarantee for Review Rebate Request.",
+    "preconditions": "A rebate request exists in Pending status.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-016-MAIN",
+    "source_id": "MMS-UC-016 Main Flow",
+    "purpose": "Verify the main success scenario for Create Vacation Food Continuity Survey.",
+    "preconditions": "Upcoming institute vacation exists as institutional context.",
+    "action_or_input": "1. Caretaker opens vacation-survey creation.2. Caretaker identifies the upcoming vacation and sets the response deadline.3. MMS creates the survey for currently registered Students only.4. MMS triggers the survey-creation notification.",
+    "expected_result": "Survey is available only to currently registered Students until deadline.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-016-ALT-A1",
+    "source_id": "MMS-UC-016 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Create Vacation Food Continuity Survey.",
+    "preconditions": "Upcoming institute vacation exists as institutional context.",
+    "action_or_input": "If no response deadline is supplied, MMS does not create the survey.",
+    "expected_result": "If no response deadline is supplied, MMS does not create the survey.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-016-ALT-A2",
+    "source_id": "MMS-UC-016 Alternative Flow A2",
+    "purpose": "Verify the explicitly specified alternative flow A2 for Create Vacation Food Continuity Survey.",
+    "preconditions": "Upcoming institute vacation exists as institutional context.",
+    "action_or_input": "Reminder timing/cadence is not specified by the frozen PS; reminder delivery is represented separately by event-triggered MMS-UC-031 without inventing a schedule.",
+    "expected_result": "Reminder timing/cadence is not specified by the frozen PS; reminder delivery is represented separately by event-triggered MMS-UC-031 without inventing a schedule.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-016-EXC",
+    "source_id": "MMS-UC-016 Exception Flow",
+    "purpose": "Verify the exception guarantee for Create Vacation Food Continuity Survey.",
+    "preconditions": "Upcoming institute vacation exists as institutional context.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-017-MAIN",
+    "source_id": "MMS-UC-017 Main Flow",
+    "purpose": "Verify the main success scenario for Respond to Vacation Food Continuity Survey.",
+    "preconditions": "Student is currently registered; survey is open.",
+    "action_or_input": "1. Student opens survey.2. System displays Yes/No response options.3. Student selects Yes or No.4. Student submits response.5. System records response.",
+    "expected_result": "An explicit Yes or No response is recorded before the deadline.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-017-ALT-A1",
+    "source_id": "MMS-UC-017 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Respond to Vacation Food Continuity Survey.",
+    "preconditions": "Student is currently registered; survey is open.",
+    "action_or_input": "If the Student is not currently registered or the survey is not open, MMS prevents response submission.",
+    "expected_result": "If the Student is not currently registered or the survey is not open, MMS prevents response submission.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-017-EXC",
+    "source_id": "MMS-UC-017 Exception Flow",
+    "purpose": "Verify the exception guarantee for Respond to Vacation Food Continuity Survey.",
+    "preconditions": "Student is currently registered; survey is open.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-018-MAIN",
+    "source_id": "MMS-UC-018 Main Flow",
+    "purpose": "Verify the main success scenario for View Vacation Survey Response Summary.",
+    "preconditions": "Survey exists.",
+    "action_or_input": "1. Caretaker opens a vacation survey response view. | 2. MMS displays recorded Yes, No, and default-No responses and the summary. | 3. Caretaker reviews the information for planning.",
+    "expected_result": "Caretaker obtains response information; no survey or response state is changed.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-018-ALT-A1",
+    "source_id": "MMS-UC-018 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for View Vacation Survey Response Summary.",
+    "preconditions": "Survey exists.",
+    "action_or_input": "If no responses exist, MMS displays the available empty/zero response summary.",
+    "expected_result": "If no responses exist, MMS displays the available empty/zero response summary.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-018-EXC",
+    "source_id": "MMS-UC-018 Exception Flow",
+    "purpose": "Verify the exception guarantee for View Vacation Survey Response Summary.",
+    "preconditions": "Survey exists.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-019-MAIN",
+    "source_id": "MMS-UC-019 Main Flow",
+    "purpose": "Verify the main success scenario for Submit Special Food Request.",
+    "preconditions": "Student is authenticated.",
+    "action_or_input": "1. Student opens the special-food request form. | 2. Student enters the request reason/context and requested date. | 3. MMS validates the one-calendar-day lead-time rule. | 4. MMS records a valid request as Requested and maintains request history. | 5. MMS triggers the submission notification to the Student.",
+    "expected_result": "Special food request is Requested and awaiting Caretaker decision.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-019-ALT-A1",
+    "source_id": "MMS-UC-019 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Submit Special Food Request.",
+    "preconditions": "Student is authenticated.",
+    "action_or_input": "If lead time is not met, system rejects submission.",
+    "expected_result": "If lead time is not met, system rejects submission.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-019-EXC",
+    "source_id": "MMS-UC-019 Exception Flow",
+    "purpose": "Verify the exception guarantee for Submit Special Food Request.",
+    "preconditions": "Student is authenticated.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-020-MAIN",
+    "source_id": "MMS-UC-020 Main Flow",
+    "purpose": "Verify the main success scenario for Review Special Food Request.",
+    "preconditions": "Special food request exists in Requested state.",
+    "action_or_input": "1. Caretaker opens a Requested special-food request.2. MMS displays request details and request time.3. Caretaker approves or rejects the request within the institution-defined decision period.4. MMS records Approved or Rejected status and triggers the applicable decision notification.",
+    "expected_result": "Request becomes Approved or explicitly Rejected; an Approved request may proceed to fulfillment.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-020-ALT-A1",
+    "source_id": "MMS-UC-020 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Review Special Food Request.",
+    "preconditions": "Special food request exists in Requested state.",
+    "action_or_input": "If the request is no longer in Requested state, MMS prevents a second decision.",
+    "expected_result": "If the request is no longer in Requested state, MMS prevents a second decision.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-020-ALT-A2",
+    "source_id": "MMS-UC-020 Alternative Flow A2",
+    "purpose": "Verify the explicitly specified alternative flow A2 for Review Special Food Request.",
+    "preconditions": "Special food request exists in Requested state.",
+    "action_or_input": "The frozen PS mentions 12 hours as an intended period but does not freeze the value; this specification leaves the parameter institution-defined.",
+    "expected_result": "The frozen PS mentions 12 hours as an intended period but does not freeze the value; this specification leaves the parameter institution-defined.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-020-EXC",
+    "source_id": "MMS-UC-020 Exception Flow",
+    "purpose": "Verify the exception guarantee for Review Special Food Request.",
+    "preconditions": "Special food request exists in Requested state.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-021-MAIN",
+    "source_id": "MMS-UC-021 Main Flow",
+    "purpose": "Verify the main success scenario for Update Special Food Fulfillment Status.",
+    "preconditions": "Special food request is Approved.",
+    "action_or_input": "1. Caretaker opens an Approved special-food request. | 2. Caretaker selects Served or Cancelled. | 3. MMS validates that the current state is Approved. | 4. MMS records the new fulfillment state. | 5. MMS triggers the applicable fulfillment-status notification to the Student.",
+    "expected_result": "Request is Served or Cancelled; the billing treatment of a later Cancelled state is not resolved by the frozen PS.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-021-ALT-A1",
+    "source_id": "MMS-UC-021 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Update Special Food Fulfillment Status.",
+    "preconditions": "Special food request is Approved.",
+    "action_or_input": "If the request is not Approved, MMS prevents a Served or Cancelled transition.",
+    "expected_result": "If the request is not Approved, MMS prevents a Served or Cancelled transition.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-021-EXC",
+    "source_id": "MMS-UC-021 Exception Flow",
+    "purpose": "Verify the exception guarantee for Update Special Food Fulfillment Status.",
+    "preconditions": "Special food request is Approved.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-022-MAIN",
+    "source_id": "MMS-UC-022 Main Flow",
+    "purpose": "Verify the main success scenario for Publish Announcement.",
+    "preconditions": "Actor is authorized to publish announcements.",
+    "action_or_input": "1. Authorized Caretaker or Warden opens announcement publication. | 2. Actor enters a mess-related announcement. | 3. Actor publishes the announcement. | 4. MMS records it in announcement history and triggers the new-announcement notification to Students.",
+    "expected_result": "Announcement is published and visible in history.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-022-ALT-A1",
+    "source_id": "MMS-UC-022 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Publish Announcement.",
+    "preconditions": "Actor is authorized to publish announcements.",
+    "action_or_input": "MMS prevents publication by an actor other than the active Caretaker or Warden.",
+    "expected_result": "MMS prevents publication by an actor other than the active Caretaker or Warden.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-022-EXC",
+    "source_id": "MMS-UC-022 Exception Flow",
+    "purpose": "Verify the exception guarantee for Publish Announcement.",
+    "preconditions": "Actor is authorized to publish announcements.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-023-MAIN",
+    "source_id": "MMS-UC-023 Main Flow",
+    "purpose": "Verify the main success scenario for View Announcement History.",
+    "preconditions": "Announcement history exists or view is available.",
+    "action_or_input": "1. Actor opens announcement history.2. System displays mess-relevant announcements according to access rights.3. Actor views announcement details.",
+    "expected_result": "Actor views announcement history.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-023-ALT-A1",
+    "source_id": "MMS-UC-023 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for View Announcement History.",
+    "preconditions": "Announcement history exists or view is available.",
+    "action_or_input": "If no announcement exists, system displays empty history.",
+    "expected_result": "If no announcement exists, system displays empty history.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-023-EXC",
+    "source_id": "MMS-UC-023 Exception Flow",
+    "purpose": "Verify the exception guarantee for View Announcement History.",
+    "preconditions": "Announcement history exists or view is available.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-024-MAIN",
+    "source_id": "MMS-UC-024 Main Flow",
+    "purpose": "Verify the main success scenario for View and Search Supervisory Reports.",
+    "preconditions": "Report data exists in MMS.",
+    "action_or_input": "1. Warden opens reports.2. System displays available supervisory report types.3. Warden selects registered student list, rebate summary, or vacation response summary.4. Warden searches or views report data.",
+    "expected_result": "Warden obtains supervisory report information within MMS scope.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-024-ALT-A1",
+    "source_id": "MMS-UC-024 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for View and Search Supervisory Reports.",
+    "preconditions": "Report data exists in MMS.",
+    "action_or_input": "If requested report data is unavailable, system displays no data.",
+    "expected_result": "If requested report data is unavailable, system displays no data.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-024-EXC",
+    "source_id": "MMS-UC-024 Exception Flow",
+    "purpose": "Verify the exception guarantee for View and Search Supervisory Reports.",
+    "preconditions": "Report data exists in MMS.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-025-MAIN",
+    "source_id": "MMS-UC-025 Main Flow",
+    "purpose": "Verify the main success scenario for Generate Operational Reports.",
+    "preconditions": "Operational report data exists in MMS.",
+    "action_or_input": "1. Caretaker opens operational reports.2. System displays available operational report types.3. Caretaker selects report type.4. System generates the selected report.",
+    "expected_result": "Caretaker obtains operational report within MMS scope.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-025-ALT-A1",
+    "source_id": "MMS-UC-025 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Generate Operational Reports.",
+    "preconditions": "Operational report data exists in MMS.",
+    "action_or_input": "If report data is unavailable, system displays no data.",
+    "expected_result": "If report data is unavailable, system displays no data.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-025-EXC",
+    "source_id": "MMS-UC-025 Exception Flow",
+    "purpose": "Verify the exception guarantee for Generate Operational Reports.",
+    "preconditions": "Operational report data exists in MMS.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-026-MAIN",
+    "source_id": "MMS-UC-026 Main Flow",
+    "purpose": "Verify the main success scenario for Track Submitted Request Status and History.",
+    "preconditions": "Student has submitted one or more MMS requests, or the status/history view is available.",
+    "action_or_input": "1. Student opens the request status/history view.2. MMS displays the Student’s submitted MMS requests.3. MMS displays current status and recorded history for each listed request.4. Student views request details.",
+    "expected_result": "Student views actor-visible request status/history for the Student’s own submitted requests.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-026-ALT-A1",
+    "source_id": "MMS-UC-026 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Track Submitted Request Status and History.",
+    "preconditions": "Student has submitted one or more MMS requests, or the status/history view is available.",
+    "action_or_input": "If the Student has no submitted requests, MMS displays an empty request history.",
+    "expected_result": "If the Student has no submitted requests, MMS displays an empty request history.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-026-ALT-A2",
+    "source_id": "MMS-UC-026 Alternative Flow A2",
+    "purpose": "Verify the explicitly specified alternative flow A2 for Track Submitted Request Status and History.",
+    "preconditions": "Student has submitted one or more MMS requests, or the status/history view is available.",
+    "action_or_input": "If the Student attempts to access another Student’s request history, MMS prevents access.",
+    "expected_result": "If the Student attempts to access another Student’s request history, MMS prevents access.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-026-EXC",
+    "source_id": "MMS-UC-026 Exception Flow",
+    "purpose": "Verify the exception guarantee for Track Submitted Request Status and History.",
+    "preconditions": "Student has submitted one or more MMS requests, or the status/history view is available.",
+    "action_or_input": "Invalid or unauthorized actions are rejected without committing an invalid business-state change; specific exceptions are listed in Alternative Flows where source-supported.",
+    "expected_result": "No unauthorized or invalid business-state change is committed; existing valid records and previously recorded history remain intact.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-027-MAIN",
+    "source_id": "MMS-UC-027 Main Flow",
+    "purpose": "Verify the main success scenario for Activate Approved Deregistration.",
+    "preconditions": "A deregistration request is in Approved — Awaiting Effective Date state.",
+    "action_or_input": "1. The next calendar day after approval begins.2. MMS identifies approved deregistration requests whose service effect is due.3. MMS makes the deregistration effective for mess service.4. MMS records the resulting lifecycle state/history.",
+    "expected_result": "The Student is deregistered for mess service from the next calendar day, as required by the frozen PS.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-027-ALT-A1",
+    "source_id": "MMS-UC-027 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Activate Approved Deregistration.",
+    "preconditions": "A deregistration request is in Approved — Awaiting Effective Date state.",
+    "action_or_input": "If the request is no longer eligible for the transition because its state has validly changed, MMS does not apply the transition.",
+    "expected_result": "If the request is no longer eligible for the transition because its state has validly changed, MMS does not apply the transition.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-027-EXC",
+    "source_id": "MMS-UC-027 Exception Flow",
+    "purpose": "Verify the exception guarantee for Activate Approved Deregistration.",
+    "preconditions": "A deregistration request is in Approved — Awaiting Effective Date state.",
+    "action_or_input": "A processing failure shall not create a partial or contradictory registration state; the previously recorded approval remains available for recovery.",
+    "expected_result": "The approved request and prior registration state remain recorded consistently until the event-triggered transition can be completed.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-028-MAIN",
+    "source_id": "MMS-UC-028 Main Flow",
+    "purpose": "Verify the main success scenario for Apply Default Vacation Response at Deadline.",
+    "preconditions": "The survey exists; a response deadline was set; one or more currently registered Students have no recorded response.",
+    "action_or_input": "1. The survey response deadline is reached.2. MMS identifies currently registered Students with no recorded response.3. MMS records No as the default response for each such Student.4. MMS makes the defaulted responses available in the survey response summary.",
+    "expected_result": "Each applicable non-responding registered Student has a recorded default No response.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-028-ALT-A1",
+    "source_id": "MMS-UC-028 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Apply Default Vacation Response at Deadline.",
+    "preconditions": "The survey exists; a response deadline was set; one or more currently registered Students have no recorded response.",
+    "action_or_input": "Students with an explicit Yes or No response are left unchanged.",
+    "expected_result": "Students with an explicit Yes or No response are left unchanged.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-028-ALT-A2",
+    "source_id": "MMS-UC-028 Alternative Flow A2",
+    "purpose": "Verify the explicitly specified alternative flow A2 for Apply Default Vacation Response at Deadline.",
+    "preconditions": "The survey exists; a response deadline was set; one or more currently registered Students have no recorded response.",
+    "action_or_input": "If no registered Student lacks a response, no default response record is created.",
+    "expected_result": "If no registered Student lacks a response, no default response record is created.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-028-EXC",
+    "source_id": "MMS-UC-028 Exception Flow",
+    "purpose": "Verify the exception guarantee for Apply Default Vacation Response at Deadline.",
+    "preconditions": "The survey exists; a response deadline was set; one or more currently registered Students have no recorded response.",
+    "action_or_input": "A processing failure shall not overwrite explicit responses or create duplicate response records.",
+    "expected_result": "Existing explicit responses remain unchanged and valid.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-029-MAIN",
+    "source_id": "MMS-UC-029 Main Flow",
+    "purpose": "Verify the main success scenario for Default-Reject Undecided Special Food Request.",
+    "preconditions": "A special-food request exists in Requested state and no Caretaker decision has been recorded within the stipulated period.",
+    "action_or_input": "1. The stipulated decision period expires.2. MMS verifies that the request remains Requested and undecided.3. MMS changes the request state to Rejected (Default).4. MMS records the lifecycle/history update.5. MMS triggers the rejection-outcome notification to the Student.",
+    "expected_result": "The undecided request is Rejected (Default) and the rejection outcome is recorded/notified.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-029-ALT-A1",
+    "source_id": "MMS-UC-029 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Default-Reject Undecided Special Food Request.",
+    "preconditions": "A special-food request exists in Requested state and no Caretaker decision has been recorded within the stipulated period.",
+    "action_or_input": "If the Caretaker has already approved or rejected the request, MMS does not perform the default rejection.",
+    "expected_result": "If the Caretaker has already approved or rejected the request, MMS does not perform the default rejection.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-029-EXC",
+    "source_id": "MMS-UC-029 Exception Flow",
+    "purpose": "Verify the exception guarantee for Default-Reject Undecided Special Food Request.",
+    "preconditions": "A special-food request exists in Requested state and no Caretaker decision has been recorded within the stipulated period.",
+    "action_or_input": "A processing failure shall not create both an explicit and a default decision for the same request.",
+    "expected_result": "The request remains in its last valid state with no duplicate decision.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-030-MAIN",
+    "source_id": "MMS-UC-030 Main Flow",
+    "purpose": "Verify the main success scenario for Generate Monthly Mess Bills.",
+    "preconditions": "Served-day data, approved special-meal/add-on charges, and approved rebate deductions applicable to the billing month are available in MMS.",
+    "action_or_input": "1. The monthly billing event occurs for the applicable calendar month.2. MMS determines served-day charges using the applicable daily-rate input.3. MMS includes approved special-meal/add-on charges.4. MMS applies approved rebate deductions.5. MMS generates the monthly bill records in Generated state for Caretaker review.",
+    "expected_result": "Monthly bill records exist in Generated state and are available to the Caretaker for review/finalization/publication through MMS-UC-010.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-030-ALT-A1",
+    "source_id": "MMS-UC-030 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Generate Monthly Mess Bills.",
+    "preconditions": "Served-day data, approved special-meal/add-on charges, and approved rebate deductions applicable to the billing month are available in MMS.",
+    "action_or_input": "If required bill-input data is unavailable, MMS does not mark the affected bill as ready for Caretaker finalization.",
+    "expected_result": "If required bill-input data is unavailable, MMS does not mark the affected bill as ready for Caretaker finalization.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-030-EXC",
+    "source_id": "MMS-UC-030 Exception Flow",
+    "purpose": "Verify the exception guarantee for Generate Monthly Mess Bills.",
+    "preconditions": "Served-day data, approved special-meal/add-on charges, and approved rebate deductions applicable to the billing month are available in MMS.",
+    "action_or_input": "A computation or data-access failure shall not publish an incomplete or unfinalized bill.",
+    "expected_result": "No incomplete bill is published; source billing data remains unchanged.",
+    "test_type": "exception-flow"
+  },
+  {
+    "test_id": "UC-031-MAIN",
+    "source_id": "MMS-UC-031 Main Flow",
+    "purpose": "Verify the main success scenario for Send Vacation Survey Reminder.",
+    "preconditions": "A vacation food-continuity survey exists and is open for currently registered Students.",
+    "action_or_input": "1. A reminder event occurs for the open survey.2. MMS identifies the applicable currently registered Students.3. MMS triggers the system-generated survey reminder email through the external email infrastructure.",
+    "expected_result": "The MMS reminder event has been triggered for the applicable survey recipients.",
+    "test_type": "main-flow"
+  },
+  {
+    "test_id": "UC-031-ALT-A1",
+    "source_id": "MMS-UC-031 Alternative Flow A1",
+    "purpose": "Verify the explicitly specified alternative flow A1 for Send Vacation Survey Reminder.",
+    "preconditions": "A vacation food-continuity survey exists and is open for currently registered Students.",
+    "action_or_input": "If the survey is no longer open, MMS does not trigger an open-survey reminder.",
+    "expected_result": "If the survey is no longer open, MMS does not trigger an open-survey reminder.",
+    "test_type": "alternative-flow"
+  },
+  {
+    "test_id": "UC-031-EXC",
+    "source_id": "MMS-UC-031 Exception Flow",
+    "purpose": "Verify the exception guarantee for Send Vacation Survey Reminder.",
+    "preconditions": "A vacation food-continuity survey exists and is open for currently registered Students.",
+    "action_or_input": "External email-delivery failure handling is outside MMS scope unless separately specified.",
+    "expected_result": "Survey and response records remain unchanged.",
+    "test_type": "exception-flow"
+  }
+]

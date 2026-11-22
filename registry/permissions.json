@@ -34,6 +34,394 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "mms": {
+      "grants": {
+        "Mess Admin": [
+          "mms.role.assign"
+        ],
+        "Mess Caretaker": [
+          "mms.announcement.publish",
+          "mms.announcement.view",
+          "mms.billing.approve",
+          "mms.billing.publish",
+          "mms.billing.review",
+          "mms.deregistration.review",
+          "mms.feedback.view",
+          "mms.menu.manage",
+          "mms.menu.view",
+          "mms.rebate.review",
+          "mms.rebate.update",
+          "mms.registration.review",
+          "mms.registration.window.manage",
+          "mms.report.operational",
+          "mms.request.view_self",
+          "mms.special_food.review",
+          "mms.special_food.update",
+          "mms.survey.create",
+          "mms.survey.view_summary"
+        ],
+        "Mess Warden": [
+          "mms.announcement.publish",
+          "mms.announcement.view",
+          "mms.billing.view_self",
+          "mms.feedback.view",
+          "mms.menu.view",
+          "mms.report.supervisory",
+          "mms.request.view_self",
+          "mms.survey.view_summary"
+        ],
+        "student": [
+          "mms.announcement.view",
+          "mms.billing.view_self",
+          "mms.deregistration.create",
+          "mms.feedback.create",
+          "mms.menu.view",
+          "mms.rebate.create",
+          "mms.registration.create",
+          "mms.request.view_self",
+          "mms.special_food.create",
+          "mms.survey_response.create"
+        ]
+      },
+      "module_grants": [
+        "Mess Admin",
+        "Mess Caretaker",
+        "Mess Warden",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/mms",
+        "icon": "FaCircle",
+        "items": [
+          {
+            "code": "mms.special-food-request",
+            "icon": "FaCircle",
+            "label": "Special Food Request",
+            "required_permission": "mms.special_food.create",
+            "sort_order": 5,
+            "to": "/mms/special-food-request"
+          },
+          {
+            "code": "mms.my-requests",
+            "icon": "FaCircle",
+            "label": "My Requests",
+            "required_permission": "mms.request.view_self",
+            "sort_order": 10,
+            "to": "/mms/requests"
+          },
+          {
+            "code": "mms.my-bills",
+            "icon": "FaCircle",
+            "label": "My Bills",
+            "required_permission": "mms.billing.view_self",
+            "sort_order": 15,
+            "to": "/mms/bills"
+          },
+          {
+            "code": "mms.menu",
+            "icon": "FaCircle",
+            "label": "Weekly Menu",
+            "required_permission": "mms.menu.view",
+            "sort_order": 20,
+            "to": "/mms/menu"
+          },
+          {
+            "code": "mms.feedback",
+            "icon": "FaCircle",
+            "label": "Feedback",
+            "required_permission": "mms.feedback.create",
+            "sort_order": 25,
+            "to": "/mms/feedback"
+          },
+          {
+            "code": "mms.survey-response",
+            "icon": "FaCircle",
+            "label": "Vacation Survey",
+            "required_permission": "mms.survey_response.create",
+            "sort_order": 30,
+            "to": "/mms/survey-response"
+          },
+          {
+            "code": "mms.registration-approvals",
+            "icon": "FaCircle",
+            "label": "Registration Approvals",
+            "required_permission": "mms.registration.review",
+            "sort_order": 55,
+            "to": "/mms/registration-approvals"
+          },
+          {
+            "code": "mms.deregistration-approvals",
+            "icon": "FaCircle",
+            "label": "Deregistration Approvals",
+            "required_permission": "mms.deregistration.review",
+            "sort_order": 60,
+            "to": "/mms/deregistration-approvals"
+          },
+          {
+            "code": "mms.rebate-approvals",
+            "icon": "FaCircle",
+            "label": "Rebate Approvals",
+            "required_permission": "mms.rebate.review",
+            "sort_order": 65,
+            "to": "/mms/rebate-approvals"
+          },
+          {
+            "code": "mms.special-food-approvals",
+            "icon": "FaCircle",
+            "label": "Special Food Approvals",
+            "required_permission": "mms.special_food.review",
+            "sort_order": 70,
+            "to": "/mms/special-food-approvals"
+          },
+          {
+            "code": "mms.menu-management",
+            "icon": "FaCircle",
+            "label": "Menu Management",
+            "required_permission": "mms.menu.manage",
+            "sort_order": 75,
+            "to": "/mms/menu-management"
+          },
+          {
+            "code": "mms.billing-review",
+            "icon": "FaCircle",
+            "label": "Billing Review",
+            "required_permission": "mms.billing.review",
+            "sort_order": 80,
+            "to": "/mms/billing-review"
+          },
+          {
+            "code": "mms.survey-management",
+            "icon": "FaCircle",
+            "label": "Vacation Survey",
+            "required_permission": "mms.survey.create",
+            "sort_order": 85,
+            "to": "/mms/survey-management"
+          },
+          {
+            "code": "mms.survey-summary",
+            "icon": "FaCircle",
+            "label": "Survey Summary",
+            "required_permission": "mms.survey.view_summary",
+            "sort_order": 90,
+            "to": "/mms/survey-summary"
+          },
+          {
+            "code": "mms.announcements",
+            "icon": "FaCircle",
+            "label": "Announcements",
+            "required_permission": "mms.announcement.publish",
+            "sort_order": 95,
+            "to": "/mms/announcements"
+          },
+          {
+            "code": "mms.feedback-review",
+            "icon": "FaCircle",
+            "label": "Feedback Review",
+            "required_permission": "mms.feedback.view",
+            "sort_order": 100,
+            "to": "/mms/feedback-review"
+          },
+          {
+            "code": "mms.operational-reports",
+            "icon": "FaCircle",
+            "label": "Operational Reports",
+            "required_permission": "mms.report.operational",
+            "sort_order": 105,
+            "to": "/mms/operational-reports"
+          },
+          {
+            "code": "mms.warden-menu",
+            "icon": "FaCircle",
+            "label": "Weekly Menu",
+            "required_permission": "mms.menu.view",
+            "sort_order": 110,
+            "to": "/mms/menu"
+          },
+          {
+            "code": "mms.warden-announcement-history",
+            "icon": "FaCircle",
+            "label": "Announcement History",
+            "required_permission": "mms.announcement.view",
+            "sort_order": 115,
+            "to": "/mms/announcements/history"
+          },
+          {
+            "code": "mms.warden-feedback-review",
+            "icon": "FaCircle",
+            "label": "Feedback Review",
+            "required_permission": "mms.feedback.view",
+            "sort_order": 120,
+            "to": "/mms/feedback-review"
+          },
+          {
+            "code": "mms.supervisory-reports",
+            "icon": "FaCircle",
+            "label": "Supervisory Reports",
+            "required_permission": "mms.report.supervisory",
+            "sort_order": 125,
+            "to": "/mms/supervisory-reports"
+          },
+          {
+            "code": "mms.role-assignment",
+            "icon": "FaCircle",
+            "label": "Role Assignment",
+            "required_permission": "mms.role.assign",
+            "sort_order": 130,
+            "to": "/mms/role-assignment"
+          }
+        ],
+        "label": "Mess Management System",
+        "nav_section": "MMS",
+        "sort_order": 20,
+        "status": "planned"
+      },
+      "permissions": [
+        {
+          "code": "mms.role.assign",
+          "label": "Assign or reassign the active Caretaker and Warden"
+        },
+        {
+          "code": "mms.registration.window.manage",
+          "label": "Open the registration window"
+        },
+        {
+          "code": "mms.registration.create",
+          "label": "Submit a mess registration request"
+        },
+        {
+          "code": "mms.registration.review",
+          "label": "Approve or reject registration requests"
+        },
+        {
+          "code": "mms.deregistration.create",
+          "label": "Submit a mess deregistration request"
+        },
+        {
+          "code": "mms.deregistration.review",
+          "label": "Approve or reject deregistration requests"
+        },
+        {
+          "code": "mms.deregistration.manage",
+          "label": "System: activate an approved deregistration"
+        },
+        {
+          "code": "mms.menu.view",
+          "label": "View the weekly menu"
+        },
+        {
+          "code": "mms.menu.manage",
+          "label": "Add, delete or modify weekly menu items"
+        },
+        {
+          "code": "mms.billing.view_self",
+          "label": "View one's own monthly bills and balance"
+        },
+        {
+          "code": "mms.billing.review",
+          "label": "Review generated monthly bills"
+        },
+        {
+          "code": "mms.billing.approve",
+          "label": "Finalize generated monthly bills"
+        },
+        {
+          "code": "mms.billing.publish",
+          "label": "Publish finalized monthly bills"
+        },
+        {
+          "code": "mms.billing.manage",
+          "label": "System: generate monthly bills"
+        },
+        {
+          "code": "mms.rebate.create",
+          "label": "Submit a mess rebate request"
+        },
+        {
+          "code": "mms.rebate.review",
+          "label": "Approve or reject rebate requests"
+        },
+        {
+          "code": "mms.rebate.update",
+          "label": "Modify rebate dates before approval"
+        },
+        {
+          "code": "mms.survey.create",
+          "label": "Create a vacation food continuity survey"
+        },
+        {
+          "code": "mms.survey.manage",
+          "label": "System: default-No and reminder for surveys"
+        },
+        {
+          "code": "mms.survey.view_summary",
+          "label": "View the vacation survey response summary"
+        },
+        {
+          "code": "mms.survey_response.create",
+          "label": "Respond Yes or No to a vacation survey"
+        },
+        {
+          "code": "mms.special_food.create",
+          "label": "Submit a special food request"
+        },
+        {
+          "code": "mms.special_food.review",
+          "label": "Approve or reject special food requests"
+        },
+        {
+          "code": "mms.special_food.update",
+          "label": "Record Served or Cancelled fulfillment"
+        },
+        {
+          "code": "mms.special_food.manage",
+          "label": "System: default-reject undecided requests"
+        },
+        {
+          "code": "mms.announcement.publish",
+          "label": "Publish mess-related announcements"
+        },
+        {
+          "code": "mms.announcement.view",
+          "label": "View announcement history"
+        },
+        {
+          "code": "mms.feedback.create",
+          "label": "Submit text feedback"
+        },
+        {
+          "code": "mms.feedback.view",
+          "label": "View feedback entries"
+        },
+        {
+          "code": "mms.report.supervisory",
+          "label": "View supervisory reports"
+        },
+        {
+          "code": "mms.report.operational",
+          "label": "Generate operational reports"
+        },
+        {
+          "code": "mms.request.view_self",
+          "label": "View one's own request status and history"
+        },
+        {
+          "code": "mms.notification.manage",
+          "label": "System: drain the notification outbox"
+        }
+      ],
+      "scope_permissions": [
+        "mms.billing.review",
+        "mms.billing.view_self",
+        "mms.feedback.view"
+      ],
+      "system_permissions": [
+        "mms.billing.manage",
+        "mms.deregistration.manage",
+        "mms.notification.manage",
+        "mms.special_food.manage",
+        "mms.survey.manage"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

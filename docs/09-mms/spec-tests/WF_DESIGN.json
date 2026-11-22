@@ -1,0 +1,191 @@
+[
+  {
+    "test_id": "WF-BW-MMS-01",
+    "source_id": "BW-MMS-01 path",
+    "purpose": "— Registration — Approved specified path",
+    "preconditions": "One valid path from opening a registration window through Student submission to Caretaker approval.",
+    "action_or_input": "Caretaker opens a registration window; Student then submits during the open window.; execute its listed state-transition table: Registration Window Not Open — Mess Caretaker — MMS-UC-002 — Open Registration Window — Window information is sufficient; outcome: Open — Registration Window Open — BR-MMS-008; Registration Window Open — Student — MMS-UC-003 — Submit Registration Request — Window is open; valid submission — Registration Request Pending — BR-MMS-009; BR-MMS-035; Registration Request Pending — Mess Caretaker — MMS-UC-004 — Review Registration Request — Outcome: Approve — Registration Request Approved / Student Registered — BR-MMS-010; BR-MMS-035",
+    "expected_result": "Registration Window Not Open — Mess Caretaker — MMS-UC-002 — Open Registration Window — Window information is sufficient; outcome: Open — Registration Window Open — BR-MMS-008; Registration Window Open — Student — MMS-UC-003 — Submit Registration Request — Window is open; valid submission — Registration Request Pending — BR-MMS-009; BR-MMS-035; Registration Request Pending — Mess Caretaker — MMS-UC-004 — Review Registration Request — Outcome: Approve — Registration Request Approved / Student Registered — BR-MMS-010; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-02",
+    "source_id": "BW-MMS-02 path",
+    "purpose": "— Registration — Rejected specified path",
+    "preconditions": "One valid path from opening a registration window through Student submission to Caretaker rejection.",
+    "action_or_input": "Caretaker opens a registration window; Student then submits during the open window.; execute its listed state-transition table: Registration Window Not Open — Mess Caretaker — MMS-UC-002 — Open Registration Window — Window information is sufficient; outcome: Open — Registration Window Open — BR-MMS-008; Registration Window Open — Student — MMS-UC-003 — Submit Registration Request — Window is open; valid submission — Registration Request Pending — BR-MMS-009; BR-MMS-035; Registration Request Pending — Mess Caretaker — MMS-UC-004 — Review Registration Request — Outcome: Reject — Registration Request Rejected — BR-MMS-010; BR-MMS-035",
+    "expected_result": "Registration Window Not Open — Mess Caretaker — MMS-UC-002 — Open Registration Window — Window information is sufficient; outcome: Open — Registration Window Open — BR-MMS-008; Registration Window Open — Student — MMS-UC-003 — Submit Registration Request — Window is open; valid submission — Registration Request Pending — BR-MMS-009; BR-MMS-035; Registration Request Pending — Mess Caretaker — MMS-UC-004 — Review Registration Request — Outcome: Reject — Registration Request Rejected — BR-MMS-010; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-CW-MMS-01",
+    "source_id": "CW-MMS-01 path",
+    "purpose": "— Registration Request Lifecycle specified path",
+    "preconditions": "Combine the approved and rejected registration basis paths while preserving the common opening/submission prefix.",
+    "action_or_input": "Caretaker opens registration window; Student submits during open window.; execute its listed state-transition table: Registration Window Not Open — Mess Caretaker — MMS-UC-002 — Open Registration Window — Outcome: Open — Registration Window Open — BR-MMS-008; Registration Window Open — Student — MMS-UC-003 — Submit Registration Request — Guard: registration window open; valid submission — Registration Request Pending — BR-MMS-009; BR-MMS-035; Registration Request Pending — Mess Caretaker — MMS-UC-004 — Review Registration Request — Outcome: Approve — Registration Request Approved / Student Registered — BR-MMS-010; BR-MMS-035; Registration Request Pending — Mess Caretaker — MMS-UC-004 — Review Registration Request — Outcome: Reject — Registration Request Rejected — BR-MMS-010; BR-MMS-035",
+    "expected_result": "Registration Window Not Open — Mess Caretaker — MMS-UC-002 — Open Registration Window — Outcome: Open — Registration Window Open — BR-MMS-008; Registration Window Open — Student — MMS-UC-003 — Submit Registration Request — Guard: registration window open; valid submission — Registration Request Pending — BR-MMS-009; BR-MMS-035; Registration Request Pending — Mess Caretaker — MMS-UC-004 — Review Registration Request — Outcome: Approve — Registration Request Approved / Student Registered — BR-MMS-010; BR-MMS-035; Registration Request Pending — Mess Caretaker — MMS-UC-004 — Review Registration Request — Outcome: Reject — Registration Request Rejected — BR-MMS-010; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-03",
+    "source_id": "BW-MMS-03 path",
+    "purpose": "— Deregistration — Approved specified path",
+    "preconditions": "Registered Student submission, Caretaker approval, and the next-calendar-day System transition that makes deregistration effective.",
+    "action_or_input": "Registered Student submits deregistration request.; execute its listed state-transition table: Student Registered — Student — MMS-UC-005 — Submit Deregistration Request — Valid submission — Deregistration Request Pending — BR-MMS-012; BR-MMS-035; Deregistration Request Pending — Mess Caretaker — MMS-UC-006 — Review Deregistration Request — Outcome: Approve — Deregistration Approved — Awaiting Effective Date — BR-MMS-010; BR-MMS-035; Deregistration Approved — Awaiting Effective Date — System — MMS-UC-027 — Activate Approved Deregistration — Trigger: next calendar day begins after approval — Student Deregistered / Mess Service Inactive — BR-MMS-013",
+    "expected_result": "Student Registered — Student — MMS-UC-005 — Submit Deregistration Request — Valid submission — Deregistration Request Pending — BR-MMS-012; BR-MMS-035; Deregistration Request Pending — Mess Caretaker — MMS-UC-006 — Review Deregistration Request — Outcome: Approve — Deregistration Approved — Awaiting Effective Date — BR-MMS-010; BR-MMS-035; Deregistration Approved — Awaiting Effective Date — System — MMS-UC-027 — Activate Approved Deregistration — Trigger: next calendar day begins after approval — Student Deregistered / Mess Service Inactive — BR-MMS-013",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-04",
+    "source_id": "BW-MMS-04 path",
+    "purpose": "— Deregistration — Rejected specified path",
+    "preconditions": "One path from registered Student submission through Caretaker rejection.",
+    "action_or_input": "Registered Student submits deregistration request.; execute its listed state-transition table: Student Registered — Student — MMS-UC-005 — Submit Deregistration Request — Valid submission — Deregistration Request Pending — BR-MMS-012; BR-MMS-035; Deregistration Request Pending — Mess Caretaker — MMS-UC-006 — Review Deregistration Request — Outcome: Reject — Deregistration Request Rejected / Student remains Registered — BR-MMS-010; BR-MMS-035",
+    "expected_result": "Student Registered — Student — MMS-UC-005 — Submit Deregistration Request — Valid submission — Deregistration Request Pending — BR-MMS-012; BR-MMS-035; Deregistration Request Pending — Mess Caretaker — MMS-UC-006 — Review Deregistration Request — Outcome: Reject — Deregistration Request Rejected / Student remains Registered — BR-MMS-010; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-CW-MMS-02",
+    "source_id": "CW-MMS-02 path",
+    "purpose": "— Deregistration Request Lifecycle specified path",
+    "preconditions": "Combine the approved and rejected deregistration paths.",
+    "action_or_input": "Registered Student submits deregistration request.; execute its listed state-transition table: Student Registered — Student — MMS-UC-005 — Submit Deregistration Request — Valid submission — Deregistration Request Pending — BR-MMS-012; BR-MMS-035; Deregistration Request Pending — Mess Caretaker — MMS-UC-006 — Review Deregistration Request — Outcome: Approve — Deregistration Approved — Awaiting Effective Date — BR-MMS-010; BR-MMS-035; Deregistration Approved — Awaiting Effective Date — System — MMS-UC-027 — Activate Approved Deregistration — Trigger: next calendar day begins after approval — Student Deregistered / Mess Service Inactive — BR-MMS-013; Deregistration Request Pending — Mess Caretaker — MMS-UC-006 — Review Deregistration Request — Outcome: Reject — Deregistration Request Rejected / Student remains Registered — BR-MMS-010; BR-MMS-035",
+    "expected_result": "Student Registered — Student — MMS-UC-005 — Submit Deregistration Request — Valid submission — Deregistration Request Pending — BR-MMS-012; BR-MMS-035; Deregistration Request Pending — Mess Caretaker — MMS-UC-006 — Review Deregistration Request — Outcome: Approve — Deregistration Approved — Awaiting Effective Date — BR-MMS-010; BR-MMS-035; Deregistration Approved — Awaiting Effective Date — System — MMS-UC-027 — Activate Approved Deregistration — Trigger: next calendar day begins after approval — Student Deregistered / Mess Service Inactive — BR-MMS-013; Deregistration Request Pending — Mess Caretaker — MMS-UC-006 — Review Deregistration Request — Outcome: Reject — Deregistration Request Rejected / Student remains Registered — BR-MMS-010; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-05",
+    "source_id": "BW-MMS-05 path",
+    "purpose": "— Rebate — Approved as Submitted specified path",
+    "preconditions": "Valid rebate submission followed by approval without changing dates.",
+    "action_or_input": "Student submits a valid rebate request.; execute its listed state-transition table: No Current Rebate Request — Student — MMS-UC-014 — Submit Rebate Request — Guards: reason/date data complete; duration >=3 days; >=1-day lead time; no overlap — Rebate Request Pending — BR-MMS-021 to BR-MMS-024; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Approve without date modification — Rebate Approved; approved dates used for billing adjustment — BR-MMS-019; BR-MMS-025; BR-MMS-035",
+    "expected_result": "No Current Rebate Request — Student — MMS-UC-014 — Submit Rebate Request — Guards: reason/date data complete; duration >=3 days; >=1-day lead time; no overlap — Rebate Request Pending — BR-MMS-021 to BR-MMS-024; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Approve without date modification — Rebate Approved; approved dates used for billing adjustment — BR-MMS-019; BR-MMS-025; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-06",
+    "source_id": "BW-MMS-06 path",
+    "purpose": "— Rebate — Dates Modified then Approved specified path",
+    "preconditions": "Valid rebate submission followed by policy-permitted date modification and approval.",
+    "action_or_input": "Student submits a valid rebate request.; execute its listed state-transition table: No Current Rebate Request — Student — MMS-UC-014 — Submit Rebate Request — Guards: reason/date data complete; duration >=3 days; >=1-day lead time; no overlap — Rebate Request Pending — BR-MMS-021 to BR-MMS-024; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Modify dates where external policy permits, then Approve — Rebate Approved with Modified Dates; approved dates used for billing adjustment — BR-MMS-019; BR-MMS-025; BR-MMS-035",
+    "expected_result": "No Current Rebate Request — Student — MMS-UC-014 — Submit Rebate Request — Guards: reason/date data complete; duration >=3 days; >=1-day lead time; no overlap — Rebate Request Pending — BR-MMS-021 to BR-MMS-024; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Modify dates where external policy permits, then Approve — Rebate Approved with Modified Dates; approved dates used for billing adjustment — BR-MMS-019; BR-MMS-025; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-07",
+    "source_id": "BW-MMS-07 path",
+    "purpose": "— Rebate — Rejected specified path",
+    "preconditions": "Valid rebate submission followed by Caretaker rejection.",
+    "action_or_input": "Student submits a valid rebate request.; execute its listed state-transition table: No Current Rebate Request — Student — MMS-UC-014 — Submit Rebate Request — Guards: reason/date data complete; duration >=3 days; >=1-day lead time; no overlap — Rebate Request Pending — BR-MMS-021 to BR-MMS-024; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Reject — Rebate Rejected — BR-MMS-035",
+    "expected_result": "No Current Rebate Request — Student — MMS-UC-014 — Submit Rebate Request — Guards: reason/date data complete; duration >=3 days; >=1-day lead time; no overlap — Rebate Request Pending — BR-MMS-021 to BR-MMS-024; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Reject — Rebate Rejected — BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-CW-MMS-03",
+    "source_id": "CW-MMS-03 path",
+    "purpose": "— Rebate Request Lifecycle specified path",
+    "preconditions": "Combine valid rebate submission with the three materially different Caretaker outcomes.",
+    "action_or_input": "Student submits a valid rebate request.; execute its listed state-transition table: No Current Rebate Request — Student — MMS-UC-014 — Submit Rebate Request — Guards: reason/date data complete; duration >=3 days; >=1-day lead time; no overlap — Rebate Request Pending — BR-MMS-021 to BR-MMS-024; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Approve without date modification — Rebate Approved; billing adjustment uses approved dates — BR-MMS-019; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Modify dates where permitted, then Approve — Rebate Approved with Modified Dates; billing adjustment uses modified approved dates — BR-MMS-019; BR-MMS-025; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Reject — Rebate Rejected — BR-MMS-035",
+    "expected_result": "No Current Rebate Request — Student — MMS-UC-014 — Submit Rebate Request — Guards: reason/date data complete; duration >=3 days; >=1-day lead time; no overlap — Rebate Request Pending — BR-MMS-021 to BR-MMS-024; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Approve without date modification — Rebate Approved; billing adjustment uses approved dates — BR-MMS-019; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Modify dates where permitted, then Approve — Rebate Approved with Modified Dates; billing adjustment uses modified approved dates — BR-MMS-019; BR-MMS-025; BR-MMS-035; Rebate Request Pending — Mess Caretaker — MMS-UC-015 — Review Rebate Request — Outcome: Reject — Rebate Rejected — BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-08",
+    "source_id": "BW-MMS-08 path",
+    "purpose": "— Vacation Survey — Yes Response specified path",
+    "preconditions": "Create survey and record an explicit Yes response.",
+    "action_or_input": "Caretaker creates survey.; execute its listed state-transition table: Vacation Survey Not Created — Mess Caretaker — MMS-UC-016 — Create Vacation Food Continuity Survey — Upcoming vacation identified; response deadline set; only currently registered Students included — Vacation Survey Open — BR-MMS-026; BR-MMS-035; Vacation Survey Open — Student — MMS-UC-017 — Respond to Vacation Food Continuity Survey — Outcome: Yes before deadline — Vacation Response = Yes — BR-MMS-041",
+    "expected_result": "Vacation Survey Not Created — Mess Caretaker — MMS-UC-016 — Create Vacation Food Continuity Survey — Upcoming vacation identified; response deadline set; only currently registered Students included — Vacation Survey Open — BR-MMS-026; BR-MMS-035; Vacation Survey Open — Student — MMS-UC-017 — Respond to Vacation Food Continuity Survey — Outcome: Yes before deadline — Vacation Response = Yes — BR-MMS-041",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-09",
+    "source_id": "BW-MMS-09 path",
+    "purpose": "— Vacation Survey — No Response specified path",
+    "preconditions": "Create survey and record an explicit No response.",
+    "action_or_input": "Caretaker creates survey.; execute its listed state-transition table: Vacation Survey Not Created — Mess Caretaker — MMS-UC-016 — Create Vacation Food Continuity Survey — Upcoming vacation identified; response deadline set; only currently registered Students included — Vacation Survey Open — BR-MMS-026; BR-MMS-035; Vacation Survey Open — Student — MMS-UC-017 — Respond to Vacation Food Continuity Survey — Outcome: No before deadline — Vacation Response = No — BR-MMS-041",
+    "expected_result": "Vacation Survey Not Created — Mess Caretaker — MMS-UC-016 — Create Vacation Food Continuity Survey — Upcoming vacation identified; response deadline set; only currently registered Students included — Vacation Survey Open — BR-MMS-026; BR-MMS-035; Vacation Survey Open — Student — MMS-UC-017 — Respond to Vacation Food Continuity Survey — Outcome: No before deadline — Vacation Response = No — BR-MMS-041",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-10",
+    "source_id": "BW-MMS-10 path",
+    "purpose": "— Vacation Survey — Default No specified path",
+    "preconditions": "Create a vacation survey and apply the source-defined default No when the response deadline is reached for a non-responding registered Student.",
+    "action_or_input": "Caretaker creates survey; Student does not respond by deadline.; execute its listed state-transition table: Vacation Survey Not Created — Mess Caretaker — MMS-UC-016 — Create Vacation Food Continuity Survey — Upcoming vacation identified; response deadline set; only currently registered Students included — Vacation Survey Open — BR-MMS-026; BR-MMS-035; Vacation Survey Open — System — MMS-UC-028 — Apply Default Vacation Response at Deadline — Trigger: response deadline reached; applicable Student has no recorded response — Vacation Response = Default No — BR-MMS-027",
+    "expected_result": "Vacation Survey Not Created — Mess Caretaker — MMS-UC-016 — Create Vacation Food Continuity Survey — Upcoming vacation identified; response deadline set; only currently registered Students included — Vacation Survey Open — BR-MMS-026; BR-MMS-035; Vacation Survey Open — System — MMS-UC-028 — Apply Default Vacation Response at Deadline — Trigger: response deadline reached; applicable Student has no recorded response — Vacation Response = Default No — BR-MMS-027",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-CW-MMS-04",
+    "source_id": "CW-MMS-04 path",
+    "purpose": "— Vacation Food Continuity Response Lifecycle specified path",
+    "preconditions": "Combine the explicit Yes, explicit No, and default-No paths after survey creation.",
+    "action_or_input": "Caretaker creates survey.; execute its listed state-transition table: Vacation Survey Not Created — Mess Caretaker — MMS-UC-016 — Create Vacation Food Continuity Survey — Upcoming vacation identified; response deadline set; only currently registered Students included — Vacation Survey Open — BR-MMS-026; BR-MMS-035; Vacation Survey Open — Student — MMS-UC-017 — Respond to Vacation Food Continuity Survey — Outcome: Yes before deadline — Vacation Response = Yes — BR-MMS-041; Vacation Survey Open — Student — MMS-UC-017 — Respond to Vacation Food Continuity Survey — Outcome: No before deadline — Vacation Response = No — BR-MMS-041; Vacation Survey Open — System — MMS-UC-028 — Apply Default Vacation Response at Deadline — Trigger: response deadline reached; no explicit response — Vacation Response = Default No — BR-MMS-027",
+    "expected_result": "Vacation Survey Not Created — Mess Caretaker — MMS-UC-016 — Create Vacation Food Continuity Survey — Upcoming vacation identified; response deadline set; only currently registered Students included — Vacation Survey Open — BR-MMS-026; BR-MMS-035; Vacation Survey Open — Student — MMS-UC-017 — Respond to Vacation Food Continuity Survey — Outcome: Yes before deadline — Vacation Response = Yes — BR-MMS-041; Vacation Survey Open — Student — MMS-UC-017 — Respond to Vacation Food Continuity Survey — Outcome: No before deadline — Vacation Response = No — BR-MMS-041; Vacation Survey Open — System — MMS-UC-028 — Apply Default Vacation Response at Deadline — Trigger: response deadline reached; no explicit response — Vacation Response = Default No — BR-MMS-027",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-11",
+    "source_id": "BW-MMS-11 path",
+    "purpose": "— Special Food — Rejected by Caretaker specified path",
+    "preconditions": "Valid special-food submission followed by explicit Caretaker rejection.",
+    "action_or_input": "Student submits valid request.; execute its listed state-transition table: ",
+    "expected_result": "— Special Food — Rejected by Caretaker reaches the stated terminal outcome.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-12",
+    "source_id": "BW-MMS-12 path",
+    "purpose": "to BW-MMS-15; CW-MMS-05 specified path",
+    "preconditions": "Set up the workflow starting state stated in the specification.",
+    "action_or_input": "to BW-MMS-15; CW-MMS-05; execute its listed state-transition table: No Special Food Request — Student — MMS-UC-019 — Submit Special Food Request — Guard: submitted at least 1 calendar day before requested date — Special Food Request = Requested — BR-MMS-028; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Reject within stipulated decision period — Rejected — BR-MMS-029; BR-MMS-031; BR-MMS-035",
+    "expected_result": "No Special Food Request — Student — MMS-UC-019 — Submit Special Food Request — Guard: submitted at least 1 calendar day before requested date — Special Food Request = Requested — BR-MMS-028; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Reject within stipulated decision period — Rejected — BR-MMS-029; BR-MMS-031; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-13",
+    "source_id": "BW-MMS-13 path",
+    "purpose": "— Special Food — Approved, Awaiting Fulfillment specified path",
+    "preconditions": "Valid special-food submission followed by approval, ending in the meaningful Approved state.",
+    "action_or_input": "Student submits valid request.; execute its listed state-transition table: No Special Food Request — Student — MMS-UC-019 — Submit Special Food Request — Guard: submitted at least 1 calendar day before requested date — Special Food Request = Requested — BR-MMS-028; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Approve within stipulated decision period — Approved — BR-MMS-031; BR-MMS-035",
+    "expected_result": "No Special Food Request — Student — MMS-UC-019 — Submit Special Food Request — Guard: submitted at least 1 calendar day before requested date — Special Food Request = Requested — BR-MMS-028; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Approve within stipulated decision period — Approved — BR-MMS-031; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-14",
+    "source_id": "BW-MMS-14 path",
+    "purpose": "— Special Food — Served specified path",
+    "preconditions": "Valid special-food submission, approval, then post-approval transition to Served.",
+    "action_or_input": "Student submits valid request.; execute its listed state-transition table: No Special Food Request — Student — MMS-UC-019 — Submit Special Food Request — Guard: submitted at least 1 calendar day before requested date — Special Food Request = Requested — BR-MMS-028; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Approve — Approved — BR-MMS-031; BR-MMS-035; Approved — Mess Caretaker — MMS-UC-021 — Update Special Food Fulfillment Status — Outcome: Served — Served — BR-MMS-031; BR-MMS-035",
+    "expected_result": "No Special Food Request — Student — MMS-UC-019 — Submit Special Food Request — Guard: submitted at least 1 calendar day before requested date — Special Food Request = Requested — BR-MMS-028; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Approve — Approved — BR-MMS-031; BR-MMS-035; Approved — Mess Caretaker — MMS-UC-021 — Update Special Food Fulfillment Status — Outcome: Served — Served — BR-MMS-031; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-15",
+    "source_id": "BW-MMS-15 path",
+    "purpose": "— Special Food — Cancelled specified path",
+    "preconditions": "Valid special-food submission, approval, then post-approval transition to Cancelled.",
+    "action_or_input": "Student submits valid request.; execute its listed state-transition table: No Special Food Request — Student — MMS-UC-019 — Submit Special Food Request — Guard: submitted at least 1 calendar day before requested date — Special Food Request = Requested — BR-MMS-028; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Approve — Approved — BR-MMS-031; BR-MMS-035; Approved — Mess Caretaker — MMS-UC-021 — Update Special Food Fulfillment Status — Outcome: Cancelled — Cancelled — BR-MMS-031; BR-MMS-035",
+    "expected_result": "No Special Food Request — Student — MMS-UC-019 — Submit Special Food Request — Guard: submitted at least 1 calendar day before requested date — Special Food Request = Requested — BR-MMS-028; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Approve — Approved — BR-MMS-031; BR-MMS-035; Approved — Mess Caretaker — MMS-UC-021 — Update Special Food Fulfillment Status — Outcome: Cancelled — Cancelled — BR-MMS-031; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-CW-MMS-05",
+    "source_id": "CW-MMS-05 path",
+    "purpose": "— Special Food Request Lifecycle specified path",
+    "preconditions": "Combine the explicit rejection, default rejection, approval, Served, and Cancelled paths.",
+    "action_or_input": "Student submits a valid special-food request.; execute its listed state-transition table: No Special Food Request — Student — MMS-UC-019 — Submit Special Food Request — Guard: submitted at least 1 calendar day before requested date — Special Food Request = Requested — BR-MMS-028; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Reject within stipulated period — Rejected — BR-MMS-029; BR-MMS-031; BR-MMS-035; Requested — System — MMS-UC-029 — Default-Reject Undecided Special Food Request — Trigger: stipulated decision period expires with no Caretaker decision — Rejected (Default) — BR-MMS-029; BR-MMS-031; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Approve within stipulated period — Approved — BR-MMS-031; BR-MMS-035; Approved — Mess Caretaker — MMS-UC-021 — Update Special Food Fulfillment Status — Outcome: Served — Served — BR-MMS-031; BR-MMS-035; Approved — Mess Caretaker — MMS-UC-021 — Update Special Food Fulfillment Status — Outcome: Cancelled — Cancelled — BR-MMS-031; BR-MMS-035",
+    "expected_result": "No Special Food Request — Student — MMS-UC-019 — Submit Special Food Request — Guard: submitted at least 1 calendar day before requested date — Special Food Request = Requested — BR-MMS-028; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Reject within stipulated period — Rejected — BR-MMS-029; BR-MMS-031; BR-MMS-035; Requested — System — MMS-UC-029 — Default-Reject Undecided Special Food Request — Trigger: stipulated decision period expires with no Caretaker decision — Rejected (Default) — BR-MMS-029; BR-MMS-031; BR-MMS-035; Requested — Mess Caretaker — MMS-UC-020 — Review Special Food Request — Outcome: Approve within stipulated period — Approved — BR-MMS-031; BR-MMS-035; Approved — Mess Caretaker — MMS-UC-021 — Update Special Food Fulfillment Status — Outcome: Served — Served — BR-MMS-031; BR-MMS-035; Approved — Mess Caretaker — MMS-UC-021 — Update Special Food Fulfillment Status — Outcome: Cancelled — Cancelled — BR-MMS-031; BR-MMS-035",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-BW-MMS-16",
+    "source_id": "BW-MMS-16 path",
+    "purpose": "— Monthly Billing — Generated to Published specified path",
+    "preconditions": "Generate monthly bill records on the calendar-month billing event and progress them through Caretaker review/finalization to publication.",
+    "action_or_input": "Calendar-month billing cycle becomes due for bill generation.; execute its listed state-transition table: Monthly Bill Not Generated — System — MMS-UC-030 — Generate Monthly Mess Bills — Calendar-month billing event; required billing inputs available — Monthly Bill Generated — BR-MMS-016; BR-MMS-017; BR-MMS-019; BR-MMS-030; Monthly Bill Generated — Mess Caretaker — MMS-UC-010 — Review, Finalize, and Publish Monthly Bills — Outcome: reviewed and finalized before publication — Monthly Bill Published — BR-MMS-018; BR-MMS-035",
+    "expected_result": "Monthly Bill Not Generated — System — MMS-UC-030 — Generate Monthly Mess Bills — Calendar-month billing event; required billing inputs available — Monthly Bill Generated — BR-MMS-016; BR-MMS-017; BR-MMS-019; BR-MMS-030; Monthly Bill Generated — Mess Caretaker — MMS-UC-010 — Review, Finalize, and Publish Monthly Bills — Outcome: reviewed and finalized before publication — Monthly Bill Published — BR-MMS-018; BR-MMS-035",
+    "test_type": "workflow-path"
+  }
+]

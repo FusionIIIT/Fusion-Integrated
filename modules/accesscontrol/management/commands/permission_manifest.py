@@ -206,7 +206,7 @@ def _enforced(module_code: str) -> set[str] | None:
             continue
         if "selectors" in parts:
             continue
-        found.update(re.findall(rf"{re.escape(module_code)}\.[a-z_]+\.[a-z_]+",
+        found.update(re.findall(rf"{re.escape(module_code)}\.[a-z_]+(?:\.[a-z_]+)+",
                                 path.read_text()))
     return found
 
