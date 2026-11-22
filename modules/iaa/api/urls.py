@@ -1,0 +1,38 @@
+from django.urls import path
+
+from modules.iaa.api import views as v
+
+urlpatterns = [
+    path("records", v.RecordListView.as_view(), name="iaa-records"),
+    path("records/<int:pk>", v.RecordDetailView.as_view(), name="iaa-record"),
+    path("records/<int:pk>/documents", v.RecordDocumentsView.as_view(),
+         name="iaa-record-documents"),
+    path("records/<int:pk>/submit", v.RecordSubmitView.as_view(), name="iaa-record-submit"),
+    path("records/<int:pk>/query", v.RecordQueryView.as_view(), name="iaa-record-query"),
+    path("records/<int:pk>/query-response", v.RecordQueryResponseView.as_view(),
+         name="iaa-record-query-response"),
+    path("records/<int:pk>/validate", v.RecordValidateView.as_view(),
+         name="iaa-record-validate"),
+    path("records/<int:pk>/decision", v.RecordDecisionView.as_view(),
+         name="iaa-record-decision"),
+    path("records/<int:pk>/processing", v.RecordProcessingView.as_view(),
+         name="iaa-record-processing"),
+    path("records/<int:pk>/history", v.RecordHistoryView.as_view(), name="iaa-record-history"),
+    path("anomalies", v.AnomalyListView.as_view(), name="iaa-anomalies"),
+    path("anomalies/<int:pk>/resolve", v.AnomalyActionView.as_view(), {"action": "resolve"},
+         name="iaa-anomaly-resolve"),
+    path("anomalies/<int:pk>/escalate", v.AnomalyActionView.as_view(), {"action": "escalate"},
+         name="iaa-anomaly-escalate"),
+    path("observations", v.ObservationListView.as_view(), name="iaa-observations"),
+    path("observations/<int:pk>/respond", v.ObservationRespondView.as_view(),
+         name="iaa-observation-respond"),
+    path("observations/<int:pk>/review", v.ObservationReviewView.as_view(),
+         name="iaa-observation-review"),
+    path("reports/summary", v.ReportSummaryView.as_view(), name="iaa-report-summary"),
+    path("reports/export", v.ReportExportView.as_view(), name="iaa-report-export"),
+    path("notifications", v.NotificationsView.as_view(), name="iaa-notifications"),
+    path("config/policies", v.PolicyView.as_view(), name="iaa-config-policies"),
+    path("config/financial-years", v.FinancialYearView.as_view(),
+         name="iaa-config-financial-years"),
+    path("config/budget-entries", v.BudgetEntryView.as_view(), name="iaa-config-budget"),
+]

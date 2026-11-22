@@ -63,6 +63,1125 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/iaa/anomalies:
+    get:
+      operationId: v1_iaa_anomalies_list
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Anomaly'
+              examples:
+                Anomaly:
+                  value:
+                  - id: 3
+                    category: budget
+                    status: open
+                  summary: anomaly
+          description: ''
+    post:
+      operationId: v1_iaa_anomalies_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlagAnomaly'
+            examples:
+              Flag:
+                value:
+                  category: policy
+                  record_id: 12
+                  description: Split bills.
+                summary: flag
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FlagAnomaly'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FlagAnomaly'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anomaly'
+              examples:
+                Flag:
+                  value:
+                    category: policy
+                    record_id: 12
+                    description: Split bills.
+                  summary: flag
+          description: ''
+  /api/v1/iaa/anomalies/{id}/escalate:
+    post:
+      operationId: v1_iaa_anomalies_escalate_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Text'
+            examples:
+              Resolve:
+                value:
+                  text: Budget re-allocated.
+                summary: resolve
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Text'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Text'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anomaly'
+              examples:
+                Resolve:
+                  value:
+                    text: Budget re-allocated.
+                  summary: resolve
+          description: ''
+  /api/v1/iaa/anomalies/{id}/resolve:
+    post:
+      operationId: v1_iaa_anomalies_resolve_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Text'
+            examples:
+              Resolve:
+                value:
+                  text: Budget re-allocated.
+                summary: resolve
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Text'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Text'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anomaly'
+              examples:
+                Resolve:
+                  value:
+                    text: Budget re-allocated.
+                  summary: resolve
+          description: ''
+  /api/v1/iaa/config/budget-entries:
+    get:
+      operationId: v1_iaa_config_budget_entries_list
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BudgetEntry'
+              examples:
+                Ledger:
+                  value:
+                  - - department: CSE
+                      kind: allocation
+                      amount: '500000.00'
+                  summary: ledger
+          description: ''
+    post:
+      operationId: v1_iaa_config_budget_entries_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetEntryIn'
+            examples:
+              Allocate:
+                value:
+                  financial_year_id: 1
+                  department: CSE
+                  kind: allocation
+                  amount: '500000'
+                summary: allocate
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BudgetEntryIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BudgetEntryIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetEntry'
+              examples:
+                Allocate:
+                  value:
+                    financial_year_id: 1
+                    department: CSE
+                    kind: allocation
+                    amount: '500000'
+                  summary: allocate
+          description: ''
+  /api/v1/iaa/config/financial-years:
+    get:
+      operationId: v1_iaa_config_financial_years_list
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FinancialYear'
+              examples:
+                Years:
+                  value:
+                  - - code: 2026-27
+                      starts_on: '2026-04-01'
+                      ends_on: '2027-03-31'
+                  summary: years
+          description: ''
+    post:
+      operationId: v1_iaa_config_financial_years_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinancialYear'
+            examples:
+              Year:
+                value:
+                  code: 2026-27
+                  starts_on: '2026-04-01'
+                  ends_on: '2027-03-31'
+                summary: year
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinancialYear'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinancialYear'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialYear'
+              examples:
+                Year:
+                  value:
+                    code: 2026-27
+                    starts_on: '2026-04-01'
+                    ends_on: '2027-03-31'
+                  summary: year
+          description: ''
+  /api/v1/iaa/config/policies:
+    get:
+      operationId: v1_iaa_config_policies_list
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Policy'
+              examples:
+                Versions:
+                  value:
+                  - - id: 1
+                      approval_timeout_hours: 48
+                  summary: versions
+          description: ''
+    post:
+      operationId: v1_iaa_config_policies_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishPolicy'
+            examples:
+              Policy:
+                value:
+                  approval_timeout_hours: 48
+                  ta_high_value_threshold: '25000'
+                  budget_check_required: true
+                  request_types:
+                  - voucher
+                  required_documents:
+                    expense: 1
+                    ta: 1
+                  routes:
+                  - kind: expense
+                    levels:
+                    - iaa_hod
+                    escalation_designation: iaa_dean
+                  anomaly_resolvers:
+                    budget:
+                    - iaa_finance_staff
+                summary: policy
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PublishPolicy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PublishPolicy'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+              examples:
+                Policy:
+                  value:
+                    approval_timeout_hours: 48
+                    ta_high_value_threshold: '25000'
+                    budget_check_required: true
+                    request_types:
+                    - voucher
+                    required_documents:
+                      expense: 1
+                      ta: 1
+                    routes:
+                    - kind: expense
+                      levels:
+                      - iaa_hod
+                      escalation_designation: iaa_dean
+                    anomaly_resolvers:
+                      budget:
+                      - iaa_finance_staff
+                  summary: policy
+          description: ''
+  /api/v1/iaa/notifications:
+    get:
+      operationId: v1_iaa_notifications_retrieve
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Dashboard:
+                  value:
+                    pending:
+                      to_review: 2
+                    notifications:
+                    - kind: submitted
+                      message: …
+                  summary: dashboard
+          description: ''
+  /api/v1/iaa/observations:
+    get:
+      operationId: v1_iaa_observations_list
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Observation'
+              examples:
+                Observation:
+                  value:
+                  - id: 5
+                    status: open
+                  summary: observation
+          description: ''
+    post:
+      operationId: v1_iaa_observations_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RaiseObservation'
+            examples:
+              Raise:
+                value:
+                  title: Missing GST invoice
+                  detail: …
+                  record_id: 12
+                summary: raise
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RaiseObservation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RaiseObservation'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Observation'
+              examples:
+                Raise:
+                  value:
+                    title: Missing GST invoice
+                    detail: …
+                    record_id: 12
+                  summary: raise
+          description: ''
+  /api/v1/iaa/observations/{id}/respond:
+    post:
+      operationId: v1_iaa_observations_respond_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RespondObservation'
+            examples:
+              Respond:
+                value:
+                  corrective_action: Invoice obtained.
+                  evidence_link: https://drive.google.com/y
+                summary: respond
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RespondObservation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RespondObservation'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Observation'
+              examples:
+                Respond:
+                  value:
+                    corrective_action: Invoice obtained.
+                    evidence_link: https://drive.google.com/y
+                  summary: respond
+          description: ''
+  /api/v1/iaa/observations/{id}/review:
+    post:
+      operationId: v1_iaa_observations_review_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewObservation'
+            examples:
+              Close:
+                value:
+                  verdict: satisfactory
+                  remarks: ''
+                summary: close
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewObservation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewObservation'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Observation'
+              examples:
+                Close:
+                  value:
+                    verdict: satisfactory
+                    remarks: ''
+                  summary: close
+          description: ''
+  /api/v1/iaa/records:
+    get:
+      operationId: v1_iaa_records_list
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Record'
+              examples:
+                Record:
+                  value:
+                  - id: 12
+                    kind: expense
+                    status: submitted
+                    user_id: 41
+                    department: CSE
+                    request_type: voucher
+                    title: Lab consumables
+                    description: Soldering kits
+                    amount: '12500.00'
+                    financial_year: 2026-27
+                  summary: record
+          description: ''
+    post:
+      operationId: v1_iaa_records_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecord'
+            examples:
+              ExpenseDraft:
+                value:
+                  kind: expense
+                  title: Lab kits
+                  department: CSE
+                summary: expense draft
+              Record:
+                value:
+                  id: 12
+                  kind: expense
+                  status: submitted
+                  user_id: 41
+                  department: CSE
+                  request_type: voucher
+                  title: Lab consumables
+                  description: Soldering kits
+                  amount: '12500.00'
+                  financial_year: 2026-27
+                summary: record
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateRecord'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Record'
+              examples:
+                ExpenseDraft:
+                  value:
+                    kind: expense
+                    title: Lab kits
+                    department: CSE
+                  summary: expense draft
+                Record:
+                  value:
+                    id: 12
+                    kind: expense
+                    status: submitted
+                    user_id: 41
+                    department: CSE
+                    request_type: voucher
+                    title: Lab consumables
+                    description: Soldering kits
+                    amount: '12500.00'
+                    financial_year: 2026-27
+                  summary: record
+          description: ''
+  /api/v1/iaa/records/{id}:
+    get:
+      operationId: v1_iaa_records_retrieve
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordDetail'
+              examples:
+                Record:
+                  value:
+                    id: 12
+                    kind: expense
+                    status: submitted
+                    user_id: 41
+                    department: CSE
+                    request_type: voucher
+                    title: Lab consumables
+                    description: Soldering kits
+                    amount: '12500.00'
+                    financial_year: 2026-27
+                  summary: record
+          description: ''
+    patch:
+      operationId: v1_iaa_records_partial_update
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedExpenseDraft'
+            examples:
+              EditDraft:
+                value:
+                  amount: '9800.00'
+                summary: edit draft
+              Record:
+                value:
+                  id: 12
+                  kind: expense
+                  status: submitted
+                  user_id: 41
+                  department: CSE
+                  request_type: voucher
+                  title: Lab consumables
+                  description: Soldering kits
+                  amount: '12500.00'
+                  financial_year: 2026-27
+                summary: record
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedExpenseDraft'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedExpenseDraft'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordDetail'
+              examples:
+                EditDraft:
+                  value:
+                    amount: '9800.00'
+                  summary: edit draft
+                Record:
+                  value:
+                    id: 12
+                    kind: expense
+                    status: submitted
+                    user_id: 41
+                    department: CSE
+                    request_type: voucher
+                    title: Lab consumables
+                    description: Soldering kits
+                    amount: '12500.00'
+                    financial_year: 2026-27
+                  summary: record
+          description: ''
+  /api/v1/iaa/records/{id}/decision:
+    post:
+      operationId: v1_iaa_records_decision_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Decision'
+            examples:
+              Approve:
+                value:
+                  decision: approve
+                  remarks: Within budget.
+                summary: approve
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Decision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordDetail'
+              examples:
+                Approve:
+                  value:
+                    decision: approve
+                    remarks: Within budget.
+                  summary: approve
+          description: ''
+  /api/v1/iaa/records/{id}/documents:
+    post:
+      operationId: v1_iaa_records_documents_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentIn'
+            examples:
+              Document:
+                value:
+                  title: Bill
+                  link: https://drive.google.com/x
+                summary: document
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DocumentIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DocumentIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+              examples:
+                Document:
+                  value:
+                    title: Bill
+                    link: https://drive.google.com/x
+                  summary: document
+          description: ''
+  /api/v1/iaa/records/{id}/history:
+    get:
+      operationId: v1_iaa_records_history_list
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trail'
+              examples:
+                Trail:
+                  value:
+                  - - action: submit
+                      from_status: draft
+                      to_status: submitted
+                      actor_role: faculty
+                  summary: trail
+          description: ''
+  /api/v1/iaa/records/{id}/processing:
+    post:
+      operationId: v1_iaa_records_processing_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Processing'
+            examples:
+              Record:
+                value:
+                  reference: VCH/2026/118
+                  note: ''
+                summary: record
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Processing'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Processing'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordDetail'
+              examples:
+                Record:
+                  value:
+                    reference: VCH/2026/118
+                    note: ''
+                  summary: record
+          description: ''
+  /api/v1/iaa/records/{id}/query:
+    post:
+      operationId: v1_iaa_records_query_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Text'
+            examples:
+              Question:
+                value:
+                  text: Attach the original bill.
+                summary: question
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Text'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Text'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordDetail'
+              examples:
+                Question:
+                  value:
+                    text: Attach the original bill.
+                  summary: question
+          description: ''
+  /api/v1/iaa/records/{id}/query-response:
+    post:
+      operationId: v1_iaa_records_query_response_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Text'
+            examples:
+              Answer:
+                value:
+                  text: Bill attached.
+                summary: answer
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Text'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Text'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordDetail'
+              examples:
+                Answer:
+                  value:
+                    text: Bill attached.
+                  summary: answer
+          description: ''
+  /api/v1/iaa/records/{id}/submit:
+    post:
+      operationId: v1_iaa_records_submit_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordDetail'
+              examples:
+                Record:
+                  value:
+                    id: 12
+                    kind: expense
+                    status: submitted
+                    user_id: 41
+                    department: CSE
+                    request_type: voucher
+                    title: Lab consumables
+                    description: Soldering kits
+                    amount: '12500.00'
+                    financial_year: 2026-27
+                  summary: record
+          description: ''
+  /api/v1/iaa/records/{id}/validate:
+    post:
+      operationId: v1_iaa_records_validate_create
+      description: Module grant first, then the permission that this HTTP method needs.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Validate'
+            examples:
+              Verify:
+                value:
+                  decision: verify
+                  remarks: ''
+                summary: verify
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Validate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Validate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordDetail'
+              examples:
+                Verify:
+                  value:
+                    decision: verify
+                    remarks: ''
+                  summary: verify
+          description: ''
+  /api/v1/iaa/reports/export:
+    get:
+      operationId: v1_iaa_reports_export_retrieve
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+          description: ''
+  /api/v1/iaa/reports/summary:
+    get:
+      operationId: v1_iaa_reports_summary_retrieve
+      description: Module grant first, then the permission that this HTTP method needs.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Summary:
+                  value:
+                    records:
+                    - kind: expense
+                      status: submitted
+                      count: 4
+                    approval_turnaround: []
+                    anomalies: []
+                    observations: []
+                  summary: summary
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1827,6 +2946,59 @@ components:
       - title
       - topic
       - withdrawn_reason
+    Anomaly:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        record:
+          type: integer
+          nullable: true
+        category:
+          type: string
+          readOnly: true
+        source:
+          type: string
+          readOnly: true
+        description:
+          type: string
+        status:
+          type: string
+          readOnly: true
+        resolver_chain: {}
+        resolver_level:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        assigned_role:
+          type: string
+          maxLength: 64
+        raised_role:
+          type: string
+          maxLength: 64
+        resolved_role:
+          type: string
+          maxLength: 64
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        resolution:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_role
+      - category
+      - created_at
+      - description
+      - id
+      - raised_role
+      - source
+      - status
     Application:
       type: object
       properties:
@@ -1993,6 +3165,66 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BudgetEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        financial_year:
+          type: string
+          readOnly: true
+        department:
+          type: string
+          maxLength: 128
+        kind:
+          type: string
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        record:
+          type: integer
+          nullable: true
+        note:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - department
+      - financial_year
+      - id
+      - kind
+    BudgetEntryIn:
+      type: object
+      properties:
+        financial_year_id:
+          type: integer
+        department:
+          type: string
+          maxLength: 128
+        kind:
+          type: string
+          pattern: ^(allocation|adjustment)$
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        note:
+          type: string
+          default: ''
+          maxLength: 255
+      required:
+      - amount
+      - department
+      - financial_year_id
+      - kind
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +3314,16 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - budget
+      - policy
+      - financial
+      type: string
+      description: |-
+        * `budget` - budget
+        * `policy` - policy
+        * `financial` - financial
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3557,62 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CreateRecord:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 128
+        request_type:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+        kind:
+          type: string
+          pattern: ^(expense|ta)$
+        purpose:
+          type: string
+        trip_start:
+          type: string
+          format: date
+          nullable: true
+        trip_end:
+          type: string
+          format: date
+          nullable: true
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentIn'
+      required:
+      - kind
+    Decision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionDecisionEnum'
+        remarks:
+          type: string
+      required:
+      - decision
+      - remarks
+    DecisionDecisionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
     Detail:
       type: object
       properties:
@@ -2322,6 +3620,46 @@ components:
           type: string
       required:
       - detail
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        link:
+          type: string
+          format: uri
+          maxLength: 500
+        added_by:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - added_by
+      - created_at
+      - id
+      - link
+      - title
+    DocumentIn:
+      type: object
+      properties:
+        link:
+          type: string
+          maxLength: 500
+          pattern: ^https://
+        title:
+          type: string
+          maxLength: 200
+      required:
+      - link
+      - title
     DocumentLink:
       type: object
       description: A Drive link. Validated in core.files.drive.
@@ -2423,6 +3761,39 @@ components:
       - fee_reference
       - season
       - user_id
+    FinancialYear:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 16
+        starts_on:
+          type: string
+          format: date
+        ends_on:
+          type: string
+          format: date
+      required:
+      - code
+      - ends_on
+      - id
+      - starts_on
+    FlagAnomaly:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        description:
+          type: string
+        record_id:
+          type: integer
+          nullable: true
+      required:
+      - category
+      - description
     IncidentRecorded:
       type: object
       properties:
@@ -2732,6 +4103,52 @@ components:
       - is_late
       - message
       - record
+    Observation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        record:
+          type: integer
+          nullable: true
+        respondent_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        title:
+          type: string
+          maxLength: 200
+        detail:
+          type: string
+        status:
+          type: string
+          readOnly: true
+        cycle:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        raised_role:
+          type: string
+          maxLength: 64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        responses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Response'
+          readOnly: true
+      required:
+      - created_at
+      - detail
+      - id
+      - raised_role
+      - respondent_user_id
+      - responses
+      - status
+      - title
     OffCampusRecord:
       type: object
       properties:
@@ -3000,6 +4417,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedExpenseDraft:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 128
+        request_type:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
     PatchedJobPosting:
       type: object
       properties:
@@ -3145,6 +4581,54 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    Policy:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        effective_from:
+          type: string
+          format: date-time
+        approval_timeout_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        ta_high_value_threshold:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        budget_check_required:
+          type: boolean
+        request_types: {}
+        required_documents: {}
+        routes: {}
+        anomaly_resolvers: {}
+        created_role:
+          type: string
+          maxLength: 64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - approval_timeout_hours
+      - created_at
+      - created_role
+      - effective_from
+      - id
+      - ta_high_value_threshold
+    Processing:
+      type: object
+      properties:
+        reference:
+          type: string
+          maxLength: 128
+        note:
+          type: string
+          default: ''
+      required:
+      - reference
     ProfileDocument:
       type: object
       description: |-
@@ -3201,6 +4685,94 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    PublishPolicy:
+      type: object
+      properties:
+        effective_from:
+          type: string
+          format: date-time
+          nullable: true
+        approval_timeout_hours:
+          type: integer
+        ta_high_value_threshold:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        budget_check_required:
+          type: boolean
+          default: true
+        request_types:
+          type: array
+          items:
+            type: string
+            maxLength: 64
+        required_documents:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 0
+        routes:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        anomaly_resolvers:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+              maxLength: 64
+      required:
+      - anomaly_resolvers
+      - approval_timeout_hours
+      - request_types
+      - required_documents
+      - routes
+      - ta_high_value_threshold
+    Query:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        question:
+          type: string
+        raised_role:
+          type: string
+          maxLength: 64
+        response:
+          type: string
+        responded_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - question
+      - raised_role
+    RaiseObservation:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        detail:
+          type: string
+        record_id:
+          type: integer
+          nullable: true
+        respondent_user_id:
+          type: integer
+          nullable: true
+      required:
+      - detail
+      - title
     Recommendation:
       type: object
       description: |-
@@ -3220,6 +4792,184 @@ components:
       - message
       - rule
       - sanction
+    Record:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        department:
+          type: string
+          maxLength: 128
+        request_type:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+        purpose:
+          type: string
+        trip_start:
+          type: string
+          format: date
+          nullable: true
+        trip_end:
+          type: string
+          format: date
+          nullable: true
+        financial_year:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+        route_levels: {}
+        current_level:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        processing_reference:
+          type: string
+          maxLength: 128
+        processing_note:
+          type: string
+        processed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - financial_year
+      - id
+      - kind
+      - status
+      - updated_at
+      - user_id
+    RecordDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        department:
+          type: string
+          maxLength: 128
+        request_type:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          nullable: true
+        purpose:
+          type: string
+        trip_start:
+          type: string
+          format: date
+          nullable: true
+        trip_end:
+          type: string
+          format: date
+          nullable: true
+        financial_year:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+        route_levels: {}
+        current_level:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        processing_reference:
+          type: string
+          maxLength: 128
+        processing_note:
+          type: string
+        processed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+          readOnly: true
+        queries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Query'
+          readOnly: true
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/Step'
+          readOnly: true
+      required:
+      - created_at
+      - documents
+      - financial_year
+      - id
+      - kind
+      - queries
+      - status
+      - steps
+      - updated_at
+      - user_id
     RecordIncident:
       type: object
       properties:
@@ -3466,6 +5216,69 @@ components:
       - message
       - reason
       - route
+    RespondObservation:
+      type: object
+      properties:
+        corrective_action:
+          type: string
+        evidence_link:
+          oneOf:
+          - type: string
+            default: ''
+            maxLength: 500
+            pattern: ^https://
+          - type: string
+            maxLength: 0
+      required:
+      - corrective_action
+    Response:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cycle:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        corrective_action:
+          type: string
+        evidence_link:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 500
+          - type: string
+            maxLength: 0
+        verdict:
+          type: string
+          readOnly: true
+        review_remarks:
+          type: string
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - corrective_action
+      - created_at
+      - cycle
+      - id
+      - verdict
+    ReviewObservation:
+      type: object
+      properties:
+        verdict:
+          $ref: '#/components/schemas/VerdictEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - verdict
     RoundOutcome:
       type: object
       properties:
@@ -3691,6 +5504,42 @@ components:
       required:
       - available
       - season
+    Step:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        level:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        designation:
+          type: string
+          maxLength: 64
+        status:
+          type: string
+          readOnly: true
+        assigned_at:
+          type: string
+          format: date-time
+        via_escalation:
+          type: boolean
+        decided_role:
+          type: string
+          maxLength: 64
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        remarks:
+          type: string
+      required:
+      - assigned_at
+      - designation
+      - id
+      - level
+      - status
     SubmitOfferLetter:
       type: object
       properties:
@@ -3698,6 +5547,13 @@ components:
           type: integer
       required:
       - document_id
+    Text:
+      type: object
+      properties:
+        text:
+          type: string
+      required:
+      - text
     TopicEnum:
       enum:
       - drive
@@ -3714,6 +5570,40 @@ components:
         * `workshop` - Workshop
         * `internship` - Internship programme
         * `general` - General
+    Trail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        action:
+          type: string
+          maxLength: 32
+        from_status:
+          type: string
+          maxLength: 24
+        to_status:
+          type: string
+          maxLength: 24
+        actor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        actor_role:
+          type: string
+          maxLength: 64
+        remarks:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_role
+      - created_at
+      - id
     Transition:
       type: object
       properties:
@@ -3814,6 +5704,32 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    Validate:
+      type: object
+      properties:
+        decision:
+          allOf:
+          - $ref: '#/components/schemas/ValidateDecisionEnum'
+          default: verify
+        remarks:
+          type: string
+          default: ''
+    ValidateDecisionEnum:
+      enum:
+      - verify
+      - reject
+      type: string
+      description: |-
+        * `verify` - verify
+        * `reject` - reject
+    VerdictEnum:
+      enum:
+      - satisfactory
+      - unsatisfactory
+      type: string
+      description: |-
+        * `satisfactory` - satisfactory
+        * `unsatisfactory` - unsatisfactory
     WaiveIncident:
       type: object
       properties:

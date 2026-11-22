@@ -13,6 +13,30 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `iaa`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `iaa.request.view` | See requests and TA claims within your role's scope | `faculty`, `iaa_auditor`, `iaa_dean`, `iaa_director`, `iaa_finance_staff`, `iaa_hod`, `staff` |
+| `iaa.request.create` | Create, submit and track your own requests and TA claims | `faculty`, `staff` |
+| `iaa.clarification.update` | Answer Finance's clarification queries on your own items | `faculty`, `staff` |
+| `iaa.request.review` | Validate requests and verify TA claims (Finance) | `iaa_finance_staff` |
+| `iaa.request.approve` | Approve or reject items assigned to your authority role | `iaa_dean`, `iaa_director`, `iaa_hod` |
+| `iaa.processing.create` | Record internal processing of approved items (no payment) | `iaa_finance_staff` |
+| `iaa.anomaly.view` | See anomalies within your role's scope | `iaa_auditor`, `iaa_dean`, `iaa_director`, `iaa_finance_staff`, `iaa_hod` |
+| `iaa.anomaly.create` | Flag a material anomaly | `iaa_auditor`, `iaa_finance_staff` |
+| `iaa.anomaly.review` | Resolve or escalate an anomaly assigned to your role | `iaa_auditor`, `iaa_dean`, `iaa_director`, `iaa_finance_staff`, `iaa_hod` |
+| `iaa.observation.view` | See audit observations within your role's scope | `faculty`, `iaa_auditor`, `iaa_finance_staff`, `staff` |
+| `iaa.observation.create` | Raise an audit observation | `iaa_auditor` |
+| `iaa.observation.update` | Respond to an audit observation addressed to you | `faculty`, `staff` |
+| `iaa.observation.review` | Verify a response and close or return an observation | `iaa_auditor` |
+| `iaa.report.view` | See role-scoped IAA reports | `iaa_auditor`, `iaa_dean`, `iaa_director`, `iaa_finance_staff`, `iaa_hod` |
+| `iaa.report.export` | Export role-scoped IAA reports | `iaa_auditor`, `iaa_dean`, `iaa_director`, `iaa_finance_staff`, `iaa_hod` |
+| `iaa.notification.view` | See IAA notifications and pending actions | `faculty`, `iaa_auditor`, `iaa_dean`, `iaa_director`, `iaa_finance_staff`, `iaa_hod`, `staff` |
+| `iaa.configuration.view` | See IAA configuration | `iaa_system_admin` |
+| `iaa.configuration.update` | Publish policy, financial years and budget entries | `iaa_system_admin` |
+| `iaa.approval.assign` | System escalation of overdue approvals | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
