@@ -80,6 +80,10 @@ ignore = [
 # A PDF-prose generator; long strings and typographic dashes are its content, not a style defect.
 "docs/08-delivery/build_assignment_pdf.py" = ["E501", "RUF001", "ISC004"]
 
+[tool.coverage.run]
+# Measure the code under test, not the tests or generated migrations.
+omit = ["*/tests/*", "*/migrations/*"]
+
 [tool.pytest.ini_options]
 # `--ds` rather than DJANGO_SETTINGS_MODULE: pytest-django lets the
 # environment variable win over this file, and a developer exporting
