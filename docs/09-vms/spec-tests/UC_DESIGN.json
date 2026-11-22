@@ -1,0 +1,38 @@
+[
+  {
+    "test_id": "TC_UC_01",
+    "source_id": "VMS-UC-010 Main Flow: Visitor pre-registration",
+    "purpose": "Test visitor actor completing self-service pre-registration portal workflow",
+    "preconditions": "Host faculty user exists and accepts visits",
+    "action_or_input": "Visitor fills form with contact info, selects faculty host, enters expected arrival and departure, submits",
+    "expected_result": "System validates mandatory inputs, saves pending visit request, outputs confirmation reference",
+    "test_type": "use_case_main_flow"
+  },
+  {
+    "test_id": "TC_UC_02",
+    "source_id": "VMS-UC-013 Main Flow: Host review and decision",
+    "purpose": "Test host actor viewing assigned pending requests and recording decision",
+    "preconditions": "VisitRequest in SUBMITTED state assigned to the authenticated host user",
+    "action_or_input": "Host views pending requests, reviews visitor details, clicks Approve with remarks",
+    "expected_result": "Decision recorded, pass generated, notification queued for visitor",
+    "test_type": "use_case_main_flow"
+  },
+  {
+    "test_id": "TC_UC_03",
+    "source_id": "VMS-UC-018 Main Flow: Gate pass validation and arrival scan",
+    "purpose": "Test security guard scanning credential at campus entry gate",
+    "preconditions": "Visitor arrives at Gate 1 with active pass within scheduled time window",
+    "action_or_input": "Guard scans QR/pass number, terminal validates credentials against VMS backend",
+    "expected_result": "Terminal displays green access grant verdict with visitor photo and authorized zones; entry timestamp logged",
+    "test_type": "use_case_main_flow"
+  },
+  {
+    "test_id": "TC_UC_04",
+    "source_id": "VMS-UC-021 Main Flow: Gate departure exit recording",
+    "purpose": "Test security guard recording visitor physical departure at gate",
+    "preconditions": "Visitor is physically on campus with an open active VisitSession",
+    "action_or_input": "Guard scans pass on exit, confirms departure in gate terminal UI",
+    "expected_result": "Visit session marked COMPLETED, exit timestamp and gate recorded, pass marked closed",
+    "test_type": "use_case_main_flow"
+  }
+]

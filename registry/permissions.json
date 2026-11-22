@@ -281,5 +281,112 @@
     }
   },
   "publisher": "integrated",
-  "version": 2
+  "version": 2,
+  "vms": {
+    "grants": {
+      "admin": [
+        "vms.request.create",
+        "vms.request.view_self",
+        "vms.request.approve",
+        "vms.gate.verify",
+        "vms.pass.view",
+        "vms.admin.manage"
+      ],
+      "faculty": [
+        "vms.request.create",
+        "vms.request.view_self",
+        "vms.request.approve"
+      ],
+      "staff": [
+        "vms.request.create",
+        "vms.request.view_self",
+        "vms.request.approve"
+      ],
+      "security": [
+        "vms.gate.verify",
+        "vms.pass.view"
+      ],
+      "student": [
+        "vms.request.create",
+        "vms.request.view_self"
+      ]
+    },
+    "module_grants": [
+      "admin",
+      "faculty",
+      "staff",
+      "security",
+      "student"
+    ],
+    "nav": {
+      "base_path": "/vms",
+      "icon": "FaIdBadge",
+      "items": [
+        {
+          "code": "vms.register",
+          "icon": "FaUserPlus",
+          "label": "Pre-Register Visit",
+          "required_permission": "vms.request.create",
+          "sort_order": 10,
+          "to": "/vms/register"
+        },
+        {
+          "code": "vms.approvals",
+          "icon": "FaCheckCircle",
+          "label": "Host Approvals",
+          "required_permission": "vms.request.approve",
+          "sort_order": 20,
+          "to": "/vms/approvals"
+        },
+        {
+          "code": "vms.gate",
+          "icon": "FaDoorOpen",
+          "label": "Gate Validation",
+          "required_permission": "vms.gate.verify",
+          "sort_order": 30,
+          "to": "/vms/gate"
+        },
+        {
+          "code": "vms.passes",
+          "icon": "FaClipboardList",
+          "label": "Active Passes & Logs",
+          "required_permission": "vms.pass.view",
+          "sort_order": 40,
+          "to": "/vms/passes"
+        }
+      ],
+      "label": "Visitor Management",
+      "nav_section": "Administration",
+      "sort_order": 28,
+      "status": "active"
+    },
+    "permissions": [
+      {
+        "code": "vms.request.create",
+        "label": "Pre-register and request visit"
+      },
+      {
+        "code": "vms.request.view_self",
+        "label": "View own visit requests"
+      },
+      {
+        "code": "vms.request.approve",
+        "label": "Review and decide visit requests as host"
+      },
+      {
+        "code": "vms.gate.verify",
+        "label": "Validate visitor passes and log check-in/check-out at gates"
+      },
+      {
+        "code": "vms.pass.view",
+        "label": "View active passes, logs, and visitor roster"
+      },
+      {
+        "code": "vms.admin.manage",
+        "label": "Manage blacklist, access policies and gates"
+      }
+    ],
+    "scope_permissions": [],
+    "system_permissions": []
+  }
 }

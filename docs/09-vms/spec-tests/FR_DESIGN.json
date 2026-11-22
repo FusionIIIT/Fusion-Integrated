@@ -1,0 +1,47 @@
+[
+  {
+    "test_id": "TC_FR_01",
+    "source_id": "VMS-AFR-010-01 pre-registration mandatory attributes",
+    "purpose": "Verify visitor pre-registration creates request with all mandatory attributes",
+    "preconditions": "Visitor and designated host user exist in identity system; phone and ID are unblacklisted",
+    "action_or_input": "Submit visit pre-registration with valid name, phone, email, Aadhaar ID, purpose, and valid time window",
+    "expected_result": "VisitRequest created with status SUBMITTED, host notified, and unique request ID returned",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_02",
+    "source_id": "VMS-AFR-010-02 blacklist phone/ID screening",
+    "purpose": "Verify pre-registration is blocked immediately when phone or ID matches BlacklistRegistry",
+    "preconditions": "BlacklistRegistry contains active entry for phone '9999999999' or ID 'BL-12345'",
+    "action_or_input": "Attempt pre-registration submission using blacklisted phone or ID document number",
+    "expected_result": "Submission refused with 400 Bad Request, reason cites blacklist restriction, no VisitRequest created",
+    "test_type": "functional_negative"
+  },
+  {
+    "test_id": "TC_FR_03",
+    "source_id": "VMS-AFR-013-01 host approval and pass issuance",
+    "purpose": "Verify host APPROVE decision generates an active VisitorPass with cryptographic QR hash",
+    "preconditions": "VisitRequest exists in SUBMITTED status assigned to faculty host",
+    "action_or_input": "Host submits decision APPROVE with permitted zones ['ACADEMIC_BLOCK', 'LIBRARY']",
+    "expected_result": "VisitRequest transitions to APPROVED; VisitorPass issued in ACTIVE status with valid_from/valid_to and unique pass_number",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_04",
+    "source_id": "VMS-AFR-018-01 gate check-in credential scan",
+    "purpose": "Verify security officer scanning active pass checks in visitor and creates VisitSession",
+    "preconditions": "VisitorPass is ACTIVE, current timestamp is within [valid_from, valid_to], gate is in permitted_zones",
+    "action_or_input": "Gate officer scans pass_number at Main Gate terminal",
+    "expected_result": "Pass status remains ACTIVE, VisitSession created in ACTIVE status with check_in_time and gate officer user_id",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_05",
+    "source_id": "VMS-AFR-021-01 gate departure check-out",
+    "purpose": "Verify gate security check-out records departure and closes active visit session",
+    "preconditions": "Active VisitSession exists for the visitor pass",
+    "action_or_input": "Gate officer records departure at Main Gate exit terminal",
+    "expected_result": "VisitSession status transitions to COMPLETED with check_out_time and exit gate logged; VisitorPass transitions to COMPLETED",
+    "test_type": "functional_positive"
+  }
+]
