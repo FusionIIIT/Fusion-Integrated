@@ -497,7 +497,8 @@ def _approval_levels(record: FinancialRecord) -> list[dict]:
         if record.record_kind == "ta" and record.amount < Decimal(str(threshold)):
             return []
         raise ConflictError(
-            "No configured approval route matches this request. Ask System Admin to configure approval hierarchy and thresholds.",
+            "No configured approval route matches this request. Ask System Admin to
+            configure approval hierarchy and thresholds.",
             code="approval_route_not_configured",
         )
     configured_levels = selected.get("levels") or []
@@ -524,7 +525,8 @@ def _approval_levels(record: FinancialRecord) -> list[dict]:
             or record.amount >= Decimal(str(threshold))
         ):
             raise ConflictError(
-                "The configured approval route has no approval levels. Configure at least one eligible authority.",
+                "The configured approval route has no approval levels. Configure at least one
+                eligible authority.",
                 code="approval_route_empty",
             )
         return []
@@ -536,7 +538,8 @@ def _approval_levels(record: FinancialRecord) -> list[dict]:
                 raise ConflictError("Approval timeout must be a positive configured duration.")
             if index == len(levels) - 1:
                 raise ConflictError(
-                    "A timed approval level must have a subsequent configured authority for escalation."
+                    "A timed approval level must have a subsequent configured authority
+                    for escalation."
                 )
     return levels
 
@@ -564,7 +567,8 @@ def finance_validate(
         ta_policy = (policy.settings if policy else {}).get("ta_policy")
         if not isinstance(ta_policy, dict):
             raise ConflictError(
-                "TA policy is not configured for this financial year. Configure it before verification.",
+                "TA policy is not configured for this financial year. Configure it before
+                verification.",
                 code="ta_policy_not_configured",
             )
         if row.trip_start_date is None or row.trip_end_date is None:
@@ -778,7 +782,8 @@ def decide_approval(actor, step_id: int, *, decision: str, remarks: str) -> Appr
         )
         if next_step is None:
             raise PermissionDeniedError(
-                "A creator/claimant cannot approve the same request, and no later eligible configured authority is available.",
+                "A creator/claimant cannot approve the same request, and no later eligible
+                configured authority is available.",
                 code="segregation_of_duties",
             )
         before = row.status
@@ -1375,7 +1380,8 @@ def escalate_overdue_approvals(now=None) -> int:
                 FINANCE_ROLES,
                 "approval_route_exhausted",
                 "IAA approval route needs configuration",
-                f"Request #{step.record_id} timed out with no further eligible configured authority.",
+                f"Request #{step.record_id} timed out with no further eligible "
+                "configured authority",
                 "financial_record",
                 step.record_id,
             )
