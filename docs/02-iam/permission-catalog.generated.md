@@ -13,6 +13,44 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `mms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `mms.role.assign` | Assign or reassign the active Caretaker and Warden | `Mess Admin` |
+| `mms.registration.window.manage` | Open the registration window | `Mess Caretaker` |
+| `mms.registration.create` | Submit a mess registration request | `student` |
+| `mms.registration.review` | Approve or reject registration requests | `Mess Caretaker` |
+| `mms.deregistration.create` | Submit a mess deregistration request | `student` |
+| `mms.deregistration.review` | Approve or reject deregistration requests | `Mess Caretaker` |
+| `mms.deregistration.manage` | System: activate an approved deregistration | _service only_ |
+| `mms.menu.view` | View the weekly menu | `Mess Caretaker`, `Mess Warden`, `student` |
+| `mms.menu.manage` | Add, delete or modify weekly menu items | `Mess Caretaker` |
+| `mms.billing.view_self` | View one's own monthly bills and balance | `Mess Warden`, `student` |
+| `mms.billing.review` | Review generated monthly bills | `Mess Caretaker` |
+| `mms.billing.approve` | Finalize generated monthly bills | `Mess Caretaker` |
+| `mms.billing.publish` | Publish finalized monthly bills | `Mess Caretaker` |
+| `mms.billing.manage` | System: generate monthly bills | _service only_ |
+| `mms.rebate.create` | Submit a mess rebate request | `student` |
+| `mms.rebate.review` | Approve or reject rebate requests | `Mess Caretaker` |
+| `mms.rebate.update` | Modify rebate dates before approval | `Mess Caretaker` |
+| `mms.survey.create` | Create a vacation food continuity survey | `Mess Caretaker` |
+| `mms.survey.manage` | System: default-No and reminder for surveys | _service only_ |
+| `mms.survey.view_summary` | View the vacation survey response summary | `Mess Caretaker`, `Mess Warden` |
+| `mms.survey_response.create` | Respond Yes or No to a vacation survey | `student` |
+| `mms.special_food.create` | Submit a special food request | `student` |
+| `mms.special_food.review` | Approve or reject special food requests | `Mess Caretaker` |
+| `mms.special_food.update` | Record Served or Cancelled fulfillment | `Mess Caretaker` |
+| `mms.special_food.manage` | System: default-reject undecided requests | _service only_ |
+| `mms.announcement.publish` | Publish mess-related announcements | `Mess Caretaker`, `Mess Warden` |
+| `mms.announcement.view` | View announcement history | `Mess Caretaker`, `Mess Warden`, `student` |
+| `mms.feedback.create` | Submit text feedback | `student` |
+| `mms.feedback.view` | View feedback entries | `Mess Caretaker`, `Mess Warden` |
+| `mms.report.supervisory` | View supervisory reports | `Mess Warden` |
+| `mms.report.operational` | Generate operational reports | `Mess Caretaker` |
+| `mms.request.view_self` | View one's own request status and history | `Mess Caretaker`, `Mess Warden`, `student` |
+| `mms.notification.manage` | System: drain the notification outbox | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
