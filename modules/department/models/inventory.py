@@ -100,6 +100,27 @@ class StockRequest(TimeStampedModel):
                 "purpose": "A purpose is required for a stock request."
             })
 
+        if self.item_id and self.requested_quantity is not None:
+            if hasattr(self, "item") and self.requested_quantity > self.item.quantity:
+                raise ValidationError({
+                    "requested_quantity": f"Requested quantity ({self.requested_quantity}) exceeds available inventory ({self.item.quantity})."
+                })
+
+        if self.status == self.Status.ISSUED:
+            if not self.decided_at or not self.decided_by_user_id or self.decision_role != "HOD":
+                raise ValidationError({
+                    "status": "Stock requests cannot be issued without prior HOD approval."
+                })
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            orig = StockRequest.objects.filter(pk=self.pk).first()
+            if orig and orig.status != self.Status.ISSUED and self.status == self.Status.ISSUED:
+                if self.item and self.item.quantity >= self.requested_quantity:
+                    self.item.quantity -= self.requested_quantity
+                    self.item.save(update_fields=["quantity"])
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return (
             f"Request #{self.pk}: {self.item.name} "

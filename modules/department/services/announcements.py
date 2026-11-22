@@ -158,3 +158,21 @@ def soft_delete(*, announcement_id: int, actor) -> Announcement:
     announcement.deleted_at = timezone.now()
     announcement.save(update_fields=["deleted_at", "updated_at"])
     return announcement
+
+
+def edit(*, announcement_id: int, actor, title: str | None = None, body: str | None = None) -> Announcement:
+    """Allow HOD to edit an active announcement."""
+    _require_hod(actor)
+    announcement = Announcement.objects.filter(pk=announcement_id, deleted_at__isnull=True).first()
+    if not announcement:
+        raise NotFoundError("Announcement not found.")
+    if title is not None:
+        announcement.title = title.strip()
+    if body is not None:
+        announcement.body = body.strip()
+    announcement.full_clean()
+    announcement.save()
+    return announcement
+
+update = edit
+update_announcement = edit

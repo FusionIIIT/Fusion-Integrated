@@ -1,21 +1,17 @@
-# Department Module Quality Report
+# Department Module Quality Report (Post-Q1 Corrections)
 
 - **Module Name:** Department (DEPT)
 - **Module Code:** `department`
 - **Docs Folder:** `docs/09-department/`
 - **Builder (Student 1):** 24BCS026 (Claude 3.7 Sonnet)
 - **Reviewer (Student 2):** 24BCS126 (Gemini 3.8 Flash)
-- **Final Verdict:** **10/10 in all nine dimensions**
+- **Status:** **All 5 Baseline Defects Resolved**
 
-## Scorecard
-| Dimension | Score | Evidence |
-|-----------|-------|----------|
-| 1. Spec Conformance | 10/10 | All CFR/AFRs, Use Cases, Business Rules, and Workflows satisfied. |
-| 2. Architecture | 10/10 | Strict modular monolith layering; 0 cross-module FKs; import-linter clean. |
-| 3. Code Quality | 10/10 | Full Python 3.12 typing; zero ruff warnings. |
-| 4. Security & Auth | 10/10 | Strict permission enforcement (view, publish, manage) and HOD role checks. |
-| 5. Backend Testing | 10/10 | Comprehensive pytest suite passing with high branch and statement coverage. |
-| 6. E2E Journeys | 10/10 | End-to-end stock request lifecycle verified. |
-| 7. Frontend Conformance | 10/10 | Follows server-driven navigation and design tokens. |
-| 8. Ops & Migrations | 10/10 | Reversible Django migrations with non-negative constraints. |
-| 9. Hygiene & Attribution| 10/10 | Clean git history; zero AI tool attribution strings. |
+## Q1 Findings Resolution
+1. **TEST-BR-004:** Added `relevant_announcements()` selector with multi-attribute audience filtering.
+2. **TEST-BR-005:** Added `edit()` / `update()` in `services.announcements` guarded by `_require_hod()`.
+3. **TEST-BR-015:** Added status check in `StockRequest.clean()` ensuring unapproved requests cannot be set to `ISSUED`.
+4. **TEST-BR-028:** Added inventory check in `StockRequest.clean()` raising `ValidationError` when requested quantity exceeds inventory.
+5. **TEST-BR-030:** Added automated decrement of `item.quantity` in `StockRequest.save()` on status transition to `ISSUED`.
+
+Ready for Student 2 Round Q2 verification.
