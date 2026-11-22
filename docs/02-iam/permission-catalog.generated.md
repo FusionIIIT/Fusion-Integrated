@@ -7,6 +7,22 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `complaints`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `complaints.complaint.create` | Submit a complaint | `faculty`, `staff`, `student` |
+| `complaints.complaint.view` | View complaints within assigned scope | `Complaint Handler`, `Complaint Supervisor`, `faculty`, `staff`, `student` |
+| `complaints.complaint.assign` | Assign active complaints to handlers | `Complaint Handler` |
+| `complaints.complaint.update` | Record handler progress and outcomes | `Complaint Handler` |
+| `complaints.complaint.approve` | Verify closure and decide reopening requests | `Complaint Supervisor` |
+| `complaints.feedback.create` | Submit complaint feedback | `faculty`, `staff`, `student` |
+| `complaints.feedback.review` | Review complaint feedback | `Complaint Handler`, `Complaint Supervisor` |
+| `complaints.announcement.view` | View complaint announcements | `Complaint Handler`, `Complaint Supervisor`, `System Admin`, `faculty`, `staff`, `student` |
+| `complaints.announcement.publish` | Publish complaint announcements | `Complaint Handler`, `Complaint Supervisor` |
+| `complaints.escalation.view` | Monitor escalated complaints | `Complaint Supervisor` |
+| `complaints.report.view` | View complaint reports and summaries | `Complaint Handler`, `Complaint Supervisor`, `System Admin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |

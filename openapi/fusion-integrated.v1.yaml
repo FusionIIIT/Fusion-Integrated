@@ -46,6 +46,652 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ok'
           description: ''
+  /api/v1/complaints/announcements:
+    get:
+      operationId: complaint_announcements
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnnouncementPage'
+          description: ''
+    post:
+      operationId: complaint_announcement_publish
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnouncementCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AnnouncementCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AnnouncementCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CMSAnnouncement'
+          description: ''
+  /api/v1/complaints/assignment-queue:
+    get:
+      operationId: complaints_assignment_queue
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintPage'
+          description: ''
+  /api/v1/complaints/attachments/{attachment_id}/download:
+    get:
+      operationId: complaint_attachment_download
+      parameters:
+      - in: path
+        name: attachment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/complaints/closures/pending:
+    get:
+      operationId: complaint_pending_closures
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintPage'
+          description: ''
+  /api/v1/complaints/complaints:
+    get:
+      operationId: complaints_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintPage'
+          description: ''
+    post:
+      operationId: complaint_submit
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplaintCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ComplaintCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ComplaintCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+  /api/v1/complaints/complaints/{reference}:
+    get:
+      operationId: complaint_detail
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/assign:
+    post:
+      operationId: complaint_assign_handler
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HandlerAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HandlerAssignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HandlerAssignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/attachments:
+    get:
+      operationId: complaint_attachments
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttachmentPage'
+          description: ''
+    post:
+      operationId: complaint_attachment_upload
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttachmentUpload'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AttachmentUpload'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/escalate:
+    post:
+      operationId: complaint_manual_escalate
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rejection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rejection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rejection'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Escalation'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/feedback:
+    post:
+      operationId: complaint_feedback_create
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeedbackCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeedbackCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/history:
+    get:
+      operationId: complaint_history
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryPage'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/progress:
+    post:
+      operationId: complaint_progress
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Progress'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Progress'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Progress'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/reject:
+    post:
+      operationId: complaint_reject
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rejection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rejection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rejection'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/reopening-requests:
+    post:
+      operationId: complaint_reopening_request
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReopeningCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReopeningCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReopeningCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reopening'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/resolve:
+    post:
+      operationId: complaint_resolve
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Resolution'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Resolution'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Resolution'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/verify/supervisor:
+    post:
+      operationId: complaint_verify_supervisor
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+  /api/v1/complaints/complaints/{reference}/verify/user:
+    post:
+      operationId: complaint_verify_user
+      parameters:
+      - in: path
+        name: reference
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
+  /api/v1/complaints/escalated:
+    get:
+      operationId: complaints_escalated_queue
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintPage'
+          description: ''
+  /api/v1/complaints/escalations/summary:
+    get:
+      operationId: complaint_escalation_summary
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EscalationSummary'
+          description: ''
+  /api/v1/complaints/feedback:
+    get:
+      operationId: complaint_feedback_review
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedbackPage'
+          description: ''
+  /api/v1/complaints/handlers:
+    get:
+      operationId: complaints_handler_options
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HandlerOption'
+          description: ''
+  /api/v1/complaints/reopening-requests:
+    get:
+      operationId: complaint_reopening_queue
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReopeningPage'
+          description: ''
+  /api/v1/complaints/reopening-requests/{request_id}/decision:
+    post:
+      operationId: complaint_reopening_decision
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReopeningDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReopeningDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReopeningDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reopening'
+          description: ''
+  /api/v1/complaints/reports:
+    get:
+      operationId: complaint_report
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintReport'
+          description: ''
+  /api/v1/complaints/work-queue:
+    get:
+      operationId: complaints_handler_queue
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintPage'
+          description: ''
   /api/v1/directory/users:
     get:
       operationId: v1_directory_users_retrieve
@@ -1827,6 +2473,36 @@ components:
       - title
       - topic
       - withdrawn_reason
+    AnnouncementCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+      required:
+      - body
+      - title
+    AnnouncementPage:
+      type: object
+      properties:
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CMSAnnouncement'
+      required:
+      - next
+      - previous
+      - results
     Application:
       type: object
       properties:
@@ -1981,6 +2657,48 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    Attachment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        original_name:
+          type: string
+          readOnly: true
+        content_type:
+          type: string
+          readOnly: true
+        byte_size:
+          type: integer
+          readOnly: true
+        uploaded_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - byte_size
+      - content_type
+      - id
+      - original_name
+      - uploaded_at
+    AttachmentPage:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+      required:
+      - results
+    AttachmentUpload:
+      type: object
+      properties:
+        file:
+          type: string
+          format: uri
+      required:
+      - file
     AudienceEnum:
       enum:
       - students
@@ -2045,6 +2763,28 @@ components:
       required:
       - application_ids
       - to_status
+    CMSAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - body
+      - id
+      - published_at
+      - title
     Candidate:
       type: object
       description: A person as the ERP portal and the IAM describe them. Read-only
@@ -2262,6 +3002,189 @@ components:
         * `prospect` - Prospect
         * `active` - Active
         * `blacklisted` - Blacklisted
+    Complaint:
+      type: object
+      properties:
+        reference:
+          type: string
+          format: uuid
+          readOnly: true
+        category:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ComplaintStatusEnum'
+          readOnly: true
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/ComplaintPriorityEnum'
+          readOnly: true
+        assigned_to_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        sla_due_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        verification_required:
+          type: boolean
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        resolved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        closed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        resolution_details:
+          type: string
+          readOnly: true
+        rejection_reason:
+          type: string
+          readOnly: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplaintHistory'
+          readOnly: true
+        feedback_submitted:
+          type: boolean
+          readOnly: true
+        reopening_status:
+          nullable: true
+          readOnly: true
+          oneOf:
+          - $ref: '#/components/schemas/ReopeningStatusEnum'
+          - $ref: '#/components/schemas/NullEnum'
+      required:
+      - assigned_to_user_id
+      - category
+      - closed_at
+      - description
+      - feedback_submitted
+      - history
+      - priority
+      - reference
+      - rejection_reason
+      - reopening_status
+      - resolution_details
+      - resolved_at
+      - sla_due_at
+      - status
+      - submitted_at
+      - verification_required
+    ComplaintCreate:
+      type: object
+      properties:
+        category:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 10000
+        attachments:
+          type: array
+          items:
+            type: string
+            format: uri
+          maxItems: 5
+      required:
+      - category
+      - description
+    ComplaintHistory:
+      type: object
+      properties:
+        event:
+          type: string
+          readOnly: true
+        from_status:
+          type: string
+          readOnly: true
+        to_status:
+          type: string
+          readOnly: true
+        actor_kind:
+          type: string
+          readOnly: true
+        details:
+          type: string
+          readOnly: true
+        occurred_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_kind
+      - details
+      - event
+      - from_status
+      - occurred_at
+      - to_status
+    ComplaintPage:
+      type: object
+      properties:
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Complaint'
+      required:
+      - next
+      - previous
+      - results
+    ComplaintPriorityEnum:
+      enum:
+      - low
+      - medium
+      - high
+      type: string
+      description: |-
+        * `low` - Low
+        * `medium` - Medium
+        * `high` - High
+    ComplaintReport:
+      type: object
+      properties:
+        complaints_by_status:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusCount'
+      required:
+      - complaints_by_status
+    ComplaintStatusEnum:
+      enum:
+      - submitted
+      - in_progress
+      - resolved
+      - rejected
+      - closed
+      type: string
+      description: |-
+        * `submitted` - Submitted
+        * `in_progress` - In Progress
+        * `resolved` - Resolved
+        * `rejected` - Rejected
+        * `closed` - Closed
     ConductIncident:
       type: object
       properties:
@@ -2315,6 +3238,14 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approved
+      - denied
+      type: string
+      description: |-
+        * `approved` - approved
+        * `denied` - denied
     Detail:
       type: object
       properties:
@@ -2407,6 +3338,43 @@ components:
       - season_decision
       - semester
       - standing
+    Escalation:
+      type: object
+      properties:
+        reference:
+          type: string
+          format: uuid
+        source:
+          type: string
+        reason:
+          type: string
+        escalated_at:
+          type: string
+          format: date-time
+      required:
+      - escalated_at
+      - reason
+      - reference
+      - source
+    EscalationCount:
+      type: object
+      properties:
+        source:
+          type: string
+        total:
+          type: integer
+      required:
+      - source
+      - total
+    EscalationSummary:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EscalationCount'
+      required:
+      - results
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +3391,136 @@ components:
       - fee_reference
       - season
       - user_id
+    Feedback:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        complaint_id:
+          type: integer
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - complaint_id
+      - created_at
+      - id
+      - message
+    FeedbackCreate:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+    FeedbackPage:
+      type: object
+      properties:
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeedbackRead'
+      required:
+      - next
+      - previous
+      - results
+    FeedbackRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        complaint_reference:
+          type: string
+          format: uuid
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - complaint_reference
+      - created_at
+      - id
+      - message
+    HandlerAssignment:
+      type: object
+      properties:
+        assignee_user_id:
+          type: integer
+          minimum: 1
+        category:
+          type: string
+          maxLength: 100
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/HandlerAssignmentPriorityEnum'
+          default: medium
+      required:
+      - assignee_user_id
+      - category
+    HandlerAssignmentPriorityEnum:
+      enum:
+      - low
+      - medium
+      - high
+      type: string
+      description: |-
+        * `low` - low
+        * `medium` - medium
+        * `high` - high
+    HandlerOption:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        display_name:
+          type: string
+        kind:
+          type: string
+        department:
+          type: string
+      required:
+      - department
+      - display_name
+      - kind
+      - user_id
+    HistoryPage:
+      type: object
+      properties:
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplaintHistory'
+      required:
+      - next
+      - previous
+      - results
     IncidentRecorded:
       type: object
       properties:
@@ -2732,6 +3830,9 @@ components:
       - is_late
       - message
       - record
+    NullEnum:
+      enum:
+      - null
     OffCampusRecord:
       type: object
       properties:
@@ -3201,6 +4302,13 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    Progress:
+      type: object
+      properties:
+        details:
+          type: string
+      required:
+      - details
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4574,102 @@ components:
       - message
       - reason
       - route
+    Rejection:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
+    Reopening:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        complaint_id:
+          type: integer
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ReopeningStatusEnum'
+          readOnly: true
+        decision_reason:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - complaint_id
+      - created_at
+      - decided_at
+      - decision_reason
+      - id
+      - reason
+      - status
+    ReopeningCreate:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
+    ReopeningDecision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        reason:
+          type: string
+          default: ''
+      required:
+      - decision
+    ReopeningPage:
+      type: object
+      properties:
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reopening'
+      required:
+      - next
+      - previous
+      - results
+    ReopeningStatusEnum:
+      enum:
+      - pending
+      - approved
+      - denied
+      type: string
+      description: |-
+        * `pending` - pending
+        * `approved` - approved
+        * `denied` - denied
+    Resolution:
+      type: object
+      properties:
+        details:
+          type: string
+      required:
+      - details
     RoundOutcome:
       type: object
       properties:
@@ -3691,6 +4895,16 @@ components:
       required:
       - available
       - season
+    StatusCount:
+      type: object
+      properties:
+        status:
+          type: string
+        total:
+          type: integer
+      required:
+      - status
+      - total
     SubmitOfferLetter:
       type: object
       properties:
