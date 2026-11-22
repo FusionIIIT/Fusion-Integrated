@@ -1674,6 +1674,271 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/vms/emergency/muster/:
+    post:
+      operationId: v1_vms_emergency_muster_create
+      summary: Trigger emergency muster roll-call
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyMuster'
+          description: ''
+  /api/v1/vms/gate/check-in/:
+    post:
+      operationId: v1_vms_gate_check_in_create
+      summary: Scan QR and check-in visitor
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QRScanRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/QRScanRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/QRScanRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitResponse'
+          description: ''
+  /api/v1/vms/gate/check-out/:
+    post:
+      operationId: v1_vms_gate_check_out_create
+      summary: Check out visitor
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckOutRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CheckOutRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CheckOutRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitResponse'
+          description: ''
+  /api/v1/vms/gate/reconcile-offline/:
+    post:
+      operationId: v1_vms_gate_reconcile_offline_create
+      summary: Reconcile offline gate logs
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineSyncRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfflineSyncRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfflineSyncRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/vms/gate/verify-zone/:
+    post:
+      operationId: v1_vms_gate_verify_zone_create
+      summary: Verify zone access for visitor
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneVerifyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ZoneVerifyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ZoneVerifyRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/vms/security/alerts/:
+    get:
+      operationId: v1_vms_security_alerts_list
+      summary: List gate alerts
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GateAlert'
+          description: ''
+  /api/v1/vms/security/blacklist/:
+    post:
+      operationId: v1_vms_security_blacklist_create
+      summary: Add to blacklist
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlacklistCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BlacklistCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BlacklistCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlacklistResponse'
+          description: ''
+  /api/v1/vms/visits/:
+    get:
+      operationId: v1_vms_visits_list
+      summary: List visible visits
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VisitResponse'
+          description: ''
+    post:
+      operationId: v1_vms_visits_create
+      summary: Request a new visit or register walk-in
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitResponse'
+          description: ''
+  /api/v1/vms/visits/{id}/approve/:
+    post:
+      operationId: v1_vms_visits_approve_create
+      summary: Host approves visit
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitResponse'
+          description: ''
+  /api/v1/vms/visits/{id}/reject/:
+    post:
+      operationId: v1_vms_visits_reject_create
+      summary: Host rejects visit
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitRejectRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitRejectRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitRejectRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitResponse'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1763,6 +2028,14 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - check_in
+      - check_out
+      type: string
+      description: |-
+        * `check_in` - check_in
+        * `check_out` - check_out
     AddCandidates:
       type: object
       properties:
@@ -1993,6 +2266,89 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BlacklistCreate:
+      type: object
+      properties:
+        id_type:
+          allOf:
+          - $ref: '#/components/schemas/IdTypeEnum'
+          default: aadhaar
+        id_number:
+          type: string
+          maxLength: 64
+        full_name:
+          type: string
+          maxLength: 128
+        phone:
+          type: string
+          default: ''
+          maxLength: 20
+        reason:
+          type: string
+          maxLength: 255
+        severity:
+          allOf:
+          - $ref: '#/components/schemas/BlacklistCreateSeverityEnum'
+          default: critical
+      required:
+      - full_name
+      - id_number
+      - reason
+    BlacklistCreateSeverityEnum:
+      enum:
+      - info
+      - warning
+      - critical
+      type: string
+      description: |-
+        * `info` - info
+        * `warning` - warning
+        * `critical` - critical
+    BlacklistResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        id_type:
+          $ref: '#/components/schemas/IdTypeEnum'
+        id_number_hash:
+          type: string
+          maxLength: 64
+        full_name:
+          type: string
+          maxLength: 128
+        phone:
+          type: string
+          maxLength: 20
+        reason:
+          type: string
+          maxLength: 255
+        severity:
+          type: string
+          maxLength: 32
+        is_active:
+          type: boolean
+        added_by:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+      required:
+      - created_at
+      - full_name
+      - id
+      - id_number_hash
+      - reason
+      - updated_at
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +2438,17 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CheckOutRequest:
+      type: object
+      properties:
+        visit_id:
+          type: integer
+        gate_name:
+          type: string
+          default: Main Gate
+          maxLength: 64
+      required:
+      - visit_id
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2407,6 +2774,60 @@ components:
       - season_decision
       - semester
       - standing
+    EmergencyMuster:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        muster_code:
+          type: string
+          maxLength: 64
+        status:
+          $ref: '#/components/schemas/EmergencyMusterStatusEnum'
+        triggered_by:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        headcount_total:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        headcount_accounted:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        ended_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - created_at
+      - id
+      - muster_code
+      - started_at
+      - triggered_by
+      - updated_at
+    EmergencyMusterStatusEnum:
+      enum:
+      - active
+      - resolved
+      type: string
+      description: |-
+        * `active` - Active
+        * `resolved` - Resolved
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +2844,76 @@ components:
       - fee_reference
       - season
       - user_id
+    GateAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        alert_type:
+          type: string
+          maxLength: 64
+        severity:
+          $ref: '#/components/schemas/GateAlertSeverityEnum'
+        message:
+          type: string
+          maxLength: 255
+        visit_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        visitor_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        status:
+          type: string
+          maxLength: 32
+        resolved_by:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+      required:
+      - alert_type
+      - created_at
+      - id
+      - message
+      - updated_at
+    GateAlertSeverityEnum:
+      enum:
+      - info
+      - warning
+      - critical
+      type: string
+      description: |-
+        * `info` - Information
+        * `warning` - Warning
+        * `critical` - Critical
+    IdTypeEnum:
+      enum:
+      - aadhaar
+      - passport
+      - driving_license
+      - voter_id
+      - other
+      type: string
+      description: |-
+        * `aadhaar` - Aadhaar Card
+        * `passport` - Passport
+        * `driving_license` - Driving License
+        * `voter_id` - Voter ID
+        * `other` - Other
     IncidentRecorded:
       type: object
       properties:
@@ -2864,6 +3355,34 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfflineEventRecord:
+      type: object
+      properties:
+        qr_code_hash:
+          type: string
+          maxLength: 64
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        gate_name:
+          type: string
+          default: Main Gate
+          maxLength: 64
+        reader_machine_id:
+          type: string
+          default: offline_device
+          maxLength: 64
+      required:
+      - action
+      - qr_code_hash
+    OfflineSyncRequest:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/OfflineEventRecord'
+      required:
+      - records
     Ok:
       type: object
       properties:
@@ -3201,6 +3720,22 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    QRScanRequest:
+      type: object
+      properties:
+        qr_code_hash:
+          type: string
+          maxLength: 64
+        gate_name:
+          type: string
+          default: Main Gate
+          maxLength: 64
+        reader_machine_id:
+          type: string
+          default: ''
+          maxLength: 64
+      required:
+      - qr_code_hash
     Recommendation:
       type: object
       description: |-
@@ -3814,6 +4349,204 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VisitRejectRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          default: Host unavailable
+          maxLength: 255
+    VisitRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 64
+        last_name:
+          type: string
+          maxLength: 64
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          type: string
+          format: email
+        id_type:
+          allOf:
+          - $ref: '#/components/schemas/IdTypeEnum'
+          default: aadhaar
+        id_number:
+          type: string
+          maxLength: 64
+        organization:
+          type: string
+          default: ''
+          maxLength: 128
+        host_user_id:
+          type: integer
+        purpose:
+          type: string
+          maxLength: 255
+        valid_from:
+          type: string
+          format: date-time
+        valid_to:
+          type: string
+          format: date-time
+        allowed_zones:
+          type: array
+          items:
+            type: string
+            maxLength: 64
+        visit_type:
+          allOf:
+          - $ref: '#/components/schemas/VisitTypeEnum'
+          default: pre_registered
+        is_multi_entry:
+          type: boolean
+          default: false
+      required:
+      - email
+      - first_name
+      - host_user_id
+      - id_number
+      - last_name
+      - phone
+      - purpose
+      - valid_from
+      - valid_to
+    VisitResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        pass_number:
+          type: string
+          maxLength: 64
+        qr_code_hash:
+          type: string
+          maxLength: 64
+        visitor:
+          allOf:
+          - $ref: '#/components/schemas/Visitor'
+          readOnly: true
+        host_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        purpose:
+          type: string
+          maxLength: 255
+        visit_type:
+          $ref: '#/components/schemas/VisitTypeEnum'
+        status:
+          $ref: '#/components/schemas/VisitResponseStatusEnum'
+        valid_from:
+          type: string
+          format: date-time
+        valid_to:
+          type: string
+          format: date-time
+        allowed_zones: {}
+        is_multi_entry:
+          type: boolean
+        check_in_time:
+          type: string
+          format: date-time
+          nullable: true
+        check_out_time:
+          type: string
+          format: date-time
+          nullable: true
+        rejection_reason:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - host_user_id
+      - id
+      - pass_number
+      - purpose
+      - qr_code_hash
+      - valid_from
+      - valid_to
+      - visitor
+    VisitResponseStatusEnum:
+      enum:
+      - requested
+      - approved
+      - rejected
+      - on_site
+      - completed
+      - cancelled
+      - expired
+      type: string
+      description: |-
+        * `requested` - Requested
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `on_site` - On Site
+        * `completed` - Completed
+        * `cancelled` - Cancelled
+        * `expired` - Expired
+    VisitTypeEnum:
+      enum:
+      - pre_registered
+      - walk_in
+      - vip
+      - contractor
+      type: string
+      description: |-
+        * `pre_registered` - Pre-registered
+        * `walk_in` - Walk-in
+        * `vip` - VIP Visit
+        * `contractor` - Contractor
+    Visitor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 64
+        last_name:
+          type: string
+          maxLength: 64
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        id_type:
+          $ref: '#/components/schemas/IdTypeEnum'
+        id_number:
+          type: string
+          writeOnly: true
+        id_number_hash:
+          type: string
+          readOnly: true
+        organization:
+          type: string
+          maxLength: 128
+        is_active:
+          type: boolean
+          readOnly: true
+      required:
+      - email
+      - first_name
+      - id
+      - id_number_hash
+      - is_active
+      - last_name
+      - phone
     WaiveIncident:
       type: object
       properties:
@@ -3830,6 +4563,17 @@ components:
           maxLength: 300
       required:
       - reason
+    ZoneVerifyRequest:
+      type: object
+      properties:
+        visit_id:
+          type: integer
+        requested_zone:
+          type: string
+          maxLength: 64
+      required:
+      - requested_zone
+      - visit_id
   securitySchemes:
     iamSession:
       type: apiKey

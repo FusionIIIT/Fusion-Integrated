@@ -1,0 +1,182 @@
+[
+  {
+    "test_id": "TC-FR-001",
+    "source_id": "VMS-CFR-001 / VMS-AFR-002",
+    "purpose": "Verify authoritative digital recording of visitor registration",
+    "preconditions": "Visitor not previously registered",
+    "action_or_input": "Register new visitor with full name, phone, email, and ID document details",
+    "expected_result": "Visitor record is created with SHA-256 hashed identity and unique visitor ID",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-002",
+    "source_id": "VMS-CFR-002 / VMS-AFR-003",
+    "purpose": "Verify role-based permission enforcement for role assignment operations",
+    "preconditions": "User authenticated without Super Admin privileges",
+    "action_or_input": "Attempt to grant VMS operational roles or permissions",
+    "expected_result": "Action is refused with HTTP 403 Forbidden",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-FR-003",
+    "source_id": "VMS-CFR-003 / VMS-AFR-004",
+    "purpose": "Verify public module contract integration for active visitor lookup",
+    "preconditions": "Active visit exists for host user ID",
+    "action_or_input": "Invoke get_active_visitors_by_user_ids public contract getter",
+    "expected_result": "Returns mapping of user ID to list of active visitor records",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "TC-FR-004",
+    "source_id": "VMS-CFR-005 / VMS-AFR-006",
+    "purpose": "Verify immutable audit logging of gate check-in events",
+    "preconditions": "Approved visit pass exists for visitor",
+    "action_or_input": "Security guard scans QR code to check in visitor at Main Gate",
+    "expected_result": "GateLog record created with timestamp, actor_id, gate_name, reader_machine_id, and check_in event type",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-005",
+    "source_id": "VMS-CFR-006 / VMS-AFR-008",
+    "purpose": "Verify pass validity period constraints enforced at registration",
+    "preconditions": "Host user exists",
+    "action_or_input": "Submit visit request with valid_to earlier than valid_from",
+    "expected_result": "Request refused with validation error",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-FR-006",
+    "source_id": "VMS-CFR-007 / VMS-AFR-009",
+    "purpose": "Verify blacklist addition and subsequent lookup restriction",
+    "preconditions": "Security Admin authenticated",
+    "action_or_input": "Add individual with Government ID and phone to blacklist registry",
+    "expected_result": "BlacklistEntry record is created with active status and hashed ID",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-007",
+    "source_id": "VMS-CFR-007 / VMS-AFR-106",
+    "purpose": "Verify blacklist match prevention during visit registration",
+    "preconditions": "Active blacklist entry exists for visitor ID hash",
+    "action_or_input": "Submit visit registration for matching visitor ID",
+    "expected_result": "Registration is rejected and critical GateAlert is created",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-008",
+    "source_id": "VMS-CFR-010 / VMS-AFR-013",
+    "purpose": "Verify host notification and listing of actionable pending visit requests",
+    "preconditions": "Visit request submitted targeting host user ID",
+    "action_or_input": "Host requests list of pending approvals",
+    "expected_result": "Pending visit request is returned with status requested",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-009",
+    "source_id": "VMS-CFR-010 / VMS-AFR-014",
+    "purpose": "Verify host approval transitions visit to approved state and generates pass",
+    "preconditions": "Visit request in requested state for host",
+    "action_or_input": "Host executes approve action",
+    "expected_result": "Visit status transitions to approved and unique pass_number and qr_code_hash are generated",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-010",
+    "source_id": "VMS-CFR-010 / VMS-AFR-015",
+    "purpose": "Verify host rejection transitions visit to rejected state with reason",
+    "preconditions": "Visit request in requested state for host",
+    "action_or_input": "Host executes reject action with rejection reason",
+    "expected_result": "Visit status transitions to rejected and rejection_reason is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-011",
+    "source_id": "VMS-CFR-012 / VMS-AFR-019",
+    "purpose": "Verify visit status update upon gate check-in",
+    "preconditions": "Visit in approved state with valid pass",
+    "action_or_input": "Security guard scans pass at gate terminal",
+    "expected_result": "Visit status updates to checked_in and check_in_time is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-012",
+    "source_id": "VMS-CFR-013 / VMS-AFR-020",
+    "purpose": "Verify gate check-in refusal when pass is expired",
+    "preconditions": "Visit in approved state with valid_to in the past",
+    "action_or_input": "Security guard attempts scan check-in",
+    "expected_result": "Check-in refused with PassExpiredError and visit state remains unchanged",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-013",
+    "source_id": "VMS-CFR-014 / VMS-AFR-024",
+    "purpose": "Verify gate alert generation when blacklisted visitor attempts entry",
+    "preconditions": "Visitor pass created prior to visitor being added to blacklist",
+    "action_or_input": "Security guard scans QR code at gate",
+    "expected_result": "Entry is denied and GateAlert of type blacklist_gate_entry_attempt is logged",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TC-FR-014",
+    "source_id": "VMS-CFR-015 / VMS-AFR-021",
+    "purpose": "Verify gate check-out transitions visit to checked_out and records exit time",
+    "preconditions": "Visit in checked_in state",
+    "action_or_input": "Security guard processes check-out with visit ID",
+    "expected_result": "Visit status updates to checked_out and check_out_time is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-015",
+    "source_id": "VMS-CFR-016 / VMS-AFR-022",
+    "purpose": "Verify walk-in registration by security personnel with default validity",
+    "preconditions": "Security guard authenticated with vms.gate.scan permission",
+    "action_or_input": "Register walk-in visitor with host ID and purpose",
+    "expected_result": "Visit created directly with pass duration defaulting to 4 hours",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-016",
+    "source_id": "VMS-CFR-017 / VMS-AFR-023",
+    "purpose": "Verify on-site visitor active count selector accuracy",
+    "preconditions": "Two visits checked_in and one visit checked_out",
+    "action_or_input": "Query active on-site visitor count",
+    "expected_result": "Count returns exactly 2",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-017",
+    "source_id": "VMS-CFR-018 / VMS-AFR-025",
+    "purpose": "Verify emergency muster initiation records headcount and triggers alert",
+    "preconditions": "Three visitors currently checked_in",
+    "action_or_input": "Security Admin triggers emergency muster roll-call",
+    "expected_result": "EmergencyMuster record created with headcount_total=3 and critical GateAlert created",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-018",
+    "source_id": "VMS-CFR-020 / VMS-AFR-036",
+    "purpose": "Verify quick visitor search by phone or name",
+    "preconditions": "Visitor registered in system",
+    "action_or_input": "Execute search query with visitor phone number",
+    "expected_result": "Returns matching visitor profile",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-019",
+    "source_id": "VMS-CFR-025 / VMS-AFR-086",
+    "purpose": "Verify offline gate scan batch reconciliation",
+    "preconditions": "Approved visit pass exists in database",
+    "action_or_input": "Submit batch sync payload containing offline check-in record",
+    "expected_result": "Event reconciled into GateLog and visit status transitioned to checked_in",
+    "test_type": "resilience"
+  },
+  {
+    "test_id": "TC-FR-020",
+    "source_id": "VMS-CFR-026 / VMS-AFR-088",
+    "purpose": "Verify zone access validation against pass allowed_zones",
+    "preconditions": "Visit pass active with allowed_zones=['Admin Block']",
+    "action_or_input": "Verify zone access for 'Server Room'",
+    "expected_result": "Access is denied with unauthorized zone response",
+    "test_type": "security"
+  }
+]

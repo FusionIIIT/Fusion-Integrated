@@ -278,6 +278,127 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "vms": {
+      "grants": {
+        "Dean": [
+          "vms.emergency.muster",
+          "vms.gate.scan",
+          "vms.security.admin"
+        ],
+        "admin": [
+          "vms.emergency.muster",
+          "vms.gate.scan",
+          "vms.security.admin",
+          "vms.visit.approve",
+          "vms.visit.create"
+        ],
+        "faculty": [
+          "vms.visit.approve",
+          "vms.visit.create"
+        ],
+        "security_guard": [
+          "vms.gate.scan"
+        ],
+        "security_officer": [
+          "vms.emergency.muster",
+          "vms.gate.scan",
+          "vms.security.admin"
+        ],
+        "staff": [
+          "vms.visit.approve",
+          "vms.visit.create"
+        ],
+        "student": [
+          "vms.visit.create"
+        ]
+      },
+      "module_grants": [
+        "Dean",
+        "admin",
+        "faculty",
+        "security_guard",
+        "security_officer",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/vms",
+        "icon": "IdentificationBadge",
+        "items": [
+          {
+            "code": "vms.visits",
+            "icon": "Ticket",
+            "label": "My Visits",
+            "required_permission": "vms.visit.create",
+            "sort_order": 10,
+            "to": "/vms/visits"
+          },
+          {
+            "code": "vms.approvals",
+            "icon": "CheckSquare",
+            "label": "Approvals",
+            "required_permission": "vms.visit.approve",
+            "sort_order": 20,
+            "to": "/vms/approvals"
+          },
+          {
+            "code": "vms.gate",
+            "icon": "QrCode",
+            "label": "Gate Terminal",
+            "required_permission": "vms.gate.scan",
+            "sort_order": 30,
+            "to": "/vms/gate"
+          },
+          {
+            "code": "vms.security",
+            "icon": "ShieldWarning",
+            "label": "Security & Alerts",
+            "required_permission": "vms.security.admin",
+            "sort_order": 40,
+            "to": "/vms/security"
+          },
+          {
+            "code": "vms.muster",
+            "icon": "UsersThree",
+            "label": "Emergency Muster",
+            "required_permission": "vms.emergency.muster",
+            "sort_order": 50,
+            "to": "/vms/muster"
+          }
+        ],
+        "label": "Visitor Management",
+        "nav_section": "Campus Operations",
+        "sort_order": 15,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "vms.visit.create",
+          "label": "Request or register visitor passes"
+        },
+        {
+          "code": "vms.visit.approve",
+          "label": "Approve or reject pending visit requests"
+        },
+        {
+          "code": "vms.gate.scan",
+          "label": "Scan QR codes, process check-ins and check-outs"
+        },
+        {
+          "code": "vms.security.admin",
+          "label": "Manage blacklist and view security alerts"
+        },
+        {
+          "code": "vms.emergency.muster",
+          "label": "Trigger and oversee emergency muster roll-call"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "vms.visit.auto_checkout",
+        "vms.visit.expire"
+      ]
     }
   },
   "publisher": "integrated",
