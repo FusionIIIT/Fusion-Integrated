@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from typing import Any
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from modules.quiz.domain.quiz_definition import QuizDefinition
@@ -209,6 +210,7 @@ class StudentAttemptSerializer(serializers.Serializer):
     quiz_title = serializers.CharField(source="quiz.title")
     items = serializers.SerializerMethodField()
 
+    @extend_schema_field(StudentAttemptItemSerializer(many=True))
     def get_items(self, _attempt) -> list[dict[str, Any]]:
         grouped: OrderedDict[int, dict[str, Any]] = OrderedDict()
         for row in self.context["presentation_rows"]:
@@ -263,6 +265,14 @@ class SubmitAttemptSerializer(serializers.Serializer):
         if not value:
             raise serializers.ValidationError("Explicit submission confirmation is required.")
         return value
+
+
+class AttemptSubmissionResponseSerializer(serializers.Serializer):
+    """Successful manual submission response returned by the attempt API."""
+
+    attempt_id = serializers.IntegerField()
+    status = serializers.ChoiceField(choices=("submitted",))
+    submitted_at = serializers.DateTimeField()
 
 
 class ReleasedResultSerializer(serializers.Serializer):

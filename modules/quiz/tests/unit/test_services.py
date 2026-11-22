@@ -297,6 +297,7 @@ def test_response_save_is_owner_scoped_revision_checked_and_key_free(monkeypatch
 
 
 def test_response_save_rejects_peer_item_expiry_and_submitted_attempt(monkeypatch) -> None:
+    monkeypatch.setattr(responses.timezone, "now", lambda: NOW)
     quiz = draft()
     attempt = make_attempt(quiz=quiz)
     peer_attempt = make_attempt(quiz=quiz, student_user_id=2002)

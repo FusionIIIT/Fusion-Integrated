@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics, status
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
@@ -14,6 +15,7 @@ from modules.quiz.api import serializers as s
 from modules.quiz.api.exceptions import AcademicAuthorizationUnavailable
 from modules.quiz.api.permissions import IsNotStudentPrincipal, IsStudentPrincipal
 from modules.quiz.domain.quiz_definition import DefinitionAction
+from modules.quiz.models import Question, Quiz, QuizResult
 from modules.quiz.selectors import (
     attempt_for_student,
     eligible_quizzes_for_student,
@@ -36,6 +38,12 @@ def _actor(request):
     return getattr(request, "principal", None)
 
 
+def _is_schema_generation(view) -> bool:
+    """Detect drf-spectacular's synthetic view, never a caller-controlled flag."""
+
+    return getattr(view, "swagger_fake_view", False)
+
+
 def _trusted_course_ids(_principal) -> tuple[int, ...]:
     """No production course authorization provider is currently configured."""
 
@@ -48,11 +56,20 @@ def _trusted_eligible_quiz_ids(_principal):
     raise AcademicAuthorizationUnavailable()
 
 
+@extend_schema_view(
+    get=extend_schema(responses=s.QuizDetailSerializer(many=True)),
+    post=extend_schema(
+        request=s.QuizDraftCreateSerializer,
+        responses={status.HTTP_201_CREATED: s.QuizDetailSerializer},
+    ),
+)
 class QuizListCreateView(generics.ListAPIView):
     permission_classes = [MODULE, IsNotStudentPrincipal]
     serializer_class = s.QuizDetailSerializer
 
     def get_queryset(self):
+        if _is_schema_generation(self):
+            return Quiz.objects.none()
         self._require(self.request, "quiz.quiz.view")
         return quizzes_for_courses(_trusted_course_ids(_actor(self.request)))
 
@@ -81,6 +98,13 @@ class QuizListCreateView(generics.ListAPIView):
             raise PermissionDenied()
 
 
+@extend_schema_view(
+    get=extend_schema(responses=s.QuizDetailSerializer),
+    put=extend_schema(
+        request=s.QuizDraftUpdateSerializer,
+        responses=s.QuizDetailSerializer,
+    ),
+)
 class QuizDetailUpdateView(APIView):
     permission_classes = [MODULE, IsNotStudentPrincipal]
 
@@ -125,6 +149,10 @@ class QuizDetailUpdateView(APIView):
 class QuizPublishView(APIView):
     permission_classes = [MODULE, IsNotStudentPrincipal, HasPermission("quiz.quiz.publish")]
 
+    @extend_schema(
+        request=s.QuizPublishSerializer,
+        responses=s.QuizDetailSerializer,
+    )
     def post(self, request, public_id):
         payload = s.QuizPublishSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
@@ -138,11 +166,14 @@ class QuizPublishView(APIView):
         return Response(s.QuizDetailSerializer(quiz).data)
 
 
+@extend_schema_view(get=extend_schema(parameters=[s.QuestionBankSearchSerializer]))
 class QuestionBankListView(generics.ListAPIView):
     permission_classes = [MODULE, IsNotStudentPrincipal, HasPermission("quiz.question.view")]
     serializer_class = s.QuestionBankOwnerSerializer
 
     def get_queryset(self):
+        if _is_schema_generation(self):
+            return Question.objects.none()
         query = s.QuestionBankSearchSerializer(data=self.request.query_params)
         query.is_valid(raise_exception=True)
         return question_bank_for_creator(
@@ -157,6 +188,8 @@ class QuestionBankDetailView(generics.RetrieveAPIView):
     lookup_field = "public_id"
 
     def get_queryset(self):
+        if _is_schema_generation(self):
+            return Question.objects.none()
         return question_bank_for_creator(creator_user_id=_actor(self.request).user_id)
 
 
@@ -165,6 +198,8 @@ class EligibleQuizListView(generics.ListAPIView):
     serializer_class = s.EligibleQuizSerializer
 
     def get_queryset(self):
+        if _is_schema_generation(self):
+            return Quiz.objects.none()
         actor = _actor(self.request)
         return eligible_quizzes_for_student(
             eligible_quiz_ids=_trusted_eligible_quiz_ids(actor),
@@ -176,6 +211,7 @@ class EligibleQuizListView(generics.ListAPIView):
 class EligibleQuizDetailView(APIView):
     permission_classes = [MODULE, HasPermission("quiz.quiz.view"), IsStudentPrincipal]
 
+    @extend_schema(responses=s.EligibleQuizSerializer)
     def get(self, request, public_id):
         actor = _actor(request)
         quiz = (
@@ -195,6 +231,7 @@ class EligibleQuizDetailView(APIView):
 class StudentAttemptDetailView(APIView):
     permission_classes = [MODULE, HasPermission("quiz.attempt.view"), IsStudentPrincipal]
 
+    @extend_schema(responses=s.StudentAttemptSerializer)
     def get(self, request, attempt_id: int):
         actor = _actor(request)
         attempt = attempt_for_student(
@@ -219,6 +256,10 @@ class StudentAttemptDetailView(APIView):
 class StudentResponseView(APIView):
     permission_classes = [MODULE, HasPermission("quiz.response.update"), IsStudentPrincipal]
 
+    @extend_schema(
+        request=s.SaveResponseSerializer,
+        responses=s.ResponseSavedSerializer,
+    )
     def put(self, request, attempt_id: int, attempt_question_id: int):
         payload = s.SaveResponseSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
@@ -234,6 +275,10 @@ class StudentResponseView(APIView):
 class StudentAttemptSubmitView(APIView):
     permission_classes = [MODULE, HasPermission("quiz.attempt.update"), IsStudentPrincipal]
 
+    @extend_schema(
+        request=s.SubmitAttemptSerializer,
+        responses=s.AttemptSubmissionResponseSerializer,
+    )
     def post(self, request, attempt_id: int):
         payload = s.SubmitAttemptSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
@@ -252,12 +297,15 @@ class StudentReleasedResultListView(generics.ListAPIView):
     serializer_class = s.ReleasedResultSerializer
 
     def get_queryset(self):
+        if _is_schema_generation(self):
+            return QuizResult.objects.none()
         return released_results_for_student(_actor(self.request).user_id)
 
 
 class StudentReleasedResultDetailView(APIView):
     permission_classes = [MODULE, HasPermission("quiz.result.view"), IsStudentPrincipal]
 
+    @extend_schema(responses=s.ReleasedResultSerializer)
     def get(self, request, result_id: int):
         rows = list(
             student_result_rows(
