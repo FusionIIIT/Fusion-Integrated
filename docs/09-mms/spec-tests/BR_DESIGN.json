@@ -1,0 +1,371 @@
+[
+  {
+    "test_id": "TEST-BR-001",
+    "source_id": "BR-MMS-001 rule enforcement",
+    "purpose": "Verify BR-MMS-001 (MMS Functional Scope Boundary): MMS shall remain limited to the mess-management functions and explicit integrations/notification triggers defined in the frozen problem statement.",
+    "preconditions": "Context: All MMS artifacts and screens. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to MMS Functional Scope Boundary under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall remain limited to the mess-management functions and explicit integrations/notification triggers defined in the frozen problem statement.. Exception handling: None inside MMS; external modules may own excluded functions.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-002",
+    "source_id": "BR-MMS-002 rule enforcement",
+    "purpose": "Verify BR-MMS-002 (Employee Identity Boundary for Role Assignment): MMS may use institutional employee identity data needed for Mess Caretaker and Mess Warden assignment, but MMS shall not own employee master-data management.",
+    "preconditions": "Context: Role management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Employee Identity Boundary for Role Assignment under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS may use institutional employee identity data needed for Mess Caretaker and Mess Warden assignment, but MMS shall not own employee master-data management.. Exception handling: If employee identity is unavailable, role assignment is not recorded.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-003",
+    "source_id": "BR-MMS-003 rule enforcement",
+    "purpose": "Verify BR-MMS-003 (Single Active Caretaker Rule): MMS shall enforce exactly one active Mess Caretaker at a time.",
+    "preconditions": "Context: Role management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Single Active Caretaker Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall enforce exactly one active Mess Caretaker at a time.. Exception handling: None stated.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-004",
+    "source_id": "BR-MMS-004 rule enforcement",
+    "purpose": "Verify BR-MMS-004 (Single Active Warden Rule): MMS shall enforce exactly one active Mess Warden at a time.",
+    "preconditions": "Context: Role management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Single Active Warden Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall enforce exactly one active Mess Warden at a time.. Exception handling: None stated.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-005",
+    "source_id": "BR-MMS-005 rule enforcement",
+    "purpose": "Verify BR-MMS-005 (Mess Admin Operational Data Restriction): MMS shall prevent Mess Admin from accessing operational mess data, student requests, billing, or feedback.",
+    "preconditions": "Context: Role management and access. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Mess Admin Operational Data Restriction under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall prevent Mess Admin from accessing operational mess data, student requests, billing, or feedback.. Exception handling: None stated.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-006",
+    "source_id": "BR-MMS-006 rule enforcement",
+    "purpose": "Verify BR-MMS-006 (Immediate Mid-cycle Role Reassignment): A mid-cycle Caretaker or Warden reassignment takes effect immediately in MMS from the recorded reassignment time.",
+    "preconditions": "Context: Role management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Immediate Mid-cycle Role Reassignment under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: A mid-cycle Caretaker or Warden reassignment takes effect immediately in MMS from the recorded reassignment time.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-007",
+    "source_id": "BR-MMS-007 rule enforcement",
+    "purpose": "Verify BR-MMS-007 (Pending Request Handoff After Caretaker Reassignment): After Caretaker reassignment, MMS shall make pending operational requests visible and actionable by the newly assigned Caretaker.",
+    "preconditions": "Context: Role management and operational requests. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Pending Request Handoff After Caretaker Reassignment under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: After Caretaker reassignment, MMS shall make pending operational requests visible and actionable by the newly assigned Caretaker.. Exception handling: Applies only to requests owned by Caretaker role.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-008",
+    "source_id": "BR-MMS-008 rule enforcement",
+    "purpose": "Verify BR-MMS-008 (Registration Window Creation): Only the active Mess Caretaker opens the registration window for a mess cycle or designated period.",
+    "preconditions": "Context: Registration management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Registration Window Creation under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: Only the active Mess Caretaker opens the registration window for a mess cycle or designated period.. Exception handling: Cycle/designated-period policy is external context.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-009",
+    "source_id": "BR-MMS-009 rule enforcement",
+    "purpose": "Verify BR-MMS-009 (Registration Submission Window Restriction): MMS shall allow Student registration requests only while the registration window is open.",
+    "preconditions": "Context: Registration management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Registration Submission Window Restriction under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall allow Student registration requests only while the registration window is open.. Exception handling: No exception stated.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-010",
+    "source_id": "BR-MMS-010 rule enforcement",
+    "purpose": "Verify BR-MMS-010 (Caretaker Request Decision Authority): Only the active Mess Caretaker may approve or reject registration and deregistration requests; the Mess Warden has oversight-only access.",
+    "preconditions": "Context: Registration and deregistration management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Caretaker Request Decision Authority under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: Only the active Mess Caretaker may approve or reject registration and deregistration requests; the Mess Warden has oversight-only access.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-011",
+    "source_id": "BR-MMS-011 rule enforcement",
+    "purpose": "Verify BR-MMS-011 (Warden Operational Request Oversight-only Rule): The Mess Warden may view operational student requests for oversight but may not approve, reject, register, deregister, or otherwise decide those requests.",
+    "preconditions": "Context: Operational student requests. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Warden Operational Request Oversight-only Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: The Mess Warden may view operational student requests for oversight but may not approve, reject, register, deregister, or otherwise decide those requests.. Exception handling: None stated.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-012",
+    "source_id": "BR-MMS-012 rule enforcement",
+    "purpose": "Verify BR-MMS-012 (Deregistration Anytime Submission): MMS shall allow Students to submit deregistration requests at any time.",
+    "preconditions": "Context: Deregistration management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Deregistration Anytime Submission under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall allow Students to submit deregistration requests at any time.. Exception handling: Student must be registered to submit a meaningful deregistration request.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-013",
+    "source_id": "BR-MMS-013 rule enforcement",
+    "purpose": "Verify BR-MMS-013 (Deregistration Effective Date Rule): MMS shall make an approved deregistration effective from the next calendar day after Caretaker approval.",
+    "preconditions": "Context: Deregistration management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Deregistration Effective Date Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall make an approved deregistration effective from the next calendar day after Caretaker approval.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-014",
+    "source_id": "BR-MMS-014 rule enforcement",
+    "purpose": "Verify BR-MMS-014 (Weekly Menu Structure Rule): MMS shall store weekly menu information day-wise and meal-wise for breakfast, lunch, and dinner.",
+    "preconditions": "Context: Menu management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Weekly Menu Structure Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall store weekly menu information day-wise and meal-wise for breakfast, lunch, and dinner.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-015",
+    "source_id": "BR-MMS-015 rule enforcement",
+    "purpose": "Verify BR-MMS-015 (Menu Update Notification Rule): MMS shall trigger system-generated email notifications to Students when weekly menu updates are published.",
+    "preconditions": "Context: Menu management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Menu Update Notification Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall trigger system-generated email notifications to Students when weekly menu updates are published.. Exception handling: MMS triggers email events but does not own email infrastructure.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-016",
+    "source_id": "BR-MMS-016 rule enforcement",
+    "purpose": "Verify BR-MMS-016 (Monthly Calendar Billing Cycle): MMS shall generate mess bills using the monthly calendar-month cycle.",
+    "preconditions": "Context: Billing management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Monthly Calendar Billing Cycle under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall generate mess bills using the monthly calendar-month cycle.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-017",
+    "source_id": "BR-MMS-017 rule enforcement",
+    "purpose": "Verify BR-MMS-017 (Bill Computation Components): MMS monthly billing shall include daily-rate multiplied by number of served days, charges for approved special meals, and automatic deductions for approved rebates.",
+    "preconditions": "Context: Billing management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Bill Computation Components under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS monthly billing shall include daily-rate multiplied by number of served days, charges for approved special meals, and automatic deductions for approved rebates.. Exception handling: Rate values are external policy inputs; payment collection is outside MMS scope.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-018",
+    "source_id": "BR-MMS-018 rule enforcement",
+    "purpose": "Verify BR-MMS-018 (Caretaker Bill Finalization Rule): MMS shall require Caretaker review and finalization before monthly bills are published to Students.",
+    "preconditions": "Context: Billing management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Caretaker Bill Finalization Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall require Caretaker review and finalization before monthly bills are published to Students.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-019",
+    "source_id": "BR-MMS-019 rule enforcement",
+    "purpose": "Verify BR-MMS-019 (Approved Rebate Billing Effect): MMS shall apply rebate deductions to monthly bills only for approved rebate requests.",
+    "preconditions": "Context: Billing and rebate management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Approved Rebate Billing Effect under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall apply rebate deductions to monthly bills only for approved rebate requests.. Exception handling: Rejected or pending rebates do not adjust bills.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-020",
+    "source_id": "BR-MMS-020 rule enforcement",
+    "purpose": "Verify BR-MMS-020 (Feedback Storage and Visibility Rule): MMS shall store Student text feedback and make feedback visible to Caretaker and Warden for monitoring and reporting.",
+    "preconditions": "Context: Feedback management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Feedback Storage and Visibility Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall store Student text feedback and make feedback visible to Caretaker and Warden for monitoring and reporting.. Exception handling: No complaint-resolution workflow is introduced.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-021",
+    "source_id": "BR-MMS-021 rule enforcement",
+    "purpose": "Verify BR-MMS-021 (Minimum Rebate Duration Rule): MMS shall reject rebate requests with a requested duration of fewer than three days.",
+    "preconditions": "Context: Rebate management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Minimum Rebate Duration Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall reject rebate requests with a requested duration of fewer than three days.. Exception handling: None stated.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-022",
+    "source_id": "BR-MMS-022 rule enforcement",
+    "purpose": "Verify BR-MMS-022 (Rebate Lead-time Rule): MMS shall reject rebate requests not submitted at least one calendar day before the rebate start date.",
+    "preconditions": "Context: Rebate management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Rebate Lead-time Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall reject rebate requests not submitted at least one calendar day before the rebate start date.. Exception handling: None stated.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-023",
+    "source_id": "BR-MMS-023 rule enforcement",
+    "purpose": "Verify BR-MMS-023 (Rebate Non-overlap Rule): MMS shall prevent overlapping rebate requests.",
+    "preconditions": "Context: Rebate management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Rebate Non-overlap Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall prevent overlapping rebate requests.. Exception handling: None stated.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-024",
+    "source_id": "BR-MMS-024 rule enforcement",
+    "purpose": "Verify BR-MMS-024 (Rebate Reason Capture Rule): MMS shall require Student rebate requests to specify a reason and shall require explanation when the reason is Other.",
+    "preconditions": "Context: Rebate management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Rebate Reason Capture Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall require Student rebate requests to specify a reason and shall require explanation when the reason is Other.. Exception handling: Allowed reasons are medical, institute leave, family function, and other.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-025",
+    "source_id": "BR-MMS-025 rule enforcement",
+    "purpose": "Verify BR-MMS-025 (Caretaker Rebate Date Modification Rule): The Caretaker may modify rebate dates before approval only where permitted by the external mess policy; approved dates become the dates used by MMS for billing adjustment.",
+    "preconditions": "Context: Rebate management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Caretaker Rebate Date Modification Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: The Caretaker may modify rebate dates before approval only where permitted by the external mess policy; approved dates become the dates used by MMS for billing adjustment.. Exception handling: The frozen PS does not define the permitted range or limits of date modification.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-026",
+    "source_id": "BR-MMS-026 rule enforcement",
+    "purpose": "Verify BR-MMS-026 (Vacation Survey Registered-student Restriction): MMS shall send vacation food continuity surveys only to currently registered Students.",
+    "preconditions": "Context: Vacation food continuity management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Vacation Survey Registered-student Restriction under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall send vacation food continuity surveys only to currently registered Students.. Exception handling: None stated.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-027",
+    "source_id": "BR-MMS-027 rule enforcement",
+    "purpose": "Verify BR-MMS-027 (Vacation Survey Default No Rule): MMS shall record No as the default response for registered Students who do not respond before the response deadline.",
+    "preconditions": "Context: Vacation food continuity management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Vacation Survey Default No Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall record No as the default response for registered Students who do not respond before the response deadline.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-028",
+    "source_id": "BR-MMS-028 rule enforcement",
+    "purpose": "Verify BR-MMS-028 (Special Food Lead-time Rule): MMS shall allow special food requests only when submitted at least one calendar day before the requested date.",
+    "preconditions": "Context: Special food arrangement. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Special Food Lead-time Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall allow special food requests only when submitted at least one calendar day before the requested date.. Exception handling: None stated.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-029",
+    "source_id": "BR-MMS-029 rule enforcement",
+    "purpose": "Verify BR-MMS-029 (Special Food Default Rejection Rule): MMS shall mark a special food request as Rejected if the Caretaker does not decide within the institution-defined decision period of receiving the request.",
+    "preconditions": "Context: Special food arrangement. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Special Food Default Rejection Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall mark a special food request as Rejected if the Caretaker does not decide within the institution-defined decision period of receiving the request.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-030",
+    "source_id": "BR-MMS-030 rule enforcement",
+    "purpose": "Verify BR-MMS-030 (Special Food Charge Rule): Approved special-food requests are chargeable and their charges are added to the Student monthly bill.",
+    "preconditions": "Context: Special food and billing link. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Special Food Charge Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: Approved special-food requests are chargeable and their charges are added to the Student monthly bill.. Exception handling: The frozen PS does not state whether a later Cancelled status reverses or suppresses the charge; see ISS-MMS-015.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-031",
+    "source_id": "BR-MMS-031 rule enforcement",
+    "purpose": "Verify BR-MMS-031 (Special Food State-transition Rule): MMS shall track special food requests using Requested, Approved, Rejected, Served, and Cancelled states; Served and Cancelled shall occur only after Approved.",
+    "preconditions": "Context: Special food arrangement. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Special Food State-transition Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall track special food requests using Requested, Approved, Rejected, Served, and Cancelled states; Served and Cancelled shall occur only after Approved.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-032",
+    "source_id": "BR-MMS-032 rule enforcement",
+    "purpose": "Verify BR-MMS-032 (Announcement Publisher and Relevance Rule): Only the active Mess Caretaker or Mess Warden may publish mess-related announcements.",
+    "preconditions": "Context: Announcements. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Announcement Publisher and Relevance Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: Only the active Mess Caretaker or Mess Warden may publish mess-related announcements.. Exception handling: No automated content-relevance validation is specified by the frozen PS.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-033",
+    "source_id": "BR-MMS-033 rule enforcement",
+    "purpose": "Verify BR-MMS-033 (Announcement History Access Rule): MMS shall maintain mess-relevant announcement history and allow MMS actors to view it according to access rights.",
+    "preconditions": "Context: Announcements. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Announcement History Access Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall maintain mess-relevant announcement history and allow MMS actors to view it according to access rights.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-034",
+    "source_id": "BR-MMS-034 rule enforcement",
+    "purpose": "Verify BR-MMS-034 (Report Role-access Rule): MMS shall restrict supervisory reports to Warden and operational reports to Caretaker as stated in the frozen problem statement.",
+    "preconditions": "Context: Reports. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Report Role-access Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall restrict supervisory reports to Warden and operational reports to Caretaker as stated in the frozen problem statement.. Exception handling: None stated.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-035",
+    "source_id": "BR-MMS-035 rule enforcement",
+    "purpose": "Verify BR-MMS-035 (MMS Notification Trigger Scope): MMS triggers system-generated email notifications only for the MMS events explicitly listed in the frozen problem statement; external email delivery infrastructure remains outside MMS.",
+    "preconditions": "Context: Notifications. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to MMS Notification Trigger Scope under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS triggers system-generated email notifications only for the MMS events explicitly listed in the frozen problem statement; external email delivery infrastructure remains outside MMS.. Exception handling: Delivery failure handling is outside MMS unless otherwise specified.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-036",
+    "source_id": "BR-MMS-036 rule enforcement",
+    "purpose": "Verify BR-MMS-036 (External Policy Ownership Boundary): MMS shall not define institutional mess policies such as rates, vacation periods, or employee appointment policy; it may only use explicitly provided values as inputs where the frozen problem statement states system behavior.",
+    "preconditions": "Context: All MMS areas. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to External Policy Ownership Boundary under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall not define institutional mess policies such as rates, vacation periods, or employee appointment policy; it may only use explicitly provided values as inputs where the frozen problem statement states system behavior.. Exception handling: Policy definition remains outside MMS.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-037",
+    "source_id": "BR-MMS-038 rule enforcement",
+    "purpose": "Verify BR-MMS-038 (Weekly Menu Visibility and Access Rule): Students, the Mess Caretaker, and the Mess Warden may view the weekly menu. Mess Admin menu access remains unresolved because the frozen PS contains conflicting statements.",
+    "preconditions": "Context: Menu management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Weekly Menu Visibility and Access Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: Students, the Mess Caretaker, and the Mess Warden may view the weekly menu. Mess Admin menu access remains unresolved because the frozen PS contains conflicting statements.. Exception handling: Mess Admin visibility requires clarification; see ISS-MMS-012.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-038",
+    "source_id": "BR-MMS-039 rule enforcement",
+    "purpose": "Verify BR-MMS-039 (Weekly Menu Maintenance Authority Rule): MMS shall permit only the Mess Caretaker to add, delete, or modify weekly mess menu items.",
+    "preconditions": "Context: Menu management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Weekly Menu Maintenance Authority Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall permit only the Mess Caretaker to add, delete, or modify weekly mess menu items.. Exception handling: None stated.",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TEST-BR-039",
+    "source_id": "BR-MMS-040 rule enforcement",
+    "purpose": "Verify BR-MMS-040 (Student Billing Information Access Rule): MMS shall allow Students to view only actor-visible monthly mess bills and outstanding balances maintained within MMS.",
+    "preconditions": "Context: Billing management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Student Billing Information Access Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall allow Students to view only actor-visible monthly mess bills and outstanding balances maintained within MMS.. Exception handling: External payment collection, accounting settlement, and payroll/accounting operations remain outside MMS.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-040",
+    "source_id": "BR-MMS-041 rule enforcement",
+    "purpose": "Verify BR-MMS-041 (Vacation Survey Response Option Rule): MMS shall restrict Student vacation food continuity responses to Yes or No.",
+    "preconditions": "Context: Vacation food continuity management. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Vacation Survey Response Option Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall restrict Student vacation food continuity responses to Yes or No.. Exception handling: Non-response is handled separately by the default-No rule.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-041",
+    "source_id": "BR-MMS-042 rule enforcement",
+    "purpose": "Verify BR-MMS-042 (Student Request Status and History Access Rule): MMS shall allow a Student to view status and history only for the Student\u2019s own submitted MMS requests.",
+    "preconditions": "Context: Request status/history access. State: Applies whenever the stated applicability/trigger is reached..",
+    "action_or_input": "Execute operation relevant to Student Request Status and History Access Rule under conditions: Applies whenever the stated applicability/trigger is reached.",
+    "expected_result": "MMS enforces constraint: MMS shall allow a Student to view status and history only for the Student\u2019s own submitted MMS requests.. Exception handling: None stated.",
+    "test_type": "authorization"
+  }
+]

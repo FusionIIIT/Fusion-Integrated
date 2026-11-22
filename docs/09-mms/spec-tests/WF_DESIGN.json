@@ -1,0 +1,191 @@
+[
+  {
+    "test_id": "TEST-WF-001",
+    "source_id": "BW-MMS-01 path execution",
+    "purpose": "Verify BW-MMS-01 (Registration \u2014 Approved): One valid path from opening a registration window through Student submission to Caretaker approval.",
+    "preconditions": "Initial state and prerequisites for workflow: Caretaker opens a registration window; Student then submits during the open window.. Participants: Mess Caretaker; Student.",
+    "action_or_input": "Execute workflow sequence: [Registration Window Not Open] -(actor:Mess Caretaker, uc:MMS-UC-002 \u2014 Open Registration Window)-> [Registration Window Open] -> [Registration Window Open] -(actor:Student, uc:MMS-UC-003 \u2014 Submit Registration Request)-> [Registration Request Pending] -> [Registration Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-004 \u2014 Review Registration Request)-> [Registration Request Approved / Student Registered] via MMS-UC-002, MMS-UC-003, MMS-UC-004",
+    "expected_result": "MMS successfully completes workflow Registration \u2014 Approved transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-002",
+    "source_id": "BW-MMS-02 path execution",
+    "purpose": "Verify BW-MMS-02 (Registration \u2014 Rejected): One valid path from opening a registration window through Student submission to Caretaker rejection.",
+    "preconditions": "Initial state and prerequisites for workflow: Caretaker opens a registration window; Student then submits during the open window.. Participants: Mess Caretaker; Student.",
+    "action_or_input": "Execute workflow sequence: [Registration Window Not Open] -(actor:Mess Caretaker, uc:MMS-UC-002 \u2014 Open Registration Window)-> [Registration Window Open] -> [Registration Window Open] -(actor:Student, uc:MMS-UC-003 \u2014 Submit Registration Request)-> [Registration Request Pending] -> [Registration Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-004 \u2014 Review Registration Request)-> [Registration Request Rejected] via MMS-UC-002, MMS-UC-003, MMS-UC-004",
+    "expected_result": "MMS successfully completes workflow Registration \u2014 Rejected transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-003",
+    "source_id": "CW-MMS-01 path execution",
+    "purpose": "Verify CW-MMS-01 (Registration Request Lifecycle): Combine the approved and rejected registration basis paths while preserving the common opening/submission prefix.",
+    "preconditions": "Initial state and prerequisites for workflow: Caretaker opens registration window; Student submits during open window.. Participants: Mess Caretaker; Student.",
+    "action_or_input": "Execute workflow sequence: [Registration Window Not Open] -(actor:Mess Caretaker, uc:MMS-UC-002 \u2014 Open Registration Window)-> [Registration Window Open] -> [Registration Window Open] -(actor:Student, uc:MMS-UC-003 \u2014 Submit Registration Request)-> [Registration Request Pending] -> [Registration Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-004 \u2014 Review Registration Request)-> [Registration Request Approved / Student Registered] -> [Registration Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-004 \u2014 Review Registration Request)-> [Registration Request Rejected] via MMS-UC-002, MMS-UC-003, MMS-UC-004",
+    "expected_result": "MMS successfully completes workflow Registration Request Lifecycle transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-004",
+    "source_id": "BW-MMS-03 path execution",
+    "purpose": "Verify BW-MMS-03 (Deregistration \u2014 Approved): Registered Student submission, Caretaker approval, and the next-calendar-day System transition that makes deregistration effective.",
+    "preconditions": "Initial state and prerequisites for workflow: Registered Student submits deregistration request.. Participants: Student; Mess Caretaker; System.",
+    "action_or_input": "Execute workflow sequence: [Student Registered] -(actor:Student, uc:MMS-UC-005 \u2014 Submit Deregistration Request)-> [Deregistration Request Pending] -> [Deregistration Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-006 \u2014 Review Deregistration Request)-> [Deregistration Approved \u2014 Awaiting Effective Date] -> [Deregistration Approved \u2014 Awaiting Effective Date] -(actor:System, uc:MMS-UC-027 \u2014 Activate Approved Deregistration)-> [Student Deregistered / Mess Service Inactive] via MMS-UC-005, MMS-UC-006, MMS-UC-027",
+    "expected_result": "MMS successfully completes workflow Deregistration \u2014 Approved transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-005",
+    "source_id": "BW-MMS-04 path execution",
+    "purpose": "Verify BW-MMS-04 (Deregistration \u2014 Rejected): One path from registered Student submission through Caretaker rejection.",
+    "preconditions": "Initial state and prerequisites for workflow: Registered Student submits deregistration request.. Participants: Student; Mess Caretaker.",
+    "action_or_input": "Execute workflow sequence: [Student Registered] -(actor:Student, uc:MMS-UC-005 \u2014 Submit Deregistration Request)-> [Deregistration Request Pending] -> [Deregistration Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-006 \u2014 Review Deregistration Request)-> [Deregistration Request Rejected / Student remains Registered] via MMS-UC-005, MMS-UC-006",
+    "expected_result": "MMS successfully completes workflow Deregistration \u2014 Rejected transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-006",
+    "source_id": "CW-MMS-02 path execution",
+    "purpose": "Verify CW-MMS-02 (Deregistration Request Lifecycle): Combine the approved and rejected deregistration paths.",
+    "preconditions": "Initial state and prerequisites for workflow: Registered Student submits deregistration request.. Participants: Student; Mess Caretaker; System.",
+    "action_or_input": "Execute workflow sequence: [Student Registered] -(actor:Student, uc:MMS-UC-005 \u2014 Submit Deregistration Request)-> [Deregistration Request Pending] -> [Deregistration Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-006 \u2014 Review Deregistration Request)-> [Deregistration Approved \u2014 Awaiting Effective Date] -> [Deregistration Approved \u2014 Awaiting Effective Date] -(actor:System, uc:MMS-UC-027 \u2014 Activate Approved Deregistration)-> [Student Deregistered / Mess Service Inactive] -> [Deregistration Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-006 \u2014 Review Deregistration Request)-> [Deregistration Request Rejected / Student remains Registered] via MMS-UC-005, MMS-UC-006, MMS-UC-027",
+    "expected_result": "MMS successfully completes workflow Deregistration Request Lifecycle transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-007",
+    "source_id": "BW-MMS-05 path execution",
+    "purpose": "Verify BW-MMS-05 (Rebate \u2014 Approved as Submitted): Valid rebate submission followed by approval without changing dates.",
+    "preconditions": "Initial state and prerequisites for workflow: Student submits a valid rebate request.. Participants: Student; Mess Caretaker.",
+    "action_or_input": "Execute workflow sequence: [No Current Rebate Request] -(actor:Student, uc:MMS-UC-014 \u2014 Submit Rebate Request)-> [Rebate Request Pending] -> [Rebate Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-015 \u2014 Review Rebate Request)-> [Rebate Approved; approved dates used for billing adjustment] via MMS-UC-014, MMS-UC-015",
+    "expected_result": "MMS successfully completes workflow Rebate \u2014 Approved as Submitted transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-008",
+    "source_id": "BW-MMS-06 path execution",
+    "purpose": "Verify BW-MMS-06 (Rebate \u2014 Dates Modified then Approved): Valid rebate submission followed by policy-permitted date modification and approval.",
+    "preconditions": "Initial state and prerequisites for workflow: Student submits a valid rebate request.. Participants: Student; Mess Caretaker.",
+    "action_or_input": "Execute workflow sequence: [No Current Rebate Request] -(actor:Student, uc:MMS-UC-014 \u2014 Submit Rebate Request)-> [Rebate Request Pending] -> [Rebate Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-015 \u2014 Review Rebate Request)-> [Rebate Approved with Modified Dates; approved dates used for billing adjustment] via MMS-UC-014, MMS-UC-015",
+    "expected_result": "MMS successfully completes workflow Rebate \u2014 Dates Modified then Approved transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-009",
+    "source_id": "BW-MMS-07 path execution",
+    "purpose": "Verify BW-MMS-07 (Rebate \u2014 Rejected): Valid rebate submission followed by Caretaker rejection.",
+    "preconditions": "Initial state and prerequisites for workflow: Student submits a valid rebate request.. Participants: Student; Mess Caretaker.",
+    "action_or_input": "Execute workflow sequence: [No Current Rebate Request] -(actor:Student, uc:MMS-UC-014 \u2014 Submit Rebate Request)-> [Rebate Request Pending] -> [Rebate Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-015 \u2014 Review Rebate Request)-> [Rebate Rejected] via MMS-UC-014, MMS-UC-015",
+    "expected_result": "MMS successfully completes workflow Rebate \u2014 Rejected transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-010",
+    "source_id": "CW-MMS-03 path execution",
+    "purpose": "Verify CW-MMS-03 (Rebate Request Lifecycle): Combine valid rebate submission with the three materially different Caretaker outcomes.",
+    "preconditions": "Initial state and prerequisites for workflow: Student submits a valid rebate request.. Participants: Student; Mess Caretaker.",
+    "action_or_input": "Execute workflow sequence: [No Current Rebate Request] -(actor:Student, uc:MMS-UC-014 \u2014 Submit Rebate Request)-> [Rebate Request Pending] -> [Rebate Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-015 \u2014 Review Rebate Request)-> [Rebate Approved; billing adjustment uses approved dates] -> [Rebate Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-015 \u2014 Review Rebate Request)-> [Rebate Approved with Modified Dates; billing adjustment uses modified approved dates] -> [Rebate Request Pending] -(actor:Mess Caretaker, uc:MMS-UC-015 \u2014 Review Rebate Request)-> [Rebate Rejected] via MMS-UC-014, MMS-UC-015",
+    "expected_result": "MMS successfully completes workflow Rebate Request Lifecycle transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-011",
+    "source_id": "BW-MMS-08 path execution",
+    "purpose": "Verify BW-MMS-08 (Vacation Survey \u2014 Yes Response): Create survey and record an explicit Yes response.",
+    "preconditions": "Initial state and prerequisites for workflow: Caretaker creates survey.. Participants: Mess Caretaker; Student.",
+    "action_or_input": "Execute workflow sequence: [Vacation Survey Not Created] -(actor:Mess Caretaker, uc:MMS-UC-016 \u2014 Create Vacation Food Continuity Survey)-> [Vacation Survey Open] -> [Vacation Survey Open] -(actor:Student, uc:MMS-UC-017 \u2014 Respond to Vacation Food Continuity Survey)-> [Vacation Response = Yes] via MMS-UC-016, MMS-UC-017",
+    "expected_result": "MMS successfully completes workflow Vacation Survey \u2014 Yes Response transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-012",
+    "source_id": "BW-MMS-09 path execution",
+    "purpose": "Verify BW-MMS-09 (Vacation Survey \u2014 No Response): Create survey and record an explicit No response.",
+    "preconditions": "Initial state and prerequisites for workflow: Caretaker creates survey.. Participants: Mess Caretaker; Student.",
+    "action_or_input": "Execute workflow sequence: [Vacation Survey Not Created] -(actor:Mess Caretaker, uc:MMS-UC-016 \u2014 Create Vacation Food Continuity Survey)-> [Vacation Survey Open] -> [Vacation Survey Open] -(actor:Student, uc:MMS-UC-017 \u2014 Respond to Vacation Food Continuity Survey)-> [Vacation Response = No] via MMS-UC-016, MMS-UC-017",
+    "expected_result": "MMS successfully completes workflow Vacation Survey \u2014 No Response transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-013",
+    "source_id": "BW-MMS-10 path execution",
+    "purpose": "Verify BW-MMS-10 (Vacation Survey \u2014 Default No): Create a vacation survey and apply the source-defined default No when the response deadline is reached for a non-responding registered Student.",
+    "preconditions": "Initial state and prerequisites for workflow: Caretaker creates survey; Student does not respond by deadline.. Participants: Mess Caretaker; System.",
+    "action_or_input": "Execute workflow sequence: [Vacation Survey Not Created] -(actor:Mess Caretaker, uc:MMS-UC-016 \u2014 Create Vacation Food Continuity Survey)-> [Vacation Survey Open] -> [Vacation Survey Open] -(actor:System, uc:MMS-UC-028 \u2014 Apply Default Vacation Response at Deadline)-> [Vacation Response = Default No] via MMS-UC-016, MMS-UC-028",
+    "expected_result": "MMS successfully completes workflow Vacation Survey \u2014 Default No transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-014",
+    "source_id": "CW-MMS-04 path execution",
+    "purpose": "Verify CW-MMS-04 (Vacation Food Continuity Response Lifecycle): Combine the explicit Yes, explicit No, and default-No paths after survey creation.",
+    "preconditions": "Initial state and prerequisites for workflow: Caretaker creates survey.. Participants: Mess Caretaker; Student; System.",
+    "action_or_input": "Execute workflow sequence: [Vacation Survey Not Created] -(actor:Mess Caretaker, uc:MMS-UC-016 \u2014 Create Vacation Food Continuity Survey)-> [Vacation Survey Open] -> [Vacation Survey Open] -(actor:Student, uc:MMS-UC-017 \u2014 Respond to Vacation Food Continuity Survey)-> [Vacation Response = Yes] -> [Vacation Survey Open] -(actor:Student, uc:MMS-UC-017 \u2014 Respond to Vacation Food Continuity Survey)-> [Vacation Response = No] -> [Vacation Survey Open] -(actor:System, uc:MMS-UC-028 \u2014 Apply Default Vacation Response at Deadline)-> [Vacation Response = Default No] via MMS-UC-016, MMS-UC-017, MMS-UC-028",
+    "expected_result": "MMS successfully completes workflow Vacation Food Continuity Response Lifecycle transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-015",
+    "source_id": "BW-MMS-11 path execution",
+    "purpose": "Verify BW-MMS-11 (Special Food \u2014 Rejected by Caretaker): Valid special-food submission followed by explicit Caretaker rejection.",
+    "preconditions": "Initial state and prerequisites for workflow: Student submits valid request.. Participants: Student; Mess Caretaker.",
+    "action_or_input": "Execute workflow sequence: [No Special Food Request] -(actor:Student, uc:MMS-UC-019 \u2014 Submit Special Food Request)-> [Special Food Request = Requested] -> [Requested] -(actor:Mess Caretaker, uc:MMS-UC-020 \u2014 Review Special Food Request)-> [Rejected] via MMS-UC-019, MMS-UC-020",
+    "expected_result": "MMS successfully completes workflow Special Food \u2014 Rejected by Caretaker transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-016",
+    "source_id": "BW-MMS-12 path execution",
+    "purpose": "Verify BW-MMS-12 (Special Food \u2014 Default Rejected): Valid special-food submission followed by source-defined default rejection when no decision occurs in time.",
+    "preconditions": "Initial state and prerequisites for workflow: Student submits valid request; no Caretaker decision occurs within the stipulated period.. Participants: Student; System.",
+    "action_or_input": "Execute workflow sequence: [No Special Food Request] -(actor:Student, uc:MMS-UC-019 \u2014 Submit Special Food Request)-> [Special Food Request = Requested] -> [Requested] -(actor:System, uc:MMS-UC-029 \u2014 Default-Reject Undecided Special Food Request)-> [Rejected (Default)] via MMS-UC-019, MMS-UC-029",
+    "expected_result": "MMS successfully completes workflow Special Food \u2014 Default Rejected transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-017",
+    "source_id": "BW-MMS-13 path execution",
+    "purpose": "Verify BW-MMS-13 (Special Food \u2014 Approved, Awaiting Fulfillment): Valid special-food submission followed by approval, ending in the meaningful Approved state.",
+    "preconditions": "Initial state and prerequisites for workflow: Student submits valid request.. Participants: Student; Mess Caretaker.",
+    "action_or_input": "Execute workflow sequence: [No Special Food Request] -(actor:Student, uc:MMS-UC-019 \u2014 Submit Special Food Request)-> [Special Food Request = Requested] -> [Requested] -(actor:Mess Caretaker, uc:MMS-UC-020 \u2014 Review Special Food Request)-> [Approved] via MMS-UC-019, MMS-UC-020",
+    "expected_result": "MMS successfully completes workflow Special Food \u2014 Approved, Awaiting Fulfillment transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-018",
+    "source_id": "BW-MMS-14 path execution",
+    "purpose": "Verify BW-MMS-14 (Special Food \u2014 Served): Valid special-food submission, approval, then post-approval transition to Served.",
+    "preconditions": "Initial state and prerequisites for workflow: Student submits valid request.. Participants: Student; Mess Caretaker.",
+    "action_or_input": "Execute workflow sequence: [No Special Food Request] -(actor:Student, uc:MMS-UC-019 \u2014 Submit Special Food Request)-> [Special Food Request = Requested] -> [Requested] -(actor:Mess Caretaker, uc:MMS-UC-020 \u2014 Review Special Food Request)-> [Approved] -> [Approved] -(actor:Mess Caretaker, uc:MMS-UC-021 \u2014 Update Special Food Fulfillment Status)-> [Served] via MMS-UC-019, MMS-UC-020, MMS-UC-021",
+    "expected_result": "MMS successfully completes workflow Special Food \u2014 Served transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-019",
+    "source_id": "BW-MMS-15 path execution",
+    "purpose": "Verify BW-MMS-15 (Special Food \u2014 Cancelled): Valid special-food submission, approval, then post-approval transition to Cancelled.",
+    "preconditions": "Initial state and prerequisites for workflow: Student submits valid request.. Participants: Student; Mess Caretaker.",
+    "action_or_input": "Execute workflow sequence: [No Special Food Request] -(actor:Student, uc:MMS-UC-019 \u2014 Submit Special Food Request)-> [Special Food Request = Requested] -> [Requested] -(actor:Mess Caretaker, uc:MMS-UC-020 \u2014 Review Special Food Request)-> [Approved] -> [Approved] -(actor:Mess Caretaker, uc:MMS-UC-021 \u2014 Update Special Food Fulfillment Status)-> [Cancelled] via MMS-UC-019, MMS-UC-020, MMS-UC-021",
+    "expected_result": "MMS successfully completes workflow Special Food \u2014 Cancelled transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-020",
+    "source_id": "CW-MMS-05 path execution",
+    "purpose": "Verify CW-MMS-05 (Special Food Request Lifecycle): Combine the explicit rejection, default rejection, approval, Served, and Cancelled paths.",
+    "preconditions": "Initial state and prerequisites for workflow: Student submits a valid special-food request.. Participants: Student; Mess Caretaker; System.",
+    "action_or_input": "Execute workflow sequence: [No Special Food Request] -(actor:Student, uc:MMS-UC-019 \u2014 Submit Special Food Request)-> [Special Food Request = Requested] -> [Requested] -(actor:Mess Caretaker, uc:MMS-UC-020 \u2014 Review Special Food Request)-> [Rejected] -> [Requested] -(actor:System, uc:MMS-UC-029 \u2014 Default-Reject Undecided Special Food Request)-> [Rejected (Default)] -> [Requested] -(actor:Mess Caretaker, uc:MMS-UC-020 \u2014 Review Special Food Request)-> [Approved] -> [Approved] -(actor:Mess Caretaker, uc:MMS-UC-021 \u2014 Update Special Food Fulfillment Status)-> [Served] -> [Approved] -(actor:Mess Caretaker, uc:MMS-UC-021 \u2014 Update Special Food Fulfillment Status)-> [Cancelled] via MMS-UC-019, MMS-UC-020, MMS-UC-029, MMS-UC-021",
+    "expected_result": "MMS successfully completes workflow Special Food Request Lifecycle transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-021",
+    "source_id": "BW-MMS-16 path execution",
+    "purpose": "Verify BW-MMS-16 (Monthly Billing \u2014 Generated to Published): Generate monthly bill records on the calendar-month billing event and progress them through Caretaker review/finalization to publication.",
+    "preconditions": "Initial state and prerequisites for workflow: Calendar-month billing cycle becomes due for bill generation.. Participants: System; Mess Caretaker.",
+    "action_or_input": "Execute workflow sequence: [Monthly Bill Not Generated] -(actor:System, uc:MMS-UC-030 \u2014 Generate Monthly Mess Bills)-> [Monthly Bill Generated] -> [Monthly Bill Generated] -(actor:Mess Caretaker, uc:MMS-UC-010 \u2014 Review, Finalize, and Publish Monthly Bills)-> [Monthly Bill Published] via MMS-UC-030, MMS-UC-010",
+    "expected_result": "MMS successfully completes workflow Monthly Billing \u2014 Generated to Published transitions, enforcing state invariants according to spec.",
+    "test_type": "workflow"
+  }
+]
