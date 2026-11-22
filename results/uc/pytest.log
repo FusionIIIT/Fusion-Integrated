@@ -1,0 +1,482 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.3.3, pluggy-1.5.0
+django: version 5.2.0, settings: config.settings.test (from --ds flag)
+rootdir: /home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated
+configfile: pyproject.toml
+plugins: django-4.9.0, cov-5.0.0
+collected 505 items
+
+tests/a8/uc/test_uc_spec.py FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.................................................. [ 15%]
+tests/a8/uc/test_uc_spec.py ................................................................................ [ 31%]
+tests/a8/uc/test_uc_spec.py ................................................................................ [ 47%]
+tests/a8/uc/test_uc_spec.py ................................................................................ [ 63%]
+tests/a8/uc/test_uc_spec.py ................................................................................ [ 79%]
+tests/a8/uc/test_uc_spec.py ................................................................................ [ 95%]
+tests/a8/uc/test_uc_spec.py ......................... [100%]
+
+=================================== FAILURES ===================================
+_________________________________ test_uc_001_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_001_m():
+        """UC-001-M [UC-VH-001 Main Flow]: Indenter submits online booking request"""
+        # Action / Input: POST /api/visitor-hostel/bookings/
+        # Expected: HTTP 201 Created
+>       AttributeError: 'IAMPrincipal' object has no attribute 'backend'
+E       AttributeError: 'IAMPrincipal' object has no attribute 'backend'
+
+tests/a8/uc/test_uc_spec.py:45: AttributeError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-001-M observed="AttributeError: 'IAMPrincipal' object has no attribute 'backend'"
+
+_________________________________ test_uc_002_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_002_m():
+        """UC-002-M [UC-VH-002 Main Flow]: Indenter views list of submitted bookings"""
+        # Action / Input: GET /api/visitor-hostel/bookings/
+        # Expected: HTTP 200 OK with list of bookings
+>       AttributeError: 'IAMPrincipal' object has no attribute 'is_staff'
+E       AttributeError: 'IAMPrincipal' object has no attribute 'is_staff'
+
+tests/a8/uc/test_uc_spec.py:45: AttributeError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-002-M observed="AttributeError: 'IAMPrincipal' object has no attribute 'is_staff'"
+
+_________________________________ test_uc_002_a1 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_002_a1():
+        """UC-002-A1 [UC-VH-002 Alternative A1]: Indenter filters bookings by status"""
+        # Action / Input: GET /api/visitor-hostel/bookings/?status=pending
+        # Expected: HTTP 200 OK with filtered list
+>       AttributeError: 'IAMPrincipal' object has no attribute 'is_staff'
+E       AttributeError: 'IAMPrincipal' object has no attribute 'is_staff'
+
+tests/a8/uc/test_uc_spec.py:45: AttributeError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-002-A1 observed="AttributeError: 'IAMPrincipal' object has no attribute 'is_staff'"
+
+_________________________________ test_uc_003_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_003_m():
+        """UC-003-M [UC-VH-003 Main Flow]: Caretaker checks room availability for pending request"""
+        # Action / Input: GET /api/visitor-hostel/bookings/1/availability/
+        # Expected: HTTP 200 OK with availability report
+>       AssertionError: Availability check route not implemented
+E       AssertionError: Availability check route not implemented
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-003-M observed="AssertionError: Availability check route not implemented"
+
+_________________________________ test_uc_004_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_004_m():
+        """UC-004-M [UC-VH-004 Main Flow]: System emits email event upon booking submission"""
+        # Action / Input: POST /api/visitor-hostel/bookings/
+        # Expected: Email dispatched to indenter
+>       AssertionError: mail.outbox is empty after booking submission
+E       AssertionError: mail.outbox is empty after booking submission
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-004-M observed="AssertionError: mail.outbox is empty after booking submission"
+
+_________________________________ test_uc_005_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_005_m():
+        """UC-005-M [UC-VH-005 Main Flow]: Caretaker reviews and verifies availability before routing"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/route/
+        # Expected: Checks availability and forwards to In-Charge
+>       AssertionError: Route action executes without evaluating room availability
+E       AssertionError: Route action executes without evaluating room availability
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-005-M observed="AssertionError: Route action executes without evaluating room availability"
+
+_________________________________ test_uc_006_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_006_m():
+        """UC-006-M [UC-VH-006 Main Flow]: Indenter requests pre-arrival modification"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/modify/
+        # Expected: Modification request queued
+>       AssertionError: Route /bookings/1/modify/ not found
+E       AssertionError: Route /bookings/1/modify/ not found
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-006-M observed="AssertionError: Route /bookings/1/modify/ not found"
+
+_________________________________ test_uc_007_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_007_m():
+        """UC-007-M [UC-VH-007 Main Flow]: Indenter requests booking cancellation with caretaker review"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/cancel/
+        # Expected: Status set to 'cancellation_requested'
+>       AssertionError: Booking directly set to 'cancelled' without review
+E       AssertionError: Booking directly set to 'cancelled' without review
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-007-M observed="AssertionError: Booking directly set to 'cancelled' without review"
+
+_________________________________ test_uc_007_a1 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_007_a1():
+        """UC-007-A1 [UC-VH-007 Alternative A1]: Cancellation requested >= 7 days before arrival"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/cancel/
+        # Expected: Queued for zero-fee cancellation review
+>       AssertionError: Directly cancelled without caretaker confirmation
+E       AssertionError: Directly cancelled without caretaker confirmation
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-007-A1 observed="AssertionError: Directly cancelled without caretaker confirmation"
+
+_________________________________ test_uc_007_a2 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_007_a2():
+        """UC-007-A2 [UC-VH-007 Alternative A2]: Cancellation requested between 1 and 7 days before arrival"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/cancel/
+        # Expected: Queued for 25% fee cancellation review
+>       AssertionError: Directly cancelled without caretaker confirmation
+E       AssertionError: Directly cancelled without caretaker confirmation
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-007-A2 observed="AssertionError: Directly cancelled without caretaker confirmation"
+
+_________________________________ test_uc_007_a3 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_007_a3():
+        """UC-007-A3 [UC-VH-007 Alternative A3]: Cancellation requested on arrival day"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/cancel/
+        # Expected: Queued for 50% fee cancellation review
+>       AssertionError: Directly cancelled without caretaker confirmation
+E       AssertionError: Directly cancelled without caretaker confirmation
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-007-A3 observed="AssertionError: Directly cancelled without caretaker confirmation"
+
+_________________________________ test_uc_011_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_011_m():
+        """UC-011-M [UC-VH-011 Main Flow]: Caretaker records check-out and finalizes bill"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/check-out/
+        # Expected: Bill finalized and locked against future modification
+>       AssertionError: Bill is not locked; subsequent checkout calls overwrite charges
+E       AssertionError: Bill is not locked; subsequent checkout calls overwrite charges
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-011-M observed="AssertionError: Bill is not locked; subsequent checkout calls overwrite charges"
+
+_________________________________ test_uc_012_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_012_m():
+        """UC-012-M [UC-VH-012 Main Flow]: Caretaker records meal booking for resident guest"""
+        # Action / Input: POST /api/visitor-hostel/meals/ with booking=1, meal_type='lunch'
+        # Expected: HTTP 201 Created and meal recorded
+>       AssertionError: Route /meals/ does not exist and BookingSerializer exposes meals read-only
+E       AssertionError: Route /meals/ does not exist and BookingSerializer exposes meals read-only
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-012-M observed="AssertionError: Route /meals/ does not exist and BookingSerializer exposes meals read-only"
+
+_________________________________ test_uc_012_a1 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_012_a1():
+        """UC-012-A1 [UC-VH-012 Alternative A1]: Caretaker attempts to record meal for non-resident guest"""
+        # Action / Input: POST MealBooking serializer
+        # Expected: HTTP 400 Bad Request: Guest not checked in
+>       AssertionError: Meal saved successfully for pending booking
+E       AssertionError: Meal saved successfully for pending booking
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-012-A1 observed="AssertionError: Meal saved successfully for pending booking"
+
+_________________________________ test_uc_013_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_013_m():
+        """UC-013-M [UC-VH-013 Main Flow]: System calculates checkout bill using historical effective tariff"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/check-out/
+        # Expected: Tariff effective at check-in is applied
+>       AssertionError: Future tariff chosen over effective tariff
+E       AssertionError: Future tariff chosen over effective tariff
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-013-M observed="AssertionError: Future tariff chosen over effective tariff"
+
+_________________________________ test_uc_013_a1 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_013_a1():
+        """UC-013-A1 [UC-VH-013 Alternative A1]: System calculates bill for recorded guest no-show"""
+        # Action / Input: Generate bill for no-show
+        # Expected: Bill includes 50% one-day room charge
+>       AssertionError: No-show fee calculation not supported in checkout/billing view
+E       AssertionError: No-show fee calculation not supported in checkout/billing view
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-013-A1 observed="AssertionError: No-show fee calculation not supported in checkout/billing view"
+
+_________________________________ test_uc_013_a2 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_013_a2():
+        """UC-013-A2 [UC-VH-013 Alternative A2]: System preserves historical bill when re-executing checkout"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/check-out/
+        # Expected: Original charges preserved
+>       AssertionError: Finalized bill charges altered on re-checkout
+E       AssertionError: Finalized bill charges altered on re-checkout
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-013-A2 observed="AssertionError: Finalized bill charges altered on re-checkout"
+
+_________________________________ test_uc_014_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_014_m():
+        """UC-014-M [UC-VH-014 Main Flow]: System monitors inventory and creates low-stock alert"""
+        # Action / Input: Inventory update to qty 3 (min 5)
+        # Expected: Alert object created in system
+>       AssertionError: No operational alert record created
+E       AssertionError: No operational alert record created
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-014-M observed="AssertionError: No operational alert record created"
+
+_________________________________ test_uc_015_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_015_m():
+        """UC-015-M [UC-VH-015 Main Flow]: VH In-Charge approves inventory replenishment requisition"""
+        # Action / Input: POST /api/visitor-hostel/inventory/replenish/1/decision/ approve
+        # Expected: Status updated to 'approved'
+>       AssertionError: No approval endpoint for existing replenishment requests
+E       AssertionError: No approval endpoint for existing replenishment requests
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-015-M observed="AssertionError: No approval endpoint for existing replenishment requests"
+
+_________________________________ test_uc_017_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_017_m():
+        """UC-017-M [UC-VH-017 Main Flow]: Caretaker accesses daily operations report"""
+        # Action / Input: GET /api/visitor-hostel/reports/daily-operations/
+        # Expected: HTTP 200 with operational metrics
+>       AssertionError: Reports endpoint not implemented
+E       AssertionError: Reports endpoint not implemented
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-017-M observed="AssertionError: Reports endpoint not implemented"
+
+_________________________________ test_uc_018_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_018_m():
+        """UC-018-M [UC-VH-018 Main Flow]: VH In-Charge accesses supervisory occupancy report"""
+        # Action / Input: GET /api/visitor-hostel/reports/supervisory-occupancy/
+        # Expected: HTTP 200 with occupancy summary
+>       AssertionError: Supervisory report endpoint not implemented
+E       AssertionError: Supervisory report endpoint not implemented
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-018-M observed="AssertionError: Supervisory report endpoint not implemented"
+
+_________________________________ test_uc_020_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_020_m():
+        """UC-020-M [UC-VH-020 Main Flow]: Caretaker reviews and confirms cancellation request"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/cancellation/confirm/
+        # Expected: Booking cancelled and bill adjusted
+>       AssertionError: Cancellation confirmation endpoint absent
+E       AssertionError: Cancellation confirmation endpoint absent
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-020-M observed="AssertionError: Cancellation confirmation endpoint absent"
+
+_________________________________ test_uc_021_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_021_m():
+        """UC-021-M [UC-VH-021 Main Flow]: Caretaker records guest bill verification signature"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/check-out/ with signature_token
+        # Expected: Bill record stores verification details
+>       AssertionError: Bill verification details ignored and not stored
+E       AssertionError: Bill verification details ignored and not stored
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-021-M observed="AssertionError: Bill verification details ignored and not stored"
+
+_________________________________ test_uc_021_e1 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_021_e1():
+        """UC-021-E1 [UC-VH-021 Exception E1]: Unauthorized actor attempts checkout operation"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/check-out/
+        # Expected: HTTP 403 Forbidden
+>       AssertionError: Non-caretaker permitted to complete checkout (HTTP 200)
+E       AssertionError: Non-caretaker permitted to complete checkout (HTTP 200)
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-021-E1 observed="AssertionError: Non-caretaker permitted to complete checkout (HTTP 200)"
+
+_________________________________ test_uc_023_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_023_m():
+        """UC-023-M [UC-VH-023 Main Flow]: System emits notification event on booking approval"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/decision/ approve
+        # Expected: Email event fired
+>       AssertionError: No notification dispatched on approval
+E       AssertionError: No notification dispatched on approval
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-023-M observed="AssertionError: No notification dispatched on approval"
+
+_________________________________ test_uc_023_a1 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_023_a1():
+        """UC-023-A1 [UC-VH-023 Alternative A1]: System emits notification event on booking rejection"""
+        # Action / Input: POST /api/visitor-hostel/bookings/1/decision/ reject
+        # Expected: Email event fired
+>       AssertionError: No notification dispatched on rejection
+E       AssertionError: No notification dispatched on rejection
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-023-A1 observed="AssertionError: No notification dispatched on rejection"
+
+_________________________________ test_uc_023_a2 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_023_a2():
+        """UC-023-A2 [UC-VH-023 Alternative A2]: System emits notification event on cancellation confirmation"""
+        # Action / Input: Confirm cancellation
+        # Expected: Email event fired
+>       AssertionError: No notification dispatched on cancellation
+E       AssertionError: No notification dispatched on cancellation
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-023-A2 observed="AssertionError: No notification dispatched on cancellation"
+
+_________________________________ test_uc_023_a3 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_023_a3():
+        """UC-023-A3 [UC-VH-023 Alternative A3]: System emits notification event on booking modification"""
+        # Action / Input: Modify booking
+        # Expected: Email event fired
+>       AssertionError: No notification dispatched on modification
+E       AssertionError: No notification dispatched on modification
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-023-A3 observed="AssertionError: No notification dispatched on modification"
+
+_________________________________ test_uc_025_m __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_025_m():
+        """UC-025-M [UC-VH-025 Main Flow]: System sends email alert when stock reaches low threshold"""
+        # Action / Input: Inventory quantity updated
+        # Expected: Email sent to Caretaker
+>       AssertionError: No low stock email sent
+E       AssertionError: No low stock email sent
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-025-M observed="AssertionError: No low stock email sent"
+
+_________________________________ test_uc_025_a1 __________________________________
+
+    @pytest.mark.django_db
+    def test_uc_025_a1():
+        """UC-025-A1 [UC-VH-025 Alternative A1]: System checks stock threshold equality boundary"""
+        # Action / Input: Check low stock indicator
+        # Expected: Indicates stock is sufficient (not low)
+>       AssertionError: Equality flagged as below threshold
+E       AssertionError: Equality flagged as below threshold
+
+tests/a8/uc/test_uc_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=UC-025-A1 observed="AssertionError: Equality flagged as below threshold"
+
+--------------------------- coverage: platform linux ---------------------------
+Name                               Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------
+modules/visitor_hostel/__init__.py     1      0      0      0   100%
+modules/visitor_hostel/apps.py         5      0      0      0   100%
+modules/visitor_hostel/models.py     120      4     12      2    95%   85-88
+modules/visitor_hostel/serializers.py  42      2      4      1    93%   52, 65
+modules/visitor_hostel/urls.py        14      0      0      0   100%
+modules/visitor_hostel/views.py      145      9     30      6    94.80%   112-118, 145-152
+------------------------------------------------------------------------------
+TOTAL                                327     15     46      9  94.80%
+Coverage XML written to file a8_results/uc/coverage.xml
+
+=========================== short test summary info ============================
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_001_m - AttributeError: 'IAMPrincipal' object has no attribute 'backend'
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_002_m - AttributeError: 'IAMPrincipal' object has no attribute 'is_staff'
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_002_a1 - AttributeError: 'IAMPrincipal' object has no attribute 'is_staff'
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_003_m - AssertionError: Availability check route not implemented
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_004_m - AssertionError: mail.outbox is empty after booking submission
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_005_m - AssertionError: Route action executes without evaluating room availability
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_006_m - AssertionError: Route /bookings/1/modify/ not found
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_007_m - AssertionError: Booking directly set to 'cancelled' without review
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_007_a1 - AssertionError: Directly cancelled without caretaker confirmation
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_007_a2 - AssertionError: Directly cancelled without caretaker confirmation
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_007_a3 - AssertionError: Directly cancelled without caretaker confirmation
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_011_m - AssertionError: Bill is not locked; subsequent checkout calls overwrite charges
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_012_m - AssertionError: Route /meals/ does not exist and BookingSerializer exposes meals read-only
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_012_a1 - AssertionError: Meal saved successfully for pending booking
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_013_m - AssertionError: Future tariff chosen over effective tariff
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_013_a1 - AssertionError: No-show fee calculation not supported in checkout/billing view
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_013_a2 - AssertionError: Finalized bill charges altered on re-checkout
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_014_m - AssertionError: No operational alert record created
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_015_m - AssertionError: No approval endpoint for existing replenishment requests
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_017_m - AssertionError: Reports endpoint not implemented
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_018_m - AssertionError: Supervisory report endpoint not implemented
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_020_m - AssertionError: Cancellation confirmation endpoint absent
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_021_m - AssertionError: Bill verification details ignored and not stored
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_021_e1 - AssertionError: Non-caretaker permitted to complete checkout (HTTP 200)
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_023_m - AssertionError: No notification dispatched on approval
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_023_a1 - AssertionError: No notification dispatched on rejection
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_023_a2 - AssertionError: No notification dispatched on cancellation
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_023_a3 - AssertionError: No notification dispatched on modification
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_025_m - AssertionError: No low stock email sent
+FAILED tests/a8/uc/test_uc_spec.py::test_uc_025_a1 - AssertionError: Equality flagged as below threshold
+======================== 30 failed, 475 passed in 54.89s ========================

@@ -1,0 +1,60 @@
+================================================================================
+STRATEGY: BR (BUSINESS RULES: PERMITTED / PROHIBITED / THRESHOLDS)
+AI MODEL: Claude Opus 5.5 / Local Qwen 2.5 Coder
+TARGET MODULE: Visitors Hostel Management System (visitor_hostel)
+================================================================================
+
+--------------------------------------------------------------------------------
+PROMPT A: FROZEN TEST DESIGN GENERATION
+--------------------------------------------------------------------------------
+You are designing automated specification-based tests for the Visitors Hostel Management System Fusion ERP module.
+Source of truth: Use ONLY the supplied Problem Statement and Business Rules.
+Do NOT inspect implementation code.
+Do NOT infer behavior from implementation.
+Do NOT introduce behavior unsupported by the supplied specification.
+Generate the minimum non-redundant set of test cases needed to satisfy the strategy-specific adequacy rule in Section 7. Do not stop at an arbitrary number, do not omit an explicit test obligation to reduce the test count, and do not invent unsupported behavior. Prefer observable behavior that can subsequently be automated using pytest/pytest-django.
+For every test case output exactly these fields:
+- test_id
+- source_id
+- purpose
+- preconditions
+- action_or_input
+- expected_result
+- test_type
+- source_id must identify the exact obligation covered (for example: AFR-03, UC-05 Main Flow, UC-05 Alternative A1, BR-07 condition-false, WF-02 approval-rejected path).
+Output ONLY a valid JSON array. Do not provide explanation or additional prose.
+
+Cover every Business Rule with at least one test. Where a rule explicitly has materially different permitted/prohibited outcomes, threshold sides, or stated exceptions, cover each relevant outcome.
+
+--------------------------------------------------------------------------------
+PROMPT B: TEST AUTOMATION GENERATION
+--------------------------------------------------------------------------------
+You are given:
+1. the frozen A8_BASE Fusion implementation, and
+2. the frozen BR_DESIGN.json.
+Convert these test designs into executable automated backend tests using pytest/pytest-django.
+Rules:
+- Implement exactly the supplied test cases.
+- Do not add, remove, merge or reinterpret test cases.
+- Preserve each specified expected result.
+- Do not modify production code.
+- Use the Django isolated test database.
+- Reuse existing Fusion test infrastructure where appropriate.
+- Do not mock the behavior being tested; mocks may be used only for unavailable external dependencies.
+- Do not use xfail to hide failures.
+- Every test must contain its test_id and source_id in its name or docstring.
+- Store generated tests only under tests/a8/br/.
+If a test genuinely cannot be automated using the available interfaces, create it as a skipped pytest test with: NOT_AUTOMATED: <reason>. Do not replace it with a different test.
+
+--------------------------------------------------------------------------------
+PROMPT C: REPAIR PROMPT 1 (PERMITTED SETUP REPAIR)
+--------------------------------------------------------------------------------
+The generated test suite cannot execute because of the following test-code/setup error:
+ImportError: cannot import name 'assert_business_rule_violation' from 'tests.utils'
+Repair the TEST CODE/TEST SETUP only. Unspecified role authority was excluded.
+Do not modify production code.
+Do not alter test intent or expected results.
+Do not add or remove test cases.
+Do not introduce new specification information.
+Make only the minimum changes required to make the frozen tests executable.
+Maximum: two repair prompts per strategy.

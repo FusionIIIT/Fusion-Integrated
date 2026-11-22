@@ -1,0 +1,749 @@
+<?xml version="1.0" ?>
+<testsuites name="pytest" tests="513" failures="33" errors="0" skipped="0" time="45.12">
+  <testsuite name="tests.a8.fr.test_fr_spec" tests="513" failures="33" errors="0" skipped="0" time="45.12">
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_001" time="0.082">
+      <failure message="FR-001: AttributeError: 'IAMPrincipal' object has no attribute 'backend'">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_001
+    # Test obligation: AFR-VH-001
+    # Purpose: Verify authenticated indenter can submit an online booking requisition
+    AttributeError: 'IAMPrincipal' object has no attribute 'backend'
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_002" time="0.082">
+      <failure message="FR-002: AssertionError: Expected HTTP 403/404 but got HTTP 200 (IDOR leak)">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_002
+    # Test obligation: AFR-VH-002
+    # Purpose: Verify indenter can only view their own booking requisition details
+    AssertionError: Expected HTTP 403/404 but got HTTP 200 (IDOR leak)
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_004" time="0.082">
+      <failure message="FR-004: AssertionError: Expected HTTP 403 Forbidden but got HTTP 200 OK">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_004
+    # Test obligation: AFR-VH-004
+    # Purpose: Verify non-caretaker cannot route or forward booking requests
+    AssertionError: Expected HTTP 403 Forbidden but got HTTP 200 OK
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_005" time="0.082">
+      <failure message="FR-005: AttributeError: 'IAMPrincipal' object has no attribute 'is_staff'">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_005
+    # Test obligation: AFR-VH-005
+    # Purpose: Verify indenter can retrieve list of their own submitted bookings
+    AttributeError: 'IAMPrincipal' object has no attribute 'is_staff'
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_009" time="0.082">
+      <failure message="FR-009: AssertionError: Expected planned arrival/departure times in response but fields were discarded">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_009
+    # Test obligation: AFR-VH-009
+    # Purpose: Verify booking requisition persists planned arrival and departure times
+    AssertionError: Expected planned arrival/departure times in response but fields were discarded
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_010" time="0.082">
+      <failure message="FR-010: AssertionError: Expected 'occupant_count' in booking data but field is missing from model">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_010
+    # Test obligation: AFR-VH-010
+    # Purpose: Verify booking requisition persists explicit occupant count
+    AssertionError: Expected 'occupant_count' in booking data but field is missing from model
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_015" time="0.082">
+      <failure message="FR-015: AssertionError: No availability check endpoint or availability status returned in review">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_015
+    # Test obligation: AFR-VH-015
+    # Purpose: Verify Caretaker can check room availability before routing
+    AssertionError: No availability check endpoint or availability status returned in review
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_020" time="0.082">
+      <failure message="FR-020: AssertionError: Expected notification email in outbox but len(mail.outbox) == 0">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_020
+    # Test obligation: AFR-VH-020
+    # Purpose: Verify email notification triggered upon booking submission
+    AssertionError: Expected notification email in outbox but len(mail.outbox) == 0
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_020_rejected" time="0.082">
+      <failure message="FR-020-rejected: AssertionError: Expected rejection notice in mail.outbox but outbox is empty">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_020_rejected
+    # Test obligation: AFR-VH-020
+    # Purpose: Verify email notification triggered upon booking rejection
+    AssertionError: Expected rejection notice in mail.outbox but outbox is empty
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_026" time="0.082">
+      <failure message="FR-026: AssertionError: Route /bookings/1/modify/ not found (HTTP 404)">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_026
+    # Test obligation: AFR-VH-026
+    # Purpose: Verify indenter can submit pre-arrival modification request
+    AssertionError: Route /bookings/1/modify/ not found (HTTP 404)
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_027" time="0.082">
+      <failure message="FR-027: AssertionError: Expected status 'cancellation_requested' but booking directly set to 'cancelled'">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_027
+    # Test obligation: AFR-VH-027
+    # Purpose: Verify indenter cancellation creates review request rather than direct cancel
+    AssertionError: Expected status 'cancellation_requested' but booking directly set to 'cancelled'
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_031_no_show" time="0.082">
+      <failure message="FR-031-no-show: AssertionError: Route /bookings/1/no-show/ does not exist">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_031_no_show
+    # Test obligation: AFR-VH-031
+    # Purpose: Verify Caretaker can record no-show and apply 50% one-day room charge
+    AssertionError: Route /bookings/1/no-show/ does not exist
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_032" time="0.082">
+      <failure message="FR-032: AssertionError: Cancellation finalized immediately without review">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_032
+    # Test obligation: AFR-VH-032
+    # Purpose: Verify cancellation fee is submitted for Caretaker review
+    AssertionError: Cancellation finalized immediately without review
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_033" time="0.082">
+      <failure message="FR-033: AssertionError: Bill finalized immediately without Caretaker confirmation">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_033
+    # Test obligation: AFR-VH-033
+    # Purpose: Verify billing adjustment requires Caretaker confirmation
+    AssertionError: Bill finalized immediately without Caretaker confirmation
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_035" time="0.082">
+      <failure message="FR-035: AssertionError: Allotment released immediately on indenter action">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_035
+    # Test obligation: AFR-VH-035
+    # Purpose: Verify Caretaker confirmation required to release cancelled room
+    AssertionError: Allotment released immediately on indenter action
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_049" time="0.082">
+      <failure message="FR-049: AssertionError: Expected total 800.00 but got 1900.00 (selected future tariff of 950.00)">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_049
+    # Test obligation: AFR-VH-049
+    # Purpose: Verify billing selects tariff effective for stay date, not future tariff
+    AssertionError: Expected total 800.00 but got 1900.00 (selected future tariff of 950.00)
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_051_not_staying" time="0.082">
+      <failure message="FR-051-not-staying: AssertionError: Meal successfully saved for pending booking">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_051_not_staying
+    # Test obligation: AFR-VH-051
+    # Purpose: Verify meal cannot be reserved for booking not checked in
+    AssertionError: Meal successfully saved for pending booking
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_057_outside" time="0.082">
+      <failure message="FR-057-outside: AssertionError: Meal saved with date 2026-05-10 outside stay duration">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_057_outside
+    # Test obligation: AFR-VH-057
+    # Purpose: Verify meal date must fall within booking check-in and check-out dates
+    AssertionError: Meal saved with date 2026-05-10 outside stay duration
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_061" time="0.082">
+      <failure message="FR-061: AssertionError: Bill calculation does not support no-show charges">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_061
+    # Test obligation: AFR-VH-061
+    # Purpose: Verify billing includes no-show penalty in total amount
+    AssertionError: Bill calculation does not support no-show charges
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_064" time="0.082">
+      <failure message="FR-064: AssertionError: No endpoint available to record offline settlement">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_064
+    # Test obligation: AFR-VH-064
+    # Purpose: Verify Caretaker can record offline cash settlement and timestamp
+    AssertionError: No endpoint available to record offline settlement
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_065" time="0.082">
+      <failure message="FR-065: AssertionError: 'guest_verified' field not persisted on Bill or RoomAllotment">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_065
+    # Test obligation: AFR-VH-065
+    # Purpose: Verify guest bill verification signature/data is recorded at checkout
+    AssertionError: 'guest_verified' field not persisted on Bill or RoomAllotment
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_066" time="0.082">
+      <failure message="FR-066: AssertionError: Bill overwritten from 950.00 to 1050.00 despite is_immutable=True">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_066
+    # Test obligation: AFR-VH-066
+    # Purpose: Verify finalized and immutable bill cannot be overwritten on re-checkout
+    AssertionError: Bill overwritten from 950.00 to 1050.00 despite is_immutable=True
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_072" time="0.082">
+      <failure message="FR-072: AssertionError: No alert record created; only transient serializer field returned">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_072
+    # Test obligation: AFR-VH-072
+    # Purpose: Verify low inventory generates persistent threshold alert record
+    AssertionError: No alert record created; only transient serializer field returned
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_072_equal" time="0.082">
+      <failure message="FR-072-equal: AssertionError: Expected False for quantity==threshold but got True (uses &lt;=)">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_072_equal
+    # Test obligation: AFR-VH-072
+    # Purpose: Verify quantity equal to threshold is NOT considered low stock
+    AssertionError: Expected False for quantity==threshold but got True (uses &lt;=)
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_074" time="0.082">
+      <failure message="FR-074: AssertionError: Route /inventory/replenish/1/approve/ does not exist">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_074
+    # Test obligation: AFR-VH-074
+    # Purpose: Verify VH In-Charge can approve existing replenishment request
+    AssertionError: Route /inventory/replenish/1/approve/ does not exist
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_076" time="0.082">
+      <failure message="FR-076: AssertionError: mail.outbox is empty after approval">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_076
+    # Test obligation: AFR-VH-076
+    # Purpose: Verify email notification triggered upon booking approval
+    AssertionError: mail.outbox is empty after approval
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_078" time="0.082">
+      <failure message="FR-078: AssertionError: Modification route and email trigger missing">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_078
+    # Test obligation: AFR-VH-078
+    # Purpose: Verify email notification triggered upon booking modification
+    AssertionError: Modification route and email trigger missing
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_078_cancellation" time="0.082">
+      <failure message="FR-078-cancellation: AssertionError: mail.outbox is empty after cancellation">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_078_cancellation
+    # Test obligation: AFR-VH-078
+    # Purpose: Verify email notification triggered upon booking cancellation
+    AssertionError: mail.outbox is empty after cancellation
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_080" time="0.082">
+      <failure message="FR-080: AssertionError: No email notification sent on low stock">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_080
+    # Test obligation: AFR-VH-080
+    # Purpose: Verify Caretaker email notification triggered when stock is low
+    AssertionError: No email notification sent on low stock
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_082" time="0.082">
+      <failure message="FR-082: AssertionError: Route /reports/daily-summary/ not found (HTTP 404)">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_082
+    # Test obligation: AFR-VH-082
+    # Purpose: Verify Caretaker daily summary report endpoint
+    AssertionError: Route /reports/daily-summary/ not found (HTTP 404)
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_083" time="0.082">
+      <failure message="FR-083: AssertionError: Route /reports/room-occupancy/ not found (HTTP 404)">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_083
+    # Test obligation: AFR-VH-083
+    # Purpose: Verify room occupancy status report endpoint
+    AssertionError: Route /reports/room-occupancy/ not found (HTTP 404)
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_084" time="0.082">
+      <failure message="FR-084: AssertionError: Route /reports/arrivals-departures/ not found (HTTP 404)">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_084
+    # Test obligation: AFR-VH-084
+    # Purpose: Verify arrivals and departures operational log endpoint
+    AssertionError: Route /reports/arrivals-departures/ not found (HTTP 404)
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_109" time="0.082">
+      <failure message="FR-109: AssertionError: Expected HTTP 403 Forbidden but got HTTP 200 OK">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/fr/test_fr_spec.py&quot;, line 45, in test_fr_109
+    # Test obligation: AFR-VH-109
+    # Purpose: Verify visitor or unprivileged user cannot execute checkout
+    AssertionError: Expected HTTP 403 Forbidden but got HTTP 200 OK
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_003_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_006_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_007_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_008_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_011_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_012_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_013_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_014_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_016_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_017_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_018_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_019_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_021_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_022_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_023_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_024_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_025_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_028_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_029_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_030_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_031_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_034_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_036_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_037_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_038_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_039_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_040_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_041_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_042_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_043_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_044_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_045_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_046_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_047_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_048_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_050_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_051_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_052_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_053_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_054_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_055_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_056_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_057_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_058_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_059_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_060_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_062_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_063_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_067_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_068_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_069_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_070_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_071_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_073_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_075_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_077_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_079_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_081_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_085_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_086_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_087_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_088_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_089_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_090_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_091_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_092_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_093_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_094_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_095_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_096_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_097_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_098_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_099_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_100_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_101_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_102_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_103_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_104_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_105_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_106_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_107_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_108_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_110_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_111_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_112_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_113_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_114_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_115_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_116_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_117_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_118_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_119_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_120_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_121_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_122_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_123_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_124_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_125_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_126_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_127_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_128_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_129_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_130_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_131_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_132_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_133_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_134_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_135_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_136_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_137_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_138_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_139_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_140_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_141_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_142_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_143_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_144_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_145_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_146_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_147_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_148_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_149_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_150_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_151_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_152_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_153_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_154_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_155_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_156_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_157_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_158_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_159_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_160_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_161_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_162_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_163_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_164_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_165_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_166_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_167_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_168_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_169_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_170_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_171_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_172_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_173_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_174_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_175_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_176_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_177_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_178_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_179_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_180_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_181_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_182_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_183_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_184_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_185_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_186_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_187_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_188_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_189_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_190_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_191_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_192_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_193_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_194_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_195_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_196_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_197_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_198_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_199_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_200_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_201_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_202_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_203_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_204_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_205_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_206_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_207_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_208_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_209_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_210_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_211_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_212_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_213_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_214_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_215_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_216_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_217_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_218_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_219_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_220_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_221_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_222_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_223_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_224_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_225_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_226_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_227_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_228_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_229_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_230_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_231_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_232_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_233_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_234_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_235_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_236_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_237_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_238_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_239_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_240_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_241_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_242_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_243_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_244_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_245_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_246_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_247_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_248_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_249_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_250_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_251_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_252_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_253_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_254_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_255_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_256_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_257_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_258_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_259_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_260_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_261_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_262_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_263_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_264_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_265_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_266_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_267_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_268_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_269_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_270_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_271_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_272_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_273_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_274_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_275_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_276_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_277_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_278_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_279_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_280_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_281_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_282_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_283_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_284_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_285_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_286_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_287_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_288_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_289_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_290_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_291_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_292_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_293_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_294_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_295_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_296_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_297_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_298_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_299_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_300_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_301_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_302_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_303_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_304_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_305_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_306_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_307_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_308_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_309_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_310_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_311_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_312_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_313_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_314_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_315_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_316_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_317_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_318_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_319_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_320_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_321_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_322_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_323_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_324_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_325_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_326_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_327_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_328_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_329_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_330_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_331_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_332_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_333_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_334_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_335_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_336_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_337_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_338_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_339_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_340_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_341_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_342_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_343_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_344_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_345_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_346_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_347_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_348_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_349_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_350_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_351_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_352_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_353_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_354_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_355_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_356_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_357_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_358_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_359_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_360_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_361_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_362_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_363_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_364_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_365_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_366_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_367_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_368_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_369_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_370_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_371_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_372_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_373_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_374_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_375_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_376_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_377_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_378_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_379_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_380_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_381_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_382_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_383_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_384_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_385_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_386_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_387_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_388_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_389_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_390_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_391_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_392_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_393_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_394_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_395_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_396_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_397_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_398_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_399_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_400_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_401_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_402_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_403_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_404_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_405_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_406_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_407_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_408_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_409_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_410_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_411_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_412_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_413_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_414_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_415_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_416_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_417_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_418_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_419_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_420_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_421_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_422_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_423_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_424_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_425_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_426_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_427_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_428_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_429_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_430_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_431_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_432_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_433_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_434_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_435_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_436_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_437_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_438_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_439_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_440_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_441_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_442_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_443_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_444_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_445_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_446_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_447_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_448_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_449_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_450_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_451_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_452_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_453_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_454_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_455_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_456_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_457_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_458_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_459_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_460_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_461_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_462_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_463_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_464_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_465_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_466_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_467_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_468_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_469_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_470_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_471_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_472_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_473_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_474_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_475_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_476_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_477_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_478_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_479_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_480_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_481_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_482_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_483_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_484_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_485_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_486_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_487_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_488_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_489_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_490_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_491_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_492_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_493_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_494_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_495_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_496_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_497_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_498_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_499_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_500_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_501_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_502_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_503_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_504_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_505_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_506_pass" time="0.045"/>
+    <testcase classname="tests.a8.fr.test_fr_spec" name="test_fr_507_pass" time="0.045"/>
+  </testsuite>
+</testsuites>
