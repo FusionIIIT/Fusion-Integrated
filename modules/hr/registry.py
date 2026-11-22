@@ -5,7 +5,7 @@ MODULE = {
     "base_path": "/hr",
     "nav_section": "Administration",
     "sort_order": 30,
-    "status": "planned",
+    "status": "active",
 }
 
 NAV_ITEMS = [
