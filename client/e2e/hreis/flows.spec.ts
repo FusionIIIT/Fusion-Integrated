@@ -110,7 +110,7 @@ test.describe("HR-EIS administrator", () => {
     await page.goto("/");
     await actAs(page, "hrAdmin");
     await page.goto("/hreis/audit");
-    await expect(page.getByText("Request compliance status")).toBeVisible();
+    await expect(page.getByText("Request compliance status", { exact: true })).toBeVisible();
 
     const response = await page.request.get("/api/v1/hreis/compliance/requests/");
     expect(response.status()).toBe(200);

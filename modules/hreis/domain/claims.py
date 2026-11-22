@@ -83,5 +83,4 @@ def validate_financial_recording(
             "The claim has not passed financial verification. Contact HR to resolve this "
             "before retrying.",
         )
-    # Whether a payment/status integration exists is an external contract.
-    # A successful check authorizes recording, never executing, a payment.
+    # This verifies only a recorded status; it does not execute external payment.

@@ -11,6 +11,7 @@ from core.api.exceptions import BadRequestError, NotFoundError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.hreis.api import serializers as s
 from modules.hreis.api.examples import operation_examples
+from modules.hreis.api.query import ValidatedListQueryMixin
 from modules.hreis.api.throttles import HREISWriteThrottleMixin
 from modules.hreis.domain.routing import AUTHORITY_DESIGNATIONS
 from modules.hreis.selectors import scoping
@@ -60,7 +61,7 @@ class MyRecordView(APIView):
         return Response(s.RecordReadSerializer(record).data)
 
 
-class RecordListCreateView(HREISWriteThrottleMixin, generics.ListAPIView):
+class RecordListCreateView(HREISWriteThrottleMixin, ValidatedListQueryMixin, generics.ListAPIView):
     serializer_class = s.RecordReadSerializer
     permission_classes = [MODULE, VIEW_RECORD]
 
@@ -382,7 +383,7 @@ class AppraisalSubmitView(HREISWriteThrottleMixin, APIView):
         return Response(s.RequestReadSerializer(row).data, status=status.HTTP_201_CREATED)
 
 
-class PolicyListCreateView(HREISWriteThrottleMixin, generics.ListAPIView):
+class PolicyListCreateView(HREISWriteThrottleMixin, ValidatedListQueryMixin, generics.ListAPIView):
     serializer_class = s.PolicyReadSerializer
     permission_classes = [MODULE, HasPermission("hreis.policy.view")]
 
@@ -425,7 +426,7 @@ class PolicyListCreateView(HREISWriteThrottleMixin, generics.ListAPIView):
         return Response(s.PolicyReadSerializer(row).data, status=status.HTTP_201_CREATED)
 
 
-class ComplianceRequestListView(generics.ListAPIView):
+class ComplianceRequestListView(ValidatedListQueryMixin, generics.ListAPIView):
     serializer_class = s.ComplianceRequestSerializer
     permission_classes = [MODULE, HasPermission("hreis.audit.view")]
 
@@ -464,7 +465,7 @@ class ComplianceRequestDetailView(APIView):
         return Response(s.ComplianceRequestSerializer(row).data)
 
 
-class RequestListView(generics.ListAPIView):
+class RequestListView(ValidatedListQueryMixin, generics.ListAPIView):
     serializer_class = s.RequestReadSerializer
     permission_classes = [MODULE, HasPermission("hreis.request.view")]
 
@@ -485,7 +486,7 @@ class RequestListView(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
 
-class ApprovalQueueView(generics.ListAPIView):
+class ApprovalQueueView(ValidatedListQueryMixin, generics.ListAPIView):
     serializer_class = s.RequestReadSerializer
     permission_classes = [
         MODULE,
@@ -579,7 +580,7 @@ class NotificationMarkReadView(HREISWriteThrottleMixin, APIView):
         return Response(s.NotificationReadSerializer(row).data)
 
 
-class NotificationListView(generics.ListAPIView):
+class NotificationListView(ValidatedListQueryMixin, generics.ListAPIView):
     serializer_class = s.NotificationReadSerializer
     permission_classes = [MODULE, HasPermission("hreis.notification.view")]
 
@@ -595,7 +596,7 @@ class NotificationListView(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
 
-class AuditListView(generics.ListAPIView):
+class AuditListView(ValidatedListQueryMixin, generics.ListAPIView):
     serializer_class = s.AuditReadSerializer
     permission_classes = [MODULE, HasPermission("hreis.audit.view")]
 

@@ -63,8 +63,7 @@ def requests_for(actor) -> QuerySet[HRRequest]:
             state__in=["approved", "financial_processing_recorded"],
         ).exclude(user_id=actor.user_id)
     if actor.active_role in AUTHORITY_DESIGNATIONS:
-        # A matching route step is necessary, but not enough: the actor also
-        # needs the family-specific decision permission.
+        # A matching authority step still requires the family's decision permission.
         permitted = Q(pk__in=[])
         if actor.has_permission("hreis.leave.approve"):
             permitted |= Q(family="leave", state="pending_authority")
@@ -102,8 +101,7 @@ def notifications_for(actor) -> QuerySet[Notification]:
     base = Notification.objects.all()
     if not _valid(actor, P_NOTIFICATION_VIEW):
         return base.none()
-    # A request-linked reminder follows its current acting-role assignment. A
-    # notification grant may show the generic reminder without granting form access.
+    # Generic reminders follow the assigned role, without granting form access.
     assigned = HRRequest.objects.none()
     if actor.active_role == HR_ADMIN:
         assigned = HRRequest.objects.exclude(user_id=actor.user_id).filter(

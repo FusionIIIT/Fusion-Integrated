@@ -1093,3 +1093,90 @@ policy/role rulings, protected shared-file permissions, five uncited live IDs
 and the six source/external uncertainties recorded earlier remain open.
 Student 2 has not provided written approval or their own independent tests,
 and no such approval is implied by these pass results.
+
+## 27. R3 technical follow-up — prepared for Student 2 review (2026-11-22)
+
+R3's fresh-checkout technical review of `ba52c66` is preserved outside Git
+under `D:\HR(EIS)\lab 9\evidence\R3-20261122-clean-checkout-review-NOT-APPROVED.txt`.
+It found two procedural/integration blockers, one live-source traceability gap
+and two directly actionable technical findings.
+
+**R3-04 resolved:** All seven HR-EIS cursor-paginated list endpoints now reject
+unrecognized query parameters, repeated keys, malformed/out-of-bounds
+`limit` values and invalid/oversized `cursor` values with a structured HTTP
+400; valid `limit` and cursor navigation are unchanged. The validation is in
+`modules/hreis/api/query.py`, not a shared platform gate. New HTTP regression
+tests in `modules/hreis/tests/test_list_query_validation.py` exercise the
+same negative boundaries on all seven routes, successful bounded limits,
+true multi-page navigation and module-grant priority. The generated
+HR-EIS reference was regenerated after source line moves. The OpenAPI schema
+was checked against the running code after the validator change.
+
+**R3-05 resolved:** Three multi-line implementation comment blocks were
+replaced with concise single-line comments; business behavior is unchanged.
+
+**R3-01 still open:** Student 2's written blueprint/gap decisions have not
+been provided and cannot be inferred from reported verbal agreement.
+**R3-02 still open:** The checked-in branch still includes protected
+platform authentication, browser harness and dependency modifications.
+The rubric forbids several of those on a module submission, even with
+signoff. They need a valid platform-baseline disposition before a
+formal all-10 review; do not silently revert the security fixes or
+claim that a signed waiver overrides the rule.
+**R3-03 still open:** Exactly 188/193 live IDs have direct builder test
+citations. The remaining five (`HR-CFR-013`, `HR-AFR-059`,
+`HR-AFR-090`, `HR-AFR-091`, `HR-AFR-093`) involve unspecified
+external exchange or an undefined inbound LTC Returned transition.
+`HR-AFR-092` has partial directory-contract coverage but full
+cross-service synchronization still requires an approved contract.
+
+The resulting code, its synthetic browser and unit tests, and the explicit
+pending decisions are organized for Student 2 in
+`student2-review-packet.md` and `student2-approval-request.md`.
+The builder has not edited Student 2's reserved `tests/spec/` or
+`spec-tests/` paths, forged an approver's response, or opened an
+institutional pull request.
+
+**Boundary:** "Ready to share for Student 2 formal approval and testing"
+means that implementation, evidence and decisions are organized and
+reviewable; it does *not* mean the student's written approval, the
+different-provider testing phase or the official nine-dimensional 10/10
+has already happened.
+
+## 28. Final Student 1 share-ready technical gates (2026-11-22)
+
+Following R3 technical remediation, all locally runnable Student 1 gates were
+rerun on the current implementation. The strict list-query regression suite
+and related request, query-budget and R2 security tests passed **118/118**.
+`make check` passed across Django, migrations, Ruff, five import-layer
+contracts, cross-module contracts, navigation, permission manifest,
+OpenAPI generation check, and the complete backend pytest suite.
+`make check-client` passed **67/67** frontend tests, both TypeScript checks
+and the production Vite build. The shared entry-bundle warning remains
+nonfatal and is unrelated to the new HR-EIS list validator.
+
+Combined statement/branch coverage: **92.30%** for `modules/hreis`
+(required 90%) and **95.79%** for `modules/hreis/domain` (required 95%).
+Django production-settings `check --deploy --fail-level WARNING` passed
+with zero unsilenced findings (two documented silences); the generated
+HR-EIS reference and OpenAPI schema both matched the code.
+
+The full synthetic disposable-database Chromium suite passed **58/58**
+(49 HR-EIS plus nine shared-platform cases, 5.1 minutes), after correcting
+a flaky text locator that ambiguously matched both the compliance title
+and the empty-state sentence. The run included every mapped live HR use case,
+all 12 designation walkthroughs, keyboard-only leave submission, rejected
+and approved decisions, and isolated finance claim recording.
+The browser fixture's disposable database
+`hreis_e2e_1795346356_291339` was dropped (verified absent), its
+temporary IAM credential revoked, and the HTTP server/migration/readiness
+logs copied outside Git to
+`D:\HR(EIS)\lab 9\evidence\R3-20261122-share-ready\`.
+
+This makes the branch ready to **share for Student 2's written review and
+preparatory testing discussion**, not for production merge. R3-04 and R3-05
+are technically closed; R3-01/R3-02/R3-03 require approvals, platform-baseline
+resolution or real external contracts. The five uncited live source IDs are
+not marked as implemented or waived. `student2-review-packet.md` is the
+handoff entry point. The rubric's fresh formal 10/10 review and Student 2's
+different-provider frozen spec suites have **not** been completed.

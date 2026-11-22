@@ -436,7 +436,7 @@ test("HR-UC-017/018: publish a future immutable policy and inspect redacted comp
   expect((await response).status()).toBe(201);
   await expect(hr.getByText("Policy version recorded", { exact: true })).toBeVisible();
   await hr.goto("/hreis/audit");
-  await expect(hr.getByText("Request compliance status")).toBeVisible();
+  await expect(hr.getByText("Request compliance status", { exact: true })).toBeVisible();
   const audit = await hr.request.get(`${API}/audit/`);
   expect((await audit.json()).results.some((event: { action: string }) => event.action === "policy_create")).toBe(true);
   const compliance = await hr.request.get(`${API}/compliance/requests/`);

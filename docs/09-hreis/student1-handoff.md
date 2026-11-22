@@ -94,3 +94,32 @@ Assignment 9 approval or a production deployment certificate.
 - External providers, the provisional Accountant mapping, source uncertainties,
   Student 2's reserved tests, written approval and formal final 10/10 review
   have **not** been completed or asserted. Communication remains deferred.
+
+## Student 2 share-ready packet (2026-11-22)
+
+Use `student2-review-packet.md` as the up-to-date entry point for Student 2's
+approval and independent-test phase. It links this fork branch, the supplied
+six original specifications, the reproducible gate commands and the
+required written choices. The unsigned `student2-approval-request.md`
+now distinguishes platform-file changes that the module-only review rubric
+cannot waive from shared changes that need an ordinary written decision.
+
+R3's executable technical findings (strict HR-EIS list query validation and
+three continued comments) were addressed in module-owned files. Student 2's
+written approval, the five unresolved live-ID test links, the protected
+shared-file baseline and real external provider contracts remain explicitly
+pending. The handoff is ready for review, **not** certified for a 10/10 merge.
+
+## Verified share-ready checkpoint (2026-11-22)
+
+- `make check`: PASS; `make check-client`: PASS (67/67 and build).
+- `pytest` module coverage: 92.30%; domain coverage: 95.79%; both PASS.
+- Disposable Chromium: 58/58 PASS; synthetic DB dropped, IAM credential
+  revoked. Actual server/migration/readiness logs in
+  `D:\HR(EIS)\lab 9\evidence\R3-20261122-share-ready\`.
+- Strict list input validation and the corrected browser locator are
+  implemented only in allowed HR-EIS module/browser-test paths.
+- Ready to share `student2-review-packet.md` for Student 2's written
+  blueprint/gap decisions and staged test preparation. The formal fresh
+  10/10 review, protected platform-baseline resolution, real external
+  provider contracts and Student 2's independent specs remain open.
