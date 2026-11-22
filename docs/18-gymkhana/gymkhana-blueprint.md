@@ -44,13 +44,13 @@
 | **UC-GYM-001** | Create New Club | API / Service | `POST /api/gymkhana/clubs/` | Student Admin only |
 | **UC-GYM-002** | Book Club Session | API / Service | `POST /api/gymkhana/clubs/{id}/sessions/` | Club Head only |
 | **UC-GYM-003** | Book Club Event | API / Service | `POST /api/gymkhana/clubs/{id}/events/` | Club Head only |
-| **UC-GYM-004** | Apply for Club Membership | API / Service | `POST /api/gymkhana/clubs/{id}/memberships/` | Authenticated Student |
+| **UC-GYM-004** | Apply for Club Membership | API / Service | `POST /api/gymkhana/clubs/{id}/memberships/apply/` | Authenticated Student |
 | **UC-GYM-005** | Approve Club Membership | API / Service | `POST /api/gymkhana/memberships/{id}/approve/` | Club Head only |
 | **UC-GYM-006** | Create Voting Poll | API / Service | `POST /api/gymkhana/clubs/{id}/polls/` | Club Head only |
 | **UC-GYM-007** | Vote in Poll | API / Service | `POST /api/gymkhana/polls/{id}/vote/` | Eligible Student only |
 | **UC-GYM-008** | Change Club Leadership | API / Service | `POST /api/gymkhana/clubs/{id}/leadership/` | Club Head only |
 | **UC-GYM-009** | Request Club Budget | API / Service | `POST /api/gymkhana/clubs/{id}/budgets/` | Club Head only |
-| **UC-GYM-010** | Submit Club Event Report | API / Service | `POST /api/gymkhana/clubs/{id}/reports/` | Club Head only |
+| **UC-GYM-010** | Submit Club Event Report | API / Service | `POST /api/gymkhana/clubs/{id}/reports/submit/` | Club Head only |
 | **UC-GYM-011** | Approve / Confirm Club | API / Service | `POST /api/gymkhana/clubs/{id}/confirm/` | Student Admin only |
 | **UC-GYM-012** | Review Club Event Report | API / Selector | `GET /api/gymkhana/clubs/{id}/reports/` | Club Faculty Councillor |
 | **BW-GYM-01** | Club Membership Enrollment Lifecycle | Domain / Service | `models/membership.py` & `services/memberships.py` | State progression |
@@ -161,6 +161,9 @@ All user/student/faculty references are stored as integer `user_id`s, adhering s
    - `title`: CharField(max_length=200)
    - `description`: TextField()
    - `report_file`: FileField(upload_to='gymkhana/reports/')
+   - `student_incharge_id`: IntegerField()
+   - `event_name`: CharField(max_length=200)
+   - `event_datetime`: DateTimeField()
    - `submitted_by_id`: IntegerField()
    - `submitted_at`: DateTimeField(auto_now_add=True)
 
@@ -358,7 +361,7 @@ All routes live under `/gymkhana/` and are guarded with permissions:
 | `POST` | `/api/gymkhana/clubs/{id}/sessions/` | `{title, venue, date, start_time, end_time, description}` | 201, 400, 403, 404 | `gymkhana.session.book` |
 | `POST` | `/api/gymkhana/clubs/{id}/events/` | `{title, venue, date, start_time, end_time, description}` | 201, 400, 403, 404 | `gymkhana.event.book` |
 | `GET` | `/api/gymkhana/clubs/{id}/bookings/` | None (filters: date, venue) | 200, 404 | `gymkhana.club.view` |
-| `POST` | `/api/gymkhana/clubs/{id}/memberships/` | None / `{remarks}` | 201, 400, 404 | `gymkhana.membership.apply` |
+| `POST` | `/api/gymkhana/clubs/{id}/memberships/apply/` | None / `{remarks}` | 201, 400, 404 | `gymkhana.membership.apply` |
 | `GET` | `/api/gymkhana/clubs/{id}/memberships/` | None (filter: status) | 200, 403, 404 | `gymkhana.membership.approve` |
 | `POST` | `/api/gymkhana/memberships/{id}/approve/` | `{remarks}` | 200, 400, 403, 404 | `gymkhana.membership.approve` |
 | `POST` | `/api/gymkhana/clubs/{id}/polls/` | `{title, description, target_batches, target_branches, expires_at, choices}` | 201, 400, 403, 404 | `gymkhana.poll.create` |
@@ -366,7 +369,7 @@ All routes live under `/gymkhana/` and are guarded with permissions:
 | `POST` | `/api/gymkhana/polls/{id}/vote/` | `{choice_id}` | 200, 400, 403, 404 | `gymkhana.poll.vote` |
 | `POST` | `/api/gymkhana/clubs/{id}/budgets/` | multipart: `{amount, purpose, description, supporting_file}` | 201, 400, 403, 404 | `gymkhana.budget.request` |
 | `GET` | `/api/gymkhana/clubs/{id}/budgets/` | None | 200, 403, 404 | `gymkhana.budget.request` |
-| `POST` | `/api/gymkhana/clubs/{id}/reports/` | multipart: `{title, description, report_file}` | 201, 400, 403, 404 | `gymkhana.report.submit` |
+| `POST` | `/api/gymkhana/clubs/{id}/reports/submit/` | multipart: `{title, description, student_incharge_id, event_name, event_datetime, report_file}` | 201, 400, 403, 404 | `gymkhana.report.submit` |
 | `GET` | `/api/gymkhana/clubs/{id}/reports/` | None | 200, 403, 404 | `gymkhana.report.review` |
 
 ---

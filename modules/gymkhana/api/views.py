@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from drf_spectacular.utils import extend_schema
+from django.http import FileResponse
+from drf_spectacular.utils import OpenApiTypes, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +9,9 @@ from rest_framework.views import APIView
 from core.api.exceptions import BadRequestError, NotFoundError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.gymkhana.api import serializers as s
+from modules.gymkhana.models.booking import ClubBooking
+from modules.gymkhana.models.budget import ClubBudgetRequest
+from modules.gymkhana.models.report import ClubEventReport
 from modules.gymkhana.selectors import (
     bookings as booking_selectors,
 )
@@ -26,6 +30,7 @@ from modules.gymkhana.selectors import (
 from modules.gymkhana.selectors import (
     reports as report_selectors,
 )
+from modules.gymkhana.selectors.scoping import is_club_councillor, is_club_head
 from modules.gymkhana.services import (
     bookings as booking_services,
 )
@@ -68,8 +73,19 @@ class ClubListCreateView(APIView):
 
     @extend_schema(responses={200: s.ClubSerializer(many=True)})
     def get(self, request):
+        allowed = {"status", "category"}
+        unknown = set(request.query_params.keys()) - allowed
+        if unknown:
+            raise BadRequestError(
+                "Unknown club-list filter parameter.",
+                code="unknown_filter",
+            )
         status_filter = request.query_params.get("status")
         category_filter = request.query_params.get("category")
+        if status_filter not in (None, "open", "confirmed"):
+            raise BadRequestError("Invalid club status filter.", code="invalid_status")
+        if category_filter not in (None, "Technical", "Sports", "Cultural"):
+            raise BadRequestError("Invalid club category filter.", code="invalid_category")
         clubs = club_selectors.list_clubs(
             request.user, status=status_filter, category=category_filter
         )
@@ -88,7 +104,7 @@ class ClubDetailView(APIView):
 
     @extend_schema(responses={200: s.ClubSerializer})
     def get(self, request, pk: int):
-        club = club_selectors.get_club(pk)
+        club = club_selectors.scope_clubs(request.user).filter(pk=pk).first()
         if not club:
             raise NotFoundError("Club not found.", code="club_not_found")
         return Response(s.ClubSerializer(club).data)
@@ -355,6 +371,9 @@ class ClubEventReportSubmitView(APIView):
             title=ser.validated_data["title"],
             description=ser.validated_data["description"],
             report_file=ser.validated_data["report_file"],
+            student_incharge_id=ser.validated_data["student_incharge_id"],
+            event_name=ser.validated_data["event_name"],
+            event_datetime=ser.validated_data["event_datetime"],
         )
         return Response(s.ClubEventReportSerializer(report).data, status=status.HTTP_201_CREATED)
 
@@ -369,3 +388,49 @@ class ClubEventReportReviewView(APIView):
             raise NotFoundError("Club not found.", code="club_not_found")
         reports = report_selectors.list_event_reports(request.user, club)
         return Response(s.ClubEventReportSerializer(reports, many=True).data)
+
+
+class ClubBookingPosterDownloadView(APIView):
+    permission_classes = [HasModuleGrant("gymkhana"), HasPermission("gymkhana.club.view")]
+
+    @extend_schema(responses={(200, "application/octet-stream"): OpenApiTypes.BINARY})
+    def get(self, request, pk: int):
+        booking = ClubBooking.objects.filter(pk=pk).select_related("club").first()
+        club = (
+            club_selectors.scope_clubs(request.user).filter(pk=booking.club_id).first()
+            if booking
+            else None
+        )
+        if not booking or not booking.poster or not club:
+            raise NotFoundError("No such poster.")
+        return FileResponse(booking.poster.open("rb"), as_attachment=True)
+
+
+class ClubBudgetFileDownloadView(APIView):
+    permission_classes = [
+        HasModuleGrant("gymkhana"),
+        HasPermission("gymkhana.budget.request"),
+    ]
+
+    @extend_schema(responses={(200, "application/octet-stream"): OpenApiTypes.BINARY})
+    def get(self, request, pk: int):
+        budget = ClubBudgetRequest.objects.filter(pk=pk).select_related("club").first()
+        user_id = _get_user_id(request)
+        if not budget or not is_club_head(user_id, budget.club_id):
+            raise NotFoundError("No such budget file.")
+        return FileResponse(budget.supporting_file.open("rb"), as_attachment=True)
+
+
+class ClubEventReportFileDownloadView(APIView):
+    permission_classes = [
+        HasModuleGrant("gymkhana"),
+        HasPermission("gymkhana.report.review"),
+    ]
+
+    @extend_schema(responses={(200, "application/octet-stream"): OpenApiTypes.BINARY})
+    def get(self, request, pk: int):
+        report = ClubEventReport.objects.filter(pk=pk).select_related("club").first()
+        user_id = _get_user_id(request)
+        if not report or not is_club_councillor(user_id, report.club_id):
+            raise NotFoundError("No such event report.")
+        return FileResponse(report.report_file.open("rb"), as_attachment=True)

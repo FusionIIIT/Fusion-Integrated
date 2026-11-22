@@ -3,6 +3,7 @@ from django.db.models import CheckConstraint, Index, Q
 
 from core.db.mixins import TimeStampedModel
 from modules.gymkhana.models.club import Club
+from modules.gymkhana.storage import gymkhana_upload_storage
 
 
 class ClubBudgetRequest(TimeStampedModel):
@@ -10,7 +11,10 @@ class ClubBudgetRequest(TimeStampedModel):
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     purpose = models.CharField(max_length=250)
     description = models.TextField()
-    supporting_file = models.FileField(upload_to="gymkhana/budgets/")
+    supporting_file = models.FileField(
+        upload_to="budgets/",
+        storage=gymkhana_upload_storage,
+    )
     status = models.CharField(max_length=20, default="open")
     submitted_by_id = models.IntegerField(db_index=True)
 

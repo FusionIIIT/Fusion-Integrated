@@ -80,3 +80,23 @@ def test_cannot_book_session_without_permission(stub_iam, club):
         format="json",
     )
     assert res.status_code == 403
+
+
+@pytest.mark.parametrize(
+    "path,method",
+    [
+        ("/api/v1/gymkhana/clubs/", "get"),
+        ("/api/v1/gymkhana/clubs/", "post"),
+        ("/api/v1/gymkhana/polls/", "get"),
+        ("/api/v1/gymkhana/memberships/1/approve/", "post"),
+        ("/api/v1/gymkhana/clubs/1/sessions/", "post"),
+        ("/api/v1/gymkhana/clubs/1/events/", "post"),
+        ("/api/v1/gymkhana/clubs/1/polls/", "post"),
+        ("/api/v1/gymkhana/clubs/1/budgets/", "post"),
+        ("/api/v1/gymkhana/clubs/1/reports/submit/", "post"),
+    ],
+)
+def test_every_endpoint_refuses_ungranted_module(path, method, stub_iam):
+    c = _client(stub_iam, user_id=102, modules=(), permissions=())
+    response = getattr(c, method)(path, {}, format="json") if method == "post" else getattr(c, method)(path)
+    assert response.status_code in (401, 403)

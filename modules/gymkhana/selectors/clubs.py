@@ -9,7 +9,9 @@ def get_club(club_id: int) -> Club | None:
 
 
 def list_clubs(user, status: str | None = None, category: str | None = None) -> QuerySet[Club]:
-    qs = scope_clubs(user)
+    qs = scope_clubs(user).prefetch_related(
+        "leaderships",
+    )
     if status:
         qs = qs.filter(status=status)
     if category:

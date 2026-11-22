@@ -200,6 +200,9 @@ class ClubEventReportSerializer(serializers.ModelSerializer):
             "club_id",
             "title",
             "description",
+            "student_incharge_id",
+            "event_name",
+            "event_datetime",
             "report_file",
             "submitted_by_id",
             "created_at",
@@ -209,6 +212,9 @@ class ClubEventReportSerializer(serializers.ModelSerializer):
 class ClubEventReportCreateSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=200)
     description = serializers.CharField()
+    student_incharge_id = serializers.IntegerField()
+    event_name = serializers.CharField(max_length=200)
+    event_datetime = serializers.DateTimeField()
     report_file = serializers.FileField()
 
     def validate_report_file(self, upload):

@@ -477,6 +477,9 @@ def test_negative_budget_and_missing_report_refusals(seeded_users):
             title="Missing report",
             description="No file",
             report_file=None,
+            student_incharge_id=101,
+            event_name="Test event",
+            event_datetime=timezone.now(),
         )
 
 
@@ -523,5 +526,8 @@ def test_budget_and_report_submissions(seeded_users):
         title="Stargazing Night Report",
         description="Successful event",
         report_file=report_file,
+        student_incharge_id=101,
+        event_name="Stargazing Night",
+        event_datetime=timezone.now(),
     )
     assert report.id is not None

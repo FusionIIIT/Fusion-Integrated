@@ -63,4 +63,19 @@ urlpatterns = [
         views.ClubEventReportSubmitView.as_view(),
         name="club_event_report_submit",
     ),
+    path(
+        "bookings/<int:pk>/poster/",
+        views.ClubBookingPosterDownloadView.as_view(),
+        name="club_booking_poster_download",
+    ),
+    path(
+        "budgets/<int:pk>/file/",
+        views.ClubBudgetFileDownloadView.as_view(),
+        name="club_budget_file_download",
+    ),
+    path(
+        "reports/<int:pk>/file/",
+        views.ClubEventReportFileDownloadView.as_view(),
+        name="club_event_report_file_download",
+    ),
 ]

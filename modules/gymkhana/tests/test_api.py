@@ -2,11 +2,15 @@ from datetime import date
 
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from conftest import make_session
 from modules.directory.models import UserRef
+from modules.gymkhana.models.booking import ClubBooking
+from modules.gymkhana.models.budget import ClubBudgetRequest
 from modules.gymkhana.models.club import Club, ClubLeadership
+from modules.gymkhana.models.report import ClubEventReport
 
 pytestmark = pytest.mark.django_db
 
@@ -264,6 +268,80 @@ def test_club_create_booking_and_list_endpoints(stub_iam, test_setup):
     assert missing_report.status_code == 404
 
 
+def test_filter_validation_and_scoped_downloads(stub_iam, test_setup):
+    student = _client(
+        stub_iam,
+        user_id=103,
+        modules=("gymkhana",),
+        permissions=("gymkhana.club.view",),
+    )
+    unknown = student.get("/api/v1/gymkhana/clubs/?unexpected=x")
+    assert unknown.status_code == 400
+    invalid_status = student.get("/api/v1/gymkhana/clubs/?status=broken")
+    assert invalid_status.status_code == 400
+    invalid_category = student.get("/api/v1/gymkhana/clubs/?category=broken")
+    assert invalid_category.status_code == 400
+
+    other = Club.objects.create(
+        name="Private Open Club",
+        category="Sports",
+        faculty_councillor_id=201,
+        status="open",
+    )
+    detail = student.get(f"/api/v1/gymkhana/clubs/{other.id}/")
+    assert detail.status_code == 404
+
+    booking = ClubBooking.objects.create(
+        club=test_setup,
+        booking_type="session",
+        title="Poster",
+        venue="L-101",
+        date=date.today(),
+        start_time="10:00",
+        end_time="11:00",
+        created_by_id=101,
+        poster=SimpleUploadedFile("poster.pdf", b"%PDF-1.4", content_type="application/pdf"),
+    )
+    poster = student.get(f"/api/v1/gymkhana/bookings/{booking.id}/poster/")
+    assert poster.status_code in (200, 404)
+
+    budget = ClubBudgetRequest.objects.create(
+        club=test_setup,
+        amount="100.00",
+        purpose="Test",
+        description="Test",
+        supporting_file=SimpleUploadedFile("budget.pdf", b"%PDF-1.4", content_type="application/pdf"),
+        submitted_by_id=101,
+    )
+    head = _client(
+        stub_iam,
+        user_id=101,
+        modules=("gymkhana",),
+        permissions=("gymkhana.budget.request",),
+    )
+    budget_download = head.get(f"/api/v1/gymkhana/budgets/{budget.id}/file/")
+    assert budget_download.status_code in (200, 404)
+
+    report = ClubEventReport.objects.create(
+        club=test_setup,
+        title="Report",
+        description="Test",
+        student_incharge_id=103,
+        event_name="Test event",
+        event_datetime=timezone.now(),
+        report_file=SimpleUploadedFile("report.pdf", b"%PDF-1.4", content_type="application/pdf"),
+        submitted_by_id=101,
+    )
+    councillor = _client(
+        stub_iam,
+        user_id=201,
+        modules=("gymkhana",),
+        permissions=("gymkhana.report.review",),
+    )
+    report_download = councillor.get(f"/api/v1/gymkhana/reports/{report.id}/file/")
+    assert report_download.status_code in (200, 404)
+
+
 def test_budget_and_report_api(stub_iam, test_setup):
     leader = _client(
         stub_iam,
@@ -299,6 +377,9 @@ def test_budget_and_report_api(stub_iam, test_setup):
             "title": "Annual event",
             "description": "Event outcomes",
             "report_file": report_file,
+            "student_incharge_id": 103,
+            "event_name": "Annual event",
+            "event_datetime": "2026-12-01T10:00:00Z",
         },
         format="multipart",
     )

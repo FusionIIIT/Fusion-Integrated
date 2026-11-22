@@ -30,6 +30,46 @@ NAV_ITEMS = [
         "required_permission": "gymkhana.poll.vote",
         "sort_order": 20,
     },
+    {
+        "code": "gymkhana.manage",
+        "label": "Club Management",
+        "icon": "Gear",
+        "to": "/gymkhana/manage",
+        "required_permission": "gymkhana.club.approve",
+        "sort_order": 30,
+    },
+    {
+        "code": "gymkhana.activities",
+        "label": "Club Activities",
+        "icon": "Calendar",
+        "to": "/gymkhana/activities",
+        "required_permission": "gymkhana.session.book",
+        "sort_order": 40,
+    },
+    {
+        "code": "gymkhana.memberships",
+        "label": "Memberships",
+        "icon": "Users",
+        "to": "/gymkhana/memberships",
+        "required_permission": "gymkhana.membership.approve",
+        "sort_order": 50,
+    },
+    {
+        "code": "gymkhana.budgets",
+        "label": "Budget Requests",
+        "icon": "Wallet",
+        "to": "/gymkhana/budgets",
+        "required_permission": "gymkhana.budget.request",
+        "sort_order": 60,
+    },
+    {
+        "code": "gymkhana.reports",
+        "label": "Event Reports",
+        "icon": "FileText",
+        "to": "/gymkhana/reports",
+        "required_permission": "gymkhana.report.submit",
+        "sort_order": 70,
+    },
 ]
 
 PERMISSIONS = [

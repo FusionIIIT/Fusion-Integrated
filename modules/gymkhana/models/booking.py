@@ -4,6 +4,7 @@ from django.db.models import CheckConstraint, F, Index, Q
 from core.db.mixins import TimeStampedModel
 from modules.gymkhana.domain.constants import BOOKING_TYPES, CONFIGURED_VENUES
 from modules.gymkhana.models.club import Club
+from modules.gymkhana.storage import gymkhana_upload_storage
 
 
 class ClubBooking(TimeStampedModel):
@@ -15,7 +16,11 @@ class ClubBooking(TimeStampedModel):
     start_time = models.TimeField()
     end_time = models.TimeField()
     description = models.TextField(blank=True)
-    poster = models.FileField(upload_to="gymkhana/posters/", blank=True)
+    poster = models.FileField(
+        upload_to="posters/",
+        storage=gymkhana_upload_storage,
+        blank=True,
+    )
     created_by_id = models.IntegerField(db_index=True)
 
     class Meta:

@@ -14,6 +14,9 @@ def submit_event_report(
     title: str,
     description: str,
     report_file,
+    student_incharge_id: int,
+    event_name: str,
+    event_datetime,
 ) -> ClubEventReport:
     club = Club.objects.filter(id=club_id).first()
     if not club:
@@ -35,6 +38,9 @@ def submit_event_report(
         club=club,
         title=title,
         description=description,
+        student_incharge_id=student_incharge_id,
+        event_name=event_name,
+        event_datetime=event_datetime,
         report_file=report_file,
         submitted_by_id=acting_user_id,
     )
