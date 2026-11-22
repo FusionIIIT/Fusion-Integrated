@@ -15,6 +15,7 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.phc
 forbidden_modules =
     modules.placement.models
     modules.placement.services
@@ -38,6 +39,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.phc.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +68,13 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:phc-layers]
+name = Layering inside phc
+type = layers
+layers =
+    modules.phc.api
+    modules.phc.services
+    modules.phc.selectors
+    modules.phc.models
+    modules.phc.domain

@@ -34,6 +34,202 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "phc": {
+      "grants": {
+        "accounts_audit": [
+          "phc.claim.payment",
+          "phc.claim.verify"
+        ],
+        "approving_authority": [
+          "phc.claim.decide",
+          "phc.requisition.decide"
+        ],
+        "employee": [
+          "phc.claim.submit",
+          "phc.claim.view_self",
+          "phc.record.view_self",
+          "phc.schedule.view"
+        ],
+        "patient": [
+          "phc.record.view_self",
+          "phc.schedule.view"
+        ],
+        "phc_staff": [
+          "phc.ambulance.log",
+          "phc.announcement.publish",
+          "phc.attendance.mark",
+          "phc.claim.configure",
+          "phc.claim.review_phc",
+          "phc.inventory.manage",
+          "phc.record.manage",
+          "phc.report.view",
+          "phc.requisition.fulfill",
+          "phc.requisition.submit",
+          "phc.schedule.manage"
+        ]
+      },
+      "module_grants": [
+        "accounts_audit",
+        "approving_authority",
+        "employee",
+        "patient",
+        "phc_staff"
+      ],
+      "nav": {
+        "base_path": "/phc",
+        "icon": "FirstAid",
+        "items": [
+          {
+            "code": "phc.schedule",
+            "icon": "CalendarCheck",
+            "label": "Doctor Schedule",
+            "required_permission": "phc.schedule.view",
+            "sort_order": 10,
+            "to": "/phc/schedule"
+          },
+          {
+            "code": "phc.my_records",
+            "icon": "FileMedical",
+            "label": "My Medical Records",
+            "required_permission": "phc.record.view_self",
+            "sort_order": 20,
+            "to": "/phc/my/visits"
+          },
+          {
+            "code": "phc.claims",
+            "icon": "Receipt",
+            "label": "My Reimbursement Claims",
+            "required_permission": "phc.claim.view_self",
+            "sort_order": 30,
+            "to": "/phc/claims/my"
+          },
+          {
+            "code": "phc.announcements",
+            "icon": "Megaphone",
+            "label": "Health Advisories",
+            "required_permission": "phc.schedule.view",
+            "sort_order": 40,
+            "to": "/phc/announcements"
+          },
+          {
+            "code": "phc.inventory",
+            "icon": "Package",
+            "label": "Inventory",
+            "required_permission": "phc.inventory.manage",
+            "sort_order": 50,
+            "to": "/phc/inventory"
+          },
+          {
+            "code": "phc.requisitions",
+            "icon": "ClipboardList",
+            "label": "Procurement Requisitions",
+            "required_permission": "phc.requisition.submit",
+            "sort_order": 60,
+            "to": "/phc/requisitions"
+          },
+          {
+            "code": "phc.ambulance",
+            "icon": "Ambulance",
+            "label": "Ambulance Log",
+            "required_permission": "phc.ambulance.log",
+            "sort_order": 70,
+            "to": "/phc/ambulance"
+          },
+          {
+            "code": "phc.reports",
+            "icon": "ChartBar",
+            "label": "Reports",
+            "required_permission": "phc.report.view",
+            "sort_order": 80,
+            "to": "/phc/reports"
+          }
+        ],
+        "label": "Primary Health Centre",
+        "nav_section": "Health",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "phc.schedule.view",
+          "label": "View doctor schedule"
+        },
+        {
+          "code": "phc.schedule.manage",
+          "label": "Create and publish doctor schedules"
+        },
+        {
+          "code": "phc.attendance.mark",
+          "label": "Mark doctor real-time attendance"
+        },
+        {
+          "code": "phc.record.view_self",
+          "label": "View own medical records"
+        },
+        {
+          "code": "phc.record.manage",
+          "label": "Create and manage patient records"
+        },
+        {
+          "code": "phc.claim.submit",
+          "label": "Submit a reimbursement claim"
+        },
+        {
+          "code": "phc.claim.view_self",
+          "label": "View own reimbursement claims"
+        },
+        {
+          "code": "phc.claim.review_phc",
+          "label": "PHC Staff review of reimbursement claims"
+        },
+        {
+          "code": "phc.claim.verify",
+          "label": "Accounts & Audit: verify reimbursement"
+        },
+        {
+          "code": "phc.claim.decide",
+          "label": "Approving Authority: decide reimbursement sanction"
+        },
+        {
+          "code": "phc.claim.payment",
+          "label": "Accounts & Audit: process reimbursement payment"
+        },
+        {
+          "code": "phc.claim.configure",
+          "label": "Configure the reimbursement submission window"
+        },
+        {
+          "code": "phc.inventory.manage",
+          "label": "Manage PHC inventory stock"
+        },
+        {
+          "code": "phc.requisition.submit",
+          "label": "Submit procurement requisitions"
+        },
+        {
+          "code": "phc.requisition.decide",
+          "label": "Approve or reject procurement requisitions"
+        },
+        {
+          "code": "phc.requisition.fulfill",
+          "label": "Mark requisition as fulfilled"
+        },
+        {
+          "code": "phc.ambulance.log",
+          "label": "Record ambulance usage"
+        },
+        {
+          "code": "phc.announcement.publish",
+          "label": "Publish health advisories"
+        },
+        {
+          "code": "phc.report.view",
+          "label": "Generate PHC administrative reports"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
