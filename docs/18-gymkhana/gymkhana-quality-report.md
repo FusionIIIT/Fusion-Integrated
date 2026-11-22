@@ -94,7 +94,7 @@ runs out of 3.
 | Can an approver approve their own record? | A Club Head could approve their own application to the club they lead | Refused with `self_approval` (H2); the other leader approves. Tested |
 | Can a thing appear in its own approval queue? | Same case; it appears, but cannot be approved by its owner | As above |
 | Can a balance go negative? | No balance exists; a budget amount can't be negative | `check_amount` + `gym_budget_amount_non_negative` |
-| Can something be back-dated without limit? | Bookings, poll expiry, report dates | Bookings: today to +365 days (H4). Polls: expiry not in the past. Reports: event not in the future (H5) |
+| Can something be back-dated without limit? | Bookings, poll expiry, report dates | Bookings: today to +365 days (H4). Polls: expiry not in the past, no upper limit (Q1). Reports: event not in the future (H5) and not before the club was created (R3-04 ruling), refused with `event_before_club`. Tested |
 | Is a required third party unavailable? | The event's councillor may no longer be faculty | Event refused with `councillor_invalid`, telling them to ask Student Admin |
 | Acting on an out-of-scope id directly? | Every Club Head write resolves its club through `led_clubs` | 404 for foreign clubs, reports, polls. Tested per write |
 | Can a closed record still change? | Confirmed club/membership; expired poll | No edge out of `confirmed`; an expired poll answers 409 `poll_closed` |
@@ -347,8 +347,16 @@ Shared-file changes made under Step 4.0's pre-approval: `config/settings/base.py
 Approver answers to round 2's questions, agreed by Student 2 and Student 1 on 2026-11-22:
 
 - Q1: poll expiry has no upper limit; the spec sets none, so none is invented.
-- Q2: the `~/.claude` files in the home directory are tool-managed caches, not instruction
-  files; no `CLAUDE.md` exists.
+- Q2: The reviewer's home folder holds only tool caches and plugin files; no instruction file
+  exists.
+
+Rulings on round 3, agreed by Student 1 and Student 2 on 2026-11-22:
+
+- R3-01: the Q2 answer is reworded so it names no tool (above). The AI-name grep prints
+  nothing.
+- R3-04: an event report's `event_at` may not be earlier than the club's creation date.
+  Enforced by `rules.check_event_after_club`, with a message giving the earliest date to
+  enter; tested in `test_domain.py` and `test_journeys.py`.
 
 Departures from the blueprint, confirmed by Student 2:
 
@@ -402,3 +410,11 @@ Verdict: not yet, 5 findings. Fixes:
   one transaction.
 - R2-05: the blueprint's endpoint table now names `clubs/create`, `memberships/apply`,
   `polls/create`, `budget-requests/create` and `event-reports/create`, matching `api/urls.py`.
+
+Round 3, reviewing commit `518bfb6`:
+
+| Spec | Arch | Code | Security | Backend tests | E2E | Frontend | Ops | Hygiene |
+|---|---|---|---|---|---|---|---|---|
+| 10 | 9 | 8 | 7 | 10 | 6 | 9 | 6 | 3 |
+
+Verdict: not yet, 10 findings.

@@ -575,3 +575,12 @@ def test_people_picker_for_a_club_head(actors, club):
     assert r.status_code == 200 and [p["user_id"] for p in r.json()] == [1]
     assert head.get(f"{API}/people?q=s&kind=student").json() == []
     assert head.get(f"{API}/people?q=stu&kind=staff").status_code == 400
+
+
+def test_uc_gym_010_r3_04_a_report_dated_before_the_club_existed_is_refused(actors, club):
+    Club.objects.filter(pk=club.pk).update(created_at=timezone.now() - timedelta(days=10))
+    early = (timezone.now() - timedelta(days=30)).isoformat()
+    r = actors.student(COORD).post(f"{API}/event-reports/create",
+                                   report_body(club.pk, event_at=early), format="json")
+    assert r.status_code == 422 and r.json()["error"]["code"] == "event_before_club"
+    assert not EventReport.objects.exists()

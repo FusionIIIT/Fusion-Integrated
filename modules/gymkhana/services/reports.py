@@ -41,6 +41,8 @@ def submit(*, actor, club_id: int, student_incharge_user_id: int, event_name: st
                         "Drive link to it.")
     try:
         rules.check_event_held(event_at, timezone.now())
+        rules.check_event_after_club(timezone.localdate(event_at),
+                                     timezone.localdate(club.created_at))
     except RuleViolation as exc:
         raise refused(exc) from exc
     people.require_students({"student_incharge_user_id": student_incharge_user_id})

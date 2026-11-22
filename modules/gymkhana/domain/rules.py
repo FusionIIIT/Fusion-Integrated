@@ -191,6 +191,15 @@ def in_audience(targets: Iterable[Target], batch_year: int | None,
     return False
 
 
+def check_event_after_club(event_day: date, club_created: date) -> None:
+    """An event cannot predate the club that held it (ruling on R3-04)."""
+    if event_day < club_created:
+        raise RuleViolation("event_before_club",
+                            f"This club was created on {club_created:%d %b %Y}, so its event "
+                            f"cannot be earlier. Enter an event date on or after "
+                            f"{club_created:%d %b %Y}.", field="event_at")
+
+
 def check_event_held(event_at: datetime, now: datetime) -> None:
     """UC-GYM-010 precondition: a report is for an event that has taken place."""
     if event_at > now:

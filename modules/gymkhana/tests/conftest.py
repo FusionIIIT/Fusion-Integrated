@@ -87,6 +87,9 @@ def make_club(name="Robotics", *, status=sm.CONFIRMED, coord=COORD, co=CO_COORD,
         faculty_councillor_user_id=councillor, created_by_user_id=ADMIN,
         approved_by_user_id=ADMIN if status == sm.CONFIRMED else None,
         approved_at=now if status == sm.CONFIRMED else None)
+    # Clubs in tests have existed a while, so a recent event does not predate them.
+    Club.objects.filter(pk=club.pk).update(created_at=now - timedelta(days=60))
+    club.refresh_from_db()
     for uid, role in ((coord, "coordinator"), (co, "co_coordinator")):
         LeadershipAssignment.objects.create(club=club, user_id=uid, role=role,
                                             valid_from=now, assigned_by_user_id=ADMIN)

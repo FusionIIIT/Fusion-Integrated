@@ -125,3 +125,11 @@ def test_a_conflict_violation_is_marked_as_such():
     with pytest.raises(RuleViolation) as exc:
         rules.check_booking_date(TODAY - timedelta(days=1), TODAY)
     assert exc.value.conflict and exc.value.field == "date"
+
+
+def test_r3_04_an_event_cannot_predate_its_club():
+    rules.check_event_after_club(TODAY, TODAY)
+    with pytest.raises(RuleViolation) as exc:
+        rules.check_event_after_club(TODAY - timedelta(days=1), TODAY)
+    assert exc.value.code == "event_before_club"
+    assert "on or after 22 Nov 2026" in exc.value.message
