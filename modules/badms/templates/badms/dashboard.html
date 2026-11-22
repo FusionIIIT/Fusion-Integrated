@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BADMS - Backup & Database Archive Management System</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-hover: #1d4ed8;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --bg-light: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+        }
+        header {
+            background-color: var(--primary);
+            color: #ffffff;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 600;
+        }
+        nav.tabs {
+            display: flex;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+            gap: 1rem;
+        }
+        nav.tabs button {
+            background: none;
+            border: none;
+            padding: 1rem 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        nav.tabs button.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.15rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.35rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+        button.btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+        button.btn:hover {
+            background-color: var(--primary-hover);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+        th {
+            background-color: #f1f5f9;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-success { background: #dcfce7; color: var(--success); }
+        .badge-danger { background: #fee2e2; color: var(--danger); }
+        .badge-warning { background: #fef3c7; color: var(--warning); }
+        .badge-info { background: #e0f2fe; color: #0284c7; }
+        .alert-box {
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            display: none;
+            font-size: 0.875rem;
+        }
+        .alert-success { background-color: #dcfce7; color: var(--success); }
+        .alert-danger { background-color: #fee2e2; color: var(--danger); }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fusion BADMS - Backup & Database Archive Management System</h1>
+        <div id="user-pill" style="font-size: 0.9rem; font-weight: 500;">Role: Dynamic Context</div>
+    </header>
+
+    <nav class="tabs" id="nav-tabs">
+        <button class="active" data-tab="tab-user">My Requests</button>
+        <button data-tab="tab-hod">HoD Approvals</button>
+        <button data-tab="tab-sysadmin">SysAdmin Backups & Restorations</button>
+        <button data-tab="tab-security">Security Governance</button>
+        <button data-tab="tab-superadmin">Global & Special Archival</button>
+    </nav>
+
+    <main>
+        <div id="global-alert" class="alert-box"></div>
+
+        <!-- 1. User Tab -->
+        <section id="tab-user" class="tab-panel active">
+            <div class="card">
+                <h2>Submit Secure Archival Request (BA-UC-002)</h2>
+                <form id="form-archival-submit">
+                    <div class="form-group">
+                        <label for="arch-filename">File Name</label>
+                        <input type="text" id="arch-filename" required placeholder="e.g. thesis_dataset_2026.tar.gz">
+                    </div>
+                    <div class="form-group">
+                        <label for="arch-filetype">File Type</label>
+                        <input type="text" id="arch-filetype" required placeholder="e.g. application/gzip">
+                    </div>
+                    <div class="form-group">
+                        <label for="arch-filesize">File Size (Bytes)</label>
+                        <input type="number" id="arch-filesize" required min="1" value="1048576">
+                    </div>
+                    <div class="form-group">
+                        <label for="arch-owners">Owners / Roll Numbers</label>
+                        <input type="text" id="arch-owners" required placeholder="e.g. 2024CS01, 2024CS02">
+                    </div>
+                    <div class="form-group">
+                        <label for="arch-reason">Reason for Archival</label>
+                        <textarea id="arch-reason" required rows="2" placeholder="Research project reproducibility..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="arch-attachment">Attachment Reference Path</label>
+                        <input type="text" id="arch-attachment" required value="/uploads/user_data/thesis.tar.gz">
+                    </div>
+                    <div class="form-group">
+                        <label for="arch-initial-class">Initial Classification (Optional, defaults to Routine)</label>
+                        <select id="arch-initial-class">
+                            <option value="">(None - Default Routine)</option>
+                            <option value="routine">Routine</option>
+                            <option value="sensitive">Sensitive</option>
+                            <option value="critical">Critical</option>
+                            <option value="archival">Archival</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Submit Request</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>My Archival Requests Tracking (BA-UC-015)</h2>
+                <table id="table-user-archivals">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>File Name</th>
+                            <th>Size</th>
+                            <th>Status</th>
+                            <th>Authoritative Class</th>
+                            <th>Submitted</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Storage Quota & Extension Request (BA-UC-007, BA-UC-022)</h2>
+                <div id="quota-summary" style="margin-bottom: 1rem; font-size: 0.9rem;"></div>
+                <form id="form-extension-submit">
+                    <div class="form-group">
+                        <label for="ext-bytes">Requested Additional Bytes</label>
+                        <input type="number" id="ext-bytes" required min="1" value="5368709120">
+                    </div>
+                    <div class="form-group">
+                        <label for="ext-justification">Justification</label>
+                        <textarea id="ext-justification" required rows="2" placeholder="Quota exhausted due to dataset storage..."></textarea>
+                    </div>
+                    <button type="submit" class="btn">Request Extension</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 2. HoD Tab -->
+        <section id="tab-hod" class="tab-panel">
+            <div class="card">
+                <h2>Department Archival Review Queue (BA-UC-003, BR-BA-002, BR-BA-010)</h2>
+                <table id="table-hod-archival">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Requester</th>
+                            <th>File Name</th>
+                            <th>Initial Class</th>
+                            <th>Reason</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Department Storage Extension Queue (BA-UC-008, BR-BA-009, BR-BA-017)</h2>
+                <table id="table-hod-extensions">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Requested (MB)</th>
+                            <th>Justification</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 3. SysAdmin Tab -->
+        <section id="tab-sysadmin" class="tab-panel">
+            <div class="card">
+                <h2>Manual Backup Control (BA-UC-001, BR-BA-001)</h2>
+                <form id="form-manual-backup" style="display: flex; gap: 1rem; align-items: flex-end;">
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label for="backup-dataset">Target Dataset</label>
+                        <input type="text" id="backup-dataset" value="all">
+                    </div>
+                    <button type="submit" class="btn">Trigger Manual Backup</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Authoritative Classification Queue (BA-UC-004, BR-BA-004)</h2>
+                <table id="table-sysadmin-classify">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>File Name</th>
+                            <th>Department</th>
+                            <th>HoD Approved At</th>
+                            <th>Assign Classification</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Data Restoration Queue (BA-UC-017, BA-UC-018, BR-BA-005)</h2>
+                <table id="table-sysadmin-restorations">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Archive ID</th>
+                            <th>Classification</th>
+                            <th>Status</th>
+                            <th>Destination</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Backup Execution History (BA-UC-014)</h2>
+                <table id="table-backup-records">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Dataset</th>
+                            <th>Status</th>
+                            <th>Artifact Checksum</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 4. Security Tab -->
+        <section id="tab-security" class="tab-panel">
+            <div class="card">
+                <h2>Sensitive Encryption Configuration Queue (BA-UC-005, BR-BA-003, BR-BA-007)</h2>
+                <table id="table-sec-encryption">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>File Name</th>
+                            <th>Classification</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Audit Log Stream (BA-UC-012, BA-UC-013, CFR-BA-018)</h2>
+                <table id="table-audit-logs">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Source</th>
+                            <th>Actor</th>
+                            <th>Action</th>
+                            <th>Resource</th>
+                            <th>Outcome</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 5. Super Admin Tab -->
+        <section id="tab-superadmin" class="tab-panel">
+            <div class="card">
+                <h2>Offline Special Archival Execution (BA-UC-010, BR-BA-018, ISS-BA-007)</h2>
+                <form id="form-special-archival">
+                    <div class="form-group">
+                        <label for="spec-dataset">Dataset Name</label>
+                        <input type="text" id="spec-dataset" required placeholder="e.g. DRDO_Radar_Data_2026">
+                    </div>
+                    <div class="form-group">
+                        <label for="spec-authority">Source Authority</label>
+                        <input type="text" id="spec-authority" required placeholder="e.g. Dean R&D / MoE Directorate">
+                    </div>
+                    <div class="form-group">
+                        <label for="spec-reason">Mandate / Justification</label>
+                        <textarea id="spec-reason" required rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="spec-path">Archive Storage Path</label>
+                        <input type="text" id="spec-path" required value="/var/archives/special/drdo_radar.enc">
+                    </div>
+                    <div class="form-group">
+                        <label for="spec-size">Size (Bytes)</label>
+                        <input type="number" id="spec-size" required min="1" value="107374182400">
+                    </div>
+                    <button type="submit" class="btn">Execute Special Archival</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // STRICT XSS DEFENSE: NEVER USE .innerHTML WITH DYNAMIC DATA!
+        // All DOM generation uses createElement and textContent exclusively.
+        document.addEventListener("DOMContentLoaded", function() {
+            // Tab switching logic
+            const tabs = document.querySelectorAll("#nav-tabs button");
+            const panels = document.querySelectorAll(".tab-panel");
+
+            tabs.forEach(tab => {
+                tab.addEventListener("click", () => {
+                    tabs.forEach(t => t.classList.remove("active"));
+                    panels.forEach(p => p.classList.remove("active"));
+                    tab.classList.add("active");
+                    const targetId = tab.getAttribute("data-tab");
+                    const targetPanel = document.getElementById(targetId);
+                    if (targetPanel) targetPanel.classList.add("active");
+                });
+            });
+
+            function showAlert(message, isError) {
+                const alert = document.getElementById("global-alert");
+                alert.textContent = message;
+                alert.className = "alert-box " + (isError ? "alert-danger" : "alert-success");
+                alert.style.display = "block";
+                setTimeout(() => { alert.style.display = "none"; }, 5000);
+            }
+
+            function createTextCell(text) {
+                const td = document.createElement("td");
+                td.textContent = text !== null && text !== undefined ? String(text) : "-";
+                return td;
+            }
+
+            function createBadgeCell(statusText) {
+                const td = document.createElement("td");
+                const span = document.createElement("span");
+                span.className = "badge";
+                span.textContent = statusText;
+                if (statusText === "success" || statusText === "approved" || statusText === "restored") {
+                    span.classList.add("badge-success");
+                } else if (statusText === "failure" || statusText === "rejected") {
+                    span.classList.add("badge-danger");
+                } else if (statusText === "submitted" || statusText === "pending") {
+                    span.classList.add("badge-warning");
+                } else {
+                    span.classList.add("badge-info");
+                }
+                td.appendChild(span);
+                return td;
+            }
+
+            // Load User Archivals
+            function loadUserArchivals() {
+                fetch("/api/v1/badms/archival-requests")
+                    .then(res => res.json())
+                    .then(data => {
+                        const tbody = document.querySelector("#table-user-archivals tbody");
+                        tbody.replaceChildren(); // Safe clear without innerHTML
+                        const results = data.results || [];
+                        results.forEach(row => {
+                            const tr = document.createElement("tr");
+                            tr.appendChild(createTextCell(row.id));
+                            tr.appendChild(createTextCell(row.file_name));
+                            tr.appendChild(createTextCell(row.file_size_bytes));
+                            tr.appendChild(createBadgeCell(row.status));
+                            tr.appendChild(createTextCell(row.authoritative_classification || "Pending"));
+                            tr.appendChild(createTextCell(new Date(row.created_at).toLocaleString()));
+                            tbody.appendChild(tr);
+                        });
+                    }).catch(() => {});
+            }
+
+            // Load Storage Quota
+            function loadStorageQuota() {
+                fetch("/api/v1/badms/storage/quota")
+                    .then(res => res.json())
+                    .then(data => {
+                        const div = document.getElementById("quota-summary");
+                        div.replaceChildren();
+                        const p = document.createElement("p");
+                        const usedMb = (data.used_bytes / 1048576).toFixed(1);
+                        const quotaMb = (data.quota_bytes / 1048576).toFixed(1);
+                        p.textContent = `Used Storage: ${usedMb} MB / ${quotaMb} MB (Full: ${data.is_full})`;
+                        div.appendChild(p);
+                    }).catch(() => {});
+            }
+
+            // Submit Archival Handler
+            document.getElementById("form-archival-submit").addEventListener("submit", function(e) {
+                e.preventDefault();
+                const payload = {
+                    file_name: document.getElementById("arch-filename").value,
+                    file_type: document.getElementById("arch-filetype").value,
+                    file_size_bytes: parseInt(document.getElementById("arch-filesize").value, 10),
+                    owners: document.getElementById("arch-owners").value,
+                    reason: document.getElementById("arch-reason").value,
+                    attachment_path: document.getElementById("arch-attachment").value,
+                    initial_classification: document.getElementById("arch-initial-class").value || "routine",
+                };
+
+                fetch("/api/v1/badms/archival-requests", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("Submission rejected by policy.");
+                    return res.json();
+                })
+                .then(data => {
+                    showAlert("Archival request submitted successfully. ID: " + data.id, false);
+                    loadUserArchivals();
+                })
+                .catch(err => showAlert(err.message, true));
+            });
+
+            // Initial load
+            loadUserArchivals();
+            loadStorageQuota();
+        });
+    </script>
+</body>
+</html>
