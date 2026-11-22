@@ -58,5 +58,5 @@ class StockThresholdEvaluation:
 
     @property
     def is_low_stock(self) -> bool:
-        # PHC-BR-07: stock_level < reorder_threshold
-        return self.current_stock < self.reorder_threshold
+        # PHC-BR-07: stock_level <= reorder_threshold
+        return self.current_stock <= self.reorder_threshold

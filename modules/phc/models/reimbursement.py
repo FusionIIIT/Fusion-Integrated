@@ -31,6 +31,23 @@ class ReimbursementClaim(TimeStampedModel):
         db_table = "phc_reimbursement_claims"
         ordering = ["-created_at"]
 
+    def clean(self) -> None:
+        super().clean()
+        if self.pk:
+            orig = ReimbursementClaim.objects.filter(pk=self.pk).values("status").first()
+            if orig:
+                from modules.phc.domain.entities import ReimbursementStatus
+                from modules.phc.domain.errors import ClaimImmutableError
+                terminal = {ReimbursementStatus.REJECTED.value, ReimbursementStatus.REIMBURSED.value}
+                if orig["status"] in terminal:
+                    raise ClaimImmutableError(
+                        f"Reimbursement claim {self.claim_number} is in terminal status '{orig['status']}' and cannot be modified or reopened (PHC-BR-14)."
+                    )
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
     def __str__(self) -> str:
         return f"Claim {self.claim_number} ({self.status}) - ₹{self.amount_claimed}"
 

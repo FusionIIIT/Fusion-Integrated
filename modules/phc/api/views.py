@@ -216,22 +216,37 @@ class PatientRecordDownloadView(APIView):
     permission_classes = [HasPermission("phc.patient_record.download_self")]
 
     def get(self, request):
+        import io
+        from django.http import HttpResponse
+        from reportlab.lib.pagesizes import letter
+        from reportlab.pdfgen import canvas
+
         patient_id = request.principal.user_id
         visits = get_patient_medical_history(patient_id)
         prescriptions = get_patient_prescriptions(patient_id)
 
-        # Structure payload representing the downloadable medical record
-        summary = {
-            "patient_user_id": patient_id,
-            "patient_name": request.principal.display_name,
-            "patient_username": request.principal.username,
-            "total_visits": len(visits),
-            "total_prescriptions": len(prescriptions),
-            "visits": PatientVisitSerializer(visits, many=True).data,
-            "prescriptions": PrescriptionSerializer(prescriptions, many=True).data,
-            "document_format": "PDF-JSON",
-        }
-        return Response(summary)
+        buffer = io.BytesIO()
+        p = canvas.Canvas(buffer, pagesize=letter)
+        p.setTitle(f"PHC Medical Record - User {patient_id}")
+        p.drawString(100, 750, "Primary Health Centre - Medical Record")
+        p.drawString(100, 730, f"Patient ID: {patient_id}")
+        p.drawString(100, 715, f"Name: {request.principal.display_name}")
+        p.drawString(100, 690, f"Total Visits: {len(visits)}")
+        p.drawString(100, 675, f"Total Prescriptions: {len(prescriptions)}")
+        y = 640
+        p.drawString(100, y, "Visits History:")
+        y -= 20
+        for v in visits[:10]:
+            p.drawString(120, y, f"- {v.visit_date}: {v.diagnosis} ({v.symptoms})")
+            y -= 15
+        p.showPage()
+        p.save()
+        pdf_bytes = buffer.getvalue()
+        buffer.close()
+
+        response = HttpResponse(pdf_bytes, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="medical_record_{patient_id}.pdf"'
+        return response
 
 
 class PatientVisitsManageView(APIView):

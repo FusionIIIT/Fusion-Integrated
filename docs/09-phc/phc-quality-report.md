@@ -223,3 +223,31 @@ TOTAL                                       1074     51     96     10    94%
 - **Commit**: `c44d183`
 - **Scores**: Spec: 10/10, Arch: 10/10, Code: 10/10, Security: 10/10, Tests: 10/10, E2E: 10/10, Frontend: 10/10, Ops: 10/10, Hygiene: 10/10.
 - **Verdict**: `VERDICT: 10/10 in all nine dimensions`
+
+
+---
+
+## 13. Step 10.5 — Resolution of Spec Test Findings
+
+Following Step 10.5 review with Student 2, four confirmed implementation defects were resolved by Student 1:
+
+1. **DEF-PHC-001** (FR-TEST-012, UC-TEST-004):
+   - *Issue*: Medical record download endpoint returned JSON instead of PDF.
+   - *Fix*: Implemented binary PDF streaming response with %PDF header in modules/phc/api/views.py.
+2. **DEF-PHC-002** (FR-TEST-003, UC-TEST-012):
+   - *Issue*: mark_attendance did not validate status parameter choices.
+   - *Fix*: Enforced choice validation against DoctorAttendance.STATUS_CHOICES raising ValueError in modules/phc/services/doctors.py.
+3. **DEF-PHC-003** (BR-TEST-013):
+   - *Issue*: Low-stock alert evaluated current_stock < reorder_threshold instead of <=.
+   - *Fix*: Updated StockThresholdEvaluation.is_low_stock in modules/phc/domain/entities.py.
+4. **DEF-PHC-004** (BR-TEST-024, WF-TEST-010):
+   - *Issue*: Terminal reimbursement claims (REJECTED, REIMBURSED) could be edited and saved.
+   - *Fix*: Enforced immutability check in ReimbursementClaim.clean() and save() raising ClaimImmutableError in modules/phc/models/reimbursement.py.
+
+### Post-Fix Test Execution Summary
+- **Module Unit Tests**: 20/20 passed
+- **FR Specification Tests**: 45/45 passed (0 failed, 0 skipped)
+- **UC Specification Tests**: 33/33 passed (0 failed, 0 skipped)
+- **BR Specification Tests**: 24/24 passed (0 failed, 0 skipped)
+- **WF Specification Tests**: 18/18 passed (0 failed, 0 skipped)
+- **Total Executable Tests**: 140/140 passed (100% success rate)

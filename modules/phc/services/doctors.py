@@ -66,6 +66,12 @@ def mark_attendance(
     remarks: str = "",
 ) -> DoctorAttendance:
     """Marks real-time attendance for visiting doctors (AFR-PHC-003, UC-PHC-08)."""
+    allowed_statuses = {choice[0] for choice in DoctorAttendance.STATUS_CHOICES}
+    if status not in allowed_statuses:
+        raise ValueError(
+            f"Invalid attendance status '{status}'. Allowed statuses are: {sorted(allowed_statuses)}"
+        )
+
     doctor = Doctor.objects.get(id=doctor_id)
     att_date = attendance_date or timezone.now().date()
     attendance, _ = DoctorAttendance.objects.update_or_create(
