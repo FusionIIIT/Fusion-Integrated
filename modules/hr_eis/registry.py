@@ -1,0 +1,145 @@
+"""Server declaration and UI metadata for HR-EIS."""
+
+MODULE = {
+    "code": "hr_eis",
+    "label": "Human Resource — Human Resource (HR-EIS)",
+    "icon": "UsersThree",
+    "base_path": "/eis",
+    "nav_section": "Administration",
+    "sort_order": 20,
+    "status": "active",
+}
+
+NAV_ITEMS = [
+    {
+        "code": "eis.profile",
+        "label": "My Service Record",
+        "icon": "User",
+        "to": "/hr-eis/profile",
+        "required_permission": "eis.profile.view_self",
+        "sort_order": 10,
+    },
+    {
+        "code": "eis.leave",
+        "label": "Leave Management",
+        "icon": "CalendarBlank",
+        "to": "/hr-eis/leave",
+        "required_permission": "eis.leave.apply",
+        "sort_order": 20,
+    },
+    {
+        "code": "eis.appraisal",
+        "label": "Yearly Appraisal",
+        "icon": "ClipboardText",
+        "to": "/hr-eis/appraisal",
+        "required_permission": "eis.appraisal.submit",
+        "sort_order": 30,
+    },
+    {
+        "code": "eis.ltc",
+        "label": "LTC Claims",
+        "icon": "AirplaneTilt",
+        "to": "/hr-eis/ltc",
+        "required_permission": "eis.ltc.apply",
+        "sort_order": 40,
+    },
+    {
+        "code": "eis.cpda",
+        "label": "CPDA Claims",
+        "icon": "BookOpen",
+        "to": "/hr-eis/cpda",
+        "required_permission": "eis.cpda.apply",
+        "sort_order": 50,
+    },
+    {
+        "code": "eis.approvals",
+        "label": "Approvals Inbox",
+        "icon": "Checks",
+        "to": "/hr-eis/approvals",
+        "required_permission": "eis.request.review",
+        "sort_order": 60,
+    },
+    {
+        "code": "eis.admin",
+        "label": "HR Administration",
+        "icon": "GearSix",
+        "to": "/hr-eis/admin",
+        "required_permission": "eis.admin.manage",
+        "sort_order": 70,
+    },
+]
+
+PERMISSIONS = [
+    ("eis.profile.view_self", "View personal service record"),
+    ("eis.profile.view_all", "View all employee records"),
+    ("eis.profile.manage", "Create and modify employee service records"),
+    ("eis.leave.apply", "Apply for leave"),
+    ("eis.leave.cancel", "Cancel leave application"),
+    ("eis.appraisal.submit", "Submit annual appraisal"),
+    ("eis.appraisal.assign_reviewer", "Assign appraisal reviewers"),
+    ("eis.ltc.apply", "Submit LTC advance or reimbursement claim"),
+    ("eis.cpda.apply", "Submit CPDA advance or reimbursement claim"),
+    ("eis.request.review", "Review, recommend, approve, or reject HR requests"),
+    ("eis.finance.settle", "Process and settle approved financial claims"),
+    ("eis.admin.manage", "Configure HR-EIS workflows and review compliance/audit logs"),
+    ("eis.audit.view", "View audit trails and compliance reports"),
+]
+
+ROLE_GRANTS = {
+    "employee": [
+        "eis.profile.view_self",
+        "eis.leave.apply",
+        "eis.leave.cancel",
+        "eis.appraisal.submit",
+        "eis.ltc.apply",
+        "eis.cpda.apply",
+    ],
+    "faculty": [
+        "eis.profile.view_self",
+        "eis.leave.apply",
+        "eis.leave.cancel",
+        "eis.appraisal.submit",
+        "eis.ltc.apply",
+        "eis.cpda.apply",
+    ],
+    "staff": [
+        "eis.profile.view_self",
+        "eis.leave.apply",
+        "eis.leave.cancel",
+        "eis.appraisal.submit",
+        "eis.ltc.apply",
+        "eis.cpda.apply",
+    ],
+    "HOD": [
+        "eis.profile.view_self",
+        "eis.leave.apply",
+        "eis.leave.cancel",
+        "eis.appraisal.submit",
+        "eis.ltc.apply",
+        "eis.cpda.apply",
+        "eis.request.review",
+    ],
+    "Registrar": [
+        "eis.profile.view_self",
+        "eis.leave.apply",
+        "eis.request.review",
+        "eis.audit.view",
+    ],
+    "Director": [
+        "eis.profile.view_self",
+        "eis.request.review",
+        "eis.audit.view",
+    ],
+    "HR Administrator": [
+        "eis.profile.view_all",
+        "eis.profile.manage",
+        "eis.appraisal.assign_reviewer",
+        "eis.request.review",
+        "eis.admin.manage",
+        "eis.audit.view",
+    ],
+    "Accountant": [
+        "eis.finance.settle",
+        "eis.audit.view",
+    ],
+}
