@@ -1,6 +1,7 @@
 from datetime import date
 
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
 
 from conftest import make_session
@@ -12,9 +13,18 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def test_setup():
-    UserRef.objects.create(user_id=101, username="s101", display_name="Student Leader", kind="student")
-    UserRef.objects.create(user_id=102, username="s102", display_name="Co Leader", kind="student")
-    UserRef.objects.create(user_id=103, username="s103", display_name="General Student", kind="student")
+    UserRef.objects.create(
+        user_id=101, username="s101", display_name="Student Leader", kind="student",
+        batch_year=2023, discipline="CSE",
+    )
+    UserRef.objects.create(
+        user_id=102, username="s102", display_name="Co Leader", kind="student",
+        batch_year=2023, discipline="CSE",
+    )
+    UserRef.objects.create(
+        user_id=103, username="s103", display_name="General Student", kind="student",
+        batch_year=2023, discipline="CSE",
+    )
     UserRef.objects.create(user_id=201, username="f201", display_name="Faculty Councillor", kind="faculty")
 
     club = Club.objects.create(
@@ -51,6 +61,9 @@ def test_list_and_detail_clubs(stub_iam, test_setup):
     assert detail_res.status_code == 200
     assert detail_res.json()["name"] == "Literature Club"
 
+    missing = c.get("/api/v1/gymkhana/clubs/999999/")
+    assert missing.status_code == 404
+
 
 def test_apply_and_approve_membership_api(stub_iam, test_setup):
     student_client = _client(
@@ -82,13 +95,24 @@ def test_apply_and_approve_membership_api(stub_iam, test_setup):
     assert approve_res.status_code == 200
     assert approve_res.json()["status"] == "confirmed"
 
+    listed = leader_client.get(
+        f"/api/v1/gymkhana/clubs/{test_setup.id}/memberships/"
+    )
+    assert listed.status_code == 200
+    assert len(listed.json()) >= 1
+
 
 def test_book_session_api(stub_iam, test_setup):
     leader_client = _client(
         stub_iam,
         user_id=101,
         modules=("gymkhana",),
-        permissions=("gymkhana.club.view", "gymkhana.session.book"),
+        permissions=(
+            "gymkhana.club.view",
+            "gymkhana.session.book",
+            "gymkhana.budget.request",
+            "gymkhana.report.review",
+        ),
     )
     res = leader_client.post(
         f"/api/v1/gymkhana/clubs/{test_setup.id}/sessions/",
@@ -104,3 +128,190 @@ def test_book_session_api(stub_iam, test_setup):
     )
     assert res.status_code == 201
     assert res.json()["venue"] == "L-101"
+
+
+def test_confirm_leadership_and_event_api(stub_iam, test_setup):
+    test_setup.status = "open"
+    test_setup.save(update_fields=["status"])
+    admin = _client(
+        stub_iam,
+        user_id=201,
+        modules=("gymkhana",),
+        permissions=("gymkhana.club.approve",),
+    )
+    confirmed = admin.post(f"/api/v1/gymkhana/clubs/{test_setup.id}/confirm/")
+    assert confirmed.status_code == 200
+
+    leader = _client(
+        stub_iam,
+        user_id=101,
+        modules=("gymkhana",),
+        permissions=("gymkhana.leadership.update", "gymkhana.event.book"),
+    )
+    leadership = leader.post(
+        f"/api/v1/gymkhana/clubs/{test_setup.id}/leadership/",
+        {"new_coordinator_id": 103, "new_co_coordinator_id": 102},
+        format="json",
+    )
+    assert leadership.status_code == 200
+    leader = _client(
+        stub_iam,
+        user_id=103,
+        modules=("gymkhana",),
+        permissions=("gymkhana.event.book",),
+    )
+    event = leader.post(
+        f"/api/v1/gymkhana/clubs/{test_setup.id}/events/",
+        {
+            "title": "Literature Fest",
+            "venue": "Auditorium",
+            "date": str(date.today()),
+            "start_time": "10:00:00",
+            "end_time": "12:00:00",
+            "description": "Annual fest",
+        },
+        format="json",
+    )
+    assert event.status_code == 201
+
+
+def test_poll_create_and_vote_api(stub_iam, test_setup):
+    leader = _client(
+        stub_iam,
+        user_id=101,
+        modules=("gymkhana",),
+        permissions=("gymkhana.poll.create", "gymkhana.poll.vote"),
+    )
+    created = leader.post(
+        f"/api/v1/gymkhana/clubs/{test_setup.id}/polls/",
+        {
+            "title": "Book of the year",
+            "target_batches": ["2023"],
+            "target_branches": ["CSE"],
+            "expires_at": "2030-01-01T12:00:00Z",
+            "choices": ["One", "Two"],
+        },
+        format="json",
+    )
+    assert created.status_code == 201
+    poll_id = created.json()["id"]
+
+    student = _client(
+        stub_iam,
+        user_id=103,
+        modules=("gymkhana",),
+        permissions=("gymkhana.poll.vote",),
+    )
+    listed = student.get("/api/v1/gymkhana/polls/")
+    assert listed.status_code == 200
+    choice_id = created.json()["choices"][0]["id"]
+    voted = student.post(
+        f"/api/v1/gymkhana/polls/{poll_id}/vote/",
+        {"choice_id": choice_id},
+        format="json",
+    )
+    assert voted.status_code == 200
+
+
+def test_club_create_booking_and_list_endpoints(stub_iam, test_setup):
+    admin = _client(
+        stub_iam,
+        user_id=201,
+        modules=("gymkhana",),
+        permissions=("gymkhana.club.create", "gymkhana.club.view"),
+    )
+    created = admin.post(
+        "/api/v1/gymkhana/clubs/",
+        {
+            "name": "Chess Club",
+            "category": "Cultural",
+            "description": "Chess",
+            "coordinator_id": 101,
+            "co_coordinator_id": 102,
+            "faculty_councillor_id": 201,
+        },
+        format="json",
+    )
+    assert created.status_code == 201
+
+    leader = _client(
+        stub_iam,
+        user_id=101,
+        modules=("gymkhana",),
+        permissions=(
+            "gymkhana.club.view",
+            "gymkhana.session.book",
+            "gymkhana.budget.request",
+            "gymkhana.report.review",
+        ),
+    )
+    listed = leader.get(f"/api/v1/gymkhana/clubs/{test_setup.id}/bookings/")
+    assert listed.status_code == 200
+
+    budget = leader.post(
+        f"/api/v1/gymkhana/clubs/{test_setup.id}/budgets/",
+        {},
+        format="json",
+    )
+    assert budget.status_code in (400, 403)
+    missing_budget = leader.get(
+        "/api/v1/gymkhana/clubs/999999/budgets/"
+    )
+    assert missing_budget.status_code == 404
+    missing_report = leader.get(
+        "/api/v1/gymkhana/clubs/999999/reports/"
+    )
+    assert missing_report.status_code == 404
+
+
+def test_budget_and_report_api(stub_iam, test_setup):
+    leader = _client(
+        stub_iam,
+        user_id=101,
+        modules=("gymkhana",),
+        permissions=("gymkhana.budget.request", "gymkhana.report.submit"),
+    )
+    budget_file = SimpleUploadedFile(
+        "budget.pdf", b"%PDF-1.4 test", content_type="application/pdf"
+    )
+    budget = leader.post(
+        f"/api/v1/gymkhana/clubs/{test_setup.id}/budgets/",
+        {
+            "amount": "1250.50",
+            "purpose": "Equipment",
+            "description": "Replacement equipment",
+            "supporting_file": budget_file,
+        },
+        format="multipart",
+    )
+    assert budget.status_code == 201
+    budgets = leader.get(
+        f"/api/v1/gymkhana/clubs/{test_setup.id}/budgets/"
+    )
+    assert budgets.status_code == 200
+
+    report_file = SimpleUploadedFile(
+        "report.pdf", b"%PDF-1.4 report", content_type="application/pdf"
+    )
+    report = leader.post(
+        f"/api/v1/gymkhana/clubs/{test_setup.id}/reports/submit/",
+        {
+            "title": "Annual event",
+            "description": "Event outcomes",
+            "report_file": report_file,
+        },
+        format="multipart",
+    )
+    assert report.status_code == 201
+
+    councillor = _client(
+        stub_iam,
+        user_id=201,
+        modules=("gymkhana",),
+        permissions=("gymkhana.report.review",),
+    )
+    reviewed = councillor.get(
+        f"/api/v1/gymkhana/clubs/{test_setup.id}/reports/"
+    )
+    assert reviewed.status_code == 200
+    assert len(reviewed.json()) == 1

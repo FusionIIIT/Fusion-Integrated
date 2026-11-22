@@ -59,6 +59,8 @@ def _get_user_id(request) -> int:
 
 
 class ClubListCreateView(APIView):
+    throttle_scope = "gymkhana.write"
+
     def get_permissions(self):
         if self.request.method == "POST":
             return [HasModuleGrant("gymkhana")(), HasPermission("gymkhana.club.create")()]
@@ -93,6 +95,8 @@ class ClubDetailView(APIView):
 
 
 class ClubConfirmView(APIView):
+    throttle_scope = "gymkhana.write"
+
     permission_classes = [HasModuleGrant("gymkhana"), HasPermission("gymkhana.club.approve")]
 
     @extend_schema(request=None, responses={200: s.ClubSerializer})
@@ -102,6 +106,8 @@ class ClubConfirmView(APIView):
 
 
 class ClubLeadershipChangeView(APIView):
+    throttle_scope = "gymkhana.write"
+
     permission_classes = [HasModuleGrant("gymkhana"), HasPermission("gymkhana.leadership.update")]
 
     @extend_schema(request=s.ClubLeadershipChangeSerializer, responses={200: s.ClubSerializer})
@@ -118,6 +124,8 @@ class ClubLeadershipChangeView(APIView):
 
 
 class ClubSessionBookingView(APIView):
+    throttle_scope = "gymkhana.write"
+
     permission_classes = [HasModuleGrant("gymkhana"), HasPermission("gymkhana.session.book")]
 
     @extend_schema(request=s.ClubBookingCreateSerializer, responses={201: s.ClubBookingSerializer})
@@ -134,11 +142,14 @@ class ClubSessionBookingView(APIView):
             title=ser.validated_data["title"],
             venue=ser.validated_data["venue"],
             description=ser.validated_data.get("description", ""),
+            poster=ser.validated_data.get("poster"),
         )
         return Response(s.ClubBookingSerializer(booking).data, status=status.HTTP_201_CREATED)
 
 
 class ClubEventBookingView(APIView):
+    throttle_scope = "gymkhana.write"
+
     permission_classes = [HasModuleGrant("gymkhana"), HasPermission("gymkhana.event.book")]
 
     @extend_schema(request=s.ClubBookingCreateSerializer, responses={201: s.ClubBookingSerializer})
@@ -155,6 +166,7 @@ class ClubEventBookingView(APIView):
             title=ser.validated_data["title"],
             venue=ser.validated_data["venue"],
             description=ser.validated_data.get("description", ""),
+            poster=ser.validated_data.get("poster"),
         )
         return Response(s.ClubBookingSerializer(booking).data, status=status.HTTP_201_CREATED)
 
@@ -180,6 +192,8 @@ class ClubBookingListView(APIView):
 
 
 class ClubMembershipApplyView(APIView):
+    throttle_scope = "gymkhana.write"
+
     permission_classes = [HasModuleGrant("gymkhana"), HasPermission("gymkhana.membership.apply")]
 
     @extend_schema(
@@ -216,6 +230,8 @@ class ClubMembershipListView(APIView):
 
 
 class MembershipApproveView(APIView):
+    throttle_scope = "gymkhana.write"
+
     permission_classes = [
         HasModuleGrant("gymkhana"),
         HasPermission("gymkhana.membership.approve"),
@@ -236,6 +252,8 @@ class MembershipApproveView(APIView):
 
 
 class ClubPollCreateView(APIView):
+    throttle_scope = "gymkhana.write"
+
     permission_classes = [HasModuleGrant("gymkhana"), HasPermission("gymkhana.poll.create")]
 
     @extend_schema(request=s.VotingPollCreateSerializer, responses={201: s.VotingPollSerializer})
@@ -266,6 +284,8 @@ class ActivePollListView(APIView):
 
 
 class PollVoteView(APIView):
+    throttle_scope = "gymkhana.write"
+
     permission_classes = [HasModuleGrant("gymkhana"), HasPermission("gymkhana.poll.vote")]
 
     @extend_schema(request=s.PollVoteSerializer, responses={200: s.PollVoteResponseSerializer})
@@ -282,6 +302,8 @@ class PollVoteView(APIView):
 
 
 class ClubBudgetRequestView(APIView):
+    throttle_scope = "gymkhana.write"
+
     def get_permissions(self):
         return [
             HasModuleGrant("gymkhana")(),
@@ -316,6 +338,7 @@ class ClubBudgetRequestView(APIView):
 
 
 class ClubEventReportSubmitView(APIView):
+    throttle_scope = "gymkhana.write"
     permission_classes = [HasModuleGrant("gymkhana"), HasPermission("gymkhana.report.submit")]
 
     @extend_schema(

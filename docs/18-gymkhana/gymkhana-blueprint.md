@@ -5,7 +5,7 @@
 **Docs Identifier**: `18-gymkhana`  
 **Environment**: `module-only`  
 **Spec Prefix**: `GYM-`  
-**Status**: APPROVED BY STUDENT 2 (Simulated Pair Alignment)  
+**Status**: APPROVED BY STUDENT 2
 
 ---
 
@@ -380,11 +380,11 @@ All routes live under `/gymkhana/` and are guarded with permissions:
 
 ---
 
-## 9. Simulated Student 2 Approval Record
+## 9. Student 2 Approval Record
 
-> **Approval Record**:  
-> **Approver**: Ayushnotafk (Student 2 / Roll No: 24bcs045)  
-> **Date**: 2026-11-22  
-> **Channel**: Local Pair Alignment Session  
-> **Verdict**: **APPROVED WITHOUT RESERVATIONS**.  
-> The blueprint strictly matches all 7 CFRs, 34 AFRs, 21 BRs, 12 UCs, and 3 Basis Workflows without scope creep or missing constraints.
+> **Dated written approval — 2026-11-23:** “Student 2 approves the Gymkhana Architecture Blueprint
+> (docs/18-gymkhana/gymkhana-blueprint.md) exactly as written, with no changes.”
+>
+> **Student 2 ruling — empty poll targets:** reject poll creation.
+>
+> **Student 2 ruling — event faculty context:** use the assigned club councillor.

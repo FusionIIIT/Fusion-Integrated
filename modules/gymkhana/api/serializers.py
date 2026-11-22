@@ -8,6 +8,24 @@ from modules.gymkhana.models.membership import ClubMembership
 from modules.gymkhana.models.poll import PollChoice, VotingPoll
 from modules.gymkhana.models.report import ClubEventReport
 
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024
+ALLOWED_UPLOAD_TYPES = {
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+}
+
+
+def validate_secure_upload(upload):
+    if not upload:
+        raise serializers.ValidationError("A file is required.")
+    if upload.size > MAX_UPLOAD_SIZE:
+        raise serializers.ValidationError("Upload must not exceed 10 MB.")
+    content_type = getattr(upload, "content_type", "")
+    if content_type not in ALLOWED_UPLOAD_TYPES:
+        raise serializers.ValidationError("Only PDF, JPEG, and PNG files are allowed.")
+    return upload
+
 
 class ClubLeadershipSerializer(serializers.ModelSerializer):
     class Meta:
@@ -64,6 +82,7 @@ class ClubBookingSerializer(serializers.ModelSerializer):
             "start_time",
             "end_time",
             "description",
+            "poster",
             "created_by_id",
             "created_at",
         ]
@@ -76,6 +95,10 @@ class ClubBookingCreateSerializer(serializers.Serializer):
     start_time = serializers.TimeField()
     end_time = serializers.TimeField()
     description = serializers.CharField(required=False, allow_blank=True, default="")
+    poster = serializers.FileField(required=False)
+
+    def validate_poster(self, upload):
+        return validate_secure_upload(upload)
 
 
 class ClubMembershipSerializer(serializers.ModelSerializer):
@@ -165,6 +188,9 @@ class ClubBudgetRequestCreateSerializer(serializers.Serializer):
     description = serializers.CharField()
     supporting_file = serializers.FileField()
 
+    def validate_supporting_file(self, upload):
+        return validate_secure_upload(upload)
+
 
 class ClubEventReportSerializer(serializers.ModelSerializer):
     class Meta:
@@ -184,3 +210,6 @@ class ClubEventReportCreateSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=200)
     description = serializers.CharField()
     report_file = serializers.FileField()
+
+    def validate_report_file(self, upload):
+        return validate_secure_upload(upload)

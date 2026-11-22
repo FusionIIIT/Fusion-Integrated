@@ -1,6 +1,6 @@
 from datetime import date, time
 
-from django.db import transaction
+from django.db import connection, transaction
 
 from core.api.exceptions import (
     BadRequestError,
@@ -8,10 +8,12 @@ from core.api.exceptions import (
     NotFoundError,
     PermissionDeniedError,
 )
-from modules.gymkhana.domain.constants import BOOKING_EVENT, BOOKING_SESSION
+from modules.directory import contracts as directory_contracts
+from modules.gymkhana.domain.constants import BOOKING_EVENT, BOOKING_SESSION, STATUS_CONFIRMED
 from modules.gymkhana.domain.validation import validate_booking_time_range, validate_venue
 from modules.gymkhana.models.booking import ClubBooking
 from modules.gymkhana.models.club import Club
+from modules.gymkhana.models.notification import GymkhanaNotificationOutbox
 from modules.gymkhana.selectors.bookings import has_venue_overlap
 from modules.gymkhana.selectors.scoping import is_club_head
 
@@ -28,10 +30,16 @@ def book_activity(
     start_time: time,
     end_time: time,
     description: str = "",
+    poster=None,
 ) -> ClubBooking:
     club = Club.objects.filter(id=club_id).first()
     if not club:
         raise NotFoundError("Club not found.", code="club_not_found")
+    if club.status != STATUS_CONFIRMED:
+        raise BadRequestError(
+            "Activities may only be booked for confirmed clubs.",
+            code="club_not_confirmed",
+        )
 
     if not is_club_head(acting_user_id, club_id):
         raise PermissionDeniedError(
@@ -52,7 +60,21 @@ def book_activity(
         )
         raise ConflictError(msg, code="venue_booking_conflict")
 
-    return ClubBooking.objects.create(
+    if connection.vendor == "postgresql":
+        from django.db import connection as db_connection
+
+        with db_connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))",
+                [f"{venue}|{booking_date.isoformat()}"],
+            )
+        if has_venue_overlap(venue, booking_date, start_time, end_time):
+            raise ConflictError(
+                f"Venue {venue} is already booked on {booking_date}.",
+                code="venue_booking_conflict",
+            )
+
+    booking = ClubBooking.objects.create(
         club=club,
         booking_type=booking_type,
         title=title,
@@ -61,8 +83,17 @@ def book_activity(
         start_time=start_time,
         end_time=end_time,
         description=description,
+        poster=poster or "",
         created_by_id=acting_user_id,
     )
+    for student in directory_contracts.search(kind="student", limit=1000):
+        GymkhanaNotificationOutbox.objects.create(
+            recipient_user_id=student.user_id,
+            topic=f"gymkhana.{booking_type}",
+            subject=f"New Gymkhana {booking_type}: {title}",
+            body=f"{title} is scheduled at {venue} on {booking_date}.",
+        )
+    return booking
 
 
 def book_session(
@@ -75,6 +106,7 @@ def book_session(
     start_time: time,
     end_time: time,
     description: str = "",
+    poster=None,
 ) -> ClubBooking:
     return book_activity(
         club_id=club_id,
@@ -86,6 +118,7 @@ def book_session(
         start_time=start_time,
         end_time=end_time,
         description=description,
+        poster=poster,
     )
 
 
@@ -99,6 +132,7 @@ def book_event(
     start_time: time,
     end_time: time,
     description: str = "",
+    poster=None,
 ) -> ClubBooking:
     return book_activity(
         club_id=club_id,
@@ -110,4 +144,5 @@ def book_event(
         start_time=start_time,
         end_time=end_time,
         description=description,
+        poster=poster,
     )

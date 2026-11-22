@@ -56,7 +56,27 @@ def scope_memberships(user, club: Club) -> QuerySet[ClubMembership]:
 
 
 def scope_polls(user) -> QuerySet[VotingPoll]:
-    return VotingPoll.objects.all()
+    user_id = getattr(user, "id", None) or getattr(user, "user_id", None)
+    if not user_id:
+        return VotingPoll.objects.none()
+    from modules.directory import contracts as directory_contracts
+
+    users = directory_contracts.get_users([user_id])
+    profile = users.get(user_id)
+    if not profile or profile.kind != "student":
+        return VotingPoll.objects.none()
+    qs = VotingPoll.objects.all()
+    if profile.batch_year:
+        qs = qs.filter(
+            target_batches__contains=[str(profile.batch_year)]
+        )
+    else:
+        return VotingPoll.objects.none()
+    if profile.discipline:
+        qs = qs.filter(target_branches__contains=[profile.discipline])
+    else:
+        return VotingPoll.objects.none()
+    return qs
 
 
 def scope_budgets(user, club: Club) -> QuerySet[ClubBudgetRequest]:
@@ -68,8 +88,7 @@ def scope_budgets(user, club: Club) -> QuerySet[ClubBudgetRequest]:
 
 def scope_reports(user, club: Club) -> QuerySet[ClubEventReport]:
     user_id = getattr(user, "id", None) or getattr(user, "user_id", None)
-    is_head = is_club_head(user_id, club.id)
     is_councillor = is_club_councillor(user_id, club.id)
-    if is_councillor or is_head or getattr(user, "is_admin", False):
+    if is_councillor or getattr(user, "is_admin", False):
         return ClubEventReport.objects.filter(club=club)
     return ClubEventReport.objects.none()

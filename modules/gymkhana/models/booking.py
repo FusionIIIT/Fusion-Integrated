@@ -15,6 +15,7 @@ class ClubBooking(TimeStampedModel):
     start_time = models.TimeField()
     end_time = models.TimeField()
     description = models.TextField(blank=True)
+    poster = models.FileField(upload_to="gymkhana/posters/", blank=True)
     created_by_id = models.IntegerField(db_index=True)
 
     class Meta:

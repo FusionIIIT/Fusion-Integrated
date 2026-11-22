@@ -11,6 +11,15 @@ from modules.gymkhana.domain.validation import (
     validate_poll_choices,
     validate_venue,
 )
+from modules.gymkhana.registry import MODULE, PERMISSIONS
+from modules.gymkhana.schedule import BEAT_SCHEDULE, TASK_ROUTES
+
+
+def test_module_registry_and_schedule_are_declared():
+    assert MODULE["code"] == "gymkhana"
+    assert PERMISSIONS
+    assert TASK_ROUTES == {}
+    assert BEAT_SCHEDULE == {}
 
 
 def test_club_state_machine_valid():

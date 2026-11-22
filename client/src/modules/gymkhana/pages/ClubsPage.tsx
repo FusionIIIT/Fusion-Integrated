@@ -7,6 +7,7 @@ import { errorMessage, http } from "../../../lib/http";
 import { DataTable } from "../../../ui/components/DataTable";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
+import { useAuth } from "../../../auth/AuthProvider";
 
 type Club = {
   id: number;
@@ -17,6 +18,7 @@ type Club = {
 };
 
 export default function ClubsPage() {
+  const { can } = useAuth();
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
@@ -109,7 +111,8 @@ export default function ClubsPage() {
               align: "right",
               render: (club) => (
                 <Group justify="flex-end" wrap="nowrap">
-                  {club.status === "confirmed" && (
+                  {club.status === "confirmed" &&
+                    can("gymkhana.membership.apply") && (
                     <Button
                       size="xs"
                       leftSection={<FaUsers size={10} />}
