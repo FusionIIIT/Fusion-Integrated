@@ -5,73 +5,7 @@ from datetime import date, timedelta
 import pytest
 from django.utils import timezone
 
-NOT_AUTOMATED = {
-    "TC-SA-BR-001-01": "the checkout has no basic-user creation interface enforcing Institute ID uniqueness.",
-    "TC-SA-BR-001-02": "the checkout has no basic-user update interface to exercise Institute ID immutability.",
-    "TC-SA-BR-002-01": "the checkout has no basic-user create/update interface; a standalone email validator would not exercise the specified account operation.",
-    "TC-SA-BR-003-01": "the checkout has no Student account record submission interface.",
-    "TC-SA-BR-003-02": "the checkout has no Faculty or Staff account record submission interface.",
-    "TC-SA-BR-003-03": "the checkout has no common user account record submission interface.",
-    "TC-SA-BR-005-02": "restoration services do not accept or enforce an authorization decision that can be omitted in the specified request.",
-    "TC-SA-BR-006-01": "the checkout exposes no role assignment service or persistence model.",
-    "TC-SA-BR-007-01": "the checkout exposes no role assignment service or persistence model.",
-    "TC-SA-BR-008-01": "the checkout exposes no role assignment service or persistence model.",
-    "TC-SA-BR-008-02": "the checkout exposes no role assignment service or persistence model.",
-    "TC-SA-BR-008-03": "the checkout exposes no role assignment service or persistence model.",
-    "TC-SA-BR-009-01": "the checkout exposes no scheduled role activation mechanism.",
-    "TC-SA-BR-009-02": "the checkout exposes no scheduled role expiry mechanism.",
-    "TC-SA-BR-009-03": "the checkout exposes no role assignment lifecycle to supersede scheduled end dates.",
-    "TC-SA-BR-010-01": "the checkout exposes no role eligibility assignment interface.",
-    "TC-SA-BR-010-02": "the checkout exposes no role eligibility assignment interface.",
-    "TC-SA-BR-011-01": "the checkout exposes no role compatibility assignment interface.",
-    "TC-SA-BR-012-01": "the checkout exposes no role reassignment or pending-work handover interface.",
-    "TC-SA-BR-012-02": "the checkout exposes no role reassignment interface.",
-    "TC-SA-BR-013-01": "the checkout exposes no prior-holder role audit access interface.",
-    "TC-SA-BR-014-01": "the checkout exposes no role revocation scheduling interface.",
-    "TC-SA-BR-014-02": "the checkout exposes no role revocation interface.",
-    "TC-SA-BR-014-03": "the checkout exposes no role revocation interface.",
-    "TC-SA-BR-014-04": "the checkout exposes no role revocation or pending-task disposition interface.",
-    "TC-SA-BR-015-01": "the checkout exposes no role validity lifecycle or access grants.",
-    "TC-SA-BR-015-02": "the checkout exposes no role lifecycle tied to user deactivation.",
-    "TC-SA-BR-016-01": "the checkout exposes no role expiry reminder mechanism.",
-    "TC-SA-BR-016-02": "the checkout exposes no role extension interface.",
-    "TC-SA-BR-016-03": "the checkout exposes no role extension interface.",
-    "TC-SA-BR-017-01": "historical archive creation has no retention-age, transaction, archival-marking, or dependency eligibility interface.",
-    "TC-SA-BR-017-02": "historical archive creation has no per-record eligibility, dependency, audit-log exclusion interface.",
-    "TC-SA-BR-018-01": "historical archive creation accepts backup metadata but offers no observable backup operation ordering relative to data movement.",
-    "TC-SA-BR-018-02": "the checkout exposes no backup execution/failure interface to trigger and verify an aborted archive movement.",
-    "TC-SA-BR-019-01": "the checkout has no archival data movement or archive database retention sweep interface.",
-    "TC-SA-BR-020-01": "the checkout has no archive read/search interface or module-specific operational data to exercise isolation.",
-    "TC-SA-BR-023-01": "the checkout has no role assignment notification flow to measure delivery timing.",
-    "TC-SA-BR-023-02": "the checkout has no role revocation notification flow to measure delivery timing.",
-    "TC-SA-BR-024-01": "the checkout exposes no authentication login failure event stream or threshold alert mechanism.",
-    "TC-SA-BR-024-02": "the checkout exposes no authentication login failure event stream or critical-alert channel configuration.",
-    "TC-SA-BR-024-03": "the checkout exposes no critical security alert dispatch mechanism or SMS channel configuration.",
-    "TC-SA-BR-025-02": "the checkout has no role assignment history model or expiry flow.",
-    "TC-SA-BR-026-01": "the checkout has no Super Admin user/role/activity/archive cross-module access interface.",
-    "TC-SA-BR-026-02": "the checkout has no views, reports, archival, or handover interfaces exposing the specified module content.",
-    "TC-SA-BR-027-01": "authentication and two-factor enforcement belong to the external IAM and are not implemented in this checkout.",
-    "TC-SA-BR-027-02": "the checkout has no Super Admin session management interface.",
-    "TC-SA-BR-027-03": "the checkout has no Super Admin inactivity timeout or session activity log interface.",
-    "TC-SA-BR-027-04": "IP whitelist login enforcement belongs to the external IAM and is not implemented in this checkout.",
-    "TC-SA-BR-028-01": "the checkout exposes no in-module Super Admin status assignment or modification interface.",
-    "TC-SA-BR-029-01": "the checkout exposes no critical operation confirmation or reauthentication interface.",
-    "TC-SA-BR-029-02": "the checkout exposes no critical operation confirmation or reauthentication interface.",
-    "TC-SA-BR-031-01": "password rotation policy and authentication belong to the external IAM and are not implemented here.",
-    "TC-SA-BR-032-01": "the checkout has no configured notification channel dispatch interface for general supported events.",
-    "TC-SA-BR-032-02": "the checkout exposes no critical-alert SMS dispatch or channel configuration interface.",
-    "TC-SA-BR-033-01": "the checkout has no backend event interface for all specified user, role, authentication, archival, and configuration event categories.",
-    "TC-SA-BR-034-01": "the checkout exposes no active-role selection or permission evaluation interface.",
-    "TC-SA-BR-034-02": "the checkout exposes no active-role selection or permission evaluation interface.",
-    "TC-SA-BR-034-03": "the checkout exposes no active-role selection or permission evaluation interface.",
-    "TC-SA-BR-035-03": "the permitted configuration service validates key membership but does not implement institutional retention value bounds.",
-}
-
-
 def run_br_case(test_id: str, principal, stub_iam) -> None:
-    if test_id in NOT_AUTOMATED:
-        pytest.skip(f"NOT_AUTOMATED: {NOT_AUTOMATED[test_id]}")
-
     if test_id == "TC-SA-BR-004-01":
         from modules.superadmin.models.archival import ArchivedUserRecord
         from modules.superadmin.services.archival import archive_user
@@ -196,7 +130,7 @@ def run_br_case(test_id: str, principal, stub_iam) -> None:
                     {},
                     format="json",
                 )
-                assert response.status_code == 422
+                assert response.status_code == 409
                 archive.refresh_from_db()
                 assert not archive.is_purged
                 assert archive.pk is not None

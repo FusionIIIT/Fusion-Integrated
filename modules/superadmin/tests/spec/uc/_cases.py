@@ -394,7 +394,4 @@ def run_case(test_id, sa_principal, it_principal, stub_iam):
         record.refresh_from_db()
         assert record.status == "restored" and record.finalized_permanent_at is None
     else:
-        pytest.skip(
-            "NOT_AUTOMATED: the frozen Fusion checkout exposes no backend interface "
-            "that can exercise this specified use-case obligation."
-        )
+        raise AssertionError(f"Unimplemented UC test case: {test_id}")

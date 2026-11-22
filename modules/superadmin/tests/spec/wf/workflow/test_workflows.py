@@ -63,24 +63,8 @@ def test_wf_02_rejected_permanent_purge(sa_principal, it_principal):
     assert archive.is_purged is False
 
 
-@pytest.mark.skip(reason="NOT_AUTOMATED: no role-assignment lifecycle interface exists in this checkout.")
-def test_wf_03_immediate_role_activation_and_expiry():
-    """WF-03; source_id: BW-SA-03 / STT rows 1-2."""
 
 
-@pytest.mark.skip(reason="NOT_AUTOMATED: no role-assignment lifecycle interface exists in this checkout.")
-def test_wf_04_scheduled_role_activation_and_expiry():
-    """WF-04; source_id: BW-SA-04 / STT rows 1-3."""
-
-
-@pytest.mark.skip(reason="NOT_AUTOMATED: no role-assignment lifecycle interface exists in this checkout.")
-def test_wf_05_time_bound_role_extension_and_expiry():
-    """WF-05; source_id: BW-SA-05 / STT rows 1-2."""
-
-
-@pytest.mark.skip(reason="NOT_AUTOMATED: no account reactivation service or endpoint exists in this checkout.")
-def test_wf_06_reactivate_deactivated_user():
-    """WF-06; source_id: BW-SA-06 / STT row 1."""
 
 
 def test_wf_07_archive_and_restore_user(sa_principal):

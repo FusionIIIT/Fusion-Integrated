@@ -5,15 +5,7 @@ import pytest
 
 def run_case(test_id, sa_principal, it_principal, stub_iam):
     if test_id not in IMPLEMENTED:
-        reasons = {
-            "TC-056": "the archival interface cannot accept the specified archival date and retention option",
-            "TC-098": "the policy interface does not configure the specified password-policy and notification-preference settings",
-        }
-        reason = reasons.get(
-            test_id,
-            "the frozen Fusion checkout exposes no backend interface for this specified obligation",
-        )
-        pytest.skip(f"NOT_AUTOMATED: {reason}.")
+        raise AssertionError(f"Unimplemented FR test case: {test_id}")
     from datetime import date, timedelta
 
     from django.utils import timezone
