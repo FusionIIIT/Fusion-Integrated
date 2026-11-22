@@ -22,7 +22,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
       - run: uv venv --python 3.12 .venv
-      - run: uv pip install --python .venv/bin/python -e ".[dev]"
+      - run: uv pip install --python .venv/bin/python --require-hashes -r requirements-dev.lock
+      - run: uv pip install --python .venv/bin/python --no-deps -e .
 
       - name: Lint
         run: .venv/bin/ruff check .
@@ -68,8 +69,11 @@ jobs:
           diff -u openapi/fusion-integrated.v1.yaml /tmp/openapi.check.yaml \
             || { echo "::error::openapi schema is stale — run 'make schema'"; exit 1; }
 
-      - name: Tests
+      - name: Tests (SQLite)
         run: .venv/bin/pytest -q
+
+      - name: PostgreSQL migrations and concurrency
+        run: .venv/bin/pytest --ds=config.settings.test_postgres --migrations -q
 
   frontend:
     runs-on: ubuntu-latest
@@ -84,6 +88,8 @@ jobs:
           cache: npm
           cache-dependency-path: client/package-lock.json
       - run: npm ci
+      - name: Lint
+        run: npm run lint
       - name: Typecheck
         run: npx tsc --noEmit
       - name: Tests
@@ -100,7 +106,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v3
       - name: Python dependencies
-        run: uvx pip-audit --strict --desc -r <(uvx pip-compile --quiet -o - pyproject.toml)
+        run: uvx pip-audit --strict --desc -r requirements.lock
       - uses: actions/setup-node@v4
         with:
           node-version: "20"

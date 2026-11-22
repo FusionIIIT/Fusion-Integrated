@@ -12,6 +12,10 @@ export interface ModuleManifest {
 }
 
 export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
+  visitor_hostel: {
+    code: "visitor_hostel", basePath: "/visitor-hostel",
+    load: () => import("../modules/visitor_hostel/routes"),
+  },
   placement_cell: {
     code: "placement_cell",
     basePath: "/placement",

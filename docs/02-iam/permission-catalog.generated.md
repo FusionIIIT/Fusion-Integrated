@@ -38,3 +38,14 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `visitor_hostel`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `visitor_hostel.booking.request` | Request and view own hostel bookings | `faculty`, `staff`, `student`, `vh_caretaker`, `vh_in_charge` |
+| `visitor_hostel.booking.manage` | Caretaker booking and stay operations | `vh_caretaker` |
+| `visitor_hostel.booking.approve` | Decide forwarded hostel bookings | `vh_in_charge` |
+| `visitor_hostel.inventory.manage` | Maintain hostel inventory | `vh_caretaker` |
+| `visitor_hostel.inventory.approve` | Decide replenishment requirements | `vh_in_charge` |
+| `visitor_hostel.tariff.manage` | Maintain hostel tariffs | `vh_in_charge` |

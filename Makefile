@@ -7,7 +7,8 @@ help:  ## show this help
 
 install:  ## create the venv and install everything
 	uv venv --python 3.12 .venv
-	uv pip install --python $(PY) -e ".[dev]"
+	uv pip install --python $(PY) --require-hashes -r requirements-dev.lock
+	uv pip install --python $(PY) --no-deps -e .
 
 up:  ## start postgres + redis
 	docker compose up -d
@@ -38,7 +39,7 @@ check: ## everything CI runs
 	$(PY) -m pytest -q
 
 check-client: ## the client half of CI
-	cd client && npm run typecheck && npm test && npm run build
+	cd client && npm run lint && npm run typecheck && npm test && npm run build
 
 SCHEMA := openapi/fusion-integrated.v1.yaml
 
@@ -59,3 +60,8 @@ schema-check:  ## the committed schema must match the code
 
 .PHONY: help install up migrate seed dev test check check-client schema \
 	schema-check permissions module-structure
+
+test-postgres:  ## run migrations and concurrency tests against PostgreSQL
+	$(PY) -m pytest --ds=config.settings.test_postgres --migrations
+
+.PHONY: test-postgres

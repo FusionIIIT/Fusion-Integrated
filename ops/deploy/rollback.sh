@@ -31,6 +31,7 @@ fi
 
 [ -d "$TARGET" ] || die "$TARGET does not exist"
 [ -f "$TARGET/manage.py" ] || die "$TARGET does not look like a release"
+[ -x "$TARGET/.venv/bin/python" ] || die "$TARGET has no release-local environment"
 
 CURRENT="$(readlink -f "$ROOT/current" 2>/dev/null || true)"
 [ "$CURRENT" = "$(readlink -f "$TARGET")" ] && die "already on $TARGET"
@@ -39,11 +40,10 @@ printf '==> rolling back to %s\n' "$TARGET"
 swap_symlink "$TARGET" "$ROOT/current"
 [ -n "$CURRENT" ] && printf '%s\n' "$CURRENT" > "$ROOT/previous"
 
-systemctl reload "fusion-$SVC" || systemctl restart "fusion-$SVC"
+systemctl restart "fusion-$SVC"
 systemctl restart "fusion-$SVC-worker@default" "fusion-$SVC-worker@notifications" \
-                  "fusion-$SVC-worker@reports" 2>/dev/null || true
-systemctl is-enabled "fusion-$SVC-beat" >/dev/null 2>&1 \
-    && systemctl restart "fusion-$SVC-beat"
+                  "fusion-$SVC-worker@reports"
+systemctl restart "fusion-$SVC-beat"
 
 printf '==> on %s\n' "$(readlink -f "$ROOT/current")"
 printf 'Migrations were not reverted. Check that this code runs against the current schema.\n'

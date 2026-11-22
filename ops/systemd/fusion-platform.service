@@ -21,7 +21,7 @@ Environment=DJANGO_SETTINGS_MODULE=config.settings.prod
 
 # gthread, not sync: every authenticated request calls the IAM over HTTP, so a
 # worker spends most of its time waiting rather than computing.
-ExecStart=/srv/fusion/platform/venv/bin/gunicorn config.wsgi:application \
+ExecStart=/srv/fusion/platform/current/.venv/bin/gunicorn config.wsgi:application \
   --bind unix:/run/fusion/platform.sock \
   --workers 5 --worker-class gthread --threads 4 \
   --max-requests 1000 --max-requests-jitter 100 \

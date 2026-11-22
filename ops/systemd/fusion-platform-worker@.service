@@ -21,7 +21,7 @@ WorkingDirectory=/srv/fusion/platform/current
 EnvironmentFile=/etc/fusion/platform.env
 # Defaults if the environment file says nothing for this queue.
 Environment=CONCURRENCY=4 PREFETCH=4
-ExecStart=/srv/fusion/platform/venv/bin/celery -A config worker \
+ExecStart=/srv/fusion/platform/current/.venv/bin/celery -A config worker \
   --queues=%i --hostname=%i@%%h --loglevel=INFO \
   --concurrency=${CONCURRENCY} --prefetch-multiplier=${PREFETCH} \
   --max-tasks-per-child=500

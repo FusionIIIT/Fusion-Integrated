@@ -227,6 +227,11 @@ PASSWORD_HASHERS = [
 ]
 
 SPECTACULAR_SETTINGS = {
+    "ENUM_NAME_OVERRIDES": {
+        "VisitorCategoryEnum": (
+            "modules.visitor_hostel.models.VisitorCategoryTariff.CATEGORY_CHOICES"
+        ),
+    },
     "TITLE": "Fusion-Integrated API",
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
@@ -275,3 +280,6 @@ LOGGING = {
         "fusion": {"level": env("FUSION_LOG_LEVEL", "INFO"), "propagate": True},
     },
 }
+
+# Bound SMTP latency for notification workers.
+EMAIL_TIMEOUT = env_int("EMAIL_TIMEOUT", 10)

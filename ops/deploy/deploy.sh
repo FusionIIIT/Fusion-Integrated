@@ -5,14 +5,13 @@
 #
 # The symlink swap is the commit point: before it the old release is still
 # serving, after it the new one is. Anything that fails before the swap leaves
-# production untouched.
+# the old code and its dependencies untouched. Database migrations are not rolled back.
 set -euo pipefail
 
 SVC="${1:?usage: deploy.sh <service> <tag>}"
 TAG="${2:?usage: deploy.sh <service> <tag>}"
 
 ROOT="${FUSION_ROOT:-/srv/fusion/$SVC}"
-VENV="$ROOT/venv"
 REPO="${FUSION_REPO:-$ROOT/repo}"
 KEEP="${KEEP_RELEASES:-5}"
 MIGRATOR_ENV="/etc/fusion/$SVC-migrator.env"
@@ -29,12 +28,14 @@ log() { printf '\n==> %s\n' "$*"; }
 die() { printf '\nFAILED: %s\n' "$*" >&2; exit 1; }
 
 [ -d "$REPO/.git" ] || die "no git repository at $REPO (set FUSION_REPO)"
-[ -x "$VENV/bin/python" ] || die "no virtualenv at $VENV"
+command -v "${PYTHON:-python3.12}" >/dev/null || die "Python 3.12 is required"
+[ -f "$MIGRATOR_ENV" ] || die "missing $MIGRATOR_ENV (runtime credentials cannot migrate)"
 [ -f "/etc/fusion/$SVC.env" ] || die "missing /etc/fusion/$SVC.env"
 
 git -C "$REPO" fetch --tags --prune
 SHA="$(git -C "$REPO" rev-parse --short "$TAG^{commit}")" || die "unknown tag $TAG"
 REL="$ROOT/releases/$SHA"
+VENV="$REL/.venv"
 
 PREVIOUS=""
 if [ -L "$ROOT/current" ]; then
@@ -49,8 +50,10 @@ else
 fi
 
 log "dependencies"
+"${PYTHON:-python3.12}" -m venv "$VENV"
 "$VENV/bin/python" -m pip install --quiet --upgrade pip
-"$VENV/bin/python" -m pip install --quiet -e "$REL"
+"$VENV/bin/python" -m pip install --quiet --require-hashes -r "$REL/requirements.lock"
+"$VENV/bin/python" -m pip install --quiet --no-deps -e "$REL"
 
 log "client"
 if [ -f "$REL/client/package-lock.json" ]; then
@@ -63,14 +66,11 @@ psql -v ON_ERROR_STOP=1 -d "${DB_NAME:-fusion_integrated}" -f "$REL/ops/db/roles
 
 log "migrations"
 # As platform_migrator: the running service has no DDL, so it cannot run these.
-if [ -f "$MIGRATOR_ENV" ]; then
-    ( set -a; . "/etc/fusion/$SVC.env"; . "$MIGRATOR_ENV"; set +a
-      cd "$REL" && "$VENV/bin/python" manage.py migrate --noinput )
-else
-    printf 'WARNING: %s absent; migrating as the service role.\n' "$MIGRATOR_ENV"
-    ( set -a; . "/etc/fusion/$SVC.env"; set +a
-      cd "$REL" && "$VENV/bin/python" manage.py migrate --noinput )
-fi
+( set -a; . "/etc/fusion/$SVC.env"; . "$MIGRATOR_ENV"; set +a
+  cd "$REL" && "$VENV/bin/python" manage.py migrate --noinput )
+
+# Restrict newly created audit/billing tables after migrations as well.
+psql -v ON_ERROR_STOP=1 -d "${DB_NAME:-fusion_integrated}" -f "$REL/ops/db/roles.sql"
 
 log "registry and checks"
 ( set -a; . "/etc/fusion/$SVC.env"; set +a
@@ -84,11 +84,10 @@ PYTHON="$VENV/bin/python" swap_symlink "$REL" "$ROOT/current"
 [ -n "$PREVIOUS" ] && printf '%s\n' "$PREVIOUS" > "$ROOT/previous"
 
 log "restart"
-systemctl reload "fusion-$SVC" || systemctl restart "fusion-$SVC"
+systemctl restart "fusion-$SVC"
 systemctl restart "fusion-$SVC-worker@default" "fusion-$SVC-worker@notifications" \
-                  "fusion-$SVC-worker@reports" 2>/dev/null || true
-systemctl is-enabled "fusion-$SVC-beat" >/dev/null 2>&1 \
-    && systemctl restart "fusion-$SVC-beat"
+                  "fusion-$SVC-worker@reports"
+systemctl restart "fusion-$SVC-beat"
 
 log "smoke"
 if ! "$REL/ops/deploy/smoke.sh" "$SVC"; then

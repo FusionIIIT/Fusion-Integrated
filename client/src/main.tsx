@@ -37,7 +37,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <QueryClientProvider client={qc}>
         {/* Opted in now so the v7 upgrade is not also a behaviour change. */}
         <BrowserRouter
-          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
         >
           {/* AuthProvider is INSIDE the router — it redirects on 401. */}
           <AuthProvider>

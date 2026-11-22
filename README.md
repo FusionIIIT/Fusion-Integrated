@@ -142,7 +142,8 @@ client/          the shell — Vite + React 18 + TS + Mantine 7.13
 ## Testing
 
 ```bash
-make test          # 40 tests, ~0.6s
+make test          # backend regression suite (SQLite)
+make test-postgres # real migrations, locking and runtime DB grants; set DB_* first
 ```
 
 Domain tests are pure Python with no database, which is why they run in
@@ -201,3 +202,37 @@ Then: offers and selection rounds, the declared-CPI integration.
 
 Design documents — architecture, ADRs, the RBAC model, the placement domain and
 the academic-snapshot contract — are in [`docs/`](docs/).
+
+
+## Visitor hostel review and deployment
+
+The hostel module now uses IAM principals and scoped booking access, transactional
+approval/allocation/stay workflows, reviewed cancellation/modification, immutable
+billing, inventory approval, audit events and scheduled notifications. The shell
+includes a booking screen; advanced operational endpoints are described in OpenAPI.
+
+Review results and deployment caveats are in
+[`results/production-review/REVIEW.txt`](results/production-review/REVIEW.txt).
+Production and development dependencies are locked in `requirements.lock` and
+`requirements-dev.lock`; `make install` uses the hashed development lock.
+
+Provision IAM grants from `registry/permissions.json`, then configure current
+operational appointments as a trusted operator using the migrator environment:
+
+```bash
+python manage.py assign_hostel_role vh_caretaker IAM_USER_ID \
+  --email caretaker@example.edu --ends-at '2027-01-01T00:00:00+05:30' --actor-id OPERATOR_IAM_ID
+python manage.py assign_hostel_role vh_in_charge IAM_USER_ID \
+  --email incharge@example.edu --ends-at '2027-01-01T00:00:00+05:30' --actor-id OPERATOR_IAM_ID
+```
+
+Legacy local Django IDs are retained separately and grant no requester access until
+explicitly mapped with `map_hostel_indenter LEGACY_ID IAM_ID --actor-id OPERATOR_IAM_ID`.
+Verify each identity mapping. This migration requires a backup and maintenance
+window; it is not compatible with an old-code rolling deployment.
+
+Deployment units now use `current/.venv`. Install the updated units and ensure any
+rollback target also has a release-local environment. Database grants are applied
+before and after migrations using `ops/db/roles.sql`; run migrations as the owning
+migrator role, not the runtime role. Configure rooms, tariffs, SMTP and both hostel
+role appointments before accepting real bookings.

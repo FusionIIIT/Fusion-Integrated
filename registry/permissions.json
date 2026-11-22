@@ -278,6 +278,83 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "visitor_hostel": {
+      "grants": {
+        "faculty": [
+          "visitor_hostel.booking.request"
+        ],
+        "staff": [
+          "visitor_hostel.booking.request"
+        ],
+        "student": [
+          "visitor_hostel.booking.request"
+        ],
+        "vh_caretaker": [
+          "visitor_hostel.booking.manage",
+          "visitor_hostel.booking.request",
+          "visitor_hostel.inventory.manage"
+        ],
+        "vh_in_charge": [
+          "visitor_hostel.booking.approve",
+          "visitor_hostel.booking.request",
+          "visitor_hostel.inventory.approve",
+          "visitor_hostel.tariff.manage"
+        ]
+      },
+      "module_grants": [
+        "faculty",
+        "staff",
+        "student",
+        "vh_caretaker",
+        "vh_in_charge"
+      ],
+      "nav": {
+        "base_path": "/visitor-hostel",
+        "icon": "FaBuilding",
+        "items": [
+          {
+            "code": "visitor_hostel.bookings",
+            "icon": "FaBuilding",
+            "label": "Hostel bookings",
+            "required_permission": "visitor_hostel.booking.request",
+            "sort_order": 10,
+            "to": "/visitor-hostel/bookings"
+          }
+        ],
+        "label": "Visitors Hostel",
+        "nav_section": "Hostel",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "visitor_hostel.booking.request",
+          "label": "Request and view own hostel bookings"
+        },
+        {
+          "code": "visitor_hostel.booking.manage",
+          "label": "Caretaker booking and stay operations"
+        },
+        {
+          "code": "visitor_hostel.booking.approve",
+          "label": "Decide forwarded hostel bookings"
+        },
+        {
+          "code": "visitor_hostel.inventory.manage",
+          "label": "Maintain hostel inventory"
+        },
+        {
+          "code": "visitor_hostel.inventory.approve",
+          "label": "Decide replenishment requirements"
+        },
+        {
+          "code": "visitor_hostel.tariff.manage",
+          "label": "Maintain hostel tariffs"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",
