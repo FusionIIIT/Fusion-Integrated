@@ -1,5 +1,224 @@
 {
   "modules": {
+    "cms": {
+      "grants": {
+        "complaint_handler": [
+          "cms.announcement.publish",
+          "cms.announcement.view",
+          "cms.complaint.assign",
+          "cms.complaint.resolve",
+          "cms.complaint.update",
+          "cms.complaint.view",
+          "cms.escalation.manual",
+          "cms.feedback.review",
+          "cms.report.view"
+        ],
+        "complaint_supervisor": [
+          "cms.announcement.publish",
+          "cms.announcement.view",
+          "cms.close.supervisor",
+          "cms.complaint.view",
+          "cms.escalation.monitor",
+          "cms.feedback.review",
+          "cms.reopening.review",
+          "cms.report.view"
+        ],
+        "faculty": [
+          "cms.announcement.view",
+          "cms.close.user",
+          "cms.complaint.reopen",
+          "cms.complaint.submit",
+          "cms.complaint.track",
+          "cms.feedback.submit"
+        ],
+        "staff": [
+          "cms.announcement.view",
+          "cms.close.user",
+          "cms.complaint.reopen",
+          "cms.complaint.submit",
+          "cms.complaint.track",
+          "cms.feedback.submit"
+        ],
+        "student": [
+          "cms.announcement.view",
+          "cms.close.user",
+          "cms.complaint.reopen",
+          "cms.complaint.submit",
+          "cms.complaint.track",
+          "cms.feedback.submit"
+        ],
+        "system_admin": [
+          "cms.report.view",
+          "cms.role.manage"
+        ]
+      },
+      "module_grants": [
+        "complaint_handler",
+        "complaint_supervisor",
+        "faculty",
+        "staff",
+        "student",
+        "system_admin"
+      ],
+      "nav": {
+        "base_path": "/cms",
+        "icon": "FaClipboardList",
+        "items": [
+          {
+            "code": "cms.my-complaints",
+            "icon": "ClipboardList",
+            "label": "My Complaints",
+            "required_permission": "cms.complaint.track",
+            "sort_order": 10,
+            "to": "/cms/mine"
+          },
+          {
+            "code": "cms.submit",
+            "icon": "FaClipboardCheck",
+            "label": "Submit Complaint",
+            "required_permission": "cms.complaint.submit",
+            "sort_order": 20,
+            "to": "/cms/submit"
+          },
+          {
+            "code": "cms.worklist",
+            "icon": "FaClipboardList",
+            "label": "Complaint Worklist",
+            "required_permission": "cms.complaint.view",
+            "sort_order": 30,
+            "to": "/cms/worklist"
+          },
+          {
+            "code": "cms.escalations",
+            "icon": "FaChartBar",
+            "label": "Escalations",
+            "required_permission": "cms.escalation.monitor",
+            "sort_order": 40,
+            "to": "/cms/escalations"
+          },
+          {
+            "code": "cms.reopening",
+            "icon": "FaCheckDouble",
+            "label": "Reopening Requests",
+            "required_permission": "cms.reopening.review",
+            "sort_order": 45,
+            "to": "/cms/reopening"
+          },
+          {
+            "code": "cms.feedback",
+            "icon": "FaUsers",
+            "label": "Feedback",
+            "required_permission": "cms.feedback.review",
+            "sort_order": 50,
+            "to": "/cms/feedback"
+          },
+          {
+            "code": "cms.announcements",
+            "icon": "Megaphone",
+            "label": "Announcements",
+            "required_permission": "cms.announcement.view",
+            "sort_order": 60,
+            "to": "/cms/announcements"
+          },
+          {
+            "code": "cms.reports",
+            "icon": "ChartNoAxesCombined",
+            "label": "Reports & Analytics",
+            "required_permission": "cms.report.view",
+            "sort_order": 70,
+            "to": "/cms/reports"
+          },
+          {
+            "code": "cms.roles",
+            "icon": "FaCog",
+            "label": "CMS Roles",
+            "required_permission": "cms.role.manage",
+            "sort_order": 80,
+            "to": "/cms/roles"
+          }
+        ],
+        "label": "Complaints",
+        "nav_section": "Services",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "cms.complaint.submit",
+          "label": "Submit complaints"
+        },
+        {
+          "code": "cms.complaint.track",
+          "label": "Track own complaints and history"
+        },
+        {
+          "code": "cms.complaint.view",
+          "label": "Review and manage complaints"
+        },
+        {
+          "code": "cms.complaint.assign",
+          "label": "Assign and prioritize complaints"
+        },
+        {
+          "code": "cms.complaint.update",
+          "label": "Record complaint progress"
+        },
+        {
+          "code": "cms.complaint.resolve",
+          "label": "Resolve or reject complaints"
+        },
+        {
+          "code": "cms.close.user",
+          "label": "Verify closure as complainant"
+        },
+        {
+          "code": "cms.close.supervisor",
+          "label": "Verify closure as supervisor"
+        },
+        {
+          "code": "cms.complaint.reopen",
+          "label": "Request reopening of own complaint"
+        },
+        {
+          "code": "cms.reopening.review",
+          "label": "Review reopening requests"
+        },
+        {
+          "code": "cms.escalation.manual",
+          "label": "Escalate unresolved complaints"
+        },
+        {
+          "code": "cms.escalation.monitor",
+          "label": "Monitor escalated complaints"
+        },
+        {
+          "code": "cms.feedback.submit",
+          "label": "Submit feedback"
+        },
+        {
+          "code": "cms.feedback.review",
+          "label": "Review submitted feedback"
+        },
+        {
+          "code": "cms.announcement.publish",
+          "label": "Publish complaint announcements"
+        },
+        {
+          "code": "cms.announcement.view",
+          "label": "View complaint announcements"
+        },
+        {
+          "code": "cms.report.view",
+          "label": "View CMS reports and analytics"
+        },
+        {
+          "code": "cms.role.manage",
+          "label": "Assign CMS handler and supervisor roles"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "directory": {
       "grants": {
         "Dean Academic": [

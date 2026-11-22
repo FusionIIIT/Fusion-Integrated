@@ -7,6 +7,29 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `cms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `cms.complaint.submit` | Submit complaints | `faculty`, `staff`, `student` |
+| `cms.complaint.track` | Track own complaints and history | `faculty`, `staff`, `student` |
+| `cms.complaint.view` | Review and manage complaints | `complaint_handler`, `complaint_supervisor` |
+| `cms.complaint.assign` | Assign and prioritize complaints | `complaint_handler` |
+| `cms.complaint.update` | Record complaint progress | `complaint_handler` |
+| `cms.complaint.resolve` | Resolve or reject complaints | `complaint_handler` |
+| `cms.close.user` | Verify closure as complainant | `faculty`, `staff`, `student` |
+| `cms.close.supervisor` | Verify closure as supervisor | `complaint_supervisor` |
+| `cms.complaint.reopen` | Request reopening of own complaint | `faculty`, `staff`, `student` |
+| `cms.reopening.review` | Review reopening requests | `complaint_supervisor` |
+| `cms.escalation.manual` | Escalate unresolved complaints | `complaint_handler` |
+| `cms.escalation.monitor` | Monitor escalated complaints | `complaint_supervisor` |
+| `cms.feedback.submit` | Submit feedback | `faculty`, `staff`, `student` |
+| `cms.feedback.review` | Review submitted feedback | `complaint_handler`, `complaint_supervisor` |
+| `cms.announcement.publish` | Publish complaint announcements | `complaint_handler`, `complaint_supervisor` |
+| `cms.announcement.view` | View complaint announcements | `complaint_handler`, `complaint_supervisor`, `faculty`, `staff`, `student` |
+| `cms.report.view` | View CMS reports and analytics | `complaint_handler`, `complaint_supervisor`, `system_admin` |
+| `cms.role.manage` | Assign CMS handler and supervisor roles | `system_admin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |

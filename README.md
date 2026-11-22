@@ -1,6 +1,6 @@
 # Fusion-Integrated
 
-The non-academic platform. **Placement Cell** first; more modules later.
+The non-academic platform. **Placement Cell** and **Complaint Management System**.
 **Independent modules, one login.**
 
 This service holds **no user table**. Identity, RBAC and common directory data
@@ -19,7 +19,7 @@ This service holds **no user table**. Identity, RBAC and common directory data
                  ▼
         Fusion-Integrated                ← this repo
         owns fusion_integrated
-        backend  →  placement  (more modules later)
+        backend  →  placement + cms
         client   →  the shell: one login, one sidebar
         holds only user_id references — no user table
 ```
@@ -131,6 +131,7 @@ modules/
   directory/     local projection of IAM's user data (a cache with a table)
   accesscontrol/ module registry + the server-driven sidebar
   placement/     companies, postings, applications, eligibility, state machine
+  cms/           complaints, lifecycle, escalation, feedback, announcements
 ops/checks/      the boundary enforcement scripts
 client/          the shell — Vite + React 18 + TS + Mantine 7.13
 ```
@@ -142,13 +143,13 @@ client/          the shell — Vite + React 18 + TS + Mantine 7.13
 ## Testing
 
 ```bash
-make test          # 40 tests, ~0.6s
+make test          # run the complete pytest suite
 ```
 
-Domain tests are pure Python with no database, which is why they run in
-milliseconds — that is the whole point of the no-Django-in-`domain/` rule. The
-IAM is never contacted: `conftest.py` swaps in an in-memory fake, so the suite
-needs no network and no running Fusion_System_Administrator.
+Domain tests are pure Python with no database, which keeps business-rule checks
+fast and helps enforce the no-Django-in-`domain/` rule. API tests use the
+in-memory IAM fake in `conftest.py`, so they do not need a running
+Fusion_System_Administrator.
 
 ---
 
@@ -161,6 +162,10 @@ cd client && npm install && npm run dev      # :5173, proxies /api to :8002
 Vite + React 18 + TypeScript (strict) + Mantine **7.13.4, pinned to match the
 sysadmin client** so the two apps look like one product. `theme.ts` and
 `AppShellLayout.module.css` are ports of that client's files, not a redesign.
+
+CMS setup, policy configuration, and requirement coverage are documented in
+[`docs/04-cms/README.md`](docs/04-cms/README.md) and
+[`docs/04-cms/requirement-traceability.md`](docs/04-cms/requirement-traceability.md).
 
 Routes are built **only** for modules the server granted, so an ungranted module
 has no route — deep-linking it hits NotFound rather than an empty shell. Module
