@@ -11,8 +11,22 @@ MODULE = {
 }
 
 NAV_ITEMS = [
-    {"code": "quizzing.list", "label": "Quizzes", "icon": "ListBullets", "to": "/quizzing", "required_permission": "quizzing.quiz.view", "sort_order": 10},
-    {"code": "quizzing.create", "label": "Create Quiz", "icon": "PlusCircle", "to": "/quizzing/create", "required_permission": "quizzing.quiz.author", "sort_order": 20},
+    {
+        "code": "quizzing.list",
+        "label": "Quizzes",
+        "icon": "ListBullets",
+        "to": "/quizzing",
+        "required_permission": "quizzing.quiz.view",
+        "sort_order": 10,
+    },
+    {
+        "code": "quizzing.create",
+        "label": "Create Quiz",
+        "icon": "PlusCircle",
+        "to": "/quizzing/create",
+        "required_permission": "quizzing.quiz.author",
+        "sort_order": 20,
+    },
 ]
 
 PERMISSIONS = [
