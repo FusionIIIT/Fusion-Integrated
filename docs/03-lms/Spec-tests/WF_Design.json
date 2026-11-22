@@ -1,0 +1,49 @@
+Error: API error (attempt 1): UNAVAILABLE (code 503): No capacity available for model gemini-3.8-flash-high on the server (Error ID: 29f6fda6-a24e-41ed-818b-1b41430ccecb-1-2010)
+
+[
+  {
+    "test_id": "TC-BW-LMS-01",
+    "source_id": "BW-LMS-01 Scheduled Course Material Release path",
+    "purpose": "Verify the scheduled course material release basis workflow where Faculty schedules valid course material for a future date (UC-LMS-003) and the System automatically transitions it to published and available when the configured release time is reached (UC-LMS-015).",
+    "preconditions": "Course workspace exists in Fusion LMS; Faculty is assigned to the course; course material item exists in 'Material Draft / Unpublished' state; enrolled Student, TA, and linked Observer exist for the course.",
+    "action_or_input": "1. Faculty configures a future release timestamp for the draft course material and saves the configuration (UC-LMS-003).\n2. Verify material state before release time is reached.\n3. System clock advances to reach the configured release timestamp, triggering scheduled content release processing (UC-LMS-015).",
+    "expected_result": "1. Course material transitions from 'Material Draft / Unpublished' to 'Material Scheduled' (BR-LMS-005, BR-LMS-006) and remains unreleased/invisible to Student, TA, and Observer.\n2. When configured release time is reached, System automatically transitions material from 'Material Scheduled' to 'Material Published / Available' (BR-LMS-005, BR-LMS-006).\n3. Published course material is accessible in read-only mode to enrolled Students, TAs, and Observers in the course workspace.",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "TC-BW-LMS-02",
+    "source_id": "BW-LMS-02 Assignment Immediate Release and On-Time Submission path (CW-LMS-01 immediate release)",
+    "purpose": "Verify the assignment immediate release and on-time submission basis workflow where Faculty creates a valid assignment (UC-LMS-007), publishes it immediately for student submission (UC-LMS-008), and an enrolled Student submits valid work before the due date (UC-LMS-010).",
+    "preconditions": "Course workspace exists; Faculty is assigned to the course; Student is enrolled in the course; no assignment exists currently.",
+    "action_or_input": "1. Faculty creates a new assignment with valid configuration including title, instructions, points possible, submission type, and future due date (UC-LMS-007).\n2. Faculty publishes the assignment with immediate release condition (UC-LMS-008).\n3. Enrolled Student accesses the published assignment and submits valid work matching the configured submission type prior to the due date (UC-LMS-010).",
+    "expected_result": "1. Assignment transitions from 'No Assignment / New' to 'Assignment Draft' (BR-LMS-009, BR-LMS-010) and is not visible to students.\n2. Assignment transitions from 'Assignment Draft' to 'Assignment Available for Submission' (BR-LMS-009–011), becoming visible and downloadable by the Student.\n3. Student submission is accepted and transitions to 'Student Submission Recorded' (BR-LMS-012–014) with submission timestamp recorded and status marked as submitted.",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "TC-BW-LMS-03",
+    "source_id": "BW-LMS-03 Assignment Scheduled Release and On-Time Submission path (CW-LMS-01 scheduled release)",
+    "purpose": "Verify the assignment scheduled release and on-time submission basis workflow where Faculty creates an assignment (UC-LMS-007), configures a future release date (UC-LMS-008), the System releases the assignment when the release time is reached (UC-LMS-015), and the Student submits work before the due date (UC-LMS-010).",
+    "preconditions": "Course workspace exists; Faculty is assigned to the course; Student is enrolled in the course; no assignment exists currently; release timestamp is set prior to due date timestamp.",
+    "action_or_input": "1. Faculty creates an assignment with valid required configuration (UC-LMS-007).\n2. Faculty configures a future release date and publishes the assignment (UC-LMS-008).\n3. System time advances to reach the configured assignment release timestamp, executing scheduled content release (UC-LMS-015).\n4. Enrolled Student accesses the now available assignment and submits valid work matching the configured submission type before the due date (UC-LMS-010).",
+    "expected_result": "1. Assignment transitions from 'No Assignment / New' to 'Assignment Draft' (BR-LMS-009, BR-LMS-010).\n2. Assignment transitions from 'Assignment Draft' to 'Assignment Published / Scheduled for Release' (BR-LMS-009–011), remaining hidden and unavailable for student submission.\n3. System automatically transitions assignment from 'Assignment Published / Scheduled for Release' to 'Assignment Available for Submission' (BR-LMS-011), making it visible and downloadable to the Student.\n4. Student submission is accepted and transitions to 'Student Submission Recorded' (BR-LMS-012–014) with on-time submitted status.",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "TC-BW-LMS-04",
+    "source_id": "BW-LMS-04 Faculty Grading and Grade Release path (CW-LMS-02 faculty grading)",
+    "purpose": "Verify the Faculty grading and grade release basis workflow where an authorized Faculty evaluates a recorded student submission with points and feedback held in draft (UC-LMS-012), and subsequently releases the grade/feedback to make it visible to the Student (UC-LMS-013).",
+    "preconditions": "Course workspace exists with assigned Faculty and enrolled Student; a published assignment exists with a recorded submission in 'Student Submission Recorded' state.",
+    "action_or_input": "1. Authorized Faculty opens the recorded student submission, enters points and feedback, and saves the evaluation (UC-LMS-012).\n2. Verify draft grade is not visible to the Student.\n3. Faculty executes release of the draft grade and feedback for the submission (UC-LMS-013).\n4. Student accesses course workspace to view assignment results.",
+    "expected_result": "1. Submission evaluation transitions from 'Student Submission Recorded' to 'Grade Draft' (BR-LMS-015, BR-LMS-016); points and feedback are saved.\n2. Grade Draft remains withheld from Student view (BR-LMS-016).\n3. Faculty action transitions grade from 'Grade Draft' to 'Grade Released / Student Visible' (BR-LMS-016–018).\n4. Student views released grade and feedback in read-only form (BR-LMS-017).",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "TC-BW-LMS-05",
+    "source_id": "BW-LMS-05 TA Grading and Faculty Grade Release path (CW-LMS-02 TA grading)",
+    "purpose": "Verify the TA grading and Faculty grade release basis workflow where an authorized TA evaluates a recorded student submission with points and feedback attributed to the TA held in draft (UC-LMS-012), and the Faculty subsequently releases the grade/feedback to the Student (UC-LMS-013).",
+    "preconditions": "Course workspace exists with assigned Faculty, assigned TA, and enrolled Student; a published assignment exists with a recorded submission in 'Student Submission Recorded' state.",
+    "action_or_input": "1. Authorized TA opens the recorded student submission, enters points and feedback, and saves the grading evaluation (UC-LMS-012).\n2. Verify draft grade attribution and student visibility.\n3. Assigned Faculty reviews the draft grade and executes release of grades and feedback (UC-LMS-013).\n4. Student accesses the course workspace to view assignment results.",
+    "expected_result": "1. Submission evaluation transitions from 'Student Submission Recorded' to 'Grade Draft' (BR-LMS-004, BR-LMS-015, BR-LMS-016); grading actions are explicitly attributed to the TA.\n2. Grade Draft remains hidden and inaccessible to the Student (BR-LMS-016).\n3. Faculty release action transitions grade from 'Grade Draft' to 'Grade Released / Student Visible' (BR-LMS-016–018).\n4. Student views their released grade and feedback in read-only form (BR-LMS-017).",
+    "test_type": "Workflow"
+  }
+]
