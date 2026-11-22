@@ -1,6 +1,6 @@
 # Module Blueprint: Placement Cell Management System (PCMS)
 **Module Code:** `placement` | **Docs Folder:** `docs/04-placement/` | **Environment:** `module-only`  
-**Author (Student 1):** Niteesh (`24BCS060`) | **Approver (Student 2):** Rohan (`24BCS135`)  
+**Pair ID:** 17A Frontend Web | **Author (Student 1):** Niteesh (`24BCS060`) | **Approver (Student 2):** Rohan (`24BCS135`)  
 **Approval Date:** 2026-11-16 | **Status:** APPROVED BY STUDENT 2
 
 ---
