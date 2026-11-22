@@ -2,8 +2,8 @@
 
 Student 1 (git author name): Nathan Dcunha
 Student 2 (git author name): Gajji Sai Pavan Kumar
-Design commit (hash and subject): feat(mms): freeze specification test designs for BR, WF, UC, and FR
-Baseline commit (hash and subject): test(mms): add specification test suites and baseline execution results
+Design commit (hash and subject): 2cfe205 test(mms): freeze specification test designs for BR, WF, UC, and FR
+Baseline commit (hash and subject): bee327a test(mms): add automated spec test suites and initial triage log
 Student 1's 10/10 commit the baseline ran on (hash): 4bec614
 
 ## Results
