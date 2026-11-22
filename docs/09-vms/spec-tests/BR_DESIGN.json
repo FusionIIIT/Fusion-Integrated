@@ -1,0 +1,47 @@
+[
+  {
+    "test_id": "TC_BR_01",
+    "source_id": "VMS-BR-051 condition-true: Blacklist registration rejection",
+    "purpose": "Ensure BlacklistRegistry rule immediately halts request creation on phone/ID match",
+    "preconditions": "Phone '+919999888877' listed as active blacklist item",
+    "action_or_input": "Invoke pre_register_visitor with phone '+919999888877'",
+    "expected_result": "Validation error raised, transaction rolled back, audit entry logged for blocked attempt",
+    "test_type": "business_rule_invariant"
+  },
+  {
+    "test_id": "TC_BR_02",
+    "source_id": "VMS-BR-190 condition-false: Temporal interval validation",
+    "purpose": "Verify rejection when scheduled_start_time is greater than or equal to scheduled_end_time",
+    "preconditions": "Valid host and visitor details provided",
+    "action_or_input": "Submit visit request where start is 2026-11-25 15:00 and end is 2026-11-25 13:00",
+    "expected_result": "Validation error or DB CheckConstraint failure; request rejected with 400 Bad Request",
+    "test_type": "business_rule_boundary"
+  },
+  {
+    "test_id": "TC_BR_03",
+    "source_id": "VMS-BR-191 condition-false: Gate zone authorization boundary",
+    "purpose": "Verify gate security check-in is refused if gate location is not in visitor permitted_zones",
+    "preconditions": "Pass is ACTIVE with permitted_zones=['CORE_LABS']; Gate is 'HOSTEL_GATE' (ZONE: HOSTELS)",
+    "action_or_input": "Guard at HOSTEL_GATE attempts gate validation and check-in",
+    "expected_result": "Validation verdict is DENIED with reason citing unauthorized zone; no check-in session recorded",
+    "test_type": "business_rule_boundary"
+  },
+  {
+    "test_id": "TC_BR_04",
+    "source_id": "VMS-BR-077 condition-false: Inactive pass credential denied",
+    "purpose": "Verify pass validation refuses entry when pass status is DEACTIVATED or EXPIRED",
+    "preconditions": "VisitorPass status set to DEACTIVATED by admin",
+    "action_or_input": "Guard scans pass credential at gate",
+    "expected_result": "Validation verdict is DENIED citing non-active pass status; entry refused",
+    "test_type": "business_rule_invariant"
+  },
+  {
+    "test_id": "TC_BR_05",
+    "source_id": "VMS-BR-105 condition-true: Departure logging audit compliance",
+    "purpose": "Verify checkout captures non-null check_out_time and check_out_guard_user_id",
+    "preconditions": "VisitSession has valid check_in_time and null check_out_time",
+    "action_or_input": "Execute check_out_visitor with guard_user_id=402 and gate='GATE_1'",
+    "expected_result": "VisitSession updated with non-null check_out_time and guard id; immutable audit event persisted",
+    "test_type": "business_rule_invariant"
+  }
+]

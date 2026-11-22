@@ -1,0 +1,20 @@
+[
+  {
+    "test_id": "TC_WF_01",
+    "source_id": "BW-VMS-01 STT R1-R4: Pre-registered Approved Visit Full Lifecycle",
+    "purpose": "Exercise full 4-step happy-path state progression from submission to completion",
+    "preconditions": "Clean test database, unblacklisted visitor and valid host",
+    "action_or_input": "Execute sequential lifecycle: (1) Submit pre-registration -> (2) Host approves -> (3) Guard checks in -> (4) Guard checks out",
+    "expected_result": "All transitions succeed sequentially: SUBMITTED -> APPROVED -> ACTIVE session -> COMPLETED session",
+    "test_type": "workflow_state_transition"
+  },
+  {
+    "test_id": "TC_WF_02",
+    "source_id": "BW-VMS-01 Guard: Out-of-order check-out before check-in rejected",
+    "purpose": "Verify out-of-order state transition attempting checkout without prior check-in fails",
+    "preconditions": "VisitRequest is APPROVED and VisitorPass is ACTIVE, but visitor has never checked in (no active session)",
+    "action_or_input": "Attempt check_out_visitor on pass",
+    "expected_result": "Refused with error indicating no active checked-in session found; pass state unaffected",
+    "test_type": "workflow_negative"
+  }
+]
