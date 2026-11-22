@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
-from drf_spectacular.utils import extend_schema
+import os
+from urllib.parse import quote
+
+from django.http import FileResponse
+from drf_spectacular.utils import OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import status
-from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from core.api.exceptions import BadRequestError, NotFoundError
+from core.files.validators import sanitise_filename
 from modules.lms import selectors, services
 from modules.lms.api.permissions import RequireLmsPermission
 from modules.lms.api.serializers import (
@@ -15,7 +20,8 @@ from modules.lms.api.serializers import (
     AssignmentSubmissionSerializer,
     CourseAnnouncementSerializer,
     CourseMaterialSerializer,
-    CourseWorkspaceSerializer,
+    CourseWorkspaceDetailSerializer,
+    CourseWorkspaceSummarySerializer,
     CourseWorkspaceUpdateSerializer,
     GradeChangeAuditSerializer,
     PublishGradesRequestSerializer,
@@ -26,71 +32,88 @@ from modules.lms.api.serializers import (
 
 class CourseWorkspaceListView(APIView):
     permission_classes = [RequireLmsPermission("lms.workspace.view")]
-    serializer_class = CourseWorkspaceSerializer
+    serializer_class = CourseWorkspaceSummarySerializer
 
     @extend_schema(
-        responses=CourseWorkspaceSerializer(many=True), operation_id="lms_workspace_list"
+        responses=CourseWorkspaceSummarySerializer(many=True),
+        operation_id="lms_workspace_list",
     )
     def get(self, request):
         courses = selectors.list_user_courses(request.principal)
-        return Response(courses)
+        return Response(CourseWorkspaceSummarySerializer(courses, many=True).data)
 
 
 class CourseWorkspaceDetailView(APIView):
-    serializer_class = CourseWorkspaceSerializer
+    serializer_class = CourseWorkspaceDetailSerializer
 
     def get_permissions(self):
         if self.request.method in ("PATCH", "PUT"):
             return [RequireLmsPermission("lms.workspace.update")()]
         return [RequireLmsPermission("lms.workspace.view")()]
 
-    @extend_schema(responses=CourseWorkspaceSerializer, operation_id="lms_workspace_detail")
+    @extend_schema(
+        responses=CourseWorkspaceDetailSerializer,
+        operation_id="lms_workspace_detail",
+    )
     def get(self, request, course_id: int):
         details = selectors.get_course_home_details(course_id, request.principal)
         if details is None:
-            raise NotFound("Course workspace not found or access denied.")
-        return Response(details)
+            raise NotFoundError("Course workspace not found or access denied.")
+        return Response(CourseWorkspaceDetailSerializer(details).data)
 
     @extend_schema(
         request=CourseWorkspaceUpdateSerializer,
-        responses=CourseWorkspaceSerializer,
+        responses=CourseWorkspaceDetailSerializer,
         operation_id="lms_workspace_update",
     )
     def patch(self, request, course_id: int):
         serializer = CourseWorkspaceUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
-            workspace = services.update_course_details(
+            services.update_course_details(
                 course_id=course_id,
                 syllabus=serializer.validated_data.get("syllabus", ""),
                 schedule_info=serializer.validated_data.get("schedule_info", ""),
                 principal=request.principal,
             )
         except ValueError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(CourseWorkspaceSerializer(workspace).data)
+            raise BadRequestError(str(e)) from e
+        details = selectors.get_course_home_details(course_id, request.principal)
+        if details is None:
+            raise NotFoundError("Course workspace not found or access denied.")
+        return Response(CourseWorkspaceDetailSerializer(details).data)
 
 
 class CourseMaterialListCreateView(APIView):
     serializer_class = CourseMaterialSerializer
+    throttle_scope = "upload"
+
+    def get_throttles(self):
+        if self.request.method == "POST":
+            return super().get_throttles()
+        return []
 
     def get_permissions(self):
         if self.request.method == "POST":
-            # Creating scheduled or published material requires material.create and material.publish
             return [
                 RequireLmsPermission("lms.material.create")(),
                 RequireLmsPermission("lms.material.publish")(),
             ]
         return [RequireLmsPermission("lms.material.view")()]
 
-    @extend_schema(responses=CourseMaterialSerializer(many=True), operation_id="lms_material_list")
+    @extend_schema(
+        responses=CourseMaterialSerializer(many=True),
+        operation_id="lms_material_list",
+    )
     def get(self, request):
         course_id = request.query_params.get("course_id")
         if not course_id:
-            return Response(
-                {"error": "course_id query param is required."}, status=status.HTTP_400_BAD_REQUEST
-            )
-        materials = selectors.list_published_materials(int(course_id), request.principal)
+            raise BadRequestError("course_id query param is required.")
+        try:
+            c_id = int(course_id)
+        except (ValueError, TypeError) as e:
+            raise BadRequestError("course_id must be an integer.") from e
+        materials = selectors.list_published_materials(c_id, request.principal)
         return Response(CourseMaterialSerializer(materials, many=True).data)
 
     @extend_schema(
@@ -115,8 +138,8 @@ class CourseMaterialListCreateView(APIView):
                 release_date=serializer.validated_data.get("release_date"),
                 principal=request.principal,
             )
-        except (ValueError, ValidationError) as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            raise BadRequestError(str(e)) from e
         return Response(CourseMaterialSerializer(material).data, status=status.HTTP_201_CREATED)
 
 
@@ -134,7 +157,7 @@ class CourseMaterialDetailView(APIView):
     def get(self, request, material_id: int):
         material = selectors.get_material_detail(material_id, request.principal)
         if not material:
-            raise NotFound("Material not found or access denied.")
+            raise NotFoundError("Material not found or access denied.")
         return Response(CourseMaterialSerializer(material).data)
 
     @extend_schema(
@@ -147,7 +170,7 @@ class CourseMaterialDetailView(APIView):
         serializer.is_valid(raise_exception=True)
         material = selectors.get_material_detail(material_id, request.principal)
         if not material:
-            raise NotFound("Material not found.")
+            raise NotFoundError("Material not found or access denied.")
         for field, value in serializer.validated_data.items():
             setattr(material, field, value)
         material.save()
@@ -159,6 +182,35 @@ class CourseMaterialDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class CourseMaterialDownloadView(APIView):
+    permission_classes = [RequireLmsPermission("lms.material.view")]
+
+    @extend_schema(
+        responses={
+            (200, "application/octet-stream"): OpenApiTypes.BINARY,
+            404: OpenApiResponse(description="Material file not found or access denied."),
+        },
+        operation_id="lms_material_download",
+    )
+    def get(self, request, material_id: int):
+        material = selectors.get_material_detail(material_id, request.principal)
+        if not material or not material.file_attachment:
+            raise NotFoundError("Material file not found or access denied.")
+        try:
+            raw_name = os.path.basename(material.file_attachment.name)
+            filename = sanitise_filename(raw_name, fallback="material_download")
+            file_handle = material.file_attachment.open("rb")
+        except (OSError, ValueError) as e:
+            raise NotFoundError("Material file could not be read.") from e
+
+        disposition = f'attachment; filename="{filename}"; filename*=UTF-8\'\'{quote(filename)}'
+        response = FileResponse(file_handle, content_type="application/octet-stream")
+        response["Content-Disposition"] = disposition
+        response["X-Content-Type-Options"] = "nosniff"
+        response["Cache-Control"] = "private, no-store"
+        return response
+
+
 class CourseAnnouncementListCreateView(APIView):
     serializer_class = CourseAnnouncementSerializer
 
@@ -168,15 +220,18 @@ class CourseAnnouncementListCreateView(APIView):
         return [RequireLmsPermission("lms.announcement.view")()]
 
     @extend_schema(
-        responses=CourseAnnouncementSerializer(many=True), operation_id="lms_announcement_list"
+        responses=CourseAnnouncementSerializer(many=True),
+        operation_id="lms_announcement_list",
     )
     def get(self, request):
         course_id = request.query_params.get("course_id")
         if not course_id:
-            return Response(
-                {"error": "course_id query param is required."}, status=status.HTTP_400_BAD_REQUEST
-            )
-        announcements = selectors.list_announcements(int(course_id), request.principal)
+            raise BadRequestError("course_id query param is required.")
+        try:
+            c_id = int(course_id)
+        except (ValueError, TypeError) as e:
+            raise BadRequestError("course_id must be an integer.") from e
+        announcements = selectors.list_announcements(c_id, request.principal)
         return Response(CourseAnnouncementSerializer(announcements, many=True).data)
 
     @extend_schema(
@@ -189,10 +244,7 @@ class CourseAnnouncementListCreateView(APIView):
         title = request.data.get("title")
         content = request.data.get("content")
         if not course_id or not title or not content:
-            return Response(
-                {"detail": "course_id, title, and content are required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise BadRequestError("course_id, title, and content are required.")
         try:
             announcement = services.post_announcement(
                 course_id=int(course_id),
@@ -200,10 +252,11 @@ class CourseAnnouncementListCreateView(APIView):
                 content=content,
                 principal=request.principal,
             )
-        except (ValueError, ValidationError) as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            raise BadRequestError(str(e)) from e
         return Response(
-            CourseAnnouncementSerializer(announcement).data, status=status.HTTP_201_CREATED
+            CourseAnnouncementSerializer(announcement).data,
+            status=status.HTTP_201_CREATED,
         )
 
 
@@ -225,7 +278,7 @@ class CourseAnnouncementDetailView(APIView):
 
         ann = CourseAnnouncement.objects.filter(id=announcement_id).first()
         if not ann:
-            raise NotFound("Announcement not found.")
+            raise NotFoundError("Announcement not found.")
         title = request.data.get("title", ann.title)
         content = request.data.get("content", ann.content)
         ann.title = title
@@ -251,10 +304,12 @@ class AssignmentListCreateView(APIView):
     def get(self, request):
         course_id = request.query_params.get("course_id")
         if not course_id:
-            return Response(
-                {"error": "course_id query param is required."}, status=status.HTTP_400_BAD_REQUEST
-            )
-        assignments = selectors.list_assignments(int(course_id), request.principal)
+            raise BadRequestError("course_id query param is required.")
+        try:
+            c_id = int(course_id)
+        except (ValueError, TypeError) as e:
+            raise BadRequestError("course_id must be an integer.") from e
+        assignments = selectors.list_assignments(c_id, request.principal)
         return Response(AssignmentSerializer(assignments, many=True).data)
 
     @extend_schema(
@@ -276,8 +331,8 @@ class AssignmentListCreateView(APIView):
                 release_date=serializer.validated_data.get("release_date"),
                 principal=request.principal,
             )
-        except (ValueError, ValidationError) as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            raise BadRequestError(str(e)) from e
         return Response(AssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED)
 
 
@@ -295,7 +350,7 @@ class AssignmentDetailView(APIView):
     def get(self, request, assignment_id: int):
         assignment = selectors.get_assignment_detail(assignment_id, request.principal)
         if not assignment:
-            raise NotFound("Assignment not found or unreleased.")
+            raise NotFoundError("Assignment not found or unreleased.")
         return Response(AssignmentSerializer(assignment).data)
 
     @extend_schema(
@@ -308,7 +363,7 @@ class AssignmentDetailView(APIView):
         serializer.is_valid(raise_exception=True)
         assignment = selectors.get_assignment_detail(assignment_id, request.principal)
         if not assignment:
-            raise NotFound("Assignment not found.")
+            raise NotFoundError("Assignment not found.")
         try:
             updated = services.update_assignment(
                 assignment_id=assignment_id,
@@ -324,8 +379,8 @@ class AssignmentDetailView(APIView):
                 release_date=serializer.validated_data.get("release_date", assignment.release_date),
                 principal=request.principal,
             )
-        except (ValueError, ValidationError) as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            raise BadRequestError(str(e)) from e
         return Response(AssignmentSerializer(updated).data)
 
     @extend_schema(responses={204: None}, operation_id="lms_assignment_delete")
@@ -347,13 +402,19 @@ class AssignmentPublishView(APIView):
                 release_date=release_date,
                 principal=request.principal,
             )
-        except (ValueError, ValidationError) as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            raise BadRequestError(str(e)) from e
         return Response(AssignmentSerializer(assignment).data)
 
 
 class SubmissionListCreateView(APIView):
     serializer_class = AssignmentSubmissionSerializer
+    throttle_scope = "lms_submission"
+
+    def get_throttles(self):
+        if self.request.method == "POST":
+            return super().get_throttles()
+        return []
 
     def get_permissions(self):
         if self.request.method == "POST":
@@ -361,7 +422,8 @@ class SubmissionListCreateView(APIView):
         return [RequireLmsPermission("lms.submission.view")()]
 
     @extend_schema(
-        responses=AssignmentSubmissionSerializer(many=True), operation_id="lms_submission_list"
+        responses=AssignmentSubmissionSerializer(many=True),
+        operation_id="lms_submission_list",
     )
     def get(self, request, assignment_id: int):
         submissions = selectors.list_course_submissions(assignment_id, request.principal)
@@ -386,10 +448,11 @@ class SubmissionListCreateView(APIView):
                 file_attachment=file_attachment,
                 principal=request.principal,
             )
-        except (ValueError, ValidationError) as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            raise BadRequestError(str(e)) from e
         return Response(
-            AssignmentSubmissionSerializer(submission).data, status=status.HTTP_201_CREATED
+            AssignmentSubmissionSerializer(submission).data,
+            status=status.HTTP_201_CREATED,
         )
 
 
@@ -397,16 +460,54 @@ class SubmissionDetailView(APIView):
     permission_classes = [RequireLmsPermission("lms.submission.view")]
     serializer_class = AssignmentSubmissionSerializer
 
-    @extend_schema(responses=AssignmentSubmissionSerializer, operation_id="lms_submission_retrieve")
+    @extend_schema(
+        responses=AssignmentSubmissionSerializer,
+        operation_id="lms_submission_retrieve",
+    )
     def get(self, request, submission_id: int):
         submission = selectors.get_submission_by_id(submission_id, request.principal)
         if not submission:
-            raise NotFound("Submission not found or access denied.")
+            raise NotFoundError("Submission not found or access denied.")
         return Response(AssignmentSubmissionSerializer(submission).data)
+
+
+class AssignmentSubmissionDownloadView(APIView):
+    permission_classes = [RequireLmsPermission("lms.submission.view")]
+
+    @extend_schema(
+        responses={
+            (200, "application/octet-stream"): OpenApiTypes.BINARY,
+            404: OpenApiResponse(description="Submission file not found or access denied."),
+        },
+        operation_id="lms_submission_download",
+    )
+    def get(self, request, submission_id: int):
+        submission = selectors.get_submission_by_id(submission_id, request.principal)
+        if not submission or not submission.file_attachment:
+            raise NotFoundError("Submission file not found or access denied.")
+        try:
+            raw_name = os.path.basename(submission.file_attachment.name)
+            filename = sanitise_filename(raw_name, fallback="submission_download")
+            file_handle = submission.file_attachment.open("rb")
+        except (OSError, ValueError) as e:
+            raise NotFoundError("Submission file could not be read.") from e
+
+        disposition = f'attachment; filename="{filename}"; filename*=UTF-8\'\'{quote(filename)}'
+        response = FileResponse(file_handle, content_type="application/octet-stream")
+        response["Content-Disposition"] = disposition
+        response["X-Content-Type-Options"] = "nosniff"
+        response["Cache-Control"] = "private, no-store"
+        return response
 
 
 class GradeSubmissionView(APIView):
     serializer_class = SubmissionGradeSerializer
+    throttle_scope = "lms_grade"
+
+    def get_throttles(self):
+        if self.request.method in ("POST", "PUT", "PATCH"):
+            return super().get_throttles()
+        return []
 
     def get_permissions(self):
         if self.request.method == "POST":
@@ -425,7 +526,7 @@ class GradeSubmissionView(APIView):
     def get(self, request, submission_id: int):
         grade = selectors.get_submission_grade(submission_id, request.principal)
         if not grade:
-            raise NotFound("Grade not found or unreleased.")
+            raise NotFoundError("Grade not found or unreleased.")
         return Response(SubmissionGradeSerializer(grade).data)
 
     @extend_schema(
@@ -437,9 +538,7 @@ class GradeSubmissionView(APIView):
         points = request.data.get("points_awarded")
         feedback = request.data.get("feedback_text", "")
         if points is None:
-            return Response(
-                {"detail": "points_awarded is required."}, status=status.HTTP_400_BAD_REQUEST
-            )
+            raise BadRequestError("points_awarded is required.")
         try:
             grade = services.grade_submission(
                 submission_id=submission_id,
@@ -447,8 +546,8 @@ class GradeSubmissionView(APIView):
                 feedback_text=feedback,
                 principal=request.principal,
             )
-        except (ValueError, ValidationError) as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            raise BadRequestError(str(e)) from e
         return Response(SubmissionGradeSerializer(grade).data)
 
     @extend_schema(
@@ -461,9 +560,7 @@ class GradeSubmissionView(APIView):
         feedback = request.data.get("feedback_text", "")
         reason = request.data.get("reason", "")
         if points is None:
-            return Response(
-                {"detail": "points_awarded is required."}, status=status.HTTP_400_BAD_REQUEST
-            )
+            raise BadRequestError("points_awarded is required.")
         try:
             grade = services.update_grade(
                 submission_id=submission_id,
@@ -472,8 +569,8 @@ class GradeSubmissionView(APIView):
                 reason=reason,
                 principal=request.principal,
             )
-        except (ValueError, ValidationError) as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            raise BadRequestError(str(e)) from e
         return Response(SubmissionGradeSerializer(grade).data)
 
 
@@ -494,8 +591,8 @@ class PublishGradesView(APIView):
                 submission_ids=submission_ids,
                 principal=request.principal,
             )
-        except (ValueError, ValidationError) as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            raise BadRequestError(str(e)) from e
         return Response({"published_count": count})
 
 
@@ -504,7 +601,8 @@ class AssignmentGradesListView(APIView):
     serializer_class = SubmissionGradeSerializer
 
     @extend_schema(
-        responses=SubmissionGradeSerializer(many=True), operation_id="lms_assignment_grades_list"
+        responses=SubmissionGradeSerializer(many=True),
+        operation_id="lms_assignment_grades_list",
     )
     def get(self, request, assignment_id: int):
         grades = selectors.list_course_grades(assignment_id, request.principal)
@@ -515,11 +613,14 @@ class SubmissionGradeDetailView(APIView):
     permission_classes = [RequireLmsPermission("lms.grade.view")]
     serializer_class = SubmissionGradeSerializer
 
-    @extend_schema(responses=SubmissionGradeSerializer, operation_id="lms_submission_grade_detail")
+    @extend_schema(
+        responses=SubmissionGradeSerializer,
+        operation_id="lms_submission_grade_detail",
+    )
     def get(self, request, submission_id: int):
         grade = selectors.get_submission_grade(submission_id, request.principal)
         if not grade:
-            raise NotFound("Grade not found or unreleased.")
+            raise NotFoundError("Grade not found or unreleased.")
         return Response(SubmissionGradeSerializer(grade).data)
 
 
@@ -528,7 +629,8 @@ class GradeAuditHistoryView(APIView):
     serializer_class = GradeChangeAuditSerializer
 
     @extend_schema(
-        responses=GradeChangeAuditSerializer(many=True), operation_id="lms_grade_audit_history"
+        responses=GradeChangeAuditSerializer(many=True),
+        operation_id="lms_grade_audit_history",
     )
     def get(self, request, submission_id: int):
         audits = selectors.get_grade_audit_history(submission_id, request.principal)

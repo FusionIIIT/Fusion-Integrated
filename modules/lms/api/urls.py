@@ -7,9 +7,11 @@ from modules.lms.api.views import (
     AssignmentGradesListView,
     AssignmentListCreateView,
     AssignmentPublishView,
+    AssignmentSubmissionDownloadView,
     CourseAnnouncementDetailView,
     CourseAnnouncementListCreateView,
     CourseMaterialDetailView,
+    CourseMaterialDownloadView,
     CourseMaterialListCreateView,
     CourseWorkspaceDetailView,
     CourseWorkspaceListView,
@@ -28,10 +30,21 @@ urlpatterns = [
     # Materials
     path("materials/", CourseMaterialListCreateView.as_view(), name="material-list"),
     path(
-        "materials/<int:material_id>/", CourseMaterialDetailView.as_view(), name="material-detail"
+        "materials/<int:material_id>/",
+        CourseMaterialDetailView.as_view(),
+        name="material-detail",
+    ),
+    path(
+        "materials/<int:material_id>/download/",
+        CourseMaterialDownloadView.as_view(),
+        name="material-download",
     ),
     # Announcements
-    path("announcements/", CourseAnnouncementListCreateView.as_view(), name="announcement-list"),
+    path(
+        "announcements/",
+        CourseAnnouncementListCreateView.as_view(),
+        name="announcement-list",
+    ),
     path(
         "announcements/<int:announcement_id>/",
         CourseAnnouncementDetailView.as_view(),
@@ -40,7 +53,9 @@ urlpatterns = [
     # Assignments
     path("assignments/", AssignmentListCreateView.as_view(), name="assignment-list"),
     path(
-        "assignments/<int:assignment_id>/", AssignmentDetailView.as_view(), name="assignment-detail"
+        "assignments/<int:assignment_id>/",
+        AssignmentDetailView.as_view(),
+        name="assignment-detail",
     ),
     path(
         "assignments/<int:assignment_id>/publish/",
@@ -64,7 +79,14 @@ urlpatterns = [
     ),
     # Submissions & Grading
     path(
-        "submissions/<int:submission_id>/", SubmissionDetailView.as_view(), name="submission-detail"
+        "submissions/<int:submission_id>/",
+        SubmissionDetailView.as_view(),
+        name="submission-detail",
+    ),
+    path(
+        "submissions/<int:submission_id>/download/",
+        AssignmentSubmissionDownloadView.as_view(),
+        name="submission-download",
     ),
     path(
         "submissions/<int:submission_id>/grade/",

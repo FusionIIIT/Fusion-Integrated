@@ -44,7 +44,6 @@ def has_course_access(course_id: int, principal: Any) -> bool:
         status=MembershipStatus.ACTIVE,
     ).exists()
 
-
 def is_course_instructor(course_id: int, principal: Any) -> bool:
     user_id = getattr(principal, "user_id", None) or getattr(principal, "erp_user_id", None)
     if user_id is None:
@@ -55,7 +54,6 @@ def is_course_instructor(course_id: int, principal: Any) -> bool:
         role=CourseRole.INSTRUCTOR,
         status=MembershipStatus.ACTIVE,
     ).exists()
-
 
 def is_course_ta(course_id: int, principal: Any) -> bool:
     user_id = getattr(principal, "user_id", None) or getattr(principal, "erp_user_id", None)
@@ -68,7 +66,6 @@ def is_course_ta(course_id: int, principal: Any) -> bool:
         status=MembershipStatus.ACTIVE,
     ).exists()
 
-
 def is_course_observer(course_id: int, principal: Any) -> bool:
     user_id = getattr(principal, "user_id", None) or getattr(principal, "erp_user_id", None)
     if user_id is None:
@@ -77,5 +74,18 @@ def is_course_observer(course_id: int, principal: Any) -> bool:
         course_id=course_id,
         user_id=user_id,
         role=CourseRole.OBSERVER,
+        status=MembershipStatus.ACTIVE,
+    ).exists()
+
+
+def is_student_enrolled(course_id: int, principal: Any) -> bool:
+    """BR-LMS-002: Student registration data governs Student course access."""
+    user_id = getattr(principal, "user_id", None) or getattr(principal, "erp_user_id", None)
+    if user_id is None:
+        return False
+    return CourseMembership.objects.filter(
+        course_id=course_id,
+        user_id=user_id,
+        role=CourseRole.STUDENT,
         status=MembershipStatus.ACTIVE,
     ).exists()

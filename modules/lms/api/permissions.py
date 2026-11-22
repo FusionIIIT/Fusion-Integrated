@@ -12,14 +12,16 @@ class HasLmsPermission(BasePermission):
         principal = getattr(request, "principal", None)
         if principal is None:
             return False
+        if "lms" not in getattr(principal, "modules", ()):
+            return False
         if not self.code:
             return True
         return principal.has_permission(self.code)
 
 
-def RequireLmsPermission(code: str):  # noqa: N802
-    return type(
-        f"RequireLmsPermission_{code.replace('.', '_')}",
-        (HasLmsPermission,),
-        {"code": code},
-    )
+class RequireLmsPermission(HasLmsPermission):
+    def __init__(self, code: str = ""):
+        self.code = code
+
+    def __call__(self):
+        return self

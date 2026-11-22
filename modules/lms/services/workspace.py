@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from django.core.exceptions import PermissionDenied
 from django.db import transaction
 
+from core.api.exceptions import PermissionDeniedError
 from modules.lms.domain.constants import CourseRole
 from modules.lms.models import CourseMembership, CourseWorkspace
 from modules.lms.selectors.scoping import is_course_instructor
@@ -20,15 +20,19 @@ def update_course_details(
 ) -> CourseWorkspace:
     """Updates syllabus and schedule info for an assigned course workspace (CFR-LMS-002)."""
     if not is_course_instructor(course_id, principal):
-        raise PermissionDenied("Only assigned instructors may update course details.")
+        raise PermissionDeniedError("Only assigned course instructors may update course details.")
 
-    workspace, _ = CourseWorkspace.objects.get_or_create(
-        course_id=course_id,
-        defaults={"course_code": f"C-{course_id}", "title": f"Course {course_id}"},
-    )
-    workspace.syllabus = syllabus
-    workspace.schedule_info = schedule_info
-    workspace.save(update_fields=["syllabus", "schedule_info", "updated_at"])
+    with transaction.atomic():
+        workspace = CourseWorkspace.objects.select_for_update().filter(course_id=course_id).first()
+        if not workspace:
+            workspace = CourseWorkspace.objects.create(
+                course_id=course_id,
+                course_code=f"C-{course_id}",
+                title=f"Course {course_id}",
+            )
+        workspace.syllabus = syllabus
+        workspace.schedule_info = schedule_info
+        workspace.save(update_fields=["syllabus", "schedule_info", "updated_at"])
     return workspace
 
 
@@ -41,7 +45,7 @@ def configure_membership(
 ) -> CourseMembership:
     """Provisions or updates a course membership entry."""
     with transaction.atomic():
-        membership, _ = CourseMembership.objects.update_or_create(
+        membership, _ = CourseMembership.objects.select_for_update().update_or_create(
             course_id=course_id,
             user_id=user_id,
             role=role,

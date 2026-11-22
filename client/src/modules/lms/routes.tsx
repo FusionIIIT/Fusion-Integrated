@@ -18,10 +18,10 @@ function guarded(permission: string, page: ReactNode) {
 
 export const routes: RouteObject[] = [
   { index: true, element: <Navigate to="courses" replace /> },
-  { path: "courses", element: <CoursesPage /> },
-  { path: "materials", element: <MaterialsPage /> },
-  { path: "announcements", element: <AnnouncementsPage /> },
-  { path: "assignments", element: <AssignmentsPage /> },
-  { path: "grades", element: <MyGradesPage /> },
+  { path: "courses", element: guarded("lms.workspace.view", <CoursesPage />) },
+  { path: "materials", element: guarded("lms.material.view", <MaterialsPage />) },
+  { path: "announcements", element: guarded("lms.announcement.view", <AnnouncementsPage />) },
+  { path: "assignments", element: guarded("lms.assignment.view", <AssignmentsPage />) },
+  { path: "grades", element: guarded("lms.grade.view", <MyGradesPage />) },
   { path: "grading", element: guarded("lms.submission.review", <GradingPage />) },
 ];

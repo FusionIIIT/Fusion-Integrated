@@ -309,3 +309,108 @@ def test_validate_grade_points():
     # Points exceeding maximum
     with pytest.raises(validators.DomainValidationError, match="cannot exceed points possible"):
         validators.validate_grade_points(points_awarded=105, points_possible=100)
+
+
+def test_rules_role_authorities_and_release_date():
+    from modules.lms.domain.constants import CourseRole
+
+    now = datetime.now(UTC)
+    future = now + timedelta(days=2)
+    past = now - timedelta(days=2)
+
+    # validate_release_date
+    assert rules.validate_release_date(None, now) is True
+    assert rules.validate_release_date(future, now) is True
+    assert rules.validate_release_date(past, now) is False
+
+    # can_update_course_details
+    assert rules.can_update_course_details(CourseRole.INSTRUCTOR) is True
+    assert rules.can_update_course_details(CourseRole.TA) is False
+    assert rules.can_update_course_details(CourseRole.STUDENT) is False
+
+    # can_post_announcement
+    assert rules.can_post_announcement(CourseRole.INSTRUCTOR) is True
+    assert rules.can_post_announcement(CourseRole.TA, can_post_flag=True) is True
+    assert rules.can_post_announcement(CourseRole.TA, can_post_flag=False) is False
+    assert rules.can_post_announcement(CourseRole.STUDENT) is False
+
+    # can_author_assignment
+    assert rules.can_author_assignment(CourseRole.INSTRUCTOR) is True
+    assert rules.can_author_assignment(CourseRole.TA) is False
+    assert rules.can_author_assignment(CourseRole.STUDENT) is False
+
+    # can_author_material
+    assert rules.can_author_material(CourseRole.INSTRUCTOR) is True
+    assert rules.can_author_material(CourseRole.TA) is False
+    assert rules.can_author_material(CourseRole.STUDENT) is False
+
+    # can_manage_workspace
+    assert rules.can_manage_workspace(CourseRole.INSTRUCTOR) is True
+    assert rules.can_manage_workspace(CourseRole.TA) is False
+    assert rules.can_manage_workspace(CourseRole.STUDENT) is False
+
+    # can_grade_submission
+    assert rules.can_grade_submission(CourseRole.INSTRUCTOR) is True
+    assert rules.can_grade_submission(CourseRole.TA, can_grade_flag=True) is True
+    assert rules.can_grade_submission(CourseRole.TA, can_grade_flag=False) is False
+    assert rules.can_grade_submission(CourseRole.STUDENT) is False
+
+    # can_release_grades
+    assert rules.can_release_grades(CourseRole.INSTRUCTOR) is True
+    assert rules.can_release_grades(CourseRole.TA) is False
+    assert rules.can_release_grades(CourseRole.STUDENT) is False
+
+
+def test_state_machine_transition_resolvers():
+    # Valid transitions
+    t_mat = sm.resolve_material_transition(MaterialStatus.DRAFT, MaterialStatus.PUBLISHED, "INSTRUCTOR")
+    assert t_mat.frm == MaterialStatus.DRAFT
+
+    t_asg = sm.resolve_assignment_transition(AssignmentStatus.DRAFT, AssignmentStatus.PUBLISHED, "INSTRUCTOR")
+    assert t_asg.frm == AssignmentStatus.DRAFT
+
+    t_grd = sm.resolve_grade_transition(GradeStatus.DRAFT, GradeStatus.PUBLISHED, "INSTRUCTOR")
+    assert t_grd.frm == GradeStatus.DRAFT
+
+    # Invalid state transition
+    with pytest.raises(sm.IllegalTransitionError):
+        sm.resolve_material_transition(MaterialStatus.ARCHIVED, MaterialStatus.DRAFT)
+
+    with pytest.raises(sm.IllegalTransitionError):
+        sm.resolve_assignment_transition(AssignmentStatus.ARCHIVED, AssignmentStatus.DRAFT)
+
+    with pytest.raises(sm.IllegalTransitionError):
+        sm.resolve_grade_transition(GradeStatus.PUBLISHED, GradeStatus.DRAFT)
+
+    # Actor not allowed
+    with pytest.raises(sm.ActorNotAllowedError):
+        sm.resolve_material_transition(MaterialStatus.DRAFT, MaterialStatus.PUBLISHED, "STUDENT")
+
+    with pytest.raises(sm.ActorNotAllowedError):
+        sm.resolve_assignment_transition(AssignmentStatus.DRAFT, AssignmentStatus.PUBLISHED, "TA")
+
+    with pytest.raises(sm.ActorNotAllowedError):
+        sm.resolve_grade_transition(GradeStatus.DRAFT, GradeStatus.PUBLISHED, "TA")
+
+
+def test_validator_instructions_and_type_failures():
+    now = datetime.now(UTC)
+    with pytest.raises(validators.DomainValidationError, match="instructions cannot be empty"):
+        validators.validate_assignment_config(
+            title="Valid Title",
+            instructions="",
+            points_possible=100,
+            submission_type=SubmissionType.FILE,
+            due_date=now + timedelta(days=5),
+            release_date=None,
+        )
+
+    with pytest.raises(validators.DomainValidationError, match="Invalid submission type"):
+        validators.validate_assignment_config(
+            title="Valid Title",
+            instructions="Valid instructions",
+            points_possible=100,
+            submission_type="UNKNOWN_TYPE",
+            due_date=now + timedelta(days=5),
+            release_date=None,
+        )

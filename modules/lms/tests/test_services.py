@@ -4,10 +4,10 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
-from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 
 from conftest import make_principal
+from core.api.exceptions import DomainError, PermissionDeniedError
 from modules.lms import services
 from modules.lms.domain.constants import (
     AssignmentStatus,
@@ -98,7 +98,7 @@ def test_workspace_service(base_course):
     assert updated.syllabus == "Updated Syllabus: Flows, Approximation"
 
     # Student cannot update details
-    with pytest.raises(PermissionDenied):
+    with pytest.raises(PermissionDeniedError):
         services.update_course_details(
             course_id=301,
             syllabus="Hacked Syllabus",
@@ -146,7 +146,7 @@ def test_materials_service(base_course):
     assert mat2.status == MaterialStatus.SCHEDULED
 
     # Non-instructor cannot create material
-    with pytest.raises(PermissionDenied):
+    with pytest.raises(PermissionDeniedError):
         services.create_material(
             course_id=301,
             title="Unauthorized",
@@ -192,7 +192,7 @@ def test_announcements_service_ta_authorization(base_course):
     assert ann2.author_role == CourseRole.TA
 
     # TA with can_post_announcement=False raises PermissionDenied
-    with pytest.raises(PermissionDenied, match="permission to post announcements"):
+    with pytest.raises(PermissionDeniedError, match="permission to post announcements"):
         services.post_announcement(
             course_id=301,
             title="TA Unauthorized",
@@ -201,7 +201,7 @@ def test_announcements_service_ta_authorization(base_course):
         )
 
     # Student raises PermissionDenied
-    with pytest.raises(PermissionDenied):
+    with pytest.raises(PermissionDeniedError):
         services.post_announcement(
             course_id=301,
             title="Student Announcement",
@@ -249,7 +249,7 @@ def test_assignments_and_submissions_workflow(base_course):
     assert sub.student_id == 5001
 
     # 4. Student attempting submission of wrong type raises ValueError (BR-LMS-012)
-    with pytest.raises(ValueError, match="must match assignment configuration"):
+    with pytest.raises((ValueError, DomainError), match="must match assignment configuration"):
         services.submit_assignment(
             assignment_id=ass.id,
             submission_type=SubmissionType.FILE,
@@ -270,7 +270,7 @@ def test_assignments_and_submissions_workflow(base_course):
         status=AssignmentStatus.PUBLISHED,
         created_by=4001,
     )
-    with pytest.raises(ValueError, match="deadline has passed"):
+    with pytest.raises((ValueError, DomainError), match="deadline has passed"):
         services.submit_assignment(
             assignment_id=past_ass.id,
             submission_type=SubmissionType.TEXT,
@@ -305,7 +305,7 @@ def test_grading_audit_and_release_workflow(base_course):
     )
 
     # 1. TA without grading authority cannot grade
-    with pytest.raises(PermissionDenied, match="grading authority"):
+    with pytest.raises(PermissionDeniedError, match="grading authority"):
         services.grade_submission(
             submission_id=sub.id,
             points_awarded=80,
@@ -334,7 +334,7 @@ def test_grading_audit_and_release_workflow(base_course):
     assert not GradeChangeAudit.objects.filter(submission_id=sub.id).exists()
 
     # 4. TA attempts to publish grades -> FAILS (Faculty only BR-LMS-017)
-    with pytest.raises(PermissionDenied, match="Only assigned instructors"):
+    with pytest.raises(PermissionDeniedError, match="Only assigned instructors"):
         services.publish_grades(
             assignment_id=ass.id,
             submission_ids=[sub.id],

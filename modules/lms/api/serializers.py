@@ -15,6 +15,25 @@ from modules.lms.models import (
 )
 
 
+class CourseWorkspaceSummarySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    course_id = serializers.IntegerField()
+    course_code = serializers.CharField()
+    title = serializers.CharField()
+    role = serializers.CharField()
+
+
+class CourseWorkspaceDetailSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    course_id = serializers.IntegerField()
+    course_code = serializers.CharField()
+    title = serializers.CharField()
+    syllabus = serializers.CharField(allow_blank=True, default="")
+    schedule_info = serializers.CharField(allow_blank=True, default="")
+    instructors = serializers.ListField(child=serializers.IntegerField(), default=list)
+    teaching_assistants = serializers.ListField(child=serializers.IntegerField(), default=list)
+
+
 class CourseWorkspaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseWorkspace

@@ -408,7 +408,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CourseWorkspace'
+                  $ref: '#/components/schemas/CourseWorkspaceSummary'
           description: ''
   /api/v1/lms/courses/{course_id}/:
     get:
@@ -428,7 +428,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseWorkspace'
+                $ref: '#/components/schemas/CourseWorkspaceDetail'
           description: ''
     patch:
       operationId: lms_workspace_update
@@ -458,7 +458,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseWorkspace'
+                $ref: '#/components/schemas/CourseWorkspaceDetail'
           description: ''
   /api/v1/lms/materials/:
     get:
@@ -566,6 +566,29 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/lms/materials/{material_id}/download/:
+    get:
+      operationId: lms_material_download
+      parameters:
+      - in: path
+        name: material_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
+        '404':
+          description: Material file not found or access denied.
   /api/v1/lms/submissions/{submission_id}/:
     get:
       operationId: lms_submission_retrieve
@@ -586,6 +609,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/AssignmentSubmission'
           description: ''
+  /api/v1/lms/submissions/{submission_id}/download/:
+    get:
+      operationId: lms_submission_download
+      parameters:
+      - in: path
+        name: submission_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
+        '404':
+          description: Submission file not found or access denied.
   /api/v1/lms/submissions/{submission_id}/grade/:
     get:
       operationId: lms_grade_retrieve
@@ -2729,6 +2775,7 @@ components:
         attempt_number:
           type: integer
           readOnly: true
+          default: 1
         status:
           allOf:
           - $ref: '#/components/schemas/AssignmentSubmissionStatusEnum'
@@ -3185,40 +3232,55 @@ components:
         * `SCHEDULED` - SCHEDULED
         * `PUBLISHED` - PUBLISHED
         * `ARCHIVED` - ARCHIVED
-    CourseWorkspace:
+    CourseWorkspaceDetail:
       type: object
       properties:
         id:
           type: integer
-          readOnly: true
         course_id:
           type: integer
-          readOnly: true
         course_code:
           type: string
-          readOnly: true
         title:
           type: string
-          readOnly: true
         syllabus:
           type: string
+          default: ''
         schedule_info:
           type: string
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
+          default: ''
+        instructors:
+          type: array
+          items:
+            type: integer
+        teaching_assistants:
+          type: array
+          items:
+            type: integer
       required:
       - course_code
       - course_id
-      - created_at
       - id
       - title
-      - updated_at
+    CourseWorkspaceSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        course_id:
+          type: integer
+        course_code:
+          type: string
+        title:
+          type: string
+        role:
+          type: string
+      required:
+      - course_code
+      - course_id
+      - id
+      - role
+      - title
     Detail:
       type: object
       properties:

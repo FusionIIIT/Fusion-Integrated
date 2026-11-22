@@ -34,6 +34,12 @@ class AssignmentSubmission(models.Model):
         indexes = [
             models.Index(fields=["assignment", "student_id", "submitted_at"]),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["assignment", "student_id", "attempt_number"],
+                name="unique_lms_assignment_student_attempt",
+            ),
+        ]
 
     def __str__(self) -> str:
         return (
