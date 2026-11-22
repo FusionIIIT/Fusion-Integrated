@@ -1,0 +1,101 @@
+[
+  {
+    "test_id": "UC-TC-01",
+    "source_id": "UC-01 Main Flow",
+    "purpose": "Employee views their own EIS profile successfully",
+    "preconditions": "Employee is authenticated and has an existing EmployeeProfile",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/me/",
+    "expected_result": "HTTP 200 with full profile data (pf_number, designation, department, date_of_joining, experiences)",
+    "test_type": "API"
+  },
+  {
+    "test_id": "UC-TC-02",
+    "source_id": "UC-01 Alternative A1",
+    "purpose": "Employee views their profile but no profile exists yet",
+    "preconditions": "Employee is authenticated but has no EmployeeProfile",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/me/",
+    "expected_result": "HTTP 404 with message 'Profile not found for logged in user.'",
+    "test_type": "API"
+  },
+  {
+    "test_id": "UC-TC-03",
+    "source_id": "UC-01 Alternative A2",
+    "purpose": "Unauthenticated user tries to view employee profile",
+    "preconditions": "No authentication provided",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/me/ without credentials",
+    "expected_result": "HTTP 401 Unauthorized",
+    "test_type": "API"
+  },
+  {
+    "test_id": "UC-TC-04",
+    "source_id": "UC-02 Main Flow",
+    "purpose": "Employee adds a new work experience entry",
+    "preconditions": "Employee is authenticated and has an EmployeeProfile",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with valid organization, position, start_date",
+    "expected_result": "HTTP 201 Created; new experience returned with correct fields",
+    "test_type": "API"
+  },
+  {
+    "test_id": "UC-TC-05",
+    "source_id": "UC-02 Alternative A1",
+    "purpose": "Employee submits work experience with invalid date range (end before start)",
+    "preconditions": "Employee is authenticated and has an EmployeeProfile",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with end_date < start_date",
+    "expected_result": "HTTP 400 with validation error on end_date field",
+    "test_type": "API"
+  },
+  {
+    "test_id": "UC-TC-06",
+    "source_id": "UC-02 Alternative A2",
+    "purpose": "Employee adds ongoing work experience (no end date)",
+    "preconditions": "Employee is authenticated and has an EmployeeProfile",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ without end_date field",
+    "expected_result": "HTTP 201 Created; end_date is null in response",
+    "test_type": "API"
+  },
+  {
+    "test_id": "UC-TC-07",
+    "source_id": "UC-03 Main Flow",
+    "purpose": "Staff user retrieves all employee profiles",
+    "preconditions": "Staff user is authenticated; multiple EmployeeProfiles exist",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/ as staff user",
+    "expected_result": "HTTP 200 returning all employee profiles",
+    "test_type": "API"
+  },
+  {
+    "test_id": "UC-TC-08",
+    "source_id": "UC-03 Alternative A1",
+    "purpose": "Non-staff employee retrieves profiles and only sees their own",
+    "preconditions": "Non-staff user authenticated; multiple profiles exist",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/ as non-staff employee",
+    "expected_result": "HTTP 200 returning only the requesting employee's profile",
+    "test_type": "API"
+  },
+  {
+    "test_id": "UC-TC-09",
+    "source_id": "UC-04 Main Flow",
+    "purpose": "Employee retrieves their list of work experiences",
+    "preconditions": "Employee authenticated; has existing WorkExperience entries",
+    "action_or_input": "GET /api/v1/hr-eis/experiences/",
+    "expected_result": "HTTP 200 returning only the employee's own experiences",
+    "test_type": "API"
+  },
+  {
+    "test_id": "UC-TC-10",
+    "source_id": "UC-04 Alternative A1",
+    "purpose": "Employee retrieves work experiences but has none yet",
+    "preconditions": "Employee authenticated; no WorkExperience exists for the employee",
+    "action_or_input": "GET /api/v1/hr-eis/experiences/",
+    "expected_result": "HTTP 200 with empty list",
+    "test_type": "API"
+  },
+  {
+    "test_id": "UC-TC-11",
+    "source_id": "UC-05 Main Flow",
+    "purpose": "Employee deletes a work experience entry",
+    "preconditions": "Employee authenticated; a WorkExperience exists belonging to this employee",
+    "action_or_input": "DELETE /api/v1/hr-eis/experiences/<id>/",
+    "expected_result": "HTTP 204 No Content; record no longer appears in GET list",
+    "test_type": "API"
+  }
+]

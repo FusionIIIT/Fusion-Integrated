@@ -1,0 +1,128 @@
+[
+  {
+    "test_id": "FR-TC-01",
+    "source_id": "CFR-01",
+    "purpose": "Verify that an authenticated employee can retrieve their own profile via /me endpoint",
+    "preconditions": "An EmployeeProfile exists for the authenticated user",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/me/ with valid authentication",
+    "expected_result": "HTTP 200 with the user's profile data including pf_number, designation, department",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-02",
+    "source_id": "CFR-01",
+    "purpose": "Verify that /me endpoint returns 404 when no profile exists for the authenticated user",
+    "preconditions": "User is authenticated but has no EmployeeProfile",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/me/ with authenticated user who has no profile",
+    "expected_result": "HTTP 404 with detail message 'Profile not found for logged in user.'",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-03",
+    "source_id": "CFR-02",
+    "purpose": "Verify that unauthenticated access to employee profiles is denied",
+    "preconditions": "No authentication token provided",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/ without authentication",
+    "expected_result": "HTTP 401 Unauthorized",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-04",
+    "source_id": "CFR-02",
+    "purpose": "Verify that unauthenticated access to work experiences is denied",
+    "preconditions": "No authentication token provided",
+    "action_or_input": "GET /api/v1/hr-eis/experiences/ without authentication",
+    "expected_result": "HTTP 401 Unauthorized",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-05",
+    "source_id": "CFR-03",
+    "purpose": "Verify that an employee can only view their own profile (non-staff user)",
+    "preconditions": "Two employees exist; non-staff user authenticates",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/ as non-staff employee",
+    "expected_result": "HTTP 200 returning only the authenticated user's own profile",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-06",
+    "source_id": "CFR-03",
+    "purpose": "Verify that a staff user can view all employee profiles",
+    "preconditions": "Multiple EmployeeProfiles exist; staff user authenticates",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/ as staff user",
+    "expected_result": "HTTP 200 returning all profiles",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-07",
+    "source_id": "CFR-04",
+    "purpose": "Verify an employee can create a work experience entry",
+    "preconditions": "Employee profile exists; user is authenticated",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with valid organization, position, start_date",
+    "expected_result": "HTTP 201 Created with the new work experience record",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-08",
+    "source_id": "CFR-04",
+    "purpose": "Verify an employee can retrieve their own work experience entries",
+    "preconditions": "WorkExperience entries exist for the employee",
+    "action_or_input": "GET /api/v1/hr-eis/experiences/ as authenticated employee",
+    "expected_result": "HTTP 200 returning only the employee's own work experiences",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-09",
+    "source_id": "AFR-01",
+    "purpose": "Verify that pf_number uniqueness constraint is enforced at the model level",
+    "preconditions": "An EmployeeProfile with pf_number 'PF9901' already exists",
+    "action_or_input": "Attempt to create another EmployeeProfile with the same pf_number 'PF9901'",
+    "expected_result": "IntegrityError or ValidationError is raised",
+    "test_type": "model/domain"
+  },
+  {
+    "test_id": "FR-TC-10",
+    "source_id": "AFR-02",
+    "purpose": "Verify that work experience end_date cannot be earlier than start_date",
+    "preconditions": "Employee profile exists; user is authenticated",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with end_date='2023-01-01' and start_date='2024-06-01'",
+    "expected_result": "HTTP 400 with error on end_date field",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-11",
+    "source_id": "AFR-02",
+    "purpose": "Verify that work experience with valid dates (end >= start) is accepted",
+    "preconditions": "Employee profile exists; user is authenticated",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with start_date='2020-01-01' and end_date='2022-06-01'",
+    "expected_result": "HTTP 201 Created",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-12",
+    "source_id": "AFR-03",
+    "purpose": "Verify work experience with null end_date (ongoing) is accepted",
+    "preconditions": "Employee profile exists; user is authenticated",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with no end_date provided",
+    "expected_result": "HTTP 201 Created with end_date null in response",
+    "test_type": "API"
+  },
+  {
+    "test_id": "FR-TC-13",
+    "source_id": "CFR-05",
+    "purpose": "Verify employee profile __str__ representation",
+    "preconditions": "An EmployeeProfile object exists",
+    "action_or_input": "Call str() on the EmployeeProfile instance",
+    "expected_result": "String matches format '<username> (<pf_number>) - <designation>'",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "FR-TC-14",
+    "source_id": "CFR-06",
+    "purpose": "Verify work experience is linked to employee and can be deleted",
+    "preconditions": "An EmployeeProfile and a WorkExperience exist for the user",
+    "action_or_input": "DELETE /api/v1/hr-eis/experiences/<id>/",
+    "expected_result": "HTTP 204 No Content",
+    "test_type": "API"
+  }
+]
