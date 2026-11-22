@@ -6,7 +6,7 @@
 | **Module Code** | `complaints` |
 | **Docs Folder** | `docs/19-complaints` |
 | **Author** | Student 1 (`24BCS134`, kushagra-005) |
-| **Approver** | Student 2 (`24BCS038`, Ashish Kumar Meena) |
+| **Approver** | Student 2 (`24BCS038`, ashish20513) |
 | **Status** | APPROVED (2026-11-22) |
 | **Specification Baseline** | CMS Specifications v1.4 FINAL (CFR/AFR Registry, Use Cases, Business Rules, Workflows) |
 
@@ -123,6 +123,6 @@ Declared in `modules/complaints/contracts.py`:
 
 ## Step 3.8 (h) — Open Questions & Approver Sign-off
 
-- Approver: Student 2 (`24BCS038`, Ashish Kumar Meena)
+- Approver: Student 2 (`24BCS038`, ashish20513)
 - Approval Date: 2026-11-22
 - Decision: Approved without waivers. All 12 CFRs and 73 AFRs represented in domain logic and contracts.

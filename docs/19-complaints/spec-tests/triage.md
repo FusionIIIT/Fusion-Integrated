@@ -1,7 +1,7 @@
 # Spec tests: complaints
 
 Student 1 (git author name): kushagra-005
-Student 2 (git author name): Ashish Kumar Meena
+Student 2 (git author name): ashish20513
 Design commit (hash and subject): 1df9db8 feat(complaints): add Prompt A spec test designs for FR, UC, BR, and WF strategies
 Baseline commit (hash and subject): a5ea561 feat(complaints): implement spec tests and establish baseline triage for Q1
 Student 1's 10/10 commit the baseline ran on (hash): 802f91e
