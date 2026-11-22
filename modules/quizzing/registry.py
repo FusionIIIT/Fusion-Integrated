@@ -27,6 +27,14 @@ NAV_ITEMS = [
         "required_permission": "quizzing.quiz.author",
         "sort_order": 20,
     },
+    {
+        "code": "quizzing.grading",
+        "label": "Grading & Reports",
+        "icon": "CheckSquare",
+        "to": "/quizzing/grading",
+        "required_permission": "quizzing.quiz.grade",
+        "sort_order": 30,
+    },
 ]
 
 PERMISSIONS = [

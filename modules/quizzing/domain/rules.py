@@ -11,18 +11,33 @@ class DomainRuleError(ValueError):
     """Domain business rule validation error."""
 
 
-def validate_quiz_schedule(start_time: datetime, end_time: datetime, duration_minutes: int) -> None:
+def validate_quiz_schedule(
+    start_time: datetime,
+    end_time: datetime,
+    duration_minutes: int,
+) -> None:
     if end_time <= start_time:
-        raise DomainRuleError("End time must be strictly after start time. Please adjust schedule dates.")
+        raise DomainRuleError(
+            "End time must be strictly after start time. Please adjust schedule dates."
+        )
     if duration_minutes <= 0:
         raise DomainRuleError("Duration must be greater than zero minutes. Please adjust duration.")
 
 
-def validate_attempt_window(quiz_status: str, start_time: datetime, end_time: datetime, now: datetime) -> None:
+def validate_attempt_window(
+    quiz_status: str,
+    start_time: datetime,
+    end_time: datetime,
+    now: datetime,
+) -> None:
     if quiz_status != "PUBLISHED":
-        raise DomainRuleError("Quiz is not currently open for attempts. Please contact your instructor.")
+        raise DomainRuleError(
+            "Quiz is not currently open for attempts. Please contact your instructor."
+        )
     if now < start_time:
-        raise DomainRuleError("Quiz start time has not been reached yet. Please wait until opening time.")
+        raise DomainRuleError(
+            "Quiz start time has not been reached yet. Please wait until opening time."
+        )
     if now > end_time:
         raise DomainRuleError("Quiz end time has passed. New attempts are no longer permitted.")
 
@@ -34,7 +49,12 @@ def validate_attempt_limit(existing_attempts_count: int, max_attempts: int) -> N
         )
 
 
-def is_attempt_expired(started_at: datetime, duration_minutes: int, end_time: datetime, now: datetime) -> bool:
+def is_attempt_expired(
+    started_at: datetime,
+    duration_minutes: int,
+    end_time: datetime,
+    now: datetime,
+) -> bool:
     attempt_deadline = started_at + timedelta(minutes=duration_minutes)
     return now > end_time or now > attempt_deadline
 
@@ -42,11 +62,16 @@ def is_attempt_expired(started_at: datetime, duration_minutes: int, end_time: da
 def validate_linear_navigation(current_order: int, last_completed_order: int) -> None:
     if current_order < last_completed_order:
         raise DomainRuleError(
-            "Back-navigation is restricted in linear mode. Please proceed forward to answer questions."
+            "Back-navigation is restricted in linear mode. "
+            "Please proceed forward to answer questions."
         )
 
 
-def validate_submission_completeness(answered_count: int, total_count: int, allow_unanswered: bool) -> None:
+def validate_submission_completeness(
+    answered_count: int,
+    total_count: int,
+    allow_unanswered: bool,
+) -> None:
     if not allow_unanswered and answered_count < total_count:
         unanswered = total_count - answered_count
         raise DomainRuleError(

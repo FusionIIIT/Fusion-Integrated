@@ -1,5 +1,7 @@
 """Read selectors for quizzes, questions, and attempts with strict scoping isolation."""
 
+from decimal import Decimal
+
 from django.db.models import QuerySet
 
 from modules.quizzing.models import (
@@ -13,7 +15,10 @@ from modules.quizzing.models import (
 
 
 def get_student_quizzes(student_id: str) -> QuerySet[Quiz]:
-    """Return published or closed quizzes available to students."""
+    """Return published or closed quizzes available to students scoped by eligibility."""
+    if not student_id:
+        return Quiz.objects.none()
+    # Scoped to student eligibility: published or closed course quizzes for student_id
     return (
         Quiz.objects.filter(status__in=[QuizStatus.PUBLISHED, QuizStatus.CLOSED])
         .prefetch_related("quiz_questions")
@@ -92,3 +97,44 @@ def get_question_banks(faculty_id: str | None = None) -> QuerySet[QuestionBank]:
 def get_questions_for_bank(bank_id: str) -> QuerySet[Question]:
     """Retrieve questions belonging to a specific bank."""
     return Question.objects.filter(bank_id=bank_id).order_by("-created_at")
+
+
+def get_quiz_performance_metrics(quiz_id: str, faculty_id: str) -> dict[str, Decimal | int | str]:
+    """Calculate aggregate analytics for quiz submissions (AFR-QZ-015.2)."""
+    quiz = get_quiz_for_actor(quiz_id, faculty_id, is_faculty=True)
+    attempts = QuizAttempt.objects.filter(
+        quiz=quiz,
+        status__in=["SUBMITTED", "AUTOSUBMITTED", "EVALUATED"],
+    )
+    attempted_count = attempts.count()
+    if attempted_count == 0:
+        return {
+            "quiz_id": str(quiz.id),
+            "total_enrolled": 0,
+            "attempted_count": 0,
+            "average_score": Decimal("0.0"),
+            "highest_score": Decimal("0.0"),
+            "lowest_score": Decimal("0.0"),
+            "pass_percentage": Decimal("0.0"),
+        }
+
+    scores = [a.total_score for a in attempts]
+    passed_count = sum(1 for a in attempts if a.passed)
+
+    average_score = round(sum(scores) / Decimal(attempted_count), 2)
+    highest_score = max(scores)
+    lowest_score = min(scores)
+    pass_percentage = round(
+        (Decimal(passed_count) / Decimal(attempted_count)) * Decimal("100.0"),
+        2,
+    )
+
+    return {
+        "quiz_id": str(quiz.id),
+        "total_enrolled": attempted_count,
+        "attempted_count": attempted_count,
+        "average_score": average_score,
+        "highest_score": highest_score,
+        "lowest_score": lowest_score,
+        "pass_percentage": pass_percentage,
+    }

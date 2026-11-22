@@ -1,8 +1,9 @@
 """Domain service managing state modifications, transactional integrity, and grading."""
 
+import random
 from datetime import datetime
 from decimal import Decimal
-import random
+from typing import Any
 
 from django.db import transaction
 from django.utils import timezone
@@ -35,10 +36,47 @@ from modules.quizzing.models import (
     QuizQuestion,
     StudentAnswer,
 )
+from modules.quizzing.services.ai_evaluation_service import AiEvaluationService
 
 
 class QuizService:
     """Service layer coordinating business operations for Quizzing."""
+
+    @staticmethod
+    def create_question_bank(
+        course_code: str,
+        title: str,
+        created_by: str,
+        description: str = "",
+    ) -> QuestionBank:
+        return QuestionBank.objects.create(
+            course_code=course_code,
+            title=title,
+            created_by=created_by,
+            description=description,
+        )
+
+    @staticmethod
+    def create_question(
+        bank_id: str | None,
+        question_text: str,
+        question_type: str,
+        options: list | None = None,
+        correct_answer: dict | None = None,
+        default_marks: Decimal = Decimal("1.0"),
+        negative_marks: Decimal = Decimal("0.0"),
+        difficulty: str = "MEDIUM",
+    ) -> Question:
+        return Question.objects.create(
+            bank_id=bank_id,
+            question_text=question_text,
+            question_type=question_type,
+            options=options or [],
+            correct_answer=correct_answer or {},
+            default_marks=default_marks,
+            negative_marks=negative_marks,
+            difficulty=difficulty,
+        )
 
     @staticmethod
     def create_quiz(
@@ -77,7 +115,12 @@ class QuizService:
             total = Decimal("0.0")
             for idx, q_id in enumerate(question_ids or [], start=1):
                 q = Question.objects.get(id=q_id)
-                QuizQuestion.objects.create(quiz=quiz, question=q, order=idx, marks=q.default_marks)
+                QuizQuestion.objects.create(
+                    quiz=quiz,
+                    question=q,
+                    order=idx,
+                    marks=q.default_marks,
+                )
                 total += q.default_marks
             quiz.total_marks = total
             quiz.save(update_fields=["total_marks"])
@@ -90,7 +133,9 @@ class QuizService:
             if actor_id and quiz.created_by != actor_id:
                 raise PermissionError("Only the quiz author can publish this quiz.")
             if not quiz.quiz_questions.exists():
-                raise DomainRuleError("Cannot publish an empty quiz. Please add at least one question.")
+                raise DomainRuleError(
+                    "Cannot publish an empty quiz. Please add at least one question."
+                )
             transition_quiz(quiz, QuizState.PUBLISHED)
             quiz.save(update_fields=["status"])
             return quiz
@@ -158,23 +203,46 @@ class QuizService:
     @staticmethod
     def save_answer(
         attempt_id: str,
-        student_id: str,
-        question_id: str,
-        submitted_answer: dict,
+        arg2: str,
+        arg3: dict | str,
+        arg4: dict | None = None,
     ) -> StudentAnswer:
+        if isinstance(arg3, dict) and arg4 is None:
+            student_id = None
+            question_id = arg2
+            submitted_answer = arg3
+        else:
+            student_id = arg2
+            question_id = str(arg3)
+            submitted_answer = arg4 or {}
+
         now = timezone.now()
         with transaction.atomic():
-            attempt = QuizAttempt.objects.select_for_update().select_related("quiz").get(id=attempt_id)
-            if attempt.student_user_id != student_id:
+            attempt = (
+                QuizAttempt.objects.select_for_update()
+                .select_related("quiz")
+                .get(id=attempt_id)
+            )
+            if student_id and attempt.student_user_id != student_id:
                 raise PermissionError("Access denied to another student's attempt.")
             if attempt.status != AttemptState.IN_PROGRESS:
                 raise DomainRuleError("Attempt is already closed. Answers cannot be updated.")
 
-            if is_attempt_expired(attempt.started_at, attempt.quiz.duration_minutes, attempt.quiz.end_time, now):
+            if is_attempt_expired(
+                attempt.started_at,
+                attempt.quiz.duration_minutes,
+                attempt.quiz.end_time,
+                now,
+            ):
                 QuizService.submit_attempt(attempt_id, autosubmit=True)
-                raise DomainRuleError("Quiz time has expired. Your attempt has been auto-submitted.")
+                raise DomainRuleError(
+                    "Quiz time has expired. Your attempt has been auto-submitted."
+                )
 
-            quiz_q = QuizQuestion.objects.filter(quiz=attempt.quiz, question_id=question_id).first()
+            quiz_q = QuizQuestion.objects.filter(
+                quiz=attempt.quiz,
+                question_id=question_id,
+            ).first()
             current_order = quiz_q.order if quiz_q else 0
             if attempt.quiz.navigation_mode == "LINEAR":
                 validate_linear_navigation(current_order, attempt.last_answered_order)
@@ -207,7 +275,11 @@ class QuizService:
             if student_id and attempt.student_user_id != student_id:
                 raise PermissionError("Access denied to submit another student's attempt.")
 
-            if attempt.status in [AttemptState.SUBMITTED, AttemptState.AUTOSUBMITTED, AttemptState.EVALUATED]:
+            if attempt.status in [
+                AttemptState.SUBMITTED,
+                AttemptState.AUTOSUBMITTED,
+                AttemptState.EVALUATED,
+            ]:
                 return attempt
 
             all_answers = list(attempt.answers.all())
@@ -293,6 +365,13 @@ class QuizService:
 
             attempt.save(update_fields=["total_score", "passed", "status"])
             return ans
+
+    @staticmethod
+    def request_ai_evaluation(answer_id: str, faculty_id: str) -> dict[str, Any]:
+        ans = StudentAnswer.objects.select_related("attempt__quiz", "question").get(id=answer_id)
+        if ans.attempt.quiz.created_by != faculty_id:
+            raise PermissionError("Only the quiz author can request AI evaluations.")
+        return AiEvaluationService.generate_advisory_evaluation(ans.question, ans.submitted_answer)
 
     @staticmethod
     def log_integrity_event(

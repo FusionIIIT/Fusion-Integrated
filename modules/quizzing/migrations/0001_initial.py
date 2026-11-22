@@ -1,8 +1,9 @@
 import uuid
 from decimal import Decimal
+
+import django.db.models.deletion
 import django.utils.timezone
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):

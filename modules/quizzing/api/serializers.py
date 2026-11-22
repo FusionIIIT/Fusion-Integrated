@@ -5,6 +5,7 @@ from rest_framework import serializers
 from modules.quizzing.models import (
     AttemptIntegrityLog,
     Question,
+    QuestionBank,
     Quiz,
     QuizAttempt,
     QuizQuestion,
@@ -17,6 +18,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = [
             "id",
+            "bank",
             "question_text",
             "question_type",
             "difficulty",
@@ -26,6 +28,23 @@ class QuestionSerializer(serializers.ModelSerializer):
             "correct_answer",
         ]
         read_only_fields = ["id"]
+
+
+class QuestionBankSerializer(serializers.ModelSerializer):
+    question_count = serializers.IntegerField(source="questions.count", read_only=True)
+
+    class Meta:
+        model = QuestionBank
+        fields = [
+            "id",
+            "course_code",
+            "title",
+            "description",
+            "created_by",
+            "created_at",
+            "question_count",
+        ]
+        read_only_fields = ["id", "created_by", "created_at", "question_count"]
 
 
 class QuizQuestionSerializer(serializers.ModelSerializer):
@@ -121,7 +140,13 @@ class StudentAnswerSerializer(serializers.ModelSerializer):
             "feedback",
             "is_evaluated",
         ]
-        read_only_fields = ["id", "autograded_score", "override_score", "final_score", "is_evaluated"]
+        read_only_fields = [
+            "id",
+            "autograded_score",
+            "override_score",
+            "final_score",
+            "is_evaluated",
+        ]
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)

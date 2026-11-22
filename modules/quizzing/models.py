@@ -218,6 +218,9 @@ class StudentAnswer(models.Model):
             models.Index(fields=["attempt", "is_evaluated"], name="qz_ans_att_eval_idx"),
         ]
 
+    def __str__(self) -> str:
+        return f"Answer for Q{self.question_id} on Attempt {self.attempt_id}"
+
     @property
     def final_score(self) -> Decimal:
         if self.override_score is not None:

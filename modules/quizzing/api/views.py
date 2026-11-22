@@ -12,13 +12,19 @@ from modules.quizzing.selectors.quiz_selectors import (
     get_attempt_for_actor,
     get_attempt_integrity_logs,
     get_faculty_quizzes,
+    get_question_banks,
+    get_questions_for_bank,
     get_quiz_attempts_for_grading,
     get_quiz_for_actor,
+    get_quiz_performance_metrics,
     get_student_quizzes,
 )
 from modules.quizzing.services.quiz_service import QuizService
+
 from .serializers import (
     AttemptIntegrityLogSerializer,
+    QuestionBankSerializer,
+    QuestionSerializer,
     QuizAttemptSerializer,
     QuizDetailSerializer,
     QuizListSerializer,
@@ -35,7 +41,6 @@ def check_has_permission(request, perm_code: str) -> bool:
     user = getattr(request, "user", None)
     if not user or not user.is_authenticated:
         return False
-    # Check Django perm or active role grant
     if hasattr(user, "has_perm") and user.has_perm(perm_code):
         return True
     active_role = getattr(user, "active_role", "")
@@ -45,12 +50,69 @@ def check_has_permission(request, perm_code: str) -> bool:
         "quizzing.quiz.grade",
     ]:
         return True
-    if active_role == "student" and perm_code in [
-        "quizzing.quiz.view",
-        "quizzing.quiz.attempt",
-    ]:
-        return True
-    return False
+    return bool(
+        active_role == "student"
+        and perm_code in ["quizzing.quiz.view", "quizzing.quiz.attempt"]
+    )
+
+
+class QuestionBankListCreateView(views.APIView):
+    """Question bank management and search API for professors (AFR-QZ-005.2)."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        if not check_has_permission(request, "quizzing.quiz.author"):
+            return Response({"error": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
+        actor_id = get_actor_username(request)
+        banks = get_question_banks(faculty_id=actor_id)
+        query = request.query_params.get("search", "").strip()
+        if query:
+            banks = banks.filter(title__icontains=query)
+        return Response(QuestionBankSerializer(banks, many=True).data)
+
+    def post(self, request):
+        if not check_has_permission(request, "quizzing.quiz.author"):
+            return Response({"error": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
+        d = request.data
+        bank = QuizService.create_question_bank(
+            course_code=d["course_code"],
+            title=d["title"],
+            created_by=get_actor_username(request),
+            description=d.get("description", ""),
+        )
+        return Response(QuestionBankSerializer(bank).data, status=status.HTTP_201_CREATED)
+
+
+class QuestionBankQuestionView(views.APIView):
+    """View to search, filter, and create questions within a question bank."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        if not check_has_permission(request, "quizzing.quiz.author"):
+            return Response({"error": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
+        questions = get_questions_for_bank(str(pk))
+        q_type = request.query_params.get("type")
+        if q_type:
+            questions = questions.filter(question_type=q_type)
+        return Response(QuestionSerializer(questions, many=True).data)
+
+    def post(self, request, pk):
+        if not check_has_permission(request, "quizzing.quiz.author"):
+            return Response({"error": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
+        d = request.data
+        q = QuizService.create_question(
+            bank_id=str(pk),
+            question_text=d["question_text"],
+            question_type=d["question_type"],
+            options=d.get("options", []),
+            correct_answer=d.get("correct_answer", {}),
+            default_marks=Decimal(str(d.get("default_marks", "1.0"))),
+            negative_marks=Decimal(str(d.get("negative_marks", "0.0"))),
+            difficulty=d.get("difficulty", "MEDIUM"),
+        )
+        return Response(QuestionSerializer(q).data, status=status.HTTP_201_CREATED)
 
 
 class QuizListCreateView(views.APIView):
@@ -92,7 +154,9 @@ class QuizListCreateView(views.APIView):
                 navigation_mode=d.get("navigation_mode", "FREE"),
                 randomize_questions=bool(d.get("randomize_questions", False)),
                 allow_unanswered=bool(d.get("allow_unanswered", True)),
-                negative_marking_percentage=Decimal(str(d.get("negative_marking_percentage", "0.0"))),
+                negative_marking_percentage=Decimal(
+                    str(d.get("negative_marking_percentage", "0.0"))
+                ),
                 question_ids=d.get("question_ids", []),
             )
             return Response(
@@ -102,7 +166,8 @@ class QuizListCreateView(views.APIView):
         except DomainRuleError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except (KeyError, ValueError) as e:
-            return Response({"error": f"Invalid parameter: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+            msg = f"Invalid parameter: {e}"
+            return Response({"error": msg}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class QuizDetailView(views.APIView):
@@ -156,10 +221,18 @@ class QuizActionView(views.APIView):
                     return Response({"error": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
                 field = "answer_key_released" if action == "release-key" else "grades_released"
                 val = bool(request.data.get("release", True))
-                quiz = QuizService.toggle_release(str(pk), faculty_id=actor_id, field=field, value=val)
+                quiz = QuizService.toggle_release(
+                    quiz_id=str(pk),
+                    faculty_id=actor_id,
+                    field=field,
+                    value=val,
+                )
                 return Response(QuizDetailSerializer(quiz, context={"request": request}).data)
 
-            return Response({"error": f"Unsupported action: {action}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": f"Unsupported action: {action}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except Quiz.DoesNotExist:
             return Response({"error": "Quiz not found."}, status=status.HTTP_404_NOT_FOUND)
         except PermissionError as e:
@@ -191,9 +264,9 @@ class QuizAttemptDetailView(views.APIView):
                     return Response({"error": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
                 ans = QuizService.save_answer(
                     attempt_id=str(pk),
-                    student_id=actor_id,
-                    question_id=request.data["question_id"],
-                    submitted_answer=request.data["submitted_answer"],
+                    arg2=actor_id,
+                    arg3=request.data["question_id"],
+                    arg4=request.data["submitted_answer"],
                 )
                 return Response(StudentAnswerSerializer(ans, context={"request": request}).data)
 
@@ -219,7 +292,10 @@ class QuizAttemptDetailView(views.APIView):
                     status=status.HTTP_201_CREATED,
                 )
 
-            return Response({"error": f"Invalid attempt action: {action}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": f"Invalid attempt action: {action}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except QuizAttempt.DoesNotExist:
             return Response({"error": "Attempt not found."}, status=status.HTTP_404_NOT_FOUND)
         except PermissionError as e:
@@ -227,7 +303,8 @@ class QuizAttemptDetailView(views.APIView):
         except DomainRuleError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except KeyError as e:
-            return Response({"error": f"Missing required parameter: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+            msg = f"Missing required parameter: {e}"
+            return Response({"error": msg}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class QuizGradingView(views.APIView):
@@ -239,7 +316,8 @@ class QuizGradingView(views.APIView):
         actor_id = get_actor_username(request)
         try:
             attempts = get_quiz_attempts_for_grading(str(pk), faculty_id=actor_id)
-            return Response(QuizAttemptSerializer(attempts, many=True, context={"request": request}).data)
+            serializer = QuizAttemptSerializer(attempts, many=True, context={"request": request})
+            return Response(serializer.data)
         except Quiz.DoesNotExist:
             return Response({"error": "Quiz not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -256,11 +334,52 @@ class QuizGradingView(views.APIView):
             )
             return Response(StudentAnswerSerializer(ans, context={"request": request}).data)
         except StudentAnswer.DoesNotExist:
-            return Response({"error": "Answer record not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Answer record not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         except PermissionError as e:
             return Response({"error": str(e)}, status=status.HTTP_403_FORBIDDEN)
         except KeyError as e:
-            return Response({"error": f"Missing required parameter: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+            msg = f"Missing required parameter: {e}"
+            return Response({"error": msg}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class QuizAnalyticsReportView(views.APIView):
+    """Aggregate quiz performance analytics and reports for instructors (AFR-QZ-015.2)."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        if not check_has_permission(request, "quizzing.quiz.grade"):
+            return Response({"error": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
+        actor_id = get_actor_username(request)
+        try:
+            metrics = get_quiz_performance_metrics(str(pk), faculty_id=actor_id)
+            return Response(metrics)
+        except Quiz.DoesNotExist:
+            return Response({"error": "Quiz not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class AiEvaluationView(views.APIView):
+    """Advisory AI subjective evaluation endpoint (AFR-QZ-012.2)."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        if not check_has_permission(request, "quizzing.quiz.grade"):
+            return Response({"error": "Forbidden."}, status=status.HTTP_403_FORBIDDEN)
+        actor_id = get_actor_username(request)
+        try:
+            suggestion = QuizService.request_ai_evaluation(answer_id=str(pk), faculty_id=actor_id)
+            return Response(suggestion)
+        except StudentAnswer.DoesNotExist:
+            return Response(
+                {"error": "Answer record not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except PermissionError as e:
+            return Response({"error": str(e)}, status=status.HTTP_403_FORBIDDEN)
 
 
 class AttemptIntegrityLogsView(views.APIView):
