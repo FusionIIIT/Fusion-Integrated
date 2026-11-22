@@ -180,45 +180,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/FinancialYearPolicy'
           description: ''
-  /api/v1/iaa/admin/roles:
-    get:
-      operationId: v1_iaa_admin_roles_retrieve
-      tags:
-      - v1
-      security:
-      - iamSession: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Page'
-          description: ''
-    post:
-      operationId: v1_iaa_admin_roles_create
-      tags:
-      - v1
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RoleAssignmentInput'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/RoleAssignmentInput'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/RoleAssignmentInput'
-        required: true
-      security:
-      - iamSession: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleAssignment'
-          description: ''
   /api/v1/iaa/anomalies:
     get:
       operationId: v1_iaa_anomalies_retrieve
@@ -636,7 +597,6 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/FinancialRecordWrite'
-        required: true
       security:
       - iamSession: []
       responses:
@@ -889,7 +849,26 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/FinancialRecordWrite'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialRecord'
+          description: ''
+  /api/v1/iaa/ta/{id}/record:
+    post:
+      operationId: v1_iaa_ta_record_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
         required: true
+      tags:
+      - v1
       security:
       - iamSession: []
       responses:
@@ -3952,14 +3931,17 @@ components:
       properties:
         request_type:
           type: string
+          default: ''
           maxLength: 80
         department:
           type: string
+          default: ''
           maxLength: 120
         amount:
           type: string
           format: decimal
           pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          default: '0.00'
         description:
           type: string
           default: ''
@@ -3980,10 +3962,6 @@ components:
         trip_details:
           type: object
           additionalProperties: {}
-      required:
-      - amount
-      - department
-      - request_type
     FinancialYearPolicy:
       type: object
       properties:
@@ -4742,14 +4720,17 @@ components:
       properties:
         request_type:
           type: string
+          default: ''
           maxLength: 80
         department:
           type: string
+          default: ''
           maxLength: 120
         amount:
           type: string
           format: decimal
           pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          default: '0.00'
         description:
           type: string
           default: ''
@@ -5250,51 +5231,6 @@ components:
       - message
       - reason
       - route
-    RoleAssignment:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        user_id:
-          type: integer
-          readOnly: true
-        role:
-          type: string
-          readOnly: true
-        assigned_by_id:
-          type: integer
-          readOnly: true
-          nullable: true
-        is_active:
-          type: boolean
-          readOnly: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-      required:
-      - assigned_by_id
-      - created_at
-      - id
-      - is_active
-      - role
-      - user_id
-    RoleAssignmentInput:
-      type: object
-      properties:
-        user_id:
-          type: integer
-          minimum: 1
-        role:
-          type: string
-          maxLength: 80
-        is_active:
-          type: boolean
-          default: true
-      required:
-      - role
-      - user_id
     RoleSwitch:
       type: object
       properties:
