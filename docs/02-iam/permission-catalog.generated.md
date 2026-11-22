@@ -13,6 +13,37 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `phc`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `phc.schedule.view` | See the published doctor schedule and today's attendance | `PHC Staff`, `faculty`, `staff`, `student` |
+| `phc.schedule.create` | Create doctor schedules | `PHC Staff` |
+| `phc.schedule.update` | Maintain doctor schedules | `PHC Staff` |
+| `phc.schedule.publish` | Publish doctor schedules to patients | `PHC Staff` |
+| `phc.attendance.update` | Mark visiting doctors Available or Departed | `PHC Staff` |
+| `phc.patient.view` | Search patient profiles | `PHC Staff` |
+| `phc.record.view` | See medical records within one's scope | `PHC Staff`, `faculty`, `staff`, `student` |
+| `phc.record.create` | Record patient visits and prescriptions | `PHC Staff` |
+| `phc.claim.view` | See reimbursement claims within one's scope | `Accounts & Audit`, `Approving Authority`, `PHC Staff`, `faculty`, `staff` |
+| `phc.claim.create` | Submit a medical bill reimbursement claim | `faculty`, `staff` |
+| `phc.claim.review` | Review claims at the PHC stage and forward them | `PHC Staff` |
+| `phc.claim.update` | Verify claims and record reimbursement payments | `Accounts & Audit` |
+| `phc.claim.approve` | Approve or reject reimbursement sanctions | `Approving Authority` |
+| `phc.inventory.view` | See inventory and low-stock alerts | `PHC Staff` |
+| `phc.inventory.create` | Add inventory items | `PHC Staff` |
+| `phc.inventory.update` | Add to or deduct from stock | `PHC Staff` |
+| `phc.requisition.view` | See procurement requisitions within one's scope | `Approving Authority`, `PHC Staff` |
+| `phc.requisition.create` | Raise procurement requisitions | `PHC Staff` |
+| `phc.requisition.approve` | Approve or reject procurement requisitions | `Approving Authority` |
+| `phc.requisition.update` | Mark approved requisitions fulfilled | `PHC Staff` |
+| `phc.ambulance.view` | See the ambulance log | `PHC Staff` |
+| `phc.ambulance.create` | Log ambulance use | `PHC Staff` |
+| `phc.advisory.view` | See health advisories | `PHC Staff`, `faculty`, `staff`, `student` |
+| `phc.advisory.publish` | Publish health advisories | `PHC Staff` |
+| `phc.report.view` | Generate anonymised PHC reports | `PHC Staff` |
+| `phc.notification.view` | See one's own PHC notifications | `PHC Staff`, `faculty`, `staff`, `student` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
