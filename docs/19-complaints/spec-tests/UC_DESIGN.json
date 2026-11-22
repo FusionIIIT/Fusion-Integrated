@@ -1,0 +1,363 @@
+{
+  "strategy": "Use Cases",
+  "source_inventory": [
+    "docs/Assignment_7_Complaint_Management_System_Report.txt"
+  ],
+  "use_cases": [
+    {
+      "id": "UC-001",
+      "title": "Submit Complaint",
+      "description": "A complainant (student/faculty/staff) creates a new complaint.",
+      "type": "derived",
+      "source": "Page 2 – Core Objectives (complaint submission)",
+      "steps": [
+        "Authenticate as complainant",
+        "POST /api/v1/complaints/ with required fields",
+        "System creates complaint with status 'submitted' and unique identifier"
+      ],
+      "scenarios": [
+        {
+          "name": "Happy path",
+          "preconditions": "Authenticated complainant",
+          "test_data": {
+            "category": "Electrical",
+            "location": "Building A",
+            "description": "Power outage"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Missing fields",
+          "preconditions": "Authenticated complainant",
+          "test_data": {
+            "category": "Electrical"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Unauthenticated",
+          "preconditions": "No authentication token",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-002",
+      "title": "Assign Complaint",
+      "description": "Handler assigns a worker, category, and priority to a submitted complaint.",
+      "type": "derived",
+      "source": "Page 2 – Core Objectives (handler assignment)",
+      "steps": [
+        "Authenticate as complaint_handler",
+        "Complaint must be in 'submitted' status",
+        "POST /{id}/assign/ with worker_id, category, priority",
+        "System updates status to 'in_progress' and recalculates SLA"
+      ],
+      "scenarios": [
+        {
+          "name": "Successful assignment",
+          "preconditions": "Handler, complaint 'submitted'",
+          "test_data": {
+            "worker_id": 42,
+            "category": "Plumbing",
+            "priority": "high"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Forbidden role",
+          "preconditions": "User with student role",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Idempotent re‑assign same worker",
+          "preconditions": "Handler already assigned same worker",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-003",
+      "title": "Progress Update",
+      "description": "Handler records progress on an in‑progress complaint.",
+      "type": "derived",
+      "source": "Page 2 – Core Objectives (progress updates)",
+      "steps": [
+        "Authenticate as complaint_handler",
+        "Complaint must be 'in_progress'",
+        "POST /{id}/progress/ with progress notes",
+        "System stores progress notes"
+      ],
+      "scenarios": [
+        {
+          "name": "Valid progress",
+          "preconditions": "Handler, complaint 'in_progress'",
+          "test_data": {
+            "progress_notes": "Replaced fuse"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Invalid state",
+          "preconditions": "Complaint 'submitted'",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-004",
+      "title": "Resolve Complaint",
+      "description": "Handler resolves a complaint, providing resolution details.",
+      "type": "derived",
+      "source": "Page 4 – Workflow BW‑CMS‑01 (resolution)",
+      "steps": [
+        "Authenticate as complaint_handler",
+        "Complaint must be 'in_progress'",
+        "POST /{id}/resolve/ with resolution info",
+        "System changes status to 'resolved' and marks verification required"
+      ],
+      "scenarios": [
+        {
+          "name": "Successful resolution",
+          "preconditions": "Handler, complaint 'in_progress'",
+          "test_data": {
+            "resolution": "Fixed",
+            "remarks": "Replaced fuse"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Missing resolution details",
+          "test_data": {},
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-005",
+      "title": "Reject Complaint",
+      "description": "Handler rejects a complaint with a mandatory reason.",
+      "type": "derived",
+      "source": "Page 4 – Workflow BW‑CMS‑04 (rejection)",
+      "steps": [
+        "Authenticate as complaint_handler",
+        "Complaint status 'submitted' or 'in_progress'",
+        "POST /{id}/reject/ with reason",
+        "System sets status to 'rejected' and records reason"
+      ],
+      "scenarios": [
+        {
+          "name": "Valid rejection",
+          "preconditions": "Handler, complaint not yet resolved",
+          "test_data": {
+            "reason": "Not a valid complaint"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Missing reason",
+          "test_data": {},
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-006",
+      "title": "User‑Verified Closure",
+      "description": "Complainant closes a resolved complaint when verification_required='user'.",
+      "type": "derived",
+      "source": "Page 4 – Workflow BW‑CMS‑02",
+      "steps": [
+        "Authenticate as original complainant",
+        "Complaint status 'resolved' and verification_required='user'",
+        "POST /{id}/verify-close/",
+        "System transitions to 'closed'"
+      ],
+      "scenarios": [
+        {
+          "name": "Authorized user closure",
+          "preconditions": "Complainant, proper verification flag",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Unauthorized user",
+          "preconditions": "Different student",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-007",
+      "title": "Supervisor‑Verified Closure",
+      "description": "Supervisor closes a resolved complaint when verification_required='supervisor'.",
+      "type": "derived",
+      "source": "Page 4 – Workflow BW‑CMS‑03",
+      "steps": [
+        "Authenticate as complaint_supervisor",
+        "Complaint status 'resolved' and verification_required='supervisor'",
+        "POST /{id}/verify-close/",
+        "System transitions to 'closed'"
+      ],
+      "scenarios": [
+        {
+          "name": "Supervisor closure",
+          "preconditions": "Supervisor role",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-008",
+      "title": "Request Reopen",
+      "description": "Complainant requests reopening of a closed complaint.",
+      "type": "derived",
+      "source": "Page 4 – Workflow BW‑CMS‑05",
+      "steps": [
+        "Authenticate as original complainant",
+        "Complaint status 'closed'",
+        "POST /{id}/reopen-request/ with reason",
+        "System records request without state change"
+      ],
+      "scenarios": [
+        {
+          "name": "Valid reopen request",
+          "preconditions": "Complainant, complaint closed",
+          "test_data": {
+            "reason": "Issue persists"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Invalid status",
+          "preconditions": "Complaint not closed",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-009",
+      "title": "Review Reopen Request",
+      "description": "Supervisor approves or denies a reopening request.",
+      "type": "derived",
+      "source": "Page 4 – Workflow BW‑CMS‑06",
+      "steps": [
+        "Authenticate as complaint_supervisor",
+        "Pending reopen request exists",
+        "POST /{id}/reopen-review/ with decision",
+        "If approve → status 'in_progress'; if deny → status remains 'closed'"
+      ],
+      "scenarios": [
+        {
+          "name": "Approve",
+          "preconditions": "Supervisor, pending request",
+          "test_data": {
+            "decision": "approve"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Deny",
+          "preconditions": "Supervisor, pending request",
+          "test_data": {
+            "decision": "deny"
+          },
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-010",
+      "title": "Manual Escalation",
+      "description": "Handler flags a complaint for manual escalation.",
+      "type": "derived",
+      "source": "Page 4 – Workflow BW‑CMS‑07",
+      "steps": [
+        "Authenticate as complaint_handler",
+        "Complaint not already escalated",
+        "POST /{id}/escalate/",
+        "System sets is_escalated=true, type='manual'"
+      ],
+      "scenarios": [
+        {
+          "name": "Escalate once",
+          "preconditions": "Handler, not escalated",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Duplicate escalation",
+          "preconditions": "Complaint already escalated",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-011",
+      "title": "Automatic SLA Breach Check",
+      "description": "System endpoint processes overdue complaints and triggers automatic escalation.",
+      "type": "derived",
+      "source": "Page 4 – Workflow BW‑CMS‑08",
+      "steps": [
+        "POST /sla-check/",
+        "System scans for complaints with sla_deadline < now and not resolved",
+        "Sets is_escalated=true, type='automatic' for each"
+      ],
+      "scenarios": [
+        {
+          "name": "Process overdue complaints",
+          "preconditions": "At least one overdue complaint exists",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "UC-012",
+      "title": "Submit Feedback",
+      "description": "Complainant provides satisfaction rating after closure.",
+      "type": "derived",
+      "source": "Page 5 – DB constraint: OneToOne feedback per complaint, permitted after resolution or closure",
+      "steps": [
+        "Authenticate as original complainant",
+        "Complaint status 'closed'",
+        "POST /{id}/feedback/ with rating and optional comments",
+        "System creates Feedback record (OneToOne)"
+      ],
+      "scenarios": [
+        {
+          "name": "First feedback",
+          "preconditions": "No existing feedback",
+          "test_data": {
+            "rating": 4,
+            "comments": "Quick response"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Duplicate feedback",
+          "preconditions": "Feedback already exists",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    }
+  ],
+  "ambiguous_items": [
+    {
+      "id": "UC-A-001",
+      "description": "Exact channel and content of SLA 75% reminder",
+      "type": "not_specified",
+      "source": "Page 2 – SLA automation (reminder mentioned, channel unspecified)"
+    },
+    {
+      "id": "UC-A-002",
+      "description": "Formula for SLA deadline calculation based on priority/category",
+      "type": "not_specified",
+      "source": "Page 2 – SLA automation"
+    }
+  ],
+  "not_automated": [
+    {
+      "id": "UC-NA-001",
+      "description": "Verification of reminder dispatch mechanism",
+      "reason": "Channel/content not defined in specification"
+    }
+  ]
+}

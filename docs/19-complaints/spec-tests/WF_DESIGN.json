@@ -1,0 +1,239 @@
+{
+  "strategy": "Workflows",
+  "source_inventory": [
+    "docs/Assignment_7_Complaint_Management_System_Report.txt"
+  ],
+  "workflows": [
+    {
+      "id": "WF-01",
+      "title": "Intake to Resolution (BW-CMS-01)",
+      "description": "Complainant submits a complaint, handler assigns, updates progress, and resolves it.",
+      "type": "explicit",
+      "source": "Page 4 – End-to-End Workflow & Authoritative State Transitions (BW-CMS-01)",
+      "steps": [
+        "Submit complaint (status 'submitted')",
+        "Assign worker/category/priority (status -> 'in_progress')",
+        "Handler updates progress (remains 'in_progress')",
+        "Handler resolves (status -> 'resolved')"
+      ],
+      "transitions": [
+        {
+          "from": "submitted",
+          "to": "in_progress",
+          "permission": "complaints.complaint.assign"
+        },
+        {
+          "from": "in_progress",
+          "to": "resolved",
+          "permission": "complaints.complaint.resolve"
+        }
+      ],
+      "scenarios": [
+        {
+          "name": "Happy path through BW-CMS-01",
+          "preconditions": "Authenticated complainant and handler",
+          "expected": "Complaint reaches 'resolved' state with proper audit entries."
+        },
+        {
+          "name": "Invalid transition attempt (skip in_progress)",
+          "preconditions": "Attempt direct resolve from 'submitted'",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "WF-02",
+      "title": "User-Verified Closure (BW-CMS-02)",
+      "description": "Complainant closes a resolved complaint when verification_required='user'.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW-CMS-02",
+      "steps": [
+        "Complaint in 'resolved' with verification_required='user'",
+        "Complainant invokes verify-close",
+        "Status changes to 'closed'"
+      ],
+      "transitions": [
+        {
+          "from": "resolved",
+          "to": "closed",
+          "permission": "complaints.complaint.close",
+          "actor": "complainant"
+        }
+      ],
+      "scenarios": [
+        {
+          "name": "Authorized user closure",
+          "preconditions": "Complainant is actor, verification flag set",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Unauthorized actor attempts closure",
+          "preconditions": "Different student attempts closure",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "WF-03",
+      "title": "Supervisor-Verified Closure (BW-CMS-03)",
+      "description": "Supervisor closes a resolved complaint when verification_required='supervisor'.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW-CMS-03",
+      "steps": [
+        "Complaint in 'resolved' with verification_required='supervisor'",
+        "Supervisor invokes verify-close",
+        "Status changes to 'closed'"
+      ],
+      "transitions": [
+        {
+          "from": "resolved",
+          "to": "closed",
+          "permission": "complaints.complaint.close",
+          "actor": "supervisor"
+        }
+      ],
+      "scenarios": [
+        {
+          "name": "Supervisor closure",
+          "preconditions": "Actor has complaint_supervisor role",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "WF-04",
+      "title": "Rejection (BW-CMS-04)",
+      "description": "Handler rejects a complaint with mandatory justification; terminal state.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW-CMS-04",
+      "steps": [
+        "Complaint in 'submitted' or 'in_progress'",
+        "Handler invokes reject with reason",
+        "Status changes to 'rejected'"
+      ],
+      "transitions": [
+        {
+          "from": "submitted",
+          "to": "rejected",
+          "permission": "complaints.complaint.resolve"
+        },
+        {
+          "from": "in_progress",
+          "to": "rejected",
+          "permission": "complaints.complaint.resolve"
+        }
+      ],
+      "scenarios": [
+        {
+          "name": "Valid rejection",
+          "preconditions": "Handler provides reason",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Missing reason",
+          "preconditions": "Reject without reason",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "WF-05",
+      "title": "Reopening Request (BW-CMS-05)",
+      "description": "Complainant requests reopening of a closed complaint; creates pending request.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW-CMS-05",
+      "steps": [
+        "Complaint in 'closed'",
+        "Complainant POST reopen-request with reason",
+        "System records request (no state change)"
+      ],
+      "scenarios": [
+        {
+          "name": "Valid reopen request",
+          "preconditions": "Complainant is original author",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Invalid status",
+          "preconditions": "Complaint not closed",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "WF-06",
+      "title": "Reopening Review (BW-CMS-06)",
+      "description": "Supervisor reviews a reopening request and either approves (back to in_progress) or denies (remains closed).",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW-CMS-06",
+      "steps": [
+        "Pending reopen request exists",
+        "Supervisor POST decision (approve/deny)",
+        "If approve -> status 'in_progress'; if deny -> stays 'closed'"
+      ],
+      "scenarios": [
+        {
+          "name": "Approve",
+          "preconditions": "Supervisor role, pending request",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Deny",
+          "preconditions": "Supervisor role, pending request",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "WF-07",
+      "title": "Manual Escalation (BW-CMS-07)",
+      "description": "Handler flags a complaint for supervisory intervention; escalation flag set, type='manual'.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW-CMS-07",
+      "steps": [
+        "Handler POST /escalate/ on a complaint not already escalated",
+        "System sets is_escalated=true, type='manual'"
+      ],
+      "scenarios": [
+        {
+          "name": "First manual escalation",
+          "preconditions": "Complaint not escalated",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Duplicate escalation",
+          "preconditions": "Complaint already escalated",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "WF-08",
+      "title": "Automatic SLA Escalation (BW-CMS-08)",
+      "description": "Background endpoint processes overdue complaints and sets automatic escalation.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW-CMS-08",
+      "steps": [
+        "POST /sla-check/",
+        "System scans for complaints with sla_deadline < now and status not resolved",
+        "Sets is_escalated=true, type='automatic'"
+      ],
+      "scenarios": [
+        {
+          "name": "Process overdue complaints",
+          "preconditions": "At least one overdue complaint exists",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    }
+  ],
+  "ambiguous_items": [
+    {
+      "id": "WF-A-001",
+      "description": "Exact timing granularity for the automatic SLA check (cron interval, on‑demand, etc.)",
+      "type": "not_specified",
+      "source": "Page 4 – BW-CMS-08 (no scheduling details)"
+    }
+  ],
+  "not_automated": []
+}

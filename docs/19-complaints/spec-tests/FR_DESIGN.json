@@ -1,0 +1,276 @@
+{
+  "strategy": "Functional Requirements",
+  "source_inventory": [
+    "docs/Assignment_7_Complaint_Management_System_Report.txt"
+  ],
+  "requirements": [
+    {
+      "id": "FR-001",
+      "description": "Allow a complainant (student, faculty, or staff) to submit a new complaint via POST /api/v1/complaints/. Required permission: complaints.complaint.create.",
+      "type": "explicit",
+      "source": "Page 2 – Core Objectives (complaint submission)",
+      "scenarios": [
+        {
+          "name": "Positive submission",
+          "preconditions": "Authenticated user with role student/faculty/staff",
+          "test_data": {
+            "category": "Electrical",
+            "location": "Building A",
+            "description": "Power outage in lab"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Negative – unauthenticated",
+          "preconditions": "No authentication token",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Negative – missing required fields",
+          "preconditions": "Authenticated user",
+          "test_data": {
+            "category": "Electrical"
+          },
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-002",
+      "description": "Allow a complaint handler to assign a worker, category, and priority to a submitted complaint via POST /{id}/assign/. Required permission: complaints.complaint.assign.",
+      "type": "explicit",
+      "source": "Page 2 – Core Objectives (handler assignment)",
+      "scenarios": [
+        {
+          "name": "Positive assignment",
+          "preconditions": "Authenticated user with role complaint_handler, complaint in 'submitted' status",
+          "test_data": {
+            "worker_id": 42,
+            "category": "Plumbing",
+            "priority": "high"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Negative – insufficient permission",
+          "preconditions": "Authenticated user with role student",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Boundary – assign to same worker again",
+          "preconditions": "Handler already assigned same worker",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-003",
+      "description": "Enable a handler to update progress of an in‑progress complaint via POST /{id}/progress/. Required permission: complaints.complaint.update.",
+      "type": "derived",
+      "source": "Page 2 – Core Objectives (progress updates)",
+      "scenarios": [
+        {
+          "name": "Positive progress update",
+          "preconditions": "Authenticated handler, complaint status 'in_progress'",
+          "test_data": {
+            "progress_notes": "Replaced faulty wiring"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Negative – wrong status",
+          "preconditions": "Complaint in 'submitted' status",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-004",
+      "description": "Allow a handler to resolve a complaint via POST /{id}/resolve/.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW‑CMS‑01 (resolution)",
+      "scenarios": [
+        {
+          "name": "Positive resolution",
+          "preconditions": "Authenticated handler, complaint 'in_progress'",
+          "test_data": {
+            "resolution": "Fixed",
+            "remarks": "Replaced fuse"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Negative – missing resolution details",
+          "test_data": {},
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-005",
+      "description": "Support complaint rejection via POST /{id}/reject/.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW‑CMS‑04 (rejection)",
+      "scenarios": [
+        {
+          "name": "Positive rejection with reason",
+          "preconditions": "Handler, complaint 'submitted' or 'in_progress'",
+          "test_data": {
+            "reason": "Not a valid complaint"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Negative – missing reason",
+          "test_data": {},
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-006",
+      "description": "Enable complainant or supervisor to close a resolved complaint via POST /{id}/verify-close/. Required permission: complaints.complaint.close.",
+      "type": "explicit",
+      "source": "Page 4 – Workflows BW‑CMS‑02 / BW‑CMS‑03 (closure verification)",
+      "scenarios": [
+        {
+          "name": "User‑verified closure",
+          "preconditions": "Complaint resolved, verification_required='user', actor is the original complainant",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Supervisor‑verified closure",
+          "preconditions": "Complaint resolved, verification_required='supervisor', actor has role complaint_supervisor",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Negative – unauthorized closure",
+          "preconditions": "Actor is another student",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-007",
+      "description": "Allow a complainant to request reopening of a closed complaint via POST /{id}/reopen-request/.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW‑CMS‑05 / BW‑CMS‑06 (reopening flow)",
+      "scenarios": [
+        {
+          "name": "Positive reopen request",
+          "preconditions": "Complaint status 'closed', actor is original complainant",
+          "test_data": {
+            "reason": "Issue persists"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Negative – request on non‑closed complaint",
+          "preconditions": "Complaint status 'in_progress'",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-008",
+      "description": "Supervisor can approve or deny a reopening request via POST /{id}/reopen-review/.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW‑CMS‑06 (supervisor approval)",
+      "scenarios": [
+        {
+          "name": "Approve reopening",
+          "preconditions": "Supervisor role, pending reopen request, decision 'approve'",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Deny reopening",
+          "preconditions": "Supervisor role, decision 'deny'",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-009",
+      "description": "Handler can manually flag a complaint for escalation via POST /{id}/escalate/.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW‑CMS‑07 (manual escalation)",
+      "scenarios": [
+        {
+          "name": "Manual escalation",
+          "preconditions": "Handler, complaint not already escalated",
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Negative – already escalated",
+          "preconditions": "Complaint already has is_escalated=true",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-010",
+      "description": "Automatic SLA breach check endpoint POST /sla-check/ triggers escalation of overdue complaints.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW‑CMS‑08 (automatic SLA escalation)",
+      "scenarios": [
+        {
+          "name": "SLA breach handling",
+          "preconditions": "There exists at least one complaint with sla_deadline < now and not resolved",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-011",
+      "description": "Submit satisfaction feedback  after complaint closure via POST /{id}/feedback/.",
+      "type": "explicit",
+      "source": "Page 5 – DB constraint: OneToOne feedback per complaint, permitted after resolution or closure",
+      "scenarios": [
+        {
+          "name": "Positive feedback",
+          "preconditions": "Complaint status 'closed', actor is original complainant",
+          "test_data": {
+            "rating": 4,
+            "comments": "Quick response"
+          },
+          "expected": "Not specified (status not documented)"
+        },
+        {
+          "name": "Negative – duplicate feedback",
+          "preconditions": "Feedback already exists for complaint",
+          "expected": "Not specified (status not documented)"
+        }
+      ]
+    },
+    {
+      "id": "FR-012",
+      "description": "Emit a reminder when 75 % of the SLA interval has elapsed for an active complaint.",
+      "type": "explicit",
+      "source": "Page 2 – SLA automation (75 % reminder mentioned)",
+      "scenarios": [],
+      "ambiguous_items": [],
+      "not_automated": []
+    }
+  ],
+  "ambiguous_items": [
+    {
+      "id": "FR-A-001",
+      "description": "Exact reminder delivery channel for the 75 % SLA threshold (email, in‑app, etc.)",
+      "type": "not_specified",
+      "source": "Page 2 – SLA automation (reminder mentioned, channel not documented)"
+    },
+    {
+      "id": "FR-A-002",
+      "description": "Exact calculation formula for SLA deadline based on priority and category defaults",
+      "type": "not_specified",
+      "source": "Page 2 – SLA automation (no formula provided)"
+    }
+  ],
+  "not_automated": [
+    {
+      "id": "FR-NA-001",
+      "description": "Verification of reminder dispatch mechanism (e.g., email content)",
+      "reason": "Channel and content not defined in specification"
+    }
+  ]
+}
