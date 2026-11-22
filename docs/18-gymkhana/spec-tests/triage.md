@@ -14,6 +14,11 @@ Student 1's 10/10 commit the baseline ran on (hash): 4fd66a11736f8f05c76469884f9
 | baseline | br | 50 | 35 | 14 | 1 | 79.7% | 47.7% |
 | baseline | wf | 37 | 19 | 15 | 3 | 78.5% | 45.4% |
 
+| q2 | fr | 53 | 39 | 14 | 0 | 82.3% | 51.1% |
+| q2 | uc | 46 | 39 | 2 | 5 | 80.1% | 48.3% |
+| q2 | br | 50 | 35 | 14 | 1 | 79.7% | 47.7% |
+| q2 | wf | 37 | 19 | 15 | 3 | 78.5% | 45.4% |
+
 ## Failures and skips
 
 | Test id | Source id | Strategies | Category | Evidence | Outcome (fixing commit, covering test, or agreed reading with spec sentence) |
