@@ -3,7 +3,7 @@
 Student 1 (git author name): Ranjith Reddy
 Student 2 (git author name): Aditya Kumar
 Design commit (hash and subject): 2e64865 test(system_admin): freeze specification-based test designs for FR, UC, BR, and WF
-Baseline commit (hash and subject): PENDING_BASELINE_HASH test(system_admin): automate specification test suites and record baseline triage
+Baseline commit (hash and subject): ae8674f test(system_admin): automate specification test suites and record baseline triage
 Student 1's 10/10 commit the baseline ran on (hash): d174377
 
 ## Results
