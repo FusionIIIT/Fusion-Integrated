@@ -38,3 +38,24 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `rspc`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `rspc.proposal.create` | Draft and submit research proposals | `faculty` |
+| `rspc.proposal.view` | View proposals and reviews | `Dean (RSPC)`, `Director`, `Head of Department`, `faculty` |
+| `rspc.proposal.endorse` | HoD endorsement of proposals | `Head of Department` |
+| `rspc.proposal.approve` | Dean approval of proposals | `Dean (RSPC)` |
+| `rspc.project.create` | Sanction and register research projects | `Dean (RSPC)`, `admin` |
+| `rspc.project.view` | View sponsored project records | `Dean (RSPC)`, `Director`, `Head of Department`, `admin`, `faculty` |
+| `rspc.project.manage` | Manage project lifecycle and budget heads | `Dean (RSPC)`, `admin` |
+| `rspc.fund.request` | Request fund disbursements from budget heads | `faculty` |
+| `rspc.fund.view` | Inspect budget heads and financial ledger | `Dean (RSPC)`, `Head of Department`, `admin`, `faculty` |
+| `rspc.fund.approve` | Approve fund disbursement vouchers | `Dean (RSPC)` |
+| `rspc.extension.request` | Request project timeline extensions | `faculty` |
+| `rspc.extension.approve` | Approve project timeline extensions | `Dean (RSPC)` |
+| `rspc.closure.request` | Submit project closure and NOC requests | `faculty` |
+| `rspc.closure.approve` | Approve final project closure | `Dean (RSPC)`, `Director` |
+| `rspc.report.view` | Generate financial and utilization reports | `Dean (RSPC)`, `Director`, `Head of Department`, `admin` |
+| `rspc.schedule.check_deadlines` | System check for project deadlines | _service only_ |

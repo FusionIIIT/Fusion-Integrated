@@ -1674,6 +1674,461 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/rspc/projects/:
+    get:
+      operationId: rspc_project_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+          description: ''
+    post:
+      operationId: rspc_project_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProjectCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProjectCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: ''
+  /api/v1/rspc/projects/{id}/:
+    get:
+      operationId: rspc_project_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: ''
+  /api/v1/rspc/projects/{id}/activate/:
+    post:
+      operationId: rspc_project_activate
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+          description: ''
+  /api/v1/rspc/projects/{id}/closure/:
+    post:
+      operationId: rspc_closure_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/rspc/projects/{id}/closure/approve/:
+    post:
+      operationId: rspc_closure_approve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/rspc/projects/{id}/disburse/:
+    post:
+      operationId: rspc_project_disburse
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Disbursement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Disbursement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Disbursement'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectFundTransaction'
+          description: ''
+  /api/v1/rspc/projects/{id}/disburse/{tx_id}/approve/:
+    post:
+      operationId: rspc_disburse_approve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: tx_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/rspc/projects/{id}/extensions/:
+    post:
+      operationId: rspc_extension_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtensionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtensionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtensionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/rspc/projects/{id}/extensions/{ext_id}/approve/:
+    post:
+      operationId: rspc_extension_approve
+      parameters:
+      - in: path
+        name: ext_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtensionReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtensionReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtensionReview'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/rspc/projects/{id}/heads/:
+    get:
+      operationId: rspc_budget_head_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectBudgetHead'
+          description: ''
+    post:
+      operationId: rspc_budget_head_allocate
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetAllocation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BudgetAllocation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BudgetAllocation'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectBudgetHead'
+          description: ''
+  /api/v1/rspc/projects/{id}/ledger/:
+    get:
+      operationId: rspc_ledger_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectFundTransaction'
+          description: ''
+  /api/v1/rspc/proposals/:
+    get:
+      operationId: rspc_proposal_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proposal'
+          description: ''
+    post:
+      operationId: rspc_proposal_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProposalCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProposalCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}/:
+    get:
+      operationId: rspc_proposal_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}/approve/:
+    post:
+      operationId: rspc_proposal_approve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalReviewAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProposalReviewAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProposalReviewAction'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}/endorse/:
+    post:
+      operationId: rspc_proposal_endorse
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalReviewAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProposalReviewAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProposalReviewAction'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
+          description: ''
+  /api/v1/rspc/proposals/{id}/submit/:
+    post:
+      operationId: rspc_proposal_submit
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proposal'
+          description: ''
+  /api/v1/rspc/reports/:
+    get:
+      operationId: rspc_report_summary
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          description: No response body
 components:
   schemas:
     AcademicDirectory:
@@ -1993,6 +2448,22 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BudgetAllocation:
+      type: object
+      properties:
+        head_type:
+          $ref: '#/components/schemas/HeadTypeEnum'
+        allocated_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        reference_no:
+          type: string
+          default: ''
+          maxLength: 128
+      required:
+      - allocated_amount
+      - head_type
     BulkOutcome:
       type: object
       properties:
@@ -2322,6 +2793,27 @@ components:
           type: string
       required:
       - detail
+    Disbursement:
+      type: object
+      properties:
+        head_type:
+          type: string
+          maxLength: 32
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        reference_no:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+          default: ''
+          maxLength: 255
+      required:
+      - amount
+      - head_type
+      - reference_no
     DocumentLink:
       type: object
       description: A Drive link. Validated in core.files.drive.
@@ -2407,6 +2899,32 @@ components:
       - season_decision
       - semester
       - standing
+    ExtensionRequest:
+      type: object
+      properties:
+        requested_end_date:
+          type: string
+          format: date
+        months_requested:
+          type: integer
+          maximum: 24
+          minimum: 1
+        justification:
+          type: string
+      required:
+      - justification
+      - months_requested
+      - requested_end_date
+    ExtensionReview:
+      type: object
+      properties:
+        approved:
+          type: boolean
+        comments:
+          type: string
+          default: ''
+      required:
+      - approved
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +2941,22 @@ components:
       - fee_reference
       - season
       - user_id
+    HeadTypeEnum:
+      enum:
+      - equipment
+      - consumables
+      - manpower
+      - travel
+      - contingency
+      - overheads
+      type: string
+      description: |-
+        * `equipment` - Equipment / Capital Assets
+        * `consumables` - Consumables & Chemicals
+        * `manpower` - Project Staff / Manpower
+        * `travel` - Travel & Field Work
+        * `contingency` - Contingency
+        * `overheads` - Institutional Overheads
     IncidentRecorded:
       type: object
       properties:
@@ -3201,6 +3735,443 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    Project:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_code:
+          type: string
+          readOnly: true
+        project_type:
+          allOf:
+          - $ref: '#/components/schemas/ProjectProjectTypeEnum'
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        funding_agency:
+          type: string
+          readOnly: true
+        sanction_order_no:
+          type: string
+          readOnly: true
+        sanction_date:
+          type: string
+          format: date
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        sanctioned_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ProjectStatusEnum'
+          readOnly: true
+        co_pis:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCoPI'
+          readOnly: true
+        budget_heads:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectBudgetHead'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - budget_heads
+      - co_pis
+      - created_at
+      - department
+      - end_date
+      - funding_agency
+      - id
+      - project_code
+      - project_type
+      - sanction_date
+      - sanction_order_no
+      - sanctioned_amount
+      - start_date
+      - status
+      - title
+      - updated_at
+      - user_id
+    ProjectBudgetHead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        head_type:
+          allOf:
+          - $ref: '#/components/schemas/HeadTypeEnum'
+          readOnly: true
+        allocated_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+        spent_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+        committed_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+        available_balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - allocated_amount
+      - available_balance
+      - committed_amount
+      - head_type
+      - id
+      - spent_amount
+    ProjectCoPI:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        share_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - department
+      - id
+      - share_percentage
+      - user_id
+    ProjectCreate:
+      type: object
+      properties:
+        project_code:
+          type: string
+          maxLength: 64
+        project_type:
+          $ref: '#/components/schemas/ProjectCreateProjectTypeEnum'
+        title:
+          type: string
+          maxLength: 255
+        department:
+          type: string
+          maxLength: 64
+        funding_agency:
+          type: string
+          maxLength: 128
+        sanction_order_no:
+          type: string
+          maxLength: 128
+        sanction_date:
+          type: string
+          format: date
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        sanctioned_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        co_pi_user_ids:
+          type: array
+          items:
+            type: integer
+      required:
+      - department
+      - end_date
+      - funding_agency
+      - project_code
+      - project_type
+      - sanction_date
+      - sanction_order_no
+      - sanctioned_amount
+      - start_date
+      - title
+    ProjectCreateProjectTypeEnum:
+      enum:
+      - sponsored
+      - consultancy
+      type: string
+      description: |-
+        * `sponsored` - sponsored
+        * `consultancy` - consultancy
+    ProjectFundTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        project_id:
+          type: integer
+          readOnly: true
+        budget_head_id:
+          type: integer
+          readOnly: true
+        head_type:
+          type: string
+          readOnly: true
+        transaction_type:
+          allOf:
+          - $ref: '#/components/schemas/TransactionTypeEnum'
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+        reference_no:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        created_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - budget_head_id
+      - created_at
+      - created_by_user_id
+      - description
+      - head_type
+      - id
+      - project_id
+      - reference_no
+      - transaction_type
+    ProjectProjectTypeEnum:
+      enum:
+      - sponsored
+      - consultancy
+      type: string
+      description: |-
+        * `sponsored` - Sponsored Research
+        * `consultancy` - Consultancy
+    ProjectStatusEnum:
+      enum:
+      - sanctioned
+      - active
+      - extension_requested
+      - closure_pending
+      - closed
+      - terminated
+      type: string
+      description: |-
+        * `sanctioned` - Sanctioned
+        * `active` - Active
+        * `extension_requested` - Extension Requested
+        * `closure_pending` - Closure Pending
+        * `closed` - Closed
+        * `terminated` - Terminated
+    Proposal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        proposal_type:
+          $ref: '#/components/schemas/ProposalProposalTypeEnum'
+        department:
+          type: string
+          maxLength: 64
+        funding_agency:
+          type: string
+          maxLength: 128
+        proposed_budget:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        overhead_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        submission_deadline:
+          type: string
+          format: date
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ProposalStatusEnum'
+          readOnly: true
+        summary:
+          type: string
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProposalReview'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - department
+      - funding_agency
+      - id
+      - proposed_budget
+      - reviews
+      - status
+      - title
+      - updated_at
+      - user_id
+    ProposalCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        proposal_type:
+          $ref: '#/components/schemas/ProposalCreateProposalTypeEnum'
+        department:
+          type: string
+          maxLength: 64
+        funding_agency:
+          type: string
+          maxLength: 128
+        proposed_budget:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        overhead_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          default: '0.00'
+        submission_deadline:
+          type: string
+          format: date
+          nullable: true
+        summary:
+          type: string
+          default: ''
+      required:
+      - department
+      - funding_agency
+      - proposal_type
+      - proposed_budget
+      - title
+    ProposalCreateProposalTypeEnum:
+      enum:
+      - sponsored_research
+      - consultancy
+      type: string
+      description: |-
+        * `sponsored_research` - sponsored_research
+        * `consultancy` - consultancy
+    ProposalProposalTypeEnum:
+      enum:
+      - sponsored_research
+      - consultancy
+      type: string
+      description: |-
+        * `sponsored_research` - Sponsored Research
+        * `consultancy` - Consultancy
+    ProposalReview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reviewer_user_id:
+          type: integer
+          readOnly: true
+        reviewer_role:
+          type: string
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        comments:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - comments
+      - created_at
+      - id
+      - reviewer_role
+      - reviewer_user_id
+    ProposalReviewAction:
+      type: object
+      properties:
+        comments:
+          type: string
+          default: ''
+    ProposalStatusEnum:
+      enum:
+      - draft
+      - submitted_hod
+      - endorsed_hod
+      - revision_requested
+      - approved_dean
+      - rejected
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted_hod` - Submitted to HoD
+        * `endorsed_hod` - Endorsed by HoD
+        * `revision_requested` - Revision Requested
+        * `approved_dean` - Approved by Dean (RSPC)
+        * `rejected` - Rejected
     Recommendation:
       type: object
       description: |-
@@ -3714,6 +4685,16 @@ components:
         * `workshop` - Workshop
         * `internship` - Internship programme
         * `general` - General
+    TransactionTypeEnum:
+      enum:
+      - allocation
+      - disbursement
+      - reversal
+      type: string
+      description: |-
+        * `allocation` - Fund Allocation / Sanction
+        * `disbursement` - Disbursement / Expenditure
+        * `reversal` - Reversal / Correction
     Transition:
       type: object
       properties:
