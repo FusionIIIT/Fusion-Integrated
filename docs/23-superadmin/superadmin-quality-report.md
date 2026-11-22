@@ -4,7 +4,7 @@
 **Bounded Context:** System Administration Governance  
 **Environment:** `Fusion-Integrated` (branch `module/superadmin`)  
 **Date:** 2026-11-22  
-**Status:** All layers complete, all 12 quality gates satisfied, 148/148 backend tests green (93.62% module branch coverage, 98.82% domain branch coverage). Zero findings open.
+**Status:** All layers complete, all 12 quality gates satisfied, 153/153 backend tests green (93.35% module branch coverage, 97.74% domain branch coverage). Zero findings open.
 
 ---
 
@@ -301,7 +301,7 @@ $ python manage.py seed_iam_permissions --manifest /home/mokshith/Desktop/fusion
 ```
 $ python -c "
 import psycopg
-conn = psycopg.connect('dbname=fusion_integrated user=fusion_admin password=123456780 host=127.0.0.1 port=5432', autocommit=True)
+conn = psycopg.connect('dbname=fusion_integrated user=fusion_admin password=<DB_PASSWORD> host=127.0.0.1 port=5432', autocommit=True)
 cur = conn.cursor()
 cur.execute('DROP DATABASE IF EXISTS fusion_integrated_fresh;')
 cur.execute('CREATE DATABASE fusion_integrated_fresh;')
@@ -331,7 +331,7 @@ demo data loaded
 
 $ python -c "
 import psycopg
-conn = psycopg.connect('dbname=fusion_integrated user=fusion_admin password=123456780 host=127.0.0.1 port=5432', autocommit=True)
+conn = psycopg.connect('dbname=fusion_integrated user=fusion_admin password=<DB_PASSWORD> host=127.0.0.1 port=5432', autocommit=True)
 cur = conn.cursor()
 cur.execute('DROP DATABASE fusion_integrated_fresh;')
 cur.close()
@@ -392,7 +392,19 @@ Exit code 0. Zero warnings or security failures in production configuration mode
 
 ## 12. Approvals, Architecture Sign-Off & Open Questions Record
 
-- **Blueprint Approval:** Approved in writing 2026-11-21 (`docs/23-superadmin/superadmin-blueprint.md`).
+- **Blueprint Approval (Student 2 — Banala Vasanthi Laxmi, 2026-11-21):**
+  - *Location:* Recorded in `docs/23-superadmin/superadmin-blueprint.md` (Phase 2 Gate) and pair review thread (`2026-11-21`).
+  - *Written Decision Quote:* `"Blueprint approved for Phase 2 implementation: bounded context separation (delegating IAM identity/role lifecycle to Fusion_System_Administrator while implementing archival, dual-authorization purge, effective-dated policies, immutable audit logs, and dashboard governance in modules/superadmin), shared registration edits, and DB schema match the SRS."`
+- **Accepted Scope Boundaries & Known Gaps Approval (Student 2 — Banala Vasanthi Laxmi, 2026-11-22):**
+  - *Location:* Recorded in `docs/23-superadmin/spec-tests/triage.md` (Section *Agreed scope dispositions*, Q2-final) and pair review correspondence (`2026-11-22`).
+  - *Written Decision Quote:* `"Student 1's written confirmation enumerates these groups; Student 2 accepts that assignment scope decision. This records a module-boundary disposition, not a claim that system-level SRS requirements are erased."`
+  - *Approved Gaps / Delegated Boundaries:*
+    1. **External IAM Responsibility (`Fusion_System_Administrator`, port 8001):** Login/password policies, 2FA, IP whitelisting, session limits/timeouts, failed-login lockout alerts, and designation assignment/active-role lifecycle (`BR-SA-006`–`016`, `BR-SA-023`–`025`, `BR-SA-027`–`029`, `BR-SA-031`, `BR-SA-034`, `CFR-SA-004`–`010`, `CFR-SA-018`–`019`, `UC-SA-006`–`014`, `WF-03`–`05`).
+    2. **General User Account CRUD (`BR-SA-001`–`003`, `CFR-SA-001`–`003`, `UC-SA-001`–`005`, `WF-06`):** Handled by IAM; `modules/superadmin` manages post-deactivation archival and restoration.
+    3. **Cross-Module Operational Data & Backup Execution (`BR-SA-017`–`020`, `BR-SA-026`):** Cross-module operational record sweeps and external backup runners are outside `modules/superadmin` scope per `BR-SA-026`.
+    4. **Multi-Channel SMS Dispatch, Unspecified Retention Bounds & PDF/Excel Builders (`BR-SA-032`, `BR-SA-035-03`, `CFR-SA-017`, `CFR-SA-021`–`022`):** Outbox notification queuing and CSV audit export are implemented; external SMS gateways, unstated institutional numeric bounds, and PDF/Excel report generators are excluded.
+- **Shared-File Registrations & Dependencies Approval (Student 2 — Banala Vasanthi Laxmi, 2026-11-21):**
+  - *Approved Shared Files:* `config/settings/base.py`, `config/urls.py`, `config/celery.py`, `.importlinter`, `client/src/app/registry.ts`, `client/e2e/accounts.ts`, `openapi/fusion-integrated.v1.yaml`, `registry/permissions.json`, and `docs/02-iam/permission-catalog.generated.md` (zero new third-party dependencies added).
 - **Phase 1 Rulings & Invariant Alignments:**
   1. *IAM Separation:* Pure boundary maintained; `Fusion_System_Administrator` remains the authoritative provider for identity and roles.
   2. *Designation Canonical Naming:* Strictly `"super_admin"` and `"it_head"` across IAM and platform manifests.
@@ -400,5 +412,3 @@ Exit code 0. Zero warnings or security failures in production configuration mode
   4. *Dual-Auth Purge Rule:* Self-approval strictly forbidden both in domain validators and PostgreSQL constraints (`~Q(requested_by=F("it_head_id"))`).
 - **Live Spec Reference Document:**
   Generated via `ops/docs/superadmin_reference.py` at `docs/23-superadmin/superadmin-reference.md`, mapping all 99 live spec IDs to `file:line` locations and cleanly exiting 0.
-- **Git Commit Gate:**
-  All changes remain unstaged and uncommitted per the prompt's instructions, ready for the user's review and commit staging.

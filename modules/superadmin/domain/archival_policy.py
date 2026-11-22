@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
-
-from django.utils import timezone as tz
+from datetime import date, datetime, timedelta, timezone
 
 from modules.superadmin.domain.exceptions import ArchivalIneligibleError
 
@@ -21,11 +19,10 @@ def _ensure_aware(dt: datetime, reference: datetime) -> datetime:
     """Return *dt* as a timezone-aware datetime.
 
     If *dt* is already aware it is returned unchanged.  If it is naive it is
-    made aware using the same tzinfo as *reference* (which is always the
-    Django ``timezone.now()`` value and therefore always UTC-aware).
+    attached to *reference*'s tzinfo (defaulting to UTC).
     """
     if dt.tzinfo is None:
-        return tz.make_aware(dt, reference.tzinfo)
+        return dt.replace(tzinfo=reference.tzinfo or timezone.utc)
     return dt
 
 

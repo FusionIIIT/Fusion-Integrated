@@ -10,56 +10,56 @@ to its enforcing source code location (`file:line`).
 | **BR-SA-001** | Institute identity uniqueness and validation | [modules/superadmin/domain/validators.py:17](../../modules/superadmin/domain/validators.py#L17) |
 | **BR-SA-002** | Valid institute email domain (@iiitdmj.ac.in) | [modules/superadmin/domain/validators.py:23](../../modules/superadmin/domain/validators.py#L23) |
 | **BR-SA-003** | Required attributes captured in archival snapshot | [modules/superadmin/models/archival.py:35](../../modules/superadmin/models/archival.py#L35) |
-| **BR-SA-004** | User archival eligibility (deactivated, 0 pending tx) | [modules/superadmin/domain/archival_policy.py:18](../../modules/superadmin/domain/archival_policy.py#L18) |
-| **BR-SA-005** | Archived user reversible restoration window default | [modules/superadmin/domain/archival_policy.py:63](../../modules/superadmin/domain/archival_policy.py#L63) |
+| **BR-SA-004** | User archival eligibility (deactivated, 0 pending tx) | [modules/superadmin/domain/archival_policy.py:29](../../modules/superadmin/domain/archival_policy.py#L29) |
+| **BR-SA-005** | Archived user reversible restoration window default | [modules/superadmin/domain/archival_policy.py:76](../../modules/superadmin/domain/archival_policy.py#L76) |
 | **BR-SA-017** | Historical data archival eligibility & date bounds | [modules/superadmin/services/historical_archive.py:20](../../modules/superadmin/services/historical_archive.py#L20) |
 | **BR-SA-018** | Pre-archive backup cryptographic checksum check | [modules/superadmin/services/historical_archive.py:29](../../modules/superadmin/services/historical_archive.py#L29) |
 | **BR-SA-019** | Archive data retention period enforcement | [modules/superadmin/models/archival.py:59](../../modules/superadmin/models/archival.py#L59) |
 | **BR-SA-020** | Archived data access mode (strictly read-only) | [modules/superadmin/selectors/archival.py:16](../../modules/superadmin/selectors/archival.py#L16) |
-| **BR-SA-021** | Permanent purge eligibility (retention elapsed) | [modules/superadmin/domain/archival_policy.py:73](../../modules/superadmin/domain/archival_policy.py#L73) |
+| **BR-SA-021** | Permanent purge eligibility (retention elapsed) | [modules/superadmin/domain/archival_policy.py:86](../../modules/superadmin/domain/archival_policy.py#L86) |
 | **BR-SA-022** | Dual authorization for permanent purge | [modules/superadmin/domain/state_machine.py:54](../../modules/superadmin/domain/state_machine.py#L54) |
 | **BR-SA-023** | Role/archival notification outbox timing | [modules/superadmin/services/notifications.py:11](../../modules/superadmin/services/notifications.py#L11) |
 | **BR-SA-024** | Failed login threshold alert configuration | [modules/superadmin/domain/constants.py:38](../../modules/superadmin/domain/constants.py#L38) |
 | **BR-SA-025** | Immutable compliance audit log entry retention | [modules/superadmin/models/audit.py:18](../../modules/superadmin/models/audit.py#L18) |
 | **BR-SA-026** | Super Admin operational content isolation | [modules/superadmin/selectors/scoping.py:14](../../modules/superadmin/selectors/scoping.py#L14) |
 | **BR-SA-028** | Denial of self-modification of admin privileges | [modules/superadmin/domain/validators.py:43](../../modules/superadmin/domain/validators.py#L43) |
-| **BR-SA-029** | Critical purge destructive execution confirmation | [modules/superadmin/services/purge.py:141](../../modules/superadmin/services/purge.py#L141) |
+| **BR-SA-029** | Critical purge destructive execution confirmation | [modules/superadmin/services/purge.py:144](../../modules/superadmin/services/purge.py#L144) |
 | **BR-SA-030** | Bulk operations batch size limit check | [modules/superadmin/domain/validators.py:29](../../modules/superadmin/domain/validators.py#L29) |
 | **BR-SA-033** | Audit log export formatting | [modules/superadmin/api/views.py:276](../../modules/superadmin/api/views.py#L276) |
 | **BR-SA-035** | System policy parameter key whitelist | [modules/superadmin/domain/validators.py:37](../../modules/superadmin/domain/validators.py#L37) |
 | **ISS-SA-004** | 30-Day Reversible Archival Window Governance | [modules/superadmin/domain/constants.py:51](../../modules/superadmin/domain/constants.py#L51) |
 | **UC-SA-014** | Identify and Filter Eligible Inactive Users | [modules/superadmin/selectors/archival.py:16](../../modules/superadmin/selectors/archival.py#L16) |
-| **UC-SA-015** | Archive Inactive User Account | [modules/superadmin/services/archival.py:40](../../modules/superadmin/services/archival.py#L40) |
+| **UC-SA-015** | Archive Inactive User Account | [modules/superadmin/services/archival.py:41](../../modules/superadmin/services/archival.py#L41) |
 | **UC-SA-016** | Archive Historical Institute Module Data | [modules/superadmin/services/historical_archive.py:20](../../modules/superadmin/services/historical_archive.py#L20) |
 | **UC-SA-017** | View Archived User and Data Records | [modules/superadmin/selectors/archival.py:33](../../modules/superadmin/selectors/archival.py#L33) |
-| **UC-SA-018** | Restore Archived User Account within Window | [modules/superadmin/services/archival.py:119](../../modules/superadmin/services/archival.py#L119) |
+| **UC-SA-018** | Restore Archived User Account within Window | [modules/superadmin/services/archival.py:120](../../modules/superadmin/services/archival.py#L120) |
 | **UC-SA-019** | Restore Historical Module Data from Archive | [modules/superadmin/services/historical_archive.py:68](../../modules/superadmin/services/historical_archive.py#L68) |
 | **UC-SA-020** | Generate Archival Compliance and Status Report | [modules/superadmin/selectors/audit.py:32](../../modules/superadmin/selectors/audit.py#L32) |
 | **UC-SA-021** | Download Archived Dataset Backup File | [modules/superadmin/models/archival.py:57](../../modules/superadmin/models/archival.py#L57) |
-| **UC-SA-022** | Initiate Permanent Data Purge Request | [modules/superadmin/services/purge.py:38](../../modules/superadmin/services/purge.py#L38) |
-| **UC-SA-023** | Authorize or Reject Permanent Data Purge Request | [modules/superadmin/services/purge.py:80](../../modules/superadmin/services/purge.py#L80) |
+| **UC-SA-022** | Initiate Permanent Data Purge Request | [modules/superadmin/services/purge.py:39](../../modules/superadmin/services/purge.py#L39) |
+| **UC-SA-023** | Authorize or Reject Permanent Data Purge Request | [modules/superadmin/services/purge.py:81](../../modules/superadmin/services/purge.py#L81) |
 | **UC-SA-024** | View Immutable System Audit Log | [modules/superadmin/selectors/audit.py:18](../../modules/superadmin/selectors/audit.py#L18) |
 | **UC-SA-025** | Export System Audit Log to CSV | [modules/superadmin/api/views.py:276](../../modules/superadmin/api/views.py#L276) |
 | **UC-SA-026** | View Admin Dashboard & Operational Metrics | [modules/superadmin/api/views.py:48](../../modules/superadmin/api/views.py#L48) |
 | **UC-SA-027** | Configure System Policy Parameters | [modules/superadmin/services/config.py:19](../../modules/superadmin/services/config.py#L19) |
-| **UC-SA-031** | Finalize User as Permanently Non-Restorable | [modules/superadmin/services/archival.py:164](../../modules/superadmin/services/archival.py#L164) |
+| **UC-SA-031** | Finalize User as Permanently Non-Restorable | [modules/superadmin/services/archival.py:167](../../modules/superadmin/services/archival.py#L167) |
 | **CW-SA-01** | Permanent Data Purge Authorization Lifecycle | [modules/superadmin/domain/state_machine.py:31](../../modules/superadmin/domain/state_machine.py#L31) |
 | **CW-SA-03** | Deactivated User Resolution & Archive Lifecycle | [modules/superadmin/domain/state_machine.py:21](../../modules/superadmin/domain/state_machine.py#L21) |
-| **BW-SA-01** | Permanent Data Purge — Approved Path | [modules/superadmin/services/purge.py:141](../../modules/superadmin/services/purge.py#L141) |
-| **BW-SA-02** | Permanent Data Purge — Rejected Path | [modules/superadmin/services/purge.py:80](../../modules/superadmin/services/purge.py#L80) |
-| **BW-SA-07** | Archived User Restoration Within Reversible Window | [modules/superadmin/services/archival.py:119](../../modules/superadmin/services/archival.py#L119) |
-| **BW-SA-08** | Archived User Reversibility Window Expiry | [modules/superadmin/services/archival.py:164](../../modules/superadmin/services/archival.py#L164) |
+| **BW-SA-01** | Permanent Data Purge — Approved Path | [modules/superadmin/services/purge.py:144](../../modules/superadmin/services/purge.py#L144) |
+| **BW-SA-02** | Permanent Data Purge — Rejected Path | [modules/superadmin/services/purge.py:81](../../modules/superadmin/services/purge.py#L81) |
+| **BW-SA-07** | Archived User Restoration Within Reversible Window | [modules/superadmin/services/archival.py:120](../../modules/superadmin/services/archival.py#L120) |
+| **BW-SA-08** | Archived User Reversibility Window Expiry | [modules/superadmin/services/archival.py:167](../../modules/superadmin/services/archival.py#L167) |
 | **BW-SA-09** | Historical Data Archive and Restore | [modules/superadmin/services/historical_archive.py:68](../../modules/superadmin/services/historical_archive.py#L68) |
-| **CFR-SA-001** | User archival verification & status persistence | [modules/superadmin/services/archival.py:40](../../modules/superadmin/services/archival.py#L40) |
+| **CFR-SA-001** | User archival verification & status persistence | [modules/superadmin/services/archival.py:41](../../modules/superadmin/services/archival.py#L41) |
 | **CFR-SA-002** | Archived record identity immutability | [modules/superadmin/models/archival.py:15](../../modules/superadmin/models/archival.py#L15) |
 | **CFR-SA-004** | Identity format and validation rules | [modules/superadmin/domain/validators.py:17](../../modules/superadmin/domain/validators.py#L17) |
 | **CFR-SA-010** | User archival lifecycle and restoration window | [modules/superadmin/domain/state_machine.py:40](../../modules/superadmin/domain/state_machine.py#L40) |
 | **CFR-SA-011** | Historical dataset archive lifecycle | [modules/superadmin/services/historical_archive.py:20](../../modules/superadmin/services/historical_archive.py#L20) |
 | **CFR-SA-012** | Historical dataset restoration | [modules/superadmin/services/historical_archive.py:68](../../modules/superadmin/services/historical_archive.py#L68) |
-| **CFR-SA-013** | Permanent purge initiation & retention gate | [modules/superadmin/services/purge.py:38](../../modules/superadmin/services/purge.py#L38) |
-| **CFR-SA-014** | Dual authorization purge approval workflow | [modules/superadmin/services/purge.py:80](../../modules/superadmin/services/purge.py#L80) |
-| **CFR-SA-015** | Permanent purge execution and data destruction | [modules/superadmin/services/purge.py:141](../../modules/superadmin/services/purge.py#L141) |
-| **CFR-SA-016** | Purge request expiration sweep | [modules/superadmin/services/purge.py:185](../../modules/superadmin/services/purge.py#L185) |
+| **CFR-SA-013** | Permanent purge initiation & retention gate | [modules/superadmin/services/purge.py:39](../../modules/superadmin/services/purge.py#L39) |
+| **CFR-SA-014** | Dual authorization purge approval workflow | [modules/superadmin/services/purge.py:81](../../modules/superadmin/services/purge.py#L81) |
+| **CFR-SA-015** | Permanent purge execution and data destruction | [modules/superadmin/services/purge.py:144](../../modules/superadmin/services/purge.py#L144) |
+| **CFR-SA-016** | Purge request expiration sweep | [modules/superadmin/services/purge.py:190](../../modules/superadmin/services/purge.py#L190) |
 | **CFR-SA-017** | Immutable audit log event generation | [modules/superadmin/services/audit.py:8](../../modules/superadmin/services/audit.py#L8) |
 | **CFR-SA-018** | Audit log query and CSV export | [modules/superadmin/api/views.py:276](../../modules/superadmin/api/views.py#L276) |
 | **CFR-SA-019** | Administrative dashboard KPI metrics | [modules/superadmin/selectors/audit.py:32](../../modules/superadmin/selectors/audit.py#L32) |
@@ -69,31 +69,31 @@ to its enforcing source code location (`file:line`).
 | **CFR-SA-023** | Notification outbox transactional queueing | [modules/superadmin/services/notifications.py:11](../../modules/superadmin/services/notifications.py#L11) |
 | **AFR-SA-001** | Institute ID format verification | [modules/superadmin/domain/validators.py:14](../../modules/superadmin/domain/validators.py#L14) |
 | **AFR-SA-002** | Institutional email domain regex | [modules/superadmin/domain/validators.py:13](../../modules/superadmin/domain/validators.py#L13) |
-| **AFR-SA-025** | User archival record initialization | [modules/superadmin/services/archival.py:77](../../modules/superadmin/services/archival.py#L77) |
-| **AFR-SA-026** | Deactivation status requirement check | [modules/superadmin/domain/archival_policy.py:27](../../modules/superadmin/domain/archival_policy.py#L27) |
-| **AFR-SA-027** | Pending transactions verification check | [modules/superadmin/domain/archival_policy.py:35](../../modules/superadmin/domain/archival_policy.py#L35) |
-| **AFR-SA-028** | Reversible restoration window deadline check | [modules/superadmin/domain/archival_policy.py:63](../../modules/superadmin/domain/archival_policy.py#L63) |
+| **AFR-SA-025** | User archival record initialization | [modules/superadmin/services/archival.py:78](../../modules/superadmin/services/archival.py#L78) |
+| **AFR-SA-026** | Deactivation status requirement check | [modules/superadmin/domain/archival_policy.py:38](../../modules/superadmin/domain/archival_policy.py#L38) |
+| **AFR-SA-027** | Pending transactions verification check | [modules/superadmin/domain/archival_policy.py:48](../../modules/superadmin/domain/archival_policy.py#L48) |
+| **AFR-SA-028** | Reversible restoration window deadline check | [modules/superadmin/domain/archival_policy.py:76](../../modules/superadmin/domain/archival_policy.py#L76) |
 | **AFR-SA-029** | Archived user search and filtering | [modules/superadmin/selectors/archival.py:16](../../modules/superadmin/selectors/archival.py#L16) |
-| **AFR-SA-030** | Duplicate archival conflict prevention | [modules/superadmin/services/archival.py:62](../../modules/superadmin/services/archival.py#L62) |
+| **AFR-SA-030** | Duplicate archival conflict prevention | [modules/superadmin/services/archival.py:63](../../modules/superadmin/services/archival.py#L63) |
 | **AFR-SA-031** | Historical dataset archive creation | [modules/superadmin/services/historical_archive.py:41](../../modules/superadmin/services/historical_archive.py#L41) |
 | **AFR-SA-032** | Backup checksum mandatory validation | [modules/superadmin/services/historical_archive.py:38](../../modules/superadmin/services/historical_archive.py#L38) |
 | **AFR-SA-033** | Archive date bounds validation | [modules/superadmin/services/historical_archive.py:34](../../modules/superadmin/services/historical_archive.py#L34) |
 | **AFR-SA-034** | Archived user detail retrieval | [modules/superadmin/selectors/archival.py:33](../../modules/superadmin/selectors/archival.py#L33) |
 | **AFR-SA-035** | Historical archive detail retrieval | [modules/superadmin/selectors/archival.py:48](../../modules/superadmin/selectors/archival.py#L48) |
 | **AFR-SA-036** | Archived user restoration transition | [modules/superadmin/domain/state_machine.py:23](../../modules/superadmin/domain/state_machine.py#L23) |
-| **AFR-SA-037** | Restoration metadata persistence | [modules/superadmin/services/archival.py:143](../../modules/superadmin/services/archival.py#L143) |
+| **AFR-SA-037** | Restoration metadata persistence | [modules/superadmin/services/archival.py:146](../../modules/superadmin/services/archival.py#L146) |
 | **AFR-SA-038** | Reversibility window expiration enforcement | [modules/superadmin/domain/state_machine.py:50](../../modules/superadmin/domain/state_machine.py#L50) |
 | **AFR-SA-039** | Historical dataset restore flag update | [modules/superadmin/services/historical_archive.py:81](../../modules/superadmin/services/historical_archive.py#L81) |
 | **AFR-SA-040** | Historical dataset restore audit logging | [modules/superadmin/services/historical_archive.py:13](../../modules/superadmin/services/historical_archive.py#L13) |
 | **AFR-SA-041** | Historical dataset restore conflict guard | [modules/superadmin/services/historical_archive.py:79](../../modules/superadmin/services/historical_archive.py#L79) |
-| **AFR-SA-044** | Premature purge retention check | [modules/superadmin/domain/archival_policy.py:73](../../modules/superadmin/domain/archival_policy.py#L73) |
-| **AFR-SA-045** | Purge request initiation persistence | [modules/superadmin/services/purge.py:59](../../modules/superadmin/services/purge.py#L59) |
-| **AFR-SA-046** | Duplicate pending purge request guard | [modules/superadmin/services/purge.py:57](../../modules/superadmin/services/purge.py#L57) |
+| **AFR-SA-044** | Premature purge retention check | [modules/superadmin/domain/archival_policy.py:86](../../modules/superadmin/domain/archival_policy.py#L86) |
+| **AFR-SA-045** | Purge request initiation persistence | [modules/superadmin/services/purge.py:60](../../modules/superadmin/services/purge.py#L60) |
+| **AFR-SA-046** | Duplicate pending purge request guard | [modules/superadmin/services/purge.py:58](../../modules/superadmin/services/purge.py#L58) |
 | **AFR-SA-047** | Dual-auth distinct actor enforcement | [modules/superadmin/domain/state_machine.py:72](../../modules/superadmin/domain/state_machine.py#L72) |
 | **AFR-SA-048** | Purge request IT Head decision transition | [modules/superadmin/domain/state_machine.py:33](../../modules/superadmin/domain/state_machine.py#L33) |
-| **AFR-SA-049** | Permanent purge physical destruction | [modules/superadmin/services/purge.py:168](../../modules/superadmin/services/purge.py#L168) |
-| **AFR-SA-050** | Purge request TTL expiration sweep | [modules/superadmin/services/purge.py:185](../../modules/superadmin/services/purge.py#L185) |
-| **AFR-SA-051** | Archival event notification dispatch | [modules/superadmin/services/archival.py:105](../../modules/superadmin/services/archival.py#L105) |
+| **AFR-SA-049** | Permanent purge physical destruction | [modules/superadmin/services/purge.py:173](../../modules/superadmin/services/purge.py#L173) |
+| **AFR-SA-050** | Purge request TTL expiration sweep | [modules/superadmin/services/purge.py:190](../../modules/superadmin/services/purge.py#L190) |
+| **AFR-SA-051** | Archival event notification dispatch | [modules/superadmin/services/archival.py:106](../../modules/superadmin/services/archival.py#L106) |
 | **AFR-SA-052** | Audit log query with actor/action filters | [modules/superadmin/selectors/audit.py:18](../../modules/superadmin/selectors/audit.py#L18) |
 | **AFR-SA-053** | Audit log streaming CSV formatting | [modules/superadmin/api/views.py:284](../../modules/superadmin/api/views.py#L284) |
 | **AFR-SA-054** | Governance dashboard KPI aggregation | [modules/superadmin/selectors/audit.py:32](../../modules/superadmin/selectors/audit.py#L32) |
