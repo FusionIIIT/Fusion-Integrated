@@ -1,0 +1,380 @@
+[
+  {
+    "test_id": "TEST-BR-001",
+    "source_id": "BR-DEPT-001-PERMITTED",
+    "purpose": "Verify Faculty, Dept_Admin, and HOD are permitted to create and publish announcements",
+    "preconditions": "Actor has department.announcement.publish permission",
+    "action_or_input": "Create and publish announcement",
+    "expected_result": "Announcement is created and published successfully",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-002",
+    "source_id": "BR-DEPT-001-PROHIBITED",
+    "purpose": "Verify Student or unauthenticated user is prohibited from publishing announcements",
+    "preconditions": "Actor is Student or unauthenticated",
+    "action_or_input": "Attempt to create or publish announcement",
+    "expected_result": "PermissionDeniedError or AuthenticationError raised",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-003",
+    "source_id": "BR-DEPT-002-MATCH",
+    "purpose": "Verify viewer matching target role, program, and academic year can view announcement",
+    "preconditions": "Announcement targeted to Student / CSE / 2026",
+    "action_or_input": "Query announcements as Student in CSE 2026",
+    "expected_result": "Announcement is visible in results",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-004",
+    "source_id": "BR-DEPT-002-MISMATCH",
+    "purpose": "Verify viewer not matching target role, program, or academic year cannot view announcement",
+    "preconditions": "Announcement targeted to Faculty / ECE / 2025",
+    "action_or_input": "Query announcements as Student in CSE 2026",
+    "expected_result": "Announcement is excluded from results",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-005",
+    "source_id": "BR-DEPT-004-HOD-EDIT",
+    "purpose": "Verify HOD is permitted to edit active department announcement",
+    "preconditions": "Active announcement exists; actor is HOD",
+    "action_or_input": "HOD updates announcement content",
+    "expected_result": "Announcement content updated successfully",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-006",
+    "source_id": "BR-DEPT-004-HOD-HIDE",
+    "purpose": "Verify HOD is permitted to hide active department announcement",
+    "preconditions": "Active announcement exists; actor is HOD",
+    "action_or_input": "HOD hides announcement",
+    "expected_result": "Announcement is_hidden set to True",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-007",
+    "source_id": "BR-DEPT-004-HOD-DELETE",
+    "purpose": "Verify HOD is permitted to delete active department announcement",
+    "preconditions": "Active announcement exists; actor is HOD",
+    "action_or_input": "HOD deletes announcement",
+    "expected_result": "Announcement deleted_at timestamp set",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-008",
+    "source_id": "BR-DEPT-004-NON_HOD-PROHIBITED",
+    "purpose": "Verify non-HOD actor is prohibited from editing, hiding, or deleting active announcement",
+    "preconditions": "Active announcement exists; actor is Dept_Admin or Faculty",
+    "action_or_input": "Non-HOD attempts hide or delete",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-009",
+    "source_id": "BR-DEPT-005-FACULTY",
+    "purpose": "Verify Faculty is permitted to submit stock requests",
+    "preconditions": "Actor is Faculty; inventory item exists with stock",
+    "action_or_input": "Faculty submits stock request",
+    "expected_result": "Stock request created with status Pending HOD Approval",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-010",
+    "source_id": "BR-DEPT-005-NON_FACULTY",
+    "purpose": "Verify non-Faculty is prohibited from submitting stock requests",
+    "preconditions": "Actor is Student or Dept_Admin",
+    "action_or_input": "Attempt stock request submission",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-011",
+    "source_id": "BR-DEPT-006-HOD-APPROVE",
+    "purpose": "Verify HOD is permitted to approve stock request",
+    "preconditions": "Pending StockRequest; actor is HOD",
+    "action_or_input": "HOD approves request",
+    "expected_result": "Status transitions to Approved for Issuance",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-012",
+    "source_id": "BR-DEPT-006-HOD-REJECT",
+    "purpose": "Verify HOD is permitted to reject stock request",
+    "preconditions": "Pending StockRequest; actor is HOD",
+    "action_or_input": "HOD rejects request",
+    "expected_result": "Status transitions to Rejected",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-013",
+    "source_id": "BR-DEPT-006-NON_HOD-PROHIBITED",
+    "purpose": "Verify non-HOD is prohibited from making stock request approval decisions",
+    "preconditions": "Pending StockRequest; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin attempts approval or rejection",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-014",
+    "source_id": "BR-DEPT-007-APPROVED-PERMITTED",
+    "purpose": "Verify Dept_Admin is permitted to issue stock for HOD-approved request",
+    "preconditions": "StockRequest is in Approved for Issuance status; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin issues the stock",
+    "expected_result": "Status transitions to Issued",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-015",
+    "source_id": "BR-DEPT-007-UNAPPROVED-PROHIBITED",
+    "purpose": "Verify stock issuance is prohibited for requests not approved by HOD",
+    "preconditions": "StockRequest is in Pending status",
+    "action_or_input": "Dept_Admin attempts issuance",
+    "expected_result": "Issuance blocked with validation or conflict error",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-016",
+    "source_id": "BR-DEPT-007-NON_ADMIN-PROHIBITED",
+    "purpose": "Verify non-Dept_Admin is prohibited from issuing stock",
+    "preconditions": "Approved StockRequest; actor is Faculty or HOD",
+    "action_or_input": "Non-Dept_Admin actor attempts issuance",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-017",
+    "source_id": "BR-DEPT-008-SUBMIT-PERMITTED",
+    "purpose": "Verify authenticated Students and Faculty are permitted to submit confidential feedback",
+    "preconditions": "Actor is authenticated Student or Faculty",
+    "action_or_input": "Submit feedback",
+    "expected_result": "Feedback record created with confidentiality preserved",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-018",
+    "source_id": "BR-DEPT-008-CONFIDENTIALITY",
+    "purpose": "Verify feedback is confidential and inaccessible outside authorized feedback roles",
+    "preconditions": "Feedback submitted",
+    "action_or_input": "Unrelated user attempts to inspect feedback",
+    "expected_result": "Access denied / feedback excluded from listing",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-019",
+    "source_id": "BR-DEPT-009-ADMIN-RESOLVE",
+    "purpose": "Verify Dept_Admin is permitted to mark feedback Resolved or Closed after initial review",
+    "preconditions": "Feedback in Under Review status; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin marks feedback Resolved or Closed",
+    "expected_result": "Feedback transitions to terminal Resolved/Closed status",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-020",
+    "source_id": "BR-DEPT-009-HOD-RESOLVE",
+    "purpose": "Verify HOD is permitted to mark feedback Resolved or Closed after initial review",
+    "preconditions": "Feedback in Under Review status; actor is HOD",
+    "action_or_input": "HOD marks feedback Resolved or Closed",
+    "expected_result": "Feedback transitions to terminal Resolved/Closed status",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-021",
+    "source_id": "BR-DEPT-009-TERMINAL-LOCKED",
+    "purpose": "Verify feedback in terminal status cannot be reopened or transitioned again",
+    "preconditions": "Feedback in Closed status",
+    "action_or_input": "Attempt further state change on closed feedback",
+    "expected_result": "Operation blocked; terminal state is final",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-022",
+    "source_id": "BR-DEPT-011-OFFICIAL-PENDING",
+    "purpose": "Verify official department-detail changes require HOD approval before becoming effective",
+    "preconditions": "Official detail proposed by Dept_Admin",
+    "action_or_input": "Save proposed official change",
+    "expected_result": "Change held in Pending HOD Approval state; official data not updated yet",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-023",
+    "source_id": "BR-DEPT-011-HEADSHIP-EXCLUDED",
+    "purpose": "Verify Headship identity is excluded from official department detail change path",
+    "preconditions": "Dept_Admin attempts official department change",
+    "action_or_input": "Attempt to edit Headship field",
+    "expected_result": "Blocked; Headship is derived only from central HOD role assignment",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-024",
+    "source_id": "BR-DEPT-013-APPROVE",
+    "purpose": "Verify HOD approval makes proposed official department details effective",
+    "preconditions": "Pending official change; actor is HOD",
+    "action_or_input": "HOD approves change",
+    "expected_result": "Official department details updated with new values",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-025",
+    "source_id": "BR-DEPT-013-REJECT",
+    "purpose": "Verify HOD rejection retains current official department details unchanged",
+    "preconditions": "Pending official change; actor is HOD",
+    "action_or_input": "HOD rejects change",
+    "expected_result": "Change rejected; previous official details remain in effect",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-026",
+    "source_id": "BR-DEPT-013-NON_HOD-PROHIBITED",
+    "purpose": "Verify non-HOD is prohibited from approving official department changes",
+    "preconditions": "Pending official change; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin attempts approval",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-027",
+    "source_id": "BR-DEPT-015-VALID-QUANTITY",
+    "purpose": "Verify requested quantity > 0 and <= current inventory passes validation",
+    "preconditions": "InventoryItem quantity = 10",
+    "action_or_input": "Stock request submitted for quantity = 5",
+    "expected_result": "Validation passes and request enters Pending status",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-028",
+    "source_id": "BR-DEPT-015-EXCEEDS-PROHIBITED",
+    "purpose": "Verify requested quantity > current inventory is prohibited and blocked before approval",
+    "preconditions": "InventoryItem quantity = 10",
+    "action_or_input": "Stock request submitted for quantity = 11",
+    "expected_result": "Validation error raised and request rejected",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-029",
+    "source_id": "BR-DEPT-015-ZERO-QTY-PROHIBITED",
+    "purpose": "Verify requested quantity <= 0 is prohibited",
+    "preconditions": "InventoryItem exists",
+    "action_or_input": "Stock request submitted with quantity = 0",
+    "expected_result": "ValidationError raised for non-positive quantity",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-030",
+    "source_id": "BR-DEPT-016-DECREMENT",
+    "purpose": "Verify stock issuance automatically decrements current inventory quantity",
+    "preconditions": "InventoryItem quantity = 20; approved request quantity = 6",
+    "action_or_input": "Execute stock issuance",
+    "expected_result": "InventoryItem quantity decremented to 14",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-031",
+    "source_id": "BR-DEPT-016-LOG-ISSUANCE",
+    "purpose": "Verify stock issuance records immutable movement log with before/after counts",
+    "preconditions": "Approved request issued",
+    "action_or_input": "Inspect created StockMovement record",
+    "expected_result": "StockMovement created with quantity_before=20, quantity=6, quantity_after=14",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-032",
+    "source_id": "BR-DEPT-016-IMMUTABILITY",
+    "purpose": "Verify stock movement log records are immutable and cannot be updated or deleted",
+    "preconditions": "StockMovement record saved in database",
+    "action_or_input": "Attempt to update quantity or delete movement record",
+    "expected_result": "ValidationError raised on save/delete",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-033",
+    "source_id": "BR-DEPT-017-REVIEW-REQUIRED",
+    "purpose": "Verify Dept_Admin initial review is required before HOD oversight access",
+    "preconditions": "Feedback in New status",
+    "action_or_input": "Dept_Admin conducts review",
+    "expected_result": "Feedback transitions to Under Review, enabling HOD oversight",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-034",
+    "source_id": "BR-DEPT-017-NO-PRE-REVIEW-OVERSIGHT",
+    "purpose": "Verify HOD oversight is prohibited prior to Dept_Admin initial review",
+    "preconditions": "Feedback in New status",
+    "action_or_input": "HOD attempts oversight/resolution on unreviewed feedback",
+    "expected_result": "Action prohibited; initial review precondition not met",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-035",
+    "source_id": "BR-DEPT-018-CATEGORIZE",
+    "purpose": "Verify Dept_Admin categorizes feedback during initial review",
+    "preconditions": "Feedback under review; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin sets category",
+    "expected_result": "Category saved on feedback record",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-036",
+    "source_id": "BR-DEPT-018-SIMPLE-CLOSE",
+    "purpose": "Verify Dept_Admin is permitted to close simple issues directly during initial review",
+    "preconditions": "Simple feedback issue under review; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin closes feedback with note",
+    "expected_result": "Status transitions to Closed",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-037",
+    "source_id": "BR-DEPT-021-INST-ADMIN",
+    "purpose": "Verify central Institute Admin is permitted to assign HOD and Dept_Admin roles",
+    "preconditions": "Actor is central Institute Admin",
+    "action_or_input": "Assign department role to employee",
+    "expected_result": "Role assignment successfully recorded",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-038",
+    "source_id": "BR-DEPT-021-DEPT-ACTOR-PROHIBITED",
+    "purpose": "Verify department actors are prohibited from self-assigning HOD or Dept_Admin roles",
+    "preconditions": "Actor is HOD or Dept_Admin",
+    "action_or_input": "Attempt to assign HOD or Dept_Admin role",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-039",
+    "source_id": "BR-DEPT-022-UNIQUE-HOD",
+    "purpose": "Verify department enforces exactly one active HOD role assignment",
+    "preconditions": "Department has active HOD",
+    "action_or_input": "Attempt concurrent second active HOD assignment without transfer",
+    "expected_result": "System rejects second active assignment with uniqueness violation",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-040",
+    "source_id": "BR-DEPT-022-UNIQUE-ADMIN",
+    "purpose": "Verify department enforces exactly one active Dept_Admin role assignment",
+    "preconditions": "Department has active Dept_Admin",
+    "action_or_input": "Attempt concurrent second active Dept_Admin assignment without transfer",
+    "expected_result": "System rejects second active assignment with uniqueness violation",
+    "test_type": "business_rule_prohibited"
+  },
+  {
+    "test_id": "TEST-BR-041",
+    "source_id": "BR-DEPT-023-BOUNDED",
+    "purpose": "Verify department role assignments must specify a valid time-bounded tenure",
+    "preconditions": "Role assignment being configured",
+    "action_or_input": "Provide start_date and end_date where start_date < end_date",
+    "expected_result": "Validity period recorded and enforced",
+    "test_type": "business_rule_permitted"
+  },
+  {
+    "test_id": "TEST-BR-042",
+    "source_id": "BR-DEPT-024-HEADSHIP-SYNC",
+    "purpose": "Verify displayed department Headship is derived directly from active HOD role assignment",
+    "preconditions": "Active HOD assignment is held by Employee X",
+    "action_or_input": "Retrieve displayed department Headship",
+    "expected_result": "Displayed Headship equals Employee X; independent HOD self-approval excluded",
+    "test_type": "business_rule_permitted"
+  }
+]
