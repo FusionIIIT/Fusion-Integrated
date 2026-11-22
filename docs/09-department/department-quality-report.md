@@ -12,7 +12,7 @@ The Department build implements announcement viewing, publication and maintenanc
 | `.venv/bin/pytest modules/department --cov=modules/department/domain --cov-branch --cov-report=term-missing --cov-fail-under=95` | 21 tests passed. Domain coverage was 100%. |
 | `manage.py check --deploy --fail-level WARNING` with local production-shaped settings | System check identified no issues (2 silenced). |
 | Department-only Playwright run without the unrelated Placement global setup | 2 passed. The public synthetic student account opened announcements and the confidential feedback form through the real portal and IAM. |
-| Repository-wide `make e2e` | Both Department checks passed. The existing sign-in suite reported a failure. The full browser gate and Department staff walkthrough are open. |
+| Repository-wide `make e2e` | 11 passed in 6.4 seconds, including both Department browser checks. The Department staff walkthrough is open. |
 
 ## Test evidence
 

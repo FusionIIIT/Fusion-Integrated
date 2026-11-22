@@ -1,7 +1,8 @@
-import { expect, signIn, test } from "../support/test";
+import { expect, signedInAs, test } from "../support/test";
+
+test.use(signedInAs("student"));
 
 test("UC-DEPT-001 opens announcements as a student", async ({ page }) => {
-  await signIn(page, "student");
   const loaded = page.waitForResponse((response) =>
     new URL(response.url()).pathname === "/api/v1/department/announcements");
   await page.goto("/department/announcements");
@@ -10,7 +11,6 @@ test("UC-DEPT-001 opens announcements as a student", async ({ page }) => {
 });
 
 test("UC-DEPT-007 opens the student's confidential feedback form", async ({ page }) => {
-  await signIn(page, "student");
   await page.goto("/department/feedback");
   await expect(page.getByRole("heading", { name: "Submit feedback" })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Feedback" })).toBeVisible();
