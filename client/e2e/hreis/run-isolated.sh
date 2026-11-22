@@ -66,8 +66,7 @@ as_runner .venv/bin/python manage.py seed_modules > "$output/readiness.log"
 if as_runner .venv/bin/python manage.py hreis_readiness >> "$output/readiness.log" 2>&1; then
   echo "Empty installation unexpectedly ready"; exit 3
 fi
-# Read IDs from the verified synthetic IAM and seed this disposable database before
-# Playwright begins. Do not alter the protected global browser setup.
+# Seed the disposable HR-EIS database from synthetic IAM IDs before Playwright setup.
 iam_ids="$(iam_command shell -c 'import json; from iam.models import IamUser; names = {"hrEmployee": "stf00001", "hrReviewer": "fac00021", "hrAuthority": "stf00003"}; print(json.dumps({key: IamUser.objects.get(username=name, is_active=True).erp_user_id for key, name in names.items()}))')"
 as_runner .venv/bin/python client/e2e/hreis/fixtures.py seed "$iam_ids" >> "$output/readiness.log"
 # Register the platform; all HR-EIS synthetic fixtures are already seeded.

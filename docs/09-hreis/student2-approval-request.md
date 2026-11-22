@@ -2,7 +2,7 @@
 
 **Module:** `hreis` · **branch:** `module/hreis` on `keptbeetle/Fusion-Integrated`
 
-**Status, 2026-11-22:** This is an unsigned request for authentic Student 2 decisions, not an approval, waiver, review verdict or production-readiness certificate. Student 1's post-R3 protected-file remediation is local until validated and published; use `git rev-parse HEAD` and the final verified change list to check the exact version being considered. The independent Stage 0/1 investigation is preliminary evidence, not the assignment's official Step 8.
+**Status, 2026-11-22:** This is an unsigned request for authentic Student 2 decisions, not an approval, waiver, review verdict or production-readiness certificate. Student 1's post-R3 protected-file remediation was verified, committed as `3cf4794` and published to `origin/module/hreis`; use `git rev-parse HEAD` and the complete final diff to verify any later revision being considered. The independent Stage 0/1/2 preflight investigations are review evidence, not the assignment's official Step 8.
 
 ## Decisions that need a real written response
 

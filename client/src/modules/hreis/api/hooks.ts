@@ -14,8 +14,7 @@ import type {
 
 const key = ["hreis"] as const;
 
-// Session identity is part of every HR-EIS read cache key. A role switch (or
-// another user signing in) cannot render data loaded for a different principal.
+// Scope every HR-EIS read cache entry by user and active role to prevent cross-role reuse.
 function useRoleQueryKey(...suffix: (string | number)[]) {
   const { session } = useAuth();
   return [...key, session?.user.id ?? null, session?.active_role ?? null, ...suffix];
