@@ -1,0 +1,344 @@
+[
+  {
+    "test_id": "TC-UC-001",
+    "source_id": "HM-UC-001 Main Flow",
+    "purpose": "Super Admin creates a new hostel master record",
+    "preconditions": "Super Admin authenticated with hostel.hostel.manage",
+    "action_or_input": "POST /api/v1/hostel/hostels with code H_UC1, name UC Hostel 1, capacity 120",
+    "expected_result": "HTTP 201 Created with new hostel record",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-002",
+    "source_id": "HM-UC-002 Main Flow",
+    "purpose": "Super Admin activates or deactivates hostel record",
+    "preconditions": "Target hostel exists; Super Admin authenticated",
+    "action_or_input": "PATCH /api/v1/hostel/hostels/{id} with is_active=False",
+    "expected_result": "HTTP 200 OK and is_active set to False",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-003",
+    "source_id": "HM-UC-003 Main Flow",
+    "purpose": "Super Admin manages Warden role binding for a hostel",
+    "preconditions": "Hostel exists; Super Admin authenticated",
+    "action_or_input": "POST /api/v1/hostel/role-bindings with user_id=10, role=warden, hostel_id={id}",
+    "expected_result": "HTTP 201 Created and Warden role binding active",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-004",
+    "source_id": "HM-UC-004 Main Flow",
+    "purpose": "Super Admin manages Caretaker role binding with shift context",
+    "preconditions": "Hostel exists; Super Admin authenticated",
+    "action_or_input": "POST /api/v1/hostel/role-bindings with user_id=11, role=caretaker, shift=evening",
+    "expected_result": "HTTP 201 Created and Caretaker role binding recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-005",
+    "source_id": "HM-UC-005 Main Flow",
+    "purpose": "Student submits hostel accommodation request",
+    "preconditions": "Student authenticated with hostel.accommodation.create",
+    "action_or_input": "POST /api/v1/hostel/requests with preferred_hostel, academic_year, semester",
+    "expected_result": "HTTP 201 Created with status submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-006",
+    "source_id": "HM-UC-006 Main Flow",
+    "purpose": "Super Admin records batch room allotment decision",
+    "preconditions": "Accommodation request submitted; room has capacity",
+    "action_or_input": "POST /api/v1/hostel/allotments/batch with student_user_id, hostel_id, room_id",
+    "expected_result": "HTTP 201 Created, allotment status active, room occupancy incremented",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-007",
+    "source_id": "HM-UC-007 Alternative A2",
+    "purpose": "Super Admin records formal room vacation update",
+    "preconditions": "Active room allotment exists",
+    "action_or_input": "POST /api/v1/hostel/allotments/{id}/vacate",
+    "expected_result": "HTTP 200 OK, allotment status vacated, room occupancy decremented",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-008",
+    "source_id": "HM-UC-008 Main Flow",
+    "purpose": "Student views own room allocation information",
+    "preconditions": "Student authenticated with hostel.allotment.view",
+    "action_or_input": "GET /api/v1/hostel/allotments",
+    "expected_result": "HTTP 200 OK containing only caller student allotment information",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-009",
+    "source_id": "HM-UC-009 Main Flow",
+    "purpose": "Caretaker maintains room availability and status",
+    "preconditions": "Caretaker authenticated with hostel.occupancy.manage",
+    "action_or_input": "PATCH /api/v1/hostel/rooms/{id} with status=occupied",
+    "expected_result": "HTTP 200 OK and room status updated",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-010",
+    "source_id": "HM-UC-010 Main Flow",
+    "purpose": "Caretaker records individual room exchange between two students",
+    "preconditions": "Two students hold active allotments in the same assigned hostel",
+    "action_or_input": "POST /api/v1/hostel/allotments/exchange with student_a_id and student_b_id",
+    "expected_result": "HTTP 201 Created and rooms swapped with exchange history retained",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-011",
+    "source_id": "HM-UC-011 Main Flow",
+    "purpose": "Warden reviews room assignments and occupancy patterns",
+    "preconditions": "Warden authenticated with hostel.occupancy.view",
+    "action_or_input": "GET /api/v1/hostel/allotments",
+    "expected_result": "HTTP 200 OK with allotments list for assigned hostel",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-012",
+    "source_id": "HM-UC-012 Main Flow",
+    "purpose": "Caretaker records student attendance batch",
+    "preconditions": "Caretaker authenticated with hostel.attendance.record",
+    "action_or_input": "POST /api/v1/hostel/attendance with date and attendance entries",
+    "expected_result": "HTTP 201 Created and attendance entries stored",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-013",
+    "source_id": "HM-UC-013 Main Flow",
+    "purpose": "Student views own attendance records",
+    "preconditions": "Student authenticated with hostel.attendance.view_self",
+    "action_or_input": "GET /api/v1/hostel/attendance",
+    "expected_result": "HTTP 200 OK with only caller student attendance records",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-014",
+    "source_id": "HM-UC-014 Main Flow",
+    "purpose": "Student submits leave request",
+    "preconditions": "Student authenticated with hostel.leave.create",
+    "action_or_input": "POST /api/v1/hostel/leaves with dates, leave_type, and reason",
+    "expected_result": "HTTP 201 Created, status submitted, notification sent",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-015",
+    "source_id": "HM-UC-015 Alternative A1",
+    "purpose": "Caretaker reviews and records leave approval decision",
+    "preconditions": "Leave request submitted; Caretaker has hostel.leave.review",
+    "action_or_input": "POST /api/v1/hostel/leaves/{id}/decide with decision=approved",
+    "expected_result": "HTTP 200 OK and leave status updated to approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-016",
+    "source_id": "HM-UC-016 Main Flow",
+    "purpose": "Student views own leave status and history",
+    "preconditions": "Student authenticated with hostel.leave.view_self",
+    "action_or_input": "GET /api/v1/hostel/leaves",
+    "expected_result": "HTTP 200 OK returning only leaves submitted by the caller",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-017",
+    "source_id": "HM-UC-017 Main Flow",
+    "purpose": "Student submits hostel-related complaint",
+    "preconditions": "Student authenticated with hostel.complaint.create",
+    "action_or_input": "POST /api/v1/hostel/complaints with category=plumbing, description=Tap leaking",
+    "expected_result": "HTTP 201 Created, status submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-018",
+    "source_id": "HM-UC-018 Alternative A3",
+    "purpose": "Caretaker records escalation of complaint to Warden",
+    "preconditions": "Complaint submitted; Caretaker has hostel.complaint.manage",
+    "action_or_input": "PATCH /api/v1/hostel/complaints/{id} with status=escalated, action_taken=Pipe burst",
+    "expected_result": "HTTP 200 OK, status escalated, escalated timestamp recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-019",
+    "source_id": "HM-UC-019 Main Flow",
+    "purpose": "Warden monitors escalated or unresolved complaints",
+    "preconditions": "Warden authenticated with hostel.complaint.oversight",
+    "action_or_input": "GET /api/v1/hostel/complaints",
+    "expected_result": "HTTP 200 OK with complaints list for assigned hostel",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-020",
+    "source_id": "HM-UC-020 Main Flow",
+    "purpose": "Student submits guest room booking request",
+    "preconditions": "Student authenticated with hostel.guestroom.create",
+    "action_or_input": "POST /api/v1/hostel/guest-rooms with guest details and dates",
+    "expected_result": "HTTP 201 Created, status submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-021",
+    "source_id": "HM-UC-021 Main Flow",
+    "purpose": "Caretaker reviews and approves guest room booking request",
+    "preconditions": "Booking submitted; Caretaker has hostel.guestroom.manage",
+    "action_or_input": "POST /api/v1/hostel/guest-rooms/{id}/decide with decision=approved, room_id={id}",
+    "expected_result": "HTTP 200 OK, status approved, room assigned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-022",
+    "source_id": "HM-UC-022 Main Flow",
+    "purpose": "Student views own guest room booking status and history",
+    "preconditions": "Student authenticated with hostel.guestroom.view_self",
+    "action_or_input": "GET /api/v1/hostel/guest-rooms",
+    "expected_result": "HTTP 200 OK returning only bookings for calling student",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-023",
+    "source_id": "HM-UC-023 Main Flow",
+    "purpose": "Student submits extended stay request for vacation/break",
+    "preconditions": "Student authenticated with hostel.extendedstay.create",
+    "action_or_input": "POST /api/v1/hostel/extended-stays with stay_reason, dates",
+    "expected_result": "HTTP 201 Created, status submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-024",
+    "source_id": "HM-UC-024 Main Flow",
+    "purpose": "Warden reviews and approves extended stay request with charge info",
+    "preconditions": "Request submitted; Warden has hostel.extendedstay.review",
+    "action_or_input": "POST /api/v1/hostel/extended-stays/{id}/decide with decision=approved, charge_amount=1000",
+    "expected_result": "HTTP 200 OK, status approved, charge recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-025",
+    "source_id": "HM-UC-025 Main Flow",
+    "purpose": "System records extended-stay charge and compliance information",
+    "preconditions": "Extended stay approved with charge",
+    "action_or_input": "GET /api/v1/hostel/extended-stays",
+    "expected_result": "HTTP 200 OK showing charge_amount=1000 and compliance_status=pending",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-026",
+    "source_id": "HM-UC-026 Main Flow",
+    "purpose": "Caretaker records disciplinary fine",
+    "preconditions": "Caretaker has hostel.fine.record",
+    "action_or_input": "POST /api/v1/hostel/fines with student_user_id, amount, reason, date",
+    "expected_result": "HTTP 201 Created, fine status recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-027",
+    "source_id": "HM-UC-027 Main Flow",
+    "purpose": "Student views own fine records and history",
+    "preconditions": "Student authenticated with hostel.fine.view_self",
+    "action_or_input": "GET /api/v1/hostel/fines",
+    "expected_result": "HTTP 200 OK returning only fines for calling student",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-028",
+    "source_id": "HM-UC-028 Main Flow",
+    "purpose": "Caretaker maintains hostel operational inventory records",
+    "preconditions": "Caretaker has hostel.inventory.manage",
+    "action_or_input": "POST /api/v1/hostel/inventory with item_name, quantity, condition",
+    "expected_result": "HTTP 201 Created and item stored",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-029",
+    "source_id": "HM-UC-029 Main Flow",
+    "purpose": "Caretaker maintains staff duty coordination information",
+    "preconditions": "Caretaker has hostel.staff.manage",
+    "action_or_input": "POST /api/v1/hostel/staff-logs with staff_name, role, shift, date",
+    "expected_result": "HTTP 201 Created and staff duty log recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-030",
+    "source_id": "HM-UC-030 Main Flow",
+    "purpose": "Warden maintains security guard shift schedule",
+    "preconditions": "Warden has hostel.security.manage",
+    "action_or_input": "POST /api/v1/hostel/security-shifts with guard_name, shift, shift_date",
+    "expected_result": "HTTP 201 Created and security guard shift stored",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-031",
+    "source_id": "HM-UC-031 Main Flow",
+    "purpose": "Caretaker publishes notice for assigned hostel",
+    "preconditions": "Caretaker has hostel.notice.publish for assigned hostel",
+    "action_or_input": "POST /api/v1/hostel/notices with title, content, priority",
+    "expected_result": "HTTP 201 Created and notice active",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-032",
+    "source_id": "HM-UC-032 Main Flow",
+    "purpose": "Student views notices on authorized notice board",
+    "preconditions": "Student authenticated with hostel.notice.view",
+    "action_or_input": "GET /api/v1/hostel/notices",
+    "expected_result": "HTTP 200 OK showing notices for student allocated hostel",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-033",
+    "source_id": "HM-UC-033 Main Flow",
+    "purpose": "Generate predefined operational summary report",
+    "preconditions": "Warden or Caretaker has hostel.report.view",
+    "action_or_input": "GET /api/v1/hostel/reports/{hostel_id}",
+    "expected_result": "HTTP 200 OK containing room stats, leave count, and complaint count",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-034",
+    "source_id": "HM-UC-034 Main Flow",
+    "purpose": "System issues HM notifications for supported events",
+    "preconditions": "Student has pending or updated notification events",
+    "action_or_input": "GET /api/v1/hostel/notifications",
+    "expected_result": "HTTP 200 OK returning notifications for authenticated user",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-036",
+    "source_id": "HM-UC-036 Main Flow",
+    "purpose": "Warden reviews attendance summaries and trends",
+    "preconditions": "Warden authenticated with hostel.attendance.review",
+    "action_or_input": "GET /api/v1/hostel/attendance",
+    "expected_result": "HTTP 200 OK with attendance entries for assigned hostel",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-037",
+    "source_id": "HM-UC-037 Main Flow",
+    "purpose": "Warden reviews leave information and summaries",
+    "preconditions": "Warden authenticated with hostel.leave.oversight",
+    "action_or_input": "GET /api/v1/hostel/leaves",
+    "expected_result": "HTTP 200 OK with leave requests for assigned hostel",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-038",
+    "source_id": "HM-UC-038 Main Flow",
+    "purpose": "Warden reviews fine summaries and disciplinary patterns",
+    "preconditions": "Warden authenticated with hostel.fine.oversight",
+    "action_or_input": "GET /api/v1/hostel/fines",
+    "expected_result": "HTTP 200 OK with fine records for assigned hostel",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-039",
+    "source_id": "HM-UC-039 Main Flow",
+    "purpose": "Warden reviews staff assignments or shift information",
+    "preconditions": "Warden authenticated with hostel.staff.view",
+    "action_or_input": "GET /api/v1/hostel/staff-logs",
+    "expected_result": "HTTP 200 OK with staff duty logs for assigned hostel",
+    "test_type": "positive"
+  }
+]

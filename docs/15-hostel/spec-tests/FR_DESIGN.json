@@ -1,0 +1,272 @@
+[
+  {
+    "test_id": "TC-FR-001-P",
+    "source_id": "CFR-HM-001",
+    "purpose": "Super Admin can create a hostel master record",
+    "preconditions": "Super Admin authenticated with hostel.hostel.manage",
+    "action_or_input": "POST /api/v1/hostel/hostels with code=H001, name=Hostel A, gender=boys, capacity=100",
+    "expected_result": "HTTP 201 Created with hostel_id and code H001",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-002-N",
+    "source_id": "CFR-HM-001",
+    "purpose": "Duplicate hostel code is rejected",
+    "preconditions": "Hostel with code H001 already exists",
+    "action_or_input": "POST /api/v1/hostel/hostels with code=H001",
+    "expected_result": "HTTP 400 Bad Request with duplicate code error",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-003-P",
+    "source_id": "CFR-HM-002",
+    "purpose": "Super Admin assigns Warden to hostel via role binding",
+    "preconditions": "Hostel exists; Super Admin authenticated",
+    "action_or_input": "POST /api/v1/hostel/role-bindings with user_id=10, role=warden, hostel_id={id}",
+    "expected_result": "HTTP 201 Created with role binding active",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-004-P",
+    "source_id": "CFR-HM-003",
+    "purpose": "Super Admin creates room under existing hostel",
+    "preconditions": "Hostel exists; Super Admin authenticated with hostel.room.manage",
+    "action_or_input": "POST /api/v1/hostel/rooms with hostel_id, number=101, capacity=3, room_type=standard",
+    "expected_result": "HTTP 201 Created with room_id and status=available",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-005-P",
+    "source_id": "CFR-HM-004",
+    "purpose": "Student submits accommodation request for hostel allocation",
+    "preconditions": "Student authenticated with hostel.accommodation.create",
+    "action_or_input": "POST /api/v1/hostel/requests with preferred_hostel, academic_year=2026-27, semester=odd",
+    "expected_result": "HTTP 201 Created with status=submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-006-P",
+    "source_id": "CFR-HM-005",
+    "purpose": "Super Admin batch allots students to rooms",
+    "preconditions": "Accommodation request submitted; room available",
+    "action_or_input": "POST /api/v1/hostel/allotments/batch with list of student_id and room_id pairs",
+    "expected_result": "HTTP 201 Created with allotment records; request status becomes allotted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-007-N",
+    "source_id": "CFR-HM-005",
+    "purpose": "Allotment fails when room capacity is exceeded",
+    "preconditions": "Room at full occupancy",
+    "action_or_input": "POST /api/v1/hostel/allotments/batch with that full room",
+    "expected_result": "HTTP 400 with CapacityExceededError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-008-P",
+    "source_id": "CFR-HM-006",
+    "purpose": "Caretaker records daily attendance for a hostel",
+    "preconditions": "Caretaker authenticated with hostel.attendance.manage; students allotted",
+    "action_or_input": "POST /api/v1/hostel/attendance with hostel_id, date, attendance list",
+    "expected_result": "HTTP 201 Created with attendance records",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-009-P",
+    "source_id": "CFR-HM-007",
+    "purpose": "Student submits leave request",
+    "preconditions": "Student authenticated with hostel.leave.create; student allotted",
+    "action_or_input": "POST /api/v1/hostel/leaves with leave_type=home, from_date, to_date",
+    "expected_result": "HTTP 201 Created with status=submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-010-P",
+    "source_id": "CFR-HM-008",
+    "purpose": "Caretaker approves a submitted leave request",
+    "preconditions": "Leave request is submitted",
+    "action_or_input": "POST /api/v1/hostel/leaves/{id}/decide with decision=approved",
+    "expected_result": "HTTP 200 OK with status=approved; student notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-011-N",
+    "source_id": "CFR-HM-008",
+    "purpose": "Invalid leave state transition is rejected",
+    "preconditions": "Leave request is already approved",
+    "action_or_input": "POST /api/v1/hostel/leaves/{id}/decide with decision=rejected",
+    "expected_result": "HTTP 400 with InvalidStateTransitionError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-012-P",
+    "source_id": "CFR-HM-009",
+    "purpose": "Student submits hostel complaint",
+    "preconditions": "Student authenticated with hostel.complaint.create",
+    "action_or_input": "POST /api/v1/hostel/complaints with category=plumbing, description=Leaking pipe",
+    "expected_result": "HTTP 201 Created with status=submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-013-N",
+    "source_id": "CFR-HM-009",
+    "purpose": "Complaint with empty category is rejected",
+    "preconditions": "Student authenticated",
+    "action_or_input": "POST /api/v1/hostel/complaints with category='', description=Leaking",
+    "expected_result": "HTTP 400 with MandatoryFieldMissingError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-014-P",
+    "source_id": "CFR-HM-010",
+    "purpose": "Caretaker resolves a submitted complaint",
+    "preconditions": "Complaint is in submitted state",
+    "action_or_input": "PATCH /api/v1/hostel/complaints/{id} with status=resolved",
+    "expected_result": "HTTP 200 OK with status=resolved and resolved_at timestamp",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-015-P",
+    "source_id": "CFR-HM-011",
+    "purpose": "Warden books a guest room",
+    "preconditions": "Guest room available; Warden authenticated with hostel.guest.manage",
+    "action_or_input": "POST /api/v1/hostel/guest-rooms with guest_name, check_in_date, check_out_date",
+    "expected_result": "HTTP 201 Created with status=submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-016-P",
+    "source_id": "CFR-HM-012",
+    "purpose": "Warden approves a guest room booking",
+    "preconditions": "Guest room booking is submitted",
+    "action_or_input": "POST /api/v1/hostel/guest-rooms/{id}/decide with decision=approved",
+    "expected_result": "HTTP 200 OK with status=approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-017-P",
+    "source_id": "CFR-HM-013",
+    "purpose": "Student submits extended stay request",
+    "preconditions": "Student allotted; authenticated with hostel.extended_stay.create",
+    "action_or_input": "POST /api/v1/hostel/extended-stays with extended_to_date, reason",
+    "expected_result": "HTTP 201 Created with status=submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-018-P",
+    "source_id": "CFR-HM-014",
+    "purpose": "Warden approves extended stay request",
+    "preconditions": "Extended stay request is submitted",
+    "action_or_input": "POST /api/v1/hostel/extended-stays/{id}/decide with decision=approved",
+    "expected_result": "HTTP 200 OK with status=approved; charge recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-019-P",
+    "source_id": "CFR-HM-015",
+    "purpose": "Warden records a fine for a student",
+    "preconditions": "Student allotted; Warden authenticated with hostel.fine.manage",
+    "action_or_input": "POST /api/v1/hostel/fines with student_user_id, amount=500, reason=Rule violation",
+    "expected_result": "HTTP 201 Created with fine_id and status=recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-020-N",
+    "source_id": "CFR-HM-015",
+    "purpose": "Fine with zero amount is rejected",
+    "preconditions": "Warden authenticated",
+    "action_or_input": "POST /api/v1/hostel/fines with student_user_id=5, amount=0, reason=test",
+    "expected_result": "HTTP 400 with MandatoryFieldMissingError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-021-P",
+    "source_id": "CFR-HM-016",
+    "purpose": "Caretaker records inventory item for hostel",
+    "preconditions": "Caretaker authenticated with hostel.inventory.manage",
+    "action_or_input": "POST /api/v1/hostel/inventory with hostel_id, name=Chair, quantity=10, condition=working",
+    "expected_result": "HTTP 201 Created with inventory_id",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-022-P",
+    "source_id": "CFR-HM-017",
+    "purpose": "Caretaker logs staff duty record",
+    "preconditions": "Caretaker authenticated with hostel.staff.manage",
+    "action_or_input": "POST /api/v1/hostel/staff-duties with staff_user_id, duty_role=cleaning, date, shift",
+    "expected_result": "HTTP 201 Created with duty log entry",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-023-P",
+    "source_id": "CFR-HM-018",
+    "purpose": "Caretaker records security guard shift",
+    "preconditions": "Caretaker authenticated with hostel.security.manage",
+    "action_or_input": "POST /api/v1/hostel/security-shifts with guard_user_id, hostel_id, date, shift",
+    "expected_result": "HTTP 201 Created with shift status=scheduled",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-024-P",
+    "source_id": "CFR-HM-019",
+    "purpose": "Warden publishes hostel notice",
+    "preconditions": "Warden authenticated with hostel.notice.manage for assigned hostel",
+    "action_or_input": "POST /api/v1/hostel/notices with hostel_id, title, content, priority=important",
+    "expected_result": "HTTP 201 Created with notice_id",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-025-N",
+    "source_id": "CFR-HM-019",
+    "purpose": "Warden cannot publish notice for unassigned hostel",
+    "preconditions": "Warden authenticated but hostel not in assigned list",
+    "action_or_input": "POST /api/v1/hostel/notices with unassigned hostel_id",
+    "expected_result": "HTTP 403 or NoticePermissionError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-026-P",
+    "source_id": "CFR-HM-020",
+    "purpose": "Super Admin can view all hostels across institution",
+    "preconditions": "Multiple hostels exist; Super Admin authenticated",
+    "action_or_input": "GET /api/v1/hostel/hostels",
+    "expected_result": "HTTP 200 OK returning all hostels",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-027-P",
+    "source_id": "CFR-HM-021",
+    "purpose": "Warden sees only hostels they are assigned to",
+    "preconditions": "Warden assigned to Hostel 1 only; Hostel 2 also exists",
+    "action_or_input": "GET /api/v1/hostel/hostels as Warden",
+    "expected_result": "HTTP 200 OK returning only Hostel 1",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-028-P",
+    "source_id": "CFR-HM-022",
+    "purpose": "Student sees only their allocated hostel data",
+    "preconditions": "Student allotted to Hostel 1",
+    "action_or_input": "GET /api/v1/hostel/hostels as Student",
+    "expected_result": "HTTP 200 OK returning Hostel 1 only",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-029-P",
+    "source_id": "CFR-HM-023",
+    "purpose": "Room exchange between two students is processed",
+    "preconditions": "Both students allotted in same hostel; Warden authenticated",
+    "action_or_input": "POST /api/v1/hostel/room-exchanges with student_a_allotment_id and student_b_allotment_id",
+    "expected_result": "HTTP 201 Created with exchange status=requested",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-030-P",
+    "source_id": "CFR-HM-024",
+    "purpose": "Notification is sent to student on allotment",
+    "preconditions": "Accommodation request submitted; room available",
+    "action_or_input": "POST /api/v1/hostel/allotments/batch triggering allotment",
+    "expected_result": "HostelNotification record created with event=room_allocation for student",
+    "test_type": "positive"
+  }
+]
