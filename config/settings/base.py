@@ -231,6 +231,10 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "GymkhanaStatusEnum": "modules.gymkhana.models.club.Club.STATUS_CHOICES",
+        "GymkhanaPollStatusEnum": "modules.gymkhana.models.poll.Poll.STATUS_CHOICES",
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False

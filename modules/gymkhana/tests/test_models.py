@@ -157,7 +157,7 @@ def test_booking_constraints_and_indexes():
     assert "gymkhana_booking_type_valid" in constraint_names
 
     index_names = {i.name for i in Booking._meta.indexes}
-    assert "gymkhana_booking_venue_slot_idx" in index_names
+    assert "gymkhana_bk_venue_slot_idx" in index_names
     assert "gymkhana_booking_club_date_idx" in index_names
 
 

@@ -52,7 +52,7 @@ class Booking(models.Model):
         indexes = [
             models.Index(
                 fields=["venue", "date", "start_time"],
-                name="gymkhana_booking_venue_slot_idx",
+                name="gymkhana_bk_venue_slot_idx",
             ),
             models.Index(fields=["club", "date"], name="gymkhana_booking_club_date_idx"),
         ]
