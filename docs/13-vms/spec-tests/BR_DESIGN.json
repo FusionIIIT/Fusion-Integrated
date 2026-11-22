@@ -1,0 +1,128 @@
+[
+  {
+    "test_id": "TC-BR-001",
+    "source_id": "VMS-BR-001 Exact ID Hash Match - Match Found",
+    "purpose": "Verify exact Government ID hash match blocks visitor",
+    "preconditions": "Blacklist entry active with id_number_hash='hash_abc123'",
+    "action_or_input": "Evaluate blacklist match for visitor with id_number_hash='hash_abc123'",
+    "expected_result": "Returns BlacklistMatchResult(is_blacklisted=True, matched_rule='BR-001')",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-002",
+    "source_id": "VMS-BR-001 Exact ID Hash Match - No Match",
+    "purpose": "Verify non-matching ID hash permits visitor",
+    "preconditions": "Blacklist entry active with id_number_hash='hash_abc123'",
+    "action_or_input": "Evaluate blacklist match for visitor with id_number_hash='hash_xyz999'",
+    "expected_result": "Returns BlacklistMatchResult(is_blacklisted=False)",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-003",
+    "source_id": "VMS-BR-004 Quorum Match on Phone and Name - Match Found",
+    "purpose": "Verify matching phone and partial name triggers watchlist hit",
+    "preconditions": "Blacklist entry with phone='+919876543210' and full_name='John Doe'",
+    "action_or_input": "Evaluate blacklist match for phone='9876543210' and name='Johnathan Doe'",
+    "expected_result": "Returns BlacklistMatchResult(is_blacklisted=True, matched_rule='BR-004')",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-004",
+    "source_id": "VMS-BR-004 Quorum Match on Phone and Name - Phone Mismatch",
+    "purpose": "Verify matching name but different phone does not trigger quorum block",
+    "preconditions": "Blacklist entry with phone='+919876543210' and full_name='John Doe'",
+    "action_or_input": "Evaluate blacklist match for phone='9111222333' and name='John Doe'",
+    "expected_result": "Returns BlacklistMatchResult(is_blacklisted=False)",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-005",
+    "source_id": "VMS-BR-008 Pass Validity Window - Valid Current Time",
+    "purpose": "Verify pass is valid when current time is between valid_from and valid_to",
+    "preconditions": "Pass valid from 1 hour ago to 3 hours in future",
+    "action_or_input": "Evaluate pass validity against current timestamp",
+    "expected_result": "Validation succeeds without error (is_valid=True)",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-006",
+    "source_id": "VMS-BR-008 Pass Validity Window - Expired Time",
+    "purpose": "Verify pass is invalid when current time is past valid_to",
+    "preconditions": "Pass valid from 5 hours ago to 1 hour ago",
+    "action_or_input": "Evaluate pass validity against current timestamp",
+    "expected_result": "Validation fails with PassExpiredError (is_valid=False)",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-007",
+    "source_id": "VMS-BR-008 Pass Validity Window - Future Start Time",
+    "purpose": "Verify pass is invalid before valid_from start time",
+    "preconditions": "Pass valid starting tomorrow",
+    "action_or_input": "Evaluate pass validity against current timestamp",
+    "expected_result": "Validation fails with PassExpiredError (not yet valid)",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-008",
+    "source_id": "VMS-BR-012 Zone Access Validation - Permitted Zone",
+    "purpose": "Verify zone access allowed when zone is in allowed_zones list",
+    "preconditions": "Allowed zones = ['Auditorium', 'Cafeteria']",
+    "action_or_input": "Validate access for 'Auditorium'",
+    "expected_result": "Returns is_authorized=True",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-009",
+    "source_id": "VMS-BR-012 Zone Access Validation - Unauthorized Zone",
+    "purpose": "Verify zone access prohibited when zone is not in allowed_zones",
+    "preconditions": "Allowed zones = ['Auditorium']",
+    "action_or_input": "Validate access for 'Data Center'",
+    "expected_result": "Returns is_authorized=False",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-010",
+    "source_id": "VMS-BR-017 / VMS-BR-020 Duplicate Same-Day Active Pass Check",
+    "purpose": "Verify prohibition against duplicate same-day active passes for same visitor",
+    "preconditions": "Visitor already has active approved pass for today",
+    "action_or_input": "Attempt to register second visit pass for same visitor on same date",
+    "expected_result": "Registration rejected with DuplicateVisitPassError",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-011",
+    "source_id": "VMS-BR-023 Idempotency of Completed Checkout",
+    "purpose": "Verify checkout cannot be re-applied to an already checked-out visit",
+    "preconditions": "Visit is in checked_out state",
+    "action_or_input": "Attempt gate check-out on already checked-out visit",
+    "expected_result": "Action rejected with InvalidTransitionError",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-012",
+    "source_id": "VMS-BR-032 Default Walk-in Pass Duration",
+    "purpose": "Verify walk-in pass duration defaults to exactly 4 hours",
+    "preconditions": "Guard initiates walk-in registration without explicit duration override",
+    "action_or_input": "Generate walk-in pass at timestamp T",
+    "expected_result": "Pass valid_to equals exactly T + 4 hours",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-013",
+    "source_id": "VMS-BR-041 Zone Isolation with Case-Insensitive Matching",
+    "purpose": "Verify zone checking normalizes case and whitespace",
+    "preconditions": "Pass allowed_zones=['Library']",
+    "action_or_input": "Validate access for '  library  '",
+    "expected_result": "Returns is_authorized=True",
+    "test_type": "business_rule"
+  },
+  {
+    "test_id": "TC-BR-014",
+    "source_id": "VMS-BR-045 Emergency Muster Headcount Consistency",
+    "purpose": "Verify emergency muster headcount reflects total on-site checked_in visitors",
+    "preconditions": "4 visitors currently checked_in, 2 checked_out, 1 approved",
+    "action_or_input": "Trigger emergency muster",
+    "expected_result": "EmergencyMuster record initialized with headcount_total=4 and headcount_accounted=0",
+    "test_type": "business_rule"
+  }
+]

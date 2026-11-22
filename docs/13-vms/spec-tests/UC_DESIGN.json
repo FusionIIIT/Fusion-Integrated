@@ -1,0 +1,146 @@
+[
+  {
+    "test_id": "TC-UC-001",
+    "source_id": "VMS-UC-001 Main Flow",
+    "purpose": "Verify visitor registration main success flow",
+    "preconditions": "Visitor not registered and not on blacklist",
+    "action_or_input": "Submit valid visitor details with phone, name, and identity document",
+    "expected_result": "Visitor entity created with unique ID and hashed identity",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-002",
+    "source_id": "VMS-UC-001 Exception Flow E1",
+    "purpose": "Verify visitor registration blocked when visitor is blacklisted",
+    "preconditions": "Visitor ID hash matches active blacklist entry",
+    "action_or_input": "Attempt to register blacklisted visitor",
+    "expected_result": "Registration rejected with BlacklistMatchError and security alert logged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-003",
+    "source_id": "VMS-UC-003 Main Flow",
+    "purpose": "Verify pre-visiting guest pass request creation",
+    "preconditions": "Valid host user ID provided",
+    "action_or_input": "Visitor submits pre-visit request for scheduled future date",
+    "expected_result": "Visit created in requested status awaiting host approval",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-004",
+    "source_id": "VMS-UC-005 Main Flow",
+    "purpose": "Verify request visit via host routing",
+    "preconditions": "Visitor registered; Host active",
+    "action_or_input": "Create visit request targeting faculty host",
+    "expected_result": "Visit record visible in host pending approvals queue",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-005",
+    "source_id": "VMS-UC-014 Main Flow",
+    "purpose": "Verify host approves visit request",
+    "preconditions": "Visit in requested status assigned to host",
+    "action_or_input": "Host invokes approve endpoint",
+    "expected_result": "Visit status updates to approved; pass number and QR code generated",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-006",
+    "source_id": "VMS-UC-015 Main Flow",
+    "purpose": "Verify host rejects visit request",
+    "preconditions": "Visit in requested status assigned to host",
+    "action_or_input": "Host invokes reject endpoint with reason 'Host traveling'",
+    "expected_result": "Visit status updates to rejected with reason recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-007",
+    "source_id": "VMS-UC-018 Main Flow",
+    "purpose": "Verify security guard scans QR code to validate visitor pass",
+    "preconditions": "Visitor holds approved pass within validity window",
+    "action_or_input": "Guard scans QR code hash at Main Gate terminal",
+    "expected_result": "Pass validated, entry granted, GateLog created",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-008",
+    "source_id": "VMS-UC-019 Main Flow",
+    "purpose": "Verify gate validation success updates visit status to checked_in",
+    "preconditions": "Visit in approved status",
+    "action_or_input": "Execute gate check-in transition",
+    "expected_result": "Status becomes checked_in, check_in_time set, on-site roster incremented",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-009",
+    "source_id": "VMS-UC-020 Exception Flow E1",
+    "purpose": "Verify gate validation failure on expired pass",
+    "preconditions": "Approved visit with valid_to in the past",
+    "action_or_input": "Guard scans expired QR code at gate",
+    "expected_result": "Validation failure reported, check-in denied, pass remains not on-site",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-010",
+    "source_id": "VMS-UC-021 Main Flow",
+    "purpose": "Verify visitor check-out at gate",
+    "preconditions": "Visitor is checked_in on campus",
+    "action_or_input": "Guard scans badge or submits check-out for visit ID",
+    "expected_result": "Visit status transitions to checked_out, check_out_time set, on-site roster decremented",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-011",
+    "source_id": "VMS-UC-022 Main Flow",
+    "purpose": "Verify walk-in visitor registration at gate terminal",
+    "preconditions": "Visitor arrives without appointment; Guard has vms.gate.scan permission",
+    "action_or_input": "Guard registers visitor and issues walk-in pass",
+    "expected_result": "Visit created with approved status, 4-hour validity, and immediate QR pass",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-012",
+    "source_id": "VMS-UC-023 Main Flow",
+    "purpose": "Verify zone access validation for permitted zone",
+    "preconditions": "Visit pass holds allowed_zones=['Library', 'Admin Block']",
+    "action_or_input": "Query zone verification for 'Library'",
+    "expected_result": "Access permitted (is_authorized=True)",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-013",
+    "source_id": "VMS-UC-023 Exception Flow E1",
+    "purpose": "Verify zone access refusal for non-permitted zone",
+    "preconditions": "Visit pass holds allowed_zones=['Library']",
+    "action_or_input": "Query zone verification for 'Research Lab'",
+    "expected_result": "Access denied (is_authorized=False)",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TC-UC-014",
+    "source_id": "VMS-UC-026 Main Flow",
+    "purpose": "Verify trigger emergency muster roll-call",
+    "preconditions": "Visitors currently checked_in on campus; Admin authenticated",
+    "action_or_input": "Admin invokes trigger emergency muster endpoint",
+    "expected_result": "EmergencyMuster record active, headcount initialized to total on-site visitors",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-015",
+    "source_id": "VMS-UC-027 Main Flow",
+    "purpose": "Verify emergency roll-call resolution",
+    "preconditions": "Emergency muster currently active",
+    "action_or_input": "Admin marks muster as resolved",
+    "expected_result": "Muster status updates to resolved with resolved_at timestamp",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-016",
+    "source_id": "VMS-UC-036 Main Flow",
+    "purpose": "Verify early termination of visit due to policy breach",
+    "preconditions": "Visitor currently checked_in on campus",
+    "action_or_input": "Admin or Security forces check-out with reason 'Security policy breach'",
+    "expected_result": "Visit status transitions to checked_out and GateAlert recorded",
+    "test_type": "functional"
+  }
+]

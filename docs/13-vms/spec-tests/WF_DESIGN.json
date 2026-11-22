@@ -1,0 +1,92 @@
+[
+  {
+    "test_id": "TC-WF-001",
+    "source_id": "BW-VMS-01 Full Pre-registered Visit Lifecycle Path",
+    "purpose": "Verify sequential state transitions from initial request to gate exit",
+    "preconditions": "Visitor registered; Host active",
+    "action_or_input": "Execute sequential triggers: HOST_APPROVE -> GATE_CHECK_IN -> GATE_CHECK_OUT",
+    "expected_result": "Visit states transition: requested -> approved -> checked_in -> checked_out",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-002",
+    "source_id": "BW-VMS-04 Decision Path - Approval",
+    "purpose": "Verify visit request approval workflow path",
+    "preconditions": "Visit in requested status",
+    "action_or_input": "Host triggers HOST_APPROVE",
+    "expected_result": "Visit transitions to approved status and pass credentials issued",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-003",
+    "source_id": "BW-VMS-04 Decision Path - Rejection",
+    "purpose": "Verify visit request rejection workflow path",
+    "preconditions": "Visit in requested status",
+    "action_or_input": "Host triggers HOST_REJECT with reason",
+    "expected_result": "Visit transitions to rejected terminal status",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-004",
+    "source_id": "BW-VMS-01 Walk-in Workflow Path",
+    "purpose": "Verify walk-in visit creation directly bypasses host approval into approved pass",
+    "preconditions": "Guard at gate terminal",
+    "action_or_input": "Guard initiates walk-in registration and scans visitor immediately",
+    "expected_result": "Visit created in approved status and transitions cleanly to checked_in",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-005",
+    "source_id": "BW-VMS-05 Early Termination Workflow Path",
+    "purpose": "Verify early visit termination while on-site",
+    "preconditions": "Visit in checked_in status",
+    "action_or_input": "Admin/Host triggers early check-out termination",
+    "expected_result": "Visit transitions to checked_out and exit timestamp recorded",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-006",
+    "source_id": "BW-VMS-06 Emergency Muster Lifecycle Path",
+    "purpose": "Verify emergency muster initiation and resolution lifecycle",
+    "preconditions": "On-site visitors present; Admin authenticated",
+    "action_or_input": "Admin triggers muster, performs roll-call, and marks muster resolved",
+    "expected_result": "Muster status transitions: active -> resolved with accounted headcount logged",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-007",
+    "source_id": "BW-VMS-19 Gate Check-in State Guard Path",
+    "purpose": "Verify illegal direct check-in from requested status is rejected",
+    "preconditions": "Visit in requested status (not approved)",
+    "action_or_input": "Guard attempts GATE_CHECK_IN trigger",
+    "expected_result": "Transition rejected with InvalidStateTransitionError; status remains requested",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-008",
+    "source_id": "BW-VMS-23 Gate Check-out State Guard Path",
+    "purpose": "Verify check-out rejected when visitor has not checked in",
+    "preconditions": "Visit in approved status",
+    "action_or_input": "Guard attempts GATE_CHECK_OUT trigger",
+    "expected_result": "Transition rejected with InvalidStateTransitionError; status remains approved",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-009",
+    "source_id": "STT-Terminal Rejection Guard Path",
+    "purpose": "Verify terminal states cannot be re-opened",
+    "preconditions": "Visit in rejected status",
+    "action_or_input": "Attempt HOST_APPROVE or GATE_CHECK_IN on rejected visit",
+    "expected_result": "Transition rejected with InvalidStateTransitionError; status remains rejected",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-WF-010",
+    "source_id": "STT-Terminal Check-out Guard Path",
+    "purpose": "Verify checked_out visit cannot transition back to checked_in",
+    "preconditions": "Visit in checked_out status",
+    "action_or_input": "Attempt GATE_CHECK_IN on checked_out visit",
+    "expected_result": "Transition rejected with InvalidStateTransitionError; status remains checked_out",
+    "test_type": "workflow"
+  }
+]
