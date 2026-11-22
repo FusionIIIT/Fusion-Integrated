@@ -23,6 +23,7 @@ from modules.superadmin.domain.exceptions import (
     DomainError as PureDomainError,
 )
 from modules.superadmin.domain.exceptions import (
+    InvalidStateTransitionError,
     ReversibilityExpiredError,
 )
 from modules.superadmin.domain.state_machine import ArchivalStateMachine
@@ -46,7 +47,7 @@ def archive_user(
     email: str,
     user_kind: str,
     is_deactivated: bool,
-    deactivated_at: timezone.datetime | None,
+    deactivated_at: timezone.datetime | None = None,
     has_pending_transactions: bool,
     archival_reason: str,
     metadata_snapshot: dict[str, Any] | None = None,
@@ -137,6 +138,8 @@ def restore_archived_user(
         )
     except ReversibilityExpiredError as exc:
         raise ConflictError(exc.message, code="reversibility_expired") from exc
+    except InvalidStateTransitionError as exc:
+        raise ConflictError(exc.message, code=exc.code) from exc
     except PureDomainError as exc:
         raise DomainError(exc.message, code=exc.code) from exc
 

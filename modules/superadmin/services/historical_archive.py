@@ -74,7 +74,7 @@ def restore_historical_archive(
     if archive is None:
         raise NotFoundError(f"Historical archive {archive_id} not found.")
     if archive.is_purged:
-        raise DomainError("This dataset was permanently purged and cannot be restored.")
+        raise ConflictError("This dataset was permanently purged and cannot be restored.")
     if archive.is_restored:
         raise ConflictError("This dataset has already been restored.")
 
