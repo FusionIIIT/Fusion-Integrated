@@ -98,13 +98,13 @@ Employee Leave Management module, that might look like:
 
 ```python
 PERMISSIONS = [
-    ("leave_elm.application.view", "See leave applications"),
-    ("leave_elm.application.apply", "Submit a leave application"),
-    ("leave_elm.application.approve", "Approve or reject a leave application"),
+    ("leave.application.view", "See leave applications"),
+    ("leave.application.create", "Submit a leave application"),
+    ("leave.application.approve", "Approve or reject a leave application"),
 ]
 
-_EMPLOYEE = ["leave_elm.application.view", "leave_elm.application.apply"]
-_APPROVER = ["leave_elm.application.view", "leave_elm.application.approve"]
+_EMPLOYEE = ["leave.application.view", "leave.application.create"]
+_APPROVER = ["leave.application.view", "leave.application.approve"]
 
 ROLE_GRANTS = {
     "Employee": _EMPLOYEE,
@@ -112,9 +112,13 @@ ROLE_GRANTS = {
 }
 ```
 
-The role name (`"Leave Approver"`) is free text — it does not need to exist
-anywhere else first. You do not need to register it with the IAM team or edit
-any file outside your own module.
+For a role your module introduces, the name (`"Leave Approver"`) is free text. It does not
+need to exist anywhere else first, you do not need to register it with the IAM team, and you
+edit no file outside your own module. Whether the institute should have that role is still
+an open question for whoever assigned you the module (`new-module-prompt.md` Step 3.8 (h)):
+create it for testing, but build on it only once they have answered. For a role the institute already has, copy its exact
+spelling from `globals_designation`, because that spelling is the join key: a typo is a grant
+that reaches nobody.
 
 If your module also has screens, declare `MODULE` and `NAV_ITEMS` the same way
 `placement/registry.py` does — see that file for the full shape, including
@@ -183,9 +187,15 @@ to take the role away:
 ./../venv/bin/python manage.py assign_role --user fac00005 --designation "Leave Approver" --remove
 ```
 
-This writes directly — it does not check whether `"Leave Approver"` is a
-"real" institute role, because for your own module's designations it never
-will be. An unrecognised designation is allowed by design (see
+This writes the grant into the ERP itself (`globals_holdsdesignation` in
+`fusionlab`), the same way the admin console's "update user roles" does, and
+then refreshes the IAM's copy at once. Because the ERP holds it, the role
+survives every later refresh and `sync_identity` run until you `--remove` it.
+A designation the ERP does not have yet, such as your invented
+`"Leave Approver"`, is created there first.
+
+It does not check whether `"Leave Approver"` is a "real" institute role,
+because for your own module's designations it never will be. An unrecognised designation is allowed by design (see
 `iam/rbac.py`'s own docstring): only the institute's existing office/rank
 roles (Dean Academic, HOD, and so on) are catalogued, and that catalogue is
 an audit list, not a gate. This also means **any basic kind can hold any role

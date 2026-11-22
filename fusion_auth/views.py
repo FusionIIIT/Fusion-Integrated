@@ -10,12 +10,14 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import BaseThrottle
 from rest_framework.views import APIView
 
 from core.api import csrf
 from core.api.exceptions import AuthenticationFailedError as AuthFailed
 from core.api.exceptions import DomainError
-from fusion_auth.client import IamUnavailable, get_client
+from core.observability.middleware import get_request_id
+from fusion_auth.client import IamThrottled, IamUnavailable, get_client
 from fusion_auth.serializers import LoginSerializer, OkSerializer, RoleSerializer, SessionSerializer
 from modules.accesscontrol import contracts as accesscontrol
 
@@ -45,7 +47,11 @@ class LoginView(APIView):
             raise DomainError("Username and password are required.",
                               code="missing_credentials")
         try:
-            token = get_client().login(username, password)
+            # NUM_PROXIES-aware, so a caller cannot pick the address the IAM throttles.
+            token = get_client().login(username, password,
+                                       client_ip=BaseThrottle().get_ident(request))
+        except IamThrottled as exc:
+            return _too_many_attempts(exc)
         except IamUnavailable as exc:
             return Response(
                 {"error": {"code": "iam_unavailable",
@@ -60,6 +66,21 @@ class LoginView(APIView):
         # The client holds this in memory and echoes it on every write.
         return _set_cookie(
             Response({"ok": True, "csrf_token": csrf.token_for(token)}), token)
+
+
+def _too_many_attempts(exc: IamThrottled) -> Response:
+    # A rate limit says when to come back; a locked account keeps the IAM's own words.
+    if exc.retry_after:
+        message = f"Too many sign-in attempts. Try again in {exc.retry_after} seconds."
+    else:
+        message = exc.message or "Too many sign-in attempts. Try again in a minute."
+    response = Response(
+        {"error": {"code": "too_many_attempts", "message": message,
+                   "details": [], "request_id": get_request_id()}},
+        status=status.HTTP_429_TOO_MANY_REQUESTS)
+    if exc.retry_after:
+        response["Retry-After"] = str(exc.retry_after)
+    return response
 
 
 @extend_schema(request=None, responses=OkSerializer)
