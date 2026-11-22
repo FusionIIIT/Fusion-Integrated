@@ -1,0 +1,326 @@
+[
+  {
+    "test_id": "TEST-UC-001",
+    "source_id": "UC-DEPT-001 Main Flow",
+    "purpose": "Verify authenticated department user views announcements matching role, program, and year",
+    "preconditions": "Published announcements exist with specific target scopes; user is authenticated",
+    "action_or_input": "User queries active announcements",
+    "expected_result": "Matching announcements are displayed in reverse chronological order",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-002",
+    "source_id": "UC-DEPT-001 Alternative A1",
+    "purpose": "Verify user with no matching announcements receives empty result list",
+    "preconditions": "Published announcements exist only for other cohorts/roles",
+    "action_or_input": "User queries active announcements",
+    "expected_result": "Empty list returned; non-matching announcements excluded",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-003",
+    "source_id": "UC-DEPT-001 Exception E1",
+    "purpose": "Verify unauthenticated user cannot view protected department announcements",
+    "preconditions": "Unauthenticated request made to announcement view interface",
+    "action_or_input": "Access announcements without valid credentials/session",
+    "expected_result": "Authentication failure or 401 Unauthorized response returned",
+    "test_type": "security_negative"
+  },
+  {
+    "test_id": "TEST-UC-004",
+    "source_id": "UC-DEPT-002 Main Flow",
+    "purpose": "Verify authorized user creates draft and publishes announcement with target audience",
+    "preconditions": "Actor has department.announcement.publish permission",
+    "action_or_input": "Create draft and publish with target_roles, target_programs, and target_academic_years",
+    "expected_result": "Announcement transitions to published status, published_at is set, notifications triggered",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-002-ALT",
+    "source_id": "UC-DEPT-002 Alternative A1",
+    "purpose": "Verify draft announcement can be saved without immediate publishing",
+    "preconditions": "Actor has publish permission",
+    "action_or_input": "Call create_draft with title and body only",
+    "expected_result": "Announcement saved with published_at None and is_active False",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-005",
+    "source_id": "UC-DEPT-002 Exception E1",
+    "purpose": "Verify unauthorized user (Student) is blocked from creating/publishing announcements",
+    "preconditions": "Actor is Student lacking publish permission",
+    "action_or_input": "Attempt create_draft or publish",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TEST-UC-006",
+    "source_id": "UC-DEPT-002 Exception E2",
+    "purpose": "Verify publishing with missing audience targeting lists is rejected",
+    "preconditions": "Draft announcement exists",
+    "action_or_input": "Publish with empty target_roles, programs, or years",
+    "expected_result": "ConflictError / ValidationError raised",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "TEST-UC-007",
+    "source_id": "UC-DEPT-003 Main Flow",
+    "purpose": "Verify HOD can edit active announcement content",
+    "preconditions": "Published active announcement exists; actor is HOD",
+    "action_or_input": "HOD updates title and body of active announcement",
+    "expected_result": "Updated title and body saved",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-008",
+    "source_id": "UC-DEPT-003 Alternative A1",
+    "purpose": "Verify HOD can hide active department announcement",
+    "preconditions": "Published active announcement exists; actor is HOD",
+    "action_or_input": "HOD hides announcement",
+    "expected_result": "is_hidden set to True; announcement excluded from active listings",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-009",
+    "source_id": "UC-DEPT-003 Alternative A2",
+    "purpose": "Verify HOD can delete active department announcement",
+    "preconditions": "Published active announcement exists; actor is HOD",
+    "action_or_input": "HOD deletes announcement",
+    "expected_result": "deleted_at timestamp set; announcement excluded from active listings",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-010",
+    "source_id": "UC-DEPT-003 Exception E1",
+    "purpose": "Verify non-HOD (e.g. Dept_Admin) cannot hide or delete active announcement",
+    "preconditions": "Active announcement exists; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin attempts hide or delete",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TEST-UC-011",
+    "source_id": "UC-DEPT-004 Main Flow",
+    "purpose": "Verify Faculty can request stock item when requested quantity <= available inventory",
+    "preconditions": "InventoryItem exists with sufficient stock; actor is Faculty",
+    "action_or_input": "Faculty submits request for valid quantity and purpose",
+    "expected_result": "StockRequest created in Pending HOD Approval status",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-012",
+    "source_id": "UC-DEPT-004 Exception E1",
+    "purpose": "Verify stock request rejected when requested quantity exceeds current inventory",
+    "preconditions": "InventoryItem current quantity = 5",
+    "action_or_input": "Faculty requests quantity = 15",
+    "expected_result": "Validation error raised and request is not accepted",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "TEST-UC-013",
+    "source_id": "UC-DEPT-004 Exception E2",
+    "purpose": "Verify non-Faculty actor (e.g. Student) cannot submit stock request",
+    "preconditions": "Actor is Student lacking stock request permission",
+    "action_or_input": "Attempt to submit stock request",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TEST-UC-014",
+    "source_id": "UC-DEPT-005 Main Flow",
+    "purpose": "Verify HOD can approve pending stock request",
+    "preconditions": "StockRequest in Pending HOD Approval status; actor is HOD",
+    "action_or_input": "HOD approves request",
+    "expected_result": "Status transitions to Approved for Issuance; decided_at recorded",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-015",
+    "source_id": "UC-DEPT-005 Alternative A1",
+    "purpose": "Verify HOD can reject pending stock request with note",
+    "preconditions": "StockRequest in Pending HOD Approval status; actor is HOD",
+    "action_or_input": "HOD rejects request with decision note",
+    "expected_result": "Status transitions to Rejected; decision_note and decided_at recorded",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-016",
+    "source_id": "UC-DEPT-005 Exception E1",
+    "purpose": "Verify non-HOD actor cannot decide stock request",
+    "preconditions": "StockRequest in Pending HOD Approval; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin attempts approval or rejection",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TEST-UC-017",
+    "source_id": "UC-DEPT-006 Main Flow",
+    "purpose": "Verify Dept_Admin issues HOD-approved stock, decrements inventory, and logs audit record",
+    "preconditions": "StockRequest is in Approved for Issuance status; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin executes stock issuance",
+    "expected_result": "Status transitions to Issued, inventory quantity decremented, StockMovement logged",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-018",
+    "source_id": "UC-DEPT-006 Exception E1",
+    "purpose": "Verify stock issuance rejected when request is not approved by HOD",
+    "preconditions": "StockRequest is in Pending status",
+    "action_or_input": "Dept_Admin attempts issuance",
+    "expected_result": "Operation blocked with validation or conflict error",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "TEST-UC-019",
+    "source_id": "UC-DEPT-006 Exception E2",
+    "purpose": "Verify non-Dept_Admin actor cannot issue stock",
+    "preconditions": "Approved StockRequest; actor is Faculty",
+    "action_or_input": "Faculty attempts issuance",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TEST-UC-020",
+    "source_id": "UC-DEPT-007 Main Flow",
+    "purpose": "Verify authenticated Student/Faculty submits feedback and Dept_Admin is notified",
+    "preconditions": "Actor is authenticated Student or Faculty",
+    "action_or_input": "Submit feedback message",
+    "expected_result": "Feedback saved in New status; notification dispatched to Dept_Admin",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-021",
+    "source_id": "UC-DEPT-007 Exception E1",
+    "purpose": "Verify unauthenticated submission is rejected",
+    "preconditions": "Unauthenticated request",
+    "action_or_input": "Attempt to submit feedback without authentication",
+    "expected_result": "Authentication error returned",
+    "test_type": "security_negative"
+  },
+  {
+    "test_id": "TEST-UC-022",
+    "source_id": "UC-DEPT-008 Main Flow",
+    "purpose": "Verify Dept_Admin performs initial review and categorizes feedback",
+    "preconditions": "Feedback in New status; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin reviews and categorizes feedback",
+    "expected_result": "Status changes to Under Review / Categorized",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-023",
+    "source_id": "UC-DEPT-008 Alternative A1",
+    "purpose": "Verify Dept_Admin closes simple issue directly during initial review",
+    "preconditions": "Simple issue feedback under initial review; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin marks closed with resolution note",
+    "expected_result": "Status transitions to Closed; submitter notified",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-024",
+    "source_id": "UC-DEPT-008 Alternative A2",
+    "purpose": "Verify Dept_Admin marks feedback resolved after review",
+    "preconditions": "Feedback under review; actor is Dept_Admin",
+    "action_or_input": "Dept_Admin marks feedback Resolved",
+    "expected_result": "Status transitions to Resolved; submitter notified",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-025",
+    "source_id": "UC-DEPT-010 Main Flow",
+    "purpose": "Verify Dept_Admin can update general department details immediately",
+    "preconditions": "Actor is Dept_Admin; general non-official field updated",
+    "action_or_input": "Submit general detail updates",
+    "expected_result": "Department details updated immediately without approval requirement",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-026",
+    "source_id": "UC-DEPT-010 Alternative A1",
+    "purpose": "Verify official department detail change enters Pending HOD Approval",
+    "preconditions": "Actor is Dept_Admin proposing official change (e.g. name or policy)",
+    "action_or_input": "Submit official department detail change",
+    "expected_result": "Change placed in Pending HOD Approval; current data effective",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-027",
+    "source_id": "UC-DEPT-010 Exception E1",
+    "purpose": "Verify attempt to modify Headship identity via official details is blocked",
+    "preconditions": "Actor attempts to change Headship identity through department details",
+    "action_or_input": "Submit change containing Headship field",
+    "expected_result": "Modification rejected; Headship identity is synchronized only from active HOD role",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "TEST-UC-028",
+    "source_id": "UC-DEPT-012 Main Flow",
+    "purpose": "Verify HOD approves pending official change and updated data becomes effective",
+    "preconditions": "Official change in Pending HOD Approval; actor is HOD",
+    "action_or_input": "HOD approves change",
+    "expected_result": "Change becomes effective in department record",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-029",
+    "source_id": "UC-DEPT-012 Alternative A1",
+    "purpose": "Verify HOD rejects official change and current data is retained",
+    "preconditions": "Official change in Pending HOD Approval; actor is HOD",
+    "action_or_input": "HOD rejects change",
+    "expected_result": "Change rejected; existing department data remains intact",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-030",
+    "source_id": "UC-DEPT-014 Main Flow",
+    "purpose": "Verify HOD resolves feedback after Dept_Admin initial review",
+    "preconditions": "Feedback in Under Review status; actor is HOD",
+    "action_or_input": "HOD resolves feedback item",
+    "expected_result": "Feedback transitions to Resolved status; submitter notified",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-031",
+    "source_id": "UC-DEPT-014 Exception E1",
+    "purpose": "Verify HOD oversight prohibited prior to Dept_Admin initial review",
+    "preconditions": "Feedback in New status (not yet reviewed)",
+    "action_or_input": "HOD attempts resolution directly",
+    "expected_result": "Action blocked; initial review precondition not met",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "TEST-UC-032",
+    "source_id": "UC-DEPT-019 Main Flow",
+    "purpose": "Verify Dept_Admin inserts inventory stock, quantity updates, and immutable audit log is created",
+    "preconditions": "Actor is Dept_Admin",
+    "action_or_input": "Insert stock record with name, unit, and initial quantity",
+    "expected_result": "InventoryItem created and StockMovement insertion log recorded",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-033",
+    "source_id": "UC-DEPT-020 Main Flow",
+    "purpose": "Verify central Institute Admin assigns time-bound HOD or Dept_Admin role",
+    "preconditions": "Actor is central Institute Admin",
+    "action_or_input": "Create time-bound role assignment for department employee",
+    "expected_result": "Valid role assignment recorded for effective transition",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TEST-UC-034",
+    "source_id": "UC-DEPT-020 Exception E1",
+    "purpose": "Verify non-Institute Admin actor cannot assign department roles",
+    "preconditions": "Actor is HOD or Dept_Admin",
+    "action_or_input": "Attempt role assignment",
+    "expected_result": "PermissionDeniedError is raised",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TEST-UC-035",
+    "source_id": "UC-DEPT-022 Main Flow",
+    "purpose": "Verify system applies role transition: outgoing role revoked, incoming role granted, Headship synced",
+    "preconditions": "Recorded role assignment reaches effective date",
+    "action_or_input": "System transition triggers",
+    "expected_result": "Outgoing role access revoked, incoming role active, Headship synchronized",
+    "test_type": "functional_positive"
+  }
+]
