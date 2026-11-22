@@ -5,27 +5,26 @@ from rest_framework.views import APIView
 
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.gymkhana.api.serializers import (
-    ClubSerializer,
-    ClubCreateSerializer,
+    CastVoteSerializer,
     ChangeLeadershipSerializer,
+    ClubBudgetRequestSerializer,
+    ClubCreateSerializer,
+    ClubEventReportSerializer,
     ClubLeadershipSerializer,
     ClubMembershipSerializer,
+    ClubSerializer,
+    CreatePollSerializer,
+    PollVoteSerializer,
     VenueBookingSerializer,
     VotingPollSerializer,
-    CreatePollSerializer,
-    CastVoteSerializer,
-    PollVoteSerializer,
-    ClubBudgetRequestSerializer,
-    ClubEventReportSerializer,
 )
 from modules.gymkhana.models import (
     Club,
-    ClubLeadership,
+    ClubBudgetRequest,
+    ClubEventReport,
     ClubMembership,
     VenueBooking,
     VotingPoll,
-    ClubBudgetRequest,
-    ClubEventReport,
 )
 from modules.gymkhana.services import applications
 
@@ -39,8 +38,8 @@ class ClubListCreateView(APIView):
 
     def get_permissions(self):
         if self.request.method == "POST":
-            return [HasModuleGrant("gymkhana"), HasPermission("gymkhana.club.admin")]
-        return [HasModuleGrant("gymkhana"), HasPermission("gymkhana.club.view")]
+            return [HasModuleGrant("gymkhana")(), HasPermission("gymkhana.club.admin")()]
+        return [HasModuleGrant("gymkhana")(), HasPermission("gymkhana.club.view")()]
 
     def get(self, request):
         clubs = Club.objects.all().order_by("id")
@@ -99,8 +98,8 @@ class ClubLeadershipChangeView(APIView):
 class VenueBookingListCreateView(APIView):
     def get_permissions(self):
         if self.request.method == "POST":
-            return [HasModuleGrant("gymkhana"), HasPermission("gymkhana.booking.manage")]
-        return [HasModuleGrant("gymkhana"), HasPermission("gymkhana.club.view")]
+            return [HasModuleGrant("gymkhana")(), HasPermission("gymkhana.booking.manage")()]
+        return [HasModuleGrant("gymkhana")(), HasPermission("gymkhana.club.view")()]
 
     def get(self, request):
         bookings = VenueBooking.objects.all().order_by("-booking_date", "-start_time")
@@ -139,7 +138,9 @@ class MembershipApplyView(APIView):
                 club_id=club_id,
                 student_id=student_id,
             )
-            return Response(ClubMembershipSerializer(membership).data, status=status.HTTP_201_CREATED)
+            return Response(
+                ClubMembershipSerializer(membership).data, status=status.HTTP_201_CREATED
+            )
         except (Club.DoesNotExist, ValueError) as exc:
             return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -164,8 +165,8 @@ class MembershipApproveView(APIView):
 class VotingPollListCreateView(APIView):
     def get_permissions(self):
         if self.request.method == "POST":
-            return [HasModuleGrant("gymkhana"), HasPermission("gymkhana.club.manage")]
-        return [HasModuleGrant("gymkhana"), HasPermission("gymkhana.poll.vote")]
+            return [HasModuleGrant("gymkhana")(), HasPermission("gymkhana.club.manage")()]
+        return [HasModuleGrant("gymkhana")(), HasPermission("gymkhana.poll.vote")()]
 
     def get(self, request):
         polls = VotingPoll.objects.filter(is_active=True).order_by("-created_at")
@@ -242,8 +243,8 @@ class BudgetRequestListCreateView(APIView):
 class EventReportListCreateView(APIView):
     def get_permissions(self):
         if self.request.method == "POST":
-            return [HasModuleGrant("gymkhana"), HasPermission("gymkhana.report.submit")]
-        return [HasModuleGrant("gymkhana"), HasPermission("gymkhana.report.review")]
+            return [HasModuleGrant("gymkhana")(), HasPermission("gymkhana.report.submit")()]
+        return [HasModuleGrant("gymkhana")(), HasPermission("gymkhana.report.review")()]
 
     def get(self, request):
         reports = ClubEventReport.objects.all().order_by("-submitted_at")

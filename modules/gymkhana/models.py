@@ -77,7 +77,8 @@ class VenueBooking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.booking_type} at {self.venue_name} on {self.booking_date} ({self.start_time}-{self.end_time})"
+        time_slot = f"{self.start_time}-{self.end_time}"
+        return f"{self.booking_type} at {self.venue_name} on {self.booking_date} ({time_slot})"
 
 
 class VotingPoll(models.Model):

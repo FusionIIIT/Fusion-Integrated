@@ -3,36 +3,39 @@ Gymkhana domain policy and validation rules.
 Pure Python validators without Django/DRF dependencies.
 """
 
+from collections.abc import Sequence
 from datetime import datetime, time
 from decimal import Decimal
-from enum import Enum
-from typing import Sequence
-
+from enum import StrEnum
 
 # ==============================================================================
 # Domain Enums & Constants
 # ==============================================================================
 
-class ClubCategory(str, Enum):
+
+class ClubCategory(StrEnum):
     """BR-GYM-003: Allowed Club Categories."""
+
     TECHNICAL = "Technical"
     SPORTS = "Sports"
     CULTURAL = "Cultural"
 
 
-class ClubStatus(str, Enum):
+class ClubStatus(StrEnum):
     """BR-GYM-004: Club Confirmation Lifecycle."""
+
     OPEN = "open"
     CONFIRMED = "confirmed"
 
 
-class MembershipStatus(str, Enum):
+class MembershipStatus(StrEnum):
     """BR-GYM-011: Membership Approval Transition."""
+
     OPEN = "open"
     CONFIRMED = "confirmed"
 
 
-class BookingType(str, Enum):
+class BookingType(StrEnum):
     SESSION = "session"
     EVENT = "event"
 
@@ -52,6 +55,7 @@ CONFIG_ALLOWED_VENUES: set[str] = {
 # ==============================================================================
 # Business Rule Validations (BR-GYM-001 to BR-GYM-021)
 # ==============================================================================
+
 
 def validate_student_leadership(coordinator_id: int, co_coordinator_id: int) -> tuple[bool, str]:
     """BR-GYM-001: Valid Student Leadership.
@@ -99,7 +103,10 @@ def validate_booking_time_range(start_time: time, end_time: time) -> tuple[bool,
     A session/event start time must be earlier than its end time.
     """
     if start_time >= end_time:
-        return False, f"Start time ({start_time}) must be strictly earlier than end time ({end_time})."
+        return (
+            False,
+            f"Start time ({start_time}) must be strictly earlier than end time ({end_time}).",
+        )
     return True, "Valid booking time range."
 
 
@@ -109,14 +116,12 @@ def check_cross_type_venue_conflict(
     new_end: time,
 ) -> bool:
     """BR-GYM-006: Cross-Type Venue Exclusivity.
-    No session or event may overlap any existing session or event in the same venue on the same date.
+    No session or event may overlap any existing session or event in the same
+    venue on the same date.
     Returns True if a conflict exists, False if the slot is clear.
     Overlap condition: (new_start < existing_end) and (new_end > existing_start).
     """
-    for ex_start, ex_end in existing_slots:
-        if new_start < ex_end and new_end > ex_start:
-            return True
-    return False
+    return any(new_start < ex_end and new_end > ex_start for ex_start, ex_end in existing_slots)
 
 
 def validate_membership_application(
@@ -129,7 +134,10 @@ def validate_membership_application(
     - BR-009: No duplicate same-club application.
     """
     if club_status != ClubStatus.CONFIRMED.value:
-        return False, f"Cannot apply for membership: club status is '{club_status}', must be 'confirmed'."
+        return (
+            False,
+            f"Cannot apply for membership: club status is '{club_status}', must be 'confirmed'.",
+        )
     if has_existing_app:
         return False, "Duplicate membership application: you have already applied to this club."
     return True, "Eligible to apply for club membership."
@@ -151,7 +159,10 @@ def validate_membership_approval_transition(current_status: str) -> tuple[bool, 
     Approving an open club-membership application changes its status to confirmed.
     """
     if current_status != MembershipStatus.OPEN.value:
-        return False, f"Only 'open' memberships can be approved. Current status is '{current_status}'."
+        return (
+            False,
+            f"Only 'open' memberships can be approved. Current status is '{current_status}'.",
+        )
     return True, "Valid membership approval transition."
 
 
@@ -193,13 +204,26 @@ def validate_vote_eligibility(
         return False, "This poll has expired."
 
     # Verify audience targeting
-    if target_batch.strip() and target_batch.strip() != "ALL":
-        if student_batch.strip() != target_batch.strip():
-            return False, f"Poll target batch '{target_batch}' does not match student batch '{student_batch}'."
+    if (
+        target_batch.strip()
+        and target_batch.strip() != "ALL"
+        and student_batch.strip() != target_batch.strip()
+    ):
+        return (
+            False,
+            f"Poll target batch '{target_batch}' does not match student batch '{student_batch}'.",
+        )
 
-    if target_branch.strip() and target_branch.strip() != "ALL":
-        if student_branch.strip() != target_branch.strip():
-            return False, f"Poll target branch '{target_branch}' does not match student branch '{student_branch}'."
+    if (
+        target_branch.strip()
+        and target_branch.strip() != "ALL"
+        and student_branch.strip() != target_branch.strip()
+    ):
+        msg = (
+            f"Poll target branch '{target_branch}' does not match "
+            f"student branch '{student_branch}'."
+        )
+        return (False, msg)
 
     return True, "Eligible to vote in poll."
 
@@ -230,7 +254,8 @@ def validate_configured_venue(venue_name: str) -> tuple[bool, str]:
     A session/event booking must use a venue configured for Gymkhana booking.
     """
     if venue_name not in CONFIG_ALLOWED_VENUES:
-        return False, f"Venue '{venue_name}' is not in configured Gymkhana venues: {sorted(CONFIG_ALLOWED_VENUES)}."
+        venues_list = sorted(CONFIG_ALLOWED_VENUES)
+        return False, f"Venue '{venue_name}' is not in configured Gymkhana venues: {venues_list}."
     return True, "Valid configured venue."
 
 

@@ -4,39 +4,39 @@ Workflow and application service functions for gymkhana.
 
 from datetime import date, datetime, time
 from decimal import Decimal
+
 from django.db import transaction
 from django.utils import timezone
 
 from modules.gymkhana.domain.policy import (
-    validate_student_leadership,
-    validate_faculty_councillor,
-    validate_club_category,
-    validate_club_confirmation_transition,
-    validate_booking_time_range,
-    check_cross_type_venue_conflict,
-    validate_membership_application,
-    validate_club_head_authorization,
-    validate_membership_approval_transition,
-    validate_poll_creation,
-    validate_vote_eligibility,
-    validate_budget_amount,
-    validate_event_report,
-    validate_configured_venue,
-    validate_faculty_report_review,
-    validate_leadership_succession,
     ClubStatus,
     MembershipStatus,
+    check_cross_type_venue_conflict,
+    validate_booking_time_range,
+    validate_budget_amount,
+    validate_club_category,
+    validate_club_confirmation_transition,
+    validate_club_head_authorization,
+    validate_configured_venue,
+    validate_event_report,
+    validate_faculty_councillor,
+    validate_faculty_report_review,
+    validate_membership_application,
+    validate_membership_approval_transition,
+    validate_poll_creation,
+    validate_student_leadership,
+    validate_vote_eligibility,
 )
 from modules.gymkhana.models import (
     Club,
-    ClubLeadership,
-    ClubMembership,
-    VenueBooking,
-    VotingPoll,
-    PollOption,
-    PollVote,
     ClubBudgetRequest,
     ClubEventReport,
+    ClubLeadership,
+    ClubMembership,
+    PollOption,
+    PollVote,
+    VenueBooking,
+    VotingPoll,
 )
 
 
@@ -128,15 +128,13 @@ def change_club_leadership(
     ClubLeadership.objects.filter(club=club, is_active=True).update(is_active=False)
 
     # Create new active leadership
-    new_leadership = ClubLeadership.objects.create(
+    return ClubLeadership.objects.create(
         club=club,
         coordinator_id=new_coordinator_id,
         co_coordinator_id=new_co_coordinator_id,
         faculty_councillor_id=active_leadership.faculty_councillor_id,
         is_active=True,
     )
-
-    return new_leadership
 
 
 @transaction.atomic
@@ -178,9 +176,11 @@ def book_venue(
     ).values_list("start_time", "end_time")
 
     if check_cross_type_venue_conflict(list(existing_bookings), start_time, end_time):
-        raise ValueError(f"Venue '{venue_name}' is already booked during this time on {booking_date}.")
+        raise ValueError(
+            f"Venue '{venue_name}' is already booked during this time on {booking_date}."
+        )
 
-    booking = VenueBooking.objects.create(
+    return VenueBooking.objects.create(
         club=club,
         booking_type=booking_type,
         venue_name=venue_name,
@@ -191,7 +191,6 @@ def book_venue(
         poster_url=poster_url,
         created_by_id=actor_id,
     )
-    return booking
 
 
 @transaction.atomic
@@ -211,12 +210,11 @@ def apply_club_membership(
     if not valid_app:
         raise ValueError(app_err)
 
-    membership = ClubMembership.objects.create(
+    return ClubMembership.objects.create(
         club=club,
         student_id=student_id,
         status=MembershipStatus.OPEN.value,
     )
-    return membership
 
 
 @transaction.atomic
@@ -323,12 +321,11 @@ def cast_poll_vote(
     if not valid_vote:
         raise ValueError(vote_err)
 
-    vote = PollVote.objects.create(
+    return PollVote.objects.create(
         poll=poll,
         option=option,
         student_id=student_id,
     )
-    return vote
 
 
 @transaction.atomic
@@ -354,7 +351,7 @@ def submit_budget_request(
     if not valid_amt:
         raise ValueError(amt_err)
 
-    req = ClubBudgetRequest.objects.create(
+    return ClubBudgetRequest.objects.create(
         club=club,
         requested_amount=requested_amount,
         description=description,
@@ -362,7 +359,6 @@ def submit_budget_request(
         status="open",
         submitted_by_id=actor_id,
     )
-    return req
 
 
 @transaction.atomic
@@ -388,14 +384,13 @@ def submit_event_report(
     if not valid_rep:
         raise ValueError(rep_err)
 
-    report = ClubEventReport.objects.create(
+    return ClubEventReport.objects.create(
         club=club,
         event_name=event_name,
         event_date=event_date,
         report_file=report_file,
         submitted_by_id=actor_id,
     )
-    return report
 
 
 def review_event_report(
