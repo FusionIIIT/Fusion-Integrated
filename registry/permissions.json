@@ -278,6 +278,265 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "visitor_hostel": {
+      "grants": {
+        "VhCaretaker": [
+          "visitor_hostel.alert.view",
+          "visitor_hostel.bill.manage",
+          "visitor_hostel.booking.review",
+          "visitor_hostel.booking.view",
+          "visitor_hostel.cancellation.approve",
+          "visitor_hostel.duty.view",
+          "visitor_hostel.inventory.manage",
+          "visitor_hostel.meal.manage",
+          "visitor_hostel.offline_booking.create",
+          "visitor_hostel.operations_report.view",
+          "visitor_hostel.replenishment.create",
+          "visitor_hostel.room.manage",
+          "visitor_hostel.stay.update",
+          "visitor_hostel.tariff.view"
+        ],
+        "VhIncharge": [
+          "visitor_hostel.bill.view",
+          "visitor_hostel.booking.approve",
+          "visitor_hostel.booking.view",
+          "visitor_hostel.duty.view",
+          "visitor_hostel.inventory.view",
+          "visitor_hostel.replenishment.approve",
+          "visitor_hostel.report.view",
+          "visitor_hostel.tariff.view"
+        ],
+        "faculty": [
+          "visitor_hostel.booking.create",
+          "visitor_hostel.booking.view_self",
+          "visitor_hostel.cancellation.create",
+          "visitor_hostel.modification.create"
+        ],
+        "staff": [
+          "visitor_hostel.booking.create",
+          "visitor_hostel.booking.view_self",
+          "visitor_hostel.cancellation.create",
+          "visitor_hostel.modification.create"
+        ],
+        "student": [
+          "visitor_hostel.booking.create",
+          "visitor_hostel.booking.view_self",
+          "visitor_hostel.cancellation.create",
+          "visitor_hostel.modification.create"
+        ]
+      },
+      "module_grants": [
+        "VhCaretaker",
+        "VhIncharge",
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/visitorhostel",
+        "icon": "House",
+        "items": [
+          {
+            "code": "vh.book",
+            "icon": "CalendarPlus",
+            "label": "Book a Room",
+            "required_permission": "visitor_hostel.booking.create",
+            "sort_order": 10,
+            "to": "/visitorhostel/book"
+          },
+          {
+            "code": "vh.mine",
+            "icon": "ListChecks",
+            "label": "My Bookings",
+            "required_permission": "visitor_hostel.booking.view_self",
+            "sort_order": 20,
+            "to": "/visitorhostel/mine"
+          },
+          {
+            "code": "vh.queue",
+            "icon": "Tray",
+            "label": "Booking Requests",
+            "required_permission": "visitor_hostel.booking.review",
+            "sort_order": 30,
+            "to": "/visitorhostel/queue"
+          },
+          {
+            "code": "vh.stays",
+            "icon": "Bed",
+            "label": "Rooms & Stays",
+            "required_permission": "visitor_hostel.stay.update",
+            "sort_order": 40,
+            "to": "/visitorhostel/stays"
+          },
+          {
+            "code": "vh.billing",
+            "icon": "Receipt",
+            "label": "Billing",
+            "required_permission": "visitor_hostel.bill.manage",
+            "sort_order": 50,
+            "to": "/visitorhostel/billing"
+          },
+          {
+            "code": "vh.inventory",
+            "icon": "Package",
+            "label": "Inventory",
+            "required_permission": "visitor_hostel.inventory.manage",
+            "sort_order": 60,
+            "to": "/visitorhostel/inventory"
+          },
+          {
+            "code": "vh.operations",
+            "icon": "ClipboardText",
+            "label": "Daily Reports",
+            "required_permission": "visitor_hostel.operations_report.view",
+            "sort_order": 70,
+            "to": "/visitorhostel/operations"
+          },
+          {
+            "code": "vh.approvals",
+            "icon": "SealCheck",
+            "label": "Approvals",
+            "required_permission": "visitor_hostel.booking.approve",
+            "sort_order": 80,
+            "to": "/visitorhostel/approvals"
+          },
+          {
+            "code": "vh.replenishment",
+            "icon": "ShoppingCart",
+            "label": "Replenishment",
+            "required_permission": "visitor_hostel.replenishment.approve",
+            "sort_order": 90,
+            "to": "/visitorhostel/replenishment"
+          },
+          {
+            "code": "vh.reports",
+            "icon": "ChartBar",
+            "label": "Reports",
+            "required_permission": "visitor_hostel.report.view",
+            "sort_order": 100,
+            "to": "/visitorhostel/reports"
+          }
+        ],
+        "label": "Visitors Hostel",
+        "nav_section": "Campus",
+        "sort_order": 20,
+        "status": "planned"
+      },
+      "permissions": [
+        {
+          "code": "visitor_hostel.booking.create",
+          "label": "Submit a booking request for a visitor"
+        },
+        {
+          "code": "visitor_hostel.booking.view_self",
+          "label": "See one's own bookings"
+        },
+        {
+          "code": "visitor_hostel.modification.create",
+          "label": "Request a booking modification"
+        },
+        {
+          "code": "visitor_hostel.cancellation.create",
+          "label": "Request a booking cancellation"
+        },
+        {
+          "code": "visitor_hostel.booking.view",
+          "label": "See every booking, online and offline"
+        },
+        {
+          "code": "visitor_hostel.booking.review",
+          "label": "Review, forward or reject a booking"
+        },
+        {
+          "code": "visitor_hostel.offline_booking.create",
+          "label": "Record a telephonic or walk-in booking"
+        },
+        {
+          "code": "visitor_hostel.cancellation.approve",
+          "label": "Confirm a cancellation request"
+        },
+        {
+          "code": "visitor_hostel.room.manage",
+          "label": "Maintain rooms and allot them"
+        },
+        {
+          "code": "visitor_hostel.stay.update",
+          "label": "Record check-in and check-out"
+        },
+        {
+          "code": "visitor_hostel.meal.manage",
+          "label": "Record meal bookings for guests"
+        },
+        {
+          "code": "visitor_hostel.bill.manage",
+          "label": "Generate bills and record settlement"
+        },
+        {
+          "code": "visitor_hostel.inventory.manage",
+          "label": "Maintain VH inventory"
+        },
+        {
+          "code": "visitor_hostel.replenishment.create",
+          "label": "Record a replenishment requirement"
+        },
+        {
+          "code": "visitor_hostel.operations_report.view",
+          "label": "See the Caretaker's daily reports"
+        },
+        {
+          "code": "visitor_hostel.alert.view",
+          "label": "See no-show and overstay alerts"
+        },
+        {
+          "code": "visitor_hostel.booking.approve",
+          "label": "Approve or reject a forwarded booking"
+        },
+        {
+          "code": "visitor_hostel.bill.view",
+          "label": "Review finalized bills and meal records"
+        },
+        {
+          "code": "visitor_hostel.inventory.view",
+          "label": "Review VH inventory"
+        },
+        {
+          "code": "visitor_hostel.replenishment.approve",
+          "label": "Approve a replenishment requirement"
+        },
+        {
+          "code": "visitor_hostel.report.view",
+          "label": "See the VH In-Charge's reports"
+        },
+        {
+          "code": "visitor_hostel.tariff.view",
+          "label": "See visitor categories and tariffs"
+        },
+        {
+          "code": "visitor_hostel.duty.view",
+          "label": "See who is on duty"
+        },
+        {
+          "code": "visitor_hostel.tariff.manage",
+          "label": "Record a new tariff version"
+        },
+        {
+          "code": "visitor_hostel.duty.manage",
+          "label": "Reassign the Caretaker or VH In-Charge"
+        },
+        {
+          "code": "visitor_hostel.modification.approve",
+          "label": "Confirm a booking modification"
+        }
+      ],
+      "scope_permissions": [
+        "visitor_hostel.booking.view"
+      ],
+      "system_permissions": [
+        "visitor_hostel.duty.manage",
+        "visitor_hostel.modification.approve",
+        "visitor_hostel.tariff.manage"
+      ]
     }
   },
   "publisher": "integrated",
