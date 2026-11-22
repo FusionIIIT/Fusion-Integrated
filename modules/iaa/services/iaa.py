@@ -189,10 +189,11 @@ def create_record(actor, payload: dict, *, kind: str) -> FinancialRecord:
 
 @transaction.atomic
 def update_draft(actor, record_id: int, payload: dict) -> FinancialRecord:
-    role = require(actor, "iaa.request.create", roles=BASIC_ROLES)
     row = FinancialRecord.objects.select_for_update().filter(pk=record_id).first()
     if row is None:
         raise NotFoundError("IAA record not found.")
+    role = require(actor, "iaa.ta.create" if row.record_kind == "ta" else "iaa.request.create",
+                   roles=BASIC_ROLES)
     if row.created_by_id != actor.user_id:
         raise PermissionDeniedError("Only the creator may edit this draft.")
     if row.status != workflow.DRAFT:
@@ -208,11 +209,12 @@ def update_draft(actor, record_id: int, payload: dict) -> FinancialRecord:
 
 @transaction.atomic
 def attach_document(actor, record_id: int, payload: dict) -> SupportingDocument:
-    require(actor, "iaa.request.create", roles=BASIC_ROLES)
     row = FinancialRecord.objects.select_for_update().filter(
         pk=record_id, created_by_id=actor.user_id, status=workflow.DRAFT).first()
     if row is None:
         raise NotFoundError("Draft not found in your scope.")
+    require(actor, "iaa.ta.create" if row.record_kind == "ta" else "iaa.request.create",
+            roles=BASIC_ROLES)
     ref = str(payload.get("storage_reference", "")).strip()
     name = str(payload.get("name", "")).strip()
     if not ref or not name:
