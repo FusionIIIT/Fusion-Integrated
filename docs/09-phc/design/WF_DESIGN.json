@@ -1,0 +1,11 @@
+{
+  "strategy": "WF",
+  "source": "PHC workflow specifications v1.1 final synchronized",
+  "cases": [
+    {"id":"WF-01","requirements":["BW-PHC-01","CW-PHC-01","PHC-BR-08","PHC-BR-13","PHC-BR-14"],"oracle":"valid claim follows employee -> PHC -> accounts -> authority -> payment; audit and status notifications are recorded"},
+    {"id":"WF-02","requirements":["BW-PHC-02","CW-PHC-01","PHC-BR-14"],"oracle":"authority rejection is terminal; no payment/reopen transition is accepted"},
+    {"id":"WF-03","requirements":["BW-PHC-03","CW-PHC-02","PHC-BR-10","PHC-BR-11"],"oracle":"approved procurement can be fulfilled after delivery; fulfillment does not adjust inventory"},
+    {"id":"WF-04","requirements":["BW-PHC-04","CW-PHC-02","PHC-BR-10","PHC-BR-11"],"oracle":"rejected procurement is terminal and cannot be approved later"}
+  ],
+  "limitations": "The designs were recorded after implementation was visible. Baseline means the first run of these new tests against the current branch."
+}
