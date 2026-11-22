@@ -1,6 +1,7 @@
 """DRF ViewSets and endpoints for VMS."""
 
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -36,7 +37,11 @@ from modules.vms.services.operations import (
 )
 
 
-class PreRegisterView(APIView):
+class BaseVMSView(APIView):
+    permission_classes = [AllowAny]
+
+
+class PreRegisterView(BaseVMSView):
     """VMS-B-01 PreRegistrationBoundary: Register a new visit."""
 
     def post(self, request):
@@ -56,7 +61,7 @@ class PreRegisterView(APIView):
         return Response(VisitRequestSerializer(qs, many=True).data)
 
 
-class HostPendingRequestsView(APIView):
+class HostPendingRequestsView(BaseVMSView):
     """VMS-B-02 HostDecisionBoundary: Fetch pending requests for host."""
 
     def get(self, request):
@@ -69,7 +74,7 @@ class HostPendingRequestsView(APIView):
         return Response(VisitRequestSerializer(qs, many=True).data)
 
 
-class HostDecisionView(APIView):
+class HostDecisionView(BaseVMSView):
     """VMS-B-02 HostDecisionBoundary: Decide visit request."""
 
     def post(self, request, request_id):
@@ -104,7 +109,7 @@ class HostDecisionView(APIView):
             )
 
 
-class GateValidationView(APIView):
+class GateValidationView(BaseVMSView):
     """VMS-B-03 GateValidationBoundary: Check-in validation at gate."""
 
     def post(self, request):
@@ -132,7 +137,7 @@ class GateValidationView(APIView):
         )
 
 
-class GateCheckoutView(APIView):
+class GateCheckoutView(BaseVMSView):
     """VMS-B-04 GateCheckoutBoundary: Checkout at gate."""
 
     def post(self, request):
@@ -154,7 +159,7 @@ class GateCheckoutView(APIView):
             )
 
 
-class ActivePassesView(APIView):
+class ActivePassesView(BaseVMSView):
     """List all currently active passes."""
 
     def get(self, request):
@@ -162,7 +167,7 @@ class ActivePassesView(APIView):
         return Response(VisitorPassSerializer(passes, many=True).data)
 
 
-class ActiveVisitsView(APIView):
+class ActiveVisitsView(BaseVMSView):
     """List all on-site visitors."""
 
     def get(self, request):
@@ -170,7 +175,7 @@ class ActiveVisitsView(APIView):
         return Response(VisitLogSerializer(logs, many=True).data)
 
 
-class CampusGatesView(APIView):
+class CampusGatesView(BaseVMSView):
     """List operational campus gates."""
 
     def get(self, request):

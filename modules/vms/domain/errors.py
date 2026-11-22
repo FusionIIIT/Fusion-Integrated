@@ -38,3 +38,18 @@ class GateAccessDeniedError(VMSDomainError):
 class VisitAlreadyCompletedError(VMSDomainError):
     def __init__(self, message: str = "Visit session has already been completed."):
         super().__init__(message, code="visit_already_completed")
+
+
+class PassNotFoundError(VMSDomainError):
+    def __init__(self, message: str = "Visitor pass not found."):
+        super().__init__(message, code="pass_not_found")
+
+
+class VisitorNotFoundError(VMSDomainError):
+    def __init__(self, message: str = "Visitor not found."):
+        super().__init__(message, code="visitor_not_found")
+
+
+class VisitRequestNotFoundError(VMSDomainError):
+    def __init__(self, message: str = "Visit request not found."):
+        super().__init__(message, code="visit_request_not_found")

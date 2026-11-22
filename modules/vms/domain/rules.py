@@ -57,3 +57,6 @@ def validate_checkout_transition(current_status: str) -> None:
         raise InvalidStateTransitionError(
             f"Cannot checkout visit with status '{current_status}'. Must be 'ON_SITE'."
         )
+
+
+validate_visit_time_window = validate_time_window

@@ -63,3 +63,9 @@ def check_is_blacklisted(phone: str = "", id_doc_number: str = "") -> tuple[bool
 
 def get_all_campus_gates() -> QuerySet[CampusGate]:
     return CampusGate.objects.filter(is_operational=True).order_by("gate_name")
+
+
+def get_request_by_id(request_id: str) -> VisitRequest | None:
+    return (
+        VisitRequest.objects.filter(request_id=request_id).select_related("visitor", "host").first()
+    )
