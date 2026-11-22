@@ -278,6 +278,216 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "psm": {
+      "grants": {
+        "accounts_admin": [
+          "psm.grn.view",
+          "psm.invoice.match",
+          "psm.po.view"
+        ],
+        "dept_admin": [
+          "psm.indent.approve_dept",
+          "psm.indent.view",
+          "psm.stock.manage",
+          "psm.stock.view"
+        ],
+        "director": [
+          "psm.indent.approve_director",
+          "psm.indent.view",
+          "psm.po.view"
+        ],
+        "faculty": [
+          "psm.grn.acknowledge",
+          "psm.grn.view",
+          "psm.indent.create",
+          "psm.indent.view"
+        ],
+        "head_of_department": [
+          "psm.indent.approve_dept",
+          "psm.indent.view",
+          "psm.stock.view"
+        ],
+        "purchase_officer": [
+          "psm.discrepancy.manage",
+          "psm.grn.view",
+          "psm.indent.approve_ps",
+          "psm.indent.view",
+          "psm.po.create",
+          "psm.po.view",
+          "psm.vendor.manage",
+          "psm.vendor.view"
+        ],
+        "staff": [
+          "psm.grn.acknowledge",
+          "psm.grn.view",
+          "psm.indent.create",
+          "psm.indent.view"
+        ],
+        "store_keeper": [
+          "psm.discrepancy.manage",
+          "psm.grn.create",
+          "psm.grn.view",
+          "psm.po.view",
+          "psm.stock.manage",
+          "psm.stock.view"
+        ]
+      },
+      "module_grants": [
+        "accounts_admin",
+        "dept_admin",
+        "director",
+        "faculty",
+        "head_of_department",
+        "purchase_officer",
+        "staff",
+        "store_keeper"
+      ],
+      "nav": {
+        "base_path": "/psm",
+        "icon": "ShoppingCart",
+        "items": [
+          {
+            "code": "psm.indents",
+            "icon": "FileText",
+            "label": "My Indents",
+            "required_permission": "psm.indent.view",
+            "sort_order": 10,
+            "to": "/psm/indents"
+          },
+          {
+            "code": "psm.indents.new",
+            "icon": "PlusCircle",
+            "label": "Raise Indent",
+            "required_permission": "psm.indent.create",
+            "sort_order": 20,
+            "to": "/psm/indents/new"
+          },
+          {
+            "code": "psm.approvals",
+            "icon": "CheckSquare",
+            "label": "Approval Queue",
+            "required_permission": "psm.indent.approve_dept",
+            "sort_order": 30,
+            "to": "/psm/approvals"
+          },
+          {
+            "code": "psm.purchase_orders",
+            "icon": "Receipt",
+            "label": "Purchase Orders",
+            "required_permission": "psm.po.view",
+            "sort_order": 40,
+            "to": "/psm/purchase-orders"
+          },
+          {
+            "code": "psm.goods_receipts",
+            "icon": "Package",
+            "label": "Goods Receipts",
+            "required_permission": "psm.grn.view",
+            "sort_order": 50,
+            "to": "/psm/goods-receipts"
+          },
+          {
+            "code": "psm.inventory",
+            "icon": "Archive",
+            "label": "Stores Inventory",
+            "required_permission": "psm.stock.view",
+            "sort_order": 60,
+            "to": "/psm/inventory"
+          },
+          {
+            "code": "psm.vendors",
+            "icon": "Users",
+            "label": "Vendor Directory",
+            "required_permission": "psm.vendor.view",
+            "sort_order": 70,
+            "to": "/psm/vendors"
+          },
+          {
+            "code": "psm.discrepancies",
+            "icon": "AlertTriangle",
+            "label": "Discrepancy Reports",
+            "required_permission": "psm.discrepancy.manage",
+            "sort_order": 80,
+            "to": "/psm/discrepancies"
+          }
+        ],
+        "label": "Purchase & Stores",
+        "nav_section": "Administration",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "psm.indent.create",
+          "label": "Raise new purchase indents"
+        },
+        {
+          "code": "psm.indent.view",
+          "label": "View indents within user or departmental scope"
+        },
+        {
+          "code": "psm.indent.approve_dept",
+          "label": "Department-level indent verification and HOD approval"
+        },
+        {
+          "code": "psm.indent.approve_ps",
+          "label": "Procurement & Stores admin indent evaluation and routing"
+        },
+        {
+          "code": "psm.indent.approve_director",
+          "label": "Director / Registrar high-value indent approval"
+        },
+        {
+          "code": "psm.stock.view",
+          "label": "View store inventory and ledger entries"
+        },
+        {
+          "code": "psm.stock.manage",
+          "label": "Issue departmental stock and manage adjustments"
+        },
+        {
+          "code": "psm.vendor.view",
+          "label": "View vendor master records"
+        },
+        {
+          "code": "psm.vendor.manage",
+          "label": "Onboard, vet, verify and update vendor master data"
+        },
+        {
+          "code": "psm.po.create",
+          "label": "Generate and issue Purchase Orders"
+        },
+        {
+          "code": "psm.po.view",
+          "label": "Inspect Purchase Orders and delivery status"
+        },
+        {
+          "code": "psm.grn.create",
+          "label": "Log Goods Receipt Notes upon delivery"
+        },
+        {
+          "code": "psm.grn.view",
+          "label": "View Goods Receipt Notes"
+        },
+        {
+          "code": "psm.grn.acknowledge",
+          "label": "Indentor goods delivery acknowledgement"
+        },
+        {
+          "code": "psm.discrepancy.manage",
+          "label": "Log and resolve discrepancy reports"
+        },
+        {
+          "code": "psm.invoice.match",
+          "label": "Perform 3-way invoice matching and payment authorization"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "psm.indent.auto_escalate",
+        "psm.stock.low_stock_sync"
+      ]
     }
   },
   "publisher": "integrated",
