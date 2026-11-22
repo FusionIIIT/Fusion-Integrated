@@ -173,6 +173,45 @@ def record_off_campus(*, season: str, user_id: int, company_id: int,
     return record
 
 
+@transaction.atomic
+def update_placement_record(*, record_id: int, actor, ctc_lpa=None,
+                            company_id: int | None = None,
+                            kind: str | None = None,
+                            is_active: bool | None = None) -> PlacementRecord:
+    """PC-UC-010, PC-BR-029, PC-AFR-031, PC-AFR-032.
+
+    Allows the TPO to correct or update placement outcomes for Students and Alumni.
+    Supports updating CTC, company, kind, and active/inactive status.
+    """
+    require(actor, P_MANAGE)
+    record = PlacementRecord.objects.select_for_update().filter(pk=record_id).first()
+    if record is None:
+        raise NotFoundError("No such placement record.")
+
+    updates = []
+    if ctc_lpa is not None:
+        record.ctc_lpa = ctc_lpa
+        updates.append("ctc_lpa")
+    if company_id is not None:
+        company = Company.objects.filter(pk=company_id).first()
+        if company is None:
+            raise NotFoundError("No such company.")
+        record.company = company
+        updates.append("company")
+    if kind is not None:
+        record.kind = kind
+        updates.append("kind")
+    if is_active is not None:
+        record.is_active = is_active
+        updates.append("is_active")
+
+    if updates:
+        record.save(update_fields=updates)
+        log.info("placement.clearance.update_record record=%s by=%s updates=%s",
+                 record_id, actor.user_id, updates)
+    return record
+
+
 def outstanding(*, season: str | None = None) -> list[PlacementRecord]:
     """Placed students who still owe a signed letter. The office's worklist."""
     rows = (PlacementRecord.objects

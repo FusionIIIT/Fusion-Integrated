@@ -245,4 +245,8 @@ export interface StaffStats {
   max_ctc?: string | null;
   by_company?: { company__name: string; placed: number; top: string | null }[];
   applications_by_status?: Record<string, number>;
+  salary_distribution?: { band: string; count: number }[];
+  company_participation_trend?: { season: string; companies_count: number }[];
+  employment_trend?: { season: string; registered: number; placed: number; placement_rate: number }[];
 }
+
