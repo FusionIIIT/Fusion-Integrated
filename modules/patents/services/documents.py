@@ -1,7 +1,4 @@
-"""Document services: validation, upload, and versioning.
-
-Enforces BR-PMS-014 (PDF), BR-PMS-015 (<=50MB), BR-PMS-016 (malware scan), BR-PMS-130 (RBAC).
-"""
+"""Document services: validation, upload, and versioning."""
 from __future__ import annotations
 
 from django.db import transaction

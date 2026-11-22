@@ -11,12 +11,7 @@ class AppendOnlyViolation(Exception):
 
 
 class PatentBudgetLedger(TimeStampedModel):
-    """Append-only budget ledger (R1-08).
-
-    A request is recorded once as REQUEST. A decision is a new APPROVAL or ESCALATION row
-    whose replaces_entry points at the request. A correction is a new REVERSAL row whose
-    replaces_entry points at the approval it reverses. Rows are never updated or deleted.
-    """
+    """Append-only budget ledger (R1-08)."""
 
     application = models.ForeignKey(
         PatentApplication,

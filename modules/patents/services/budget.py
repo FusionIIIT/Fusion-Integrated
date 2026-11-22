@@ -1,7 +1,4 @@
-"""Budget services: append-only ledger, decisions, reversals and threshold escalation.
-
-Enforces BR-PMS-048..053, BR-PMS-128. Every change is a new ledger row (R1-08).
-"""
+"""Budget services: append-only ledger, decisions, reversals and threshold escalation."""
 from __future__ import annotations
 
 from decimal import Decimal
@@ -61,11 +58,7 @@ def decide_budget(
     decision: str,  # "APPROVE", "REJECT"
     notes: str = "",
 ) -> PatentBudgetLedger:
-    """Record a decision as a new row. Above the threshold it is recorded as an ESCALATION.
-
-    A later decision on an escalated request is the higher authority's decision, so the
-    threshold does not escalate it a second time.
-    """
+    """Record a decision as a new row. Above the threshold it is recorded as an ESCALATION."""
     if not scoping.is_director(actor) and not scoping.is_pcc_admin(actor):
         raise PermissionDeniedError("Director authority required to decide budget.")
     if decision not in ("APPROVE", "REJECT"):

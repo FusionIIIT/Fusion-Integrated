@@ -66,13 +66,15 @@ class InvalidAppealOutcomeError(ValidationError):
 
 def validate_application_fields(title: str, abstract: str, description: str, claims: str) -> None:
     if not (title and title.strip()):
-        raise IncompleteApplicationError("Application title is required.")
+        raise IncompleteApplicationError("Enter an application title before submitting.")
     if not (abstract and abstract.strip()):
-        raise IncompleteApplicationError("Application abstract is required.")
+        raise IncompleteApplicationError("Enter an abstract before submitting.")
     if not (description and description.strip()):
-        raise IncompleteApplicationError("Detailed technical description is required.")
+        raise IncompleteApplicationError(
+            "Enter a detailed technical description before submitting."
+        )
     if not (claims and claims.strip()):
-        raise IncompleteApplicationError("Patent claims definition is required.")
+        raise IncompleteApplicationError("Enter the patent claims before submitting.")
 
 
 def validate_document(
@@ -82,9 +84,9 @@ def validate_document(
 ) -> None:
     fmt = file_format.lower().lstrip(".")
     if fmt != "pdf":
-        raise DocumentFormatError("Application supporting documents must be in PDF format.")
+        raise DocumentFormatError("Upload supporting documents in PDF format.")
     if size_bytes <= 0:
-        raise DocumentSizeError("Document file size must be greater than zero bytes.")
+        raise DocumentSizeError("Upload a document that is not empty.")
     if size_bytes > max_bytes:
         raise DocumentSizeError(
             f"Document size ({size_bytes} bytes) exceeds limit of {max_bytes} bytes."
@@ -93,13 +95,13 @@ def validate_document(
 
 def validate_ownership_shares(shares: Sequence[Decimal | float | int]) -> None:
     if not shares:
-        raise InvalidSharePercentageError("At least one inventor share is required.")
+        raise InvalidSharePercentageError("Add at least one inventor with an ownership share.")
     total = Decimal("0")
     for s in shares:
         d = Decimal(str(s))
         if d <= 0 or d > 100:
             raise InvalidSharePercentageError(
-                "Each ownership share percentage must be between 0 and 100."
+                "Enter each ownership share as a percentage from 0 to 100."
             )
         total += d
     if total != Decimal("100"):
@@ -119,7 +121,7 @@ def validate_justification(justification: str, min_length: int = MIN_JUSTIFICATI
 def validate_coi(applicant_user_id: int, reviewer_user_id: int) -> None:
     if applicant_user_id == reviewer_user_id:
         raise ConflictOfInterestError(
-            "A reviewer or administrator cannot review an application they authored."
+            "Assign a reviewer who has not authored or co-invented this application."
         )
 
 

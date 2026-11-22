@@ -1,9 +1,4 @@
-"""Transactional application services and state machine choke-point.
-
-All state transitions flow through transition_application() under select_for_update().
-Enforces BR-PMS-014..017, BR-PMS-020..027, BR-PMS-029..036, BR-PMS-038, BR-PMS-040..046,
-BR-PMS-067..070, BR-PMS-092..095, BR-PMS-126..128, BR-PMS-130.
-"""
+"""Transactional application services and state machine choke-point."""
 from __future__ import annotations
 
 import datetime
@@ -201,111 +196,10 @@ def transition_application(
             raise NotFoundError("Patent application not found.")
 
         lane = actor_lane(actor, app)
-
-        # Resolve target state from event and payload
-        to_status: str | None = None
-        if event == "submit":
-            to_status = sm.SUBMITTED
-        elif event == "assign_director":
-            to_status = sm.UNDER_REVIEW
-            director_id = payload.get("director_id")
-            if not director_id:
-                raise BadRequestError("director_id required for assign_director.")
-            val.validate_coi(app.user_id, director_id)
-            for ci_uid in app.co_inventors.values_list("user_id", flat=True):
-                if ci_uid:
-                    val.validate_coi(ci_uid, director_id)
-        elif event == "submit_review":
-            decision = payload.get("decision")
-            justification = payload.get("justification", "")
-            if decision not in ("APPROVE", "REJECT", "NEEDS_REVISION"):
-                raise ConflictError(f"Decision {decision!r} is invalid.")
-            val.validate_justification(justification)
-            to_status = {
-                "APPROVE": sm.APPROVED,
-                "REJECT": sm.REJECTED,
-                "NEEDS_REVISION": sm.NEEDS_REVISION,
-            }[decision]
-        elif event == "assign_attorney":
-            to_status = sm.ASSIGNMENT_OFFERED
-            attorney_id = payload.get("attorney_id")
-            if not attorney_id:
-                raise BadRequestError("attorney_id required for assign_attorney.")
-            member = AttorneyPanelMember.objects.filter(
-                user_id=attorney_id, is_approved_panel=True
-            ).first()
-            if not member:
-                raise ConflictError("Selected attorney is not an approved panel member.")
-            policy = PatentPolicy.objects.filter(is_active=True).first()
-            if (
-                policy
-                and policy.max_attorney_workload is not None
-                and member.active_workload >= policy.max_attorney_workload
-            ):
-                raise ConflictError(
-                    "Attorney has reached maximum active workload capacity (BR-PMS-043)."
-                )
-        elif event == "accept_assignment":
-            to_status = sm.ATTORNEY_ASSIGNED
-        elif event == "decline_assignment":
-            to_status = sm.PENDING_REVIEW
-        elif event == "start_assessment":
-            to_status = sm.ASSESSMENT_IN_PROGRESS
-        elif event == "file_external":
-            to_status = sm.FILED
-            has_approved_budget = app.budget_entries.filter(status="APPROVED").exists()
-            all_consented = all(ci.consent_granted for ci in app.co_inventors.all())
-            clearance = fil.evaluate_filing_clearance(
-                has_inventor_agreements=all_consented,
-                has_budget_approval=has_approved_budget,
-                has_format_compliance=True,
-            )
-            if not clearance.cleared:
-                raise ConflictError("; ".join(clearance.reasons))
-        elif event == "grant":
-            to_status = sm.GRANTED
-        elif event in {"reject", "reject_assessment"}:
-            to_status = sm.REJECTED
-        elif event == "withdraw":
-            to_status = sm.WITHDRAWN
-            reason = payload.get("reason", "")
-            if not reason.strip():
-                raise BadRequestError("Mandatory reason required for withdrawal.")
-            policy = PatentPolicy.objects.filter(is_active=True).first()
-            eligible_states = tuple(policy.withdrawal_eligible_states) if policy else ()
-            if app.status not in eligible_states:
-                raise ConflictError(
-                    f"Application status {app.status} is not eligible for withdrawal."
-                )
-        elif event == "file_appeal":
-            to_status = sm.APPEAL_SUBMITTED
-            grounds = payload.get("grounds", "")
-            if not grounds.strip():
-                raise BadRequestError("Grounds required to file appeal.")
-            if app.status != sm.REJECTED:
-                raise ConflictError("Appeal can only be filed against a REJECTED application.")
-        elif event == "decide_appeal":
-            outcome = payload.get("outcome")
-            val.validate_appeal_outcome(outcome)
-            to_status = {
-                "REMAND": sm.REMANDED,
-                "Remand for Amendment": sm.REMANDED,
-                "UPHOLD": sm.REJECTION_UPHELD,
-                "Uphold Rejection": sm.REJECTION_UPHELD,
-                "MODIFY": sm.DECISION_MODIFIED,
-                "Modify Decision": sm.DECISION_MODIFIED,
-            }[outcome]
-        elif event == "resubmit":
-            to_status = sm.RESUBMITTED
-        elif event == "expire":
-            to_status = sm.EXPIRED
-        else:
-            to_status = payload.get("to_status")
-
+        to_status = _resolve_target(app, event, actor, payload)
         if not to_status:
             raise BadRequestError(f"Cannot resolve target status for event {event!r}.")
 
-        # Check state machine transition and actor lane
         try:
             sm.resolve(app.status, to_status, lane)
         except sm.InvalidTransition as err:
@@ -313,72 +207,12 @@ def transition_application(
         except sm.ActorNotAllowed as err:
             raise PermissionDeniedError(str(err)) from err
 
-        # Perform side effects
         had_active_attorney = (
             bool(app.assigned_attorney_id)
             and app.status in {sm.ATTORNEY_ASSIGNED, sm.ASSESSMENT_IN_PROGRESS, sm.FILED}
         )
+        _apply_side_effects(app, event, actor, payload, had_active_attorney)
 
-        if event == "assign_director":
-            app.assigned_director_id = payload["director_id"]
-        elif event == "submit_review":
-            decision = payload["decision"]
-            justification = payload["justification"]
-            ReviewDecision.objects.create(
-                application=app,
-                director_user_id=getattr(actor, "user_id", 0),
-                decision=decision,
-                justification=justification,
-            )
-            if decision in ("REJECT", "NEEDS_REVISION"):
-                app.decision_date = timezone.now()
-            if decision == "REJECT" and had_active_attorney:
-                _decrement_attorney_workload(app.assigned_attorney_id)
-        elif event == "assign_attorney":
-            if had_active_attorney and app.assigned_attorney_id != payload["attorney_id"]:
-                _decrement_attorney_workload(app.assigned_attorney_id)
-            app.assigned_attorney_id = payload["attorney_id"]
-        elif event == "accept_assignment":
-            if app.assigned_attorney_id:
-                member = AttorneyPanelMember.objects.filter(
-                    user_id=app.assigned_attorney_id
-                ).first()
-                if member:
-                    member.active_workload += 1
-                    member.save(update_fields=["active_workload"])
-        elif event == "decline_assignment":
-            if app.assigned_attorney_id:
-                _decrement_attorney_workload(app.assigned_attorney_id)
-            app.assigned_attorney_id = None
-        elif event == "withdraw":
-            if had_active_attorney:
-                _decrement_attorney_workload(app.assigned_attorney_id)
-        elif event == "file_appeal":
-            AppealRecord.objects.create(
-                application=app,
-                applicant_user_id=getattr(actor, "user_id", app.user_id),
-                grounds=payload["grounds"],
-            )
-        elif event == "decide_appeal":
-            appeal = app.appeals.order_by("-id").first()
-            if appeal:
-                appeal.status = payload["outcome"]
-                appeal.director_user_id = getattr(actor, "user_id", 0)
-                appeal.decision_notes = payload.get("notes", "")
-                appeal.decided_at = timezone.now()
-                appeal.save()
-        elif event == "file_external":
-            app.external_filing_id = payload.get("external_filing_id", f"IPO-{app.id}")
-            app.filing_date = timezone.now().date()
-        elif event == "grant":
-            app.grant_date = timezone.now().date()
-            due = payload.get("renewal_due_date")
-            if due:
-                app.renewal_due_date = (
-                    due if isinstance(due, datetime.date) else datetime.date.fromisoformat(str(due))
-                )
-            if had_active_attorney:
-                _decrement_attorney_workload(app.assigned_attorney_id)
 
         if (
             to_status in {sm.REJECTED, sm.EXPIRED, sm.LAPSED, sm.REJECTION_UPHELD}
@@ -391,3 +225,196 @@ def transition_application(
         app.save()
 
     return app
+
+
+
+def _resolve_target(app, event: str, actor, payload: dict) -> str | None:
+    """Map an event and its payload to the target status, enforcing event guards."""
+    to_status: str | None = None
+    if event == "submit":
+        to_status = sm.SUBMITTED
+    elif event == "assign_director":
+        to_status = sm.UNDER_REVIEW
+        director_id = payload.get("director_id")
+        if not director_id:
+            raise BadRequestError("director_id required for assign_director.")
+        val.validate_coi(app.user_id, director_id)
+        for ci_uid in app.co_inventors.values_list("user_id", flat=True):
+            if ci_uid:
+                val.validate_coi(ci_uid, director_id)
+    elif event == "submit_review":
+        decision = payload.get("decision")
+        justification = payload.get("justification", "")
+        if decision not in ("APPROVE", "REJECT", "NEEDS_REVISION"):
+            raise ConflictError(f"Decision {decision!r} is invalid.")
+        val.validate_justification(justification)
+        to_status = {
+            "APPROVE": sm.APPROVED,
+            "REJECT": sm.REJECTED,
+            "NEEDS_REVISION": sm.NEEDS_REVISION,
+        }[decision]
+    else:
+        to_status = _resolve_mid_target(app, event, actor, payload)
+    return to_status
+
+
+def _resolve_mid_target(app, event: str, actor, payload: dict) -> str | None:
+    """Resolve the target status for attorney assignment, assessment and filing events."""
+    to_status: str | None = None
+    if event == "assign_attorney":
+        to_status = sm.ASSIGNMENT_OFFERED
+        attorney_id = payload.get("attorney_id")
+        if not attorney_id:
+            raise BadRequestError("attorney_id required for assign_attorney.")
+        member = AttorneyPanelMember.objects.filter(
+            user_id=attorney_id, is_approved_panel=True
+        ).first()
+        if not member:
+            raise ConflictError("Selected attorney is not an approved panel member.")
+        policy = PatentPolicy.objects.filter(is_active=True).first()
+        if (
+            policy
+            and policy.max_attorney_workload is not None
+            and member.active_workload >= policy.max_attorney_workload
+        ):
+            raise ConflictError(
+                "Attorney has reached maximum active workload capacity (BR-PMS-043)."
+            )
+    elif event == "accept_assignment":
+        to_status = sm.ATTORNEY_ASSIGNED
+    elif event == "decline_assignment":
+        to_status = sm.PENDING_REVIEW
+    elif event == "start_assessment":
+        to_status = sm.ASSESSMENT_IN_PROGRESS
+    elif event == "file_external":
+        to_status = sm.FILED
+        has_approved_budget = app.budget_entries.filter(status="APPROVED").exists()
+        all_consented = all(ci.consent_granted for ci in app.co_inventors.all())
+        clearance = fil.evaluate_filing_clearance(
+            has_inventor_agreements=all_consented,
+            has_budget_approval=has_approved_budget,
+            has_format_compliance=True,
+        )
+        if not clearance.cleared:
+            raise ConflictError("; ".join(clearance.reasons))
+    elif event == "grant":
+        to_status = sm.GRANTED
+    elif event in {"reject", "reject_assessment"}:
+        to_status = sm.REJECTED
+    else:
+        to_status = _resolve_remaining_target(app, event, actor, payload)
+    return to_status
+
+
+
+def _resolve_remaining_target(app, event: str, actor, payload: dict) -> str | None:
+    """Resolve the target status for withdrawal, appeal and resubmission events."""
+    to_status: str | None = None
+    if event == "withdraw":
+        to_status = sm.WITHDRAWN
+        reason = payload.get("reason", "")
+        if not reason.strip():
+            raise BadRequestError("Mandatory reason required for withdrawal.")
+        policy = PatentPolicy.objects.filter(is_active=True).first()
+        eligible_states = tuple(policy.withdrawal_eligible_states) if policy else ()
+        if app.status not in eligible_states:
+            raise ConflictError(
+                f"Application status {app.status} is not eligible for withdrawal."
+            )
+    elif event == "file_appeal":
+        to_status = sm.APPEAL_SUBMITTED
+        grounds = payload.get("grounds", "")
+        if not grounds.strip():
+            raise BadRequestError("Grounds required to file appeal.")
+        if app.status != sm.REJECTED:
+            raise ConflictError("Appeal can only be filed against a REJECTED application.")
+    elif event == "decide_appeal":
+        outcome = payload.get("outcome")
+        val.validate_appeal_outcome(outcome)
+        to_status = {
+            "REMAND": sm.REMANDED,
+            "Remand for Amendment": sm.REMANDED,
+            "UPHOLD": sm.REJECTION_UPHELD,
+            "Uphold Rejection": sm.REJECTION_UPHELD,
+            "MODIFY": sm.DECISION_MODIFIED,
+            "Modify Decision": sm.DECISION_MODIFIED,
+        }[outcome]
+    elif event == "resubmit":
+        to_status = sm.RESUBMITTED
+    elif event == "expire":
+        to_status = sm.EXPIRED
+    else:
+        to_status = payload.get("to_status")
+    return to_status
+
+
+def _apply_side_effects(app, event: str, actor, payload: dict, had_active_attorney: bool) -> None:
+    """Apply the event's effects on the application and attorney workload."""
+    if event == "assign_director":
+        app.assigned_director_id = payload["director_id"]
+    elif event == "submit_review":
+        decision = payload["decision"]
+        justification = payload["justification"]
+        ReviewDecision.objects.create(
+            application=app,
+            director_user_id=getattr(actor, "user_id", 0),
+            decision=decision,
+            justification=justification,
+        )
+        if decision in ("REJECT", "NEEDS_REVISION"):
+            app.decision_date = timezone.now()
+        if decision == "REJECT" and had_active_attorney:
+            _decrement_attorney_workload(app.assigned_attorney_id)
+    elif event == "assign_attorney":
+        if had_active_attorney and app.assigned_attorney_id != payload["attorney_id"]:
+            _decrement_attorney_workload(app.assigned_attorney_id)
+        app.assigned_attorney_id = payload["attorney_id"]
+    elif event == "accept_assignment":
+        if app.assigned_attorney_id:
+            member = AttorneyPanelMember.objects.filter(
+                user_id=app.assigned_attorney_id
+            ).first()
+            if member:
+                member.active_workload += 1
+                member.save(update_fields=["active_workload"])
+    elif event == "decline_assignment":
+        if app.assigned_attorney_id:
+            _decrement_attorney_workload(app.assigned_attorney_id)
+        app.assigned_attorney_id = None
+    elif event == "withdraw":
+        if had_active_attorney:
+            _decrement_attorney_workload(app.assigned_attorney_id)
+    else:
+        _apply_appeal_and_filing_effects(app, event, actor, payload, had_active_attorney)
+
+
+
+def _apply_appeal_and_filing_effects(app, event: str, actor, payload: dict,
+                                         had_active_attorney: bool) -> None:
+    """Apply appeal and external-filing effects."""
+    if event == "file_appeal":
+        AppealRecord.objects.create(
+            application=app,
+            applicant_user_id=getattr(actor, "user_id", app.user_id),
+            grounds=payload["grounds"],
+        )
+    elif event == "decide_appeal":
+        appeal = app.appeals.order_by("-id").first()
+        if appeal:
+            appeal.status = payload["outcome"]
+            appeal.director_user_id = getattr(actor, "user_id", 0)
+            appeal.decision_notes = payload.get("notes", "")
+            appeal.decided_at = timezone.now()
+            appeal.save()
+    elif event == "file_external":
+        app.external_filing_id = payload.get("external_filing_id", f"IPO-{app.id}")
+        app.filing_date = timezone.now().date()
+    elif event == "grant":
+        app.grant_date = timezone.now().date()
+        due = payload.get("renewal_due_date")
+        if due:
+            app.renewal_due_date = (
+                due if isinstance(due, datetime.date) else datetime.date.fromisoformat(str(due))
+            )
+        if had_active_attorney:
+            _decrement_attorney_workload(app.assigned_attorney_id)

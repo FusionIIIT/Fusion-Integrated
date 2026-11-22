@@ -1,8 +1,4 @@
-"""Patents API views (Step 4.5).
-
-Every view takes its queryset from selectors.scoping, so authorization is
-strictly enforced by narrowing the queryset; out-of-scope records 404.
-"""
+"""Patents API views (Step 4.5)."""
 from __future__ import annotations
 
 from drf_spectacular.utils import extend_schema
@@ -483,10 +479,7 @@ class AuditLogsView(APIView):
 
 @extend_schema(request=None, responses=s.ConsentTokenIssuedSerializer)
 class CoInventorConsentTokenView(APIView):
-    """POST /api/v1/patents/applications/<pk>/co-inventors/<ci_pk>/consent-token
-
-    Emails a one-time consent link to an external co-inventor. The applicant never sees it.
-    """
+    """POST /api/v1/patents/applications/<pk>/co-inventors/<ci_pk>/consent-token."""
     permission_classes = [MODULE, HasPermission(p.P_APPLICATION_VIEW_SELF)]
     throttle_scope = "patent_mutate"
 
@@ -499,11 +492,7 @@ class CoInventorConsentTokenView(APIView):
 
 @extend_schema(request=s.ConsentConfirmSerializer, responses=s.ConsentResponseSerializer)
 class ConsentConfirmView(APIView):
-    """POST /api/v1/patents/consent/confirm
-
-    Records a co-inventor's consent with the one-time token from their email. No login is
-    needed, because an external co-inventor has no institute account.
-    """
+    """POST /api/v1/patents/consent/confirm."""
     authentication_classes = []
     permission_classes = []
     throttle_scope = "patent_mutate"

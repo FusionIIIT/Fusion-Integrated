@@ -4,8 +4,9 @@ from __future__ import annotations
 import threading
 
 import pytest
-from django.db import connection
+from django.db import DatabaseError, connection
 
+from core.api.exceptions import ConflictError
 from modules.patents.domain import permissions as p
 from modules.patents.domain import state_machine as sm
 from modules.patents.models import AttorneyPanelMember, PatentApplication, PatentPolicy
@@ -41,7 +42,7 @@ def test_concurrent_attorney_workload_updates_under_lock():
         try:
             barrier.wait()
             attorney_service.update_attorney_workload(user_id=505, delta=1)
-        except Exception as exc:  # noqa: BLE001
+        except (DatabaseError, ConflictError) as exc:
             errors.append(exc)
         finally:
             connection.close()

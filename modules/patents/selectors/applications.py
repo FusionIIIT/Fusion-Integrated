@@ -1,8 +1,4 @@
-"""Patent application queries and detail lookups.
-
-All reads pass through here or scoping.py. Ownership filtering lives here,
-so an out-of-scope id naturally yields NotFoundError (404) instead of 403.
-"""
+"""Patent application queries and detail lookups."""
 from __future__ import annotations
 
 from django.db.models import QuerySet
@@ -28,10 +24,7 @@ def get_application(actor, application_id: int) -> PatentApplication | None:
 
 
 def get_application_or_404(actor, application_id: int) -> PatentApplication:
-    """Fetch an application within actor's scope or raise NotFoundError (404).
-
-    Out-of-scope or non-existent applications always return 404, never 403.
-    """
+    """Fetch an application within actor's scope or raise NotFoundError (404)."""
     app = get_application(actor, application_id)
     if app is None:
         raise NotFoundError("Patent application not found.")

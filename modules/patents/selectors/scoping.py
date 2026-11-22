@@ -1,19 +1,4 @@
-"""Role scope, decided in one place.
-
-Enforces BR-PMS-003, BR-PMS-005, BR-PMS-006, BR-PMS-126, BR-PMS-130, and BR-PMS-131.
-
-Every list and detail view starts from a queryset built here. Ownership is
-enforced by narrowing the queryset, never by fetching a row and then checking
-it — so a row you may not see is a 404, not a 403. A 403 would confirm it
-exists, which for confidential patent data is itself a disclosure (BR-PMS-130).
-
-    BR-PMS-003  Applicants may access information only for their own applications
-    BR-PMS-005  Directors may access reports/analytics only within authorized scope
-    BR-PMS-006  Director workflow-oversight is limited to applications in Director's domain
-    BR-PMS-126  A valid PMS role assignment is required before accessing functions
-    BR-PMS-130  Confidential patent information is protected by RBAC
-    BR-PMS-131  PMS maintains exactly one active PCC_ADMIN oversight role
-"""
+"""Role scope, decided in one place."""
 from __future__ import annotations
 
 from django.db.models import Q, QuerySet
@@ -64,6 +49,10 @@ def _own_id(actor) -> int | None:
 
 
 def _roles(actor) -> set[str]:
+    """Only the acting designation counts, so a dual-role user sees only that role's view."""
+    active = getattr(actor, "active_role", None)
+    if active:
+        return {str(active).lower()}
     return {r.lower() for r in getattr(actor, "roles", ())}
 
 
@@ -139,13 +128,7 @@ def has_pms_access(actor) -> bool:
 # -- Applications -------------------------------------------------------------
 
 def applications_for(actor) -> QuerySet[PatentApplication]:
-    """Scoped patent applications queryset.
-
-    BR-PMS-003: Applicants may access information only for their own applications.
-    BR-PMS-005 / BR-PMS-006: Director oversight limited to applications in Director's domain.
-    BR-PMS-126: Requires valid PMS role assignment.
-    BR-PMS-130: Confidential patent info protected by RBAC.
-    """
+    """Scoped patent applications queryset."""
     base = PatentApplication.objects.all()
     if not has_pms_access(actor):
         return base.none()

@@ -1,8 +1,4 @@
-"""Consent tokens for external co-inventors who have no institute account (R1 decision).
-
-The applicant asks for a token. The system emails it to the co-inventor, who confirms once.
-The applicant never sees the raw token, and only its SHA-256 hash is stored.
-"""
+"""Consent tokens for external co-inventors who have no institute account (R1 decision)."""
 from __future__ import annotations
 
 import hashlib

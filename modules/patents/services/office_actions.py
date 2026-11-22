@@ -1,7 +1,4 @@
-"""Office action services: tracking, drafting responses, applicant approvals.
-
-Enforces BW-PMS-12..13, BR-PMS-065..066, BR-PMS-138, BR-PMS-142, BR-PMS-146.
-"""
+"""Office action services: tracking, drafting responses, applicant approvals."""
 from __future__ import annotations
 
 import datetime

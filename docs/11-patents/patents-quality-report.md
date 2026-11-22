@@ -25,7 +25,7 @@ Written approvals from Student 2, quoted as she gave them. Each quote is her own
 | **Phase 5** (frontend) | `c4cdc3e` | Frontend pages and route guards | "I approve Phase 5 (frontend) as written in the uncommitted working tree ... on 2026-11-22 at 20:55 IST." (Shivani Mahour, 24bme054) |
 | **Phase 6** (ops, docs) | `e0192d2` | Ops, docs and seams | "I approve Phase 6 (ops, docs and seams) as written in the uncommitted working tree ... on 2026-11-22 at 21:05 IST." (Shivani Mahour, 24bme054) |
 | **Definition of Done** | `b6fae0c` | Attorney cap, exit tests, comments | "I approve the blueprint revision ... and the Definition of Done changes as written ... on 2026-11-22 at 22:56 IST." (Shivani Mahour, 24bme054) |
-| **Review round 1 fixes** (R1-08 and two decisions) | pending commit | Append-only budget ledger, effective-dated policy, missed-renewal alert, external co-inventor consent tokens, shared files | "I approve the append-only PatentBudgetLedger and effective-dated PatentPolicy superseding design (R1-08), the shared-file updates to .importlinter, client/src/app/registry.ts, and config/settings/base.py, and the two review decisions (email-based consent tokens for external co-inventors without institute IAM accounts, and raising an overdue alert for Director confirmation rather than auto-expiring or abandoning patents when an annuity renewal deadline passes) for the patents module, on 2026-11-23 at 00:05 IST." (Shivani Mahour, 24bme054) |
+| **Review round 1 fixes** (R1-08 and two decisions) | `ec2d6e2` | Append-only budget ledger, effective-dated policy, missed-renewal alert, external co-inventor consent tokens, shared files | "I approve the append-only PatentBudgetLedger and effective-dated PatentPolicy superseding design (R1-08), the shared-file updates to .importlinter, client/src/app/registry.ts, and config/settings/base.py, and the two review decisions (email-based consent tokens for external co-inventors without institute IAM accounts, and raising an overdue alert for Director confirmation rather than auto-expiring or abandoning patents when an annuity renewal deadline passes) for the patents module, on 2026-11-23 at 00:05 IST." (Shivani Mahour, 24bme054) |
 
 Phase 1 (spec and domain questions) was answered in the Phase 1 reply and is recorded in the blueprint's open items, not as a separate approval.
 
@@ -36,7 +36,7 @@ Full wording for each approval is in the approval messages, which are kept with 
 ## 3. Test Counts and Coverage Gates
 
 ### 3.1 Backend Test Suite (Pytest)
-- **Total Backend Tests:** 76 passed (0 failed, 0 skipped)
+- **Total Backend Tests:** 93 passed (0 failed, 0 skipped)
 - **Test Locations:**
   - `modules/patents/tests/test_domain.py` (Domain rules, state machine, policy)
   - `modules/patents/tests/test_api.py` (DRF endpoints, auth, permissions, CSRF)
@@ -164,3 +164,18 @@ DATABASE_URL="postgres://localhost/fusion_scratch" .venv/bin/python manage.py pm
 | **Item 10** | No Secrets Tracked | Complete | Clean env / secret scans |
 | **Item 11** | Plain User Access Control | Complete | Unprivileged users strictly isolated to self-owned applications |
 | **Item 12** | Squashed Migrations | Complete | Single canonical `0001_initial.py` migration file |
+
+## 9. Deliberate-Failure Checks (Step 5.15)
+
+Five rules were broken on purpose, one at a time. Each break was reverted after its test ran.
+
+| Broken rule | File | Result | Test that caught it |
+|---|---|---|---|
+| Review justification minimum removed | `domain/validation.py` | Caught | `test_domain.py` justification tests |
+| Director review SLA changed to 99 days | `domain/deadlines.py` | Caught | `test_r2_fixes.py::test_director_review_default_is_pinned` |
+| Create permission check bypassed | `api/views.py` | Caught | `test_api.py::test_unauthorized_create_fails_with_403` |
+| Double budget decision allowed | `services/budget.py` | Caught | `test_decisions_r1.py::test_decision_is_a_new_row_and_cannot_be_decided_twice` |
+| Policy edited in place allowed | `models/policy.py` | Caught | `test_decisions_r1.py::test_policy_content_cannot_be_edited_in_place` |
+
+Review round 2 (R2-01, R2-02, R2-07) is not complete in this report. The end-to-end specs cover only the applicant pages and the office route guards, not every live use case. The browser walkthrough table and the keyboard-only walkthrough are not recorded yet.
+

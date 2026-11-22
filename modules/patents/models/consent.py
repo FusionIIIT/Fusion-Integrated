@@ -5,11 +5,7 @@ from modules.patents.models.application import CoInventor
 
 
 class CoInventorConsentToken(TimeStampedModel):
-    """One-time consent token sent by email to an external co-inventor (R1 decision).
-
-    Only the SHA-256 hash of the token is stored. The raw token is sent to the co-inventor's
-    email address and is never shown to the applicant.
-    """
+    """One-time consent token sent by email to an external co-inventor (R1 decision)."""
 
     co_inventor = models.ForeignKey(
         CoInventor,

@@ -443,10 +443,7 @@ paths:
   /api/v1/patents/applications/{id}/co-inventors/{ci_pk}/consent-token:
     post:
       operationId: v1_patents_applications_co_inventors_consent_token_create
-      description: |-
-        POST /api/v1/patents/applications/<pk>/co-inventors/<ci_pk>/consent-token
-
-        Emails a one-time consent link to an external co-inventor. The applicant never sees it.
+      description: POST /api/v1/patents/applications/<pk>/co-inventors/<ci_pk>/consent-token.
       parameters:
       - in: path
         name: ci_pk
@@ -764,11 +761,7 @@ paths:
   /api/v1/patents/consent/confirm:
     post:
       operationId: v1_patents_consent_confirm_create
-      description: |-
-        POST /api/v1/patents/consent/confirm
-
-        Records a co-inventor's consent with the one-time token from their email. No login is
-        needed, because an external co-inventor has no institute account.
+      description: POST /api/v1/patents/consent/confirm.
       tags:
       - v1
       requestBody:
