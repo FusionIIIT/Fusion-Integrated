@@ -12,6 +12,7 @@ from django.utils import timezone
 
 from modules.directory.models import UserRef
 from modules.placement.models import Application, Company, JobPosting
+from modules.spacs.models import AwardCandidate, AwardCycle, SchemeCatalogue, SchemePolicyVersion, ScholarshipApplication
 
 
 class Command(BaseCommand):
@@ -55,6 +56,100 @@ class Command(BaseCommand):
                 defaults={"status": status, "cpi_at_apply": "8.10",
                           "eligibility_snapshot": {"is_eligible": True},
                           "applied_at": timezone.now()})
+
+        # --- SPACS Demo Data ---
+        now = timezone.now()
+        mcm, _ = SchemeCatalogue.objects.update_or_create(
+            code="mcm-scholarship",
+            defaults={
+                "name": "Merit-cum-Means (MCM) Scholarship",
+                "scheme_type": "scholarship",
+                "description": "Tuition waiver and monthly stipend for meritorious students from lower-income families.",
+                "status": "published",
+            },
+        )
+        mcm_ver, _ = SchemePolicyVersion.objects.update_or_create(
+            scheme=mcm,
+            version_number=1,
+            defaults={
+                "title": "MCM Policy 2026-27",
+                "description": "Guidelines approved by Senate for MCM award.",
+                "eligibility_criteria": {"min_cpi": 6.5, "max_parental_income": 600000},
+                "required_documents": [
+                    {"type": "income_certificate", "name": "Income Certificate", "required": True},
+                    {"type": "grade_sheet", "name": "Latest Grade Sheet", "required": True},
+                ],
+                "candidate_source_method": "application",
+                "is_renewable": True,
+                "renewal_rules": {"min_cpi": 6.5, "max_backlogs": 0, "max_years": 4},
+                "policy_approval_reference": "Senate Resolution 42.4",
+                "policy_approved_by": "Senate",
+                "effective_from": now.date() - timedelta(days=30),
+                "effective_to": now.date() + timedelta(days=335),
+                "application_window_start": now - timedelta(days=10),
+                "application_window_end": now + timedelta(days=20),
+                "renewal_window_start": now - timedelta(days=10),
+                "renewal_window_end": now + timedelta(days=20),
+                "status": "published",
+            },
+        )
+
+        ScholarshipApplication.objects.update_or_create(
+            application_number="SPACS-2026-00001",
+            defaults={
+                "student_user_id": 1001,
+                "scheme": mcm,
+                "policy_version": mcm_ver,
+                "academic_cycle": "2026-27",
+                "status": "submitted",
+                "submitted_at": now - timedelta(days=2),
+                "application_data": {"parental_income": 450000, "cpi": 8.10, "bank_account": "1234567890"},
+                "eligibility_snapshot": {"is_eligible": True},
+            },
+        )
+
+        dgm, _ = SchemeCatalogue.objects.update_or_create(
+            code="directors-gold-medal",
+            defaults={
+                "name": "Director's Gold Medal",
+                "scheme_type": "award",
+                "description": "For the outstanding graduating student across all disciplines.",
+                "status": "published",
+            },
+        )
+        dgm_ver, _ = SchemePolicyVersion.objects.update_or_create(
+            scheme=dgm,
+            version_number=1,
+            defaults={
+                "title": "Director's Gold Medal Guidelines 2026",
+                "candidate_source_method": "academic_pool",
+                "policy_approval_reference": "Board Minute 28.1",
+                "policy_approved_by": "Board of Governors",
+                "effective_from": now.date() - timedelta(days=60),
+                "effective_to": now.date() + timedelta(days=300),
+                "status": "published",
+            },
+        )
+        dgm_cycle, _ = AwardCycle.objects.update_or_create(
+            scheme=dgm,
+            convocation_year=2026,
+            defaults={
+                "policy_version": dgm_ver,
+                "academic_cycle": "2025-26",
+                "evaluating_body": "Director's Gold Medal Selection Committee",
+                "status": "pool_prepared",
+            },
+        )
+        AwardCandidate.objects.update_or_create(
+            award_cycle=dgm_cycle,
+            student_user_id=1001,
+            defaults={
+                "source_method": "academic_pool",
+                "cpi": "8.85",
+                "discipline": "CSE",
+                "is_shortlisted": True,
+            },
+        )
 
 
 
