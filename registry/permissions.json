@@ -278,6 +278,58 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "superadmin": {
+      "grants": {
+        "Director": [
+          "superadmin.audit.view",
+          "superadmin.role.manage",
+          "superadmin.user.manage"
+        ],
+        "super_admin": [
+          "superadmin.audit.view",
+          "superadmin.role.manage",
+          "superadmin.user.manage"
+        ]
+      },
+      "module_grants": [
+        "Director",
+        "super_admin"
+      ],
+      "nav": {
+        "base_path": "/superadmin",
+        "icon": "ShieldCheck",
+        "items": [
+          {
+            "code": "superadmin.users",
+            "icon": "Users",
+            "label": "User Accounts",
+            "required_permission": "superadmin.user.manage",
+            "sort_order": 1,
+            "to": "/superadmin/users"
+          }
+        ],
+        "label": "Super Admin",
+        "nav_section": "Administration",
+        "sort_order": 5,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "superadmin.user.manage",
+          "label": "Create, maintain, and archive user accounts"
+        },
+        {
+          "code": "superadmin.role.manage",
+          "label": "Assign and revoke additional roles"
+        },
+        {
+          "code": "superadmin.audit.view",
+          "label": "Inspect system-wide audit logs"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",
