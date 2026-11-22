@@ -172,6 +172,15 @@ def record_coinventor_consent(actor, application_id: int) -> bool:
     return True
 
 
+def _decrement_attorney_workload(user_id: int | None) -> None:
+    if not user_id:
+        return
+    member = AttorneyPanelMember.objects.filter(user_id=user_id).first()
+    if member and member.active_workload > 0:
+        member.active_workload -= 1
+        member.save(update_fields=["active_workload"])
+
+
 def transition_application(
     application_id: int,
     event: str,
@@ -222,11 +231,20 @@ def transition_application(
             attorney_id = payload.get("attorney_id")
             if not attorney_id:
                 raise BadRequestError("attorney_id required for assign_attorney.")
-            is_approved = AttorneyPanelMember.objects.filter(
+            member = AttorneyPanelMember.objects.filter(
                 user_id=attorney_id, is_approved_panel=True
-            ).exists()
-            if not is_approved:
+            ).first()
+            if not member:
                 raise ConflictError("Selected attorney is not an approved panel member.")
+            policy = PatentPolicy.objects.filter(is_active=True).first()
+            if (
+                policy
+                and policy.max_attorney_workload is not None
+                and member.active_workload >= policy.max_attorney_workload
+            ):
+                raise ConflictError(
+                    "Attorney has reached maximum active workload capacity (BR-PMS-043)."
+                )
         elif event == "accept_assignment":
             to_status = sm.ATTORNEY_ASSIGNED
         elif event == "decline_assignment":
@@ -291,6 +309,11 @@ def transition_application(
             raise PermissionDeniedError(str(err)) from err
 
         # Perform side effects
+        had_active_attorney = (
+            bool(app.assigned_attorney_id)
+            and app.status in {sm.ATTORNEY_ASSIGNED, sm.ASSESSMENT_IN_PROGRESS, sm.FILED}
+        )
+
         if event == "assign_director":
             app.assigned_director_id = payload["director_id"]
         elif event == "submit_review":
@@ -306,6 +329,21 @@ def transition_application(
                 app.decision_date = timezone.now()
         elif event == "assign_attorney":
             app.assigned_attorney_id = payload["attorney_id"]
+        elif event == "accept_assignment":
+            if app.assigned_attorney_id:
+                member = AttorneyPanelMember.objects.filter(
+                    user_id=app.assigned_attorney_id
+                ).first()
+                if member:
+                    member.active_workload += 1
+                    member.save(update_fields=["active_workload"])
+        elif event == "decline_assignment":
+            if app.assigned_attorney_id:
+                _decrement_attorney_workload(app.assigned_attorney_id)
+            app.assigned_attorney_id = None
+        elif event == "withdraw":
+            if had_active_attorney:
+                _decrement_attorney_workload(app.assigned_attorney_id)
         elif event == "file_appeal":
             AppealRecord.objects.create(
                 application=app,
@@ -325,6 +363,8 @@ def transition_application(
             app.filing_date = timezone.now().date()
         elif event == "grant":
             app.grant_date = timezone.now().date()
+            if had_active_attorney:
+                _decrement_attorney_workload(app.assigned_attorney_id)
 
         app.status = to_status
         app.version += 1

@@ -1,7 +1,4 @@
-/** Wire types for the patents API, mirroring the serializers and OpenAPI schemas.
- *
- * All Money and Decimal figures arrive as STRINGS as Django serializes Decimal.
- */
+// Wire types for the patents API mirroring Django serializers (decimals serialized as strings).
 
 export interface Page<T> {
   results: T[];

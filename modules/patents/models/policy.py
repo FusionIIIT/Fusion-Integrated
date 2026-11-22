@@ -12,6 +12,10 @@ class PatentPolicy(TimeStampedModel):
         null=True,
         blank=True,
     )
+    max_attorney_workload = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+    )
     max_document_size_bytes = models.BigIntegerField(default=52428800)
     withdrawal_eligible_states = models.JSONField(default=list)
     effective_from = models.DateTimeField(auto_now_add=True)

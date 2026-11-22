@@ -3,8 +3,7 @@ import { Navigate, type RouteObject } from "react-router-dom";
 
 import { RequirePermission } from "../../auth/RequirePermission";
 
-/** One lazy chunk per page. Vite can only split these if the import() argument
- *  is a static literal — a computed path silently bundles everything. */
+// One lazy chunk per page with static literal import paths for Vite bundle splitting.
 const MyApplicationsPage = lazy(() => import("./pages/MyApplicationsPage"));
 const NewApplicationPage = lazy(() => import("./pages/NewApplicationPage"));
 const PriorArtPage = lazy(() => import("./pages/PriorArtPage"));
@@ -17,11 +16,7 @@ const AllApplicationsPage = lazy(() => import("./pages/AllApplicationsPage"));
 const AttorneyPanelPage = lazy(() => import("./pages/AttorneyPanelPage"));
 const ReportsPage = lazy(() => import("./pages/ReportsPage"));
 
-/** Paths are RELATIVE — the shell mounts them under the manifest's basePath.
- *
- *  Every entry here has a matching nav item in the server's registry.py, and
- *  that correspondence matters: the sidebar is built server-side, so a nav item
- *  without a route here renders a link that goes nowhere. */
+// Relative paths mounted under patents manifest basePath matching registry.py nav items.
 function office(permission: string, page: ReactNode) {
   return <RequirePermission permission={permission}>{page}</RequirePermission>;
 }

@@ -40,6 +40,7 @@ Singleton configuration governing institutional patent timelines, thresholds, an
 * `revision_resubmission_days`: Revision window before rejection expiry (default: 60 days, BR-PMS-034..038).
 * `office_action_response_days`: Default response deadline for examiner actions (BR-PMS-065).
 * `cost_escalation_threshold`: Budget limit requiring enhanced approval (BR-PMS-051). Has no default value and is set by the institute through `PatentPolicy` or `pms_seed_policy --threshold`.
+* `max_attorney_workload`: Maximum active drafting/prosecution assignments per panel attorney (BR-PMS-043). Has no default value (nullable) and is set by the institute through `PatentPolicy` or `pms_seed_policy --max-workload` (proposed default: 5). When unset, no workload limit is enforced unless configured by policy.
 * `withdrawal_eligible_states`: Configurable tuple of states eligible for pre-filing withdrawal (BR-PMS-068).
 
 ### 2.4 PatentBudgetLedger

@@ -24,11 +24,11 @@ make migrate
 ```
 
 ### Step 2: Seed Institutional Policy
-The module requires an active singleton `PatentPolicy` record configuring review SLAs, deadlines, and cost thresholds:
+The module requires an active singleton `PatentPolicy` record configuring review SLAs, deadlines, cost thresholds, and attorney capacity limits:
 ```bash
 .venv/bin/python manage.py pms_seed_policy
 ```
-*Creates active policy with 15-day review SLA, 60-day resubmission window, and pre-filing withdrawal states. Seeds no threshold unless `--threshold` is passed; the institute must configure this threshold before budget escalation rules are applied.*
+*Creates active policy with 15-day review SLA, 60-day resubmission window, and pre-filing withdrawal states. Seeds no threshold unless `--threshold` is passed and no attorney workload cap unless `--max-workload` is passed (proposed standard capacity: 5); the institute must configure these thresholds before budget escalation rules and attorney workload caps are applied.*
 
 ### Step 3: Register Module & Navigation
 Registers `patents` and its 11 navigation routes in the central access control registry:
@@ -77,3 +77,12 @@ PLACEMENT_UPLOAD_ROOT=/tmp/check-uploads \
 REDIS_CACHE_URL=redis://127.0.0.1:6379/1 REDIS_BROKER_URL=redis://127.0.0.1:6380/0 \
 .venv/bin/python manage.py check --deploy --fail-level WARNING
 ```
+
+---
+
+## 4. Frontend Architecture and Client Routing Notes
+
+* **Client Routes (`client/src/modules/patents/routes.tsx`)**: One lazy chunk per page using static literal import paths for Vite bundle splitting. Paths are relative and mounted under the patents manifest `basePath` corresponding directly to server navigation items in `modules/patents/registry.py`.
+* **Data Access Hooks (`client/src/modules/patents/api/hooks.ts`)**: Implemented with TanStack Query. Every mutation invalidates its associated queries automatically to ensure cache consistency without manual cache surgery.
+* **Wire Types (`client/src/modules/patents/api/types.ts`)**: Wire types mirror backend Django REST framework serializers and OpenAPI schemas; monetary and decimal figures are handled as strings to preserve numerical precision without JavaScript floating point issues.
+

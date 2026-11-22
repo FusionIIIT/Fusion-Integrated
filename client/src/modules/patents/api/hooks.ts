@@ -1,7 +1,4 @@
-/** Data access hooks for the patents module using TanStack Query.
- *
- * Every mutation invalidates the queries it can affect; no manual cache surgery.
- */
+// Data access hooks for patents module using TanStack Query with automatic cache invalidation.
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { http } from "../../../lib/http";

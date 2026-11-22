@@ -25,6 +25,12 @@ class Command(BaseCommand):
             default=None,
             help="Optional cost escalation threshold (BR-PMS-051)",
         )
+        parser.add_argument(
+            "--max-workload",
+            type=int,
+            default=None,
+            help="Optional maximum active attorney workload capacity (BR-PMS-043)",
+        )
 
     def handle(self, *args, **options):
         active = PatentPolicy.objects.filter(is_active=True).first()
@@ -34,6 +40,7 @@ class Command(BaseCommand):
             return
 
         threshold = Decimal(options["threshold"]) if options["threshold"] else None
+        max_workload = options.get("max_workload")
         # Default pre-filing statuses eligible for withdrawal per BR-PMS-068
         withdrawal_states = [
             sm.DRAFT,
@@ -54,6 +61,7 @@ class Command(BaseCommand):
             director_review_days=dl.DEFAULT_REVIEW_DAYS,
             revision_resubmission_days=dl.DEFAULT_REVISION_DAYS,
             cost_escalation_threshold=threshold,
+            max_attorney_workload=max_workload,
             withdrawal_eligible_states=withdrawal_states,
             is_active=True,
         )
