@@ -11,12 +11,12 @@
 
 ## 1. Approvals on Record
 
-| Subject | Approver | Date | Formal Approval Statement |
-|:---|:---|:---|:---|
-| **Phase 2 Blueprint** | Student 2 (`ruthvikgundelli`) | 2026-11-22 | *"Approved Phase 2 Blueprint `docs/09-rspc/rspc-blueprint.md` covering all 29 CFRs, 126 AFRs, 29 UCs, 38 BRs, and 18 WFs."* |
-| **Shared File Changes** | Student 2 (`ruthvikgundelli`) | 2026-11-22 | *"Approved registration entries in `config/settings/base.py`, `config/urls.py`, `config/celery.py`, `.importlinter`, `client/src/app/registry.ts`, `openapi/fusion-integrated.v1.yaml`, and `registry/permissions.json`."* |
-| **External Dependencies** | Student 2 (`ruthvikgundelli`) | 2026-11-22 | *"Approved: Zero external pip or npm dependencies added. Pure platform framework stack used."* |
-| **Known Gaps** | Student 2 (`ruthvikgundelli`) | 2026-11-22 | *"Approved known gaps for initial release: consultancy, staff appointments, procurement, and external agency integrations deferred per Step 3.8(h)."* |
+| Subject | Status | Notes |
+|:---|:---|:---|
+| **Phase 2 Blueprint** | Submitted for Review | Baseline core research grant lifecycle implemented. |
+| **Shared File Changes** | Registered | Standard entries in settings, celery, URLs, permissions. |
+| **External Dependencies** | Verified | Zero external pip/npm dependencies added. |
+| **Known Gaps (283 Skips)** | Pending Course Approver Determination | 12 deferred feature categories itemized in Blueprint Step 3.8(h) pending course approver decision. |
 
 ---
 

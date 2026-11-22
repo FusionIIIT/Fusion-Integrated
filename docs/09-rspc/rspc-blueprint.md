@@ -379,6 +379,5 @@ Per dimension 1 of the module review rubric, features deferred beyond the core r
 12. **BR Skips (44 skipped cases in `modules/rspc/tests/spec/br/`)**:
     - Covers: Authority limits, appointments, procurement hierarchy, reports, reminders, agency status.
 
-### 3. Approver Written Sign-off
-> "Approved known gaps for initial release on 2026-11-22: The core RSPC lifecycle (proposal drafting, submission, HoD endorsement, Dean approval, project sanction, budget head allocation, append-only fund disbursement, project extension review, and closure) constitutes the complete viable baseline. The 283 spec test skips across deferred features (consultancy, staff appointments, procurement, reports, notifications, external integrations, admin/director routing) are accepted as known gaps for this release."
-> — ruthvikgundelli (2026-11-22)
+### 3. Approver Status
+The above 12 categories covering the 283 skipped spec-test cases represent deferred features submitted for course approver waiver / determination.
