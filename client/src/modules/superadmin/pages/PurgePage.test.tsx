@@ -7,6 +7,7 @@ import PurgePage from "./PurgePage";
 
 const hooks = vi.hoisted(() => ({
   usePurgeRequests: vi.fn(),
+  useCreatePurgeRequest: vi.fn(),
   useDecidePurgeRequest: vi.fn(),
   useExecutePurge: vi.fn(),
 }));
@@ -44,13 +45,16 @@ const completedPurge: PurgeRequest = {
 };
 
 describe("PurgePage", () => {
+  const mockCreatePurge = { mutate: vi.fn(), isPending: false };
   const mockDecide = { mutate: vi.fn(), isPending: false };
   const mockExecute = { mutate: vi.fn(), isPending: false };
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    mockCreatePurge.mutate.mockReset();
     mockDecide.mutate.mockReset();
     mockExecute.mutate.mockReset();
+    hooks.useCreatePurgeRequest.mockReturnValue(mockCreatePurge);
     hooks.useDecidePurgeRequest.mockReturnValue(mockDecide);
     hooks.useExecutePurge.mockReturnValue(mockExecute);
   });
@@ -168,5 +172,36 @@ describe("PurgePage", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Confirm Permanent Purge" }));
 
     expect(mockExecute.mutate).toHaveBeenCalledWith(11, expect.any(Object));
+  });
+
+  it("allows initiating a new purge request", async () => {
+    hooks.usePurgeRequests.mockReturnValue({
+      data: { count: 0, next: null, previous: null, results: [] },
+      isPending: false,
+      error: null,
+    });
+
+    render(
+      <MantineProvider>
+        <PurgePage />
+      </MantineProvider>,
+    );
+
+    const initBtn = screen.getByRole("button", { name: "Initiate Purge" });
+    fireEvent.click(initBtn);
+
+    const dialog = await screen.findByRole("dialog");
+    const archiveInput = within(dialog).getByLabelText(/^Dataset Archive ID/i);
+    const reasonInput = within(dialog).getByLabelText(/^Request reason/i);
+
+    fireEvent.change(archiveInput, { target: { value: "42" } });
+    fireEvent.change(reasonInput, { target: { value: "Mandatory compliance expiration." } });
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Create Purge Request" }));
+
+    expect(mockCreatePurge.mutate).toHaveBeenCalledWith(
+      { archive_id: 42, request_reason: "Mandatory compliance expiration." },
+      expect.any(Object),
+    );
   });
 });

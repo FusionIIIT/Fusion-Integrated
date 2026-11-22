@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  Badge, Button, Card, Container, Group, Loader, Modal, Stack, Text, Textarea,
+  Badge, Button, Card, Container, Group, Loader, Modal, Stack, Text, Textarea, TextInput,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { TbCheck, TbPlayerPlay, TbTrash, TbX } from "react-icons/tb";
@@ -9,7 +9,12 @@ import { errorMessage } from "../../../lib/http";
 import { DataTable, type Column } from "../../../ui/components/DataTable";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { useDecidePurgeRequest, useExecutePurge, usePurgeRequests } from "../api/hooks";
+import {
+  useCreatePurgeRequest,
+  useDecidePurgeRequest,
+  useExecutePurge,
+  usePurgeRequests,
+} from "../api/hooks";
 import type { PurgeRequest } from "../api/types";
 
 const STATUS_COLOR: Record<string, string> = {
@@ -42,14 +47,39 @@ const COLUMNS: Column<PurgeRequest>[] = [
 
 export default function PurgePage() {
   const { data, isPending, error } = usePurgeRequests();
+  const createPurge = useCreatePurgeRequest();
   const decide = useDecidePurgeRequest();
   const execute = useExecutePurge();
+  const [initiating, setInitiating] = useState(false);
+  const [archiveId, setArchiveId] = useState("");
+  const [initiateReason, setInitiateReason] = useState("");
   const [deciding, setDeciding] = useState<{ req: PurgeRequest; approve: boolean } | null>(null);
   const [executing, setExecuting] = useState<PurgeRequest | null>(null);
   const [comments, setComments] = useState("");
 
   if (isPending) return <Container size="xl"><Loader mt="xl" /></Container>;
   if (error) return <Container size="xl"><ErrorState error={error} /></Container>;
+
+  function handleInitiate() {
+    if (!archiveId || !initiateReason) return;
+    createPurge.mutate(
+      { archive_id: Number(archiveId), request_reason: initiateReason },
+      {
+        onSuccess: () => {
+          notifications.show({
+            color: "green",
+            title: "Purge requested",
+            message: `Purge request created for dataset #${archiveId}.`,
+          });
+          setInitiating(false);
+          setArchiveId("");
+          setInitiateReason("");
+        },
+        onError: (e) =>
+          notifications.show({ color: "red", title: "Request failed", message: errorMessage(e) }),
+      },
+    );
+  }
 
   function handleDecide() {
     if (!deciding) return;
@@ -92,6 +122,11 @@ export default function PurgePage() {
       <PageHeader
         title="Purge Authorization"
         subtitle="Dual-authorization permanent data destruction requests"
+        action={
+          <Button leftSection={<TbTrash size={12} />} onClick={() => setInitiating(true)}>
+            Initiate Purge
+          </Button>
+        }
       />
 
       <Card padding="lg" withBorder>
@@ -195,6 +230,56 @@ export default function PurgePage() {
             <Button variant="default" onClick={() => setExecuting(null)}>Cancel</Button>
             <Button color="red" loading={execute.isPending} onClick={handleExecute}>
               Confirm Permanent Purge
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      {/* Initiate purge modal */}
+      <Modal
+        opened={initiating}
+        onClose={() => {
+          setInitiating(false);
+          setArchiveId("");
+          setInitiateReason("");
+        }}
+        title="Initiate Purge Request"
+        transitionProps={{ duration: 0 }}
+      >
+        <Stack>
+          <TextInput
+            label="Dataset Archive ID"
+            placeholder="e.g. 1"
+            value={archiveId}
+            onChange={(e) => setArchiveId(e.currentTarget.value)}
+            required
+          />
+          <Textarea
+            label="Request reason"
+            placeholder="Mandatory retention expired..."
+            value={initiateReason}
+            onChange={(e) => setInitiateReason(e.currentTarget.value)}
+            required
+            minRows={3}
+          />
+          <Group justify="flex-end">
+            <Button
+              variant="default"
+              onClick={() => {
+                setInitiating(false);
+                setArchiveId("");
+                setInitiateReason("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              color="red"
+              loading={createPurge.isPending}
+              disabled={!archiveId.trim() || !initiateReason.trim()}
+              onClick={handleInitiate}
+            >
+              Create Purge Request
             </Button>
           </Group>
         </Stack>

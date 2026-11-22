@@ -257,6 +257,56 @@ def test_cookie_authenticated_write_without_csrf_token_returns_403(stub_iam):
     assert response.status_code == 403
 
 
+# -- Throttling rate limit enforcement ------------------------------------
+
+
+def test_write_endpoint_throttled_returns_429(stub_iam):
+    """R2-01: Exercising a throttled write endpoint beyond its rate returns HTTP 429."""
+    from django.conf import settings
+    from django.core.cache import cache
+    from django.test import override_settings
+    from rest_framework.settings import api_settings
+    from rest_framework.throttling import SimpleRateThrottle
+
+    from modules.superadmin.tests.conftest import SA_PERMS
+
+    cache.clear()
+    orig_rates = SimpleRateThrottle.THROTTLE_RATES
+    try:
+        client = _client(stub_iam, SA_PERMS, uid=100)
+        with override_settings(
+            REST_FRAMEWORK={
+                **settings.REST_FRAMEWORK,
+                "DEFAULT_THROTTLE_RATES": {
+                    **settings.REST_FRAMEWORK.get("DEFAULT_THROTTLE_RATES", {}),
+                    "superadmin_write": "1/min",
+                },
+            }
+        ):
+            SimpleRateThrottle.THROTTLE_RATES = api_settings.DEFAULT_THROTTLE_RATES
+            payload = {
+                "key": "archival.reversibility_window_days",
+                "value": "45",
+                "description": "Test throttle",
+            }
+            resp1 = client.post(
+                "/api/v1/superadmin/policy/parameters/",
+                payload,
+                format="json",
+            )
+            assert resp1.status_code in (200, 201)
+
+            resp2 = client.post(
+                "/api/v1/superadmin/policy/parameters/",
+                payload,
+                format="json",
+            )
+            assert resp2.status_code == 429
+    finally:
+        SimpleRateThrottle.THROTTLE_RATES = orig_rates
+        cache.clear()
+
+
 # -- Comprehensive Audit: Every endpoint refuses callers without module grant
 #    and callers with module grant but lacking the specific permission --------
 

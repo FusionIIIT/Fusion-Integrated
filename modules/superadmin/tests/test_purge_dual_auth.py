@@ -104,7 +104,7 @@ def test_it_head_cannot_approve_their_own_purge_request(it_principal, sa_princip
         request_reason="IT Head self-initiated request.",
     )
 
-    with pytest.raises(ConflictError, match=r"self_approval_forbidden|dual authorization rule"):
+    with pytest.raises(ConflictError, match=r"self_approval_forbidden|independent IT Head"):
         decide_purge_request(it_principal, request_id=req.pk, approve=True)
 
 

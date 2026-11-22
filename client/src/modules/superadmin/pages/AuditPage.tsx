@@ -75,6 +75,7 @@ export default function AuditPage() {
 
       <Group mb="md" gap="sm">
         <TextInput
+          aria-label="Search by actor username"
           placeholder="Search by actor username…"
           leftSection={<TbSearch size={14} />}
           value={search}

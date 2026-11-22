@@ -4,7 +4,7 @@
 **Bounded Context:** System Administration Governance  
 **Environment:** `Fusion-Integrated` (branch `module/superadmin`)  
 **Date:** 2026-11-22  
-**Status:** All layers complete, all 12 quality gates satisfied, 113/113 backend tests green (92.46% module branch coverage, 98.82% domain branch coverage). Zero findings open.
+**Status:** All layers complete, all 12 quality gates satisfied, 148/148 backend tests green (93.62% module branch coverage, 98.82% domain branch coverage). Zero findings open.
 
 ---
 
@@ -41,10 +41,10 @@ Every standing architecture check has been executed and confirmed passing with z
 
 ## 3. Test Suite Summary & Journey Coverage
 
-- **Total Backend Tests:** 113
-- **Passed:** 113 (100%)
+- **Total Backend Tests:** 148
+- **Passed:** 148 (100%)
 - **Failed:** 0
-- **Total Line & Branch Coverage:** 92.46% (Domain: 98.82%)
+- **Total Line & Branch Coverage:** 93.62% (Domain: 98.82%)
 
 ### Test File Distribution
 
@@ -55,7 +55,7 @@ Every standing architecture check has been executed and confirmed passing with z
 | `test_archival_service.py` | User archival creation, restoration, reversibility deadline checks, expiry sweep | 11 | Passed |
 | `test_purge_dual_auth.py` | Dual-authorization workflow, distinct actor enforcement, DB check constraints | 10 | Passed |
 | `test_policy_config.py` | Effective-dated policy append-only versioning & hardcoded fallback defaults | 8 | Passed |
-| `test_privilege_escalation.py` | Permission gates on all API endpoints; 403 response on missing permissions | 9 | Passed |
+| `test_privilege_escalation.py` | Permission gates on all API endpoints; 403 response on missing permissions | 44 | Passed |
 | `test_audit_immutability.py` | Audit log immutability: custom `save()` and `delete()` blocked | 5 | Passed |
 | `test_schedule.py` | Celery beat schedule, task registrations, queue routing (`superadmin`) | 8 | Passed |
 | `test_client_route_guards.py` | Frontend route guards vs registry declared permissions | 7 | Passed |
@@ -64,7 +64,7 @@ Every standing architecture check has been executed and confirmed passing with z
 | `test_management_commands.py` | Management commands: `seed_superadmin_policy`, archival/purge sweeps | 3 | Passed |
 | `test_api.py` | Dashboard summary, user detail, historical archives, CSV export | 4 | Passed |
 | `test_concurrency.py` | Concurrency races for dual-auth purge decisions and user restoration | 2 | Passed |
-| `test_journeys.py` | End-to-end HTTP APIClient coverage citing all 99 live spec IDs | 6 | Passed |
+| `test_journeys.py` | End-to-end HTTP APIClient coverage citing all 99 live spec IDs | 16 | Passed |
 
 ### Concurrency Testing
 Concurrency is verified in `modules/superadmin/tests/test_concurrency.py` using `@pytest.mark.django_db(transaction=True)` and `threading.Barrier`:
@@ -134,7 +134,7 @@ modules/superadmin/tasks.py                                           20      5 
 --------------------------------------------------------------------------------------------------------------
 TOTAL                                                               1018     49    142     19    94%
 Required test coverage of 90% reached. Total coverage: 93.62%
-147 passed in 5.54s
+148 passed in 5.25s
 ```
 
 ### 2. Pure Domain Branch Coverage (`--cov-fail-under=95`)
@@ -144,7 +144,7 @@ $ .venv/bin/pytest modules/superadmin --cov=modules/superadmin/domain --cov-bran
 
 ........................................................................ [ 48%]
 ........................................................................ [ 97%]
-...                                                                      [100%]
+....                                                                     [100%]
 ================================ tests coverage ================================
 _______________ coverage: platform linux, python 3.14.4-final-0 ________________
 
@@ -159,7 +159,7 @@ modules/superadmin/domain/validators.py           22      0     12      0   100%
 ------------------------------------------------------------------------------------------
 TOTAL                                            142      2     28      0    99%
 Required test coverage of 95% reached. Total coverage: 98.82%
-147 passed in 5.33s
+148 passed in 5.09s
 ```
 
 ---

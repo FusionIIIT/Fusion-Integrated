@@ -103,6 +103,6 @@ to its enforcing source code location (`file:line`).
 | **AFR-SA-058** | System policy parameter key validation | [modules/superadmin/domain/validators.py:37](../../modules/superadmin/domain/validators.py#L37) |
 | **AFR-SA-081A** | Celery beat reversibility window sweep task | [modules/superadmin/tasks.py:11](../../modules/superadmin/tasks.py#L11) |
 | **AFR-SA-081B** | Bulk operation batch size validation | [modules/superadmin/domain/validators.py:29](../../modules/superadmin/domain/validators.py#L29) |
-| **AFR-SA-081C** | Bulk limit exception instantiation | [modules/superadmin/domain/exceptions.py:80](../../modules/superadmin/domain/exceptions.py#L80) |
+| **AFR-SA-081C** | Bulk limit exception instantiation | [modules/superadmin/domain/exceptions.py:92](../../modules/superadmin/domain/exceptions.py#L92) |
 | **AFR-SA-081D** | Self-modification forbidden check | [modules/superadmin/domain/validators.py:43](../../modules/superadmin/domain/validators.py#L43) |
 | **AFR-SA-082** | Scheduled notification outbox drain task | [modules/superadmin/tasks.py:23](../../modules/superadmin/tasks.py#L23) |
