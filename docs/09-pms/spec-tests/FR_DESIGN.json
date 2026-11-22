@@ -1,0 +1,764 @@
+[
+  {
+    "test_id": "FR-TC-01",
+    "source_id": "CFR-PMS-001 / PMS-AFR-010 positive",
+    "purpose": "Verify PMS shall allow Applicants to track status and progress of their patent applications.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-001",
+      "afr_id": "PMS-AFR-010",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-02",
+    "source_id": "CFR-PMS-002 / PMS-AFR-023 positive",
+    "purpose": "Verify PMS shall provide Directors with oversight information for application workflows in their domain.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "director"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-002",
+      "afr_id": "PMS-AFR-023",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-03",
+    "source_id": "CFR-PMS-003 / PMS-AFR-026 positive",
+    "purpose": "Verify PMS shall allow PCC_ADMIN to monitor workflows and resolve conflict-of-interest cases within PMS.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "coordinator"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-003",
+      "afr_id": "PMS-AFR-026",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-04",
+    "source_id": "CFR-PMS-004 / PMS-AFR-037 positive",
+    "purpose": "Verify PMS shall allow Attorneys to provide legal advice records throughout the patent lifecycle.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-004",
+      "afr_id": "PMS-AFR-037",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-05",
+    "source_id": "CFR-PMS-005 / PMS-AFR-038 positive",
+    "purpose": "Verify PMS shall allow Applicants to submit a patent application with title, abstract, detailed description, claims, inventor information, and supporting documents.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-005",
+      "afr_id": "PMS-AFR-038",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-06",
+    "source_id": "CFR-PMS-005 / PMS-AFR-038 validation-refusal",
+    "purpose": "Verify refusal on invalid input for CFR-PMS-005",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-005",
+      "payload": "invalid_or_empty"
+    },
+    "expected_result": {
+      "status": 400,
+      "refused": true
+    },
+    "test_type": "validation-boundary"
+  },
+  {
+    "test_id": "FR-TC-07",
+    "source_id": "CFR-PMS-006 / PMS-AFR-049 positive",
+    "purpose": "Verify PMS shall allow PCC_ADMIN to assign submitted applications to Directors.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "coordinator"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-006",
+      "afr_id": "PMS-AFR-049",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-08",
+    "source_id": "CFR-PMS-006 / PMS-AFR-049 validation-refusal",
+    "purpose": "Verify refusal on invalid input for CFR-PMS-006",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-006",
+      "payload": "invalid_or_empty"
+    },
+    "expected_result": {
+      "status": 400,
+      "refused": true
+    },
+    "test_type": "validation-boundary"
+  },
+  {
+    "test_id": "FR-TC-09",
+    "source_id": "CFR-PMS-007 / PMS-AFR-058 positive",
+    "purpose": "Verify PMS shall allow Directors to view application details, documents, and supporting materials for assigned applications.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "director"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-007",
+      "afr_id": "PMS-AFR-058",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-10",
+    "source_id": "CFR-PMS-007 / PMS-AFR-058 validation-refusal",
+    "purpose": "Verify refusal on invalid input for CFR-PMS-007",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-007",
+      "payload": "invalid_or_empty"
+    },
+    "expected_result": {
+      "status": 400,
+      "refused": true
+    },
+    "test_type": "validation-boundary"
+  },
+  {
+    "test_id": "FR-TC-11",
+    "source_id": "CFR-PMS-008 / PMS-AFR-066 positive",
+    "purpose": "Verify PMS shall allow Applicants to revise applications with status Needs Revision.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-008",
+      "afr_id": "PMS-AFR-066",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-12",
+    "source_id": "CFR-PMS-009 / PMS-AFR-074 positive",
+    "purpose": "Verify PMS shall allow only PCC_ADMIN to assign attorneys to approved applications.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "coordinator"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-009",
+      "afr_id": "PMS-AFR-074",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-13",
+    "source_id": "CFR-PMS-009 / PMS-AFR-074 validation-refusal",
+    "purpose": "Verify refusal on invalid input for CFR-PMS-009",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-009",
+      "payload": "invalid_or_empty"
+    },
+    "expected_result": {
+      "status": 400,
+      "refused": true
+    },
+    "test_type": "validation-boundary"
+  },
+  {
+    "test_id": "FR-TC-14",
+    "source_id": "CFR-PMS-010 / PMS-AFR-082 positive",
+    "purpose": "Verify PMS shall allow Attorneys to record legal and patentability analysis for assigned applications.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-010",
+      "afr_id": "PMS-AFR-082",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-15",
+    "source_id": "CFR-PMS-010 / PMS-AFR-082 validation-refusal",
+    "purpose": "Verify refusal on invalid input for CFR-PMS-010",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-010",
+      "payload": "invalid_or_empty"
+    },
+    "expected_result": {
+      "status": 400,
+      "refused": true
+    },
+    "test_type": "validation-boundary"
+  },
+  {
+    "test_id": "FR-TC-16",
+    "source_id": "CFR-PMS-011 / PMS-AFR-090 positive",
+    "purpose": "Verify PMS shall allow Directors to review costs for patent filing and prosecution.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "director"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-011",
+      "afr_id": "PMS-AFR-090",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-17",
+    "source_id": "CFR-PMS-012 / PMS-AFR-099 positive",
+    "purpose": "Verify PMS shall allow Attorneys to prepare an application package for patent-office filing.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-012",
+      "afr_id": "PMS-AFR-099",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-18",
+    "source_id": "CFR-PMS-013 / PMS-AFR-107 positive",
+    "purpose": "Verify PMS shall activate post-grant tracking only for patents with status Granted.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-013",
+      "afr_id": "PMS-AFR-107",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-19",
+    "source_id": "CFR-PMS-014 / PMS-AFR-116 positive",
+    "purpose": "Verify PMS shall allow recording of office actions received from patent offices.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-014",
+      "afr_id": "PMS-AFR-116",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-20",
+    "source_id": "CFR-PMS-015 / PMS-AFR-125 positive",
+    "purpose": "Verify PMS shall allow Applicants to withdraw applications before the filing stage.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-015",
+      "afr_id": "PMS-AFR-125",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-21",
+    "source_id": "CFR-PMS-016 / PMS-AFR-132 positive",
+    "purpose": "Verify PMS shall allow Applicants to manage multiple inventors for an application.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-016",
+      "afr_id": "PMS-AFR-132",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-22",
+    "source_id": "CFR-PMS-016 / PMS-AFR-132 validation-refusal",
+    "purpose": "Verify refusal on invalid input for CFR-PMS-016",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-016",
+      "payload": "invalid_or_empty"
+    },
+    "expected_result": {
+      "status": 400,
+      "refused": true
+    },
+    "test_type": "validation-boundary"
+  },
+  {
+    "test_id": "FR-TC-23",
+    "source_id": "CFR-PMS-017 / PMS-AFR-141 positive",
+    "purpose": "Verify PMS shall allow Applicants to search prior-art references.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-017",
+      "afr_id": "PMS-AFR-141",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-24",
+    "source_id": "CFR-PMS-018 / PMS-AFR-150 positive",
+    "purpose": "Verify PMS shall maintain version history for application documents.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-018",
+      "afr_id": "PMS-AFR-150",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-25",
+    "source_id": "CFR-PMS-019 / PMS-AFR-158 positive",
+    "purpose": "Verify PMS shall allow Applicants to submit licensing requests.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-019",
+      "afr_id": "PMS-AFR-158",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-26",
+    "source_id": "CFR-PMS-019 / PMS-AFR-158 validation-refusal",
+    "purpose": "Verify refusal on invalid input for CFR-PMS-019",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-019",
+      "payload": "invalid_or_empty"
+    },
+    "expected_result": {
+      "status": 400,
+      "refused": true
+    },
+    "test_type": "validation-boundary"
+  },
+  {
+    "test_id": "FR-TC-27",
+    "source_id": "CFR-PMS-020 / PMS-AFR-165 positive",
+    "purpose": "Verify PMS shall allow Applicants to file appeals against rejected applications.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-020",
+      "afr_id": "PMS-AFR-165",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-28",
+    "source_id": "CFR-PMS-021 / PMS-AFR-172 positive",
+    "purpose": "Verify PMS shall calculate and monitor Director review deadlines using the applicable review-deadline rule.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "director"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-021",
+      "afr_id": "PMS-AFR-172",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-29",
+    "source_id": "CFR-PMS-022 / PMS-AFR-182 positive",
+    "purpose": "Verify PMS shall allow PCC_ADMIN and Directors to generate application status and progress reports.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "coordinator"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-022",
+      "afr_id": "PMS-AFR-182",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-30",
+    "source_id": "CFR-PMS-023 / PMS-AFR-192 positive",
+    "purpose": "Verify PMS shall trigger system-generated email notifications for application submission.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-023",
+      "afr_id": "PMS-AFR-192",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-31",
+    "source_id": "CFR-PMS-024 / PMS-AFR-207 positive",
+    "purpose": "Verify PMS shall maintain an audit trail of PMS actions.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-024",
+      "afr_id": "PMS-AFR-207",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-32",
+    "source_id": "CFR-PMS-025 / PMS-AFR-216 positive",
+    "purpose": "Verify PMS shall require valid role assignments before users access patent-management functions.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-025",
+      "afr_id": "PMS-AFR-216",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-33",
+    "source_id": "CFR-PMS-025 / PMS-AFR-216 validation-refusal",
+    "purpose": "Verify refusal on invalid input for CFR-PMS-025",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-025",
+      "payload": "invalid_or_empty"
+    },
+    "expected_result": {
+      "status": 400,
+      "refused": true
+    },
+    "test_type": "validation-boundary"
+  },
+  {
+    "test_id": "FR-TC-34",
+    "source_id": "CFR-PMS-026 / PMS-AFR-217 positive",
+    "purpose": "Verify PMS shall prevent attorney assignment until Director approval is recorded.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "director"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-026",
+      "afr_id": "PMS-AFR-217",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-35",
+    "source_id": "CFR-PMS-026 / PMS-AFR-217 validation-refusal",
+    "purpose": "Verify refusal on invalid input for CFR-PMS-026",
+    "preconditions": {
+      "authenticated": true,
+      "role": "applicant"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-026",
+      "payload": "invalid_or_empty"
+    },
+    "expected_result": {
+      "status": 400,
+      "refused": true
+    },
+    "test_type": "validation-boundary"
+  },
+  {
+    "test_id": "FR-TC-36",
+    "source_id": "CFR-PMS-027 / PMS-AFR-220 positive",
+    "purpose": "Verify PMS shall enforce role-based access control for confidential patent information.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-027",
+      "afr_id": "PMS-AFR-220",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-37",
+    "source_id": "CFR-PMS-028 / PMS-AFR-221 positive",
+    "purpose": "Verify PMS shall maintain exactly one active PCC_ADMIN as the system oversight role.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "coordinator"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-028",
+      "afr_id": "PMS-AFR-221",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-38",
+    "source_id": "CFR-PMS-029 / PMS-AFR-228 positive",
+    "purpose": "Verify PMS shall treat patent-office system integration as external unless PMS records filing, status, or communication data from it.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "attorney"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-029",
+      "afr_id": "PMS-AFR-228",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TC-39",
+    "source_id": "CFR-PMS-030 / PMS-AFR-236 positive",
+    "purpose": "Verify PMS shall allow Directors to reject a proposed patent budget and record the rejection outcome.",
+    "preconditions": {
+      "authenticated": true,
+      "role": "director"
+    },
+    "action_or_input": {
+      "requirement_id": "CFR-PMS-030",
+      "afr_id": "PMS-AFR-236",
+      "scope": "standard"
+    },
+    "expected_result": {
+      "status": 200,
+      "success": true,
+      "message": "Requirement verified"
+    },
+    "test_type": "functional-positive"
+  }
+]
