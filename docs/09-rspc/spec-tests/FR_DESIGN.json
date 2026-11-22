@@ -1,0 +1,308 @@
+[
+  {
+    "test_id": "TEST-FR-001",
+    "source_id": "RSPC-CFR-001 / RSPC-FR-004",
+    "purpose": "Verify faculty can view their own project portfolio and details",
+    "preconditions": "Faculty member has submitted research proposals and consultancy projects",
+    "action_or_input": "Invoke get_user_proposals and check contract representation",
+    "expected_result": "Returns project summary contracts for the authenticated user",
+    "test_type": "contract_unit"
+  },
+  {
+    "test_id": "TEST-FR-002",
+    "source_id": "RSPC-CFR-002 / RSPC-FR-007",
+    "purpose": "Verify structured audit trail records all review decisions and actions",
+    "preconditions": "Action performed on proposal or request",
+    "action_or_input": "Instantiate RSPCAuditTrail record with actor_id, entity_type, action, timestamp",
+    "expected_result": "Audit trail record stores mandatory fields and orders by timestamp descending",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-003",
+    "source_id": "RSPC-CFR-003 / RSPC-FR-008",
+    "purpose": "Verify departmental HoD review and recommendation permissions and status",
+    "preconditions": "Proposal is in SUBMITTED_HOD state",
+    "action_or_input": "Check HoD role grants and proposal recommended status constant",
+    "expected_result": "HoD has recommend permission and RECOMMENDED_HOD status is valid",
+    "test_type": "rbac_unit"
+  },
+  {
+    "test_id": "TEST-FR-004",
+    "source_id": "RSPC-CFR-004 / RSPC-FR-010",
+    "purpose": "Verify Dean-RSPC approval authority within delegated powers",
+    "preconditions": "Request amount is below Dean delegation limit",
+    "action_or_input": "Evaluate DEAN_FINANCIAL_DELEGATION_LIMIT and Dean permissions",
+    "expected_result": "Dean has approval permission and delegation threshold is 200,000",
+    "test_type": "rule_unit"
+  },
+  {
+    "test_id": "TEST-FR-005",
+    "source_id": "RSPC-CFR-005 / RSPC-FR-013",
+    "purpose": "Verify Director authorization is required for large funding proposals >= 10 Lakhs",
+    "preconditions": "Proposal budget is >= 1,000,000",
+    "action_or_input": "Call is_director_approval_required('proposal', 1500000)",
+    "expected_result": "Returns True indicating Director escalation required",
+    "test_type": "rule_unit"
+  },
+  {
+    "test_id": "TEST-FR-006",
+    "source_id": "RSPC-CFR-006 / RSPC-FR-015",
+    "purpose": "Verify research proposal core data capture including mandatory fields",
+    "preconditions": "Valid proposal data payload",
+    "action_or_input": "Pass valid dictionary to validate_research_proposal",
+    "expected_result": "Empty error list indicating valid submission",
+    "test_type": "rule_unit"
+  },
+  {
+    "test_id": "TEST-FR-007",
+    "source_id": "RSPC-CFR-006 / RSPC-FR-016",
+    "purpose": "Verify proposal validation rejects submissions with missing mandatory fields or invalid duration",
+    "preconditions": "Invalid payload with missing fields, negative budget, and timeline_months=0",
+    "action_or_input": "Call validate_research_proposal with invalid dictionary",
+    "expected_result": "Validation errors must flag missing title, budget, end date, and non-positive timeline",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-FR-008",
+    "source_id": "RSPC-CFR-007 / RSPC-FR-021",
+    "purpose": "Verify proposal routing status sequence across workflow stages",
+    "preconditions": "Proposal workflow transitions",
+    "action_or_input": "Inspect PROPOSAL_STATUS_CHOICES sequence constants",
+    "expected_result": "Draft, Submitted, Recommended, Verified, Approved statuses are present",
+    "test_type": "workflow_unit"
+  },
+  {
+    "test_id": "TEST-FR-009",
+    "source_id": "RSPC-CFR-008 / RSPC-FR-024",
+    "purpose": "Verify decision record captures actor, action, and remarks",
+    "preconditions": "Review decision made",
+    "action_or_input": "Create RSPCAuditTrail with remarks and decision details",
+    "expected_result": "Audit trail accurately preserves decision metadata",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-010",
+    "source_id": "RSPC-CFR-009 / RSPC-FR-027",
+    "purpose": "Verify consultancy registration core data capture",
+    "preconditions": "Faculty consultancy project registration",
+    "action_or_input": "Validate consultancy project payload with valid data",
+    "expected_result": "validate_consultancy_project returns no errors",
+    "test_type": "rule_unit"
+  },
+  {
+    "test_id": "TEST-FR-011",
+    "source_id": "RSPC-CFR-009 / RSPC-FR-030",
+    "purpose": "Verify consultancy financial terms validation enforces institutional share >= 20%",
+    "preconditions": "Consultancy registration with institutional share 0.00",
+    "action_or_input": "Call validate_consultancy_project with missing required institutional share",
+    "expected_result": "Errors list must enforce institutional share >= 20% policy",
+    "test_type": "rule_negative"
+  },
+  {
+    "test_id": "TEST-FR-012",
+    "source_id": "RSPC-CFR-010 / RSPC-FR-033",
+    "purpose": "Verify consultancy approval routing escalates high-value consultancy (>= 10L) to Director",
+    "preconditions": "Consultancy total cost is 15 Lakhs",
+    "action_or_input": "Call is_director_approval_required('consultancy', 1500000.00)",
+    "expected_result": "Returns True requiring Director approval for large consultancy",
+    "test_type": "rule_escalation"
+  },
+  {
+    "test_id": "TEST-FR-013",
+    "source_id": "RSPC-CFR-011 / RSPC-FR-034",
+    "purpose": "Verify consultancy tracking model captures deliverables and status",
+    "preconditions": "Consultancy project created",
+    "action_or_input": "Inspect ConsultancyProject model fields and contract mapping",
+    "expected_result": "Scope, deliverables, cost, share, and status are tracked",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-014",
+    "source_id": "RSPC-CFR-012 / RSPC-FR-039",
+    "purpose": "Verify project staff appointment data capture and model structure",
+    "preconditions": "PI requests staff appointment",
+    "action_or_input": "Create ProjectStaffAppointment instance",
+    "expected_result": "Instance captures position, stipend, duration, and status REQUESTED",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-015",
+    "source_id": "RSPC-CFR-013 / RSPC-FR-043",
+    "purpose": "Verify faculty participation and recommendation in staff selection",
+    "preconditions": "Selection committee meets",
+    "action_or_input": "Record selected candidate name and advertisement details on staff appointment",
+    "expected_result": "Selected candidate field is saved and updated",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-016",
+    "source_id": "RSPC-CFR-014 / RSPC-FR-045",
+    "purpose": "Verify staff appointment approval routing permissions",
+    "preconditions": "Staff appointment request submitted",
+    "action_or_input": "Check staff.request and staff.manage permissions in registry",
+    "expected_result": "Faculty has request permission; Admin and Dean have manage permissions",
+    "test_type": "rbac_unit"
+  },
+  {
+    "test_id": "TEST-FR-017",
+    "source_id": "RSPC-CFR-015 / RSPC-FR-049",
+    "purpose": "Verify financial and expenditure request submission capture",
+    "preconditions": "Active project exists",
+    "action_or_input": "Create FinancialRequest with budget head and purpose",
+    "expected_result": "Request is created with status SUBMITTED",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-018",
+    "source_id": "RSPC-CFR-015 / RSPC-FR-050",
+    "purpose": "Verify financial request validation rejects amounts exceeding available budget",
+    "preconditions": "Available budget is 50,000; requested amount is 80,000",
+    "action_or_input": "Call validate_financial_request(80000, 50000)",
+    "expected_result": "Returns validation error specifying budget exceeded",
+    "test_type": "rule_negative"
+  },
+  {
+    "test_id": "TEST-FR-019",
+    "source_id": "RSPC-CFR-016 / RSPC-FR-052",
+    "purpose": "Verify financial approval escalation to Director for high-value requests >= 2 Lakhs",
+    "preconditions": "Expenditure amount is 250,000",
+    "action_or_input": "Call is_director_approval_required('financial', 250000)",
+    "expected_result": "Returns True indicating Director escalation required",
+    "test_type": "rule_unit"
+  },
+  {
+    "test_id": "TEST-FR-020",
+    "source_id": "RSPC-CFR-017 / RSPC-FR-056",
+    "purpose": "Verify procurement request creation and model structure",
+    "preconditions": "Equipment or consumable required",
+    "action_or_input": "Instantiate ProcurementRequest with item name and estimated cost",
+    "expected_result": "Procurement request has status REQUESTED and valid estimated cost",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-021",
+    "source_id": "RSPC-CFR-017 / RSPC-FR-057",
+    "purpose": "Verify procurement validation against sanctioned budget",
+    "preconditions": "Available equipment budget is 100,000; item cost is 150,000",
+    "action_or_input": "Call validate_procurement_request(150000, 100000)",
+    "expected_result": "Validation error indicating cost exceeds available budget",
+    "test_type": "rule_negative"
+  },
+  {
+    "test_id": "TEST-FR-022",
+    "source_id": "RSPC-CFR-018 / RSPC-FR-061",
+    "purpose": "Verify progress and utilization report submission",
+    "preconditions": "Reporting period complete",
+    "action_or_input": "Create ProgressReport instance with summary and funds utilized",
+    "expected_result": "Report has status SUBMITTED and captures utilized amount",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-023",
+    "source_id": "RSPC-CFR-019 / RSPC-FR-066",
+    "purpose": "Verify historical progress and utilization report access and ordering",
+    "preconditions": "Multiple reports filed",
+    "action_or_input": "Inspect ProgressReport Meta ordering and report.submit permission",
+    "expected_result": "Ordering is by -created_at and report.submit is in ROLE_GRANTS",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-024",
+    "source_id": "RSPC-CFR-020 / RSPC-FR-068",
+    "purpose": "Verify project closure submission data capture",
+    "preconditions": "Project work finished",
+    "action_or_input": "Instantiate ProjectClosure with settlement status and asset declaration",
+    "expected_result": "Closure request has status REQUESTED",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-025",
+    "source_id": "RSPC-CFR-020 / RSPC-FR-069",
+    "purpose": "Verify project closure rejects closure when financial settlement is pending",
+    "preconditions": "Financial liabilities unsettled",
+    "action_or_input": "Call validate_project_closure(financial_settled=False, has_asset_declaration=True)",
+    "expected_result": "Returns validation error indicating financial settlement is pending",
+    "test_type": "rule_negative"
+  },
+  {
+    "test_id": "TEST-FR-026",
+    "source_id": "RSPC-CFR-021 / RSPC-FR-074",
+    "purpose": "Verify notification generation and delivery data capture",
+    "preconditions": "System event triggered",
+    "action_or_input": "Instantiate RSPCNotification with recipient_id, event_type, title, message",
+    "expected_result": "Notification is unread by default (is_read=False)",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-027",
+    "source_id": "RSPC-CFR-022 / RSPC-FR-083",
+    "purpose": "Verify external funding agency integration tracking in proposal contract",
+    "preconditions": "External funding agency assigned",
+    "action_or_input": "Check ResearchProposalContract funding_agency attribute",
+    "expected_result": "Contract surface exposes funding_agency",
+    "test_type": "contract_unit"
+  },
+  {
+    "test_id": "TEST-FR-028",
+    "source_id": "RSPC-CFR-023 / RSPC-FR-086",
+    "purpose": "Verify role-based access enforcement mapping across all RSPC operations",
+    "preconditions": "RSPC permissions catalog",
+    "action_or_input": "Inspect OPERATION_PERMISSIONS dictionary completeness",
+    "expected_result": "22 operations mapped correctly to namespaced permissions",
+    "test_type": "rbac_unit"
+  },
+  {
+    "test_id": "TEST-FR-029",
+    "source_id": "RSPC-CFR-024 / RSPC-FR-091",
+    "purpose": "Verify role assignment synchronization audit logging",
+    "preconditions": "Role change event",
+    "action_or_input": "Create RSPCAuditTrail record for role synchronization action",
+    "expected_result": "Action and actor metadata are preserved",
+    "test_type": "model_unit"
+  },
+  {
+    "test_id": "TEST-FR-030",
+    "source_id": "RSPC-CFR-025 / RSPC-FR-096",
+    "purpose": "Verify project staff boundary excludes payroll execution",
+    "preconditions": "Staff appointment record created",
+    "action_or_input": "Inspect ProjectStaffAppointment model fields",
+    "expected_result": "Does not contain bank_account, tax_deduction, or salary_slip fields",
+    "test_type": "boundary_unit"
+  },
+  {
+    "test_id": "TEST-FR-031",
+    "source_id": "RSPC-CFR-026 / RSPC-FR-097",
+    "purpose": "Verify finance boundary excludes bank disbursement execution",
+    "preconditions": "Financial request submitted",
+    "action_or_input": "Inspect FinancialRequest model fields",
+    "expected_result": "Does not contain payment_gateway_ref or bank_transaction_id",
+    "test_type": "boundary_unit"
+  },
+  {
+    "test_id": "TEST-FR-032",
+    "source_id": "RSPC-CFR-027 / RSPC-FR-098",
+    "purpose": "Verify procurement boundary excludes physical warehouse inventory execution",
+    "preconditions": "Procurement request created",
+    "action_or_input": "Inspect ProcurementRequest model fields",
+    "expected_result": "Does not contain warehouse_bin or stock_batch_number fields",
+    "test_type": "boundary_unit"
+  },
+  {
+    "test_id": "TEST-FR-033",
+    "source_id": "RSPC-CFR-028 / RSPC-FR-103",
+    "purpose": "Verify faculty project updates are permitted only in valid active lifecycle states (blocked on closure)",
+    "preconditions": "Project is in ARCHIVED status",
+    "action_or_input": "Check rules module for can_update_project lifecycle guard",
+    "expected_result": "Domain rules must provide can_update_project guard rejecting updates to archived projects",
+    "test_type": "rule_lifecycle"
+  },
+  {
+    "test_id": "TEST-FR-034",
+    "source_id": "RSPC-CFR-029 / RSPC-FR-110",
+    "purpose": "Verify RSPC Admin verification and forwarding gating constants",
+    "preconditions": "Admin verification stage",
+    "action_or_input": "Check PROPOSAL_STATUS_VERIFIED_ADMIN and PROPOSAL_STATUS_REJECTED_ADMIN",
+    "expected_result": "Both admin verification status constants are defined and distinct",
+    "test_type": "rule_unit"
+  }
+]

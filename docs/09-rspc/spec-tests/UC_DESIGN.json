@@ -1,0 +1,362 @@
+[
+  {
+    "test_id": "TEST-UC-001",
+    "source_id": "RSPC-UC-001 Main Flow",
+    "purpose": "Faculty views own RSPC project portfolio",
+    "preconditions": "Faculty is authenticated and has active projects",
+    "action_or_input": "Query project summary contract and check proposal view permissions",
+    "expected_result": "Contract represents project portfolio with title, budget, and status",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-002",
+    "source_id": "RSPC-UC-002 Main Flow",
+    "purpose": "Faculty submits research project proposal",
+    "preconditions": "Faculty enters complete and valid proposal data",
+    "action_or_input": "Validate research proposal data payload",
+    "expected_result": "validate_research_proposal returns empty error list",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-003",
+    "source_id": "RSPC-UC-002 Alternative A1",
+    "purpose": "Save research proposal as draft for subsequent editing",
+    "preconditions": "Faculty saves partially completed proposal",
+    "action_or_input": "Create ResearchProposal instance with status PROPOSAL_STATUS_DRAFT",
+    "expected_result": "Proposal status is saved as DRAFT",
+    "test_type": "use_case_alternative"
+  },
+  {
+    "test_id": "TEST-UC-004",
+    "source_id": "RSPC-UC-002 Exception E1",
+    "purpose": "Proposal submission fails validation due to non-positive timeline or invalid budget",
+    "preconditions": "Proposal submitted with non-positive timeline duration",
+    "action_or_input": "Validate proposal with timeline_months=0 and negative budget",
+    "expected_result": "Validation errors must reject non-positive timeline duration and invalid budget",
+    "test_type": "use_case_exception"
+  },
+  {
+    "test_id": "TEST-UC-005",
+    "source_id": "RSPC-UC-003 Main Flow",
+    "purpose": "HoD reviews and recommends research proposal",
+    "preconditions": "Proposal is in SUBMITTED_HOD state",
+    "action_or_input": "Check HoD recommendation permission and RECOMMENDED_HOD status",
+    "expected_result": "HoD has permission to recommend and status constant exists",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-006",
+    "source_id": "RSPC-UC-003 Alternative A1",
+    "purpose": "HoD reviews and rejects research proposal with remarks",
+    "preconditions": "Proposal does not align with department goals",
+    "action_or_input": "Check PROPOSAL_STATUS_REJECTED_HOD constant and audit remarks support",
+    "expected_result": "REJECTED_HOD status is defined and audit trail supports rejection remarks",
+    "test_type": "use_case_alternative"
+  },
+  {
+    "test_id": "TEST-UC-007",
+    "source_id": "RSPC-UC-004 Main Flow",
+    "purpose": "RSPC Admin verifies research proposal compliance and forwards",
+    "preconditions": "Proposal is in RECOMMENDED_HOD state",
+    "action_or_input": "Verify proposal status VERIFIED_ADMIN and admin verification permission",
+    "expected_result": "RSPC admin has verify permission and VERIFIED_ADMIN status exists",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-008",
+    "source_id": "RSPC-UC-004 Alternative A1",
+    "purpose": "RSPC Admin marks proposal as not eligible / rejected with remarks",
+    "preconditions": "Proposal lacks regulatory compliance",
+    "action_or_input": "Check PROPOSAL_STATUS_REJECTED_ADMIN status constant",
+    "expected_result": "REJECTED_ADMIN status is defined and valid",
+    "test_type": "use_case_alternative"
+  },
+  {
+    "test_id": "TEST-UC-009",
+    "source_id": "RSPC-UC-005 Main Flow",
+    "purpose": "Dean-RSPC approves proposal within delegated limits",
+    "preconditions": "Proposal is verified by admin and budget is below threshold",
+    "action_or_input": "Check PROPOSAL_STATUS_APPROVED_DEAN and Dean approval permission",
+    "expected_result": "Dean has permission to approve and APPROVED_DEAN status is valid",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-010",
+    "source_id": "RSPC-UC-005 Alternative A1",
+    "purpose": "Dean-RSPC forwards large funding proposal to Director",
+    "preconditions": "Proposal budget >= 10 Lakhs",
+    "action_or_input": "Call is_director_approval_required('proposal', 1200000) and verify FORWARDED_DIRECTOR",
+    "expected_result": "Returns True and FORWARDED_DIRECTOR status is defined",
+    "test_type": "use_case_alternative"
+  },
+  {
+    "test_id": "TEST-UC-011",
+    "source_id": "RSPC-UC-006 Main Flow",
+    "purpose": "Director reviews and authorizes significant proposal",
+    "preconditions": "Proposal forwarded to Director",
+    "action_or_input": "Check APPROVED_DIRECTOR status and director authorization permission",
+    "expected_result": "Director has authorization permission and APPROVED_DIRECTOR status exists",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-012",
+    "source_id": "RSPC-UC-007 Main Flow",
+    "purpose": "Faculty registers consultancy project with complete details",
+    "preconditions": "Valid consultancy project data entered",
+    "action_or_input": "Validate consultancy project payload",
+    "expected_result": "validate_consultancy_project returns empty list",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-013",
+    "source_id": "RSPC-UC-007 Exception E1",
+    "purpose": "Consultancy registration rejected when mandatory financial terms or institutional share are invalid",
+    "preconditions": "Consultancy payload with total_cost=0 and institutional_share=0",
+    "action_or_input": "Validate consultancy project with 0 cost and missing institutional share",
+    "expected_result": "Errors must reject non-positive cost and require institutional share >= 20%",
+    "test_type": "use_case_exception"
+  },
+  {
+    "test_id": "TEST-UC-014",
+    "source_id": "RSPC-UC-008 Main Flow",
+    "purpose": "Faculty tracks consultancy deliverables, payments, and settlements",
+    "preconditions": "Active consultancy project",
+    "action_or_input": "Inspect ConsultancyProjectContract and ConsultancyProject model attributes",
+    "expected_result": "Contract exposes total_cost, institutional_share, and status",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-015",
+    "source_id": "RSPC-UC-009 Main Flow",
+    "purpose": "Faculty requests project-based staff appointment",
+    "preconditions": "Sanctioned project exists with staff budget",
+    "action_or_input": "Create ProjectStaffAppointment with stipend, duration, and position title",
+    "expected_result": "Staff appointment created with status REQUESTED",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-016",
+    "source_id": "RSPC-UC-010 Main Flow",
+    "purpose": "RSPC Admin verifies and manages staff appointment operational records",
+    "preconditions": "Staff appointment requested",
+    "action_or_input": "Check rspc.staff.manage permission granted to rspc_admin",
+    "expected_result": "rspc_admin has rspc.staff.manage permission",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-017",
+    "source_id": "RSPC-UC-011 Main Flow",
+    "purpose": "Faculty submits fund utilization or expenditure request",
+    "preconditions": "Faculty has active project and expenditure within sanctioned budget",
+    "action_or_input": "Validate financial request within budget and create FinancialRequest",
+    "expected_result": "Validation succeeds and request is in SUBMITTED state",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-018",
+    "source_id": "RSPC-UC-011 Exception E1",
+    "purpose": "Financial request rejected when requested amount exceeds available budget",
+    "preconditions": "Requested amount exceeds remaining sanctioned funds",
+    "action_or_input": "Call validate_financial_request(amount=200000, available_budget=150000)",
+    "expected_result": "Validation fails with error message indicating budget exceeded",
+    "test_type": "use_case_exception"
+  },
+  {
+    "test_id": "TEST-UC-019",
+    "source_id": "RSPC-UC-012 Main Flow",
+    "purpose": "RSPC Admin verifies financial request and forwards for approval",
+    "preconditions": "Financial request submitted",
+    "action_or_input": "Check FINANCIAL_STATUS_VERIFIED_ADMIN and admin verification permission",
+    "expected_result": "Status constant exists and rspc_admin has financial.verify permission",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-020",
+    "source_id": "RSPC-UC-013 Main Flow",
+    "purpose": "Faculty requests equipment or consumable procurement",
+    "preconditions": "Project has procurement budget allocation",
+    "action_or_input": "Validate procurement request within budget and instantiate ProcurementRequest",
+    "expected_result": "Validation passes and ProcurementRequest status is REQUESTED",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-021",
+    "source_id": "RSPC-UC-013 Exception E1",
+    "purpose": "Procurement request rejected when cost exceeds available equipment budget",
+    "preconditions": "Estimated cost exceeds available budget",
+    "action_or_input": "Call validate_procurement_request(estimated_cost=300000, available_budget=200000)",
+    "expected_result": "Validation returns error indicating budget exceeded",
+    "test_type": "use_case_exception"
+  },
+  {
+    "test_id": "TEST-UC-022",
+    "source_id": "RSPC-UC-014 Main Flow",
+    "purpose": "Faculty submits periodic progress and utilization report",
+    "preconditions": "Reporting deadline reached",
+    "action_or_input": "Instantiate ProgressReport with valid period dates and funds utilized",
+    "expected_result": "Report is created with status SUBMITTED",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-023",
+    "source_id": "RSPC-UC-015 Main Flow",
+    "purpose": "Faculty submits project closure and completion report",
+    "preconditions": "Project milestones completed and liabilities settled",
+    "action_or_input": "Validate closure requirements with financial_settled=True and asset_declaration=True",
+    "expected_result": "validate_project_closure returns empty error list",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-024",
+    "source_id": "RSPC-UC-015 Exception E1",
+    "purpose": "Project closure rejected when financial settlement is pending",
+    "preconditions": "Project has pending financial liabilities",
+    "action_or_input": "Call validate_project_closure(financial_settled=False, has_asset_declaration=True)",
+    "expected_result": "Returns validation error that financial settlement is pending",
+    "test_type": "use_case_exception"
+  },
+  {
+    "test_id": "TEST-UC-025",
+    "source_id": "RSPC-UC-016 Main Flow",
+    "purpose": "Authorized user receives and views RSPC notifications",
+    "preconditions": "Notification dispatched to user",
+    "action_or_input": "Create RSPCNotification and check is_read toggle",
+    "expected_result": "Notification is initially unread and can be marked as read",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-026",
+    "source_id": "RSPC-UC-017 Main Flow",
+    "purpose": "RSPC Admin reviews audit logs and compliance records",
+    "preconditions": "Audit entries recorded",
+    "action_or_input": "Check rspc.audit.view permission granted to rspc_admin",
+    "expected_result": "rspc_admin has rspc.audit.view permission",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-027",
+    "source_id": "RSPC-UC-018 Main Flow",
+    "purpose": "Synchronize RSPC role assignment change from IAM",
+    "preconditions": "Role change event published",
+    "action_or_input": "Record role synchronization in RSPCAuditTrail",
+    "expected_result": "Audit entry captures role sync action with timestamp",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-028",
+    "source_id": "RSPC-UC-021 Main Flow",
+    "purpose": "Faculty updates project lifecycle information in active state",
+    "preconditions": "Project is in active lifecycle state (e.g. APPROVED_DEAN)",
+    "action_or_input": "Check project active status and update deliverables",
+    "expected_result": "Project status is active and allows informational updates",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-029",
+    "source_id": "RSPC-UC-021 Exception E1",
+    "purpose": "Project lifecycle update blocked when project is archived or closed",
+    "preconditions": "Project is in ARCHIVED or REJECTED state",
+    "action_or_input": "Check rules module for can_update_project guard rejecting updates",
+    "expected_result": "Domain rules must provide can_update_project guard rejecting updates to archived projects",
+    "test_type": "use_case_exception"
+  },
+  {
+    "test_id": "TEST-UC-030",
+    "source_id": "RSPC-UC-022 Main Flow",
+    "purpose": "Faculty records staff selection recommendation",
+    "preconditions": "Selection committee completes interviews",
+    "action_or_input": "Update ProjectStaffAppointment with selected_candidate_name",
+    "expected_result": "Candidate recommendation is recorded on appointment instance",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-031",
+    "source_id": "RSPC-UC-023 Main Flow",
+    "purpose": "Dean-RSPC reviews and decides staff appointment request",
+    "preconditions": "Staff appointment recommended by PI",
+    "action_or_input": "Check Dean role grants for staff management permissions",
+    "expected_result": "Dean has rspc.staff.manage permission",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-032",
+    "source_id": "RSPC-UC-024 Main Flow",
+    "purpose": "Dean-RSPC reviews and approves financial request within delegation",
+    "preconditions": "Financial request verified by admin and within 2 Lakhs",
+    "action_or_input": "Check FINANCIAL_STATUS_APPROVED_DEAN and Dean financial approval permission",
+    "expected_result": "Status constant exists and Dean has rspc.financial.approve_dean",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-033",
+    "source_id": "RSPC-UC-024 Alternative A1",
+    "purpose": "Financial request exceeds Dean limit and is escalated to Director",
+    "preconditions": "Financial request amount >= 200,000",
+    "action_or_input": "Call is_director_approval_required('financial', 300000) and verify ESCALATED_DIRECTOR",
+    "expected_result": "Returns True and FINANCIAL_STATUS_ESCALATED_DIRECTOR exists",
+    "test_type": "use_case_alternative"
+  },
+  {
+    "test_id": "TEST-UC-034",
+    "source_id": "RSPC-UC-025 Main Flow",
+    "purpose": "RSPC Admin verifies procurement request against sanctioned budget",
+    "preconditions": "Procurement request submitted",
+    "action_or_input": "Verify validate_procurement_request logic with cost <= budget",
+    "expected_result": "Validation succeeds with empty error list",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-035",
+    "source_id": "RSPC-UC-026 Main Flow",
+    "purpose": "Dean-RSPC approves procurement request",
+    "preconditions": "Procurement verified by admin",
+    "action_or_input": "Check rspc.procurement.approve permission in Dean role grants",
+    "expected_result": "Dean has rspc.procurement.approve permission",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-036",
+    "source_id": "RSPC-UC-027 Main Flow",
+    "purpose": "RSPC Admin verifies project closure and asset records",
+    "preconditions": "Project closure submitted",
+    "action_or_input": "Check CLOSURE_STATUS_VERIFIED_ADMIN and rspc.closure.approve permission in admin",
+    "expected_result": "Status constant exists and rspc_admin has closure approval permission",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-037",
+    "source_id": "RSPC-UC-028 Main Flow",
+    "purpose": "Dean-RSPC approves project closure and triggers archival",
+    "preconditions": "Closure verified by admin",
+    "action_or_input": "Check CLOSURE_STATUS_APPROVED_DEAN and CLOSURE_STATUS_ARCHIVED",
+    "expected_result": "Both status constants are defined and distinct",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-038",
+    "source_id": "RSPC-UC-029 Main Flow",
+    "purpose": "Exchange RSPC integration records across Fusion modules",
+    "preconditions": "Inter-module contract query",
+    "action_or_input": "Verify RSPCProjectSummaryContract attributes and types",
+    "expected_result": "Contract has project_id, project_type, title, pi_id, budget, status",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-039",
+    "source_id": "RSPC-UC-030 Main Flow",
+    "purpose": "Record external funding-agency tracking update",
+    "preconditions": "Funding agency sanction update received",
+    "action_or_input": "Create ResearchProposal with funding_agency and scheme_name",
+    "expected_result": "ResearchProposal preserves funding agency and scheme details",
+    "test_type": "use_case_main"
+  },
+  {
+    "test_id": "TEST-UC-040",
+    "source_id": "RSPC-UC-031 Main Flow",
+    "purpose": "Generate and dispatch system notification on lifecycle events",
+    "preconditions": "Lifecycle event triggered",
+    "action_or_input": "Create RSPCNotification instance with event_type and message",
+    "expected_result": "Notification record created with recipient ID and content",
+    "test_type": "use_case_main"
+  }
+]
