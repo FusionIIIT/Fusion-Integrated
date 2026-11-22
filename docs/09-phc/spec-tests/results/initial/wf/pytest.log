@@ -1,0 +1,133 @@
+FFF.                                                                     [100%]
+================================== FAILURES ===================================
+____________ test_reimbursement_approved_path_and_terminal_payment ____________
+
+phc_client = <function phc_client.<locals>.make at 0x000001858D62ADE0>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+
+    def test_reimbursement_approved_path_and_terminal_payment(phc_client, prescription):
+        from modules.phc.models import ReimbursementClaim, ReimbursementAudit
+        employee = phc_client(uid=1001, kind="faculty", permissions=("phc.claim.submit",))
+        submit = employee.post("/api/v1/phc/claims/submit/", {
+            "prescription_id": prescription.pk, "amount_claimed": "45.00",
+        }, format="json")
+        assert submit.status_code == 201
+        claim_id = submit.json()["id"]
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.claim.review_phc",))
+        accounts = phc_client(uid=901, kind="staff", permissions=("phc.claim.verify", "phc.claim.payment"))
+        authority = phc_client(uid=902, kind="staff", permissions=("phc.claim.decide",))
+>       assert staff.post(f"/api/v1/phc/claims/{claim_id}/review/").json()["status"] == "pending_accounts_verification"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'status'
+
+modules\phc\tests\test_wf.py:20: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-22 19:46:38 INFO fusion.phc.notifications phc.notify.claim_status claim=1 to=pending_phc_review
+2026-11-22 19:46:38 INFO fusion.phc.reimbursement phc.claim.submitted claim=1 claimant=1001
+2026-11-22 19:46:38 WARNING django.request Forbidden: /api/v1/phc/claims/1/review/
+------------------------------ Captured log call ------------------------------
+INFO     fusion.phc.notifications:notifications.py:63 phc.notify.claim_status claim=1 to=pending_phc_review
+INFO     fusion.phc.reimbursement:reimbursement.py:110 phc.claim.submitted claim=1 claimant=1001
+WARNING  django.request:log.py:293 Forbidden: /api/v1/phc/claims/1/review/
+_______________ test_rejected_claim_cannot_be_reopened_or_paid ________________
+
+phc_client = <function phc_client.<locals>.make at 0x000001858A864F40>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+
+    def test_rejected_claim_cannot_be_reopened_or_paid(phc_client, prescription):
+        from modules.phc.models import ReimbursementClaim
+        claim = ReimbursementClaim.objects.create(user_id=1001, prescription=prescription,
+                                                   amount_claimed=Decimal("10"),
+                                                   status="pending_sanction")
+        authority = phc_client(uid=902, kind="staff", permissions=("phc.claim.decide",))
+        accounts = phc_client(uid=901, kind="staff", permissions=("phc.claim.payment",))
+>       assert authority.post(f"/api/v1/phc/claims/{claim.pk}/decide/", {"approve": False},
+                              format="json").json()["status"] == "rejected"
+E       KeyError: 'status'
+
+modules\phc\tests\test_wf.py:35: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-22 19:46:38 WARNING django.request Forbidden: /api/v1/phc/claims/1/decide/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:293 Forbidden: /api/v1/phc/claims/1/decide/
+_______ test_requisition_approval_fulfillment_does_not_change_inventory _______
+
+phc_client = <function phc_client.<locals>.make at 0x000001858A865800>
+
+    def test_requisition_approval_fulfillment_does_not_change_inventory(phc_client):
+        from modules.phc.models import InventoryItem
+        item = InventoryItem.objects.create(name="Gloves", stock_quantity=Decimal("8"))
+        staff = phc_client(uid=900, kind="staff", permissions=(
+            "phc.requisition.submit", "phc.requisition.fulfill"))
+        created = staff.post("/api/v1/phc/requisitions/create/", {
+            "title": "Gloves", "line_items": [{"item_name": "Gloves", "quantity": "10"}],
+        }, format="json")
+        assert created.status_code == 201
+        req_id = created.json()["id"]
+        authority = phc_client(uid=902, kind="staff", permissions=("phc.requisition.decide",))
+        assert authority.post(f"/api/v1/phc/requisitions/{req_id}/decide/",
+                              {"approve": True}, format="json").json()["status"] == "approved"
+>       assert staff.post(f"/api/v1/phc/requisitions/{req_id}/fulfill/").json()["status"] == "fulfilled"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'status'
+
+modules\phc\tests\test_wf.py:53: KeyError
+---------------------------- Captured stderr call -----------------------------
+2026-11-22 19:46:38 INFO fusion.phc.inventory phc.requisition.created req=1 by=900
+2026-11-22 19:46:38 INFO fusion.phc.notifications phc.notify.requisition req=1 status=approved
+2026-11-22 19:46:38 INFO fusion.phc.inventory phc.requisition.decided req=1 status=approved by=902
+2026-11-22 19:46:38 WARNING django.request Forbidden: /api/v1/phc/requisitions/1/fulfill/
+------------------------------ Captured log call ------------------------------
+INFO     fusion.phc.inventory:inventory.py:117 phc.requisition.created req=1 by=900
+INFO     fusion.phc.notifications:notifications.py:87 phc.notify.requisition req=1 status=approved
+INFO     fusion.phc.inventory:inventory.py:171 phc.requisition.decided req=1 status=approved by=902
+WARNING  django.request:log.py:293 Forbidden: /api/v1/phc/requisitions/1/fulfill/
+============================== warnings summary ===============================
+modules/phc/tests/test_wf.py::test_reimbursement_approved_path_and_terminal_payment
+modules/phc/tests/test_wf.py::test_requisition_approval_fulfillment_does_not_change_inventory
+modules/phc/tests/test_wf.py::test_requisition_rejection_is_terminal
+  C:\Users\user\Downloads\assignment9\Fusion-Integrated\.venv\Lib\site-packages\rest_framework\fields.py:1015: UserWarning: min_value should be an integer or Decimal instance.
+    warnings.warn("min_value should be an integer or Decimal instance.")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.4-final-0 _______________
+
+Name                                     Stmts   Miss  Cover
+------------------------------------------------------------
+modules\phc\__init__.py                      0      0   100%
+modules\phc\api\__init__.py                  0      0   100%
+modules\phc\api\serializers.py             122      2    98%
+modules\phc\api\urls.py                      3      0   100%
+modules\phc\api\views.py                   350    165    53%
+modules\phc\apps.py                          6      0   100%
+modules\phc\contracts.py                     0      0   100%
+modules\phc\domain\__init__.py               0      0   100%
+modules\phc\domain\reimbursement.py         13      3    77%
+modules\phc\domain\state_machine.py         33      6    82%
+modules\phc\migrations\0001_initial.py       8      0   100%
+modules\phc\migrations\__init__.py           0      0   100%
+modules\phc\models.py                      199     16    92%
+modules\phc\selectors\__init__.py            0      0   100%
+modules\phc\selectors\scoping.py            44     21    52%
+modules\phc\services\__init__.py             0      0   100%
+modules\phc\services\inventory.py           58     21    64%
+modules\phc\services\notifications.py       47     29    38%
+modules\phc\services\operations.py          37     26    30%
+modules\phc\services\pdf.py                 54     54     0%
+modules\phc\services\records.py             18     10    44%
+modules\phc\services\reimbursement.py       60     24    60%
+modules\phc\services\schedules.py           25     15    40%
+modules\phc\tests\__init__.py                0      0   100%
+modules\phc\tests\conftest.py               19      0   100%
+modules\phc\tests\test_br.py                43     43     0%
+modules\phc\tests\test_fr.py                30     30     0%
+modules\phc\tests\test_uc.py                41     41     0%
+modules\phc\tests\test_wf.py                45      9    80%
+------------------------------------------------------------
+TOTAL                                     1255    515    59%
+Coverage XML written to file docs\09-phc\spec-tests\results\wf\coverage.xml
+=========================== short test summary info ===========================
+FAILED modules/phc/tests/test_wf.py::test_reimbursement_approved_path_and_terminal_payment
+FAILED modules/phc/tests/test_wf.py::test_rejected_claim_cannot_be_reopened_or_paid
+FAILED modules/phc/tests/test_wf.py::test_requisition_approval_fulfillment_does_not_change_inventory

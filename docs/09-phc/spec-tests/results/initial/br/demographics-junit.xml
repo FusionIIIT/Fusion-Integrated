@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.962" timestamp="2026-11-22T20:12:22.719371+05:30" hostname="LAPTOP-FF79NG73"><testcase classname="modules.phc.tests.test_br" name="test_demographics_report_aggregates_visits_by_patient_category" time="0.501"><failure message="KeyError: 'patient_groups'">phc_client = &lt;function phc_client.&lt;locals&gt;.make at 0x000001534B4DA660&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001534B4AD940&gt;
+
+    def test_demographics_report_aggregates_visits_by_patient_category(
+        phc_client, monkeypatch
+    ):
+        from types import SimpleNamespace
+    
+        from modules.directory import contracts as directory_contracts
+        from modules.phc.models import PatientVisit
+    
+        PatientVisit.objects.create(
+            user_id=1001, visit_date="2026-11-01", chief_complaint="A",
+            recorded_by_user_id=900,
+        )
+        PatientVisit.objects.create(
+            user_id=1001, visit_date="2026-11-02", chief_complaint="B",
+            recorded_by_user_id=900,
+        )
+        PatientVisit.objects.create(
+            user_id=2002, visit_date="2026-11-02", chief_complaint="C",
+            recorded_by_user_id=900,
+        )
+        monkeypatch.setattr(
+            directory_contracts,
+            "get_users",
+            lambda user_ids: {
+                1001: SimpleNamespace(kind="student"),
+                2002: SimpleNamespace(kind="faculty"),
+            },
+        )
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.report.view",))
+        response = staff.get("/api/v1/phc/reports/?type=demographics")
+        assert response.status_code == 200
+&gt;       assert response.json()["patient_groups"] == [
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            {"category": "employee", "patients": 1, "visits": 1},
+            {"category": "student", "patients": 1, "visits": 2},
+        ]
+E       KeyError: 'patient_groups'
+
+modules\phc\tests\test_br.py:110: KeyError</failure></testcase></testsuite></testsuites>

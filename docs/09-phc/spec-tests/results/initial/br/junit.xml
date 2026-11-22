@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="5" time="1.170" timestamp="2026-11-22T19:45:23.487975+05:30" hostname="LAPTOP-FF79NG73"><testcase classname="modules.phc.tests.test_br" name="test_claim_submit_requires_employee_own_prescription_expense_date" time="0.606"><failure message="assert 409 == 201&#10; +  where 409 = &lt;Response status_code=409, &quot;application/json&quot;&gt;.status_code&#10; +    where &lt;Response status_code=409, &quot;application/json&quot;&gt; = post('/api/v1/phc/claims/submit/', {'prescription_id': 1, 'amount_claimed': '20.00'}, format='json')&#10; +      where post = &lt;rest_framework.test.APIClient object at 0x0000020D24472710&gt;.post">phc_client = &lt;function phc_client.&lt;locals&gt;.make at 0x0000020D243CF100&gt;
+prescription = &lt;Prescription: rx#1 Paracetamol patient=1001&gt;
+
+    def test_claim_submit_requires_employee_own_prescription_expense_date(phc_client, prescription):
+        student = phc_client(uid=1001, kind="student", permissions=("phc.claim.submit",))
+        payload = {"prescription_id": prescription.pk, "amount_claimed": "20.00"}
+        assert student.post("/api/v1/phc/claims/submit/", payload, format="json").status_code == 403
+        employee = phc_client(uid=1001, kind="faculty", permissions=("phc.claim.submit",))
+        other = phc_client(uid=2002, kind="staff", permissions=("phc.claim.submit",))
+&gt;       assert employee.post("/api/v1/phc/claims/submit/", payload, format="json").status_code == 201
+E       assert 409 == 201
+E        +  where 409 = &lt;Response status_code=409, "application/json"&gt;.status_code
+E        +    where &lt;Response status_code=409, "application/json"&gt; = post('/api/v1/phc/claims/submit/', {'prescription_id': 1, 'amount_claimed': '20.00'}, format='json')
+E        +      where post = &lt;rest_framework.test.APIClient object at 0x0000020D24472710&gt;.post
+
+modules\phc\tests\test_br.py:15: AssertionError</failure></testcase><testcase classname="modules.phc.tests.test_br" name="test_claimant_only_sees_own_claims_and_status_change_notifies" time="0.031"><failure message="assert 404 == 200&#10; +  where 404 = &lt;Response status_code=404, &quot;application/json&quot;&gt;.status_code&#10; +    where &lt;Response status_code=404, &quot;application/json&quot;&gt; = get('/api/v1/phc/claims/my/1/')&#10; +      where get = &lt;rest_framework.test.APIClient object at 0x0000020D24C7CC30&gt;.get">prescription = &lt;Prescription: rx#1 Paracetamol patient=1001&gt;
+phc_client = &lt;function phc_client.&lt;locals&gt;.make at 0x0000020D24CBB9C0&gt;
+
+    def test_claimant_only_sees_own_claims_and_status_change_notifies(prescription, phc_client):
+        from modules.phc.models import PhcNotification, ReimbursementClaim
+        claim = ReimbursementClaim.objects.create(user_id=1001, prescription=prescription,
+                                                   amount_claimed=Decimal("12.00"))
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.claim.review_phc",))
+        assert staff.post(f"/api/v1/phc/claims/{claim.pk}/review/").status_code == 200
+        assert PhcNotification.objects.filter(recipient_user_id=1001,
+                                               event_type="claim_status_changed").exists()
+        claimant = phc_client(uid=1001, kind="faculty", permissions=("phc.claim.view_self",))
+        foreign = phc_client(uid=2002, kind="faculty", permissions=("phc.claim.view_self",))
+&gt;       assert claimant.get(f"/api/v1/phc/claims/my/{claim.pk}/").status_code == 200
+E       assert 404 == 200
+E        +  where 404 = &lt;Response status_code=404, "application/json"&gt;.status_code
+E        +    where &lt;Response status_code=404, "application/json"&gt; = get('/api/v1/phc/claims/my/1/')
+E        +      where get = &lt;rest_framework.test.APIClient object at 0x0000020D24C7CC30&gt;.get
+
+modules\phc\tests\test_br.py:29: AssertionError</failure></testcase><testcase classname="modules.phc.tests.test_br" name="test_submission_window_configuration_is_staff_only" time="0.012"><failure message="assert 403 == 200&#10; +  where 403 = &lt;Response status_code=403, &quot;application/json&quot;&gt;.status_code">phc_client = &lt;function phc_client.&lt;locals&gt;.make at 0x0000020D24CF6A20&gt;
+
+    def test_submission_window_configuration_is_staff_only(phc_client):
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.claim.configure",))
+        patient = phc_client(uid=1001, permissions=())
+        changed = staff.patch("/api/v1/phc/claims/config/", {"submission_window_days": 30},
+                              format="json")
+&gt;       assert changed.status_code == 200
+E       assert 403 == 200
+E        +  where 403 = &lt;Response status_code=403, "application/json"&gt;.status_code
+
+modules\phc\tests\test_br.py:38: AssertionError</failure></testcase><testcase classname="modules.phc.tests.test_br" name="test_inventory_adjustment_audits_and_alerts_below_threshold" time="0.018" /><testcase classname="modules.phc.tests.test_br" name="test_reports_do_not_expose_patient_identifiers" time="0.007" /></testsuite></testsuites>

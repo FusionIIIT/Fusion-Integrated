@@ -1,0 +1,62 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________________ test_staff_can_search_patient_profile ____________________
+
+phc_client = <function phc_client.<locals>.make at 0x000002B336A5F880>
+
+    def test_staff_can_search_patient_profile(phc_client):
+        from modules.directory.models import UserRef
+    
+        UserRef.objects.create(user_id=1001, username="student-1001",
+                               display_name="Asha Patient", kind="student")
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.record.manage",))
+        response = staff.get("/api/v1/phc/patients/search/?q=Asha")
+>       assert response.status_code == 200
+E       assert 404 == 200
+E        +  where 404 = <HttpResponseNotFound status_code=404, "text/html; charset=utf-8">.status_code
+
+modules\phc\tests\test_uc.py:77: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-22 19:58:32 WARNING django.request Not Found: /api/v1/phc/patients/search/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:293 Not Found: /api/v1/phc/patients/search/
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.4-final-0 _______________
+
+Name                                     Stmts   Miss  Cover
+------------------------------------------------------------
+modules\phc\__init__.py                      0      0   100%
+modules\phc\api\__init__.py                  0      0   100%
+modules\phc\api\serializers.py             122      6    95%
+modules\phc\api\urls.py                      3      0   100%
+modules\phc\api\views.py                   348    184    47%
+modules\phc\apps.py                          6      0   100%
+modules\phc\contracts.py                     0      0   100%
+modules\phc\domain\__init__.py               0      0   100%
+modules\phc\domain\reimbursement.py         13      7    46%
+modules\phc\domain\state_machine.py         33     10    70%
+modules\phc\migrations\0001_initial.py       8      0   100%
+modules\phc\migrations\__init__.py           0      0   100%
+modules\phc\models.py                      199     19    90%
+modules\phc\registry.py                      7      7     0%
+modules\phc\selectors\__init__.py            0      0   100%
+modules\phc\selectors\scoping.py            44     21    52%
+modules\phc\services\__init__.py             0      0   100%
+modules\phc\services\inventory.py           58     43    26%
+modules\phc\services\notifications.py       45     35    22%
+modules\phc\services\operations.py          41     29    29%
+modules\phc\services\pdf.py                 54     54     0%
+modules\phc\services\records.py             18     10    44%
+modules\phc\services\reimbursement.py       60     41    32%
+modules\phc\services\schedules.py           23     15    35%
+modules\phc\tests\__init__.py                0      0   100%
+modules\phc\tests\conftest.py               19      4    79%
+modules\phc\tests\test_br.py                43     43     0%
+modules\phc\tests\test_fr.py                31     31     0%
+modules\phc\tests\test_uc.py                61     47    23%
+modules\phc\tests\test_wf.py                47     47     0%
+------------------------------------------------------------
+TOTAL                                     1283    653    49%
+Coverage XML written to file docs\09-phc\spec-tests\results\initial\uc\patient-search-coverage.xml
+=========================== short test summary info ===========================
+FAILED modules/phc/tests/test_uc.py::test_staff_can_search_patient_profile - ...
