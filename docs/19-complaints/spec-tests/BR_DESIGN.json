@@ -1,0 +1,123 @@
+{
+  "strategy": "Business Rules",
+  "source_inventory": [
+    "docs/Assignment_7_Complaint_Management_System_Report.txt"
+  ],
+  "business_rules": [
+    {
+      "id": "BR-001",
+      "description": "Exactly one active Complaint Handler must exist at any time; assigning a new handler deactivates the previous one.",
+      "type": "explicit",
+      "source": "Page 2 – Core Objectives (Time‑Bound Role Management)",
+      "scenario": {
+        "positive": {
+          "preconditions": "Two handler assignments in sequence",
+          "expected": "Second assignment overwrites first, only latest is_active=true"
+        },
+        "negative": {
+          "description": "Attempt to create overlapping active handlers via direct DB insert",
+          "expected": "Derived requirement: system should prevent overlapping active handlers (implementation not documented)"
+        }
+      }
+    },
+    {
+      "id": "BR-002",
+      "description": "Exactly one active Complaint Supervisor must exist at any time; assigning a new supervisor deactivates the previous one.",
+      "type": "explicit",
+      "source": "Page 2 – Core Objectives (Time‑Bound Role Management)",
+      "scenario": {
+        "positive": {
+          "preconditions": "Two supervisor assignments in sequence",
+          "expected": "Only latest supervisor is_active=true"
+        }
+      }
+    },
+    {
+      "id": "BR-003",
+      "description": "Complaint categories must be active (boolean flag) to be assignable.",
+      "type": "derived",
+      "source": "Page 5 – Relational Database Schema (ComplaintCategory is_active)",
+      "scenario": {
+        "negative": {
+          "preconditions": "Assign a complaint to an inactive category",
+          "expected": "Validation error – category not selectable"
+        }
+      }
+    },
+    {
+      "id": "BR-004",
+      "description": "Rejection of a complaint requires a mandatory reason recorded in the database.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW‑CMS‑04 (rejection)",
+      "scenario": {
+        "negative": {
+          "preconditions": "Reject request without reason",
+          "expected": "Not specified (status not documented)"
+        }
+      }
+    },
+    {
+      "id": "BR-005",
+      "description": "Each complaint may have at most one feedback record (OneToOne relationship).",
+      "type": "explicit",
+      "source": "Page 5 – DB constraint (OneToOne feedback)",
+      "scenario": {
+        "negative": {
+          "preconditions": "Attempt to submit a second feedback for same complaint",
+          "expected": "Not specified (status not documented)"
+        }
+      }
+    },
+    {
+      "id": "BR-006",
+      "description": "Manual escalation can be performed only once per complaint; subsequent attempts are rejected.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW‑CMS‑07 (manual escalation)",
+      "scenario": {
+        "negative": {
+          "preconditions": "Complaint already marked is_escalated=true (type='manual')",
+          "expected": "Not specified (status not documented)"
+        }
+      }
+    },
+    {
+      "id": "BR-007",
+      "description": "Automatic SLA escalation occurs only for overdue complaints not yet resolved.",
+      "type": "explicit",
+      "source": "Page 4 – Workflow BW‑CMS‑08 (automatic SLA escalation)",
+      "scenario": {
+        "positive": {
+          "preconditions": "Complaint with sla_deadline < now and status not resolved",
+          "expected": "is_escalated set true, type='automatic'"
+        }
+      }
+    },
+    {
+      "id": "BR-008",
+      "description": "Cross‑module foreign keys are prohibited; references to external entities must be plain integer IDs.",
+      "type": "explicit",
+      "source": "Page 2 – ADR‑0013 (no cross‑module FKs)"
+    },
+    {
+      "id": "BR-009",
+      "description": "Complaint ID format follows pattern CMP‑YYYYMMDD‑XXXX (generated on submission).",
+      "type": "explicit",
+      "source": "Page 4 – BW‑CMS‑01 description",
+      "scenario": {
+        "positive": {
+          "preconditions": "Submit new complaint",
+          "expected": "Generated identifier matches pattern"
+        }
+      }
+    }
+  ],
+  "ambiguous_items": [
+    {
+      "id": "BR-A-001",
+      "description": "Whether the system enforces uniqueness of active role assignments at the database level or solely via application logic",
+      "type": "not_specified",
+      "source": "Page 2 – Role management description (no explicit DB constraint mentioned)"
+    }
+  ],
+  "not_automated": []
+}
