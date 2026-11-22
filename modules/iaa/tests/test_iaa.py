@@ -74,3 +74,20 @@ def test_observation_deletion_is_prohibited():
         title="Missing documents", details="No evidence", raised_by_id=4)
     with pytest.raises(ValueError, match="deletion is prohibited"):
         row.delete()
+
+
+def test_iam_department_designations_normalize_to_distinct_iaa_authorities():
+    from modules.iaa.services.iaa import normalize_role
+    assert normalize_role("HOD (CSE)") == "hod"
+    assert normalize_role("Dean Academic") == "dean"
+    assert normalize_role("Director") == "director"
+
+
+@pytest.mark.django_db
+def test_audit_observation_queryset_delete_is_prohibited():
+    from modules.iaa.models import AuditObservation
+    AuditObservation.objects.create(
+        record_kind="expense_voucher", record_id=2,
+        title="Evidence gap", details="Missing evidence", raised_by_id=5)
+    with pytest.raises(ValueError, match="deletion is prohibited"):
+        AuditObservation.objects.filter(record_id=2).delete()
