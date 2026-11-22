@@ -1,0 +1,44 @@
+from typing import Optional
+from django.db.models import QuerySet
+from rest_framework.exceptions import NotFound
+
+from modules.iwd.models.complaint import Complaint
+from modules.iwd.models.estimate import RepairEstimate
+from modules.iwd.models.inventory import InventoryItem
+
+
+def scope_complaints_for_actor(
+    user_id: int,
+    acting_role: str,
+) -> QuerySet[Complaint]:
+    """Applies role-appropriate scoping to complaints (yields 404 on unowned)."""
+    role = acting_role.lower()
+    if role in ["iwd_admin", "department_head", "director", "auditor", "accounts", "dean"]:
+        return Complaint.objects.all()
+    if role == "engineer":
+        return Complaint.objects.filter(assigned_engineer_id=user_id)
+    # Default: Institute Employee sees only their own
+    return Complaint.objects.filter(complainant_user_id=user_id)
+
+
+def get_scoped_complaint(
+    complaint_id: int,
+    user_id: int,
+    acting_role: str,
+) -> Complaint:
+    """Retrieves complaint within actor scope or raises NotFound (404, never 403)."""
+    qs = scope_complaints_for_actor(user_id, acting_role)
+    try:
+        return qs.get(id=complaint_id)
+    except Complaint.DoesNotExist:
+        raise NotFound("Complaint not found.")
+
+
+def scope_estimates_for_complaint(
+    complaint_id: int,
+) -> QuerySet[RepairEstimate]:
+    return RepairEstimate.objects.filter(complaint_id=complaint_id).order_by("-version")
+
+
+def get_all_inventory() -> QuerySet[InventoryItem]:
+    return InventoryItem.objects.all().order_by("item_code")
