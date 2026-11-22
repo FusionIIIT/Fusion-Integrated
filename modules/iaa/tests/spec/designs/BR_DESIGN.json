@@ -1,0 +1,398 @@
+[
+  {
+    "test_id": "TC-BR-001",
+    "source_id": "IAA-BR-001",
+    "purpose": "Verify that approval action is blocked and routed to the next eligible configured authority when the approver identity is identical to the expense/voucher request creator identity.",
+    "preconditions": "An expense/voucher request created by User A (who also holds an Approving Authority role) is validated by Finance and reaches approval stage where User A is the configured default approver.",
+    "action_or_input": "User A attempts to submit an approval decision on the expense/voucher request created by User A.",
+    "expected_result": "The approval decision by User A is blocked under segregation of duties, and the request is automatically routed to the next eligible configured authority in the hierarchy.",
+    "test_type": "Negative / Security"
+  },
+  {
+    "test_id": "TC-BR-002",
+    "source_id": "IAA-BR-001",
+    "purpose": "Verify that approval action is blocked and routed to the next eligible configured authority when the approver identity is identical to the TA claim claimant identity.",
+    "preconditions": "A high-value TA claim submitted by User B (who also holds an Approving Authority role) is verified by Finance and reaches the approval stage where User B is the configured default approver.",
+    "action_or_input": "User B attempts to submit an approval decision on the TA claim submitted by User B.",
+    "expected_result": "The approval decision by User B is blocked under segregation of duties, and the TA claim is routed to the next eligible configured authority in the hierarchy.",
+    "test_type": "Negative / Security"
+  },
+  {
+    "test_id": "TC-BR-003",
+    "source_id": "IAA-BR-001",
+    "purpose": "Verify that an eligible configured authority whose identity differs from the creator/claimant can successfully approve the request.",
+    "preconditions": "An expense/voucher request created by User A is routed to User C, an eligible configured approving authority distinct from User A.",
+    "action_or_input": "User C submits an approval decision with mandatory remarks.",
+    "expected_result": "The approval decision is accepted and processed successfully without segregation-of-duties violation.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-004",
+    "source_id": "IAA-BR-002",
+    "purpose": "Verify that an expense/voucher request is routed to the configured single-level authority based on request type, department, and amount criteria.",
+    "preconditions": "System approval rules are configured such that Request Type X in Department D with amount <= 50000 routes to HoD.",
+    "action_or_input": "A Finance-validated expense/voucher request for Department D of Type X with amount 30000 reaches the approval routing stage.",
+    "expected_result": "The request is routed to the configured HoD for Department D as the assigned approving authority.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-005",
+    "source_id": "IAA-BR-002",
+    "purpose": "Verify that an expense/voucher request requiring multi-level approval is routed sequentially through configured hierarchical levels.",
+    "preconditions": "System approval hierarchy is configured such that requests exceeding 100000 require sequential multi-level approval: first HoD, then Dean.",
+    "action_or_input": "A Finance-validated expense request of 150000 receives HoD approval at level 1.",
+    "expected_result": "The request transitions to require the second approval level and is routed to the configured Dean for approval.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-006",
+    "source_id": "IAA-BR-002",
+    "purpose": "Verify that a request matching top-tier configured criteria is routed to the Director approval level.",
+    "preconditions": "System approval rules configure institutional capital expense requests above 500000 to route to the Director.",
+    "action_or_input": "An expense request meeting the Director-level criteria completes prior configured clearance levels and becomes ready for top-tier authority approval.",
+    "expected_result": "The request is routed to the Director as the designated approving authority.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-007",
+    "source_id": "IAA-BR-003",
+    "purpose": "Verify that a user holding multiple roles successfully executes and logs an action under their explicitly activated role.",
+    "preconditions": "User U holds both Basic User and HoD roles in IAA, and has explicitly selected and activated the HoD role in the current session.",
+    "action_or_input": "User U performs an approval decision on a pending departmental request.",
+    "expected_result": "The action is authorized against the active HoD role, executed successfully, and logged in the audit trail with User U and active role 'HoD'.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-008",
+    "source_id": "IAA-BR-003",
+    "purpose": "Verify that a user holding multiple roles cannot perform an action specific to another assigned role without explicitly activating it.",
+    "preconditions": "User U holds both Basic User and HoD roles in IAA, but currently has 'Basic User' activated as the active role.",
+    "action_or_input": "User U attempts to execute an approval action on a pending departmental voucher request.",
+    "expected_result": "The approval action is denied because the current active role (Basic User) lacks approval authority; execution is blocked until the user explicitly activates the HoD role.",
+    "test_type": "Negative / Security"
+  },
+  {
+    "test_id": "TC-BR-009",
+    "source_id": "IAA-BR-004",
+    "purpose": "Verify that a System Admin is blocked from accessing operational financial request content and submitting operational approval decisions.",
+    "preconditions": "User Admin is logged in with the active role of System Admin.",
+    "action_or_input": "User Admin attempts to view operational financial request details and submit an approval decision on a pending expense voucher.",
+    "expected_result": "Access to operational financial content and approval actions is denied to System Admin.",
+    "test_type": "Negative / Security"
+  },
+  {
+    "test_id": "TC-BR-010",
+    "source_id": "IAA-BR-004",
+    "purpose": "Verify that a System Admin is permitted to access and manage configuration metadata.",
+    "preconditions": "User Admin is logged in with the active role of System Admin.",
+    "action_or_input": "User Admin accesses administrative configuration functions to update approval hierarchy rules, financial year settings, and policy parameters.",
+    "expected_result": "Access is granted and configuration metadata changes are successfully saved and logged.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-011",
+    "source_id": "IAA-BR-005",
+    "purpose": "Verify that an approval or rejection decision submission is blocked if remarks are omitted.",
+    "preconditions": "An Approving Authority (HoD) opens a pending expense request ready for decision.",
+    "action_or_input": "The Approving Authority attempts to submit an 'Approve' or 'Reject' decision with the remarks field left blank or whitespace-only.",
+    "expected_result": "The decision submission is blocked, validation error indicates mandatory remarks are required, and the request status remains unchanged.",
+    "test_type": "Negative / Validation"
+  },
+  {
+    "test_id": "TC-BR-012",
+    "source_id": "IAA-BR-005",
+    "purpose": "Verify that an approval decision is successfully submitted and persisted with remarks, decision identity, and timestamp.",
+    "preconditions": "An Approving Authority (Dean) opens a pending high-value TA claim ready for decision.",
+    "action_or_input": "The Approving Authority enters mandatory remarks 'Approved as per institutional policy' and submits the approval decision.",
+    "expected_result": "The approval decision is persisted along with the provided remarks, approver identity, and timestamp.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-013",
+    "source_id": "IAA-BR-006",
+    "purpose": "Verify that recording completion of an approved expense/voucher transitions the record to terminal Recorded status without triggering or implying bank or monetary payment transfer.",
+    "preconditions": "An expense/voucher request has received all required authority approvals and is ready for internal processing by Finance Staff.",
+    "action_or_input": "Finance Staff records internal processing completion (IAA-UC-105).",
+    "expected_result": "Internal governance processing data is saved, record status transitions to terminal Recorded status, and no payment/bank transfer integration is invoked or payment-success semantics implied.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-014",
+    "source_id": "IAA-BR-006",
+    "purpose": "Verify that recording completion of an approved TA claim transitions the record to terminal Recorded status representing internal record completion only.",
+    "preconditions": "A TA claim has completed verification and any required authority approvals, and is ready for Finance processing.",
+    "action_or_input": "Finance Staff records internal TA completion (IAA-UC-404).",
+    "expected_result": "The TA claim transitions to terminal Recorded status, internal completion details are recorded, the record becomes read-only, and no external bank transfer or disbursement is executed.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-015",
+    "source_id": "IAA-BR-101",
+    "purpose": "Verify that saving an incomplete expense/voucher request as Draft is permitted without triggering mandatory submission validation errors.",
+    "preconditions": "A Basic User initiates a new expense/voucher request.",
+    "action_or_input": "The Basic User enters partial details with mandatory fields and required attachments missing, and selects 'Save as Draft'.",
+    "expected_result": "The incomplete expense/voucher request is saved successfully in Draft status without blocking.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-016",
+    "source_id": "IAA-BR-101",
+    "purpose": "Verify that formal submission of an expense/voucher request or TA claim is blocked when mandatory fields or required documents are missing.",
+    "preconditions": "A Draft expense/voucher request or new TA claim is open for formal submission with missing mandatory fields or missing required documentary attachments.",
+    "action_or_input": "The user attempts formal submission of the request/claim.",
+    "expected_result": "Formal submission is blocked, validation errors identifying all missing mandatory fields and documents are displayed, and the record does not transition to submitted state.",
+    "test_type": "Negative / Validation"
+  },
+  {
+    "test_id": "TC-BR-017",
+    "source_id": "IAA-BR-101",
+    "purpose": "Verify that formal submission succeeds when all mandatory fields and required documentary attachments are provided.",
+    "preconditions": "A user completes all mandatory fields and attaches all required documents for an expense/voucher request or TA claim.",
+    "action_or_input": "The user attempts formal submission.",
+    "expected_result": "Completeness validation passes and the request/claim is formally submitted.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-018",
+    "source_id": "IAA-BR-102",
+    "purpose": "Verify that Finance validation passes when requested amount is within available departmental budget.",
+    "preconditions": "A submitted expense request of amount 20000 undergoes Finance validation where the available departmental budget is 100000.",
+    "action_or_input": "Finance Staff triggers budget availability validation during review.",
+    "expected_result": "Budget check verifies sufficient funds, no budget anomaly is triggered, and Finance review proceeds.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-019",
+    "source_id": "IAA-BR-102",
+    "purpose": "Verify that when available departmental budget is insufficient, the system flags a budget anomaly and routes for review/escalation rather than automatically rejecting the request.",
+    "preconditions": "A submitted expense request of amount 80000 undergoes Finance review where the available departmental budget is only 30000.",
+    "action_or_input": "Finance validation performs the budget availability check.",
+    "expected_result": "The request is not automatically rejected; instead, a budget anomaly is flagged, recorded, and routed for configured review/escalation.",
+    "test_type": "Negative / Boundary"
+  },
+  {
+    "test_id": "TC-BR-020",
+    "source_id": "IAA-BR-102",
+    "purpose": "Verify that departmental budget validation is bypassed when the configured policy does not require a departmental budget check for the request category.",
+    "preconditions": "An expense request or TA claim belongs to a category explicitly configured as exempt from departmental budget check under institutional policy.",
+    "action_or_input": "Finance Staff validates the request.",
+    "expected_result": "The departmental budget availability check is skipped according to configured policy, and validation proceeds without flagging a budget anomaly.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-021",
+    "source_id": "IAA-BR-103",
+    "purpose": "Verify that ordinary completeness or missing submission field errors are handled by validation rules and do not create anomaly records.",
+    "preconditions": "A user attempts to submit a request with missing mandatory fields.",
+    "action_or_input": "Submission fails submission completeness validation.",
+    "expected_result": "Validation errors are displayed to the user as per IAA-BR-101; no material anomaly record is generated or tracked in the system.",
+    "test_type": "Negative / Functional"
+  },
+  {
+    "test_id": "TC-BR-022",
+    "source_id": "IAA-BR-103",
+    "purpose": "Verify that flagging a material policy, budget, or financial anomaly creates a linked anomaly record in Open state and notifies relevant actors.",
+    "preconditions": "Finance Staff or Auditor identifies a material policy violation or financial discrepancy during request/audit review.",
+    "action_or_input": "The reviewer flags the material anomaly on the record.",
+    "expected_result": "An anomaly record linked to the request is created in 'Open' state, relevant actors are notified, and the anomaly is actively tracked.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-023",
+    "source_id": "IAA-BR-103",
+    "purpose": "Verify that an Open anomaly record remains tracked until resolved or escalated by the designated resolver.",
+    "preconditions": "An anomaly record exists in Open state linked to a financial request.",
+    "action_or_input": "The designated resolver reviews the anomaly and submits a resolution or escalation decision with supporting rationale.",
+    "expected_result": "The anomaly transitions from Open to Resolved or Escalated status, and the outcome is recorded in its tracking history.",
+    "test_type": "Positive / Lifecycle"
+  },
+  {
+    "test_id": "TC-BR-024",
+    "source_id": "IAA-BR-104",
+    "purpose": "Verify that direct editing of an expense/voucher request or TA claim by its creator is blocked after formal submission.",
+    "preconditions": "An expense/voucher request or TA claim has been formally submitted and has left pre-submission state.",
+    "action_or_input": "The creator attempts to directly modify original claim fields, expense line items, or amounts.",
+    "expected_result": "Direct editing is blocked and the record is maintained as read-only against ordinary creator modifications.",
+    "test_type": "Negative / Security"
+  },
+  {
+    "test_id": "TC-BR-025",
+    "source_id": "IAA-BR-104",
+    "purpose": "Verify that a creator is permitted to submit structured clarification responses and evidence on a submitted record when requested by Finance.",
+    "preconditions": "A submitted request has a clarification query raised by Finance Staff and is awaiting creator response.",
+    "action_or_input": "The creator submits a structured response with requested clarification details and supporting documents.",
+    "expected_result": "The structured response and documents are accepted and recorded without unlocking the baseline submitted record for direct ordinary editing.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-026",
+    "source_id": "IAA-BR-201",
+    "purpose": "Verify that Finance verification of a TA claim succeeds when it satisfies configured TA policy, documentary requirements, and budget availability.",
+    "preconditions": "A submitted TA claim includes valid trip dates, purpose, claimed amount, all mandatory receipts/supporting documents, and sufficient departmental budget.",
+    "action_or_input": "Finance Staff performs verification of the TA claim.",
+    "expected_result": "The TA claim is verified successfully and marked as verified.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-027",
+    "source_id": "IAA-BR-201",
+    "purpose": "Verify that Finance verification of a TA claim is rejected or routed for clarification when configured TA policy or documentary requirements are violated.",
+    "preconditions": "A submitted TA claim violates travel entitlement limits or lacks mandatory travel proof documents required by policy.",
+    "action_or_input": "Finance Staff reviews the non-compliant TA claim.",
+    "expected_result": "Verification cannot succeed as verified; the claim is rejected or clarification is requested from the claimant according to policy.",
+    "test_type": "Negative / Validation"
+  },
+  {
+    "test_id": "TC-BR-028",
+    "source_id": "IAA-BR-202",
+    "purpose": "Verify that a verified TA claim meeting configured high-value threshold criteria is routed for authority approval.",
+    "preconditions": "System configures high-value TA threshold as amount >= 25000. A TA claim of amount 30000 completes Finance verification.",
+    "action_or_input": "Finance Staff completes verification on the claim.",
+    "expected_result": "The claim meets high-value criteria and is routed to the configured authority approval route (HoD/Dean/Director).",
+    "test_type": "Positive / Boundary"
+  },
+  {
+    "test_id": "TC-BR-029",
+    "source_id": "IAA-BR-202",
+    "purpose": "Verify that a verified TA claim strictly below the configured high-value threshold does not require authority approval and proceeds directly to Finance processing.",
+    "preconditions": "System configures high-value TA threshold as amount >= 25000. A TA claim of amount 24999 completes Finance verification.",
+    "action_or_input": "Finance Staff completes verification on the claim.",
+    "expected_result": "The claim does not trigger authority approval routing and proceeds directly to internal Finance processing.",
+    "test_type": "Positive / Boundary"
+  },
+  {
+    "test_id": "TC-BR-030",
+    "source_id": "IAA-BR-301",
+    "purpose": "Verify valid audit observation lifecycle progression from Open to Responded and from Responded to Closed.",
+    "preconditions": "An Auditor creates an audit observation against a financial record in Open status.",
+    "action_or_input": "The auditee submits corrective response and evidence transitioning status to Responded; subsequently, the Auditor verifies evidence and closes the observation.",
+    "expected_result": "The observation transitions sequentially Open -> Responded -> Closed, with complete history maintained.",
+    "test_type": "Positive / Lifecycle"
+  },
+  {
+    "test_id": "TC-BR-031",
+    "source_id": "IAA-BR-301",
+    "purpose": "Verify that an unsatisfactory response returns the observation from Responded to Open for another cycle rather than using an unsupported Reopened state.",
+    "preconditions": "An audit observation is in Responded state with submitted evidence evaluated as unsatisfactory by the Auditor.",
+    "action_or_input": "The Auditor rejects the response and requests further corrective action.",
+    "expected_result": "The observation transitions from Responded back to Open state for another cycle; no Reopened state is used.",
+    "test_type": "Positive / Lifecycle"
+  },
+  {
+    "test_id": "TC-BR-032",
+    "source_id": "IAA-BR-301",
+    "purpose": "Verify that deletion of audit observations or destruction of their audit history is strictly prohibited.",
+    "preconditions": "An audit observation exists in Open, Responded, or Closed state.",
+    "action_or_input": "Any user or administrator attempts to delete the audit observation record or purge its history.",
+    "expected_result": "Deletion is blocked and the audit observation and its entire history remain preserved immutably.",
+    "test_type": "Negative / Security"
+  },
+  {
+    "test_id": "TC-BR-033",
+    "source_id": "IAA-BR-302",
+    "purpose": "Verify that an audit observation can only be closed by an Auditor after satisfactory verification of response, corrective action, and supporting evidence.",
+    "preconditions": "An audit observation is in Responded state with complete corrective action and supporting evidence submitted.",
+    "action_or_input": "The Auditor verifies that the corrective action and evidence satisfy all audit requirements and submits closure.",
+    "expected_result": "The observation is successfully verified and transitioned to Closed status.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-034",
+    "source_id": "IAA-BR-302",
+    "purpose": "Verify that audit observation closure is blocked when attempted by a non-Auditor role or without satisfactory verification.",
+    "preconditions": "An audit observation is in Responded state.",
+    "action_or_input": "A non-Auditor user (such as Basic User or Finance Staff) attempts to close the observation, or an Auditor attempts closure while evidence is incomplete/unsatisfactory.",
+    "expected_result": "Closure is blocked, unauthorized role error or verification failure is returned, and status does not become Closed.",
+    "test_type": "Negative / Authorization"
+  },
+  {
+    "test_id": "TC-BR-035",
+    "source_id": "IAA-BR-401",
+    "purpose": "Verify that a pending authority approval exceeding the configured duration threshold is automatically escalated to the next eligible configured authority.",
+    "preconditions": "An approval item has been pending with an assigned HoD for a duration (current_time - assigned_time) strictly greater than the configured timeout limit T.",
+    "action_or_input": "Timeout evaluation service runs (IAA-UC-203 event trigger).",
+    "expected_result": "The item status is set to Escalated, it is routed to the next eligible configured authority (e.g., Dean), the transition is logged in the audit trail, and relevant actors are notified.",
+    "test_type": "Positive / Boundary"
+  },
+  {
+    "test_id": "TC-BR-036",
+    "source_id": "IAA-BR-401",
+    "purpose": "Verify that a pending authority approval does not escalate when the pending duration is less than or equal to the configured timeout limit.",
+    "preconditions": "An approval item has been pending with an assigned authority for a duration (current_time - assigned_time) <= configured timeout limit T.",
+    "action_or_input": "Timeout evaluation service checks the pending approval item.",
+    "expected_result": "The approval item remains in Pending status with the current assigned authority and is not escalated.",
+    "test_type": "Positive / Boundary"
+  },
+  {
+    "test_id": "TC-BR-037",
+    "source_id": "IAA-BR-401",
+    "purpose": "Verify that approval timeout escalation does not trigger on records pending Finance verification or anomaly review under baseline configuration.",
+    "preconditions": "A request is in Finance verification or Anomaly Review state, and has been in that state for longer than the authority approval timeout duration T.",
+    "action_or_input": "Timeout escalation evaluation executes.",
+    "expected_result": "Escalation is not triggered on the record; approval timeout escalation applies strictly to pending authority approvals.",
+    "test_type": "Negative / Functional"
+  },
+  {
+    "test_id": "TC-BR-038",
+    "source_id": "IAA-BR-501",
+    "purpose": "Verify that an authorized user can access functions, records, and reports within their active role permissions and ownership/assignment scope.",
+    "preconditions": "A Basic User is logged in with active role 'Basic User'.",
+    "action_or_input": "The Basic User navigates to view their own submitted expense requests and TA claims.",
+    "expected_result": "Access is granted, and the user views status and details of records within their ownership scope.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-039",
+    "source_id": "IAA-BR-501",
+    "purpose": "Verify that a user is denied access when attempting to invoke functions or view financial records outside their active role permissions or ownership/assignment scope.",
+    "preconditions": "A Basic User is logged in with active role 'Basic User'.",
+    "action_or_input": "The Basic User attempts to view financial requests of other departments or invoke Finance validation functions.",
+    "expected_result": "Access is denied and unauthorized operation error is returned.",
+    "test_type": "Negative / Security"
+  },
+  {
+    "test_id": "TC-BR-040",
+    "source_id": "IAA-BR-502",
+    "purpose": "Verify that changing a user role assignment does not alter historical action records or the identity and role recorded on previously completed actions.",
+    "preconditions": "User U approved Request R while holding the active role of HoD, and the action was recorded with User U as HoD. Subsequently, System Admin revokes User U's HoD role or reassigns User U to Basic User.",
+    "action_or_input": "An auditor inspects the historical action log and decision records for Request R.",
+    "expected_result": "The historical record on Request R remains unchanged, retaining User U and active role 'HoD' with original timestamp.",
+    "test_type": "Positive / Integrity"
+  },
+  {
+    "test_id": "TC-BR-041",
+    "source_id": "IAA-BR-503",
+    "purpose": "Verify that every state-changing operational action appends an immutable audit log entry capturing user identity, active role, timestamp, action, and resulting status.",
+    "preconditions": "A financial request is submitted, validated, approved, or escalated.",
+    "action_or_input": "An actor performs a state-changing operational action (e.g., approval decision submission or escalation).",
+    "expected_result": "An immutable audit trail entry is appended containing the actor's user identity, active role, timestamp, action name, and resulting record status.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-042",
+    "source_id": "IAA-BR-503",
+    "purpose": "Verify that configuration actions performed by System Admin append an immutable audit log entry with admin identity, active role, timestamp, and action details.",
+    "preconditions": "System Admin updates an approval hierarchy rule or policy parameter.",
+    "action_or_input": "System Admin submits the configuration change.",
+    "expected_result": "An immutable audit log entry is created recording the admin user identity, active role 'System Admin', timestamp, and configuration action details.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-043",
+    "source_id": "IAA-BR-504",
+    "purpose": "Verify that notifications are generated for configured submission, status changes, approval, rejection, escalation, anomaly, and audit observation events.",
+    "preconditions": "A lifecycle event occurs (such as request submission, approval decision, escalation, anomaly flagging, or audit observation creation).",
+    "action_or_input": "The event completes successfully in the system.",
+    "expected_result": "A Fusion dashboard notification is generated and delivered to the relevant recipient actor(s) based on role, ownership, and assignment scope.",
+    "test_type": "Positive / Functional"
+  },
+  {
+    "test_id": "TC-BR-044",
+    "source_id": "IAA-BR-504",
+    "purpose": "Verify that notifications are restricted by role, ownership, and assignment scope so that unauthorized actors do not receive confidential notifications.",
+    "preconditions": "A financial anomaly or approval escalation occurs on a departmental record.",
+    "action_or_input": "The system dispatches notifications for the event.",
+    "expected_result": "Notifications are sent only to authorized actors according to RBAC and assignment scope; unrelated users cannot access or view the notification.",
+    "test_type": "Negative / Security"
+  }
+]
