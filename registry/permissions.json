@@ -1,5 +1,199 @@
 {
   "modules": {
+    "complaints": {
+      "grants": {
+        "admin": [
+          "complaints.announcement.publish",
+          "complaints.complaint.assign",
+          "complaints.complaint.close",
+          "complaints.complaint.create",
+          "complaints.complaint.escalate",
+          "complaints.complaint.feedback",
+          "complaints.complaint.reopen",
+          "complaints.complaint.report",
+          "complaints.complaint.resolve",
+          "complaints.complaint.supervise",
+          "complaints.complaint.update",
+          "complaints.complaint.view",
+          "complaints.complaint.view_self",
+          "complaints.role.manage"
+        ],
+        "complaint_handler": [
+          "complaints.announcement.publish",
+          "complaints.complaint.assign",
+          "complaints.complaint.close",
+          "complaints.complaint.create",
+          "complaints.complaint.escalate",
+          "complaints.complaint.feedback",
+          "complaints.complaint.reopen",
+          "complaints.complaint.report",
+          "complaints.complaint.resolve",
+          "complaints.complaint.update",
+          "complaints.complaint.view",
+          "complaints.complaint.view_self"
+        ],
+        "complaint_supervisor": [
+          "complaints.announcement.publish",
+          "complaints.complaint.close",
+          "complaints.complaint.create",
+          "complaints.complaint.feedback",
+          "complaints.complaint.reopen",
+          "complaints.complaint.report",
+          "complaints.complaint.supervise",
+          "complaints.complaint.view",
+          "complaints.complaint.view_self"
+        ],
+        "faculty": [
+          "complaints.complaint.close",
+          "complaints.complaint.create",
+          "complaints.complaint.feedback",
+          "complaints.complaint.reopen",
+          "complaints.complaint.view_self"
+        ],
+        "staff": [
+          "complaints.complaint.close",
+          "complaints.complaint.create",
+          "complaints.complaint.feedback",
+          "complaints.complaint.reopen",
+          "complaints.complaint.view_self"
+        ],
+        "student": [
+          "complaints.complaint.close",
+          "complaints.complaint.create",
+          "complaints.complaint.feedback",
+          "complaints.complaint.reopen",
+          "complaints.complaint.view_self"
+        ]
+      },
+      "module_grants": [
+        "admin",
+        "complaint_handler",
+        "complaint_supervisor",
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/complaints",
+        "icon": "FaClipboardList",
+        "items": [
+          {
+            "code": "complaints.mine",
+            "icon": "FaUserCheck",
+            "label": "My Complaints",
+            "required_permission": "complaints.complaint.view_self",
+            "sort_order": 10,
+            "to": "/complaints/mine"
+          },
+          {
+            "code": "complaints.queue",
+            "icon": "FaClipboardList",
+            "label": "Complaint Queue",
+            "required_permission": "complaints.complaint.assign",
+            "sort_order": 20,
+            "to": "/complaints/queue"
+          },
+          {
+            "code": "complaints.supervisor",
+            "icon": "FaClipboardCheck",
+            "label": "Supervisor Oversight",
+            "required_permission": "complaints.complaint.supervise",
+            "sort_order": 30,
+            "to": "/complaints/supervisor"
+          },
+          {
+            "code": "complaints.announcements",
+            "icon": "FaBullhorn",
+            "label": "Announcements",
+            "required_permission": "complaints.complaint.view_self",
+            "sort_order": 40,
+            "to": "/complaints/announcements"
+          },
+          {
+            "code": "complaints.reports",
+            "icon": "FaChartBar",
+            "label": "Reports & Analytics",
+            "required_permission": "complaints.complaint.report",
+            "sort_order": 50,
+            "to": "/complaints/reports"
+          },
+          {
+            "code": "complaints.roles",
+            "icon": "FaUsers",
+            "label": "Role Assignment",
+            "required_permission": "complaints.role.manage",
+            "sort_order": 60,
+            "to": "/complaints/roles"
+          }
+        ],
+        "label": "Complaints",
+        "nav_section": "Services",
+        "sort_order": 35,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "complaints.complaint.view_self",
+          "label": "View own complaints"
+        },
+        {
+          "code": "complaints.complaint.create",
+          "label": "Submit a complaint"
+        },
+        {
+          "code": "complaints.complaint.view",
+          "label": "View complaints within scope"
+        },
+        {
+          "code": "complaints.complaint.assign",
+          "label": "Assign complaint category, priority, and worker"
+        },
+        {
+          "code": "complaints.complaint.update",
+          "label": "Update complaint progress and resolution"
+        },
+        {
+          "code": "complaints.complaint.resolve",
+          "label": "Resolve or reject complaint"
+        },
+        {
+          "code": "complaints.complaint.close",
+          "label": "Verify resolution and close complaint"
+        },
+        {
+          "code": "complaints.complaint.reopen",
+          "label": "Request or review complaint reopening"
+        },
+        {
+          "code": "complaints.complaint.feedback",
+          "label": "Submit or review feedback"
+        },
+        {
+          "code": "complaints.complaint.escalate",
+          "label": "Manually escalate complaint"
+        },
+        {
+          "code": "complaints.complaint.supervise",
+          "label": "Supervise escalated complaints and reopenings"
+        },
+        {
+          "code": "complaints.announcement.publish",
+          "label": "Publish complaint-related announcements"
+        },
+        {
+          "code": "complaints.complaint.report",
+          "label": "Generate operational or summary reports"
+        },
+        {
+          "code": "complaints.role.manage",
+          "label": "Assign and reassign CMS Handler and Supervisor roles"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "complaints.complaint.auto_escalate"
+      ]
+    },
     "directory": {
       "grants": {
         "Dean Academic": [

@@ -46,6 +46,555 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ok'
           description: ''
+  /api/v1/complaints/:
+    get:
+      operationId: v1_complaints_list
+      summary: List visible complaints
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComplaintList'
+          description: ''
+    post:
+      operationId: v1_complaints_create
+      summary: Submit a complaint
+      tags:
+      - v1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmitComplaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmitComplaint'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitComplaint'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/{id}/:
+    get:
+      operationId: v1_complaints_retrieve
+      summary: Get complaint details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/{id}/assign/:
+    post:
+      operationId: v1_complaints_assign_create
+      summary: Assign worker and update category/priority
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignComplaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssignComplaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssignComplaint'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/{id}/detail/:
+    get:
+      operationId: v1_complaints_detail_retrieve
+      summary: Get complaint details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/{id}/escalate/:
+    post:
+      operationId: v1_complaints_escalate_create
+      summary: Manually escalate complaint
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManualEscalate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ManualEscalate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ManualEscalate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/{id}/feedback/:
+    post:
+      operationId: v1_complaints_feedback_create
+      summary: Submit satisfaction feedback
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitFeedback'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmitFeedback'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmitFeedback'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintFeedback'
+          description: ''
+  /api/v1/complaints/{id}/progress/:
+    post:
+      operationId: v1_complaints_progress_create
+      summary: Update complaint progress
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProgressUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProgressUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProgressUpdate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/{id}/reject/:
+    post:
+      operationId: v1_complaints_reject_create
+      summary: Reject complaint with mandatory reason
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectComplaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RejectComplaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RejectComplaint'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/{id}/reopen-request/:
+    post:
+      operationId: v1_complaints_reopen_request_create
+      summary: Request reopening for closed complaint
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReopeningRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReopeningRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReopeningRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/{id}/reopen-review/:
+    post:
+      operationId: v1_complaints_reopen_review_create
+      summary: Review reopening request (approve or deny)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReopeningReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReopeningReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReopeningReview'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/{id}/resolve/:
+    post:
+      operationId: v1_complaints_resolve_create
+      summary: Resolve complaint
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveComplaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResolveComplaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResolveComplaint'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/{id}/verify-close/:
+    post:
+      operationId: v1_complaints_verify_close_create
+      summary: Verify and close resolved complaint
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyClose'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyClose'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyClose'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintDetail'
+          description: ''
+  /api/v1/complaints/announcements/:
+    get:
+      operationId: v1_complaints_announcements_list
+      summary: List active announcements
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComplaintAnnouncement'
+          description: ''
+    post:
+      operationId: v1_complaints_announcements_create
+      summary: Publish announcement
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplaintAnnouncement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ComplaintAnnouncement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ComplaintAnnouncement'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintAnnouncement'
+          description: ''
+  /api/v1/complaints/categories/:
+    get:
+      operationId: v1_complaints_categories_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedComplaintCategoryList'
+          description: ''
+    post:
+      operationId: v1_complaints_categories_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplaintCategory'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ComplaintCategory'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ComplaintCategory'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintCategory'
+          description: ''
+  /api/v1/complaints/reports/summary/:
+    get:
+      operationId: v1_complaints_reports_summary_retrieve
+      summary: Get CMS operational summary reports
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/complaints/roles/:
+    get:
+      operationId: v1_complaints_roles_retrieve
+      summary: Get active CMS handler and supervisor role holders
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    post:
+      operationId: v1_complaints_roles_create
+      summary: Assign CMS role
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CmsRoleAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CmsRoleAssignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CmsRoleAssignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CmsRoleAssignment'
+          description: ''
+  /api/v1/complaints/sla-check/:
+    post:
+      operationId: v1_complaints_sla_check_create
+      description: Trigger SLA check and reminders.
+      summary: Trigger autonomous SLA breach checks and reminders
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlaCheckResult'
+          description: ''
   /api/v1/directory/users:
     get:
       operationId: v1_directory_users_retrieve
@@ -1981,6 +2530,21 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    AssignComplaint:
+      type: object
+      properties:
+        worker_id:
+          type: integer
+          nullable: true
+        worker_name:
+          type: string
+          maxLength: 120
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        category_id:
+          type: integer
+        remarks:
+          type: string
     AudienceEnum:
       enum:
       - students
@@ -2100,6 +2664,45 @@ components:
       - blocking
       - cleared
       - message
+      - user_id
+    CmsRoleAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        role_type:
+          $ref: '#/components/schemas/RoleTypeEnum'
+        role_type_label:
+          type: string
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        assigned_by_user_id:
+          type: integer
+          readOnly: true
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by_user_id
+      - created_at
+      - end_date
+      - id
+      - role_type
+      - role_type_label
+      - start_date
       - user_id
     Company:
       type: object
@@ -2262,6 +2865,377 @@ components:
         * `prospect` - Prospect
         * `active` - Active
         * `blacklisted` - Blacklisted
+    ComplaintAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        content:
+          type: string
+        category_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        category_name:
+          type: string
+          readOnly: true
+        author_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        author_name:
+          type: string
+          maxLength: 120
+        is_active:
+          type: boolean
+        pinned:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_user_id
+      - category_id
+      - category_name
+      - content
+      - created_at
+      - id
+      - title
+    ComplaintAttachment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        file_name:
+          type: string
+          readOnly: true
+        file_size:
+          type: integer
+          readOnly: true
+        uploaded_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - file
+      - file_name
+      - file_size
+      - id
+      - uploaded_by_user_id
+    ComplaintCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 80
+        description:
+          type: string
+        default_sla_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_active:
+          type: boolean
+      required:
+      - id
+      - name
+    ComplaintDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        complaint_id:
+          type: string
+          readOnly: true
+        complainant_user_id:
+          type: integer
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/ComplaintCategory'
+          readOnly: true
+        location:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ComplaintStatusEnum'
+          readOnly: true
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          readOnly: true
+        assigned_worker_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        assigned_worker_name:
+          type: string
+          readOnly: true
+        resolution_details:
+          type: string
+          readOnly: true
+        rejection_reason:
+          type: string
+          readOnly: true
+        verification_required:
+          allOf:
+          - $ref: '#/components/schemas/VerificationRequiredEnum'
+          readOnly: true
+        is_escalated:
+          type: boolean
+          readOnly: true
+        escalation_type:
+          allOf:
+          - $ref: '#/components/schemas/EscalationTypeEnum'
+          readOnly: true
+        escalated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        escalation_remarks:
+          type: string
+          readOnly: true
+        resolved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        closed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        rejected_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        reopening_status:
+          allOf:
+          - $ref: '#/components/schemas/ReopeningStatusEnum'
+          readOnly: true
+        reopening_reason:
+          type: string
+          readOnly: true
+        reopening_review_remarks:
+          type: string
+          readOnly: true
+        sla_deadline:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        sla_reminder_sent:
+          type: boolean
+          readOnly: true
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplaintAttachment'
+          readOnly: true
+        transitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplaintTransition'
+          readOnly: true
+        feedback:
+          allOf:
+          - $ref: '#/components/schemas/ComplaintFeedback'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_worker_id
+      - assigned_worker_name
+      - attachments
+      - category
+      - closed_at
+      - complainant_user_id
+      - complaint_id
+      - created_at
+      - description
+      - escalated_at
+      - escalation_remarks
+      - escalation_type
+      - feedback
+      - id
+      - is_escalated
+      - location
+      - priority
+      - rejected_at
+      - rejection_reason
+      - reopening_reason
+      - reopening_review_remarks
+      - reopening_status
+      - resolution_details
+      - resolved_at
+      - sla_deadline
+      - sla_reminder_sent
+      - status
+      - transitions
+      - updated_at
+      - verification_required
+    ComplaintFeedback:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        rating:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        comments:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - rating
+    ComplaintList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        complaint_id:
+          type: string
+          maxLength: 32
+        complainant_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        category_id:
+          type: integer
+          readOnly: true
+        category_name:
+          type: string
+          readOnly: true
+        location:
+          type: string
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 4000
+        status:
+          $ref: '#/components/schemas/ComplaintStatusEnum'
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        assigned_worker_name:
+          type: string
+          maxLength: 120
+        is_escalated:
+          type: boolean
+        verification_required:
+          $ref: '#/components/schemas/VerificationRequiredEnum'
+        reopening_status:
+          $ref: '#/components/schemas/ReopeningStatusEnum'
+        sla_deadline:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        closed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - category_id
+      - category_name
+      - complainant_user_id
+      - complaint_id
+      - created_at
+      - description
+      - id
+      - location
+    ComplaintStatusEnum:
+      enum:
+      - submitted
+      - in_progress
+      - resolved
+      - rejected
+      - closed
+      type: string
+      description: |-
+        * `submitted` - submitted
+        * `in_progress` - in_progress
+        * `resolved` - resolved
+        * `rejected` - rejected
+        * `closed` - closed
+    ComplaintTransition:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        from_status:
+          type: string
+          readOnly: true
+        to_status:
+          type: string
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        actor_role:
+          type: string
+          readOnly: true
+        remarks:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_role
+      - actor_user_id
+      - created_at
+      - from_status
+      - id
+      - remarks
+      - to_status
     ConductIncident:
       type: object
       properties:
@@ -2407,6 +3381,16 @@ components:
       - season_decision
       - semester
       - standing
+    EscalationTypeEnum:
+      enum:
+      - none
+      - manual
+      - automatic_sla
+      type: string
+      description: |-
+        * `none` - none
+        * `manual` - manual
+        * `automatic_sla` - automatic_sla
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2663,6 +3647,13 @@ components:
       required:
       - password
       - username
+    ManualEscalate:
+      type: object
+      properties:
+        remarks:
+          type: string
+      required:
+      - remarks
     ModeEnum:
       enum:
       - online
@@ -2943,6 +3934,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedComplaintCategoryList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplaintCategory'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -3145,6 +4155,16 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PriorityEnum:
+      enum:
+      - low
+      - medium
+      - high
+      type: string
+      description: |-
+        * `low` - low
+        * `medium` - medium
+        * `high` - high
     ProfileDocument:
       type: object
       description: |-
@@ -3201,6 +4221,13 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    ProgressUpdate:
+      type: object
+      properties:
+        progress_notes:
+          type: string
+      required:
+      - progress_notes
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4493,56 @@ components:
       - message
       - reason
       - route
+    RejectComplaint:
+      type: object
+      properties:
+        rejection_reason:
+          type: string
+      required:
+      - rejection_reason
+    ReopeningRequest:
+      type: object
+      properties:
+        reopening_reason:
+          type: string
+      required:
+      - reopening_reason
+    ReopeningReview:
+      type: object
+      properties:
+        approved:
+          type: boolean
+        review_remarks:
+          type: string
+      required:
+      - approved
+    ReopeningStatusEnum:
+      enum:
+      - none
+      - pending
+      - approved
+      - denied
+      type: string
+      description: |-
+        * `none` - none
+        * `pending` - pending
+        * `approved` - approved
+        * `denied` - denied
+    ResolveComplaint:
+      type: object
+      properties:
+        resolution_details:
+          type: string
+      required:
+      - resolution_details
+    RoleTypeEnum:
+      enum:
+      - handler
+      - supervisor
+      type: string
+      description: |-
+        * `handler` - Complaint Handler
+        * `supervisor` - Complaint Supervisor
     RoundOutcome:
       type: object
       properties:
@@ -3655,6 +4732,16 @@ components:
       - id
       - kind
       - username
+    SlaCheckResult:
+      type: object
+      properties:
+        escalated_count:
+          type: integer
+        reminders_sent:
+          type: integer
+      required:
+      - escalated_count
+      - reminders_sent
     SourceEnum:
       enum:
       - campus
@@ -3691,6 +4778,40 @@ components:
       required:
       - available
       - season
+    SubmitComplaint:
+      type: object
+      properties:
+        category_id:
+          type: integer
+        location:
+          type: string
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 4000
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          default: medium
+        verification_required:
+          allOf:
+          - $ref: '#/components/schemas/VerificationRequiredEnum'
+          default: none
+      required:
+      - category_id
+      - description
+      - location
+    SubmitFeedback:
+      type: object
+      properties:
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+        comments:
+          type: string
+      required:
+      - rating
     SubmitOfferLetter:
       type: object
       properties:
@@ -3814,6 +4935,21 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VerificationRequiredEnum:
+      enum:
+      - none
+      - user
+      - supervisor
+      type: string
+      description: |-
+        * `none` - none
+        * `user` - user
+        * `supervisor` - supervisor
+    VerifyClose:
+      type: object
+      properties:
+        remarks:
+          type: string
     WaiveIncident:
       type: object
       properties:
