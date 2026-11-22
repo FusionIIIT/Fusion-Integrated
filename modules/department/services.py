@@ -23,14 +23,14 @@ def _department(actor, permission, roles):
         raise PermissionDeniedError()
     department = department_for(actor, live_identity(actor))
     if not department:
-        raise PermissionDeniedError("No verified department membership.")
+        raise PermissionDeniedError("Contact your department office to verify your membership.")
     return department
 
 
 def _next_state(transitions, current, action):
     state = transitions.get((current, action))
     if state is None:
-        raise ConflictError("The record is not in a state that permits this action.")
+        raise ConflictError("Refresh the record and choose an action allowed in its current state.")
     return state
 
 
@@ -91,7 +91,7 @@ def request_stock(*, actor, item_id, quantity):
     if item is None:
         raise NotFoundError()
     if quantity > item.quantity:
-        raise ConflictError("The requested quantity exceeds the current inventory.")
+        raise ConflictError("Request a quantity no greater than the current inventory.")
     request = StockRequest.objects.create(item=item, user_id=actor.user_id, quantity=quantity)
     Notice.objects.bulk_create([
         Notice(department=department, audience="admin", message="A stock request was submitted."),

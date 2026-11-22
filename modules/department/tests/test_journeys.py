@@ -37,7 +37,7 @@ def post(client, path, data):
 
 
 def test_announcement_publish_notice_and_hod_hide(role_client):
-    """UC-DEPT-002/003; BR-DEPT-001/003/004; AFR-DEPT-046."""
+    """UC-DEPT-002, UC-DEPT-003; BR-DEPT-001, BR-DEPT-003, BR-DEPT-004; AFR-DEPT-046."""
     faculty = role_client("faculty")
     publication = {"content": "Department seminar", "target_roles": ["student"],
                    "target_programmes": [], "target_batch_years": []}
@@ -55,7 +55,7 @@ def test_announcement_publish_notice_and_hod_hide(role_client):
 
 
 def test_stock_approval_issue_and_rejection(role_client):
-    """UC-DEPT-004/005/006/019; BW-DEPT-01/02; AFR-DEPT-009-016 and 041-043."""
+    """UC-DEPT-004, UC-DEPT-005, UC-DEPT-006, UC-DEPT-019; BW-DEPT-01, BW-DEPT-02; AFR-DEPT-009-016 and 041-043."""
     admin = role_client("deptadmin_cse", kind="staff")
     item = post(admin, "inventory", {"name": "Cable", "quantity": 4})
     assert item.status_code == 201
@@ -66,6 +66,8 @@ def test_stock_approval_issue_and_rejection(role_client):
     assert accepted.status_code == rejected.status_code == 201
     assert StockItem.objects.get(pk=item_id).quantity == 4
     approved_id, rejected_id = accepted.json()["id"], rejected.json()["id"]
+    assert Notice.objects.filter(audience="admin", department="CSE").count() == 2
+    assert Notice.objects.filter(audience="hod", department="CSE").count() == 2
 
     hod = role_client("HOD (CSE)", user_id=12)
     assert post(hod, f"stock-requests/{approved_id}/action", {"action": "approve"}).status_code == 200
@@ -90,7 +92,7 @@ def test_stock_audit_cannot_be_updated(role_client):
 
 
 def test_feedback_is_reviewed_before_hod_disposition(role_client):
-    """UC-DEPT-007/008/014; BR-DEPT-017/018; BW-DEPT-04."""
+    """UC-DEPT-007, UC-DEPT-008, UC-DEPT-014; BR-DEPT-017, BR-DEPT-018; BW-DEPT-04."""
     student = role_client("student", user_id=20, kind="student")
     submission = post(student, "feedback", {"content": "Add a ramp to the laboratory"})
     assert submission.status_code == 201
@@ -110,7 +112,7 @@ def test_feedback_is_reviewed_before_hod_disposition(role_client):
 
 
 def test_timetable_batches_are_atomic_and_student_reads_match_cohort(role_client):
-    """UC-DEPT-009/018; BR-DEPT-010; AFR-DEPT-029-031/036/037."""
+    """UC-DEPT-009, UC-DEPT-018; BR-DEPT-010; AFR-DEPT-029-031/036/037."""
     admin = role_client("deptadmin_cse", kind="staff")
     slot = {"title": "Programming", "kind": "class", "term": "2026 autumn", "day": 0,
             "starts_at": "10:00", "ends_at": "11:00", "room": "R1", "instructor_id": 11,
@@ -132,7 +134,7 @@ def test_timetable_batches_are_atomic_and_student_reads_match_cohort(role_client
 
 
 def test_faculty_lab_resources_use_department_scope(role_client):
-    """UC-DEPT-011/017; BR-DEPT-012; AFR-DEPT-034/035."""
+    """UC-DEPT-011, UC-DEPT-017; BR-DEPT-012; AFR-DEPT-034/035."""
     admin = role_client("deptadmin_cse", kind="staff")
     assert post(admin, "labs", {"name": "Networks", "details": "Ten workstations"}).status_code == 200
     assert post(admin, "labs", {"name": "Networks", "details": "Twelve workstations"}).status_code == 200
@@ -143,7 +145,7 @@ def test_faculty_lab_resources_use_department_scope(role_client):
 
 
 def test_department_general_save_and_official_decision(role_client):
-    """UC-DEPT-010/012; BR-DEPT-011/013; BW-DEPT-05/06; AFR-DEPT-038-040."""
+    """UC-DEPT-010, UC-DEPT-012; BR-DEPT-011, BR-DEPT-013; BW-DEPT-05, BW-DEPT-06; AFR-DEPT-038-040."""
     admin = role_client("deptadmin_cse", kind="staff")
     assert post(admin, "details", {"general_information": "Office hours 9 to 5"}).status_code == 200
     accepted = post(admin, "proposals", {"field": "official_name", "value": "Computer Science"})
@@ -162,7 +164,7 @@ def test_department_general_save_and_official_decision(role_client):
 
 
 def test_stock_shortage_after_approval_preserves_existing_movements(role_client):
-    """BR-DEPT-007/015/016 and the approved concurrent-shortage interpretation."""
+    """BR-DEPT-007, BR-DEPT-015, BR-DEPT-016 and the approved concurrent-shortage interpretation."""
     admin = role_client("deptadmin_cse", kind="staff")
     item = post(admin, "inventory", {"name": "Scope probe", "quantity": 4}).json()["id"]
     assert post(admin, "inventory", {"name": "Scope probe", "quantity": 1}).json()["quantity"] == 5
@@ -187,7 +189,7 @@ def test_stock_shortage_after_approval_preserves_existing_movements(role_client)
 
 
 def test_announcement_edit_and_delete_are_department_hod_actions(role_client):
-    """UC-DEPT-003; BR-DEPT-003/004; AFR-DEPT-004/006."""
+    """UC-DEPT-003; BR-DEPT-003, BR-DEPT-004; AFR-DEPT-004/006."""
     author = role_client("faculty")
     payload = {"content": "Notice", "target_roles": [],
                "target_programmes": [], "target_batch_years": []}
@@ -229,3 +231,55 @@ def test_department_declines_write_when_faculty_department_is_unknown(role_clien
     assert faculty.get(f"{BASE}/notices").json()["results"] == []
     assert post(faculty, "feedback", {"content": "Unknown department"}).status_code == 403
     assert not Feedback.objects.exists()
+
+
+@pytest.mark.parametrize("invalid", [
+    {"content": ""}, {"content": " "}, {"target_roles": ["unrecognized"]},
+    {"target_batch_years": [1800]},
+])
+def test_invalid_announcement_never_publishes_or_notifies(role_client, invalid):
+    """BR-DEPT-003; UC-DEPT-002: missing or invalid targets/content are refused."""
+    faculty = role_client("faculty")
+    payload = {"content": "Seminar", "target_roles": [], "target_programmes": [],
+               "target_batch_years": [], **invalid}
+    assert post(faculty, "announcements", payload).status_code == 400
+    assert not Announcement.objects.exists()
+    assert not Notice.objects.exists()
+
+
+def test_overlapping_timetable_edit_preserves_published_slot(role_client):
+    """UC-DEPT-009; BR-DEPT-010: an invalid edit cannot overwrite a valid slot."""
+    admin = role_client("deptadmin_cse", kind="staff")
+    slot = {"title": "Programming", "kind": "class", "term": "Autumn", "day": 0,
+            "starts_at": "10:00", "ends_at": "11:00", "room": "R1", "instructor_id": 11,
+            "programme": "BTech", "batch_year": 2024}
+    later = {**slot, "starts_at": "11:00", "ends_at": "12:00"}
+    ids = [row["id"] for row in post(admin, "timetable", {"slots": [slot, later]}).json()]
+    assert admin.put(f"{BASE}/timetable/{ids[1]}", slot, format="json").status_code == 409
+    assert TimetableSlot.objects.get(pk=ids[1]).starts_at.hour == 11
+    other = role_client("deptadmin_me", kind="staff", department="ME")
+    assert other.put(f"{BASE}/timetable/{ids[0]}", later, format="json").status_code == 404
+
+
+def test_feedback_content_never_enters_notices_and_other_departments_cannot_read(role_client):
+    """BR-DEPT-017; CW-DEPT-02: confidential content stays scoped."""
+    student = role_client("student", kind="student")
+    secret = "Private laboratory complaint"
+    assert post(student, "feedback", {"content": secret}).status_code == 201
+    assert all(secret not in notice.message for notice in Notice.objects.all())
+    other = role_client("deptadmin_me", kind="staff", department="ME")
+    assert other.get(f"{BASE}/feedback").json()["results"] == []
+
+
+def test_official_proposal_cannot_bypass_approval_or_repeat_decision(role_client):
+    """BR-DEPT-011, BR-DEPT-013; CW-DEPT-03: only an approved proposal publishes."""
+    admin = role_client("deptadmin_cse", kind="staff")
+    proposal = {"field": "core_policies", "value": "Access hours"}
+    pk = post(admin, "proposals", proposal).json()["id"]
+    assert post(admin, "proposals", proposal).status_code == 409
+    assert post(admin, f"proposals/{pk}/action", {"action": "approve"}).status_code == 403
+    assert admin.get(f"{BASE}/details").json()["core_policies"] == ""
+    hod = role_client("HOD (CSE)")
+    assert post(hod, f"proposals/{pk}/action", {"action": "reject"}).status_code == 200
+    assert post(hod, f"proposals/{pk}/action", {"action": "approve"}).status_code == 409
+    assert hod.get(f"{BASE}/details").json()["core_policies"] == ""

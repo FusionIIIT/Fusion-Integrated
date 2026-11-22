@@ -1,12 +1,13 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from fusion_auth.client import IamUnavailable
 from fusion_auth.permissions import HasModuleGrant
+from modules.department.permissions import VIEW_ANNOUNCEMENT
 from modules.department.registry import ROLE_GRANTS
 from modules.department.roles import acting_role
 
@@ -35,6 +36,12 @@ class ActiveDepartmentPermission(BasePermission):
 class DepartmentAccess:
     read_permission = ""
     write_permission = ""
+    throttle_scope = "department_write"
+
+    def get_throttles(self):
+        if self.request.method in SAFE_METHODS:
+            return []
+        return super().get_throttles()
 
     def get_permissions(self):
         is_read = self.request.method in {"GET", "HEAD"}
@@ -52,8 +59,8 @@ class DepartmentAccessSerializer(serializers.Serializer):
     permissions = serializers.ListField(child=serializers.CharField())
 
 
-class DepartmentAccessView(APIView):
-    permission_classes = [HasModuleGrant("department")]
+class DepartmentAccessView(DepartmentAccess, APIView):
+    read_permission = VIEW_ANNOUNCEMENT
 
     @extend_schema(responses=DepartmentAccessSerializer)
     def get(self, request):

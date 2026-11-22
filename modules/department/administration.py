@@ -1,5 +1,4 @@
-from django.db import transaction
-from django.db.models import Q
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from core.api.exceptions import ConflictError, NotFoundError
@@ -13,6 +12,12 @@ from modules.department.models import (
 )
 from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS
 from modules.department.services import _department, _next_state
+
+TIMETABLE_OVERLAP_CONSTRAINTS = {
+    "dept_timetable_room_overlap",
+    "dept_timetable_instructor_overlap",
+    "dept_timetable_cohort_overlap",
+}
 
 
 @transaction.atomic
@@ -29,38 +34,46 @@ def _lock_department(department):
     return DepartmentDetails.objects.select_for_update().get(pk=row.pk)
 
 
-def _assert_slot_available(department, slot, current_id=None):
-    overlapping = TimetableSlot.objects.filter(
-        Q(room__iexact=slot["room"]) | Q(instructor_id=slot["instructor_id"])
-        | Q(programme=slot["programme"], batch_year=slot["batch_year"]),
-        department=department, term=slot["term"], day=slot["day"],
-        starts_at__lt=slot["ends_at"], ends_at__gt=slot["starts_at"],
-    ).exclude(pk=current_id)
-    if overlapping.exists():
-        raise ConflictError("This slot overlaps another slot for its room, instructor or cohort.")
+def _is_timetable_overlap(error):
+    diag = getattr(error.__cause__, "diag", None)
+    return getattr(diag, "constraint_name", None) in TIMETABLE_OVERLAP_CONSTRAINTS
 
 
-@transaction.atomic
 def upload_timetable(*, actor, slots):
     department = _department(actor, p.UPDATE_TIMETABLE, ADMIN_DEPARTMENTS)
-    _lock_department(department)
-    saved = []
-    for slot in slots:
-        _assert_slot_available(department, slot)
-        saved.append(TimetableSlot.objects.create(department=department, **slot))
-    return saved
+    try:
+        with transaction.atomic():
+            _lock_department(department)
+            return TimetableSlot.objects.bulk_create([
+                TimetableSlot(department=department, **slot) for slot in slots
+            ])
+    except IntegrityError as exc:
+        if not _is_timetable_overlap(exc):
+            raise
+        raise ConflictError(
+            "Choose times that do not overlap for the room, instructor or cohort.",
+        ) from exc
 
 
-@transaction.atomic
 def replace_timetable_slot(*, actor, slot_id, values):
     department = _department(actor, p.UPDATE_TIMETABLE, ADMIN_DEPARTMENTS)
-    _lock_department(department)
-    rows = TimetableSlot.objects.filter(pk=slot_id, department=department)
-    if not rows.exists():
-        raise NotFoundError()
-    _assert_slot_available(department, values, current_id=slot_id)
-    rows.update(**values)
-    return rows.get()
+    rows = TimetableSlot.objects.select_for_update().filter(pk=slot_id, department=department)
+    try:
+        with transaction.atomic():
+            _lock_department(department)
+            slot = rows.first()
+            if slot is None:
+                raise NotFoundError()
+            for field, value in values.items():
+                setattr(slot, field, value)
+            slot.save(update_fields=values.keys())
+            return slot
+    except IntegrityError as exc:
+        if not _is_timetable_overlap(exc):
+            raise
+        raise ConflictError(
+            "Choose times that do not overlap for the room, instructor or cohort.",
+        ) from exc
 
 
 @transaction.atomic
