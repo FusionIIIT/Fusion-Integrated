@@ -70,7 +70,7 @@ class PolicyInput(serializers.Serializer):
 class SectionInput(serializers.Serializer):
     kind = serializers.ChoiceField(choices=("MODULE", "WEEK"))
     label = serializers.CharField(max_length=200)
-    order = serializers.IntegerField(min_value=0, required=False)
+    order = serializers.IntegerField(min_value=0, max_value=2_147_483_647, required=False)
 
 
 class FileSerializer(serializers.ModelSerializer):
@@ -110,7 +110,7 @@ class MaterialInput(serializers.Serializer):
     url = serializers.CharField(max_length=2000, required=False, allow_blank=True)
     file = serializers.FileField(required=False)
     section_id = serializers.IntegerField(required=False, allow_null=True)
-    order = serializers.IntegerField(min_value=0, required=False)
+    order = serializers.IntegerField(min_value=0, max_value=2_147_483_647, required=False)
 
 
 class ReleaseInput(serializers.Serializer):

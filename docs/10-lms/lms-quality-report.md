@@ -1,5 +1,32 @@
 # LMS implementation quality report
 
+## Validation follow-up — 23 November 2026
+
+The original builder snapshot below describes commit
+`cdd8de9fb7caf83cb9f80f4cf9792cabc1874ca6`. The first independent review attempt
+on that revision was interrupted by the platform before returning a scorecard.
+It therefore produced no final verdict or nine-dimension scores.
+
+Three application input-validation failures reported during that attempt have now
+been corrected: section and material order inputs are bounded by the verified
+PostgreSQL PositiveIntegerField range, 0 through 2,147,483,647; values outside it
+return 400 before writes. Malformed link parsing now becomes a domain validation
+response, 422, rather than an unhandled exception. Rejected edits preserve stored
+values, and an invalid submission link consumes no successful submission attempt.
+
+Twelve new regression cases cover create/edit refusal, supported ordering
+boundaries, malformed material and submission links, and a later valid submission.
+Current verification: `make check` passes with 593 platform cases collected;
+168 LMS cases pass with 99.05% module branch coverage and 100% domain branch
+coverage; `make check-client` passes with 58 cases and a production build;
+`make e2e` passes all 17 browser cases. OpenAPI and the 103 source links were
+regenerated and checked. No dependency, registration, authorization policy or
+Student 2 specification-test file changed in this follow-up.
+
+Step 7 is still incomplete. Builder checks and corrected partial findings are not
+an independent approval or a replacement for an unedited completed scorecard.
+The remaining sections retain the original builder evidence as historical context.
+
 Record date: 22 November 2026. Scope: the Student 1 builder implementation on
 `module/lms`. Independent review has not yet occurred; no 10/10 scorecard is claimed.
 Student 2 specification-test folders were neither created nor edited.
@@ -316,7 +343,6 @@ assignment sweep: 0 0
 ## Independent review milestone
 
 No independent numbered review round has been completed. This is a builder record,
-not a review scorecard. A fresh reviewer must inspect the committed revision using
-the unedited upstream review prompt. Step 8 remains gated on the pushed revision
+not a review scorecard. Independent review of the latest revision remains pending. Step 8 remains gated on the pushed revision
 and its unedited nine-dimension 10/10 scorecard. No file in either Student 2
 specification-test folder is part of this builder change.

@@ -37,7 +37,10 @@ def payload(kind, text="", url="", has_file=False, *, material=False):
     if not valid:
         raise RuleViolation("Provide exactly the payload required by the content type.")
     if url:
-        parsed = urlsplit(url)
+        try:
+            parsed = urlsplit(url)
+        except ValueError as exc:
+            raise RuleViolation("Use a valid HTTP or HTTPS link.") from exc
         if parsed.scheme not in ("https", "http") or not parsed.hostname or parsed.username:
             raise RuleViolation("Use an HTTP or HTTPS link without embedded credentials.")
 
