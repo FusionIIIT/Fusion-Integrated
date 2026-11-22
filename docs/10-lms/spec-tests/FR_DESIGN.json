@@ -1,0 +1,317 @@
+[
+  {
+    "test_id": "FR-TEST-001",
+    "source_id": "AFR-LMS-001.1",
+    "purpose": "Verify authorized user can open dedicated course workspace",
+    "preconditions": "CourseWorkspace exists; User enrolled as Student",
+    "action_or_input": "Call get_course_workspace(course_id, user_id)",
+    "expected_result": "CourseWorkspace returned with correct course_code",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-002",
+    "source_id": "AFR-LMS-001.2",
+    "purpose": "Verify course home displays syllabus, schedule, instructors, and TAs",
+    "preconditions": "CourseWorkspace populated with syllabus, schedule, and instructor/TA memberships",
+    "action_or_input": "Retrieve workspace and related memberships for course",
+    "expected_result": "Syllabus, schedule, and memberships contain instructor and TA roles",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-003",
+    "source_id": "AFR-LMS-001.3",
+    "purpose": "Verify unenrolled user access restriction to course workspace",
+    "preconditions": "CourseWorkspace exists; User has no membership",
+    "action_or_input": "Call get_course_workspace for unenrolled user",
+    "expected_result": "Raises UnauthorizedCourseAccess / LmsDomainError",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-004",
+    "source_id": "AFR-LMS-002.1",
+    "purpose": "Verify Faculty can configure and update course details",
+    "preconditions": "User is assigned Faculty instructor for course",
+    "action_or_input": "Faculty updates syllabus and schedule fields",
+    "expected_result": "Workspace persists updated details",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-005",
+    "source_id": "AFR-LMS-002.2",
+    "purpose": "Verify Student cannot modify course workspace details",
+    "preconditions": "User is enrolled Student",
+    "action_or_input": "Student invokes API or service to update course details",
+    "expected_result": "Operation rejected / PermissionDenied",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-006",
+    "source_id": "AFR-LMS-003.1",
+    "purpose": "Verify Faculty can upload supported material types (file, link, note)",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "Faculty creates materials with material_type in [file, link, note]",
+    "expected_result": "CourseMaterial objects created successfully",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-007",
+    "source_id": "AFR-LMS-003.2",
+    "purpose": "Verify Faculty can organize materials into modules/sections",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "Faculty uploads material specifying section_or_week=Week 1",
+    "expected_result": "Material saved with section_or_week=Week 1",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-008",
+    "source_id": "AFR-LMS-003.3",
+    "purpose": "Verify Faculty can schedule future material release",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "Faculty uploads material with is_scheduled=True and future release date",
+    "expected_result": "CourseMaterial status is scheduled and scheduled_release_at is set",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-009",
+    "source_id": "AFR-LMS-003.4",
+    "purpose": "Verify scheduled material visibility rule when release date reached",
+    "preconditions": "CourseMaterial has status=scheduled and scheduled_release_at <= now",
+    "action_or_input": "Evaluate material visibility for student",
+    "expected_result": "Material is available / published",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-010",
+    "source_id": "AFR-LMS-004.1",
+    "purpose": "Verify Student read-only material access and unpublished material hidden",
+    "preconditions": "Course has published and draft materials; User is Student",
+    "action_or_input": "get_course_materials(course_id, user_role=student)",
+    "expected_result": "Only published materials returned; draft/scheduled hidden",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-011",
+    "source_id": "AFR-LMS-004.2",
+    "purpose": "Verify TA read-only material access",
+    "preconditions": "Published course material exists; User is TA",
+    "action_or_input": "get_course_materials(course_id, user_role=ta)",
+    "expected_result": "Published materials returned",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-012",
+    "source_id": "AFR-LMS-004.3",
+    "purpose": "Verify Observer read-only material access",
+    "preconditions": "Published course material exists; User is Observer",
+    "action_or_input": "get_course_materials(course_id, user_role=observer)",
+    "expected_result": "Published materials returned; write actions prohibited",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-013",
+    "source_id": "AFR-LMS-005.1",
+    "purpose": "Verify Faculty can post course announcement",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "post_course_announcement with title and content",
+    "expected_result": "Announcement created with is_ta_announcement=False",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-014",
+    "source_id": "AFR-LMS-005.2",
+    "purpose": "Verify permitted TA can post announcement",
+    "preconditions": "User is TA with can_post_announcements=True",
+    "action_or_input": "post_course_announcement with can_post_announcements=True",
+    "expected_result": "Announcement created with is_ta_announcement=True",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-015",
+    "source_id": "AFR-LMS-005.3",
+    "purpose": "Verify announcement timestamping and course-wide visibility",
+    "preconditions": "Announcement posted in course",
+    "action_or_input": "get_course_announcements(course_id)",
+    "expected_result": "Announcement returned with posted_at timestamp",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-016",
+    "source_id": "AFR-LMS-006.1",
+    "purpose": "Verify Faculty can create assignment in draft state",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "create_assignment with title, instructions, points, due_date",
+    "expected_result": "Assignment created with status=draft",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-017",
+    "source_id": "AFR-LMS-006.2",
+    "purpose": "Verify assignment configuration validation (negative points rejected)",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "create_assignment with points_possible <= 0",
+    "expected_result": "Raises AssignmentConfigurationError",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-018",
+    "source_id": "AFR-LMS-006.4",
+    "purpose": "Verify draft assignment remains hidden from students",
+    "preconditions": "Assignment has status=draft; User is Student",
+    "action_or_input": "get_course_assignments(course_id, user_role=student)",
+    "expected_result": "Draft assignment is omitted from query results",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-019",
+    "source_id": "AFR-LMS-007.1",
+    "purpose": "Verify Faculty can publish assignment immediately",
+    "preconditions": "Assignment has status=draft; User is Faculty",
+    "action_or_input": "publish_assignment(is_scheduled=False)",
+    "expected_result": "Assignment status becomes available and published_at is set",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-020",
+    "source_id": "AFR-LMS-007.2",
+    "purpose": "Verify scheduled assignment hidden from students before release date",
+    "preconditions": "Assignment status=scheduled with release_date in future",
+    "action_or_input": "get_course_assignments(course_id, user_role=student)",
+    "expected_result": "Scheduled assignment is omitted from available list",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-021",
+    "source_id": "AFR-LMS-007.4",
+    "purpose": "Verify Student can view available assignment",
+    "preconditions": "Assignment has status=available; User is Student",
+    "action_or_input": "get_course_assignments(course_id, user_role=student)",
+    "expected_result": "Available assignment is included in student list",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-022",
+    "source_id": "AFR-LMS-008.1",
+    "purpose": "Verify Student can submit assignment with matching submission type",
+    "preconditions": "Assignment is available with submission_type=text; User is enrolled Student",
+    "action_or_input": "submit_assignment with submission_type=text",
+    "expected_result": "StudentSubmission created with status=submitted",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-023",
+    "source_id": "AFR-LMS-008.2",
+    "purpose": "Verify submission type mismatch is rejected",
+    "preconditions": "Assignment configured for file submission; User submits text",
+    "action_or_input": "submit_assignment with submission_type=text on file assignment",
+    "expected_result": "Raises InvalidSubmissionType / LmsDomainError",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-024",
+    "source_id": "AFR-LMS-009.1",
+    "purpose": "Verify Student can view own submission history and status",
+    "preconditions": "StudentSubmission exists for Student 1",
+    "action_or_input": "get_submission_detail for Student 1",
+    "expected_result": "Submission returned with content and submitted_at",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-025",
+    "source_id": "AFR-LMS-010.1",
+    "purpose": "Verify Faculty can grade student submission with score and feedback",
+    "preconditions": "StudentSubmission exists; User is Faculty",
+    "action_or_input": "grade_submission with valid points and feedback",
+    "expected_result": "Grade created with status=draft and grader attribution",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-026",
+    "source_id": "AFR-LMS-010.2",
+    "purpose": "Verify TA can grade student submission with score and feedback",
+    "preconditions": "StudentSubmission exists; User is TA",
+    "action_or_input": "grade_submission with grader_role=ta",
+    "expected_result": "Grade created with graded_by_user_id set to TA user_id",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-027",
+    "source_id": "AFR-LMS-011.1",
+    "purpose": "Verify draft grade remains hidden from student until release",
+    "preconditions": "Grade exists with status=draft; User is evaluated Student",
+    "action_or_input": "get_student_course_grades for Student",
+    "expected_result": "Draft grade is omitted from student grades",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-028",
+    "source_id": "AFR-LMS-011.3",
+    "purpose": "Verify Faculty can release draft grades to students",
+    "preconditions": "Draft grades exist; User is Faculty",
+    "action_or_input": "release_assignment_grades by Faculty",
+    "expected_result": "Grades transition to released and released_at timestamp set",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-029",
+    "source_id": "AFR-LMS-012.1",
+    "purpose": "Verify Student can view released grade and feedback",
+    "preconditions": "Grade has status=released; User is evaluated Student",
+    "action_or_input": "get_student_course_grades for Student",
+    "expected_result": "Released grade and feedback present in student response",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-030",
+    "source_id": "AFR-LMS-013.1",
+    "purpose": "Verify post-release grade modification creates audit log",
+    "preconditions": "Grade is released; Faculty modifies score",
+    "action_or_input": "modify_released_grade with new points and reason",
+    "expected_result": "Grade updated and GradeChangeLog records old/new points, user, and reason",
+    "test_type": "functional-positive"
+  },
+  {
+    "test_id": "FR-TEST-031",
+    "source_id": "AFR-LMS-014.3",
+    "purpose": "Verify TA authoring restriction on assignments",
+    "preconditions": "User is TA",
+    "action_or_input": "create_assignment with user_role=ta",
+    "expected_result": "Raises TAAuthoringRestriction / LmsDomainError",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-032",
+    "source_id": "AFR-LMS-014.4",
+    "purpose": "Verify TA authoring restriction on course materials",
+    "preconditions": "User is TA",
+    "action_or_input": "upload_course_material with user_role=ta",
+    "expected_result": "Raises TAAuthoringRestriction / LmsDomainError",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-033",
+    "source_id": "AFR-LMS-015.2",
+    "purpose": "Verify Observer restriction from viewing student submissions",
+    "preconditions": "Student submissions exist; User is Observer",
+    "action_or_input": "get_assignment_submissions with user_role=observer",
+    "expected_result": "Raises ObserverAccessViolation",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-034",
+    "source_id": "AFR-LMS-015.4",
+    "purpose": "Verify Observer write restriction on grade evaluation",
+    "preconditions": "User is Observer",
+    "action_or_input": "grade_submission with grader_role=observer",
+    "expected_result": "Raises ObserverAccessViolation",
+    "test_type": "functional-negative"
+  },
+  {
+    "test_id": "FR-TEST-035",
+    "source_id": "AFR-LMS-001.3-DEFECT",
+    "purpose": "Verify unenrolled user submission rejection via API endpoint",
+    "preconditions": "Assignment is available; Requesting user has NO membership in course",
+    "action_or_input": "POST to /api/v1/lms/assignments/<id>/submissions/ from unenrolled user",
+    "expected_result": "HTTP 403 Forbidden or rejection due to lack of course membership",
+    "test_type": "functional-negative"
+  }
+]

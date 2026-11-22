@@ -1,0 +1,308 @@
+[
+  {
+    "test_id": "BR-TEST-001",
+    "source_id": "BR-LMS-001 permitted",
+    "purpose": "Enrolled member (Student/Faculty/TA/Observer) can access course workspace",
+    "preconditions": "CourseWorkspace exists; User has valid CourseMembership",
+    "action_or_input": "get_course_workspace(course_id, user_id)",
+    "expected_result": "CourseWorkspace instance returned",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-002",
+    "source_id": "BR-LMS-001 prohibited",
+    "purpose": "Unenrolled user without course membership is prohibited from accessing course",
+    "preconditions": "CourseWorkspace exists; User has no membership record",
+    "action_or_input": "get_course_workspace(course_id, user_id)",
+    "expected_result": "Raises UnauthorizedCourseAccess",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-003",
+    "source_id": "BR-LMS-002 permitted",
+    "purpose": "Active student registration grants course access",
+    "preconditions": "User has active CourseMembership with role=student",
+    "action_or_input": "Student queries course details and materials",
+    "expected_result": "Access granted for student view",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-004",
+    "source_id": "BR-LMS-003 permitted",
+    "purpose": "Observer can view syllabus and published course materials",
+    "preconditions": "Published course material exists; User is Observer",
+    "action_or_input": "Observer retrieves course materials",
+    "expected_result": "Published materials returned",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-005",
+    "source_id": "BR-LMS-003 prohibited",
+    "purpose": "Observer is prohibited from viewing student submissions, grades, or performing write actions",
+    "preconditions": "Submissions and grades exist; User is Observer",
+    "action_or_input": "Observer attempts get_assignment_submissions or grade_submission",
+    "expected_result": "Raises ObserverAccessViolation",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-006",
+    "source_id": "BR-LMS-004 permitted",
+    "purpose": "TA can view course content and student submissions for grading",
+    "preconditions": "Submissions exist; User is assigned TA",
+    "action_or_input": "TA views submissions and enters draft evaluation",
+    "expected_result": "Access granted and evaluation recorded",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-007",
+    "source_id": "BR-LMS-004 prohibited",
+    "purpose": "TA is prohibited from creating or deleting assignments and materials",
+    "preconditions": "User is assigned TA",
+    "action_or_input": "TA attempts create_assignment or upload_course_material",
+    "expected_result": "Raises TAAuthoringRestriction",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-008",
+    "source_id": "BR-LMS-005 permitted",
+    "purpose": "Published materials are visible to students and TAs",
+    "preconditions": "CourseMaterial with status=published exists",
+    "action_or_input": "validate_material_visibility(status=published, role=student)",
+    "expected_result": "Returns True (visible)",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-009",
+    "source_id": "BR-LMS-005 prohibited",
+    "purpose": "Draft materials are prohibited from student view",
+    "preconditions": "CourseMaterial with status=draft exists",
+    "action_or_input": "validate_material_visibility(status=draft, role=student)",
+    "expected_result": "Returns False (hidden)",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-010",
+    "source_id": "BR-LMS-006 threshold-le",
+    "purpose": "Material scheduled_release_at <= now is published/visible",
+    "preconditions": "CourseMaterial with status=scheduled and scheduled_release_at in past",
+    "action_or_input": "Evaluate material release status",
+    "expected_result": "Material is treated as available",
+    "test_type": "business-rule-threshold"
+  },
+  {
+    "test_id": "BR-TEST-011",
+    "source_id": "BR-LMS-006 threshold-gt",
+    "purpose": "Material scheduled_release_at > now remains scheduled/hidden from students",
+    "preconditions": "CourseMaterial with status=scheduled and scheduled_release_at in future",
+    "action_or_input": "Student queries course materials",
+    "expected_result": "Material is hidden / omitted",
+    "test_type": "business-rule-threshold"
+  },
+  {
+    "test_id": "BR-TEST-012",
+    "source_id": "BR-LMS-007 permitted-faculty",
+    "purpose": "Faculty is authorized to post course announcements",
+    "preconditions": "User is Faculty",
+    "action_or_input": "post_course_announcement by Faculty",
+    "expected_result": "Announcement created with is_ta_announcement=False",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-013",
+    "source_id": "BR-LMS-007 permitted-ta",
+    "purpose": "TA with can_post_announcements=True is authorized to post announcements",
+    "preconditions": "User is TA with can_post_announcements=True",
+    "action_or_input": "post_course_announcement with can_post_announcements=True",
+    "expected_result": "Announcement created with is_ta_announcement=True",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-014",
+    "source_id": "BR-LMS-007 prohibited-ta",
+    "purpose": "TA without permission is prohibited from posting announcements",
+    "preconditions": "User is TA with can_post_announcements=False",
+    "action_or_input": "post_course_announcement with can_post_announcements=False",
+    "expected_result": "Raises TAAuthoringRestriction",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-015",
+    "source_id": "BR-LMS-008 course-wide",
+    "purpose": "Announcements have automatic timestamp and course-wide visibility",
+    "preconditions": "Announcement posted in course",
+    "action_or_input": "get_course_announcements(course_id)",
+    "expected_result": "Announcement returned with valid posted_at timestamp",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-016",
+    "source_id": "BR-LMS-009 permitted",
+    "purpose": "Assignment configuration with positive points and valid due date is accepted",
+    "preconditions": "Title, points > 0, valid submission_type, future due_date",
+    "action_or_input": "validate_assignment_configuration(title, points=100, submission_type=text, due_date=future)",
+    "expected_result": "Validation passes with no exception",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-017",
+    "source_id": "BR-LMS-009 prohibited",
+    "purpose": "Assignment with non-positive points (points <= 0) is rejected",
+    "preconditions": "points_possible = 0 or negative",
+    "action_or_input": "validate_assignment_configuration(title, points=0, submission_type=text, due_date=future)",
+    "expected_result": "Raises AssignmentConfigurationError",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-018",
+    "source_id": "BR-LMS-010 draft-holding",
+    "purpose": "Assignment remains in draft and hidden from students before explicit publication",
+    "preconditions": "Assignment status=draft",
+    "action_or_input": "get_course_assignments for student",
+    "expected_result": "Draft assignment is omitted from student view",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-019",
+    "source_id": "BR-LMS-011 threshold-le",
+    "purpose": "Assignment scheduled_release_at <= now becomes available",
+    "preconditions": "Assignment status=scheduled and scheduled_release_at <= now",
+    "action_or_input": "validate_submission_eligibility with now >= scheduled_release_at",
+    "expected_result": "Validation passes; assignment is open",
+    "test_type": "business-rule-threshold"
+  },
+  {
+    "test_id": "BR-TEST-020",
+    "source_id": "BR-LMS-011 threshold-gt",
+    "purpose": "Assignment scheduled_release_at > now remains unavailable",
+    "preconditions": "Assignment status=scheduled and scheduled_release_at in future",
+    "action_or_input": "validate_submission_eligibility with now < scheduled_release_at",
+    "expected_result": "Raises AssignmentNotAvailable / LmsDomainError",
+    "test_type": "business-rule-threshold"
+  },
+  {
+    "test_id": "BR-TEST-021",
+    "source_id": "BR-LMS-012 permitted",
+    "purpose": "Submission conforming to assignment submission_type is accepted",
+    "preconditions": "Assignment submission_type=text; actual submission_type=text",
+    "action_or_input": "validate_submission_type(configured_type=text, actual_type=text)",
+    "expected_result": "Validation passes with no exception",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-022",
+    "source_id": "BR-LMS-012 prohibited",
+    "purpose": "Submission violating submission_type is rejected",
+    "preconditions": "Assignment submission_type=file; actual submission_type=text",
+    "action_or_input": "validate_submission_type(configured_type=file, actual_type=text)",
+    "expected_result": "Raises InvalidSubmissionType",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-023",
+    "source_id": "BR-LMS-013 threshold-on-time",
+    "purpose": "Submission at or before due date evaluated as submitted (on-time)",
+    "preconditions": "submission_time <= due_date",
+    "action_or_input": "evaluate_submission_timeliness(due_date, submission_time=due_date)",
+    "expected_result": "Returns SubmissionStatus.SUBMITTED.value",
+    "test_type": "business-rule-threshold"
+  },
+  {
+    "test_id": "BR-TEST-024",
+    "source_id": "BR-LMS-013 threshold-late",
+    "purpose": "Submission after due date evaluated as late",
+    "preconditions": "submission_time > due_date",
+    "action_or_input": "evaluate_submission_timeliness(due_date, submission_time=due_date + 1h)",
+    "expected_result": "Returns SubmissionStatus.LATE.value",
+    "test_type": "business-rule-threshold"
+  },
+  {
+    "test_id": "BR-TEST-025",
+    "source_id": "BR-LMS-014 permitted",
+    "purpose": "Student is permitted to view their own submission record",
+    "preconditions": "Submission belongs to Student 1; Requesting user is Student 1",
+    "action_or_input": "validate_submission_ownership(student_user_id=1001, requesting_user_id=1001, role=student)",
+    "expected_result": "Validation passes with no exception",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-026",
+    "source_id": "BR-LMS-014 prohibited",
+    "purpose": "Student is prohibited from accessing another student submission record",
+    "preconditions": "Submission belongs to Student 1; Requesting user is Student 2",
+    "action_or_input": "validate_submission_ownership(student_user_id=1001, requesting_user_id=1002, role=student)",
+    "expected_result": "Raises SubmissionOwnershipViolation",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-027",
+    "source_id": "BR-LMS-015 permitted-faculty",
+    "purpose": "Faculty has grading authority and grader attribution is recorded",
+    "preconditions": "Submission exists; User is Faculty",
+    "action_or_input": "grade_submission with grader_role=faculty",
+    "expected_result": "Grade recorded with graded_by_user_id=Faculty",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-028",
+    "source_id": "BR-LMS-015 permitted-ta",
+    "purpose": "TA has grading authority and TA attribution is recorded",
+    "preconditions": "Submission exists; User is TA",
+    "action_or_input": "grade_submission with grader_role=ta",
+    "expected_result": "Grade recorded with graded_by_user_id=TA",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-029",
+    "source_id": "BR-LMS-016 draft-hidden",
+    "purpose": "Draft grades are strictly hidden from students",
+    "preconditions": "Grade status=draft; User is evaluated Student",
+    "action_or_input": "validate_grade_visibility_for_student(grade_status=draft, role=student)",
+    "expected_result": "Raises DraftGradeVisibilityViolation",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-030",
+    "source_id": "BR-LMS-017 permitted-faculty",
+    "purpose": "Faculty has exclusive grade release authority",
+    "preconditions": "Draft grades exist; User is Faculty",
+    "action_or_input": "validate_grade_release_authority(role=faculty)",
+    "expected_result": "Validation passes with no exception",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-031",
+    "source_id": "BR-LMS-017 prohibited-ta",
+    "purpose": "TA is prohibited from releasing grades",
+    "preconditions": "User is TA",
+    "action_or_input": "validate_grade_release_authority(role=ta)",
+    "expected_result": "Raises GradeReleaseAuthorityViolation",
+    "test_type": "business-rule-prohibited"
+  },
+  {
+    "test_id": "BR-TEST-032",
+    "source_id": "BR-LMS-018 released-visible",
+    "purpose": "Released grades and feedback are readable by the student",
+    "preconditions": "Grade status=released; User is Student",
+    "action_or_input": "validate_grade_visibility_for_student(grade_status=released, role=student)",
+    "expected_result": "Validation passes with no exception",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-033",
+    "source_id": "BR-LMS-019 audit-logged",
+    "purpose": "Modification of released grade must generate immutable GradeChangeLog entry",
+    "preconditions": "Grade is released; Faculty updates points from 80 to 85 with reason",
+    "action_or_input": "modify_released_grade(grade_id, new_points=85, reason=Re-evaluated Question 3)",
+    "expected_result": "Grade updated and GradeChangeLog contains old_points=80, new_points=85, reason, modifier_user_id",
+    "test_type": "business-rule-permitted"
+  },
+  {
+    "test_id": "BR-TEST-034",
+    "source_id": "BR-LMS-001 prohibited-api-defect",
+    "purpose": "Unenrolled user role default defect in AssignmentPublishView",
+    "preconditions": "Assignment is draft; User has no course membership",
+    "action_or_input": "Unenrolled user posts to AssignmentPublishView",
+    "expected_result": "Expected: HTTP 403 Forbidden. Implementation defect: Defaults role to faculty and publishes.",
+    "test_type": "business-rule-prohibited"
+  }
+]

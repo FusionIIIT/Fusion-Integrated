@@ -1,0 +1,344 @@
+[
+  {
+    "test_id": "UC-TEST-001",
+    "source_id": "UC-LMS-001 Main Flow",
+    "purpose": "Enrolled user opens course workspace and views course home details",
+    "preconditions": "CourseWorkspace exists; User enrolled as Student",
+    "action_or_input": "User accesses course workspace home",
+    "expected_result": "Workspace details (title, syllabus, schedule) returned",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-002",
+    "source_id": "UC-LMS-001 Exception E1",
+    "purpose": "Unenrolled user attempts to access course workspace",
+    "preconditions": "Course exists; User is not enrolled",
+    "action_or_input": "Unenrolled user accesses course workspace",
+    "expected_result": "Access denied / UnauthorizedCourseAccess raised",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-003",
+    "source_id": "UC-LMS-002 Main Flow",
+    "purpose": "Assigned Faculty updates syllabus and schedule",
+    "preconditions": "Course exists; User is assigned Faculty instructor",
+    "action_or_input": "Faculty edits syllabus and schedule text",
+    "expected_result": "Updated syllabus and schedule persisted in database",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-004",
+    "source_id": "UC-LMS-002 Exception E1",
+    "purpose": "Unauthorized role attempts to edit course workspace details",
+    "preconditions": "Course exists; User is Student",
+    "action_or_input": "Student invokes course detail update",
+    "expected_result": "Operation denied / PermissionDenied",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-005",
+    "source_id": "UC-LMS-003 Main Flow",
+    "purpose": "Faculty uploads course material with immediate publication",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "Faculty uploads material with is_scheduled=False",
+    "expected_result": "CourseMaterial created with status=published and published_at set",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-006",
+    "source_id": "UC-LMS-003 Alternative A1",
+    "purpose": "Faculty schedules course material with future release date",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "Faculty uploads material with is_scheduled=True and future release date",
+    "expected_result": "CourseMaterial created with status=scheduled",
+    "test_type": "use-case-alternative"
+  },
+  {
+    "test_id": "UC-TEST-007",
+    "source_id": "UC-LMS-003 Exception E1",
+    "purpose": "TA attempts to upload course material",
+    "preconditions": "Course exists; User is TA",
+    "action_or_input": "TA attempts upload_course_material",
+    "expected_result": "Raises TAAuthoringRestriction",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-008",
+    "source_id": "UC-LMS-004 Main Flow",
+    "purpose": "Student views published course materials",
+    "preconditions": "Published course material exists; User is Student",
+    "action_or_input": "Student retrieves course materials",
+    "expected_result": "Published materials returned",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-009",
+    "source_id": "UC-LMS-004 Alternative A1",
+    "purpose": "Observer views published course materials in read-only mode",
+    "preconditions": "Published material exists; User is Observer",
+    "action_or_input": "Observer retrieves materials",
+    "expected_result": "Published materials returned; no write permissions",
+    "test_type": "use-case-alternative"
+  },
+  {
+    "test_id": "UC-TEST-010",
+    "source_id": "UC-LMS-004 Exception E1",
+    "purpose": "Student attempts to view scheduled material before release date",
+    "preconditions": "Material status is scheduled in future; User is Student",
+    "action_or_input": "Student retrieves course materials",
+    "expected_result": "Scheduled material is excluded from student response",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-011",
+    "source_id": "UC-LMS-005 Main Flow",
+    "purpose": "Faculty posts course announcement",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "Faculty posts announcement with title and content",
+    "expected_result": "CourseAnnouncement created with is_ta_announcement=False",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-012",
+    "source_id": "UC-LMS-005 Alternative A1",
+    "purpose": "TA with announcement permission posts announcement",
+    "preconditions": "Course exists; User is TA with can_post_announcements=True",
+    "action_or_input": "TA posts course announcement",
+    "expected_result": "CourseAnnouncement created with is_ta_announcement=True",
+    "test_type": "use-case-alternative"
+  },
+  {
+    "test_id": "UC-TEST-013",
+    "source_id": "UC-LMS-005 Exception E1",
+    "purpose": "TA without announcement permission attempts to post announcement",
+    "preconditions": "Course exists; User is TA with can_post_announcements=False",
+    "action_or_input": "TA attempts post_course_announcement",
+    "expected_result": "Raises TAAuthoringRestriction / PermissionDenied",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-014",
+    "source_id": "UC-LMS-006 Main Flow",
+    "purpose": "Enrolled user views course announcements",
+    "preconditions": "Course announcements exist; User is Student",
+    "action_or_input": "User queries course announcements",
+    "expected_result": "Announcements returned ordered by timestamp",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-015",
+    "source_id": "UC-LMS-007 Main Flow",
+    "purpose": "Faculty creates draft assignment with valid configuration",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "create_assignment with title, points, instructions, due_date",
+    "expected_result": "Assignment created with status=draft",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-016",
+    "source_id": "UC-LMS-007 Alternative A1",
+    "purpose": "Faculty edits existing draft assignment",
+    "preconditions": "Assignment exists in draft state; User is Faculty",
+    "action_or_input": "Faculty modifies assignment title or points",
+    "expected_result": "Updated fields persisted while maintaining draft status",
+    "test_type": "use-case-alternative"
+  },
+  {
+    "test_id": "UC-TEST-017",
+    "source_id": "UC-LMS-007 Exception E1",
+    "purpose": "Faculty creates assignment with invalid points (points <= 0)",
+    "preconditions": "Course exists; User is Faculty",
+    "action_or_input": "create_assignment with points_possible=0",
+    "expected_result": "Raises AssignmentConfigurationError",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-018",
+    "source_id": "UC-LMS-007 Exception E2",
+    "purpose": "TA attempts to create assignment",
+    "preconditions": "Course exists; User is TA",
+    "action_or_input": "TA attempts create_assignment",
+    "expected_result": "Raises TAAuthoringRestriction / LmsDomainError",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-019",
+    "source_id": "UC-LMS-008 Main Flow",
+    "purpose": "Faculty publishes draft assignment immediately",
+    "preconditions": "Assignment status is draft; User is Faculty",
+    "action_or_input": "publish_assignment with is_scheduled=False",
+    "expected_result": "Assignment status transitions to available",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-020",
+    "source_id": "UC-LMS-008 Alternative A1",
+    "purpose": "Faculty schedules assignment for future release",
+    "preconditions": "Assignment status is draft; User is Faculty",
+    "action_or_input": "publish_assignment with is_scheduled=True and release_date in future",
+    "expected_result": "Assignment status transitions to scheduled",
+    "test_type": "use-case-alternative"
+  },
+  {
+    "test_id": "UC-TEST-021",
+    "source_id": "UC-LMS-008 Exception E1",
+    "purpose": "Unenrolled or non-faculty user attempts to publish assignment via API",
+    "preconditions": "Assignment is draft; User is unenrolled or non-faculty",
+    "action_or_input": "POST to /api/v1/lms/assignments/<id>/publish/ by non-faculty user",
+    "expected_result": "HTTP 403 Forbidden or rejection due to lack of faculty role",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-022",
+    "source_id": "UC-LMS-009 Main Flow",
+    "purpose": "Student views published assignment details",
+    "preconditions": "Assignment status is available; User is Student",
+    "action_or_input": "Student retrieves assignment list/detail",
+    "expected_result": "Assignment returned with instructions and due date",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-023",
+    "source_id": "UC-LMS-009 Exception E1",
+    "purpose": "Student attempts to access draft assignment before publication",
+    "preconditions": "Assignment status is draft; User is Student",
+    "action_or_input": "Student fetches assignments",
+    "expected_result": "Draft assignment is withheld from student view",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-024",
+    "source_id": "UC-LMS-010 Main Flow",
+    "purpose": "Student submits valid work before deadline",
+    "preconditions": "Assignment is available; User is enrolled Student; before due_date",
+    "action_or_input": "Student submits content matching submission_type",
+    "expected_result": "StudentSubmission created with status=submitted",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-025",
+    "source_id": "UC-LMS-010 Alternative A1",
+    "purpose": "Student submits work after deadline",
+    "preconditions": "Assignment is available; current time > due_date; User is Student",
+    "action_or_input": "Student submits work after deadline",
+    "expected_result": "StudentSubmission created with status=late",
+    "test_type": "use-case-alternative"
+  },
+  {
+    "test_id": "UC-TEST-026",
+    "source_id": "UC-LMS-010 Exception E1",
+    "purpose": "Unenrolled student attempts to submit assignment via API",
+    "preconditions": "Assignment is available; User has no enrollment in course",
+    "action_or_input": "POST to /api/v1/lms/assignments/<id>/submissions/ from unenrolled user",
+    "expected_result": "HTTP 403 Forbidden or rejection due to lack of membership",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-027",
+    "source_id": "UC-LMS-010 Exception E2",
+    "purpose": "Student submits work with mismatched submission type",
+    "preconditions": "Assignment configured for file; Student submits text",
+    "action_or_input": "Student submits invalid submission type",
+    "expected_result": "Raises InvalidSubmissionType / LmsDomainError",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-028",
+    "source_id": "UC-LMS-011 Main Flow",
+    "purpose": "Student views own submission history and status",
+    "preconditions": "Submission exists for Student 1; User is Student 1",
+    "action_or_input": "Student 1 requests submission detail",
+    "expected_result": "Own submission returned with content and status",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-029",
+    "source_id": "UC-LMS-011 Exception E1",
+    "purpose": "Student attempts to view another student submission detail",
+    "preconditions": "Submission belongs to Student 1; Requesting user is Student 2",
+    "action_or_input": "Student 2 requests Student 1 submission detail",
+    "expected_result": "Raises SubmissionOwnershipViolation",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-030",
+    "source_id": "UC-LMS-012 Main Flow",
+    "purpose": "Faculty evaluates submission and saves draft grade",
+    "preconditions": "Submission exists; User is Faculty",
+    "action_or_input": "Faculty grades submission with score and feedback",
+    "expected_result": "Grade created with status=draft and graded_by_user_id=Faculty",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-031",
+    "source_id": "UC-LMS-012 Alternative A1",
+    "purpose": "TA evaluates submission and saves draft grade with attribution",
+    "preconditions": "Submission exists; User is TA",
+    "action_or_input": "TA grades submission with valid points",
+    "expected_result": "Grade created with status=draft and graded_by_user_id=TA",
+    "test_type": "use-case-alternative"
+  },
+  {
+    "test_id": "UC-TEST-032",
+    "source_id": "UC-LMS-012 Exception E1",
+    "purpose": "Grade submission with score exceeding points_possible",
+    "preconditions": "Assignment points_possible=100; Grader enters 105",
+    "action_or_input": "grade_submission with points=105",
+    "expected_result": "Raises LmsDomainError (exceeds points possible)",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-033",
+    "source_id": "UC-LMS-013 Main Flow",
+    "purpose": "Faculty releases all draft grades for assignment",
+    "preconditions": "Draft grades exist for assignment; User is Faculty",
+    "action_or_input": "Faculty invokes release_assignment_grades",
+    "expected_result": "All draft grades transition to status=released with released_at timestamp",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-034",
+    "source_id": "UC-LMS-013 Exception E1",
+    "purpose": "TA attempts to release assignment grades",
+    "preconditions": "Draft grades exist; User is TA",
+    "action_or_input": "release_assignment_grades with releaser_role=ta",
+    "expected_result": "Raises GradeReleaseAuthorityViolation / LmsDomainError",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-035",
+    "source_id": "UC-LMS-014 Main Flow",
+    "purpose": "Student views own released grade and feedback",
+    "preconditions": "Grade is released; User is evaluated Student",
+    "action_or_input": "Student queries course grades",
+    "expected_result": "Released grade points and feedback returned",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-036",
+    "source_id": "UC-LMS-014 Exception E1",
+    "purpose": "Student attempts to view unreleased / draft grade",
+    "preconditions": "Grade status is draft; User is Student",
+    "action_or_input": "Student queries course grades",
+    "expected_result": "Draft grade withheld from student response",
+    "test_type": "use-case-exception"
+  },
+  {
+    "test_id": "UC-TEST-037",
+    "source_id": "UC-LMS-015 Main Flow",
+    "purpose": "System scheduled content release when release date <= now",
+    "preconditions": "Material status=scheduled with release date <= now",
+    "action_or_input": "Evaluate material visibility for student",
+    "expected_result": "Material is available / published",
+    "test_type": "use-case-main"
+  },
+  {
+    "test_id": "UC-TEST-038",
+    "source_id": "UC-LMS-015 Alternative A1",
+    "purpose": "Scheduled content remains hidden when release date > now",
+    "preconditions": "Material status=scheduled with release date in future",
+    "action_or_input": "Evaluate material visibility for student",
+    "expected_result": "Material is hidden / unavailable",
+    "test_type": "use-case-alternative"
+  }
+]
