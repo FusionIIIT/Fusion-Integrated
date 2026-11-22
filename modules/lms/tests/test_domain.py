@@ -1,0 +1,788 @@
+"""Unit tests for LMS pure domain rules and entities."""
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
+
+import pytest
+
+from modules.lms.domain.entities import (
+    AnnouncementDetails,
+    AssignmentDetails,
+    AssignmentStatus,
+    CourseDetails,
+    CourseRole,
+    CourseStatus,
+    DeadlineWindowStatus,
+    EvaluationDetails,
+    GradeStatus,
+    MaterialDetails,
+    MaterialStatus,
+    MaterialType,
+    SectionType,
+    SubmissionDetails,
+    SubmissionStatus,
+    SubmissionType,
+    validate_announcement_details,
+    validate_assignment_details,
+    validate_course_details,
+    validate_deadline_window,
+    validate_evaluation_score,
+    validate_extension_details,
+    validate_material_details,
+    validate_submission_details,
+)
+from modules.lms.domain.errors import (
+    AssignmentAccessDeniedError,
+    AssignmentAuthoringDeniedError,
+    CourseAccessDeniedError,
+    CourseEditingDeniedError,
+    DeadlineWindowError,
+    ExtensionDeniedError,
+    ExtensionNotFoundError,
+    GradingConflictError,
+    GradingError,
+    GradingPermissionDeniedError,
+    LMSRuleError,
+    MaterialAccessDeniedError,
+    MaterialAuthoringDeniedError,
+    ScoreValidationError,
+    SubmissionAccessDeniedError,
+    SubmissionError,
+    SubmissionTypeError,
+    SubmissionWindowClosedError,
+)
+
+
+def test_course_details_dataclass():
+    c = CourseDetails(
+        code="CS301",
+        title="Database Systems",
+        description="Core DBMS",
+        syllabus="SQL, Relational Algebra",
+        schedule="Mon/Wed 10:00-11:00",
+        status=CourseStatus.PUBLISHED,
+    )
+    assert c.code == "CS301"
+    assert c.title == "Database Systems"
+    assert c.status == CourseStatus.PUBLISHED
+
+
+def test_validate_course_details_valid():
+    validate_course_details(title="Operating Systems", status=CourseStatus.PUBLISHED)
+    validate_course_details(title="Compiler Design", status=CourseStatus.DRAFT)
+
+
+def test_validate_course_details_empty_title():
+    with pytest.raises(LMSRuleError, match="title cannot be empty"):
+        validate_course_details(title="   ", status=CourseStatus.PUBLISHED)
+
+
+def test_validate_course_details_title_too_long():
+    with pytest.raises(LMSRuleError, match="exceed 200 characters"):
+        validate_course_details(title="A" * 201, status=CourseStatus.PUBLISHED)
+
+
+def test_validate_course_details_invalid_status():
+    with pytest.raises(LMSRuleError, match="Invalid course status"):
+        validate_course_details(title="Algorithms", status="archived")
+
+
+def test_course_roles_and_privileges():
+    assert CourseRole.FACULTY in CourseRole.EDITORS
+    assert CourseRole.TA in CourseRole.READ_ONLY
+    assert CourseRole.STUDENT in CourseRole.READ_ONLY
+    assert CourseRole.OBSERVER in CourseRole.READ_ONLY
+    assert CourseRole.TA not in CourseRole.EDITORS
+    assert CourseRole.OBSERVER not in CourseRole.EDITORS
+
+
+def test_lms_error_hierarchy():
+    assert issubclass(CourseAccessDeniedError, LMSRuleError)
+    assert issubclass(CourseEditingDeniedError, LMSRuleError)
+    assert issubclass(MaterialAccessDeniedError, LMSRuleError)
+    assert issubclass(MaterialAuthoringDeniedError, LMSRuleError)
+
+
+def test_material_details_dataclass():
+    m = MaterialDetails(
+        title="Lecture 1 Slides",
+        section_title="Module 1: Introduction",
+        material_type=MaterialType.FILE,
+        section_type=SectionType.MODULE,
+        status=MaterialStatus.PUBLISHED,
+    )
+    assert m.title == "Lecture 1 Slides"
+    assert m.section_title == "Module 1: Introduction"
+    assert m.material_type == MaterialType.FILE
+    assert m.status == MaterialStatus.PUBLISHED
+
+
+def test_validate_material_details_valid():
+    validate_material_details(
+        title="Intro Notes",
+        section_title="Week 1",
+        material_type=MaterialType.NOTE,
+        section_type=SectionType.WEEK,
+        status=MaterialStatus.PUBLISHED,
+        content="Welcome to the course notes",
+    )
+    validate_material_details(
+        title="Documentation Link",
+        section_title="Module 1",
+        material_type=MaterialType.LINK,
+        section_type=SectionType.MODULE,
+        status=MaterialStatus.PUBLISHED,
+        link_url="https://docs.python.org",
+    )
+    validate_material_details(
+        title="Scheduled Chapter",
+        section_title="Week 2",
+        material_type=MaterialType.FILE,
+        section_type=SectionType.WEEK,
+        status=MaterialStatus.SCHEDULED,
+        release_at=datetime(2026, 12, 1, 10, 0, tzinfo=UTC),
+    )
+
+
+def test_validate_material_details_invalid():
+    # Empty title
+    with pytest.raises(LMSRuleError, match="title cannot be empty"):
+        validate_material_details(
+            title="",
+            section_title="Week 1",
+            material_type=MaterialType.NOTE,
+            section_type=SectionType.WEEK,
+            status=MaterialStatus.PUBLISHED,
+            content="Hello",
+        )
+
+    # Empty section
+    with pytest.raises(LMSRuleError, match="Section title cannot be empty"):
+        validate_material_details(
+            title="Syllabus",
+            section_title="",
+            material_type=MaterialType.NOTE,
+            section_type=SectionType.WEEK,
+            status=MaterialStatus.PUBLISHED,
+            content="Hello",
+        )
+
+    # Invalid type
+    with pytest.raises(LMSRuleError, match="Invalid material type"):
+        validate_material_details(
+            title="Video",
+            section_title="Week 1",
+            material_type="video",
+            section_type=SectionType.WEEK,
+            status=MaterialStatus.PUBLISHED,
+        )
+
+    # Scheduled without release_at
+    with pytest.raises(LMSRuleError, match="Scheduled material requires a valid release date"):
+        validate_material_details(
+            title="Midterm prep",
+            section_title="Week 5",
+            material_type=MaterialType.NOTE,
+            section_type=SectionType.WEEK,
+            status=MaterialStatus.SCHEDULED,
+            release_at=None,
+        )
+
+    # Invalid link
+    with pytest.raises(LMSRuleError, match="Link URL must start with"):
+        validate_material_details(
+            title="Bad Link",
+            section_title="Week 1",
+            material_type=MaterialType.LINK,
+            section_type=SectionType.WEEK,
+            status=MaterialStatus.PUBLISHED,
+            link_url="ftp://files.example.com",
+        )
+
+    # Note with empty content
+    with pytest.raises(LMSRuleError, match="Note materials require content text"):
+        validate_material_details(
+            title="Blank Note",
+            section_title="Week 1",
+            material_type=MaterialType.NOTE,
+            section_type=SectionType.WEEK,
+            status=MaterialStatus.PUBLISHED,
+            content="",
+        )
+
+
+def test_validate_announcement_details_valid():
+    validate_announcement_details(
+        title="Midterm Exam Schedule",
+        content="Exam will be held on Friday at 10:00 in Room 101.",
+    )
+    details = AnnouncementDetails(
+        title="Quiz 2",
+        content="Topics: Chapters 3-4.",
+    )
+    assert details.title == "Quiz 2"
+
+
+def test_validate_announcement_details_invalid():
+    # Empty title
+    with pytest.raises(LMSRuleError, match="Announcement title cannot be empty"):
+        validate_announcement_details(title="", content="Valid content")
+
+    # Whitespace title
+    with pytest.raises(LMSRuleError, match="Announcement title cannot be empty"):
+        validate_announcement_details(title="   ", content="Valid content")
+
+    # Title exceeds 200 characters
+    with pytest.raises(LMSRuleError, match="Announcement title cannot exceed 200 characters"):
+        validate_announcement_details(title="X" * 201, content="Valid content")
+
+    # Empty content
+    with pytest.raises(LMSRuleError, match="Announcement content cannot be empty"):
+        validate_announcement_details(title="Valid title", content="")
+
+    # Whitespace content
+    with pytest.raises(LMSRuleError, match="Announcement content cannot be empty"):
+        validate_announcement_details(title="Valid title", content="   ")
+
+
+def test_assignment_details_dataclass():
+    a = AssignmentDetails(
+        title="Project Milestone 1",
+        instructions="Complete ER design and schema diagrams.",
+        submission_type=SubmissionType.FILE,
+        points_possible=Decimal("150.00"),
+        status=AssignmentStatus.DRAFT,
+    )
+    assert a.title == "Project Milestone 1"
+    assert a.submission_type == "file"
+    assert a.points_possible == Decimal("150.00")
+    assert a.status == "draft"
+
+
+def test_validate_assignment_details_valid():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=7)
+    release = now + timedelta(days=1)
+
+    # Valid draft
+    validate_assignment_details(
+        title="Draft Homework",
+        submission_type=SubmissionType.FILE,
+        status=AssignmentStatus.DRAFT,
+    )
+
+    # Valid published
+    validate_assignment_details(
+        title="Published Homework",
+        instructions="Submit PDF.",
+        submission_type=SubmissionType.FILE,
+        status=AssignmentStatus.PUBLISHED,
+        points_possible=100,
+        due_at=due,
+    )
+
+    # Valid scheduled
+    validate_assignment_details(
+        title="Scheduled Homework",
+        instructions="Submit link.",
+        submission_type=SubmissionType.LINK,
+        status=AssignmentStatus.SCHEDULED,
+        points_possible=50,
+        due_at=due,
+        release_at=release,
+    )
+
+
+def test_validate_assignment_details_invalid_title():
+    with pytest.raises(LMSRuleError, match="Assignment title cannot be empty"):
+        validate_assignment_details(
+            title="",
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.DRAFT,
+        )
+
+    with pytest.raises(LMSRuleError, match="exceed 200 characters"):
+        validate_assignment_details(
+            title="X" * 201,
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.DRAFT,
+        )
+
+
+def test_validate_assignment_details_invalid_submission_type_and_status():
+    with pytest.raises(LMSRuleError, match="Invalid submission type"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type="video",
+            status=AssignmentStatus.DRAFT,
+        )
+
+    with pytest.raises(LMSRuleError, match="Invalid assignment status"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.FILE,
+            status="archived",
+        )
+
+
+def test_validate_assignment_details_invalid_points():
+    with pytest.raises(LMSRuleError, match="greater than zero"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.DRAFT,
+            points_possible=0,
+        )
+
+    with pytest.raises(LMSRuleError, match="greater than zero"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.DRAFT,
+            points_possible=-10,
+        )
+
+
+def test_validate_assignment_details_publication_requirements():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=7)
+
+    # Published without instructions fails BR-LMS-009
+    with pytest.raises(LMSRuleError, match="Published assignment requires instructions"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.PUBLISHED,
+            due_at=due,
+            points_possible=100,
+            instructions="",
+        )
+
+    # Published without due_at fails BR-LMS-009
+    with pytest.raises(LMSRuleError, match="Published assignment requires a valid due date"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.FILE,
+            status=AssignmentStatus.PUBLISHED,
+            due_at=None,
+            points_possible=100,
+            instructions="Submit work.",
+        )
+
+
+def test_validate_assignment_details_scheduled_and_date_order():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=5)
+
+    # Scheduled without release_at
+    with pytest.raises(LMSRuleError, match="Scheduled assignment requires a valid release date"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.TEXT,
+            status=AssignmentStatus.SCHEDULED,
+            due_at=due,
+            points_possible=100,
+            instructions="Write essay.",
+            release_at=None,
+        )
+
+    # Release after due date
+    with pytest.raises(LMSRuleError, match="release date cannot be after the due date"):
+        validate_assignment_details(
+            title="Assignment",
+            submission_type=SubmissionType.TEXT,
+            status=AssignmentStatus.SCHEDULED,
+            due_at=now,
+            release_at=now + timedelta(days=1),
+            points_possible=100,
+            instructions="Write essay.",
+        )
+
+
+def test_assignment_domain_errors():
+    assert issubclass(AssignmentAccessDeniedError, LMSRuleError)
+    assert issubclass(AssignmentAuthoringDeniedError, LMSRuleError)
+
+
+def test_deadline_window_status_enum():
+    assert DeadlineWindowStatus.NOT_OPEN == "not_open"
+    assert DeadlineWindowStatus.OPEN == "open"
+    assert DeadlineWindowStatus.LATE_ALLOWED == "late_allowed"
+    assert DeadlineWindowStatus.CLOSED == "closed"
+    assert len(DeadlineWindowStatus.ALL) == 4
+
+
+def test_validate_deadline_window_valid():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=5)
+    closes = now + timedelta(days=7)
+
+    # Normal window with cutoff and late submissions
+    v_due, v_closes, v_late = validate_deadline_window(
+        due_at=due, closes_at=closes, allow_late=True
+    )
+    assert v_due == due
+    assert v_closes == closes
+    assert v_late is True
+
+    # No cutoff, no late
+    v_due2, v_closes2, v_late2 = validate_deadline_window(
+        due_at=due, closes_at=None, allow_late=False
+    )
+    assert v_due2 == due
+    assert v_closes2 is None
+    assert v_late2 is False
+
+    # No due date at all
+    v_due3, v_closes3, v_late3 = validate_deadline_window(
+        due_at=None, closes_at=None, allow_late=False
+    )
+    assert v_due3 is None
+    assert v_closes3 is None
+    assert v_late3 is False
+
+
+def test_validate_deadline_window_invalid():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=5)
+    closes = now + timedelta(days=2)
+
+    # Cutoff earlier than due date
+    with pytest.raises(DeadlineWindowError, match="cannot be earlier than the due date"):
+        validate_deadline_window(due_at=due, closes_at=closes, allow_late=True)
+
+    # Cutoff set without due date
+    with pytest.raises(DeadlineWindowError, match="due date must be set"):
+        validate_deadline_window(due_at=None, closes_at=closes, allow_late=True)
+
+
+def test_validate_extension_details_valid():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=3)
+    ext = now + timedelta(days=6)
+
+    ext_dt, r = validate_extension_details(
+        student_user_id=42,
+        extended_due_at=ext,
+        assignment_due_at=due,
+        reason="  Medical extension  ",
+    )
+    assert ext_dt == ext
+    assert r == "Medical extension"
+
+
+def test_validate_extension_details_invalid():
+    now = datetime.now(UTC)
+    due = now + timedelta(days=5)
+
+    # Invalid user id
+    with pytest.raises(ExtensionDeniedError, match="Valid student user ID is required"):
+        validate_extension_details(
+            student_user_id=0,
+            extended_due_at=now + timedelta(days=7),
+            assignment_due_at=due,
+        )
+
+    # Extension earlier than or equal to original due date
+    with pytest.raises(ExtensionDeniedError, match="strictly later than the assignment due date"):
+        validate_extension_details(
+            student_user_id=1,
+            extended_due_at=due - timedelta(days=1),
+            assignment_due_at=due,
+        )
+
+    with pytest.raises(ExtensionDeniedError, match="strictly later than the assignment due date"):
+        validate_extension_details(
+            student_user_id=1,
+            extended_due_at=due,
+            assignment_due_at=due,
+        )
+
+    # Reason exceeds 500 chars
+    with pytest.raises(ExtensionDeniedError, match="cannot exceed 500 characters"):
+        validate_extension_details(
+            student_user_id=1,
+            extended_due_at=due + timedelta(days=1),
+            assignment_due_at=due,
+            reason="x" * 501,
+        )
+
+
+def test_deadline_domain_errors():
+    assert issubclass(DeadlineWindowError, LMSRuleError)
+    assert issubclass(ExtensionDeniedError, LMSRuleError)
+    assert issubclass(ExtensionNotFoundError, LMSRuleError)
+
+
+def test_submission_details_dataclass():
+    s = SubmissionDetails(
+        assignment_id=1,
+        student_user_id=10,
+        submission_type=SubmissionType.FILE,
+        status=SubmissionStatus.SUBMITTED,
+        file_name="solution.pdf",
+        file_size=1024,
+        attempt_number=1,
+    )
+    assert s.assignment_id == 1
+    assert s.student_user_id == 10
+    assert s.submission_type == "file"
+    assert s.status == "submitted"
+    assert s.file_name == "solution.pdf"
+    assert s.file_size == 1024
+    assert s.attempt_number == 1
+
+
+def test_validate_submission_details_valid_file():
+    class DummyFile:
+        name = "report.pdf"
+        size = 2048
+
+    dummy = DummyFile()
+    validate_submission_details(
+        assignment_submission_type="file",
+        submission_type="file",
+        file=dummy,
+    )
+
+
+def test_validate_submission_details_valid_text():
+    validate_submission_details(
+        assignment_submission_type="text",
+        submission_type="text",
+        content_text="   echo 'Hello World'   ",
+    )
+
+
+def test_validate_submission_details_valid_link():
+    validate_submission_details(
+        assignment_submission_type="link",
+        submission_type="link",
+        link_url="  https://github.com/student/project  ",
+    )
+
+
+def test_validate_submission_details_type_mismatch():
+    with pytest.raises(SubmissionTypeError, match="does not match the assignment"):
+        validate_submission_details(
+            assignment_submission_type="file",
+            submission_type="text",
+            content_text="here is my code",
+        )
+
+    with pytest.raises(SubmissionTypeError, match="does not match the assignment"):
+        validate_submission_details(
+            assignment_submission_type="text",
+            submission_type="link",
+            link_url="https://example.com",
+        )
+
+
+def test_validate_submission_details_file_missing():
+    with pytest.raises(SubmissionTypeError, match="requires an uploaded file attachment"):
+        validate_submission_details(
+            assignment_submission_type="file",
+            submission_type="file",
+            file=None,
+        )
+
+
+def test_validate_submission_details_text_empty():
+    with pytest.raises(SubmissionTypeError, match="requires non-empty content text"):
+        validate_submission_details(
+            assignment_submission_type="text",
+            submission_type="text",
+            content_text="   ",
+        )
+
+
+def test_validate_submission_details_link_invalid():
+    with pytest.raises(SubmissionTypeError, match="requires a valid URL"):
+        validate_submission_details(
+            assignment_submission_type="link",
+            submission_type="link",
+            link_url="   ",
+        )
+
+    with pytest.raises(SubmissionTypeError, match="must start with 'http://' or 'https://'"):
+        validate_submission_details(
+            assignment_submission_type="link",
+            submission_type="link",
+            link_url="not-a-valid-url",
+        )
+
+    with pytest.raises(SubmissionTypeError, match="must start with 'http://' or 'https://'"):
+        validate_submission_details(
+            assignment_submission_type="link",
+            submission_type="link",
+            link_url="ftp://ftp.example.com/file",
+        )
+
+
+def test_submission_domain_errors():
+    assert issubclass(SubmissionError, LMSRuleError)
+    assert issubclass(SubmissionTypeError, SubmissionError)
+    assert issubclass(SubmissionWindowClosedError, SubmissionError)
+    assert issubclass(SubmissionAccessDeniedError, SubmissionError)
+
+
+def test_evaluation_details_dataclass():
+    now = datetime.now(UTC)
+    ev = EvaluationDetails(
+        submission_id=10,
+        assignment_id=5,
+        student_user_id=42,
+        score=Decimal("95.50"),
+        graded_by_user_id=1,
+        status=GradeStatus.DRAFT,
+        graded_at=now,
+    )
+    assert ev.submission_id == 10
+    assert ev.assignment_id == 5
+    assert ev.student_user_id == 42
+    assert ev.score == Decimal("95.50")
+    assert ev.graded_by_user_id == 1
+    assert ev.status == "draft"
+    assert ev.graded_at == now
+
+
+def test_validate_evaluation_score_valid():
+    pts_possible = Decimal("100.00")
+
+    # Regular score
+    score = validate_evaluation_score(score="85.50", points_possible=pts_possible)
+    assert score == Decimal("85.50")
+
+    # Int score
+    score = validate_evaluation_score(score=90, points_possible=pts_possible)
+    assert score == Decimal("90.00")
+
+    # Decimal score
+    score = validate_evaluation_score(score=Decimal("75.25"), points_possible=pts_possible)
+    assert score == Decimal("75.25")
+
+
+def test_validate_evaluation_score_boundaries():
+    pts_possible = Decimal("100.00")
+
+    # Exactly zero
+    assert validate_evaluation_score(score="0.00", points_possible=pts_possible) == Decimal("0.00")
+
+    # Exactly max points
+    assert validate_evaluation_score(score="100.00", points_possible=pts_possible) == Decimal("100.00")
+
+
+def test_validate_evaluation_score_exceeds_max():
+    pts_possible = Decimal("100.00")
+    with pytest.raises(ScoreValidationError, match="cannot exceed maximum points possible"):
+        validate_evaluation_score(score="100.01", points_possible=pts_possible)
+
+    with pytest.raises(ScoreValidationError, match="cannot exceed maximum points possible"):
+        validate_evaluation_score(score="150", points_possible=pts_possible)
+
+
+def test_validate_evaluation_score_negative():
+    pts_possible = Decimal("100.00")
+    with pytest.raises(ScoreValidationError, match="cannot be negative"):
+        validate_evaluation_score(score="-0.01", points_possible=pts_possible)
+
+    with pytest.raises(ScoreValidationError, match="cannot be negative"):
+        validate_evaluation_score(score="-10", points_possible=pts_possible)
+
+
+def test_validate_evaluation_score_invalid_types():
+    pts_possible = Decimal("100.00")
+    with pytest.raises(ScoreValidationError, match="Score is required"):
+        validate_evaluation_score(score=None, points_possible=pts_possible)
+
+    with pytest.raises(ScoreValidationError, match="Invalid numeric score"):
+        validate_evaluation_score(score="invalid_number", points_possible=pts_possible)
+
+
+def test_validate_evaluation_score_excess_precision():
+    pts_possible = Decimal("100.00")
+    with pytest.raises(ScoreValidationError, match="cannot have more than 2 decimal places"):
+        validate_evaluation_score(score="85.123", points_possible=pts_possible)
+
+
+def test_grading_domain_errors():
+    assert issubclass(GradingError, LMSRuleError)
+    assert issubclass(ScoreValidationError, GradingError)
+    assert issubclass(GradingPermissionDeniedError, GradingError)
+    assert issubclass(GradingConflictError, GradingError)
+
+
+def test_domain_validation_boundary_conditions():
+    from unittest.mock import MagicMock
+
+    from modules.lms.domain.entities import (
+        validate_assignment_details,
+        validate_extension_details,
+        validate_material_details,
+        validate_submission_details,
+    )
+    from modules.lms.domain.errors import ExtensionDeniedError, SubmissionTypeError
+
+    # Material title length
+    with pytest.raises(LMSRuleError, match="Material title cannot exceed 200 characters"):
+        validate_material_details(
+            title="A" * 201, section_title="Sec", section_type="module", material_type="link", status="draft", link_url="https://test.edu"
+        )
+
+    # Section title length
+    with pytest.raises(LMSRuleError, match="Section title cannot exceed 100 characters"):
+        validate_material_details(
+            title="Title", section_title="S" * 101, section_type="module", material_type="link", status="draft", link_url="https://test.edu"
+        )
+
+    # Invalid section type
+    with pytest.raises(LMSRuleError, match="Invalid section type"):
+        validate_material_details(
+            title="Title", section_title="Sec", section_type="invalid_sec", material_type="link", status="draft", link_url="https://test.edu"
+        )
+
+    # Assignment invalid points possible
+    with pytest.raises(LMSRuleError, match="Points possible must be a valid positive number"):
+        validate_assignment_details(
+            title="A", instructions="I", submission_type="text", status="draft", points_possible="not_a_num"
+        )
+
+    with pytest.raises(LMSRuleError, match="Points possible must be greater than zero"):
+        validate_assignment_details(
+            title="A", instructions="I", submission_type="text", status="draft", points_possible=0
+        )
+
+    # closes_at < due_at
+    now = datetime.now(UTC)
+    with pytest.raises(LMSRuleError, match="Closing cutoff date cannot be earlier than the due date"):
+        validate_assignment_details(
+            title="A", instructions="I", submission_type="text", status="draft", points_possible=100,
+            due_at=now + timedelta(days=2), closes_at=now + timedelta(days=1)
+        )
+
+    # Extension None extended_due_at
+    with pytest.raises(ExtensionDeniedError, match="Extended due date cannot be empty"):
+        validate_extension_details(
+            student_user_id=101, assignment_due_at=now, extended_due_at=None
+        )
+
+    # Invalid submission type
+    with pytest.raises(SubmissionTypeError, match="Invalid submission type"):
+        validate_submission_details(
+            assignment_submission_type="text", submission_type="unsupported_type"
+        )
+
+    # File submission exceeding 50 MB
+    mock_big_file = MagicMock()
+    mock_big_file.size = 51 * 1024 * 1024
+    with pytest.raises(SubmissionTypeError, match="exceeds maximum limit of 50 MB"):
+        validate_submission_details(
+            assignment_submission_type="file", submission_type="file", file=mock_big_file
+        )
+
+    # Link URL exceeding 500 chars
+    long_url = "https://example.com/" + "a" * 500
+    with pytest.raises(SubmissionTypeError, match="cannot exceed 500 characters"):
+        validate_submission_details(
+            assignment_submission_type="link", submission_type="link", link_url=long_url
+        )
+

@@ -1,0 +1,425 @@
+[
+  {
+    "test_id": "TC_FR_01",
+    "source_id": "AFR-LMS-001.1",
+    "purpose": "Verify system opens dedicated course workspace when authorized user selects a course",
+    "preconditions": "Course CS101 exists; user is enrolled as an authorized student in CS101",
+    "action_or_input": "Authorized student requests to open course workspace for CS101",
+    "expected_result": "Course workspace for CS101 is opened and returned successfully",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_02",
+    "source_id": "AFR-LMS-001.2",
+    "purpose": "Verify system displays course syllabus, schedule, instructor(s), and TA(s) on course home page",
+    "preconditions": "Course CS101 exists with configured syllabus, schedule, assigned instructor and TA; user is enrolled",
+    "action_or_input": "User views course home page for CS101",
+    "expected_result": "Course home details display syllabus, schedule, instructor list, and TA roster",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_03",
+    "source_id": "AFR-LMS-001.3",
+    "purpose": "Verify system restricts course workspace access to users enrolled in, assigned to, or linked to the course",
+    "preconditions": "Course CS101 exists; user is not enrolled in, assigned to, or linked to CS101",
+    "action_or_input": "Unenrolled user attempts to access course workspace for CS101",
+    "expected_result": "Access is restricted and denied (404 Not Found / access error preventing leakage)",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TC_FR_04",
+    "source_id": "AFR-LMS-002.1",
+    "purpose": "Verify Faculty can configure course workspace for an assigned course",
+    "preconditions": "Course CS101 exists; Faculty member is assigned as instructor to CS101",
+    "action_or_input": "Assigned Faculty updates course workspace configuration (syllabus, schedule, description)",
+    "expected_result": "Workspace configuration is updated successfully",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_05",
+    "source_id": "AFR-LMS-002.2",
+    "purpose": "Verify Faculty can publish and edit course details for an assigned course workspace",
+    "preconditions": "Course CS101 exists; Faculty is assigned to CS101; course details were previously published",
+    "action_or_input": "Assigned Faculty edits course title and syllabus and publishes changes",
+    "expected_result": "Updated course details are persisted and published",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_06",
+    "source_id": "AFR-LMS-003.1",
+    "purpose": "Verify Faculty can add course materials as files, links, or notes",
+    "preconditions": "Course CS101 exists; Faculty is assigned to CS101",
+    "action_or_input": "Faculty creates three materials: one file material, one link material, and one lecture note material",
+    "expected_result": "All three material types (file, link, note) are accepted and created in the course",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_07",
+    "source_id": "AFR-LMS-003.2",
+    "purpose": "Verify Faculty can organize course materials into modules or weekly sections",
+    "preconditions": "Course CS101 exists; Faculty is assigned to CS101",
+    "action_or_input": "Faculty adds material with module/weekly section organization specified",
+    "expected_result": "Material is stored and categorized under the designated module or weekly section",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_08",
+    "source_id": "AFR-LMS-003.3",
+    "purpose": "Verify Faculty can configure a future release date for course material",
+    "preconditions": "Course CS101 exists; Faculty is assigned to CS101",
+    "action_or_input": "Faculty creates course material with release_at set to a future timestamp",
+    "expected_result": "Material is created with scheduled release status and future timestamp",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_09",
+    "source_id": "AFR-LMS-003.4",
+    "purpose": "Verify scheduled material is published/available to authorized users when release time is reached",
+    "preconditions": "Course CS101 has scheduled material whose release timestamp has arrived/passed",
+    "action_or_input": "System processes scheduled releases at or after release time",
+    "expected_result": "Material transitions to published state and becomes available to authorized users",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_10",
+    "source_id": "AFR-LMS-004.1",
+    "purpose": "Verify Student can view published course materials for registered course in read-only form",
+    "preconditions": "Course CS101 has published materials; student is enrolled in CS101",
+    "action_or_input": "Enrolled student requests course materials list for CS101",
+    "expected_result": "Published materials are returned in read-only format; draft or unreleased materials are not visible",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_11",
+    "source_id": "AFR-LMS-004.2",
+    "purpose": "Verify TA can view published course materials for assigned course in read-only form",
+    "preconditions": "Course CS101 has published materials; TA is assigned to CS101",
+    "action_or_input": "Assigned TA requests course materials list for CS101",
+    "expected_result": "Published materials are returned in read-only format for TA",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_12",
+    "source_id": "AFR-LMS-004.3",
+    "purpose": "Verify Observer can view published course materials for linked course in read-only form",
+    "preconditions": "Course CS101 has published materials; user is linked as Observer to CS101",
+    "action_or_input": "Observer requests course materials list for CS101",
+    "expected_result": "Published materials are returned in read-only format for Observer",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_13",
+    "source_id": "AFR-LMS-005.1",
+    "purpose": "Verify Faculty can post a course-wide announcement for an assigned course",
+    "preconditions": "Course CS101 exists; Faculty is assigned to CS101",
+    "action_or_input": "Faculty posts announcement with valid title and content",
+    "expected_result": "Announcement is created and posted to the course stream",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_14",
+    "source_id": "AFR-LMS-005.2",
+    "purpose": "Verify TA can post announcement only when permitted, and unpermitted TA is prevented from posting",
+    "preconditions": "Course CS101 exists; TA is assigned to CS101 without posting permission",
+    "action_or_input": "Unpermitted TA attempts to post an announcement to CS101",
+    "expected_result": "Announcement posting attempt is denied with permission error",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TC_FR_15",
+    "source_id": "AFR-LMS-005.3",
+    "purpose": "Verify system timestamps each posted course announcement",
+    "preconditions": "Course CS101 exists; Faculty is assigned to CS101",
+    "action_or_input": "Faculty posts an announcement to CS101",
+    "expected_result": "Created announcement records a valid creation timestamp",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_16",
+    "source_id": "AFR-LMS-005.4",
+    "purpose": "Verify posted announcement is visible to all users enrolled in or linked to the course",
+    "preconditions": "Announcement posted in CS101; Faculty, Student, TA, and Observer are members of CS101",
+    "action_or_input": "Each member role requests announcements for CS101",
+    "expected_result": "The announcement is visible to all enrolled or linked members",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_17",
+    "source_id": "AFR-LMS-006.1",
+    "purpose": "Verify Faculty can create an assignment for an assigned course",
+    "preconditions": "Course CS101 exists; Faculty is assigned to CS101",
+    "action_or_input": "Faculty creates an assignment with valid parameters",
+    "expected_result": "Assignment is created successfully in CS101",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_18",
+    "source_id": "AFR-LMS-006.2",
+    "purpose": "Verify system captures assignment due date, instructions, submission type, and points possible",
+    "preconditions": "Course CS101 exists; Faculty is assigned to CS101",
+    "action_or_input": "Faculty creates assignment with due_date, instructions, submission_type file, and points_possible 100",
+    "expected_result": "All configuration fields (due_date, instructions, submission_type, points_possible) are captured and stored",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_19",
+    "source_id": "AFR-LMS-006.3",
+    "purpose": "Verify Faculty can edit an existing assignment",
+    "preconditions": "Assignment A1 exists in CS101; Faculty is assigned to CS101",
+    "action_or_input": "Faculty updates assignment instructions and points possible",
+    "expected_result": "Assignment details are updated with the new configuration",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_20",
+    "source_id": "AFR-LMS-006.4",
+    "purpose": "Verify assignment remains in Draft state until Faculty publishes it",
+    "preconditions": "Faculty creates assignment without immediate publication",
+    "action_or_input": "Inspect assignment status immediately after creation",
+    "expected_result": "Assignment status is Draft; assignment is not published",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_21",
+    "source_id": "AFR-LMS-007.1",
+    "purpose": "Verify Faculty can publish an assignment",
+    "preconditions": "Draft assignment A1 exists in CS101; Faculty is assigned to CS101",
+    "action_or_input": "Faculty initiates publish action on assignment A1",
+    "expected_result": "Assignment status transitions from Draft to Published",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_22",
+    "source_id": "AFR-LMS-007.2",
+    "purpose": "Verify published assignment with future release date is withheld from Students until release time",
+    "preconditions": "Assignment A1 is published with release_at set to future date; student is enrolled in CS101",
+    "action_or_input": "Enrolled student queries assignments for CS101 before release date",
+    "expected_result": "Assignment A1 is withheld and omitted from student view",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TC_FR_23",
+    "source_id": "AFR-LMS-007.3",
+    "purpose": "Verify scheduled assignment becomes available to authorized Students when release time is reached",
+    "preconditions": "Assignment A1 was scheduled with release_at; current time reaches or passes release_at",
+    "action_or_input": "System releases assignment or student queries assignments at/after release time",
+    "expected_result": "Assignment A1 becomes visible and accessible to authorized students",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_24",
+    "source_id": "AFR-LMS-007.4",
+    "purpose": "Verify Student can view and download released assignment for registered course",
+    "preconditions": "Assignment A1 is released and has attachment file; student is enrolled in CS101",
+    "action_or_input": "Student retrieves assignment details and downloads attachment",
+    "expected_result": "Assignment details and attachment file are successfully retrieved",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_25",
+    "source_id": "AFR-LMS-008.1",
+    "purpose": "Verify Student can submit assignment work according to configured submission type (file, text, link)",
+    "preconditions": "Released assignment configured for file submission; student enrolled in CS101",
+    "action_or_input": "Student submits matching file artifact for assignment",
+    "expected_result": "Submission is accepted and recorded with the file artifact",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_26",
+    "source_id": "AFR-LMS-008.2",
+    "purpose": "Verify system accepts and records Student submission made before due date",
+    "preconditions": "Released assignment with future due date; student enrolled in CS101",
+    "action_or_input": "Student submits work prior to the due date",
+    "expected_result": "Submission is accepted, recorded as on-time (status submitted, is_late=False)",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_27",
+    "source_id": "AFR-LMS-009.1",
+    "purpose": "Verify Student can view Student own submission history for an assignment",
+    "preconditions": "Student S1 has submitted work for assignment A1; Student S2 also submitted work",
+    "action_or_input": "Student S1 queries submission history for assignment A1",
+    "expected_result": "Only Student S1 own submission records are returned; S2 records are omitted",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_28",
+    "source_id": "AFR-LMS-009.2",
+    "purpose": "Verify system shows Student own submission status as submitted, late, or missing",
+    "preconditions": "Assignment A1 exists; student S1 submitted on time; student S2 submitted after due date; student S3 has not submitted and deadline passed",
+    "action_or_input": "Query submission status for S1, S2, and S3",
+    "expected_result": "Status is displayed accurately (e.g. submitted, late, missing) reflecting submission timing",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_29",
+    "source_id": "AFR-LMS-010.1",
+    "purpose": "Verify Faculty can grade an individual Student submission by entering points and feedback",
+    "preconditions": "Student submission exists for assignment A1; Faculty is assigned to CS101",
+    "action_or_input": "Faculty grades submission with points=85 and feedback text",
+    "expected_result": "Grade score and feedback are saved successfully",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_30",
+    "source_id": "AFR-LMS-010.2",
+    "purpose": "Verify TA can grade an individual Student submission for assigned course with points and feedback",
+    "preconditions": "Student submission exists in CS101; TA is assigned to CS101",
+    "action_or_input": "TA grades submission with points=78 and feedback text",
+    "expected_result": "Grade score and feedback entered by TA are saved successfully",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_31",
+    "source_id": "AFR-LMS-010.3",
+    "purpose": "Verify system records identity of Faculty member or TA who performs grading action",
+    "preconditions": "Submission exists; grader (Faculty or TA) performs grading",
+    "action_or_input": "Grader submits grade evaluation for student submission",
+    "expected_result": "Saved grade record contains graded_by / grader user identifier matching the actor",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_32",
+    "source_id": "AFR-LMS-011.1",
+    "purpose": "Verify grade and feedback remain in Draft state until release",
+    "preconditions": "Grader evaluates submission and saves grade without immediate release",
+    "action_or_input": "Inspect status of saved grade record",
+    "expected_result": "Grade status is Draft / unreleased",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_33",
+    "source_id": "AFR-LMS-011.2",
+    "purpose": "Verify system prevents Student from viewing grade or feedback before release",
+    "preconditions": "Submission has grade in Draft state; student is the submitter",
+    "action_or_input": "Student queries submission or grade details before release",
+    "expected_result": "Draft grade score and feedback are withheld and hidden from student view",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TC_FR_34",
+    "source_id": "AFR-LMS-011.3",
+    "purpose": "Verify Faculty can release draft grades and feedback to Students",
+    "preconditions": "Draft grades exist for assignment submissions; Faculty is assigned to CS101",
+    "action_or_input": "Faculty initiates grade release for assignment submissions",
+    "expected_result": "Grades transition to Released state and become available to students",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_35",
+    "source_id": "AFR-LMS-012.1",
+    "purpose": "Verify Student can view own grade and feedback after release",
+    "preconditions": "Student submission grade is in Released state; student is the submitter",
+    "action_or_input": "Student views grade and feedback for the submission",
+    "expected_result": "Released score and instructor feedback are visible to the student",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_36",
+    "source_id": "AFR-LMS-012.2",
+    "purpose": "Verify released grade and feedback are presented to Student in read-only form",
+    "preconditions": "Student views released grade",
+    "action_or_input": "Student attempts to modify grade or views representation",
+    "expected_result": "Grade is read-only; student cannot edit or alter score or feedback",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_37",
+    "source_id": "AFR-LMS-013.1",
+    "purpose": "Verify system records who made the change when a released grade is changed",
+    "preconditions": "Released grade exists in CS101; Faculty updates score/feedback",
+    "action_or_input": "Faculty updates previously released grade",
+    "expected_result": "System updates grade and logs identity of user who modified the grade",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_38",
+    "source_id": "AFR-LMS-013.2",
+    "purpose": "Verify system records when change was made when a released grade is changed",
+    "preconditions": "Released grade exists in CS101; Faculty updates score/feedback",
+    "action_or_input": "Faculty updates previously released grade",
+    "expected_result": "System updates grade and logs audit timestamp of the modification",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_39",
+    "source_id": "AFR-LMS-014.1",
+    "purpose": "Verify TA can view course details, published materials, and announcements for assigned course",
+    "preconditions": "Course CS101 has published materials and announcements; TA is assigned to CS101",
+    "action_or_input": "TA queries course workspace, materials, and announcements",
+    "expected_result": "TA successfully views workspace details, published materials, and announcements",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_40",
+    "source_id": "AFR-LMS-014.2",
+    "purpose": "Verify TA can view Student submissions for assigned course",
+    "preconditions": "Submissions exist for assignment in CS101; TA is assigned to CS101",
+    "action_or_input": "TA queries student submissions for assignment in CS101",
+    "expected_result": "TA successfully retrieves list and details of student submissions",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_41",
+    "source_id": "AFR-LMS-014.3",
+    "purpose": "Verify TA is prevented from creating or editing assignments",
+    "preconditions": "Course CS101 exists; TA is assigned to CS101",
+    "action_or_input": "TA attempts to create or edit an assignment in CS101",
+    "expected_result": "Operation is denied with permission error (403 Forbidden / PermissionDenied)",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TC_FR_42",
+    "source_id": "AFR-LMS-014.4",
+    "purpose": "Verify TA is prevented from creating or editing course materials",
+    "preconditions": "Course CS101 exists; TA is assigned to CS101",
+    "action_or_input": "TA attempts to create, update, or delete course materials in CS101",
+    "expected_result": "Operation is denied with permission error (403 Forbidden / PermissionDenied)",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TC_FR_43",
+    "source_id": "AFR-LMS-014.5",
+    "purpose": "Verify TA is prevented from modifying course structure",
+    "preconditions": "Course CS101 exists; TA is assigned to CS101",
+    "action_or_input": "TA attempts to modify course workspace configuration or structure in CS101",
+    "expected_result": "Operation is denied with permission error (403 Forbidden / PermissionDenied)",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TC_FR_44",
+    "source_id": "AFR-LMS-015.1",
+    "purpose": "Verify Observer can view course details, published materials, and announcements in read-only form",
+    "preconditions": "Course CS101 has published materials and announcements; user is linked as Observer to CS101",
+    "action_or_input": "Observer views workspace details, published materials, and announcements",
+    "expected_result": "Observer retrieves course overview, published materials, and announcements in read-only format",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "TC_FR_45",
+    "source_id": "AFR-LMS-015.2",
+    "purpose": "Verify Observer is prevented from viewing individual Student submissions",
+    "preconditions": "Student submissions exist in CS101; user is linked as Observer to CS101",
+    "action_or_input": "Observer attempts to view or list student submissions in CS101",
+    "expected_result": "Access is denied (403 Forbidden / PermissionDenied)",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TC_FR_46",
+    "source_id": "AFR-LMS-015.3",
+    "purpose": "Verify Observer is prevented from viewing grades or any Student-specific data",
+    "preconditions": "Grades and student submissions exist in CS101; user is linked as Observer to CS101",
+    "action_or_input": "Observer attempts to access grades or student performance data",
+    "expected_result": "Access is denied (403 Forbidden / PermissionDenied)",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "TC_FR_47",
+    "source_id": "AFR-LMS-015.4",
+    "purpose": "Verify Observer is prevented from performing write actions anywhere in LMS Course Management",
+    "preconditions": "Course CS101 exists; user is linked as Observer to CS101",
+    "action_or_input": "Observer attempts write operations (create announcement, create material, modify course)",
+    "expected_result": "Write operations are strictly denied (403 Forbidden / PermissionDenied)",
+    "test_type": "authorization_negative"
+  }
+]

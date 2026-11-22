@@ -1,0 +1,326 @@
+[
+  {
+    "test_id": "TC-BR-01",
+    "source_id": "BR-LMS-001 Permitted",
+    "purpose": "Verify an authorized enrolled user is permitted to access the course workspace.",
+    "preconditions": "Course exists; user is enrolled.",
+    "action_or_input": "Authorized user requests course workspace details.",
+    "expected_result": "Access is granted and course workspace details are returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-02",
+    "source_id": "BR-LMS-001 Prohibited",
+    "purpose": "Verify access to course workspace is prohibited for unenrolled users.",
+    "preconditions": "Course exists; user is not enrolled in course.",
+    "action_or_input": "Unenrolled user requests course workspace details.",
+    "expected_result": "Access is denied or returns None.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-03",
+    "source_id": "BR-LMS-002 Permitted",
+    "purpose": "Verify registered student can access course materials and home based on registration data.",
+    "preconditions": "Student is registered in the course.",
+    "action_or_input": "Registered student accesses course home.",
+    "expected_result": "Student is recognized as a member and granted access.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-04",
+    "source_id": "BR-LMS-002 Prohibited",
+    "purpose": "Verify unregistered student cannot access course workspace.",
+    "preconditions": "User is student but not registered in course.",
+    "action_or_input": "Unregistered student accesses course workspace.",
+    "expected_result": "Access is denied or returns None.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-05",
+    "source_id": "BR-LMS-003 Permitted Read",
+    "purpose": "Verify Observer can read course details, published materials, and announcements.",
+    "preconditions": "Observer is linked to course.",
+    "action_or_input": "Observer requests course workspace, materials, and announcements.",
+    "expected_result": "Course workspace, materials, and announcements are readable.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-06",
+    "source_id": "BR-LMS-003 Prohibited Student Data",
+    "purpose": "Verify Observer is prohibited from viewing individual student submissions or grades.",
+    "preconditions": "Observer is linked to course; student submissions and grades exist.",
+    "action_or_input": "Observer attempts to view student submission or grade.",
+    "expected_result": "Access is denied or returns None, protecting student privacy.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-07",
+    "source_id": "BR-LMS-003 Prohibited Write",
+    "purpose": "Verify Observer is prohibited from performing write actions in course.",
+    "preconditions": "Observer is linked to course.",
+    "action_or_input": "Observer attempts to create course material or announcement.",
+    "expected_result": "Write action is rejected with permission error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-08",
+    "source_id": "BR-LMS-004 Permitted View/Grade",
+    "purpose": "Verify TA may view submissions and grade for assigned course.",
+    "preconditions": "TA is assigned to course; submission exists.",
+    "action_or_input": "TA views submissions list and grades a submission.",
+    "expected_result": "TA can view submissions and record draft grade.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-09",
+    "source_id": "BR-LMS-004 Prohibited Authoring",
+    "purpose": "Verify TA is prohibited from creating or editing assignments and materials.",
+    "preconditions": "TA is assigned to course.",
+    "action_or_input": "TA attempts to create assignment or course material.",
+    "expected_result": "Action is rejected with permission error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-10",
+    "source_id": "BR-LMS-005 Permitted Published",
+    "purpose": "Verify students and TAs can view published course materials.",
+    "preconditions": "Material is in published status; student is enrolled.",
+    "action_or_input": "Student queries course materials.",
+    "expected_result": "Published material is returned in the list.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-11",
+    "source_id": "BR-LMS-005 Prohibited Unpublished",
+    "purpose": "Verify unpublished draft or future scheduled material is hidden from students.",
+    "preconditions": "Material is in draft or unreleased scheduled status; student is enrolled.",
+    "action_or_input": "Student queries course materials.",
+    "expected_result": "Unpublished material is omitted from student view.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-12",
+    "source_id": "BR-LMS-006 Future Release",
+    "purpose": "Verify scheduled material remains unavailable before its release time.",
+    "preconditions": "Material is scheduled with release time in future; student queries materials.",
+    "action_or_input": "Student lists course materials.",
+    "expected_result": "Scheduled material is not visible.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-13",
+    "source_id": "BR-LMS-006 Release Time Reached",
+    "purpose": "Verify scheduled material transitions to published when release time is reached.",
+    "preconditions": "Material is scheduled with release time in past.",
+    "action_or_input": "Scheduled materials release task is triggered.",
+    "expected_result": "Material status transitions to published.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-14",
+    "source_id": "BR-LMS-007 Faculty Permitted",
+    "purpose": "Verify assigned faculty may post course announcements.",
+    "preconditions": "Faculty is assigned to course.",
+    "action_or_input": "Faculty posts an announcement.",
+    "expected_result": "Announcement is successfully posted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-15",
+    "source_id": "BR-LMS-007 TA Permitted/Configured",
+    "purpose": "Verify TA may post course announcement where permitted by Faculty.",
+    "preconditions": "TA is assigned to course with announcement permission.",
+    "action_or_input": "Permitted TA attempts to post announcement.",
+    "expected_result": "Announcement is posted by permitted TA.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-16",
+    "source_id": "BR-LMS-007 Student Prohibited",
+    "purpose": "Verify student is prohibited from posting course announcements.",
+    "preconditions": "Student is enrolled in course.",
+    "action_or_input": "Student attempts to post announcement.",
+    "expected_result": "Posting attempt is rejected with permission error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-17",
+    "source_id": "BR-LMS-008 Timestamp & Visibility",
+    "purpose": "Verify posted announcement is timestamped and visible to enrolled course members.",
+    "preconditions": "Announcement exists in course.",
+    "action_or_input": "Enrolled student queries announcements.",
+    "expected_result": "Announcement is returned with valid created timestamp.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-18",
+    "source_id": "BR-LMS-009 Valid Configuration",
+    "purpose": "Verify assignment defining due date, instructions, submission type, and points can be published.",
+    "preconditions": "Draft assignment has all required fields configured with future due date.",
+    "action_or_input": "Faculty publishes assignment.",
+    "expected_result": "Assignment transitions to published.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-19",
+    "source_id": "BR-LMS-009 Missing Configuration",
+    "purpose": "Verify assignment missing required configuration cannot be published.",
+    "preconditions": "Draft assignment lacks required due date.",
+    "action_or_input": "Faculty attempts to publish invalid assignment.",
+    "expected_result": "Publication is rejected with validation rule error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-20",
+    "source_id": "BR-LMS-010 Draft State",
+    "purpose": "Verify newly created assignment remains in Draft state until published.",
+    "preconditions": "Faculty creates assignment.",
+    "action_or_input": "Assignment is saved without publishing.",
+    "expected_result": "Assignment status is Draft.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-21",
+    "source_id": "BR-LMS-011 Future Release Hidden",
+    "purpose": "Verify published assignment configured with future release date is withheld from students.",
+    "preconditions": "Assignment is published/scheduled with future release date.",
+    "action_or_input": "Student lists course assignments.",
+    "expected_result": "Assignment is not visible in student list.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-22",
+    "source_id": "BR-LMS-011 Released Available",
+    "purpose": "Verify assignment is visible to students once release time arrives.",
+    "preconditions": "Assignment release date is in the past.",
+    "action_or_input": "Scheduled assignments release task runs and student lists assignments.",
+    "expected_result": "Assignment transitions to published and is visible to student.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-23",
+    "source_id": "BR-LMS-012 Conforming Submission",
+    "purpose": "Verify student submission matching configured type is accepted.",
+    "preconditions": "Assignment configured for text submission; student is enrolled.",
+    "action_or_input": "Student submits text content.",
+    "expected_result": "Submission is accepted and recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-24",
+    "source_id": "BR-LMS-012 Non-Conforming Submission",
+    "purpose": "Verify student submission with inconsistent type is rejected.",
+    "preconditions": "Assignment configured for file submission; student is enrolled.",
+    "action_or_input": "Student submits text without file.",
+    "expected_result": "Submission is rejected with validation error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-25",
+    "source_id": "BR-LMS-013 On-Time Submission",
+    "purpose": "Verify on-time submission before due date is accepted with submitted status.",
+    "preconditions": "Current time is before assignment due date.",
+    "action_or_input": "Student submits assignment work.",
+    "expected_result": "Submission status is submitted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-26",
+    "source_id": "BR-LMS-013 Past Due Date",
+    "purpose": "Verify submission after due date is tracked with late status when allowed.",
+    "preconditions": "Due date has passed; allow_late is enabled.",
+    "action_or_input": "Student submits assignment work.",
+    "expected_result": "Submission is recorded with late status.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-27",
+    "source_id": "BR-LMS-014 Own Submission",
+    "purpose": "Verify student may view their own submission history and status.",
+    "preconditions": "Student has submitted an assignment.",
+    "action_or_input": "Student requests own submission history.",
+    "expected_result": "Submission history for the student is returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-28",
+    "source_id": "BR-LMS-014 Peer Submission Prohibited",
+    "purpose": "Verify student is prohibited from viewing another student submission data.",
+    "preconditions": "Student A submitted work; Student B queries Student A data.",
+    "action_or_input": "Student B requests Student A submission history.",
+    "expected_result": "Access is denied with permission error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-29",
+    "source_id": "BR-LMS-015 Faculty/TA Grading & Attribution",
+    "purpose": "Verify faculty and TA can grade submissions and grader identity is attributed.",
+    "preconditions": "Submission exists; grader is assigned TA.",
+    "action_or_input": "TA grades submission with points and feedback.",
+    "expected_result": "Grade is recorded with TA user ID attribution.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-30",
+    "source_id": "BR-LMS-015 Student Grading Prohibited",
+    "purpose": "Verify student is prohibited from grading submissions.",
+    "preconditions": "Submission exists; actor is student.",
+    "action_or_input": "Student attempts to record a grade.",
+    "expected_result": "Action is rejected with permission error.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-31",
+    "source_id": "BR-LMS-016 Draft Hidden",
+    "purpose": "Verify draft grade remains invisible to student.",
+    "preconditions": "Grade exists in Draft status; student is enrolled.",
+    "action_or_input": "Student queries submission grade.",
+    "expected_result": "Grade is not exposed (returns None).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-32",
+    "source_id": "BR-LMS-016 Released Visible",
+    "purpose": "Verify released grade is visible to corresponding student.",
+    "preconditions": "Grade exists in Released status; student is enrolled.",
+    "action_or_input": "Student queries submission grade.",
+    "expected_result": "Grade and score are returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-33",
+    "source_id": "BR-LMS-017 Faculty Release",
+    "purpose": "Verify faculty can release draft grades to students.",
+    "preconditions": "Draft grade exists; actor is faculty.",
+    "action_or_input": "Faculty initiates grade release service.",
+    "expected_result": "Grades are transitioned to released status.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-34",
+    "source_id": "BR-LMS-017 TA Release Prohibited",
+    "purpose": "Verify TA grading does not release grades and TA cannot release grades.",
+    "preconditions": "TA grades submission.",
+    "action_or_input": "TA submits grade.",
+    "expected_result": "Grade remains in Draft status.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-35",
+    "source_id": "BR-LMS-018 Read-Only Grade",
+    "purpose": "Verify student has read-only access to released grade and no write access.",
+    "preconditions": "Released grade exists.",
+    "action_or_input": "Student views grade and attempts no write capability.",
+    "expected_result": "Grade is displayed in read-only form; student cannot modify grade.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-36",
+    "source_id": "BR-LMS-019 Audit on Grade Change",
+    "purpose": "Verify changing a released grade creates an audit log record with actor and timestamp.",
+    "preconditions": "Grade has been released.",
+    "action_or_input": "Faculty updates score on released grade.",
+    "expected_result": "Audit record is created recording actor and time.",
+    "test_type": "positive"
+  }
+]

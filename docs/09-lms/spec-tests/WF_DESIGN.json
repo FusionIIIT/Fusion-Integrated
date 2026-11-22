@@ -1,0 +1,191 @@
+[
+  {
+    "test_id": "TC-WF-01",
+    "source_id": "BW-LMS-01 Transition 1",
+    "purpose": "Verify material transitions from Draft/Unpublished to Scheduled when future release is configured.",
+    "preconditions": "Course exists; faculty is assigned.",
+    "action_or_input": "Faculty configures material with future release date.",
+    "expected_result": "Material enters Scheduled state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-02",
+    "source_id": "BW-LMS-01 Transition 2",
+    "purpose": "Verify scheduled material transitions to Published/Available when release time is reached.",
+    "preconditions": "Material is in Scheduled state with release time in past.",
+    "action_or_input": "System scheduled content release runs.",
+    "expected_result": "Material transitions to Published state and becomes available.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-03",
+    "source_id": "BW-LMS-01 Guard Check",
+    "purpose": "Verify material in Scheduled state remains withheld before release time arrives.",
+    "preconditions": "Material is Scheduled with future release time.",
+    "action_or_input": "Student queries course materials.",
+    "expected_result": "Material is not visible in student materials list.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-04",
+    "source_id": "BW-LMS-02 Transition 1",
+    "purpose": "Verify new assignment transitions to Draft state upon creation with valid parameters.",
+    "preconditions": "Faculty is assigned to course.",
+    "action_or_input": "Faculty creates assignment with valid title, due date, submission type, and points.",
+    "expected_result": "Assignment state is Draft.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-05",
+    "source_id": "BW-LMS-02 Transition 2",
+    "purpose": "Verify assignment in Draft state transitions to Published and Available when immediate release is published.",
+    "preconditions": "Assignment is in Draft state.",
+    "action_or_input": "Faculty publishes assignment with immediate release.",
+    "expected_result": "Assignment state is Published and visible to students.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-06",
+    "source_id": "BW-LMS-02 Transition 3",
+    "purpose": "Verify available assignment records submission when student submits on-time matching configured type.",
+    "preconditions": "Assignment is Available; student is registered; current time before due date.",
+    "action_or_input": "Student submits matching content.",
+    "expected_result": "Student submission is recorded with SUBMITTED status.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-07",
+    "source_id": "BW-LMS-02 Guard Failure",
+    "purpose": "Verify publishing draft assignment without required configuration fails and assignment remains Draft.",
+    "preconditions": "Draft assignment lacks required due date.",
+    "action_or_input": "Faculty attempts publication.",
+    "expected_result": "Publication fails with validation rule error; state remains Draft.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-WF-08",
+    "source_id": "BW-LMS-03 Transition 2",
+    "purpose": "Verify assignment in Draft transitions to Scheduled when published with future release date.",
+    "preconditions": "Draft assignment has future release date and valid due date.",
+    "action_or_input": "Faculty publishes assignment with future release timing.",
+    "expected_result": "Assignment enters Scheduled state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-09",
+    "source_id": "BW-LMS-03 Transition 3",
+    "purpose": "Verify scheduled assignment transitions to Available when system processes release time.",
+    "preconditions": "Assignment is in Scheduled state with release time in past.",
+    "action_or_input": "System scheduled assignment release task runs.",
+    "expected_result": "Assignment transitions to Published/Available.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-10",
+    "source_id": "BW-LMS-03 Transition 4",
+    "purpose": "Verify student can submit on-time to newly released scheduled assignment.",
+    "preconditions": "Assignment has been released; current time is before due date.",
+    "action_or_input": "Student submits assignment work.",
+    "expected_result": "Submission is recorded with SUBMITTED status.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-11",
+    "source_id": "BW-LMS-03 Guard Check",
+    "purpose": "Verify student cannot submit to assignment while it remains in Scheduled state.",
+    "preconditions": "Assignment is in Scheduled state with future release date.",
+    "action_or_input": "Student attempts to submit work before release date.",
+    "expected_result": "Submission attempt is rejected with ConflictError.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-WF-12",
+    "source_id": "BW-LMS-04 Transition 1",
+    "purpose": "Verify recorded student submission transitions to Grade Draft when faculty grades it.",
+    "preconditions": "Student submission exists; grader is faculty.",
+    "action_or_input": "Faculty records points and feedback.",
+    "expected_result": "Grade is recorded in Draft state with faculty attribution.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-13",
+    "source_id": "BW-LMS-04 Transition 2",
+    "purpose": "Verify grade in Draft state transitions to Released when faculty releases grades.",
+    "preconditions": "Grade is in Draft state; actor is faculty.",
+    "action_or_input": "Faculty executes grade release service.",
+    "expected_result": "Grade transitions to Released state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-14",
+    "source_id": "BW-LMS-04 Visibility Guard",
+    "purpose": "Verify grade in Draft state is invisible to student until release transition occurs.",
+    "preconditions": "Grade is in Draft state.",
+    "action_or_input": "Student attempts to view grade.",
+    "expected_result": "Grade is not exposed (returns None).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-15",
+    "source_id": "BW-LMS-05 Transition 1",
+    "purpose": "Verify recorded student submission transitions to Grade Draft with TA attribution when TA grades it.",
+    "preconditions": "Student submission exists; grader is assigned TA.",
+    "action_or_input": "TA records points and feedback.",
+    "expected_result": "Grade is recorded in Draft state with TA user ID attribution.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-16",
+    "source_id": "BW-LMS-05 Transition 2",
+    "purpose": "Verify TA draft grade transitions to Released when faculty performs release.",
+    "preconditions": "Grade was drafted by TA; actor is faculty.",
+    "action_or_input": "Faculty executes grade release service.",
+    "expected_result": "Grade transitions to Released state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-17",
+    "source_id": "BW-LMS-05 Authority Guard",
+    "purpose": "Verify TA cannot perform grade release transition.",
+    "preconditions": "Grade is in Draft state; actor is TA.",
+    "action_or_input": "TA attempts grade release.",
+    "expected_result": "TA grade release is prohibited.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-WF-18",
+    "source_id": "CW-LMS-01 Immediate Composite Path",
+    "purpose": "Verify complete composite workflow from draft creation to immediate publish to on-time submission.",
+    "preconditions": "Faculty and student are enrolled in course.",
+    "action_or_input": "Faculty creates draft -> publishes immediately -> student submits on-time.",
+    "expected_result": "All transitions succeed and student submission is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-19",
+    "source_id": "CW-LMS-01 Scheduled Composite Path",
+    "purpose": "Verify complete composite workflow from draft creation to scheduled release to system auto-release to on-time submission.",
+    "preconditions": "Faculty and student are enrolled; future release scheduled.",
+    "action_or_input": "Faculty creates draft -> schedules release -> system auto-releases -> student submits on-time.",
+    "expected_result": "All transitions succeed sequentially ending in recorded submission.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-20",
+    "source_id": "CW-LMS-02 Faculty Grading Composite Path",
+    "purpose": "Verify complete composite workflow from submission to faculty grading to grade release to student viewing.",
+    "preconditions": "Submission exists; faculty grades and releases.",
+    "action_or_input": "Faculty grades submission -> releases grade -> student views released grade.",
+    "expected_result": "Grade is released and student views final score.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-21",
+    "source_id": "CW-LMS-02 TA Grading Composite Path",
+    "purpose": "Verify complete composite workflow from submission to TA grading to faculty grade release to student viewing.",
+    "preconditions": "Submission exists; TA grades -> faculty releases.",
+    "action_or_input": "TA grades submission -> faculty releases grade -> student views released grade.",
+    "expected_result": "Grade transitions from draft to released and student views score.",
+    "test_type": "positive"
+  }
+]

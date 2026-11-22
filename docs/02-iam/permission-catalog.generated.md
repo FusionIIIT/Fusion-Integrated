@@ -13,6 +13,25 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `lms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `lms.course.view` | View courses and course home workspaces | `faculty`, `staff`, `student` |
+| `lms.course.manage` | Configure and edit course workspace details | `faculty` |
+| `lms.material.view` | View published course materials | `faculty`, `staff`, `student` |
+| `lms.material.manage` | Create, edit, organize, and schedule course materials | `faculty` |
+| `lms.announcement.view` | View course announcements | `faculty`, `staff`, `student` |
+| `lms.announcement.manage` | Post and manage course announcements | `faculty` |
+| `lms.assignment.view` | View published course assignments | `faculty`, `staff`, `student` |
+| `lms.assignment.manage` | Create, edit, and publish course assignments | `faculty` |
+| `lms.deadline.view` | View assignment deadlines and submission window status | `faculty`, `staff`, `student` |
+| `lms.deadline.manage` | Configure submission windows and grant extensions | `faculty` |
+| `lms.submission.submit` | Submit assignment work (Student only) | `student` |
+| `lms.submission.view` | View assignment submissions (own for student, all for faculty/TA) | `faculty`, `staff`, `student` |
+| `lms.grade.view` | View assignment grades and evaluation records | `faculty`, `staff` |
+| `lms.grade.grade` | Evaluate and record grades for student submissions | `faculty`, `staff` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
