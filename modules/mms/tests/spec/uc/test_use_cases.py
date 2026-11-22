@@ -1,8 +1,8 @@
 """Automated specification-based test suite for MMS module."""
 
 from datetime import date, timedelta
+
 import pytest
-from django.test import TestCase
 
 from modules.mms import contracts, selectors, services
 from modules.mms.domain import rules
@@ -10,18 +10,8 @@ from modules.mms.domain.constants import (
     DayOfWeek,
     FeedbackCategory,
     MealTime,
-    MessRole,
     RebateStatus,
     RegistrationStatus,
-)
-from modules.mms.models import (
-    DailyMenuItem,
-    MessActionLog,
-    MessFeedback,
-    MessRegistration,
-    MessRoleAssignment,
-    RebateRequest,
-    RegistrationWindow,
 )
 
 
@@ -98,7 +88,6 @@ def test_test_uc_006_mms_uc_003_main_flow():
     source_id: MMS-UC-003 Main Flow
     purpose: Verify MMS-UC-003 (Submit Registration Request) main success flow: Submit a mess registration request during an open registration window.
     """
-    pass
 
 
 def test_test_uc_007_mms_uc_003_a1_if_no_window_i():
@@ -135,7 +124,6 @@ def test_test_uc_009_mms_uc_004_main_flow():
     source_id: MMS-UC-004 Main Flow
     purpose: Verify MMS-UC-004 (Review Registration Request) main success flow: Approve or reject a submitted registration request.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -161,7 +149,6 @@ def test_test_uc_011_mms_uc_005_main_flow():
     source_id: MMS-UC-005 Main Flow
     purpose: Verify MMS-UC-005 (Submit Deregistration Request) main success flow: Submit a mess deregistration request at any time.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -187,7 +174,6 @@ def test_test_uc_013_mms_uc_006_main_flow():
     source_id: MMS-UC-006 Main Flow
     purpose: Verify MMS-UC-006 (Review Deregistration Request) main success flow: Approve or reject a submitted deregistration request.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -213,7 +199,6 @@ def test_test_uc_015_mms_uc_007_main_flow():
     source_id: MMS-UC-007 Main Flow
     purpose: Verify MMS-UC-007 (View Operational Student Requests for Oversight) main success flow: View operational student requests for supervisory oversight without decision authority.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -237,7 +222,6 @@ def test_test_uc_017_mms_uc_008_main_flow():
     source_id: MMS-UC-008 Main Flow
     purpose: Verify MMS-UC-008 (Publish or Update Weekly Menu) main success flow: Create, modify, delete, publish, or update day-wise and meal-wise weekly menu information.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -304,7 +288,6 @@ def test_test_uc_021_mms_uc_010_main_flow():
     source_id: MMS-UC-010 Main Flow
     purpose: Verify MMS-UC-010 (Review, Finalize, and Publish Monthly Bills) main success flow: Review system-generated monthly bills, finalize them, and publish finalized bills to Students.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -314,7 +297,6 @@ def test_test_uc_022_mms_uc_010_a1_if_the_caretak():
     source_id: MMS-UC-010 A1 - If the Caretaker does not finalize a generated bill, MMS doe
     purpose: Verify MMS-UC-010 (Review, Finalize, and Publish Monthly Bills) alternative flow A1: If the Caretaker does not finalize a generated bill, MMS does not publish that bill.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -324,7 +306,6 @@ def test_test_uc_023_mms_uc_011_main_flow():
     source_id: MMS-UC-011 Main Flow
     purpose: Verify MMS-UC-011 (View Monthly Bills and Outstanding Balances) main success flow: View monthly mess bills and outstanding balances.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -334,7 +315,6 @@ def test_test_uc_024_mms_uc_011_a1_if_no_bill_exi():
     source_id: MMS-UC-011 A1 - If no bill exists for a month, system displays no bill for t
     purpose: Verify MMS-UC-011 (View Monthly Bills and Outstanding Balances) alternative flow A1: If no bill exists for a month, system displays no bill for that month.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -382,7 +362,6 @@ def test_test_uc_027_mms_uc_013_main_flow():
     source_id: MMS-UC-013 Main Flow
     purpose: Verify MMS-UC-013 (View Feedback) main success flow: View stored feedback entries for monitoring and reporting.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -411,7 +390,6 @@ def test_test_uc_029_mms_uc_014_main_flow():
     source_id: MMS-UC-014 Main Flow
     purpose: Verify MMS-UC-014 (Submit Rebate Request) main success flow: Submit a rebate request with reason and date range.
     """
-    pass
 
 
 def test_test_uc_030_mms_uc_014_a1_if_duration_is():
@@ -469,7 +447,6 @@ def test_test_uc_033_mms_uc_015_main_flow():
     source_id: MMS-UC-015 Main Flow
     purpose: Verify MMS-UC-015 (Review Rebate Request) main success flow: Approve, reject, or modify dates before approving a rebate request.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -499,7 +476,6 @@ def test_test_uc_035_mms_uc_016_main_flow():
     source_id: MMS-UC-016 Main Flow
     purpose: Verify MMS-UC-016 (Create Vacation Food Continuity Survey) main success flow: Create a vacation food continuity survey for upcoming institute vacation.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -509,7 +485,6 @@ def test_test_uc_036_mms_uc_016_a1_if_no_response():
     source_id: MMS-UC-016 A1 - If no response deadline is supplied, MMS does not create the
     purpose: Verify MMS-UC-016 (Create Vacation Food Continuity Survey) alternative flow A1: If no response deadline is supplied, MMS does not create the survey.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -519,7 +494,6 @@ def test_test_uc_037_mms_uc_016_a2_reminder_timin():
     source_id: MMS-UC-016 A2 - Reminder timing/cadence is not specified by the frozen PS; r
     purpose: Verify MMS-UC-016 (Create Vacation Food Continuity Survey) alternative flow A2: Reminder timing/cadence is not specified by the frozen PS; reminder delivery is represented separately by event-triggered MMS-UC-031 without inventing a schedule.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -529,17 +503,15 @@ def test_test_uc_038_mms_uc_017_main_flow():
     source_id: MMS-UC-017 Main Flow
     purpose: Verify MMS-UC-017 (Respond to Vacation Food Continuity Survey) main success flow: Submit Yes or No response to a vacation food continuity survey.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
 def test_test_uc_039_mms_uc_017_a1_if_the_student():
     """
     test_id: TEST-UC-039
-    source_id: MMS-UC-017 A1 - If the Student is not currently registered or the survey is 
+    source_id: MMS-UC-017 A1 - If the Student is not currently registered or the survey is
     purpose: Verify MMS-UC-017 (Respond to Vacation Food Continuity Survey) alternative flow A1: If the Student is not currently registered or the survey is not open, MMS prevents response submission.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -549,7 +521,6 @@ def test_test_uc_040_mms_uc_018_main_flow():
     source_id: MMS-UC-018 Main Flow
     purpose: Verify MMS-UC-018 (View Vacation Survey Response Summary) main success flow: View the vacation food continuity response list and summary for operational planning.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -559,7 +530,6 @@ def test_test_uc_041_mms_uc_018_a1_if_no_response():
     source_id: MMS-UC-018 A1 - If no responses exist, MMS displays the available empty/zero
     purpose: Verify MMS-UC-018 (View Vacation Survey Response Summary) alternative flow A1: If no responses exist, MMS displays the available empty/zero response summary.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -569,7 +539,6 @@ def test_test_uc_042_mms_uc_019_main_flow():
     source_id: MMS-UC-019 Main Flow
     purpose: Verify MMS-UC-019 (Submit Special Food Request) main success flow: Submit special food request due to illness or personal event at least one calendar day before requested date.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -579,7 +548,6 @@ def test_test_uc_043_mms_uc_019_a1_if_lead_time_i():
     source_id: MMS-UC-019 A1 - If lead time is not met, system rejects submission.
     purpose: Verify MMS-UC-019 (Submit Special Food Request) alternative flow A1: If lead time is not met, system rejects submission.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -589,7 +557,6 @@ def test_test_uc_044_mms_uc_020_main_flow():
     source_id: MMS-UC-020 Main Flow
     purpose: Verify MMS-UC-020 (Review Special Food Request) main success flow: Approve or reject a Requested special-food request within the institution-defined decision period.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -599,7 +566,6 @@ def test_test_uc_045_mms_uc_020_a1_if_the_request():
     source_id: MMS-UC-020 A1 - If the request is no longer in Requested state, MMS prevents
     purpose: Verify MMS-UC-020 (Review Special Food Request) alternative flow A1: If the request is no longer in Requested state, MMS prevents a second decision.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -609,7 +575,6 @@ def test_test_uc_046_mms_uc_020_a2_the_frozen_ps():
     source_id: MMS-UC-020 A2 - The frozen PS mentions 12 hours as an intended period but do
     purpose: Verify MMS-UC-020 (Review Special Food Request) alternative flow A2: The frozen PS mentions 12 hours as an intended period but does not freeze the value; this specification leaves the parameter institution-defined.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -619,7 +584,6 @@ def test_test_uc_047_mms_uc_021_main_flow():
     source_id: MMS-UC-021 Main Flow
     purpose: Verify MMS-UC-021 (Update Special Food Fulfillment Status) main success flow: Record a post-approval fulfillment status of Served or Cancelled for a special-food request.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -629,7 +593,6 @@ def test_test_uc_048_mms_uc_021_a1_if_the_request():
     source_id: MMS-UC-021 A1 - If the request is not Approved, MMS prevents a Served or Can
     purpose: Verify MMS-UC-021 (Update Special Food Fulfillment Status) alternative flow A1: If the request is not Approved, MMS prevents a Served or Cancelled transition.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -639,7 +602,6 @@ def test_test_uc_049_mms_uc_022_main_flow():
     source_id: MMS-UC-022 Main Flow
     purpose: Verify MMS-UC-022 (Publish Announcement) main success flow: Publish mess-related announcements.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -649,7 +611,6 @@ def test_test_uc_050_mms_uc_022_a1_mms_prevents_p():
     source_id: MMS-UC-022 A1 - MMS prevents publication by an actor other than the active C
     purpose: Verify MMS-UC-022 (Publish Announcement) alternative flow A1: MMS prevents publication by an actor other than the active Caretaker or Warden.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -659,7 +620,6 @@ def test_test_uc_051_mms_uc_023_main_flow():
     source_id: MMS-UC-023 Main Flow
     purpose: Verify MMS-UC-023 (View Announcement History) main success flow: View announcement history relevant to mess services according to access rights.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -669,7 +629,6 @@ def test_test_uc_052_mms_uc_023_a1_if_no_announce():
     source_id: MMS-UC-023 A1 - If no announcement exists, system displays empty history.
     purpose: Verify MMS-UC-023 (View Announcement History) alternative flow A1: If no announcement exists, system displays empty history.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -679,17 +638,15 @@ def test_test_uc_053_mms_uc_024_main_flow():
     source_id: MMS-UC-024 Main Flow
     purpose: Verify MMS-UC-024 (View and Search Supervisory Reports) main success flow: View and search registered student lists, rebate summaries, and vacation survey response summaries.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: supervisory reporting service/model not yet implemented in MMS")
 def test_test_uc_054_mms_uc_024_a1_if_requested_r():
     """
     test_id: TEST-UC-054
-    source_id: MMS-UC-024 A1 - If requested report data is unavailable, system displays no 
+    source_id: MMS-UC-024 A1 - If requested report data is unavailable, system displays no
     purpose: Verify MMS-UC-024 (View and Search Supervisory Reports) alternative flow A1: If requested report data is unavailable, system displays no data.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -699,7 +656,6 @@ def test_test_uc_055_mms_uc_025_main_flow():
     source_id: MMS-UC-025 Main Flow
     purpose: Verify MMS-UC-025 (Generate Operational Reports) main success flow: Generate registration trend, special meal log, and billing summary reports.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: supervisory reporting service/model not yet implemented in MMS")
@@ -709,7 +665,6 @@ def test_test_uc_056_mms_uc_025_a1_if_report_data():
     source_id: MMS-UC-025 A1 - If report data is unavailable, system displays no data.
     purpose: Verify MMS-UC-025 (Generate Operational Reports) alternative flow A1: If report data is unavailable, system displays no data.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: capability MMS-UC-026 Main Flow not yet supported in current MMS release")
@@ -717,9 +672,8 @@ def test_test_uc_057_mms_uc_026_main_flow():
     """
     test_id: TEST-UC-057
     source_id: MMS-UC-026 Main Flow
-    purpose: Verify MMS-UC-026 (Track Submitted Request Status and History) main success flow: View the status and history of the Student’s own submitted MMS requests.
+    purpose: Verify MMS-UC-026 (Track Submitted Request Status and History) main success flow: View the status and history of the Student's own submitted MMS requests.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: capability MMS-UC-026 A1 - If the Student has no submitted requests, MMS displays an em not yet supported in current MMS release")
@@ -729,17 +683,15 @@ def test_test_uc_058_mms_uc_026_a1_if_the_student():
     source_id: MMS-UC-026 A1 - If the Student has no submitted requests, MMS displays an em
     purpose: Verify MMS-UC-026 (Track Submitted Request Status and History) alternative flow A1: If the Student has no submitted requests, MMS displays an empty request history.
     """
-    pass
 
 
-@pytest.mark.skip(reason="NOT_AUTOMATED: capability MMS-UC-026 A2 - If the Student attempts to access another Student’s request  not yet supported in current MMS release")
+@pytest.mark.skip(reason="NOT_AUTOMATED: capability MMS-UC-026 A2 - If the Student attempts to access another Student's request  not yet supported in current MMS release")
 def test_test_uc_059_mms_uc_026_a2_if_the_student():
     """
     test_id: TEST-UC-059
-    source_id: MMS-UC-026 A2 - If the Student attempts to access another Student’s request 
-    purpose: Verify MMS-UC-026 (Track Submitted Request Status and History) alternative flow A2: If the Student attempts to access another Student’s request history, MMS prevents access.
+    source_id: MMS-UC-026 A2 - If the Student attempts to access another Student's request
+    purpose: Verify MMS-UC-026 (Track Submitted Request Status and History) alternative flow A2: If the Student attempts to access another Student's request history, MMS prevents access.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -784,7 +736,6 @@ def test_test_uc_062_mms_uc_028_main_flow():
     source_id: MMS-UC-028 Main Flow
     purpose: Verify MMS-UC-028 (Apply Default Vacation Response at Deadline) main success flow: Record No for each currently registered Student who has not responded to an open vacation food-continuity survey by its response deadline.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -794,7 +745,6 @@ def test_test_uc_063_mms_uc_028_a1_students_with():
     source_id: MMS-UC-028 A1 - Students with an explicit Yes or No response are left unchan
     purpose: Verify MMS-UC-028 (Apply Default Vacation Response at Deadline) alternative flow A1: Students with an explicit Yes or No response are left unchanged.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -804,7 +754,6 @@ def test_test_uc_064_mms_uc_028_a2_if_no_register():
     source_id: MMS-UC-028 A2 - If no registered Student lacks a response, no default respon
     purpose: Verify MMS-UC-028 (Apply Default Vacation Response at Deadline) alternative flow A2: If no registered Student lacks a response, no default response record is created.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -814,7 +763,6 @@ def test_test_uc_065_mms_uc_029_main_flow():
     source_id: MMS-UC-029 Main Flow
     purpose: Verify MMS-UC-029 (Default-Reject Undecided Special Food Request) main success flow: Reject a special-food request automatically when it remains undecided after the institution-defined stipulated decision period.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -824,7 +772,6 @@ def test_test_uc_066_mms_uc_029_a1_if_the_caretak():
     source_id: MMS-UC-029 A1 - If the Caretaker has already approved or rejected the reques
     purpose: Verify MMS-UC-029 (Default-Reject Undecided Special Food Request) alternative flow A1: If the Caretaker has already approved or rejected the request, MMS does not perform the default rejection.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -834,7 +781,6 @@ def test_test_uc_067_mms_uc_030_main_flow():
     source_id: MMS-UC-030 Main Flow
     purpose: Verify MMS-UC-030 (Generate Monthly Mess Bills) main success flow: Generate the monthly mess bills for a calendar-month billing cycle from the source-defined charge and deduction components.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -844,7 +790,6 @@ def test_test_uc_068_mms_uc_030_a1_if_required_bi():
     source_id: MMS-UC-030 A1 - If required bill-input data is unavailable, MMS does not mar
     purpose: Verify MMS-UC-030 (Generate Monthly Mess Bills) alternative flow A1: If required bill-input data is unavailable, MMS does not mark the affected bill as ready for Caretaker finalization.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -854,7 +799,6 @@ def test_test_uc_069_mms_uc_031_main_flow():
     source_id: MMS-UC-031 Main Flow
     purpose: Verify MMS-UC-031 (Send Vacation Survey Reminder) main success flow: Trigger the required vacation food-continuity survey reminder email for applicable registered Students.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -864,4 +808,3 @@ def test_test_uc_070_mms_uc_031_a1_if_the_survey():
     source_id: MMS-UC-031 A1 - If the survey is no longer open, MMS does not trigger an ope
     purpose: Verify MMS-UC-031 (Send Vacation Survey Reminder) alternative flow A1: If the survey is no longer open, MMS does not trigger an open-survey reminder.
     """
-    pass

@@ -1,27 +1,17 @@
 """Automated specification-based test suite for MMS module."""
 
 from datetime import date, timedelta
-import pytest
-from django.test import TestCase
 
-from modules.mms import contracts, selectors, services
+import pytest
+
+from modules.mms import selectors, services
 from modules.mms.domain import rules
 from modules.mms.domain.constants import (
     DayOfWeek,
     FeedbackCategory,
     MealTime,
-    MessRole,
     RebateStatus,
     RegistrationStatus,
-)
-from modules.mms.models import (
-    DailyMenuItem,
-    MessActionLog,
-    MessFeedback,
-    MessRegistration,
-    MessRoleAssignment,
-    RebateRequest,
-    RegistrationWindow,
 )
 
 
@@ -32,7 +22,6 @@ def test_test_fr_001_cfr_mms_001_requirement_valida():
     source_id: CFR-MMS-001 requirement validation
     purpose: Verify CFR-MMS-001 (Module Scope and Policy Boundary): MMS shall provide only the mess-management capabilities and explicit integration/notification responsibilities defined by the frozen Problem Statement, while excluding payment/accounting/payroll/procurement/inventory functions and institutional policy definition beyond explicitly stated behavior.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -114,7 +103,6 @@ def test_test_fr_007_cfr_mms_007_requirement_valida():
     source_id: CFR-MMS-007 requirement validation
     purpose: Verify CFR-MMS-007 (Student Request Tracking and Registration/Deregistration Notifications): MMS shall maintain Student-visible request status/history and trigger the defined submission and decision email notifications for registration and deregistration requests.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -138,7 +126,6 @@ def test_test_fr_009_cfr_mms_009_requirement_valida():
     source_id: CFR-MMS-009 requirement validation
     purpose: Verify CFR-MMS-009 (Monthly Billing Management and Student Billing Access): MMS shall generate monthly mess bills on the calendar-month cycle from served-day charges, approved special-meal/add-on charges, and approved rebate deductions; require Caretaker review/finalization before publication; allow Students to view published bills and MMS balances; and notify Students on publication, while excluding payment/accounting settlement functions.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -176,7 +163,6 @@ def test_test_fr_012_cfr_mms_012_requirement_valida():
     source_id: CFR-MMS-012 requirement validation
     purpose: Verify CFR-MMS-012 (Rebate Decision, Status, Billing Effect and Notifications): MMS shall allow the Mess Caretaker to approve or reject a rebate request and, where external policy permits, modify dates before approval; approved dates shall drive billing adjustment, Students shall be able to track status, and defined submission/decision notifications shall be triggered.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -186,7 +172,6 @@ def test_test_fr_013_cfr_mms_013_requirement_valida():
     source_id: CFR-MMS-013 requirement validation
     purpose: Verify CFR-MMS-013 (Vacation Food Continuity Survey Setup and Notifications): MMS shall allow the Mess Caretaker to create an upcoming-vacation food-continuity survey for currently registered Students, set its response deadline, trigger the survey-creation notification, and issue reminders without inventing an unspecified reminder cadence.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -196,7 +181,6 @@ def test_test_fr_014_cfr_mms_014_requirement_valida():
     source_id: CFR-MMS-014 requirement validation
     purpose: Verify CFR-MMS-014 (Vacation Survey Response, Default and Summary): MMS shall accept only Yes/No Student vacation-food responses, record No automatically for registered Students who do not respond by the deadline, and allow the Mess Caretaker to view the resulting response summary.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -206,7 +190,6 @@ def test_test_fr_015_cfr_mms_015_requirement_valida():
     source_id: CFR-MMS-015 requirement validation
     purpose: Verify CFR-MMS-015 (Special Food Request Submission): MMS shall allow a Student to submit a special-food request for illness or a personal event only with the required lead time and shall trigger the submission notification.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -216,7 +199,6 @@ def test_test_fr_016_cfr_mms_016_requirement_valida():
     source_id: CFR-MMS-016 requirement validation
     purpose: Verify CFR-MMS-016 (Special Food Decision and Default Rejection): MMS shall allow the Mess Caretaker to approve or reject a special-food request within the institution-defined decision period, automatically reject an undecided request when that period expires, and trigger the applicable decision notification.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -226,7 +208,6 @@ def test_test_fr_017_cfr_mms_017_requirement_valida():
     source_id: CFR-MMS-017 requirement validation
     purpose: Verify CFR-MMS-017 (Special Food Status, Fulfillment and Billing Link): MMS shall maintain special-food request status/history through Requested, Approved, Rejected, Served, and Cancelled; allow Served/Cancelled only after Approved; trigger fulfillment-related notifications; and add approved special-food charges to monthly billing, while preserving unresolved fulfillment-actor and cancellation-billing questions.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -236,7 +217,6 @@ def test_test_fr_018_cfr_mms_018_requirement_valida():
     source_id: CFR-MMS-018 requirement validation
     purpose: Verify CFR-MMS-018 (Mess Announcements and History): MMS shall allow the Mess Caretaker or Mess Warden to publish mess-related announcements, notify Students of new announcements, maintain announcement history, and allow MMS actors to view that history according to access rights.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -246,7 +226,6 @@ def test_test_fr_019_cfr_mms_019_requirement_valida():
     source_id: CFR-MMS-019 requirement validation
     purpose: Verify CFR-MMS-019 (Warden Supervisory Reporting): MMS shall allow the Mess Warden to view and search registered-Student lists, rebate summaries, and vacation-survey response summaries.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -256,7 +235,6 @@ def test_test_fr_020_cfr_mms_020_requirement_valida():
     source_id: CFR-MMS-020 requirement validation
     purpose: Verify CFR-MMS-020 (Caretaker Operational Reporting): MMS shall allow the Mess Caretaker to generate registration-trend reports, special-meal logs, and billing-summary reports.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: supervisory reporting service/model not yet implemented in MMS")
@@ -266,7 +244,6 @@ def test_test_fr_021_cfr_mms_021_requirement_valida():
     source_id: CFR-MMS-021 requirement validation
     purpose: Verify CFR-MMS-021 (MMS Report Scope Boundary): MMS reporting shall remain limited to MMS operational and supervisory information and shall exclude external financial, payroll, procurement, and inventory reporting.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: email notification dispatcher not yet implemented in MMS")
@@ -276,7 +253,6 @@ def test_test_fr_022_cfr_mms_022_requirement_valida():
     source_id: CFR-MMS-022 requirement validation
     purpose: Verify CFR-MMS-022 (Notification Governance and Email Boundary): MMS shall trigger system-generated email notifications only for events explicitly identified in the frozen Problem Statement and shall not own the external email-delivery infrastructure.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: capability AFR-MMS-001 verification not yet supported in current MMS release")
@@ -286,7 +262,6 @@ def test_test_fr_023_afr_mms_001_verification():
     source_id: AFR-MMS-001 verification
     purpose: Verify AFR-MMS-001: MMS shall provide only the mess-management functionality explicitly defined in the frozen problem statement.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: external ERP domain function excluded from MMS scope")
@@ -296,7 +271,6 @@ def test_test_fr_024_afr_mms_100_verification():
     source_id: AFR-MMS-100 verification
     purpose: Verify AFR-MMS-100: MMS shall not perform payment collection, accounting settlement, payroll processing, procurement, stock management, or inventory management.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -306,7 +280,6 @@ def test_test_fr_025_afr_mms_101_verification():
     source_id: AFR-MMS-101 verification
     purpose: Verify AFR-MMS-101: MMS shall not define institutional mess policies such as rates, vacation periods, eligibility policy, or approval authority beyond behavior explicitly stated in the frozen problem statement.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -444,7 +417,6 @@ def test_test_fr_035_afr_mms_007_verification():
     source_id: AFR-MMS-007 verification
     purpose: Verify AFR-MMS-007: MMS shall prevent the Mess Admin from accessing operational mess data, including student requests, billing details, rebate details, special-food requests, vacation responses, and feedback entries.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -528,7 +500,7 @@ def test_test_fr_041_afr_mms_017_verification():
     """
     test_id: TEST-FR-041
     source_id: AFR-MMS-017 verification
-    purpose: Verify AFR-MMS-017: MMS shall record the Caretaker’s decision on a deregistration request when the decision is made.
+    purpose: Verify AFR-MMS-017: MMS shall record the Caretaker's decision on a deregistration request when the decision is made.
     """
     assignment = services.assign_mess_role("Mess 1", "caretaker", employee_id=105, assigned_by_id=1)
     assert assignment.id is not None
@@ -589,9 +561,8 @@ def test_test_fr_045_afr_mms_011_verification():
     """
     test_id: TEST-FR-045
     source_id: AFR-MMS-011 verification
-    purpose: Verify AFR-MMS-011: MMS shall allow a Student to track the status and history of the Student’s submitted MMS requests.
+    purpose: Verify AFR-MMS-011: MMS shall allow a Student to track the status and history of the Student's submitted MMS requests.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -620,7 +591,6 @@ def test_test_fr_047_afr_mms_022_verification():
     source_id: AFR-MMS-022 verification
     purpose: Verify AFR-MMS-022: MMS shall trigger a system-generated email notification to the Student when a registration or deregistration request is submitted.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: email notification dispatcher not yet implemented in MMS")
@@ -630,7 +600,6 @@ def test_test_fr_048_afr_mms_023_verification():
     source_id: AFR-MMS-023 verification
     purpose: Verify AFR-MMS-023: MMS shall trigger a system-generated email notification to the Student when a registration or deregistration request is approved or rejected.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -786,7 +755,6 @@ def test_test_fr_058_afr_mms_032_verification():
     source_id: AFR-MMS-032 verification
     purpose: Verify AFR-MMS-032: MMS shall trigger system-generated email notifications to Students when the weekly menu is updated.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -794,9 +762,8 @@ def test_test_fr_059_afr_mms_009_verification():
     """
     test_id: TEST-FR-059
     source_id: AFR-MMS-009 verification
-    purpose: Verify AFR-MMS-009: MMS shall allow a Student to view the Student’s monthly mess bills.
+    purpose: Verify AFR-MMS-009: MMS shall allow a Student to view the Student's monthly mess bills.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -806,7 +773,6 @@ def test_test_fr_060_afr_mms_033_verification():
     source_id: AFR-MMS-033 verification
     purpose: Verify AFR-MMS-033: MMS shall generate mess bills using a calendar-month billing cycle.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -816,7 +782,6 @@ def test_test_fr_061_afr_mms_034_verification():
     source_id: AFR-MMS-034 verification
     purpose: Verify AFR-MMS-034: MMS shall include daily-rate charges for served days in monthly bill computation.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -826,7 +791,6 @@ def test_test_fr_062_afr_mms_035_verification():
     source_id: AFR-MMS-035 verification
     purpose: Verify AFR-MMS-035: MMS shall include charges for approved special meals or add-ons in monthly bill computation.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -836,7 +800,6 @@ def test_test_fr_063_afr_mms_036_verification():
     source_id: AFR-MMS-036 verification
     purpose: Verify AFR-MMS-036: MMS shall deduct approved rebates in monthly bill computation.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -846,7 +809,6 @@ def test_test_fr_064_afr_mms_037_verification():
     source_id: AFR-MMS-037 verification
     purpose: Verify AFR-MMS-037: MMS shall allow the Mess Caretaker to review system-generated monthly mess bills before publication.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -856,7 +818,6 @@ def test_test_fr_065_afr_mms_038_verification():
     source_id: AFR-MMS-038 verification
     purpose: Verify AFR-MMS-038: MMS shall require the Mess Caretaker to finalize monthly mess bills before publication.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -866,7 +827,6 @@ def test_test_fr_066_afr_mms_039_verification():
     source_id: AFR-MMS-039 verification
     purpose: Verify AFR-MMS-039: MMS shall allow the Mess Caretaker to publish finalized monthly mess bills.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -874,9 +834,8 @@ def test_test_fr_067_afr_mms_040_verification():
     """
     test_id: TEST-FR-067
     source_id: AFR-MMS-040 verification
-    purpose: Verify AFR-MMS-040: MMS shall allow a Student to view the Student’s published monthly mess bill.
+    purpose: Verify AFR-MMS-040: MMS shall allow a Student to view the Student's published monthly mess bill.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -884,9 +843,8 @@ def test_test_fr_068_afr_mms_041_verification():
     """
     test_id: TEST-FR-068
     source_id: AFR-MMS-041 verification
-    purpose: Verify AFR-MMS-041: MMS shall allow a Student to view the Student’s outstanding mess balance maintained within MMS.
+    purpose: Verify AFR-MMS-041: MMS shall allow a Student to view the Student's outstanding mess balance maintained within MMS.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -896,7 +854,6 @@ def test_test_fr_069_afr_mms_042_verification():
     source_id: AFR-MMS-042 verification
     purpose: Verify AFR-MMS-042: MMS shall not perform payment collection, accounting settlement, or payroll/account integration as part of billing management.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -906,7 +863,6 @@ def test_test_fr_070_afr_mms_043_verification():
     source_id: AFR-MMS-043 verification
     purpose: Verify AFR-MMS-043: MMS shall trigger a system-generated email notification to Students when monthly bills are published.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -1137,7 +1093,6 @@ def test_test_fr_084_afr_mms_057_verification():
     source_id: AFR-MMS-057 verification
     purpose: Verify AFR-MMS-057: When rebate dates are modified before approval, MMS shall use the approved dates as the rebate dates for billing adjustment.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -1167,7 +1122,6 @@ def test_test_fr_086_afr_mms_059_verification():
     source_id: AFR-MMS-059 verification
     purpose: Verify AFR-MMS-059: MMS shall automatically apply approved rebate adjustments to the corresponding monthly mess bill.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: email notification dispatcher not yet implemented in MMS")
@@ -1177,7 +1131,6 @@ def test_test_fr_087_afr_mms_060_verification():
     source_id: AFR-MMS-060 verification
     purpose: Verify AFR-MMS-060: MMS shall trigger a system-generated email notification to the Student when a rebate request is submitted.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: email notification dispatcher not yet implemented in MMS")
@@ -1187,7 +1140,6 @@ def test_test_fr_088_afr_mms_061_verification():
     source_id: AFR-MMS-061 verification
     purpose: Verify AFR-MMS-061: MMS shall trigger a system-generated email notification to the Student when a rebate request is approved or rejected.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -1197,7 +1149,6 @@ def test_test_fr_089_afr_mms_062_verification():
     source_id: AFR-MMS-062 verification
     purpose: Verify AFR-MMS-062: MMS shall allow the Mess Caretaker to create a vacation food continuity survey for an upcoming institute vacation.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -1207,7 +1158,6 @@ def test_test_fr_090_afr_mms_063_verification():
     source_id: AFR-MMS-063 verification
     purpose: Verify AFR-MMS-063: MMS shall make a vacation food continuity survey available only to currently registered Students.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -1217,7 +1167,6 @@ def test_test_fr_091_afr_mms_065_verification():
     source_id: AFR-MMS-065 verification
     purpose: Verify AFR-MMS-065: MMS shall allow the Mess Caretaker to set a response deadline for each vacation food continuity survey.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -1227,7 +1176,6 @@ def test_test_fr_092_afr_mms_068_verification():
     source_id: AFR-MMS-068 verification
     purpose: Verify AFR-MMS-068: MMS shall trigger system-generated email notification when a vacation food continuity survey is created.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -1237,7 +1185,6 @@ def test_test_fr_093_afr_mms_069_verification():
     source_id: AFR-MMS-069 verification
     purpose: Verify AFR-MMS-069: MMS shall trigger system-generated email reminders for vacation food continuity surveys; reminder timing is not specified by the frozen PS.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -1245,9 +1192,8 @@ def test_test_fr_094_afr_mms_064_verification():
     """
     test_id: TEST-FR-094
     source_id: AFR-MMS-064 verification
-    purpose: Verify AFR-MMS-064: MMS shall restrict a Student’s vacation food continuity response to Yes or No.
+    purpose: Verify AFR-MMS-064: MMS shall restrict a Student's vacation food continuity response to Yes or No.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -1257,7 +1203,6 @@ def test_test_fr_095_afr_mms_066_verification():
     source_id: AFR-MMS-066 verification
     purpose: Verify AFR-MMS-066: For each currently registered Student who has not responded by the survey deadline, MMS shall record the response as No.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -1267,7 +1212,6 @@ def test_test_fr_096_afr_mms_067_verification():
     source_id: AFR-MMS-067 verification
     purpose: Verify AFR-MMS-067: MMS shall allow the Mess Caretaker to view the vacation survey response summary for operational planning.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1277,7 +1221,6 @@ def test_test_fr_097_afr_mms_070_verification():
     source_id: AFR-MMS-070 verification
     purpose: Verify AFR-MMS-070: MMS shall allow a Student to submit a special food request due to illness or a personal event.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1287,7 +1230,6 @@ def test_test_fr_098_afr_mms_071_verification():
     source_id: AFR-MMS-071 verification
     purpose: Verify AFR-MMS-071: MMS shall accept a special food request only when submitted at least 1 calendar day before the requested date.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1297,7 +1239,6 @@ def test_test_fr_099_afr_mms_075_verification():
     source_id: AFR-MMS-075 verification
     purpose: Verify AFR-MMS-075: MMS shall trigger a system-generated email notification to the Student when a special food request is submitted.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1307,7 +1248,6 @@ def test_test_fr_100_afr_mms_072_verification():
     source_id: AFR-MMS-072 verification
     purpose: Verify AFR-MMS-072: MMS shall allow the Mess Caretaker to approve or reject a special food request within the institution-defined stipulated decision period.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1317,7 +1257,6 @@ def test_test_fr_101_afr_mms_073_verification():
     source_id: AFR-MMS-073 verification
     purpose: Verify AFR-MMS-073: If a special food request is not decided within the institution-defined stipulated decision period, MMS shall mark the request Rejected by default.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1327,7 +1266,6 @@ def test_test_fr_102_afr_mms_076_verification():
     source_id: AFR-MMS-076 verification
     purpose: Verify AFR-MMS-076: MMS shall trigger a system-generated email notification to the Student when a special food request is approved or rejected.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1337,7 +1275,6 @@ def test_test_fr_103_afr_mms_074_verification():
     source_id: AFR-MMS-074 verification
     purpose: Verify AFR-MMS-074: MMS shall maintain special food request history and status so the Student can track the request.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1345,9 +1282,8 @@ def test_test_fr_104_afr_mms_077_verification():
     """
     test_id: TEST-FR-104
     source_id: AFR-MMS-077 verification
-    purpose: Verify AFR-MMS-077: MMS shall add charges for approved special food requests to the Student’s monthly mess bill.
+    purpose: Verify AFR-MMS-077: MMS shall add charges for approved special food requests to the Student's monthly mess bill.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1357,7 +1293,6 @@ def test_test_fr_105_afr_mms_078_verification():
     source_id: AFR-MMS-078 verification
     purpose: Verify AFR-MMS-078: MMS shall track special food requests using the states Requested, Approved, Rejected, Served, and Cancelled.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1367,7 +1302,6 @@ def test_test_fr_106_afr_mms_079_verification():
     source_id: AFR-MMS-079 verification
     purpose: Verify AFR-MMS-079: MMS shall permit Served and Cancelled statuses only after a special food request has reached Approved status.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: email notification dispatcher not yet implemented in MMS")
@@ -1377,7 +1311,6 @@ def test_test_fr_107_afr_mms_080_verification():
     source_id: AFR-MMS-080 verification
     purpose: Verify AFR-MMS-080: MMS shall trigger system-generated email notifications for special-food fulfillment-related updates where applicable.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -1387,7 +1320,6 @@ def test_test_fr_108_afr_mms_010_verification():
     source_id: AFR-MMS-010 verification
     purpose: Verify AFR-MMS-010: MMS shall allow a Student to view mess-service announcements relevant to the Student.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -1397,7 +1329,6 @@ def test_test_fr_109_afr_mms_081_verification():
     source_id: AFR-MMS-081 verification
     purpose: Verify AFR-MMS-081: MMS shall allow the Mess Caretaker to publish mess-related announcements.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -1407,7 +1338,6 @@ def test_test_fr_110_afr_mms_082_verification():
     source_id: AFR-MMS-082 verification
     purpose: Verify AFR-MMS-082: MMS shall allow the Mess Warden to publish mess-related announcements.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -1417,7 +1347,6 @@ def test_test_fr_111_afr_mms_083_verification():
     source_id: AFR-MMS-083 verification
     purpose: Verify AFR-MMS-083: MMS shall trigger a system-generated email notification to Students when a new announcement is published.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -1427,7 +1356,6 @@ def test_test_fr_112_afr_mms_084_verification():
     source_id: AFR-MMS-084 verification
     purpose: Verify AFR-MMS-084: MMS shall maintain announcement history relevant to mess services.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -1437,7 +1365,6 @@ def test_test_fr_113_afr_mms_085_verification():
     source_id: AFR-MMS-085 verification
     purpose: Verify AFR-MMS-085: MMS shall allow MMS actors to view announcement history according to their access rights.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -1475,7 +1402,6 @@ def test_test_fr_116_afr_mms_088_verification():
     source_id: AFR-MMS-088 verification
     purpose: Verify AFR-MMS-088: MMS shall allow the Mess Warden to view and search vacation survey response summaries.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -1485,7 +1411,6 @@ def test_test_fr_117_afr_mms_089_verification():
     source_id: AFR-MMS-089 verification
     purpose: Verify AFR-MMS-089: MMS shall allow the Mess Caretaker to generate registration trend reports.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -1495,7 +1420,6 @@ def test_test_fr_118_afr_mms_090_verification():
     source_id: AFR-MMS-090 verification
     purpose: Verify AFR-MMS-090: MMS shall allow the Mess Caretaker to generate special meal logs.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -1505,7 +1429,6 @@ def test_test_fr_119_afr_mms_091_verification():
     source_id: AFR-MMS-091 verification
     purpose: Verify AFR-MMS-091: MMS shall allow the Mess Caretaker to generate billing summary reports.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: supervisory reporting service/model not yet implemented in MMS")
@@ -1515,7 +1438,6 @@ def test_test_fr_120_afr_mms_092_verification():
     source_id: AFR-MMS-092 verification
     purpose: Verify AFR-MMS-092: MMS reports shall be limited to MMS operational and supervisory information.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: supervisory reporting service/model not yet implemented in MMS")
@@ -1525,7 +1447,6 @@ def test_test_fr_121_afr_mms_093_verification():
     source_id: AFR-MMS-093 verification
     purpose: Verify AFR-MMS-093: MMS shall not provide external financial, payroll, procurement, or inventory reports.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: email notification dispatcher not yet implemented in MMS")
@@ -1535,7 +1456,6 @@ def test_test_fr_122_afr_mms_094_verification():
     source_id: AFR-MMS-094 verification
     purpose: Verify AFR-MMS-094: MMS shall trigger system-generated email notifications only for MMS events explicitly identified in the frozen problem statement.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: email notification dispatcher not yet implemented in MMS")
@@ -1545,4 +1465,3 @@ def test_test_fr_123_afr_mms_095_verification():
     source_id: AFR-MMS-095 verification
     purpose: Verify AFR-MMS-095: MMS shall not own the external email delivery infrastructure used to deliver system-generated email notifications.
     """
-    pass

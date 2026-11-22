@@ -1,27 +1,16 @@
 """Automated specification-based test suite for MMS module."""
 
 from datetime import date, timedelta
-import pytest
-from django.test import TestCase
 
-from modules.mms import contracts, selectors, services
+import pytest
+
+from modules.mms import selectors, services
 from modules.mms.domain import rules
 from modules.mms.domain.constants import (
     DayOfWeek,
-    FeedbackCategory,
     MealTime,
-    MessRole,
     RebateStatus,
     RegistrationStatus,
-)
-from modules.mms.models import (
-    DailyMenuItem,
-    MessActionLog,
-    MessFeedback,
-    MessRegistration,
-    MessRoleAssignment,
-    RebateRequest,
-    RegistrationWindow,
 )
 
 
@@ -32,7 +21,6 @@ def test_test_br_001_br_mms_001_rule_enforcement():
     source_id: BR-MMS-001 rule enforcement
     purpose: Verify BR-MMS-001 (MMS Functional Scope Boundary): MMS shall remain limited to the mess-management functions and explicit integrations/notification triggers defined in the frozen problem statement.
     """
-    pass
 
 
 def test_test_br_002_br_mms_002_rule_enforcement():
@@ -84,7 +72,6 @@ def test_test_br_005_br_mms_005_rule_enforcement():
     source_id: BR-MMS-005 rule enforcement
     purpose: Verify BR-MMS-005 (Mess Admin Operational Data Restriction): MMS shall prevent Mess Admin from accessing operational mess data, student requests, billing, or feedback.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -231,7 +218,6 @@ def test_test_br_015_br_mms_015_rule_enforcement():
     source_id: BR-MMS-015 rule enforcement
     purpose: Verify BR-MMS-015 (Menu Update Notification Rule): MMS shall trigger system-generated email notifications to Students when weekly menu updates are published.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -241,7 +227,6 @@ def test_test_br_016_br_mms_016_rule_enforcement():
     source_id: BR-MMS-016 rule enforcement
     purpose: Verify BR-MMS-016 (Monthly Calendar Billing Cycle): MMS shall generate mess bills using the monthly calendar-month cycle.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -251,7 +236,6 @@ def test_test_br_017_br_mms_017_rule_enforcement():
     source_id: BR-MMS-017 rule enforcement
     purpose: Verify BR-MMS-017 (Bill Computation Components): MMS monthly billing shall include daily-rate multiplied by number of served days, charges for approved special meals, and automatic deductions for approved rebates.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -261,7 +245,6 @@ def test_test_br_018_br_mms_018_rule_enforcement():
     source_id: BR-MMS-018 rule enforcement
     purpose: Verify BR-MMS-018 (Caretaker Bill Finalization Rule): MMS shall require Caretaker review and finalization before monthly bills are published to Students.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: monthly billing calculation service/model not yet implemented in MMS")
@@ -271,7 +254,6 @@ def test_test_br_019_br_mms_019_rule_enforcement():
     source_id: BR-MMS-019 rule enforcement
     purpose: Verify BR-MMS-019 (Approved Rebate Billing Effect): MMS shall apply rebate deductions to monthly bills only for approved rebate requests.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: supervisory reporting service/model not yet implemented in MMS")
@@ -281,7 +263,6 @@ def test_test_br_020_br_mms_020_rule_enforcement():
     source_id: BR-MMS-020 rule enforcement
     purpose: Verify BR-MMS-020 (Feedback Storage and Visibility Rule): MMS shall store Student text feedback and make feedback visible to Caretaker and Warden for monitoring and reporting.
     """
-    pass
 
 
 def test_test_br_021_br_mms_021_rule_enforcement():
@@ -350,7 +331,6 @@ def test_test_br_025_br_mms_025_rule_enforcement():
     source_id: BR-MMS-025 rule enforcement
     purpose: Verify BR-MMS-025 (Caretaker Rebate Date Modification Rule): The Caretaker may modify rebate dates before approval only where permitted by the external mess policy; approved dates become the dates used by MMS for billing adjustment.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -360,7 +340,6 @@ def test_test_br_026_br_mms_026_rule_enforcement():
     source_id: BR-MMS-026 rule enforcement
     purpose: Verify BR-MMS-026 (Vacation Survey Registered-student Restriction): MMS shall send vacation food continuity surveys only to currently registered Students.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -370,7 +349,6 @@ def test_test_br_027_br_mms_027_rule_enforcement():
     source_id: BR-MMS-027 rule enforcement
     purpose: Verify BR-MMS-027 (Vacation Survey Default No Rule): MMS shall record No as the default response for registered Students who do not respond before the response deadline.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -380,7 +358,6 @@ def test_test_br_028_br_mms_028_rule_enforcement():
     source_id: BR-MMS-028 rule enforcement
     purpose: Verify BR-MMS-028 (Special Food Lead-time Rule): MMS shall allow special food requests only when submitted at least one calendar day before the requested date.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -390,7 +367,6 @@ def test_test_br_029_br_mms_029_rule_enforcement():
     source_id: BR-MMS-029 rule enforcement
     purpose: Verify BR-MMS-029 (Special Food Default Rejection Rule): MMS shall mark a special food request as Rejected if the Caretaker does not decide within the institution-defined decision period of receiving the request.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -400,7 +376,6 @@ def test_test_br_030_br_mms_030_rule_enforcement():
     source_id: BR-MMS-030 rule enforcement
     purpose: Verify BR-MMS-030 (Special Food Charge Rule): Approved special-food requests are chargeable and their charges are added to the Student monthly bill.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: special food request service/model not yet implemented in MMS")
@@ -410,7 +385,6 @@ def test_test_br_031_br_mms_031_rule_enforcement():
     source_id: BR-MMS-031 rule enforcement
     purpose: Verify BR-MMS-031 (Special Food State-transition Rule): MMS shall track special food requests using Requested, Approved, Rejected, Served, and Cancelled states; Served and Cancelled shall occur only after Approved.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -420,7 +394,6 @@ def test_test_br_032_br_mms_032_rule_enforcement():
     source_id: BR-MMS-032 rule enforcement
     purpose: Verify BR-MMS-032 (Announcement Publisher and Relevance Rule): Only the active Mess Caretaker or Mess Warden may publish mess-related announcements.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: announcement publication service/model not yet implemented in MMS")
@@ -430,7 +403,6 @@ def test_test_br_033_br_mms_033_rule_enforcement():
     source_id: BR-MMS-033 rule enforcement
     purpose: Verify BR-MMS-033 (Announcement History Access Rule): MMS shall maintain mess-relevant announcement history and allow MMS actors to view it according to access rights.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: supervisory reporting service/model not yet implemented in MMS")
@@ -440,7 +412,6 @@ def test_test_br_034_br_mms_034_rule_enforcement():
     source_id: BR-MMS-034 rule enforcement
     purpose: Verify BR-MMS-034 (Report Role-access Rule): MMS shall restrict supervisory reports to Warden and operational reports to Caretaker as stated in the frozen problem statement.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: email notification dispatcher not yet implemented in MMS")
@@ -450,7 +421,6 @@ def test_test_br_035_br_mms_035_rule_enforcement():
     source_id: BR-MMS-035 rule enforcement
     purpose: Verify BR-MMS-035 (MMS Notification Trigger Scope): MMS triggers system-generated email notifications only for the MMS events explicitly listed in the frozen problem statement; external email delivery infrastructure remains outside MMS.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -460,7 +430,6 @@ def test_test_br_036_br_mms_036_rule_enforcement():
     source_id: BR-MMS-036 rule enforcement
     purpose: Verify BR-MMS-036 (External Policy Ownership Boundary): MMS shall not define institutional mess policies such as rates, vacation periods, or employee appointment policy; it may only use explicitly provided values as inputs where the frozen problem statement states system behavior.
     """
-    pass
 
 
 @pytest.mark.django_db
@@ -498,7 +467,6 @@ def test_test_br_039_br_mms_040_rule_enforcement():
     source_id: BR-MMS-040 rule enforcement
     purpose: Verify BR-MMS-040 (Student Billing Information Access Rule): MMS shall allow Students to view only actor-visible monthly mess bills and outstanding balances maintained within MMS.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: vacation survey service/model not yet implemented in MMS")
@@ -508,7 +476,6 @@ def test_test_br_040_br_mms_041_rule_enforcement():
     source_id: BR-MMS-041 rule enforcement
     purpose: Verify BR-MMS-041 (Vacation Survey Response Option Rule): MMS shall restrict Student vacation food continuity responses to Yes or No.
     """
-    pass
 
 
 @pytest.mark.skip(reason="NOT_AUTOMATED: capability BR-MMS-042 rule enforcement not yet supported in current MMS release")
@@ -516,6 +483,5 @@ def test_test_br_041_br_mms_042_rule_enforcement():
     """
     test_id: TEST-BR-041
     source_id: BR-MMS-042 rule enforcement
-    purpose: Verify BR-MMS-042 (Student Request Status and History Access Rule): MMS shall allow a Student to view status and history only for the Student’s own submitted MMS requests.
+    purpose: Verify BR-MMS-042 (Student Request Status and History Access Rule): MMS shall allow a Student to view status and history only for the Student's own submitted MMS requests.
     """
-    pass
