@@ -62,9 +62,9 @@ def normalize_role(value: Any) -> str:
         return ROLE_ALIASES[lowered]
     # Actual IAM designations are department-specific (for example HOD (CSE)
     # and Dean Academic); map them to the three distinct IAA authority classes.
-    if lowered == "hod" or lowered.startswith("hod ") or lowered.startswith("head of department"):
+    if lowered == "hod" or lowered.startswith(("hod ", "head of department")):
         return "hod"
-    if lowered == "dean" or lowered.startswith("dean ") or lowered.startswith("dean ("):
+    if lowered == "dean" or lowered.startswith(("dean ", "dean (")):
         return "dean"
     if lowered == "director" or lowered.startswith("director "):
         return "director"
