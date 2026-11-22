@@ -69,7 +69,10 @@ export default function StockPage() {
 
         <Card padding="lg">
           <Title order={4} mb="sm">Internal Stock Issues</Title>
-          <DataTable<InternalIssue>
+          {issues.error ? (
+            <ErrorState error={issues.error} />
+          ) : (
+            <DataTable<InternalIssue>
             rows={issues.data?.results ?? []}
             loading={issues.isPending}
             rowKey={(r) => r.id}
@@ -105,6 +108,7 @@ export default function StockPage() {
               },
             ]}
           />
+          )}
         </Card>
       </Stack>
 

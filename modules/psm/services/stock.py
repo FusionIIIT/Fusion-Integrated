@@ -67,6 +67,19 @@ def create_stock_location(
     return loc
 
 
+def _route_to_external(actor, indent, reason: str) -> tuple[object, None]:
+    """Transition an indent with insufficient stock to external procurement."""
+    transition_indent(
+        indent=indent,
+        to_status=sm.EXTERNAL_REQUIRED,
+        actor=actor,
+        actor_lane=sm.DEPT_ADMIN,
+        action="indent.stock_checked",
+        reason=reason,
+    )
+    return indent, None
+
+
 @transaction.atomic
 def check_and_reserve(*, actor, indent_id: int) -> tuple[object, StockReservation | None]:
     """Check departmental then central stock and reserve (PSM-UC-007, BR-PSM-003, 013)."""
@@ -74,30 +87,16 @@ def check_and_reserve(*, actor, indent_id: int) -> tuple[object, StockReservatio
     if indent is None:
         raise NotFoundError("Indent not found.")
     if indent.item_id is None:
-        transition_indent(
-            indent=indent,
-            to_status=sm.EXTERNAL_REQUIRED,
-            actor=actor,
-            actor_lane=sm.DEPT_ADMIN,
-            action="indent.stock_checked",
-            reason="No linked stock catalog item; routed to external procurement",
+        return _route_to_external(
+            actor, indent, "No linked stock catalog item; routed to external procurement"
         )
-        return indent, None
     # Lock the StockItem row so concurrent reservations serialize cleanly (BR-PSM-013).
     StockItem.objects.select_for_update().get(pk=indent.item_id)
     balances = stock_balances_for_item(indent.item_id)
     with translate_errors():
         chosen = sr.select_allocation_location(balances, indent.department, indent.quantity)
     if chosen is None:
-        transition_indent(
-            indent=indent,
-            to_status=sm.EXTERNAL_REQUIRED,
-            actor=actor,
-            actor_lane=sm.DEPT_ADMIN,
-            action="indent.stock_checked",
-            reason="Insufficient departmental and central stock",
-        )
-        return indent, None
+        return _route_to_external(actor, indent, "Insufficient departmental and central stock")
     reservation = StockReservation.objects.create(
         item_id=indent.item_id,
         location_id=chosen.location_id,
@@ -215,6 +214,39 @@ def dispatch_internal_issue(*, actor, issue_id: int) -> InternalIssue:
     return issue
 
 
+def _ensure_no_open_grn_discrepancy(source_ref_type: str, source_ref_id: int | None) -> None:
+    """Block GRN-linked stock adjustments while a discrepancy case remains open."""
+    if source_ref_type != "grn" or source_ref_id is None:
+        return
+    has_open = (
+        DiscrepancyCase.objects.filter(grn_id=source_ref_id)
+        .exclude(status__in=(sm.DISC_RESOLVED, sm.DISC_CLOSED))
+        .exists()
+    )
+    if has_open:
+        raise ConflictError(
+            "Resolve the open discrepancy case before posting a stock adjustment for this GRN.",
+            code="unresolved_discrepancy",
+        )
+
+
+def _current_balance(item: StockItem, location: StockLocation) -> tuple[int, int]:
+    """Return current on-hand and active reserved quantities for an item at a location."""
+    on_hand = (
+        StockLedgerEntry.objects.filter(item=item, location=location).aggregate(
+            t=Sum("quantity_delta")
+        )["t"]
+        or 0
+    )
+    reserved = (
+        StockReservation.objects.filter(item=item, location=location, status="active").aggregate(
+            t=Sum("quantity")
+        )["t"]
+        or 0
+    )
+    return on_hand, reserved
+
+
 @transaction.atomic
 def record_adjustment(
     *,
@@ -236,29 +268,8 @@ def record_adjustment(
     location = scoping.stock_locations_for(actor).filter(pk=location_id).first()
     if location is None:
         raise NotFoundError("Stock location not found.")
-    if source_ref_type == "grn" and source_ref_id is not None:
-        has_open = (
-            DiscrepancyCase.objects.filter(grn_id=source_ref_id)
-            .exclude(status__in=(sm.DISC_RESOLVED, sm.DISC_CLOSED))
-            .exists()
-        )
-        if has_open:
-            raise ConflictError(
-                "Resolve the open discrepancy case before posting a stock adjustment for this GRN.",
-                code="unresolved_discrepancy",
-            )
-    on_hand = (
-        StockLedgerEntry.objects.filter(item=item, location=location).aggregate(
-            t=Sum("quantity_delta")
-        )["t"]
-        or 0
-    )
-    reserved = (
-        StockReservation.objects.filter(item=item, location=location, status="active").aggregate(
-            t=Sum("quantity")
-        )["t"]
-        or 0
-    )
+    _ensure_no_open_grn_discrepancy(source_ref_type, source_ref_id)
+    on_hand, reserved = _current_balance(item, location)
     with translate_errors():
         sr.ensure_adjustment_non_negative(on_hand, reserved, quantity_delta)
     entry = StockLedgerEntry.objects.create(

@@ -115,6 +115,60 @@ def transition_indent(
     return indent
 
 
+def _submit_created_indent(actor, indent: Indent, dup_window_days: int, now) -> None:
+    """Submit a newly created indent, snapshot v1, and notify requestor."""
+    dup_id = _check_duplicate(indent, dup_window_days, now)
+    transition_indent(
+        indent=indent,
+        to_status=sm.SUBMITTED,
+        actor=actor,
+        actor_lane=sm.EMPLOYEE,
+        action="indent.submitted",
+        reason="Submitted by requestor",
+        extra_updates={
+            "indent_number": next_number("IND"),
+            "submitted_at": now,
+            "is_duplicate_flagged": dup_id is not None,
+            "duplicate_of_indent_id": dup_id,
+        },
+    )
+    IndentVersion.objects.create(
+        indent=indent, version=1, snapshot=_indent_snapshot(indent), actor_user_id=actor.user_id
+    )
+    enqueue_notification(
+        topic="indent.submitted",
+        dedupe_key=f"indent.submitted:{indent.pk}:v1",
+        recipient_user_id=actor.user_id,
+        subject=f"Indent {indent.indent_number} submitted",
+        body=f"Indent for {indent.item_description} (qty {indent.quantity}) submitted.",
+        payload={"indent_id": indent.pk, "duplicate_flagged": indent.is_duplicate_flagged},
+    )
+
+
+def _apply_indent_changes(indent: Indent, changes: dict) -> None:
+    """Apply mutable field updates and re-validate completeness for an indent."""
+    for key in ("department", "item_description", "quantity", "estimated_cost", "justification"):
+        if key in changes:
+            val = changes[key]
+            setattr(indent, key, val.strip() if isinstance(val, str) else val)
+    if "item_id" in changes:
+        item_id = changes["item_id"]
+        item = StockItem.objects.filter(pk=item_id, is_active=True).first() if item_id else None
+        if item_id is not None and item is None:
+            raise NotFoundError("Selected stock item was not found.")
+        indent.item = item
+    with translate_errors():
+        ir.validate_indent_completeness(
+            ir.IndentInput(
+                item_description=indent.item_description,
+                quantity=indent.quantity,
+                estimated_cost=indent.estimated_cost,
+                justification=indent.justification,
+                department=indent.department,
+            )
+        )
+
+
 @transaction.atomic
 def create_indent(
     *,
@@ -157,65 +211,20 @@ def create_indent(
         policy=policy,
     )
     if submit:
-        dup_id = _check_duplicate(indent, spec.duplicate_window_days, now)
-        transition_indent(
-            indent=indent,
-            to_status=sm.SUBMITTED,
-            actor=actor,
-            actor_lane=sm.EMPLOYEE,
-            action="indent.submitted",
-            reason="Submitted by requestor",
-            extra_updates={
-                "indent_number": next_number("IND"),
-                "submitted_at": now,
-                "is_duplicate_flagged": dup_id is not None,
-                "duplicate_of_indent_id": dup_id,
-            },
-        )
-        IndentVersion.objects.create(
-            indent=indent, version=1, snapshot=_indent_snapshot(indent), actor_user_id=actor.user_id
-        )
-        enqueue_notification(
-            topic="indent.submitted",
-            dedupe_key=f"indent.submitted:{indent.pk}:v1",
-            recipient_user_id=actor.user_id,
-            subject=f"Indent {indent.indent_number} submitted",
-            body=f"Indent for {indent.item_description} (qty {indent.quantity}) submitted.",
-            payload={"indent_id": indent.pk, "duplicate_flagged": indent.is_duplicate_flagged},
-        )
+        _submit_created_indent(actor, indent, spec.duplicate_window_days, now)
     return indent
 
 
 @transaction.atomic
 def modify_indent(*, actor, indent_id: int, **changes) -> Indent:
     """Modify an own pending indent and create a new version (PSM-UC-023, BW-PSM-07)."""
-    policy = require_active_policy()
-    spec = policy_to_spec(policy)
+    spec = policy_to_spec(require_active_policy())
     indent = Indent.objects.select_for_update().filter(pk=indent_id, user_id=actor.user_id).first()
     if indent is None:
         raise NotFoundError("Indent not found.")
     with translate_errors():
         ir.ensure_state_permissible(indent.status, spec.modifiable_states, "modify")
-    for key in ("department", "item_description", "quantity", "estimated_cost", "justification"):
-        if key in changes:
-            val = changes[key]
-            setattr(indent, key, val.strip() if isinstance(val, str) else val)
-    if "item_id" in changes:
-        item_id = changes["item_id"]
-        item = StockItem.objects.filter(pk=item_id, is_active=True).first() if item_id else None
-        if item_id is not None and item is None:
-            raise NotFoundError("Selected stock item was not found.")
-        indent.item = item
-    with translate_errors():
-        ir.validate_indent_completeness(
-            ir.IndentInput(
-                item_description=indent.item_description,
-                quantity=indent.quantity,
-                estimated_cost=indent.estimated_cost,
-                justification=indent.justification,
-                department=indent.department,
-            )
-        )
+    _apply_indent_changes(indent, changes)
     now = timezone.now()
     dup_id = _check_duplicate(indent, spec.duplicate_window_days, now)
     next_ver = indent.version + 1

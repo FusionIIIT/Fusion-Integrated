@@ -14,6 +14,7 @@ pytestmark = pytest.mark.django_db
 
 
 def _ps_client(stub_iam):
+    all_perms = tuple(code for code, _ in registry.PERMISSIONS)
     stub_iam(
         make_session(
             user_id=6001,
@@ -21,7 +22,7 @@ def _ps_client(stub_iam):
             active_role="ps_admin",
             roles=("ps_admin",),
             modules=("psm",),
-            permissions=tuple(registry.ROLE_GRANTS["ps_admin"]),
+            permissions=all_perms,
         )
     )
     c = APIClient()
@@ -59,11 +60,23 @@ def _seed_rows(start: int, end: int):
 @pytest.mark.parametrize(
     "path",
     [
+        "/api/v1/psm/dashboard",
         "/api/v1/psm/indents",
-        "/api/v1/psm/vendors",
+        "/api/v1/psm/stock/items",
+        "/api/v1/psm/stock/locations",
         "/api/v1/psm/stock/availability",
+        "/api/v1/psm/internal-issues",
+        "/api/v1/psm/transfers",
+        "/api/v1/psm/vendors",
+        "/api/v1/psm/tenders",
         "/api/v1/psm/purchase-orders",
         "/api/v1/psm/grns",
+        "/api/v1/psm/discrepancies",
+        "/api/v1/psm/invoices",
+        "/api/v1/psm/reports/schedules",
+        "/api/v1/psm/audit",
+        "/api/v1/psm/notifications",
+        "/api/v1/psm/policy",
     ],
 )
 def test_list_endpoint_query_count_is_constant_as_rows_grow(stub_iam, path):

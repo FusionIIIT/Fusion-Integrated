@@ -73,24 +73,8 @@ def submit_invoice(
     return invoice
 
 
-@transaction.atomic
-def verify_invoice(*, actor, invoice_id: int) -> Invoice:
-    """Perform three-way PO-GRN-Invoice match (PSM-UC-013, BR-PSM-017, 018)."""
-    policy = require_active_policy()
-    spec = policy_to_spec(policy)
-    invoice = (
-        Invoice.objects.select_for_update()
-        .select_related("purchase_order", "purchase_order__indent", "vendor")
-        .filter(pk=invoice_id)
-        .first()
-    )
-    if invoice is None:
-        raise NotFoundError("Invoice not found.")
-    if invoice.status in (sm.INV_PAID, sm.INV_PARTIALLY_PAID):
-        raise ConflictError(
-            f"Cannot re-verify an invoice that is already '{invoice.status}'.",
-            code="invoice_already_paid",
-        )
+def _compute_three_way_outcome(invoice: Invoice, spec) -> fr.MatchOutcome:
+    """Gather confirmed GRN quantity and discrepancy state, then run pure match rules."""
     po = invoice.purchase_order
     confirmed_qty = (
         GoodsReceiptNote.objects.filter(purchase_order=po, status="confirmed").aggregate(
@@ -103,7 +87,7 @@ def verify_invoice(*, actor, invoice_id: int) -> Invoice:
         .exclude(status__in=(sm.DISC_RESOLVED, sm.DISC_CLOSED))
         .exists()
     )
-    outcome = fr.three_way_match(
+    return fr.three_way_match(
         fr.ThreeWayMatchInput(
             po_ordered_quantity=po.ordered_quantity,
             po_unit_price=po.unit_price,
@@ -116,7 +100,10 @@ def verify_invoice(*, actor, invoice_id: int) -> Invoice:
             partial_payment_enabled=spec.partial_payment_enabled,
         )
     )
-    old_status = invoice.status
+
+
+def _apply_match_outcome(actor, invoice: Invoice, outcome: fr.MatchOutcome) -> None:
+    """Transition invoice to verified or on_hold based on the three-way match verdict."""
     if outcome.matched:
         with translate_errors():
             sm.resolve("invoice", invoice.status, sm.INV_VERIFIED, sm.ACCOUNTS)
@@ -141,6 +128,28 @@ def verify_invoice(*, actor, invoice_id: int) -> Invoice:
             "updated_at",
         ]
     )
+
+
+@transaction.atomic
+def verify_invoice(*, actor, invoice_id: int) -> Invoice:
+    """Perform three-way PO-GRN-Invoice match (PSM-UC-013, BR-PSM-017, 018)."""
+    spec = policy_to_spec(require_active_policy())
+    invoice = (
+        Invoice.objects.select_for_update()
+        .select_related("purchase_order", "purchase_order__indent", "vendor")
+        .filter(pk=invoice_id)
+        .first()
+    )
+    if invoice is None:
+        raise NotFoundError("Invoice not found.")
+    if invoice.status in (sm.INV_PAID, sm.INV_PARTIALLY_PAID):
+        raise ConflictError(
+            f"Cannot re-verify an invoice that is already '{invoice.status}'.",
+            code="invoice_already_paid",
+        )
+    old_status = invoice.status
+    outcome = _compute_three_way_outcome(invoice, spec)
+    _apply_match_outcome(actor, invoice, outcome)
     audit_record(
         actor=actor,
         action="invoice.verified" if outcome.matched else "invoice.held",
@@ -153,7 +162,7 @@ def verify_invoice(*, actor, invoice_id: int) -> Invoice:
     enqueue_notification(
         topic=f"invoice.{invoice.status}",
         dedupe_key=f"invoice.verify:{invoice.pk}:{invoice.status}:{invoice.updated_at.isoformat()}",
-        recipient_user_id=po.indent.user_id,
+        recipient_user_id=invoice.purchase_order.indent.user_id,
         subject=f"Invoice {invoice.invoice_number} is now {invoice.status}",
         body=invoice.hold_reason or f"Invoice verified for {invoice.eligible_amount}.",
         payload={"invoice_id": invoice.pk, "status": invoice.status},
@@ -195,13 +204,59 @@ def hold_invoice(*, actor, invoice_id: int, reason: str) -> Invoice:
     return invoice
 
 
+def _record_payment_tx(
+    actor, invoice: Invoice, amount: Decimal, ref: str, is_partial: bool, notes: str
+) -> PaymentTransaction:
+    """Create the append-only PaymentTransaction row, guarding duplicate references."""
+    try:
+        return PaymentTransaction.objects.create(
+            invoice=invoice,
+            vendor=invoice.vendor,
+            amount=amount,
+            payment_reference=ref,
+            is_partial=is_partial,
+            status="released",
+            processed_by_user_id=actor.user_id,
+            notes=notes.strip(),
+        )
+    except IntegrityError as exc:
+        raise ConflictError(
+            "That payment reference has already been used.", code="duplicate_payment_reference"
+        ) from exc
+
+
+def _notify_payment_released(
+    actor, invoice: Invoice, tx: PaymentTransaction, old_status: str
+) -> None:
+    """Record audit log and notify requestor after releasing a vendor payment."""
+    audit_record(
+        actor=actor,
+        action="payment.released",
+        target_type="invoice",
+        target_id=invoice.pk,
+        from_state=old_status,
+        to_state=invoice.status,
+        details={"payment_id": tx.pk, "amount": str(tx.amount)},
+    )
+    enqueue_notification(
+        topic="payment.released",
+        dedupe_key=f"payment.released:{tx.pk}",
+        recipient_user_id=invoice.purchase_order.indent.user_id,
+        subject=f"Payment {tx.payment_reference} released for {invoice.invoice_number}",
+        body=(
+            f"Released {tx.amount} ({'partial' if tx.is_partial else 'full'}) "
+            f"to {invoice.vendor.name}."
+        ),
+        payload={"payment_id": tx.pk, "invoice_id": invoice.pk},
+    )
+
+
 @transaction.atomic
 def process_payment(
     *, actor, invoice_id: int, amount: Decimal, payment_reference: str = "", notes: str = ""
 ) -> PaymentTransaction:
     """Release eligible full or partial payment (PSM-UC-029, BR-PSM-017, 022)."""
-    policy = require_active_policy()
-    spec = policy_to_spec(policy)
+    spec = policy_to_spec(require_active_policy())
     invoice = (
         Invoice.objects.select_for_update()
         .select_related("purchase_order", "purchase_order__indent", "vendor")
@@ -231,40 +286,11 @@ def process_payment(
     target_status = sm.INV_PARTIALLY_PAID if is_partial else sm.INV_PAID
     with translate_errors():
         sm.resolve("invoice", invoice.status, target_status, sm.ACCOUNTS)
-    ref = (payment_reference or next_number("PAY")).strip()
-    try:
-        tx = PaymentTransaction.objects.create(
-            invoice=invoice,
-            vendor=invoice.vendor,
-            amount=amount,
-            payment_reference=ref,
-            is_partial=is_partial,
-            status="released",
-            processed_by_user_id=actor.user_id,
-            notes=notes.strip(),
-        )
-    except IntegrityError as exc:
-        raise ConflictError(
-            "That payment reference has already been used.", code="duplicate_payment_reference"
-        ) from exc
+    tx = _record_payment_tx(
+        actor, invoice, amount, (payment_reference or next_number("PAY")).strip(), is_partial, notes
+    )
     old_status = invoice.status
     invoice.status = target_status
     invoice.save(update_fields=["status", "updated_at"])
-    audit_record(
-        actor=actor,
-        action="payment.released",
-        target_type="invoice",
-        target_id=invoice.pk,
-        from_state=old_status,
-        to_state=target_status,
-        details={"payment_id": tx.pk, "amount": str(amount)},
-    )
-    enqueue_notification(
-        topic="payment.released",
-        dedupe_key=f"payment.released:{tx.pk}",
-        recipient_user_id=invoice.purchase_order.indent.user_id,
-        subject=f"Payment {tx.payment_reference} released for {invoice.invoice_number}",
-        body=f"Released {amount} ({'partial' if is_partial else 'full'}) to {invoice.vendor.name}.",
-        payload={"payment_id": tx.pk, "invoice_id": invoice.pk},
-    )
+    _notify_payment_released(actor, invoice, tx, old_status)
     return tx

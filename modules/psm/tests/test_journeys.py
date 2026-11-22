@@ -434,7 +434,11 @@ def test_journey_bw_psm_06_07_08_10_discrepancy_modify_transfer_and_audit(stub_i
         },
         format="json",
     ).data["id"]
-    assert da.post(f"/api/v1/psm/transfers/{trf_id}/dispatch", {}, format="json").status_code == 200
+    # R1-03: destination deptadmin_cse is refused on dispatch; central source is dispatched by ps_admin
+    assert da.post(f"/api/v1/psm/transfers/{trf_id}/dispatch", {}, format="json").status_code == 403
+    ps = _actor(stub_iam, uid=9301, role="ps_admin")
+    assert ps.post(f"/api/v1/psm/transfers/{trf_id}/dispatch", {}, format="json").status_code == 200
+    da = _actor(stub_iam, uid=9302, role="deptadmin_cse")
     assert da.post(f"/api/v1/psm/transfers/{trf_id}/confirm", {}, format="json").status_code == 200
     assert StockLedgerEntry.objects.filter(entry_type="transfer_out", source_ref_id=trf_id).exists()
     assert StockLedgerEntry.objects.filter(entry_type="transfer_in", source_ref_id=trf_id).exists()
@@ -575,3 +579,213 @@ def test_journey_bw_psm_06_07_08_10_discrepancy_modify_transfer_and_audit(stub_i
     assert aud.get("/api/v1/psm/dashboard").status_code == 200
     assert ReportGenerationLog.objects.count() >= 3
     assert PsmAuditLog.objects.count() >= 10
+
+
+def test_journey_remaining_live_ucs_and_alternate_flows(stub_iam):
+    # R1-06: PSM-UC-003, 005, 020, 023, 024, 026, 027, 029, 032, 033, 034, 035 HTTP journeys
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from modules.psm.models import ReportSchedule
+    from modules.psm.services import reports as report_svc
+
+    seed_default_policy()
+    emp = _actor(stub_iam, uid=9401, role="faculty")
+    # PSM-UC-001 -> PSM-UC-023 (modify) -> PSM-UC-003 (repeat) -> PSM-UC-005 (withdraw)
+    r_ind = emp.post(
+        "/api/v1/psm/indents",
+        {
+            "department": "CSE",
+            "item_description": "Lab Sensor",
+            "quantity": 2,
+            "estimated_cost": "12000.00",
+            "justification": "IoT bench",
+        },
+        format="json",
+    )
+    assert r_ind.status_code == 201
+    ind_id = r_ind.data["id"]
+    assert (
+        emp.patch(
+            f"/api/v1/psm/indents/{ind_id}",
+            {"quantity": 3, "justification": "Updated IoT bench"},
+            format="json",
+        ).status_code
+        == 200
+    )
+    r_rep = emp.post(f"/api/v1/psm/indents/{ind_id}/repeat", {}, format="json")
+    assert r_rep.status_code == 201
+    rep_id = r_rep.data["id"]
+    assert (
+        emp.post(
+            f"/api/v1/psm/indents/{rep_id}/withdraw", {"reason": "Duplicate"}, format="json"
+        ).status_code
+        == 200
+    )
+
+    # PSM-UC-019 / PSM-UC-024 (vendor update + re-verify) -> PSM-UC-026 (PO) -> PSM-UC-027 (schedule)
+    ps = _actor(stub_iam, uid=9402, role="ps_admin")
+    v_id = ps.post(
+        "/api/v1/psm/vendors",
+        {
+            "name": "UC24 Vendor",
+            "gstin": "23ABCDE4321F1Z5",
+            "bank_account_number": "123456789099",
+            "bank_ifsc": "SBIN0001234",
+            "bank_name": "SBI",
+            "compliance_documents": ["gst.pdf"],
+            "contact_email": "uc24@v.test",
+        },
+        format="json",
+    ).data["id"]
+    assert (
+        ps.patch(
+            f"/api/v1/psm/vendors/{v_id}",
+            {"contact_email": "uc24-new@v.test", "change_reason": "Email updated"},
+            format="json",
+        ).status_code
+        == 200
+    )
+    assert VendorVersion.objects.filter(vendor_id=v_id).count() >= 2
+    assert ps.post(f"/api/v1/psm/vendors/{v_id}/verify", {}, format="json").status_code == 200
+
+    da_cse = _actor(stub_iam, uid=9403, role="deptadmin_cse")
+    assert (
+        da_cse.post(f"/api/v1/psm/indents/{ind_id}/stock-check", {}, format="json").status_code
+        == 200
+    )
+    assert (
+        da_cse.post(
+            f"/api/v1/psm/indents/{ind_id}/review",
+            {"decision": "approve", "priority": "normal"},
+            format="json",
+        ).status_code
+        == 200
+    )
+    hod = _actor(stub_iam, uid=9404, role="HOD (CSE)")
+    assert (
+        hod.post(
+            f"/api/v1/psm/indents/{ind_id}/recommend", {"decision": "recommend"}, format="json"
+        ).status_code
+        == 200
+    )
+    ps = _actor(stub_iam, uid=9402, role="ps_admin")
+    assert (
+        ps.post(f"/api/v1/psm/indents/{ind_id}/procurement-review", {}, format="json").status_code
+        == 200
+    )
+    po_id = ps.post(
+        "/api/v1/psm/purchase-orders",
+        {
+            "indent_id": ind_id,
+            "vendor_id": v_id,
+            "unit_price": "4000.00",
+            "planned_delivery_date": "2030-01-15",
+        },
+        format="json",
+    ).data["id"]
+    assert (
+        ps.patch(
+            f"/api/v1/psm/purchase-orders/{po_id}",
+            {"status": "in_transit", "delivery_notes": "Shipped"},
+            format="json",
+        ).status_code
+        == 200
+    )
+
+    # PSM-UC-028 -> PSM-UC-020 (discrepancy) -> PSM-UC-032 (comms + resolve) -> PSM-UC-029 (invoice hold & pay)
+    emp = _actor(stub_iam, uid=9401, role="faculty")
+    grn_id = emp.post(
+        "/api/v1/psm/grns",
+        {
+            "purchase_order_id": po_id,
+            "received_quantity": 3,
+            "accepted_quantity": 3,
+            "rejected_quantity": 0,
+        },
+        format="json",
+    ).data["id"]
+    assert emp.post(f"/api/v1/psm/grns/{grn_id}/confirm", {}, format="json").status_code == 200
+    acc = _actor(stub_iam, uid=9405, role="Accounts Admin")
+    inv_id = acc.post(
+        "/api/v1/psm/invoices",
+        {
+            "purchase_order_id": po_id,
+            "invoice_number": "INV-UC29-1",
+            "billed_quantity": 3,
+            "billed_amount": "12000.00",
+        },
+        format="json",
+    ).data["id"]
+    assert (
+        acc.post(
+            f"/api/v1/psm/invoices/{inv_id}/hold", {"reason": "Verify HSN"}, format="json"
+        ).status_code
+        == 200
+    )
+    assert acc.post(f"/api/v1/psm/invoices/{inv_id}/verify", {}, format="json").status_code == 200
+    assert (
+        acc.post(
+            f"/api/v1/psm/invoices/{inv_id}/pay",
+            {"amount": "12000.00", "payment_reference": "UTR-UC29-1"},
+            format="json",
+        ).status_code
+        == 201
+    )
+
+    # PSM-UC-033 / PSM-UC-034 (transfer dispatch + confirm) & PSM-UC-035 (scheduled report execution)
+    ps = _actor(stub_iam, uid=9402, role="ps_admin")
+    loc_src = ps.post(
+        "/api/v1/psm/stock/locations",
+        {"code": "UC33-CSE", "name": "CSE Lab", "department": "CSE", "is_central": False},
+        format="json",
+    ).data["id"]
+    loc_dst = ps.post(
+        "/api/v1/psm/stock/locations",
+        {"code": "UC33-ECE", "name": "ECE Lab", "department": "ECE", "is_central": False},
+        format="json",
+    ).data["id"]
+    it_id = ps.post(
+        "/api/v1/psm/stock/items", {"sku": "UC33-SKU", "name": "Sensor Pack"}, format="json"
+    ).data["id"]
+    ps.post(
+        "/api/v1/psm/stock/adjustments",
+        {"item_id": it_id, "location_id": loc_src, "quantity_delta": 8, "reason": "Init"},
+        format="json",
+    )
+    da_ece = _actor(stub_iam, uid=9406, role="deptadmin_ece")
+    trf_id = da_ece.post(
+        "/api/v1/psm/transfers",
+        {
+            "item_id": it_id,
+            "source_location_id": loc_src,
+            "destination_location_id": loc_dst,
+            "quantity": 2,
+        },
+        format="json",
+    ).data["id"]
+    da_cse = _actor(stub_iam, uid=9403, role="deptadmin_cse")
+    assert (
+        da_cse.post(f"/api/v1/psm/transfers/{trf_id}/dispatch", {}, format="json").status_code
+        == 200
+    )
+    da_ece = _actor(stub_iam, uid=9406, role="deptadmin_ece")
+    assert (
+        da_ece.post(f"/api/v1/psm/transfers/{trf_id}/confirm", {}, format="json").status_code == 200
+    )
+    assert (
+        StockLedgerEntry.objects.filter(
+            source_ref_type="stock_transfer", source_ref_id=trf_id
+        ).count()
+        == 2
+    )
+
+    ps = _actor(stub_iam, uid=9402, role="ps_admin")
+    s_id = ps.post(
+        "/api/v1/psm/reports/schedules",
+        {"name": "UC35 Daily", "report_type": "operational", "cadence": "daily", "filters": {}},
+        format="json",
+    ).data["id"]
+    ReportSchedule.objects.filter(pk=s_id).update(next_run_at=timezone.now() - timedelta(minutes=1))
+    assert report_svc.run_due_schedules() == 1

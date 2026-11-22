@@ -47,7 +47,9 @@ export default function DashboardPage() {
 
           <Card padding="lg" withBorder>
             <Title order={4} mb="sm">Recent Notifications</Title>
-            {notifs.isPending ? (
+            {notifs.error ? (
+              <ErrorState error={notifs.error} />
+            ) : notifs.isPending ? (
               <Skeleton height={60} />
             ) : (notifs.data?.results.length ?? 0) === 0 ? (
               <Text size="sm" c="dimmed">No notifications yet.</Text>

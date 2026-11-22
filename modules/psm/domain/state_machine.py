@@ -100,6 +100,23 @@ TENDER_STATES = (
 )
 TENDER_TERMINAL = frozenset({TENDER_AWARDED_STATE, TENDER_CANCELLED})
 
+# Purchase order states (PSM-UC-025, PSM-UC-027, AFR-PSM-041, AFR-PSM-042)
+PO_ISSUED = "issued"
+PO_IN_TRANSIT = "in_transit"
+PO_PARTIALLY_DELIVERED = "partially_delivered"
+PO_DELIVERED = "delivered"
+PO_CLOSED = "closed"
+PO_CANCELLED = "cancelled"
+PO_STATES = (
+    PO_ISSUED,
+    PO_IN_TRANSIT,
+    PO_PARTIALLY_DELIVERED,
+    PO_DELIVERED,
+    PO_CLOSED,
+    PO_CANCELLED,
+)
+PO_TERMINAL = frozenset({PO_CLOSED, PO_CANCELLED})
+
 # Actor lanes
 EMPLOYEE = "employee"
 DEPT_ADMIN = "dept_admin"
@@ -387,6 +404,61 @@ TENDER_TRANSITIONS: tuple[Transition, ...] = (
     Transition(TENDER_PUBLISHED, TENDER_CANCELLED, "psm.tender.publish", frozenset({PS_ADMIN}), ()),
 )
 
+PO_TRANSITIONS: tuple[Transition, ...] = (
+    Transition(PO_ISSUED, PO_IN_TRANSIT, "psm.purchase_order.update", frozenset({PS_ADMIN}), ()),
+    Transition(
+        PO_ISSUED,
+        PO_PARTIALLY_DELIVERED,
+        "psm.purchase_order.update",
+        frozenset({PS_ADMIN, RECEIVING_ACTOR}),
+        (),
+    ),
+    Transition(
+        PO_ISSUED,
+        PO_DELIVERED,
+        "psm.purchase_order.update",
+        frozenset({PS_ADMIN, RECEIVING_ACTOR}),
+        (),
+    ),
+    Transition(PO_ISSUED, PO_CANCELLED, "psm.purchase_order.update", frozenset({PS_ADMIN}), ()),
+    Transition(
+        PO_IN_TRANSIT,
+        PO_PARTIALLY_DELIVERED,
+        "psm.purchase_order.update",
+        frozenset({PS_ADMIN, RECEIVING_ACTOR}),
+        (),
+    ),
+    Transition(
+        PO_IN_TRANSIT,
+        PO_DELIVERED,
+        "psm.purchase_order.update",
+        frozenset({PS_ADMIN, RECEIVING_ACTOR}),
+        (),
+    ),
+    Transition(PO_IN_TRANSIT, PO_CANCELLED, "psm.purchase_order.update", frozenset({PS_ADMIN}), ()),
+    Transition(
+        PO_PARTIALLY_DELIVERED,
+        PO_PARTIALLY_DELIVERED,
+        "psm.purchase_order.update",
+        frozenset({PS_ADMIN, RECEIVING_ACTOR}),
+        (),
+    ),
+    Transition(
+        PO_PARTIALLY_DELIVERED,
+        PO_DELIVERED,
+        "psm.purchase_order.update",
+        frozenset({PS_ADMIN, RECEIVING_ACTOR}),
+        (),
+    ),
+    Transition(
+        PO_DELIVERED,
+        PO_CLOSED,
+        "psm.purchase_order.update",
+        frozenset({PS_ADMIN, ACCOUNTS}),
+        (),
+    ),
+)
+
 
 def _index(table: tuple[Transition, ...]) -> dict[tuple[str, str], Transition]:
     return {(t.frm, t.to): t for t in table}
@@ -398,6 +470,7 @@ _TABLES = {
     "discrepancy": _index(DISCREPANCY_TRANSITIONS),
     "invoice": _index(INVOICE_TRANSITIONS),
     "tender": _index(TENDER_TRANSITIONS),
+    "purchase_order": _index(PO_TRANSITIONS),
 }
 
 

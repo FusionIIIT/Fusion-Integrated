@@ -11,6 +11,29 @@ from modules.psm.models import PsmPolicy
 from modules.psm.services.common import audit_record
 
 
+def _validate_policy_thresholds(
+    direct_limit: Decimal,
+    final_approval_threshold: Decimal,
+    sla_reminder_hours: int,
+    sla_escalation_hours: int,
+    high_priority_sla_reminder_hours: int,
+    high_priority_sla_escalation_hours: int,
+) -> None:
+    """Validate positive cost thresholds and SLA reminder < escalation ordering."""
+    if direct_limit <= 0 or final_approval_threshold <= 0:
+        raise DomainError("Cost thresholds must be greater than zero.", code="invalid_policy")
+    if (
+        sla_escalation_hours <= sla_reminder_hours
+        or high_priority_sla_escalation_hours <= high_priority_sla_reminder_hours
+    ):
+        raise DomainError(
+            "SLA escalation hours must exceed SLA reminder hours.", code="invalid_policy"
+        )
+
+
+_DEFAULT_PERMISSIBLE_STATES = ["draft", "submitted", "changes_requested", "department_reviewed"]
+
+
 @transaction.atomic
 def publish_policy(
     *,
@@ -28,29 +51,34 @@ def publish_policy(
     duplicate_window_days: int = 14,
 ) -> PsmPolicy:
     """Create a new effective-dated policy version and supersede the prior active one."""
-    if direct_limit <= 0 or final_approval_threshold <= 0:
-        raise DomainError("Cost thresholds must be greater than zero.", code="invalid_policy")
-    if (
-        sla_escalation_hours <= sla_reminder_hours
-        or high_priority_sla_escalation_hours <= high_priority_sla_reminder_hours
-    ):
-        raise DomainError(
-            "SLA escalation hours must exceed SLA reminder hours.", code="invalid_policy"
-        )
+    _validate_policy_thresholds(
+        direct_limit,
+        final_approval_threshold,
+        sla_reminder_hours,
+        sla_escalation_hours,
+        high_priority_sla_reminder_hours,
+        high_priority_sla_escalation_hours,
+    )
     latest = PsmPolicy.objects.select_for_update().order_by("-version").first()
-    next_version = (latest.version + 1) if latest else 1
     PsmPolicy.objects.filter(is_active=True).update(is_active=False)
-    defaults = ["draft", "submitted", "changes_requested", "department_reviewed"]
+    mod_states = (
+        modifiable_states if modifiable_states is not None else list(_DEFAULT_PERMISSIBLE_STATES)
+    )
+    wd_states = (
+        withdrawable_states
+        if withdrawable_states is not None
+        else list(_DEFAULT_PERMISSIBLE_STATES)
+    )
     policy = PsmPolicy.objects.create(
-        version=next_version,
+        version=(latest.version + 1) if latest else 1,
         effective_from=timezone.now(),
         is_active=True,
         created_by_user_id=getattr(actor, "user_id", None) if actor else None,
         direct_limit=direct_limit,
         final_approval_threshold=final_approval_threshold,
         high_priority_direct_allowed=high_priority_direct_allowed,
-        modifiable_states=modifiable_states if modifiable_states is not None else defaults,
-        withdrawable_states=withdrawable_states if withdrawable_states is not None else defaults,
+        modifiable_states=mod_states,
+        withdrawable_states=wd_states,
         sla_reminder_hours=sla_reminder_hours,
         sla_escalation_hours=sla_escalation_hours,
         high_priority_sla_reminder_hours=high_priority_sla_reminder_hours,

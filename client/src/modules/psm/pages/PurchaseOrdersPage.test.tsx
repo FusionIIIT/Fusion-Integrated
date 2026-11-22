@@ -1,5 +1,5 @@
 // PurchaseOrdersPage tests: loading, empty, error, permission gate, and PO issuance.
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { http } from "../../../lib/http";
@@ -33,10 +33,8 @@ describe("PurchaseOrdersPage", () => {
     const postSpy = vi.spyOn(http, "post").mockResolvedValue({ data: { id: 1, po_number: "PO-1" } });
     renderPsmPage(<PurchaseOrdersPage />, ["psm.purchase_order.view", "psm.purchase_order.create"]);
     fireEvent.click(screen.getByRole("button", { name: /issue po/i }));
-    const buttons = await screen.findAllByRole("button", { name: /issue po/i });
-    const submitBtn = buttons[buttons.length - 1];
-    expect(submitBtn).toBeDefined();
-    fireEvent.click(submitBtn!);
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: /issue po/i }));
     await waitFor(() => expect(postSpy).toHaveBeenCalledWith("/psm/purchase-orders", expect.objectContaining({ indent_id: 1 })));
   });
 });

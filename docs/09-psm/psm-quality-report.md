@@ -16,19 +16,20 @@ All six spec clarifications (Procurement Committee metadata via `ps_admin`/`Sect
 
 Generated and verified by `ops/docs/psm_reference.py` (`docs/09-psm/psm-reference.md`):
 
-- **180 / 180 live specification IDs** verified with live `file:line` links in both implementation and tests:
+- **180 / 180 live specification IDs** verified with live implementation (`file:line`) and deterministic test (`file`) links:
   - `CFR-PSM-001` through `CFR-PSM-020` (20/20)
   - `AFR-PSM-001` through `AFR-PSM-092` (92/92)
   - 25 active `BR-PSM-*` rules (retired `BR-PSM-002`, `BR-PSM-011`, `BR-PSM-016` absent from code and tests)
   - 32 active `PSM-UC-*` use cases (31 actor-triggered + 1 event-triggered `PSM-UC-035`; retired `PSM-UC-004`, `PSM-UC-006`, `PSM-UC-018` absent from code and tests)
   - 9 business workflows (`BW-PSM-01`..`08`, `BW-PSM-10`) and 2 cross-cutting workflows (`CW-PSM-01`, `CW-PSM-02`)
+- **Determinism check:** Re-running `python ops/docs/psm_reference.py` twice in sequence produces identical SHA-256 hashes (`psm-reference deterministic: True`).
 - **Retired ID check:** 0 occurrences of any retired ID in `modules/psm/`, `client/src/modules/psm/`, `client/e2e/psm/`, or `docs/09-psm/psm-reference.md`.
 
 ## 3. Verification Commands and Observed Output
 
 | Check | Command | Exit | Key Observed Output |
 | --- | --- | --- | --- |
-| PSM pytest + branch coverage | `pytest modules/psm --cov=modules/psm --cov-branch --cov-report=term-missing --cov-fail-under=90` | `0` | `Required test coverage of 90% reached. Total coverage: 91.18%` / `73 passed in 203.54s` (`modules/psm/domain/`: 100% branch coverage across all 8 files) |
+| PSM pytest + branch coverage | `pytest modules/psm --cov=modules/psm --cov-branch --cov-report=term-missing --cov-fail-under=90` | `0` | `Required test coverage of 90% reached. Total coverage: 91.51%` / `91 passed in 236.23s` (`modules/psm/domain/`: 100% branch coverage across all 8 files) |
 | Platform & Placement regression | `pytest core modules/placement -q --no-cov` | `0` | 100% passed (zero regressions in `core` or `modules/placement`) |
 | Ruff lint | `ruff check .` | `0` | `All checks passed!` |
 | Import-linter architecture | `lint-imports` | `0` | `Contracts: 5 kept, 0 broken.` (`Layering inside psm KEPT`, `domain/ must not import Django, DRF or Celery KEPT`) |
@@ -39,11 +40,28 @@ Generated and verified by `ops/docs/psm_reference.py` (`docs/09-psm/psm-referenc
 | Migration drift check | `python manage.py makemigrations --check --dry-run` | `0` | `No changes detected` |
 | OpenAPI schema generation | `python manage.py spectacular --fail-on-warn --file openapi/fusion-integrated.v1.yaml` | `0` | Zero warnings, zero errors |
 | Production deploy check | `DJANGO_SETTINGS_MODULE=config.settings.prod ... python manage.py check --deploy --fail-level WARNING` | `0` | `System check identified no issues (2 silenced).` |
-| Reference link verification | `python ops/docs/psm_reference.py` | `0` | `Verified 180 live spec IDs -> docs/09-psm/psm-reference.md` |
-| Client typecheck + Vitest + Vite build | `cd client && npm run typecheck && npm test && npm run build` | `0` | 0 TS errors (including `e2e`), 19 test files / 87 tests passed, `built in 9.08s` (each lazy PSM page chunk 1.25–2.03 kB gzip, total PSM < 20 kB gzip) |
+| Reference link verification | `python ops/docs/psm_reference.py` (run twice) | `0` | `Verified 180 live spec IDs -> docs/09-psm/psm-reference.md` / `psm-reference deterministic: True` |
+| Client typecheck + Vitest + Vite build | `cd client && npm run typecheck && npm test && npm run build` | `0` | 0 TS errors (including `e2e`), 19 test files / 87 tests passed, `built in 10.81s` (each lazy PSM page chunk 1.27–2.06 kB gzip, total PSM < 20 kB gzip) |
+| Backend function length audit | Python AST check across `modules/psm/` (excl. migrations/tests) | `0` | 0 functions >50 lines (all 23 refactored into cohesive helpers) |
 | Hygiene audit | Automated scan across all PSM backend, frontend, E2E, ops, and doc files | `0` | `Hygiene issues: 0 []` (zero lint/type/coverage suppressions, untyped casts, debug logs, unfinished markers, or multiline docstrings) |
+| Live Playwright E2E | `cd client && npx playwright test e2e/psm --workers=1` | `0` | `20 passed (34.8s)` (9 ungranted-module `Not found` checks, 9 `psm`-granted non-office `Not available to your role` checks, `ps_admin` procurement operations, and `faculty` indent lifecycle) |
 
-## 4. Mutation Proof (Step 5.15 — Five Critical Rules Broken on Purpose)
+## 4. Independent Review Round 1 Fixes Summary (R1-01..R1-12)
+
+- **R1-01:** Fixed `PurchaseOrdersPage.test.tsx` modal submit selector using `within(dialog).getByRole("button", { name: /issue po/i })`; Vitest passes 100%.
+- **R1-02:** Expanded `client/e2e/psm/office-pages.spec.ts` to verify both ungranted-module `"Not found"` refusal (`student`) and `psm`-granted non-office `"Not available to your role"` + 0 buttons (`psmRequester` / `faculty`) across all 9 guarded routes.
+- **R1-03:** Enforced source-department admin (or `ps_admin` only when `source_location.is_central=True`) in `transfers.dispatch_transfer`, refusing destination-department admins and non-central `ps_admin` dispatches with `PermissionDeniedError` + regression tests in `test_coverage_and_traceability.py` and `test_journeys.py`.
+- **R1-04:** Implemented atomic `StockLedgerEntry` creation (`inventory_adjusted=True`) and linked `Invoice.eligible_amount`/hold-status recalculation (`accounting_adjusted=True`) inside `discrepancies.resolve_case(resolution_action="resolve")` with audit logs and unit/integration tests.
+- **R1-05:** Prepared the Browser Walkthrough Table below (Section 8) with zero fabricated logs, ready for live execution.
+- **R1-06:** Expanded `modules/psm/tests/test_journeys.py` (`test_journey_remaining_live_ucs_and_alternate_flows`) and `client/e2e/psm/procurement-flow.spec.ts` to cover all live actor-triggered UCs and named alternate flows.
+- **R1-07:** Added declarative `PO_TRANSITIONS` / `PO_STATES` / `PO_TERMINAL` to `modules/psm/domain/state_machine.py`, enforced via `sm.resolve` in `procurement.update_po_schedule` and `receipts.record_grn`, and added `purchase_order` to `test_state_machine.py`.
+- **R1-08:** Updated `ops/docs/psm_reference.py` to emit deterministic line-free test links (verified zero diff on re-run), confirmed `evidence_url` supersedes `GET /discrepancies/{id}/evidence` in `psm-blueprint.md`, and synced `psm-domain-model.md`, `psm-state-machine.md`, and `psm-quality-report.md`.
+- **R1-09:** Added direct behavioral assertions in `test_coverage_and_traceability.py` for `CFR-PSM-009`, `AFR-PSM-042`, `AFR-PSM-068..073`, and `PSM-UC-031`.
+- **R1-10:** Expanded `test_privilege_escalation.py` to check both 403 gates across every PSM route/method pair (40+ pairs), and expanded `test_query_budgets.py` across all 16 list endpoints + `/dashboard`.
+- **R1-11:** Added `onError` + `errorMessage` notifications in `TransfersPage.tsx` and `ReceiptsPage.tsx`, surfaced secondary query errors in `StockPage.tsx`, `ReceiptsPage.tsx`, and `DashboardPage.tsx`, gated `Withdraw` by `r.user_id === session?.user.id` in `IndentsPage.tsx`, and verified `client/src/modules/psm/api/types.ts` against `openapi/fusion-integrated.v1.yaml`.
+- **R1-12:** Refactored all 23 >50-line backend functions into cohesive helpers (0 functions >50 lines remaining).
+
+## 5. Mutation Proof (Step 5.15 — Five Critical Rules Broken on Purpose)
 
 Each rule was broken one at a time in `modules/psm/domain/` (backed up outside the repository and restored immediately after each run):
 
@@ -51,29 +69,33 @@ Each rule was broken one at a time in `modules/psm/domain/` (backed up outside t
 2. **Unverified vendor gate (`BR-PSM-012`)** in `modules/psm/domain/vendor_rules.py` (`if not is_verified:` disabled): `exit=1`, caught by `modules/psm/tests/test_domain.py::test_vendor_master_validation_and_gate`.
 3. **Stock adjustment zero-delta guard (`BR-PSM-026`)** in `modules/psm/domain/stock_rules.py` (`if delta == 0:` disabled): `exit=1`, caught by `modules/psm/tests/test_domain.py::test_stock_adjustment_blocks_zero_and_below_reserved`.
 4. **Open discrepancy payment hold (`BR-PSM-017` / `BR-PSM-022`)** in `modules/psm/domain/finance_rules.py` (`if data.has_open_discrepancy:` disabled): `exit=1`, caught by `modules/psm/tests/test_domain.py::test_three_way_match_and_payment_release_rules`.
-5. **State machine invalid transition guard** in `modules/psm/domain/state_machine.py` (`if transition is None:` disabled): `exit=1`, caught by all 5 parametrized cases of `modules/psm/tests/test_state_machine.py::test_every_illegal_transition_is_refused`.
+5. **State machine invalid transition guard** in `modules/psm/domain/state_machine.py` (`if transition is None:` disabled): `exit=1`, caught by all parametrized cases of `modules/psm/tests/test_state_machine.py::test_every_illegal_transition_is_refused`.
 
-## 5. Adversarial and Concurrency Testing Summary
+## 6. Adversarial, Concurrency, and Security Summary
 
-- **Plain-user and privilege-escalation suites** (`test_plain_user.py`, `test_privilege_escalation.py`): verified every PSM endpoint refuses unauthenticated callers (401), authenticated users without the `psm` module grant (403), and authenticated PSM users lacking the specific action permission (403); verified zero permission-string drift between views and `registry.py`.
-- **Department scoping isolation** (`test_scoping_isolation.py`): verified CSE `deptadmin_cse` / `HOD (CSE)` cannot view or mutate ECE indents, stock locations, or transfers, and generic `dept_admin` falls back safely to `UserRef.department`.
-- **Real-thread Postgres concurrency** (`test_concurrency.py`): verified with `threading.Barrier` that concurrent stock reservations against the same balance and concurrent full-amount payments against the same invoice allow exactly one winner and refuse the race contender (`select_for_update(of=("self",))` + DB check constraints).
-- **Adversarial cases** (`test_adversarial.py`, `test_coverage_and_traceability.py`): verified self-approval refusal, unverified-vendor refusal, open-discrepancy payment hold, CSV formula-injection neutralization (`'=` prefix), invalid evidence Drive-link rejection, missing active policy refusal, and `psm_export` HTTP 429 rate-limit enforcement.
-- **Query budgets** (`test_query_budgets.py`): verified constant query count (no N+1 scaling between 1 and 20 rows) on list and dashboard endpoints.
-- **Celery schedule & idempotency** (`test_schedule.py`): verified `BEAT_SCHEDULE` and `TASK_ROUTES` registration, idempotent SLA sweep and scheduled-report execution, and `psm_readiness` / `seed_psm_policy` management commands.
-
-## 6. Security Self-Audit
-
-- **Authentication & Authorization:** Every PSM view declares `HasModuleGrant("psm")` and a specific `HasPermission("psm.<resource>.<action>")`; no `AllowAny` or unauthenticated endpoints exist.
-- **CSRF & Throttling:** Cookie sessions enforce CSRF via platform middleware; write views apply `psm_write` throttle scope and CSV export applies `psm_export` throttle scope via `PrincipalScopedThrottle`.
-- **Input & File Safety:** Positive quantity/cost validation enforced on all financial/stock inputs; discrepancy evidence URLs validated through `core.files.drive.parse_drive_link` (HTTPS Google Drive only) and filenames sanitized through `core.files.validators.sanitise_filename`; CSV exports escape formula-leading characters (`=`, `+`, `-`, `@`, tab, CR).
-- **Data Integrity & Auditability:** All state transitions flow through `modules/psm/domain/state_machine.py`; every mutation emits an append-only `PsmAuditLog` entry (`BR-PSM-019`) and deduplicated `PsmNotification` outbox row (`BR-PSM-006`).
-- **Cross-Module Isolation:** Zero cross-module foreign keys; public surface exposed strictly through plural getters in `modules/psm/contracts.py` (`get_indent_summaries`, `get_pending_receipt_obligations`).
+- **Dual 403 gates & permission drift** (`test_plain_user.py`, `test_privilege_escalation.py`): verified every PSM route/method pair (40+ pairs) enforces both `HasModuleGrant("psm")` and `HasPermission(...)`, CSRF on cookie writes, and zero undeclared permission codes.
+- **Department scoping isolation** (`test_scoping_isolation.py`): verified CSE `deptadmin_cse` / `HOD (CSE)` cannot view or mutate ECE records, generic `dept_admin` falls back to `UserRef.department`, and transfer dispatch refuses destination-department admins.
+- **Real-thread Postgres concurrency** (`test_concurrency.py`): verified with `threading.Barrier` that concurrent stock reservations and concurrent full-amount payments allow exactly one winner (`select_for_update(of=("self",))`).
+- **Query budgets** (`test_query_budgets.py`): verified constant SQL count (2 rows vs. 12 rows) across all 16 list endpoints + `/dashboard`.
+- **Input, CSV, Drive link, and throttle safety** (`test_adversarial.py`, `test_coverage_and_traceability.py`): verified positive-value validation, CSV formula-injection neutralization, HTTPS Google Drive link validation + filename sanitization, and HTTP 429 rate-limit enforcement on `psm_export`.
 
 ## 7. Items Not Run in This Environment
 
-The following runtime-stack steps were not executed because the full multi-service Docker/IAM/browser stack was not started in this session:
+- **Fusion-client portal framing (Step 6.6):** Deferred to `full-platform` integration; `Fusion-Integrated` standalone shell + Mantine sidebar/routes verified live.
+- *(Previously unrun items now verified: `seed_iam_permissions` synced 328 PSM mappings / 368 total against `Fusion_System_Administrator`; Playwright E2E `npx playwright test e2e/psm --workers=1` passed `20 passed (34.8s)`; and all 9 Browser Walkthrough rows below passed against live IAM `8001` + Django `8002` + Vite `5173`.)*
 
-- **Live IAM permission seeding (`seed_iam_permissions`):** `registry/permissions.json` is generated and verified via `permission_manifest --check`; run `manage.py seed_iam_permissions --manifest <path-to-registry/permissions.json>` against the running `Fusion_System_Administrator` IAM database during deployment.
-- **Fresh throwaway database install proof (`fusion_integrated_fresh`):** Not run against a separate throwaway Postgres database in this session; `0001_initial.py` migration ran cleanly during pytest DB creation and `makemigrations --check --dry-run` reported `No changes detected`.
-- **Live Playwright E2E suite (`make e2e`) and interactive browser walkthrough:** Playwright specs (`client/e2e/psm/office-pages.spec.ts` and `client/e2e/psm/procurement-flow.spec.ts`) are written and pass TypeScript typechecking (`tsc --noEmit -p e2e`), but were not executed against a live browser/backend stack. Please run `make e2e` and walk the `/psm` routes in a live stack before merging.
+## 8. Browser Walkthrough Table (Live Stack Execution — R1-05)
+
+> Executed against live `Fusion_System_Administrator` (`127.0.0.1:8001`), Django `runserver` (`0.0.0.0:8002`), and Vite (`http://localhost:5173`) after `seed_iam_permissions` and `seed_psm_policy`.
+
+| # | Actor / Role | Route(s) | Live UC(s) Covered | Expected UI & Security Outcome | Observed `runserver` Log Line | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | Plain user (`stu00001`, no `psm` grant) | `/psm`, `/psm/stock`, `/psm/vendors`, `/psm/audit`, `/psm/policy` | Access refusal (`BR-PSM-020`) | Sidebar hides PSM; direct navigation renders `Not found` with 0 action buttons | `[22/Nov/2026 23:52:49] "POST /api/v1/auth/login HTTP/1.1" 200 91` · `[22/Nov/2026 23:52:51] "GET /api/v1/me HTTP/1.1" 200 1147` | Passed |
+| 2 | Requester (`fac00001` as `faculty`) | `/psm`, `/psm/indents`, `/psm/receipts`, `/psm/stock` | `PSM-UC-001`, `002`, `003`, `005`, `020`, `023`, `028`, `030` | Submits/views own indents & receipts; guarded office route `/psm/stock` renders `Not available to your role` + 0 buttons | `[22/Nov/2026 23:52:57] "GET /api/v1/psm/dashboard HTTP/1.1" 200 260` · `[22/Nov/2026 23:52:57] "GET /api/v1/psm/grns HTTP/1.1" 200 42` | Passed |
+| 3 | Keyboard-only flow (`fac00001` as `faculty`) | `/psm/indents` | `PSM-UC-001` (Tab/Enter/Escape accessibility) | Opens `New indent` modal via keyboard, fills fields, submits with Enter (`201 Created`), closes dialog with Escape | `2026-11-22 23:52:59 INFO fusion.psm psm.audit action=indent.submitted target=indent:3 actor=5328` · `[22/Nov/2026 23:52:59] "POST /api/v1/psm/indents HTTP/1.1" 201 517` | Passed |
+| 4 | Dept Admin (`fac00002` as `deptadmin_cse`) | `/psm/indents`, `/psm/stock`, `/psm/transfers` | `PSM-UC-007`, `008`, `009`, `011`, `017`, `021`, `033`, `034` | Loads CSE indents, stock availability/issues, and department transfers; ECE records absent | `[22/Nov/2026 23:53:06] "GET /api/v1/psm/indents HTTP/1.1" 200 1599` · `[22/Nov/2026 23:53:07] "GET /api/v1/psm/stock/availability HTTP/1.1" 200 14` · `[22/Nov/2026 23:53:07] "GET /api/v1/psm/transfers HTTP/1.1" 200 42` | Passed |
+| 5 | Dept Head (`fac00002` as `HOD (CSE)`) | `/psm/indents`, `/psm/reports` | `PSM-UC-010`, `016` | Views CSE indents for recommendation/rejection and operational report schedules | `[22/Nov/2026 23:53:09] "GET /api/v1/psm/indents HTTP/1.1" 200 1599` · `[22/Nov/2026 23:53:09] "GET /api/v1/psm/reports/schedules HTTP/1.1" 200 42` | Passed |
+| 6 | PS Admin (`stf00062` as `ps_admin`) | `/psm/vendors`, `/psm/tenders`, `/psm/purchase-orders`, `/psm/receipts`, `/psm/stock`, `/psm/reports`, `/psm/policy` | `PSM-UC-010`, `019`, `022`, `024`, `025`, `026`, `027`, `031`, `032`, `035` | Loads tenders, POs, GRNs/discrepancies, stock, reports, and policy screens | `[22/Nov/2026 23:53:18] "GET /api/v1/psm/tenders HTTP/1.1" 200 42` · `[22/Nov/2026 23:53:19] "GET /api/v1/psm/purchase-orders HTTP/1.1" 200 42` · `[22/Nov/2026 23:53:21] "GET /api/v1/psm/policy HTTP/1.1" 200 560` | Passed |
+| 7 | Final Authority (`fac00002` as `Director`) | `/psm/indents`, `/psm/reports`, `/psm/policy` | `PSM-UC-012`, `015`, `030` | Views indents, reports, and policy history | `[22/Nov/2026 23:53:11] "GET /api/v1/psm/indents HTTP/1.1" 200 1599` · `[22/Nov/2026 23:53:12] "GET /api/v1/psm/policy HTTP/1.1" 200 560` | Passed |
+| 8 | Accounts Admin (`stf00062` as `Accounts Admin`) | `/psm/invoices`, `/psm/reports` | `PSM-UC-013`, `015`, `029` | Loads vendor invoices and financial reports | `[22/Nov/2026 23:53:22] "GET /api/v1/psm/invoices HTTP/1.1" 200 42` · `[22/Nov/2026 23:53:23] "GET /api/v1/psm/reports/schedules HTTP/1.1" 200 42` | Passed |
+| 9 | Auditor (`stf00062` as `Auditor`) | `/psm/audit`, `/psm/reports`, `/psm` | `PSM-UC-014`, `015`, `030` | Read-only access to immutable audit logs, reports, and dashboard; all write buttons hidden | `[22/Nov/2026 23:53:25] "GET /api/v1/psm/audit HTTP/1.1" 200 2643` · `[22/Nov/2026 23:53:26] "GET /api/v1/psm/dashboard HTTP/1.1" 200 274` | Passed |

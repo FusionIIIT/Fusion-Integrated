@@ -53,10 +53,37 @@ export default function TransfersPage() {
               render: (r) => (
                 <Group justify="flex-end" gap="xs">
                   {can("psm.transfer.update") && r.status === "requested" && (
-                    <Button size="xs" onClick={() => act.mutate({ id: r.id, action: "dispatch" })}>Dispatch</Button>
+                    <Button
+                      size="xs"
+                      onClick={() =>
+                        act.mutate(
+                          { id: r.id, action: "dispatch" },
+                          {
+                            onSuccess: () => notifications.show({ color: "green", title: "Dispatched", message: "Transfer dispatched." }),
+                            onError: (e) => notifications.show({ color: "red", title: "Refused", message: errorMessage(e) }),
+                          },
+                        )
+                      }
+                    >
+                      Dispatch
+                    </Button>
                   )}
                   {can("psm.transfer.approve") && r.status === "dispatched" && (
-                    <Button size="xs" color="green" onClick={() => act.mutate({ id: r.id, action: "confirm" })}>Confirm receipt</Button>
+                    <Button
+                      size="xs"
+                      color="green"
+                      onClick={() =>
+                        act.mutate(
+                          { id: r.id, action: "confirm" },
+                          {
+                            onSuccess: () => notifications.show({ color: "green", title: "Confirmed", message: "Transfer receipt confirmed." }),
+                            onError: (e) => notifications.show({ color: "red", title: "Refused", message: errorMessage(e) }),
+                          },
+                        )
+                      }
+                    >
+                      Confirm receipt
+                    </Button>
                   )}
                 </Group>
               ),

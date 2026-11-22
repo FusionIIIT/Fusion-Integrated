@@ -74,40 +74,46 @@ def onboard_vendor(
     return vendor
 
 
+_MUTABLE_VENDOR_FIELDS = (
+    "name",
+    "gstin",
+    "bank_account_number",
+    "bank_ifsc",
+    "bank_name",
+    "compliance_documents",
+    "contact_email",
+    "is_active",
+)
+_SENSITIVE_VENDOR_FIELDS = frozenset(
+    {"gstin", "bank_account_number", "bank_ifsc", "bank_name", "compliance_documents"}
+)
+
+
+def _apply_vendor_fields(vendor: Vendor, fields: dict) -> bool:
+    """Apply normalized vendor edits and return True if sensitive compliance fields changed."""
+    sensitive_changed = False
+    for key in _MUTABLE_VENDOR_FIELDS:
+        if key not in fields:
+            continue
+        val = fields[key]
+        if key in ("gstin", "bank_ifsc") and isinstance(val, str):
+            val = val.strip().upper()
+        elif isinstance(val, str):
+            val = val.strip()
+        if getattr(vendor, key) != val:
+            if key in _SENSITIVE_VENDOR_FIELDS:
+                sensitive_changed = True
+            setattr(vendor, key, val)
+    return sensitive_changed
+
+
 @transaction.atomic
 def update_vendor(*, actor, vendor_id: int, change_reason: str = "", **fields) -> Vendor:
     """Update vendor master data and append a VendorVersion snapshot (BR-PSM-025)."""
     vendor = Vendor.objects.select_for_update().filter(pk=vendor_id).first()
     if vendor is None:
         raise NotFoundError("Vendor not found.")
-    sensitive_changed = False
-    for key in (
-        "name",
-        "gstin",
-        "bank_account_number",
-        "bank_ifsc",
-        "bank_name",
-        "compliance_documents",
-        "contact_email",
-        "is_active",
-    ):
-        if key in fields:
-            val = fields[key]
-            if key in ("gstin", "bank_ifsc") and isinstance(val, str):
-                val = val.strip().upper()
-            elif isinstance(val, str):
-                val = val.strip()
-            if getattr(vendor, key) != val:
-                if key in (
-                    "gstin",
-                    "bank_account_number",
-                    "bank_ifsc",
-                    "bank_name",
-                    "compliance_documents",
-                ):
-                    sensitive_changed = True
-                setattr(vendor, key, val)
-    if sensitive_changed:
+    if _apply_vendor_fields(vendor, fields):
         vendor.is_verified = False
         vendor.verified_at = None
         vendor.verified_by_user_id = None

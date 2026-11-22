@@ -15,7 +15,7 @@ import { useCreateIndent, useIndentAction, useIndentDetail, useIndents } from ".
 import type { Indent } from "../api/types";
 
 export default function IndentsPage() {
-  const { can } = useAuth();
+  const { can, session } = useAuth();
   const { data, isPending, error } = useIndents();
   const createIndent = useCreateIndent();
   const act = useIndentAction();
@@ -126,7 +126,7 @@ export default function IndentsPage() {
                   {can("psm.procurement.approve") && r.status === "awaiting_final_approval" && (
                     <Button size="xs" onClick={() => runAction(r.id, "final-decision", { decision: "approve" })}>Final approve</Button>
                   )}
-                  {can("psm.indent.delete") && r.status === "submitted" && (
+                  {can("psm.indent.delete") && r.user_id === session?.user.id && r.status === "submitted" && (
                     <Button size="xs" variant="subtle" color="red" onClick={() => runAction(r.id, "withdraw", { reason: "Withdrawn" })}>
                       Withdraw
                     </Button>

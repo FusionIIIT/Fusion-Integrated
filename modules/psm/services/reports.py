@@ -161,6 +161,48 @@ class _ScheduledActor:
         return code in self._perms
 
 
+def _execute_one_schedule(pk: int, now) -> int:
+    """Execute a single due report schedule under lock and log its outcome."""
+    with transaction.atomic():
+        sched = ReportSchedule.objects.select_for_update().get(pk=pk)
+        if not sched.is_active or sched.next_run_at > now:
+            return 0
+        actor = _ScheduledActor(sched.created_by_user_id, sched.created_by_role)
+        needed = (
+            "psm.financial_report.view" if sched.report_type == "financial" else "psm.report.view"
+        )
+        if not actor.has_permission(needed):
+            ReportGenerationLog.objects.create(
+                report_type=sched.report_type,
+                trigger_type="scheduled",
+                schedule=sched,
+                filters=sched.filters,
+                status="blocked",
+                actor_user_id=sched.created_by_user_id,
+                error_message=f"Role '{sched.created_by_role}' no longer holds {needed}.",
+            )
+            sched.is_active = False
+            sched.save(update_fields=["is_active", "updated_at"])
+            return 0
+        _, rows = report_sel.build_report_rows(
+            actor, report_type=sched.report_type, filters=sched.filters
+        )
+        ReportGenerationLog.objects.create(
+            report_type=sched.report_type,
+            trigger_type="scheduled",
+            schedule=sched,
+            filters=sched.filters,
+            export_format="json",
+            row_count=len(rows),
+            status="succeeded",
+            actor_user_id=sched.created_by_user_id,
+        )
+        sched.last_run_at = now
+        sched.next_run_at = now + VALID_CADENCES.get(sched.cadence, timedelta(days=1))
+        sched.save(update_fields=["last_run_at", "next_run_at", "updated_at"])
+        return 1
+
+
 def run_due_schedules(*, now=None) -> int:
     """Execute all due active report schedules idempotently (PSM-UC-035, BR-PSM-024)."""
     now = now or timezone.now()
@@ -169,46 +211,4 @@ def run_due_schedules(*, now=None) -> int:
             "pk", flat=True
         )
     )
-    executed = 0
-    for pk in due_ids:
-        with transaction.atomic():
-            sched = ReportSchedule.objects.select_for_update().get(pk=pk)
-            if not sched.is_active or sched.next_run_at > now:
-                continue
-            actor = _ScheduledActor(sched.created_by_user_id, sched.created_by_role)
-            needed = (
-                "psm.financial_report.view"
-                if sched.report_type == "financial"
-                else "psm.report.view"
-            )
-            if not actor.has_permission(needed):
-                ReportGenerationLog.objects.create(
-                    report_type=sched.report_type,
-                    trigger_type="scheduled",
-                    schedule=sched,
-                    filters=sched.filters,
-                    status="blocked",
-                    actor_user_id=sched.created_by_user_id,
-                    error_message=f"Role '{sched.created_by_role}' no longer holds {needed}.",
-                )
-                sched.is_active = False
-                sched.save(update_fields=["is_active", "updated_at"])
-                continue
-            _, rows = report_sel.build_report_rows(
-                actor, report_type=sched.report_type, filters=sched.filters
-            )
-            ReportGenerationLog.objects.create(
-                report_type=sched.report_type,
-                trigger_type="scheduled",
-                schedule=sched,
-                filters=sched.filters,
-                export_format="json",
-                row_count=len(rows),
-                status="succeeded",
-                actor_user_id=sched.created_by_user_id,
-            )
-            sched.last_run_at = now
-            sched.next_run_at = now + VALID_CADENCES.get(sched.cadence, timedelta(days=1))
-            sched.save(update_fields=["last_run_at", "next_run_at", "updated_at"])
-            executed += 1
-    return executed
+    return sum(_execute_one_schedule(pk, now) for pk in due_ids)

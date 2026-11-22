@@ -143,7 +143,9 @@ def test_http_endpoints_invoices_reports_schedules_audit_notifications_policy(st
         submit=True,
     )
     stock.check_and_reserve(actor=p_dept, indent_id=ind.pk)
-    approvals.dept_admin_review(actor=p_dept, indent_id=ind.pk, decision="approve", priority="normal")
+    approvals.dept_admin_review(
+        actor=p_dept, indent_id=ind.pk, decision="approve", priority="normal"
+    )
     approvals.hod_recommend(actor=p_hod, indent_id=ind.pk, decision="recommend")
     procurement.review_and_select_method(actor=p_ps, indent_id=ind.pk)
     po = procurement.create_and_issue_po(
@@ -258,7 +260,9 @@ def test_discrepancy_resolution_return_replacement_and_communication():
         submit=True,
     )
     stock.check_and_reserve(actor=p_dept, indent_id=ind.pk)
-    approvals.dept_admin_review(actor=p_dept, indent_id=ind.pk, decision="approve", priority="normal")
+    approvals.dept_admin_review(
+        actor=p_dept, indent_id=ind.pk, decision="approve", priority="normal"
+    )
     approvals.hod_recommend(actor=p_hod, indent_id=ind.pk, decision="recommend")
     procurement.review_and_select_method(actor=p_ps, indent_id=ind.pk)
     po = procurement.create_and_issue_po(
@@ -405,7 +409,7 @@ def test_transfers_cancel_stock_adjustments_vendor_updates_and_approvals():
     with pytest.raises(NotFoundError):
         transfers.cancel_transfer(actor=p_dept_ece, transfer_id=999999)
 
-    # Transfer request + dispatch + confirm (PSM-UC-032, PSM-UC-033, PSM-UC-034, BR-PSM-027)
+    # Transfer request + dispatch authorization + confirm (PSM-UC-032, 033, 034, BR-PSM-027)
     tr2 = transfers.request_transfer(
         actor=p_dept_ece,
         item_id=item.pk,
@@ -414,10 +418,38 @@ def test_transfers_cancel_stock_adjustments_vendor_updates_and_approvals():
         quantity=3,
         notes="ECE bench",
     )
-    dispatched = transfers.dispatch_transfer(actor=p_ps, transfer_id=tr2.pk)
+    # R1-03: destination-dept admin and ps_admin on non-central source are refused
+    with pytest.raises(PermissionDeniedError):
+        transfers.dispatch_transfer(actor=p_dept_ece, transfer_id=tr2.pk)
+    with pytest.raises(PermissionDeniedError):
+        transfers.dispatch_transfer(actor=p_ps, transfer_id=tr2.pk)
+    dispatched = transfers.dispatch_transfer(actor=p_dept, transfer_id=tr2.pk)
     assert dispatched.status == "dispatched"
-    confirmed = transfers.confirm_transfer(actor=p_ps, transfer_id=tr2.pk)
+    confirmed = transfers.confirm_transfer(actor=p_dept_ece, transfer_id=tr2.pk)
     assert confirmed.status == "completed"
+    # Verify dual ledger posting (BR-PSM-027, AFR-PSM-068..070)
+    assert StockLedgerEntry.objects.filter(
+        source_ref_type="stock_transfer", source_ref_id=tr2.pk, entry_type="transfer_out"
+    ).exists()
+    assert StockLedgerEntry.objects.filter(
+        source_ref_type="stock_transfer", source_ref_id=tr2.pk, entry_type="transfer_in"
+    ).exists()
+    # R1-03: ps_admin is permitted when source_location.is_central=True
+    loc_central = stock.create_stock_location(
+        actor=p_ps, code="LOC-CEN-COV", name="Central Store", department="Stores", is_central=True
+    )
+    stock.record_adjustment(
+        actor=p_ps, item_id=item.pk, location_id=loc_central.pk, quantity_delta=10, reason="Init"
+    )
+    tr_cen = transfers.request_transfer(
+        actor=p_dept_ece,
+        item_id=item.pk,
+        source_location_id=loc_central.pk,
+        destination_location_id=loc_ece.pk,
+        quantity=2,
+        notes="From central",
+    )
+    assert transfers.dispatch_transfer(actor=p_ps, transfer_id=tr_cen.pk).status == "dispatched"
 
     # Vendor update + change history (PSM-UC-020, BR-PSM-021)
     v = vendors.onboard_vendor(
@@ -450,7 +482,9 @@ def test_transfers_cancel_stock_adjustments_vendor_updates_and_approvals():
         submit=True,
     )
     stock.check_and_reserve(actor=p_dept, indent_id=ind.pk)
-    approvals.dept_admin_review(actor=p_dept, indent_id=ind.pk, decision="approve", priority="normal")
+    approvals.dept_admin_review(
+        actor=p_dept, indent_id=ind.pk, decision="approve", priority="normal"
+    )
     ind_chg = approvals.hod_recommend(
         actor=p_hod,
         indent_id=ind.pk,
@@ -463,7 +497,9 @@ def test_transfers_cancel_stock_adjustments_vendor_updates_and_approvals():
     )
     assert ind_mod.status == "submitted"
     stock.check_and_reserve(actor=p_dept, indent_id=ind.pk)
-    approvals.dept_admin_review(actor=p_dept, indent_id=ind.pk, decision="approve", priority="normal")
+    approvals.dept_admin_review(
+        actor=p_dept, indent_id=ind.pk, decision="approve", priority="normal"
+    )
     ind_rej = approvals.hod_recommend(
         actor=p_hod, indent_id=ind.pk, decision="reject", reason="Deferred to Q2"
     )
@@ -531,3 +567,168 @@ def test_reports_all_types_filters_scoping_and_throttle_429(stub_iam, monkeypatc
     assert r1.status_code == 200
     assert r2.status_code == 429
     cache.clear()
+
+
+def test_r1_04_discrepancy_resolve_atomic_inventory_and_accounting_adjustments():
+    # R1-04: AFR-PSM-054, AFR-PSM-055, BR-PSM-019 atomic stock ledger + invoice adjustment
+    from modules.psm.models import Invoice, PsmAuditLog
+    from modules.psm.services import finance
+
+    p_emp, p_dept, p_hod, p_ps, _p_dir, p_acc, _p_aud = _setup_actors()
+    policy.seed_default_policy()
+    loc = stock.create_stock_location(
+        actor=p_ps, code="LOC-R104", name="CSE Lab", department="CSE", is_central=False
+    )
+    item = stock.create_stock_item(
+        actor=p_ps, sku="SKU-R104", name="Oscilloscope", category="Lab", unit="pcs"
+    )
+    v = vendors.onboard_vendor(
+        actor=p_ps,
+        name="R104 Vendor",
+        gstin="23ABCDE5678F1Z5",
+        bank_account_number="998877665544",
+        bank_ifsc="SBIN0001234",
+        bank_name="SBI",
+        compliance_documents=["gst.pdf"],
+        contact_email="r104@v.test",
+    )
+    vendors.verify_vendor(actor=p_ps, vendor_id=v.pk)
+    ind = indents.create_indent(
+        actor=p_emp,
+        department="CSE",
+        item_id=item.pk,
+        item_description="Oscilloscope",
+        quantity=3,
+        estimated_cost=Decimal("15000.00"),
+        justification="Lab equip",
+        submit=True,
+    )
+    stock.check_and_reserve(actor=p_dept, indent_id=ind.pk)
+    approvals.dept_admin_review(
+        actor=p_dept, indent_id=ind.pk, decision="approve", priority="normal"
+    )
+    approvals.hod_recommend(actor=p_hod, indent_id=ind.pk, decision="recommend")
+    procurement.review_and_select_method(actor=p_ps, indent_id=ind.pk)
+    po = procurement.create_and_issue_po(
+        actor=p_ps,
+        indent_id=ind.pk,
+        vendor_id=v.pk,
+        ordered_quantity=3,
+        unit_price=Decimal("5000.00"),
+        planned_delivery_date=date.today() + timedelta(days=5),
+    )
+    grn = receipts.record_grn(
+        actor=p_emp,
+        purchase_order_id=po.pk,
+        received_quantity=3,
+        accepted_quantity=2,
+        rejected_quantity=1,
+        inspection_notes="1 cracked unit",
+    )
+    inv = finance.submit_invoice(
+        actor=p_acc,
+        purchase_order_id=po.pk,
+        invoice_number="INV-R104-1",
+        billed_quantity=3,
+        billed_amount=Decimal("15000.00"),
+    )
+    case = discrepancies.report_discrepancy(
+        actor=p_emp,
+        grn_id=grn.pk,
+        discrepancy_type="damaged",
+        affected_quantity=1,
+        description="Cracked display",
+        requested_resolution="return_and_adjust",
+    )
+    inv.refresh_from_db()
+    assert inv.status == "on_hold"
+    resolved = discrepancies.resolve_case(
+        actor=p_ps,
+        case_id=case.pk,
+        resolution_action="resolve",
+        resolution_notes="Vendor issued credit note for 1 unit",
+        inventory_adjusted=True,
+        accounting_adjusted=True,
+    )
+    assert resolved.status == "resolved"
+    adj_entry = StockLedgerEntry.objects.filter(
+        source_ref_type="discrepancy", source_ref_id=case.pk, location=loc, item=item
+    ).first()
+    assert adj_entry is not None
+    assert adj_entry.quantity_delta == -1
+    inv = Invoice.objects.get(pk=inv.pk)
+    assert inv.eligible_amount == Decimal("10000.00")
+    assert inv.status == "verified"
+    assert inv.hold_reason == ""
+    assert PsmAuditLog.objects.filter(
+        action="stock.discrepancy_adjusted", target_id=adj_entry.pk
+    ).exists()
+    assert PsmAuditLog.objects.filter(
+        action="invoice.discrepancy_adjusted", target_id=inv.pk
+    ).exists()
+
+
+def test_r1_07_r1_09_po_state_machine_and_direct_spec_assertions():
+    # R1-07, R1-09: CFR-PSM-009, AFR-PSM-042, AFR-PSM-068..073, PSM-UC-031 direct assertions
+    from modules.psm.models import PsmNotification, ReportGenerationLog
+
+    p_emp, p_dept, p_hod, p_ps, _p_dir, _p_acc, _p_aud = _setup_actors()
+    policy.seed_default_policy()
+    v = vendors.onboard_vendor(
+        actor=p_ps,
+        name="PO SM Vendor",
+        gstin="23ABCDE9999F1Z5",
+        bank_account_number="554433221100",
+        bank_ifsc="SBIN0001234",
+        bank_name="SBI",
+        compliance_documents=["gst.pdf"],
+        contact_email="posm@v.test",
+    )
+    vendors.verify_vendor(actor=p_ps, vendor_id=v.pk)
+    ind = indents.create_indent(
+        actor=p_emp,
+        department="CSE",
+        item_description="Network Switch",
+        quantity=2,
+        estimated_cost=Decimal("18000.00"),
+        justification="Lab rack",
+        submit=True,
+    )
+    stock.check_and_reserve(actor=p_dept, indent_id=ind.pk)
+    approvals.dept_admin_review(
+        actor=p_dept, indent_id=ind.pk, decision="approve", priority="normal"
+    )
+    approvals.hod_recommend(actor=p_hod, indent_id=ind.pk, decision="recommend")
+    procurement.review_and_select_method(actor=p_ps, indent_id=ind.pk)
+    po = procurement.create_and_issue_po(
+        actor=p_ps,
+        indent_id=ind.pk,
+        vendor_id=v.pk,
+        ordered_quantity=2,
+        unit_price=Decimal("9000.00"),
+        planned_delivery_date=date.today() + timedelta(days=7),
+    )
+    # Illegal PO jump issued -> closed refused by declarative state machine (R1-07)
+    with pytest.raises(ConflictError):
+        procurement.update_po_schedule(actor=p_ps, po_id=po.pk, status="closed")
+    # Legal PO progression issued -> in_transit -> delivered -> closed (CFR-PSM-009, AFR-PSM-042)
+    po = procurement.update_po_schedule(
+        actor=p_ps, po_id=po.pk, status="in_transit", delivery_notes="Dispatched by courier"
+    )
+    assert po.status == "in_transit"
+    assert PsmNotification.objects.filter(topic="po.status_changed").exists()
+    po = procurement.update_po_schedule(actor=p_ps, po_id=po.pk, status="delivered")
+    po = procurement.update_po_schedule(actor=p_ps, po_id=po.pk, status="closed")
+    assert po.status == "closed"
+    with pytest.raises(ConflictError):
+        procurement.update_po_schedule(actor=p_ps, po_id=po.pk, delivery_notes="Late note")
+    # Scheduled report creation, update, and execution log (PSM-UC-031, AFR-PSM-071..073)
+    sched = reports.create_schedule(
+        actor=p_ps, name="Daily Ops", report_type="operational", cadence="daily", filters={}
+    )
+    sched = reports.update_schedule(actor=p_ps, schedule_id=sched.pk, cadence="weekly")
+    assert sched.cadence == "weekly"
+    sched.next_run_at = timezone.now() - timedelta(minutes=1)
+    sched.save(update_fields=["next_run_at"])
+    assert reports.run_due_schedules() == 1
+    assert ReportGenerationLog.objects.filter(schedule=sched, status="succeeded").exists()

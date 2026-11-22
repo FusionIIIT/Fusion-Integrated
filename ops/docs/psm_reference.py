@@ -44,7 +44,9 @@ def _all_live_ids() -> list[tuple[str, str]]:
     return ids
 
 
-def _scan_files(paths: list[pathlib.Path], *, exclude_tests: bool = False) -> dict[str, list[str]]:
+def _scan_files(
+    paths: list[pathlib.Path], *, exclude_tests: bool = False, include_lines: bool = True
+) -> dict[str, list[str]]:
     hits: dict[str, list[str]] = {}
     for base in paths:
         for file_path in sorted(base.rglob("*")):
@@ -55,11 +57,19 @@ def _scan_files(paths: list[pathlib.Path], *, exclude_tests: bool = False) -> di
             rel = file_path.relative_to(ROOT).as_posix()
             for lineno, line in enumerate(file_path.read_text(encoding="utf-8").splitlines(), 1):
                 for match in SPEC_ID_RE.findall(line):
-                    hits.setdefault(match, []).append(f"{rel}:{lineno}")
+                    ref = f"{rel}:{lineno}" if include_lines else rel
+                    bucket = hits.setdefault(match, [])
+                    if ref not in bucket:
+                        bucket.append(ref)
     return hits
 
 
 def _verify_ref(ref: str) -> None:
+    if ":" not in ref:
+        target = ROOT / ref
+        if not target.is_file():
+            raise RuntimeError(f"Missing linked file: {ref}")
+        return
     rel_path, line_str = ref.rsplit(":", 1)
     lineno = int(line_str)
     target = ROOT / rel_path
@@ -71,8 +81,8 @@ def _verify_ref(ref: str) -> None:
 
 
 def main() -> int:
-    code_hits = _scan_files([*BACKEND_DIRS, CLIENT_DIR], exclude_tests=True)
-    test_hits = _scan_files([TEST_DIR], exclude_tests=False)
+    code_hits = _scan_files([*BACKEND_DIRS, CLIENT_DIR], exclude_tests=True, include_lines=True)
+    test_hits = _scan_files([TEST_DIR], exclude_tests=False, include_lines=False)
 
     for retired in sorted(RETIRED_IDS):
         if retired in code_hits or retired in test_hits:

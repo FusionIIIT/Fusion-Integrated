@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import transaction
 from django.utils import timezone
 
-from core.api.exceptions import ConflictError, DomainError, NotFoundError
+from core.api.exceptions import ConflictError, DomainError, NotFoundError, PermissionDeniedError
 from modules.psm.domain import state_machine as sm
 from modules.psm.models import (
     StockItem,
@@ -22,6 +22,76 @@ from modules.psm.services.common import (
     next_number,
     translate_errors,
 )
+
+
+def _ensure_can_dispatch(actor, transfer: StockTransfer) -> None:
+    """Allow source department admin or ps_admin when source is central (PSM-UC-033)."""
+    lane = actor_lane_for(actor)
+    src = transfer.source_location
+    if lane == sm.PS_ADMIN:
+        if not src.is_central:
+            raise PermissionDeniedError(
+                "Only the source department admin may dispatch a non-central stock transfer.",
+                code="wrong_source_dispatcher",
+            )
+        return
+    dept = scoping.actor_department(actor)
+    if not dept or src.department.lower() != dept.lower():
+        raise PermissionDeniedError(
+            "Only the source department admin may dispatch this stock transfer.",
+            code="wrong_source_dept",
+        )
+
+
+def _reserve_source_stock(actor, transfer: StockTransfer) -> StockReservation:
+    """Lock item, check allocable balance at source, and create active reservation."""
+    StockItem.objects.select_for_update().get(pk=transfer.item_id)
+    balances = {b.location_id: b for b in stock_balances_for_item(transfer.item_id)}
+    src_bal = balances.get(transfer.source_location_id)
+    if src_bal is None or src_bal.allocable < transfer.quantity:
+        avail = src_bal.allocable if src_bal else 0
+        raise ConflictError(
+            f"Source location {transfer.source_location.code} only has {avail} allocable unit(s).",
+            code="insufficient_source_stock",
+        )
+    return StockReservation.objects.create(
+        item=transfer.item,
+        location=transfer.source_location,
+        quantity=transfer.quantity,
+        purpose="stock_transfer",
+        transfer_id=transfer.pk,
+        status="active",
+        reserved_by_user_id=actor.user_id,
+    )
+
+
+def _post_transfer_ledgers(actor, transfer: StockTransfer, now) -> None:
+    """Consume active reservation and append paired transfer_out / transfer_in ledger rows."""
+    StockItem.objects.select_for_update().get(pk=transfer.item_id)
+    if transfer.reservation_id:
+        StockReservation.objects.filter(pk=transfer.reservation_id, status="active").update(
+            status="consumed", released_at=now
+        )
+    StockLedgerEntry.objects.create(
+        item=transfer.item,
+        location=transfer.source_location,
+        entry_type="transfer_out",
+        quantity_delta=-transfer.quantity,
+        source_ref_type="stock_transfer",
+        source_ref_id=transfer.pk,
+        reason=f"Transfer {transfer.transfer_number} to {transfer.destination_location.code}",
+        actor_user_id=actor.user_id,
+    )
+    StockLedgerEntry.objects.create(
+        item=transfer.item,
+        location=transfer.destination_location,
+        entry_type="transfer_in",
+        quantity_delta=transfer.quantity,
+        source_ref_type="stock_transfer",
+        source_ref_id=transfer.pk,
+        reason=f"Transfer {transfer.transfer_number} from {transfer.source_location.code}",
+        actor_user_id=actor.user_id,
+    )
 
 
 @transaction.atomic
@@ -86,26 +156,8 @@ def dispatch_transfer(*, actor, transfer_id: int) -> StockTransfer:
         raise NotFoundError("Stock transfer not found.")
     with translate_errors():
         sm.resolve("transfer", transfer.status, sm.TRANSFER_DISPATCHED, actor_lane_for(actor))
-    # Serialize concurrent reservations on the same StockItem row (BR-PSM-013).
-    StockItem.objects.select_for_update().get(pk=transfer.item_id)
-    balances = {b.location_id: b for b in stock_balances_for_item(transfer.item_id)}
-    src_bal = balances.get(transfer.source_location_id)
-    if src_bal is None or src_bal.allocable < transfer.quantity:
-        avail = src_bal.allocable if src_bal else 0
-        raise ConflictError(
-            f"Source location {transfer.source_location.code} only has {avail} allocable unit(s).",
-            code="insufficient_source_stock",
-        )
-    reservation = StockReservation.objects.create(
-        item=transfer.item,
-        location=transfer.source_location,
-        quantity=transfer.quantity,
-        purpose="stock_transfer",
-        transfer_id=transfer.pk,
-        status="active",
-        reserved_by_user_id=actor.user_id,
-    )
-    transfer.reservation = reservation
+    _ensure_can_dispatch(actor, transfer)
+    transfer.reservation = _reserve_source_stock(actor, transfer)
     transfer.status = sm.TRANSFER_DISPATCHED
     transfer.dispatched_by_user_id = actor.user_id
     transfer.dispatched_at = timezone.now()
@@ -153,32 +205,8 @@ def confirm_transfer(*, actor, transfer_id: int) -> StockTransfer:
             "Only the destination department admin may confirm receipt of this transfer.",
             code="wrong_destination_dept",
         )
-    StockItem.objects.select_for_update().get(pk=transfer.item_id)
     now = timezone.now()
-    if transfer.reservation_id:
-        StockReservation.objects.filter(pk=transfer.reservation_id, status="active").update(
-            status="consumed", released_at=now
-        )
-    StockLedgerEntry.objects.create(
-        item=transfer.item,
-        location=transfer.source_location,
-        entry_type="transfer_out",
-        quantity_delta=-transfer.quantity,
-        source_ref_type="stock_transfer",
-        source_ref_id=transfer.pk,
-        reason=f"Transfer {transfer.transfer_number} to {transfer.destination_location.code}",
-        actor_user_id=actor.user_id,
-    )
-    StockLedgerEntry.objects.create(
-        item=transfer.item,
-        location=transfer.destination_location,
-        entry_type="transfer_in",
-        quantity_delta=transfer.quantity,
-        source_ref_type="stock_transfer",
-        source_ref_id=transfer.pk,
-        reason=f"Transfer {transfer.transfer_number} from {transfer.source_location.code}",
-        actor_user_id=actor.user_id,
-    )
+    _post_transfer_ledgers(actor, transfer, now)
     transfer.status = sm.TRANSFER_COMPLETED
     transfer.confirmed_by_user_id = actor.user_id
     transfer.confirmed_at = now

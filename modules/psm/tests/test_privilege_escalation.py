@@ -195,3 +195,28 @@ def test_all_permission_strings_in_module_code_are_declared():
         )
     unknown = used - declared
     assert not unknown, f"Undeclared permission codes found: {sorted(unknown)}"
+
+
+def test_every_psm_route_and_method_enforces_both_403_gates(stub_iam):
+    # R1-10: verify both module-grant gate and permission gate across every PSM route/method pair.
+    from modules.psm.api import urls as psm_urls
+
+    all_perms = tuple(code for code, _ in registry.PERMISSIONS)
+    pairs: list[tuple[str, str]] = []
+    for pattern in psm_urls.urlpatterns:
+        raw = str(pattern.pattern)
+        path = "/api/v1/psm/" + re.sub(r"<int:[^>]+>", "1", raw)
+        view_cls = pattern.callback.view_class
+        pairs.extend(
+            (method, path)
+            for method in ("get", "post", "patch", "put", "delete")
+            if hasattr(view_cls, method)
+        )
+    assert len(pairs) >= 40
+    for method, path in pairs:
+        c_no_mod = _client(stub_iam, modules=(), permissions=all_perms)
+        r_no_mod = getattr(c_no_mod, method)(path, {}, format="json")
+        assert r_no_mod.status_code == 403, f"No-module gate missed on {method.upper()} {path}"
+        c_no_perm = _client(stub_iam, modules=("psm",), permissions=())
+        r_no_perm = getattr(c_no_perm, method)(path, {}, format="json")
+        assert r_no_perm.status_code == 403, f"No-permission gate missed on {method.upper()} {path}"

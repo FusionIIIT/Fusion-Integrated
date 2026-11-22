@@ -15,6 +15,9 @@ export const ACCOUNTS = {
   psAdmin: {
     username: "stf00062", role: "ps_admin", grants: ["ps_admin"],
   },
+  psmRequester: {
+    username: "fac00001", role: "faculty", grants: ["faculty"],
+  },
 } as const satisfies Record<string, Account>;
 
 export type AccountKey = keyof typeof ACCOUNTS;

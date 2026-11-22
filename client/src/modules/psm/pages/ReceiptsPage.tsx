@@ -94,39 +94,54 @@ export default function ReceiptsPage() {
 
         <Card padding="lg">
           <Title order={4} mb="sm">Discrepancy Cases</Title>
-          <DataTable<DiscrepancyCase>
-            rows={cases.data?.results ?? []}
-            loading={cases.isPending}
-            rowKey={(r) => r.id}
-            empty={{ title: "No discrepancy cases logged." }}
-            columns={[
-              { key: "case", header: "Case", render: (r) => r.case_number },
-              { key: "type", header: "Type", render: (r) => `${r.discrepancy_type} (${r.affected_quantity})` },
-              { key: "res", header: "Requested", render: (r) => r.requested_resolution },
-              { key: "status", header: "Status", render: (r) => <Badge variant="light">{r.status}</Badge> },
-              {
-                key: "actions",
-                header: "Actions",
-                align: "right",
-                render: (r) =>
-                  can("psm.discrepancy.update") && r.status === "open" ? (
-                    <Button
-                      size="xs"
-                      onClick={() =>
-                        resolveDisc.mutate({
-                          id: r.id,
-                          body: { resolution_action: "resolve", resolution_notes: "Resolved via return/adjustment", inventory_adjusted: true, accounting_adjusted: true },
-                        })
-                      }
-                    >
-                      Resolve
-                    </Button>
-                  ) : (
-                    <Text size="xs" c="dimmed">—</Text>
-                  ),
-              },
-            ]}
-          />
+          {cases.error ? (
+            <ErrorState error={cases.error} />
+          ) : (
+            <DataTable<DiscrepancyCase>
+              rows={cases.data?.results ?? []}
+              loading={cases.isPending}
+              rowKey={(r) => r.id}
+              empty={{ title: "No discrepancy cases logged." }}
+              columns={[
+                { key: "case", header: "Case", render: (r) => r.case_number },
+                { key: "type", header: "Type", render: (r) => `${r.discrepancy_type} (${r.affected_quantity})` },
+                { key: "res", header: "Requested", render: (r) => r.requested_resolution },
+                { key: "status", header: "Status", render: (r) => <Badge variant="light">{r.status}</Badge> },
+                {
+                  key: "actions",
+                  header: "Actions",
+                  align: "right",
+                  render: (r) =>
+                    can("psm.discrepancy.update") && r.status === "open" ? (
+                      <Button
+                        size="xs"
+                        onClick={() =>
+                          resolveDisc.mutate(
+                            {
+                              id: r.id,
+                              body: {
+                                resolution_action: "resolve",
+                                resolution_notes: "Resolved via return/adjustment",
+                                inventory_adjusted: true,
+                                accounting_adjusted: true,
+                              },
+                            },
+                            {
+                              onSuccess: () => notifications.show({ color: "green", title: "Resolved", message: "Discrepancy case resolved." }),
+                              onError: (e) => notifications.show({ color: "red", title: "Refused", message: errorMessage(e) }),
+                            },
+                          )
+                        }
+                      >
+                        Resolve
+                      </Button>
+                    ) : (
+                      <Text size="xs" c="dimmed">—</Text>
+                    ),
+                },
+              ]}
+            />
+          )}
         </Card>
       </Stack>
 

@@ -36,23 +36,8 @@ def stock_balances_for_item(item_id: int) -> list[StockBalance]:
     ]
 
 
-def availability_rows(
-    actor, *, item_id: int | None = None, location_id: int | None = None
-) -> list[dict]:
-    """Return scoped on-hand, reserved, and allocable stock rows in constant queries."""
-    locs = list(scoping.stock_locations_for(actor))
-    if location_id is not None:
-        locs = [loc for loc in locs if loc.pk == location_id]
-    loc_ids = [loc.pk for loc in locs]
-    if not loc_ids:
-        return []
-    items_qs = StockItem.objects.filter(is_active=True)
-    if item_id is not None:
-        items_qs = items_qs.filter(pk=item_id)
-    items = list(items_qs)
-    if not items:
-        return []
-    item_ids = [it.pk for it in items]
+def _aggregate_maps(item_ids: list[int], loc_ids: list[int]) -> tuple[dict, dict]:
+    """Fetch summed ledger on-hand and active reservation quantities in two queries."""
     ledger_map = {
         (r["item_id"], r["location_id"]): r["total"] or 0
         for r in StockLedgerEntry.objects.filter(item_id__in=item_ids, location_id__in=loc_ids)
@@ -67,6 +52,25 @@ def availability_rows(
         .values("item_id", "location_id")
         .annotate(total=Sum("quantity"))
     }
+    return ledger_map, res_map
+
+
+def availability_rows(
+    actor, *, item_id: int | None = None, location_id: int | None = None
+) -> list[dict]:
+    """Return scoped on-hand, reserved, and allocable stock rows in constant queries."""
+    locs = list(scoping.stock_locations_for(actor))
+    if location_id is not None:
+        locs = [loc for loc in locs if loc.pk == location_id]
+    if not locs:
+        return []
+    items_qs = StockItem.objects.filter(is_active=True)
+    if item_id is not None:
+        items_qs = items_qs.filter(pk=item_id)
+    items = list(items_qs)
+    if not items:
+        return []
+    ledger_map, res_map = _aggregate_maps([it.pk for it in items], [loc.pk for loc in locs])
     rows: list[dict] = []
     for it in items:
         for loc in locs:
