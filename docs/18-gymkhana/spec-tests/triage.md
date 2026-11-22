@@ -2,7 +2,7 @@
 Student 1 (git author name): Ayushnotafk
 Student 2 (git author name): Ayushnotafk
 Design commit (hash and subject): 732e171 Freeze Gymkhana specification-based test designs (FR, BR, UC, WF)
-Baseline commit (hash and subject): PENDING_BASELINE_COMMIT
+Baseline commit (hash and subject): e3c1b78 Add gymkhana spec tests and baseline triage log
 Student 1's 10/10 commit the baseline ran on (hash): 4fd66a11736f8f05c76469884f9b78bacd440aae
 
 ## Results
