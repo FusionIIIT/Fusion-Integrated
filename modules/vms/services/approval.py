@@ -74,7 +74,9 @@ def decide(*, host_actor, request_id: int, decision: str, note: str = "",
     """Host approves or rejects. Returns ``(request, pass_or_None)``.
 
     Not the assigned host -> NotFoundError (BR no enumeration). A request that
-    is no longer pending -> ConflictError.
+    is no longer pending -> ConflictError. A pre-registered visit needs this explicit
+    Host decision before a pass exists (BR-052), and an Expired request can no longer be
+    decided or activated (BR-200).
     """
     if decision not in (APPROVE, REJECT):
         raise BadRequestError("decision must be 'approve' or 'reject'.", code="invalid_decision")

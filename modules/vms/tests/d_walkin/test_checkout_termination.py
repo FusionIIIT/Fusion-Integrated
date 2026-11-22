@@ -237,7 +237,7 @@ def test_roster_is_one_query(django_assert_num_queries):
         _ = [r.visit_request.visitor.full_name for r in rows]
 
 
-def test_visit_history_lists_visitor_logs():
+def test_uc_011_visit_history_lists_visitor_logs():
     vp = on_site_pass()
     f.make_visit_log(visit_pass=vp, event=E.CHECK_OUT)
     assert roster.visit_history(vp.visit_request.visitor).count() == 2

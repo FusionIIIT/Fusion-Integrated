@@ -88,7 +88,10 @@ def send_reminders(now: datetime | None = None) -> int:
 
 
 def expire_pending(now: datetime | None = None) -> int:
-    """Expire pending requests past their deadline (BR-062, BW-VMS-03). Idempotent."""
+    """Expire pending requests past their deadline (BR-062, BR-200, BW-VMS-03). Idempotent.
+
+    An Expired request is never revived: approval is refused and no pass is issued (BR-200).
+    """
     now = now or timezone.now()
     waiting = (Q(status=VisitRequest.Status.PENDING)
                | (Q(status=VisitRequest.Status.AWAITING_ADMIN)

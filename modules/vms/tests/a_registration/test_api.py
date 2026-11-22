@@ -82,7 +82,7 @@ def test_visitor_cannot_see_other_visitor(visitor_api):
     assert mine_client.get(BASE + f"visitor/requests/{their_vr.pk}/pass").status_code == 404
 
 
-def test_visitor_request_detail_has_history_and_decision_note(visitor_api, host):
+def test_uc_011_visitor_request_detail_has_history_and_decision_note(visitor_api, host):
     client, _ = visitor_api()
     r = client.post(BASE + "visitor/pre-registrations", payload(), format="json")
     rid = r.json()["id"]

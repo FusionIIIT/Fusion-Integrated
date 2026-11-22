@@ -161,6 +161,7 @@ def check_zone(*, actor, pass_id: int, zone_id: int, reader_id: str = "", gate_i
                              detail={"zone_id": zone_id, "visit_log_id": log.pk})
             return {"allowed": True, "failures": [], "visit_log": log,
                     "vip_override": ev.vip_waived}
+        # BR-192: every unauthorized zone-access attempt is logged, never silently dropped.
         log = VisitLog.objects.create(
             visit_pass=vp, event=E.ZONE_DENIED, zone=zone, device_id=reader_id[:80],
             gate_id=gate_id, logged_by_user_id=actor_id,

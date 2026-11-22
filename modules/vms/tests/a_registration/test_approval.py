@@ -85,6 +85,23 @@ def test_expired_request_cannot_be_decided(host):
     assert e.value.code == "request_expired"
 
 
+def test_br_200_expired_request_stays_expired_no_approval_and_no_pass(host):
+    """BR-200: once the timeout marks a request Expired it cannot be approved, no pass is
+    issued, and nothing revives it."""
+    from modules.vms.services import scheduler_work
+    vr = _pending(expires_at=timezone.now() - timedelta(minutes=1))
+    assert scheduler_work.expire_pending() == 1
+    vr.refresh_from_db()
+    assert vr.status == "expired"
+    for decision in ("approve", "reject"):
+        with pytest.raises(ConflictError):
+            approval.decide(host_actor=host, request_id=vr.pk, decision=decision,
+                            note="late")
+    vr.refresh_from_db()
+    assert vr.status == "expired" and not VisitPass.objects.exists()
+    assert scheduler_work.expire_pending() == 0
+
+
 def test_zone_restriction_must_be_a_subset(host):
     z1, z2, z3 = f.make_zone(), f.make_zone(), f.make_zone()
     vr = _pending()
