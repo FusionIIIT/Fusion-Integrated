@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.vh",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -210,6 +211,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": ["core.api.throttling.PrincipalScopedThrottle"],
     # Only endpoints opting in via `throttle_scope` are limited.
     "DEFAULT_THROTTLE_RATES": {
+        "vh_write": "120/min",
         "recruiter_login": "5/min",
         "recruiter_invite_accept": "10/hour",
         "apply": "30/hour",
@@ -230,6 +232,24 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "VisitorCategoryEnum": [
+            ("A", "Category A"),
+            ("B", "Category B"),
+            ("C", "Category C"),
+            ("D", "Category D"),
+        ],
+        "BillingResponsibilityEnum": [
+            ("visitor", "Visitor"),
+            ("indenter", "Indenter"),
+            ("institute", "Institute"),
+            ("project", "Project"),
+        ],
+        "OccupancyTypeEnum": [
+            ("single", "Single"),
+            ("double", "Double"),
+        ],
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False

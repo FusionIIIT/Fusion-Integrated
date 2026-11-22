@@ -1,0 +1,875 @@
+[
+  {
+    "test_id": "FR-TEST-001",
+    "source_id": "AFR-VH-001 indenter-track-bookings",
+    "purpose": "Verify Indenter can track the status and history of submitted bookings.",
+    "preconditions": "Indenter has submitted one or more booking requisitions.",
+    "action_or_input": "Indenter sends GET request to /api/v1/vh/bookings/.",
+    "expected_result": "HTTP 200 OK with list containing indenter bookings and their current status.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-002",
+    "source_id": "AFR-VH-002 indenter-view-booking-detail",
+    "purpose": "Verify Indenter can view detailed booking and confirmation info for submitted booking.",
+    "preconditions": "Booking exists belonging to Indenter.",
+    "action_or_input": "Indenter sends GET request to /api/v1/vh/bookings/{id}/.",
+    "expected_result": "HTTP 200 OK with booking details including reference, dates, and visitor info.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-003",
+    "source_id": "AFR-VH-003 indenter-printable-booking-detail",
+    "purpose": "Verify Indenter booking detail contains printable confirmation information.",
+    "preconditions": "Confirmed booking exists.",
+    "action_or_input": "Indenter queries booking detail for printing confirmation.",
+    "expected_result": "HTTP 200 OK with complete confirmation data suitable for print view.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-004",
+    "source_id": "AFR-VH-004 visitor-no-direct-access",
+    "purpose": "Verify unauthenticated visitors cannot access VHMS endpoints directly.",
+    "preconditions": "No valid session or token provided.",
+    "action_or_input": "Unauthenticated request sent to /api/v1/vh/bookings/.",
+    "expected_result": "HTTP 401 Unauthorized refusal.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-TEST-005",
+    "source_id": "AFR-VH-005 indenter-submit-online-booking",
+    "purpose": "Verify Indenter can submit an online booking request using standardized form.",
+    "preconditions": "Indenter is authenticated community member.",
+    "action_or_input": "POST to /api/v1/vh/bookings/ with complete valid requisition payload.",
+    "expected_result": "HTTP 201 Created with booking_reference and status pending.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-006",
+    "source_id": "AFR-VH-006 record-visitor-details",
+    "purpose": "Verify visitor details are recorded in each booking requisition.",
+    "preconditions": "Requisition submitted with visitor name, email, phone.",
+    "action_or_input": "POST to /api/v1/vh/bookings/.",
+    "expected_result": "VisitorDetail record created and associated with booking.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-007",
+    "source_id": "AFR-VH-007 record-visit-purpose",
+    "purpose": "Verify visit purpose is recorded in booking requisition.",
+    "preconditions": "Payload includes visit_purpose string.",
+    "action_or_input": "POST to /api/v1/vh/bookings/.",
+    "expected_result": "Booking instance has recorded visit_purpose.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-008",
+    "source_id": "AFR-VH-008 record-visitor-category",
+    "purpose": "Verify visitor category (A, B, C, D) is recorded in requisition.",
+    "preconditions": "Payload specifies visitor_category B.",
+    "action_or_input": "POST to /api/v1/vh/bookings/.",
+    "expected_result": "Booking instance has visitor_category=B.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-009",
+    "source_id": "AFR-VH-009 record-stay-duration-and-timings",
+    "purpose": "Verify stay duration and timings (arrival and departure dates) are recorded.",
+    "preconditions": "Payload contains arrival_date and departure_date.",
+    "action_or_input": "POST to /api/v1/vh/bookings/.",
+    "expected_result": "Booking instance records exact arrival and departure dates.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-010",
+    "source_id": "AFR-VH-010 record-rooms-and-occupants",
+    "purpose": "Verify number of rooms and number of occupants are recorded in requisition.",
+    "preconditions": "Payload contains number_of_rooms=2 and number_of_occupants=3.",
+    "action_or_input": "POST to /api/v1/vh/bookings/.",
+    "expected_result": "Booking created with number_of_rooms=2 and number_of_occupants=3.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-011",
+    "source_id": "AFR-VH-011 record-billing-responsibility",
+    "purpose": "Verify billing responsibility is recorded in booking requisition.",
+    "preconditions": "Payload contains billing_responsibility=institute.",
+    "action_or_input": "POST to /api/v1/vh/bookings/.",
+    "expected_result": "Booking created with billing_responsibility=institute.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-012",
+    "source_id": "AFR-VH-012 valid-billing-responsibility",
+    "purpose": "Verify permitted billing responsibility values (visitor, indenter, institute, project).",
+    "preconditions": "Indenter submits booking with permitted billing responsibility.",
+    "action_or_input": "POST with billing_responsibility in [visitor, indenter, institute, project].",
+    "expected_result": "HTTP 201 Created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-TEST-013",
+    "source_id": "AFR-VH-012 invalid-billing-responsibility",
+    "purpose": "Verify rejection of unpermitted billing responsibility value.",
+    "preconditions": "Indenter submits booking with invalid billing responsibility.",
+    "action_or_input": "POST with billing_responsibility=external_sponsor.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-TEST-014",
+    "source_id": "AFR-VH-013 initial-status-pending",
+    "purpose": "Verify booking status is set to Pending upon submission.",
+    "preconditions": "Requisition submitted.",
+    "action_or_input": "POST to /api/v1/vh/bookings/.",
+    "expected_result": "HTTP 201 Created with status=pending.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "FR-TEST-015",
+    "source_id": "AFR-VH-014 caretaker-review-requests",
+    "purpose": "Verify Caretaker can review submitted pending booking requests.",
+    "preconditions": "Pending booking exists.",
+    "action_or_input": "Caretaker sends GET request to /api/v1/vh/bookings/?status=pending.",
+    "expected_result": "HTTP 200 OK containing pending booking.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-016",
+    "source_id": "AFR-VH-015 caretaker-check-room-availability",
+    "purpose": "Verify Caretaker can check room availability for date range.",
+    "preconditions": "Rooms exist with partial occupancy.",
+    "action_or_input": "Caretaker sends GET to /api/v1/vh/rooms/availability/?start_date=...&end_date=....",
+    "expected_result": "HTTP 200 OK with available room count and room details.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-017",
+    "source_id": "AFR-VH-016 caretaker-reject-booking-directly",
+    "purpose": "Verify Caretaker can directly reject a booking request.",
+    "preconditions": "Pending booking exists.",
+    "action_or_input": "Caretaker sends POST to /api/v1/vh/bookings/{id}/route/ with action=reject and reason.",
+    "expected_result": "HTTP 200 OK with status=rejected.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-018",
+    "source_id": "AFR-VH-017 caretaker-forward-booking",
+    "purpose": "Verify Caretaker can forward eligible booking request to VH In-Charge.",
+    "preconditions": "Pending booking exists with available rooms.",
+    "action_or_input": "Caretaker sends POST to /api/v1/vh/bookings/{id}/route/ with action=forward.",
+    "expected_result": "HTTP 200 OK with status=forwarded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-019",
+    "source_id": "AFR-VH-018 incharge-approve-booking",
+    "purpose": "Verify VH In-Charge can approve forwarded booking request.",
+    "preconditions": "Forwarded booking exists.",
+    "action_or_input": "VH In-Charge sends POST to /api/v1/vh/bookings/{id}/decide/ with action=approve.",
+    "expected_result": "HTTP 200 OK with status=approved.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-020",
+    "source_id": "AFR-VH-019 incharge-reject-booking",
+    "purpose": "Verify VH In-Charge can reject forwarded booking request.",
+    "preconditions": "Forwarded booking exists.",
+    "action_or_input": "VH In-Charge sends POST to /api/v1/vh/bookings/{id}/decide/ with action=reject and reason.",
+    "expected_result": "HTTP 200 OK with status=rejected.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-021",
+    "source_id": "AFR-VH-020 notify-indenter-final-decision",
+    "purpose": "Verify Indenter is notified of final booking decision.",
+    "preconditions": "Booking approved or rejected by VH In-Charge.",
+    "action_or_input": "Check BookingNotificationLog after incharge decision.",
+    "expected_result": "Notification log record created for booking with decision event.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-022",
+    "source_id": "AFR-VH-021 caretaker-record-telephonic-booking",
+    "purpose": "Verify Caretaker can record telephonic offline booking.",
+    "preconditions": "Caretaker receives telephonic request.",
+    "action_or_input": "POST to /api/v1/vh/bookings/offline/ with booking_source=telephonic.",
+    "expected_result": "HTTP 201 Created with is_offline=True and booking_source=telephonic.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-023",
+    "source_id": "AFR-VH-022 caretaker-record-walkin-booking",
+    "purpose": "Verify Caretaker can record walk-in offline booking.",
+    "preconditions": "Caretaker receives walk-in visitor request.",
+    "action_or_input": "POST to /api/v1/vh/bookings/offline/ with booking_source=walk_in.",
+    "expected_result": "HTTP 201 Created with is_offline=True and booking_source=walk_in.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-024",
+    "source_id": "AFR-VH-023 same-approval-routing-offline",
+    "purpose": "Verify offline booking follows same approval routing as online booking.",
+    "preconditions": "Pending offline booking exists.",
+    "action_or_input": "Caretaker forwards and Incharge approves offline booking.",
+    "expected_result": "Transitions through Pending -> Forwarded -> Approved succeed identically.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "FR-TEST-025",
+    "source_id": "AFR-VH-024 same-room-availability-offline",
+    "purpose": "Verify offline bookings use same room availability check.",
+    "preconditions": "All rooms booked for dates.",
+    "action_or_input": "Caretaker checks room availability for offline booking dates.",
+    "expected_result": "Availability query correctly reflects zero available rooms.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-026",
+    "source_id": "AFR-VH-025 flag-offline-bookings",
+    "purpose": "Verify offline bookings are clearly flagged for audit and reporting.",
+    "preconditions": "Offline booking created.",
+    "action_or_input": "Inspect booking record in database and report view.",
+    "expected_result": "is_offline is True and booking_source identifies offline type.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-027",
+    "source_id": "AFR-VH-026 indenter-request-modification",
+    "purpose": "Verify Indenter can request booking modification before arrival.",
+    "preconditions": "Approved booking exists prior to arrival date.",
+    "action_or_input": "Indenter sends POST to /api/v1/vh/bookings/{id}/modify/ with new dates.",
+    "expected_result": "HTTP 200 OK and booking dates updated.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-028",
+    "source_id": "AFR-VH-027 indenter-request-cancellation",
+    "purpose": "Verify Indenter can request booking cancellation before arrival.",
+    "preconditions": "Approved booking exists prior to arrival.",
+    "action_or_input": "Indenter sends POST to /api/v1/vh/bookings/{id}/cancel/ with reason.",
+    "expected_result": "HTTP 200 OK with status=cancellation_requested.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-029",
+    "source_id": "AFR-VH-028 compute-cancellation-charges",
+    "purpose": "Verify system computes cancellation charges according to stated schedule.",
+    "preconditions": "Approved booking with daily rate Decimal(500.00).",
+    "action_or_input": "Request cancellation and check computed charge.",
+    "expected_result": "Charge percentage and fee computed per schedule.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-030",
+    "source_id": "AFR-VH-029 cancellation-7-days-zero-charge",
+    "purpose": "Verify 0% charge for cancellation occurring exactly 7 days before arrival.",
+    "preconditions": "Approved booking with arrival exactly 7 days from today.",
+    "action_or_input": "Indenter submits cancellation request.",
+    "expected_result": "cancellation_charge_percentage is 0.00.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-TEST-031",
+    "source_id": "AFR-VH-030 cancellation-within-7-days-25-percent",
+    "purpose": "Verify 25% charge of one-day rent for cancellation within 7 days before arrival.",
+    "preconditions": "Approved booking with arrival 3 days from today.",
+    "action_or_input": "Indenter submits cancellation request.",
+    "expected_result": "cancellation_charge_percentage is 25.00.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-TEST-032",
+    "source_id": "AFR-VH-031 cancellation-same-day-50-percent",
+    "purpose": "Verify 50% charge of one-day rent for same-day cancellation or no-show.",
+    "preconditions": "Approved booking with arrival today.",
+    "action_or_input": "Indenter submits cancellation request on arrival date.",
+    "expected_result": "cancellation_charge_percentage is 50.00.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-TEST-033",
+    "source_id": "AFR-VH-032 caretaker-review-cancellation-requests",
+    "purpose": "Verify Caretaker can review pending cancellation requests.",
+    "preconditions": "Booking with status cancellation_requested exists.",
+    "action_or_input": "Caretaker queries bookings with status=cancellation_requested.",
+    "expected_result": "HTTP 200 OK containing cancellation request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-034",
+    "source_id": "AFR-VH-033 caretaker-confirm-cancellation",
+    "purpose": "Verify Caretaker can confirm cancellation request.",
+    "preconditions": "Booking with status cancellation_requested exists.",
+    "action_or_input": "Caretaker sends POST to /api/v1/vh/bookings/{id}/confirm-cancellation/.",
+    "expected_result": "HTTP 200 OK with status=cancelled.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-035",
+    "source_id": "AFR-VH-034 adjust-billing-modification",
+    "purpose": "Verify billing information adjusted according to confirmed modification outcome.",
+    "preconditions": "Booking duration modified from 2 days to 4 days.",
+    "action_or_input": "Generate bill after modification.",
+    "expected_result": "Bill room rent reflects 4 days instead of 2 days.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-036",
+    "source_id": "AFR-VH-035 adjust-billing-cancellation",
+    "purpose": "Verify billing information reflects applicable cancellation charge.",
+    "preconditions": "Cancelled booking with 25% charge confirmed.",
+    "action_or_input": "Generate bill for cancelled booking.",
+    "expected_result": "Bill total equals 25% of one-day room rent with cancellation line item.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-037",
+    "source_id": "AFR-VH-036 room-allotment-only-after-approval",
+    "purpose": "Verify rooms can be allotted only after booking is approved.",
+    "preconditions": "Booking in pending state.",
+    "action_or_input": "Caretaker attempts to allot room to pending booking.",
+    "expected_result": "HTTP 409 Conflict / 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-TEST-038",
+    "source_id": "AFR-VH-037 support-single-occupancy-records",
+    "purpose": "Verify Single occupancy records are supported in room allotment.",
+    "preconditions": "Approved booking exists.",
+    "action_or_input": "Allot room with occupancy_type=single.",
+    "expected_result": "RoomAllotment record created with occupancy_type=single.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-039",
+    "source_id": "AFR-VH-038 support-double-occupancy-records",
+    "purpose": "Verify Double occupancy records are supported in room allotment.",
+    "preconditions": "Approved booking exists.",
+    "action_or_input": "Allot room with occupancy_type=double.",
+    "expected_result": "RoomAllotment record created with occupancy_type=double.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-040",
+    "source_id": "AFR-VH-039 support-suite-room-records",
+    "purpose": "Verify Suite room records are supported in VHMS.",
+    "preconditions": "Suite room configured.",
+    "action_or_input": "Inspect room record with room_type=suite.",
+    "expected_result": "Room successfully created and queried with room_type=suite.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-041",
+    "source_id": "AFR-VH-040 support-non-suite-room-records",
+    "purpose": "Verify Non-suite room records are supported in VHMS.",
+    "preconditions": "Non-suite room configured.",
+    "action_or_input": "Inspect room record with room_type=non_suite.",
+    "expected_result": "Room successfully created and queried with room_type=non_suite.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-042",
+    "source_id": "AFR-VH-041 record-guest-checkin-time",
+    "purpose": "Verify Caretaker can record guest check-in time.",
+    "preconditions": "Approved booking with allotted room.",
+    "action_or_input": "Caretaker sends POST to /api/v1/vh/bookings/{id}/checkin/.",
+    "expected_result": "HTTP 200 OK, status=checked_in, checkin_time is recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-043",
+    "source_id": "AFR-VH-042 record-guest-checkout-time",
+    "purpose": "Verify Caretaker can record guest check-out time.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "Caretaker sends POST to /api/v1/vh/bookings/{id}/checkout/.",
+    "expected_result": "HTTP 200 OK, status=checked_out, checkout_time is recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-044",
+    "source_id": "AFR-VH-043 generate-no-show-alert",
+    "purpose": "Verify system generates alert for expected guests who do not check in.",
+    "preconditions": "Approved booking whose arrival date/time has passed with no check-in.",
+    "action_or_input": "Evaluate no-show check via service or task.",
+    "expected_result": "StayAlert record created with alert_type=no_show.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-045",
+    "source_id": "AFR-VH-044 generate-overstay-alert",
+    "purpose": "Verify system generates alert for guests overstaying beyond approved duration.",
+    "preconditions": "Checked-in booking whose departure date has passed without checkout.",
+    "action_or_input": "Evaluate overstay check via service or task.",
+    "expected_result": "StayAlert record created with alert_type=overstay.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-046",
+    "source_id": "AFR-VH-045 visitor-categories-a-b-c-d",
+    "purpose": "Verify VHMS classifies visitors into categories A, B, C, D.",
+    "preconditions": "Tariff configuration and bookings support categories A, B, C, D.",
+    "action_or_input": "Create bookings with visitor_category A, B, C, D.",
+    "expected_result": "All four categories valid; invalid category rejected.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-TEST-047",
+    "source_id": "AFR-VH-046 category-specific-tariffs",
+    "purpose": "Verify system maintains category-specific tariffs.",
+    "preconditions": "Tariff configs created for Category A and Category B.",
+    "action_or_input": "Query tariffs by category.",
+    "expected_result": "Tariff rates match configured category-specific amounts.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-048",
+    "source_id": "AFR-VH-047 occupancy-specific-tariffs",
+    "purpose": "Verify system maintains occupancy-specific tariffs (single vs double).",
+    "preconditions": "Tariff configs created for single and double occupancy.",
+    "action_or_input": "Query tariffs by occupancy.",
+    "expected_result": "Single and double occupancy return their distinct rates.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-049",
+    "source_id": "AFR-VH-048 tariff-effective-from-dates",
+    "purpose": "Verify system records effective-from dates for tariffs.",
+    "preconditions": "TariffConfig has effective_from date field.",
+    "action_or_input": "Create TariffConfig with effective_from=date.today().",
+    "expected_result": "TariffConfig persisted with recorded effective_from date.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-050",
+    "source_id": "AFR-VH-049 auto-select-applicable-tariff",
+    "purpose": "Verify system automatically selects applicable tariff during billing.",
+    "preconditions": "Multiple dated tariffs exist.",
+    "action_or_input": "Generate bill for booking with category A and single occupancy.",
+    "expected_result": "Bill calculates room rent using latest effective tariff active on arrival date.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-051",
+    "source_id": "AFR-VH-050 historical-bills-immutable-to-tariff-changes",
+    "purpose": "Verify tariff changes do not affect already generated historical bills.",
+    "preconditions": "Finalized bill exists at rate 500.00.",
+    "action_or_input": "New tariff config created with rate 800.00.",
+    "expected_result": "Existing finalized bill amount remains unchanged at 500.00.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "FR-TEST-052",
+    "source_id": "AFR-VH-051 meals-only-for-staying-guests",
+    "purpose": "Verify meal bookings are permitted only for guests staying in VH.",
+    "preconditions": "Booking is not checked in.",
+    "action_or_input": "Attempt to book meal for booking in pending or cancelled state.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-TEST-053",
+    "source_id": "AFR-VH-052 full-day-meal-options",
+    "purpose": "Verify system supports full-day meal option.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "Book meal with meal_option=full_day.",
+    "expected_result": "MealBooking created with meal_option=full_day.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-054",
+    "source_id": "AFR-VH-053 individual-meal-options",
+    "purpose": "Verify system supports individual meal options.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "Book meal with meal_option=individual and individual_type=breakfast.",
+    "expected_result": "MealBooking created with meal_option=individual.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-055",
+    "source_id": "AFR-VH-054 addon-meal-options",
+    "purpose": "Verify system supports add-on meal options.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "Book meal with meal_option=add_on and add_on_type=tea.",
+    "expected_result": "MealBooking created with meal_option=add_on.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-056",
+    "source_id": "AFR-VH-055 individual-meal-options-restricted",
+    "purpose": "Verify individual meal options restricted to Breakfast, Lunch, Dinner.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "Attempt to book individual meal with type=midnight_snack.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-TEST-057",
+    "source_id": "AFR-VH-056 addon-meal-options-restricted",
+    "purpose": "Verify add-on meal options restricted to Tea and Milk.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "Attempt to book add-on meal with type=coffee.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-TEST-058",
+    "source_id": "AFR-VH-057 link-meals-to-stay-duration",
+    "purpose": "Verify meal booking must fall within guest stay duration.",
+    "preconditions": "Stay from 2026-12-01 to 2026-12-05.",
+    "action_or_input": "Attempt to book meal for 2026-12-10.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-TEST-059",
+    "source_id": "AFR-VH-058 meals-reflected-in-billing",
+    "purpose": "Verify recorded meal bookings are reflected in VHMS billing.",
+    "preconditions": "Stay with 2 recorded meal bookings.",
+    "action_or_input": "Generate bill for stay.",
+    "expected_result": "Bill meal_charge_total equals sum of meal bookings and line items exist.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-060",
+    "source_id": "AFR-VH-059 generate-bills-room-rent",
+    "purpose": "Verify system generates bills based on room rent.",
+    "preconditions": "2-day stay in room with 500.00 daily rate.",
+    "action_or_input": "Generate bill for booking.",
+    "expected_result": "Bill contains room_rent_total of 1000.00.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-061",
+    "source_id": "AFR-VH-060 generate-bills-meal-consumption",
+    "purpose": "Verify system generates bills based on meal consumption.",
+    "preconditions": "Stay with meals totaling 350.00.",
+    "action_or_input": "Generate bill for booking.",
+    "expected_result": "Bill includes meal_charge_total of 350.00.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-062",
+    "source_id": "AFR-VH-061 generate-bills-cancellation-charges",
+    "purpose": "Verify system generates bills based on cancellation charges.",
+    "preconditions": "Cancelled booking with 25% charge of 500.00 rent.",
+    "action_or_input": "Generate bill for cancelled booking.",
+    "expected_result": "Bill includes cancellation_charge_total of 125.00.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-063",
+    "source_id": "AFR-VH-062 record-billing-responsibility",
+    "purpose": "Verify billing responsibility is recorded on generated bill.",
+    "preconditions": "Booking has billing_responsibility=project.",
+    "action_or_input": "Generate bill.",
+    "expected_result": "Bill instance has billing_responsibility=project.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-064",
+    "source_id": "AFR-VH-063 bills-settled-offline-cash",
+    "purpose": "Verify bills are treated as settled offline in cash.",
+    "preconditions": "Unsettled bill exists.",
+    "action_or_input": "Caretaker records settlement with payment_mode=offline_cash.",
+    "expected_result": "BillSettlement created with payment_mode=offline_cash.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-065",
+    "source_id": "AFR-VH-064 record-offline-settlement-info",
+    "purpose": "Verify Caretaker can record offline bill settlement information.",
+    "preconditions": "Bill exists.",
+    "action_or_input": "POST to /api/v1/vh/bills/{id}/settle/ with amount_paid and receipt_number.",
+    "expected_result": "HTTP 200 OK, bill status=settled, settlement record stored.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-066",
+    "source_id": "AFR-VH-065 caretaker-verify-bill-at-checkout",
+    "purpose": "Verify Caretaker records guest bill verification during checkout.",
+    "preconditions": "Checked-in booking with bill exists.",
+    "action_or_input": "POST to /api/v1/vh/bookings/{id}/checkout/ verifying bill.",
+    "expected_result": "Bill verified_by and verified_at recorded upon checkout.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-067",
+    "source_id": "AFR-VH-066 maintain-immutable-billing-records",
+    "purpose": "Verify billing records are maintained as immutable for audit.",
+    "preconditions": "Settled bill with is_immutable=True exists.",
+    "action_or_input": "Attempt to alter line item or total on settled bill.",
+    "expected_result": "Refusal or error; settled bill remains unaltered.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "FR-TEST-068",
+    "source_id": "AFR-VH-068 caretaker-maintain-inventory-records",
+    "purpose": "Verify Caretaker maintains VH inventory records.",
+    "preconditions": "Caretaker authenticated.",
+    "action_or_input": "GET and POST to /api/v1/vh/inventory/.",
+    "expected_result": "HTTP 200 / 201 with inventory items returned and created.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-069",
+    "source_id": "AFR-VH-069 support-inventory-categories",
+    "purpose": "Verify support for items like linen, utensils, consumables.",
+    "preconditions": "Items created in categories linen, utensils, consumables.",
+    "action_or_input": "Query inventory items by category.",
+    "expected_result": "Categories linen, utensils, and consumables recognized and stored.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-070",
+    "source_id": "AFR-VH-070 record-current-quantity",
+    "purpose": "Verify system records current quantity for each inventory item.",
+    "preconditions": "Inventory item created.",
+    "action_or_input": "Inspect current_quantity field.",
+    "expected_result": "Non-negative integer quantity persisted accurately.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-071",
+    "source_id": "AFR-VH-071 record-minimum-threshold",
+    "purpose": "Verify system records minimum threshold level for inventory items.",
+    "preconditions": "Inventory item created with minimum_threshold=15.",
+    "action_or_input": "Inspect minimum_threshold field.",
+    "expected_result": "Minimum threshold value 15 persisted.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-072",
+    "source_id": "AFR-VH-072 alert-when-quantity-below-threshold",
+    "purpose": "Verify alert generated when current quantity falls below minimum threshold.",
+    "preconditions": "Item with current_quantity 5 and threshold 10.",
+    "action_or_input": "Update inventory quantity below threshold.",
+    "expected_result": "is_threshold_alert becomes True.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-TEST-073",
+    "source_id": "AFR-VH-073 incharge-review-replenishment-requests",
+    "purpose": "Verify VH In-Charge reviews replenishment requirements.",
+    "preconditions": "Replenishment request created.",
+    "action_or_input": "VH In-Charge queries pending replenishments.",
+    "expected_result": "HTTP 200 OK with pending replenishment request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-074",
+    "source_id": "AFR-VH-074 incharge-approve-replenishment-request",
+    "purpose": "Verify VH In-Charge approves replenishment requirements.",
+    "preconditions": "Pending replenishment request exists.",
+    "action_or_input": "POST to /api/v1/vh/inventory/replenishments/{id}/approve/.",
+    "expected_result": "HTTP 200 OK, status=approved, approved_by recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-075",
+    "source_id": "AFR-VH-076 notification-booking-submission",
+    "purpose": "Verify notification triggered for booking submission.",
+    "preconditions": "Indenter submits booking.",
+    "action_or_input": "POST to /api/v1/vh/bookings/.",
+    "expected_result": "BookingNotificationLog entry created for booking_submission.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-076",
+    "source_id": "AFR-VH-077 notification-approval-or-rejection",
+    "purpose": "Verify notification triggered for booking approval or rejection.",
+    "preconditions": "Booking approved or rejected.",
+    "action_or_input": "Incharge decides booking.",
+    "expected_result": "BookingNotificationLog entry created for booking_decision.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-077",
+    "source_id": "AFR-VH-078 notification-modification-cancellation",
+    "purpose": "Verify notification triggered for booking modification or cancellation.",
+    "preconditions": "Cancellation confirmed.",
+    "action_or_input": "Caretaker confirms cancellation.",
+    "expected_result": "BookingNotificationLog entry created for booking_cancellation.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-078",
+    "source_id": "AFR-VH-079 notification-stay-reminders",
+    "purpose": "Verify system triggers notifications for check-in and check-out reminders.",
+    "preconditions": "Scheduled task runs for upcoming arrivals.",
+    "action_or_input": "Execute reminder task or service.",
+    "expected_result": "Reminder notification logs generated for expected guests.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-079",
+    "source_id": "AFR-VH-080 notification-inventory-threshold-alert",
+    "purpose": "Verify system triggers notification for inventory threshold alerts.",
+    "preconditions": "Inventory item drops below threshold.",
+    "action_or_input": "Update inventory quantity below threshold.",
+    "expected_result": "Inventory threshold alert notification dispatched.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-080",
+    "source_id": "AFR-VH-082 incharge-booking-summary-report",
+    "purpose": "Verify VH In-Charge can generate or view booking summary reports.",
+    "preconditions": "Bookings in various states exist.",
+    "action_or_input": "GET /api/v1/vh/reports/incharge/?report_type=booking_summary.",
+    "expected_result": "HTTP 200 OK with aggregated booking counts by status.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-081",
+    "source_id": "AFR-VH-083 incharge-category-occupancy-report",
+    "purpose": "Verify VH In-Charge can generate or view category-wise occupancy reports.",
+    "preconditions": "Occupancies recorded across categories A, B.",
+    "action_or_input": "GET /api/v1/vh/reports/incharge/?report_type=category_occupancy.",
+    "expected_result": "HTTP 200 OK with occupancy breakdown by category.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-082",
+    "source_id": "AFR-VH-084 incharge-revenue-billing-summary-report",
+    "purpose": "Verify VH In-Charge can generate revenue and billing summary report.",
+    "preconditions": "Settled bills exist.",
+    "action_or_input": "GET /api/v1/vh/reports/incharge/?report_type=revenue_summary.",
+    "expected_result": "HTTP 200 OK with total revenue and settled amount.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-083",
+    "source_id": "AFR-VH-085 incharge-inventory-usage-report",
+    "purpose": "Verify VH In-Charge can generate inventory usage report.",
+    "preconditions": "Inventory items exist.",
+    "action_or_input": "GET /api/v1/vh/reports/incharge/?report_type=inventory_usage.",
+    "expected_result": "HTTP 200 OK with item usage and stock levels.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-084",
+    "source_id": "AFR-VH-086 caretaker-daily-occupancy-report",
+    "purpose": "Verify Caretaker can generate daily occupancy report.",
+    "preconditions": "Active stays exist.",
+    "action_or_input": "GET /api/v1/vh/reports/caretaker/?report_type=daily_occupancy.",
+    "expected_result": "HTTP 200 OK with occupied rooms for date.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-085",
+    "source_id": "AFR-VH-087 caretaker-arrivals-departures-report",
+    "purpose": "Verify Caretaker can generate upcoming arrivals and departures report.",
+    "preconditions": "Upcoming bookings scheduled.",
+    "action_or_input": "GET /api/v1/vh/reports/caretaker/?report_type=arrivals_departures.",
+    "expected_result": "HTTP 200 OK listing upcoming check-ins and check-outs.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-086",
+    "source_id": "AFR-VH-088 caretaker-pending-approval-report",
+    "purpose": "Verify Caretaker can generate pending approval report.",
+    "preconditions": "Bookings in pending and forwarded states exist.",
+    "action_or_input": "GET /api/v1/vh/reports/caretaker/?report_type=pending_approvals.",
+    "expected_result": "HTTP 200 OK with pending requisitions list.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-087",
+    "source_id": "AFR-VH-089 caretaker-stay-exception-logs",
+    "purpose": "Verify Caretaker can generate no-show and overstay exception logs.",
+    "preconditions": "Stay alerts exist.",
+    "action_or_input": "GET /api/v1/vh/reports/caretaker/?report_type=stay_exceptions.",
+    "expected_result": "HTTP 200 OK listing recorded no-show and overstay alerts.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-088",
+    "source_id": "AFR-VH-090 exactly-one-active-caretaker",
+    "purpose": "Verify VHMS maintains exactly one active Caretaker at a time.",
+    "preconditions": "Active Caretaker exists.",
+    "action_or_input": "Assign new Caretaker.",
+    "expected_result": "Previous Caretaker is deactivated; exactly 1 active Caretaker exists.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-089",
+    "source_id": "AFR-VH-091 exactly-one-active-incharge",
+    "purpose": "Verify VHMS maintains exactly one active VH In-Charge at a time.",
+    "preconditions": "Active In-Charge exists.",
+    "action_or_input": "Assign new VH In-Charge.",
+    "expected_result": "Previous In-Charge is deactivated; exactly 1 active In-Charge exists.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-090",
+    "source_id": "AFR-VH-092 time-bound-role-assignments",
+    "purpose": "Verify operational role assignments have time bounds (valid_from, valid_to).",
+    "preconditions": "Role reassignment requested with time bounds.",
+    "action_or_input": "POST to /api/v1/vh/roles/reassign/ with valid_from and valid_to.",
+    "expected_result": "OperationalRoleHolder saved with time bounds.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-091",
+    "source_id": "AFR-VH-093 immediate-role-reassignment",
+    "purpose": "Verify operational role reassignment takes effect immediately.",
+    "preconditions": "Role reassignment performed.",
+    "action_or_input": "Check active role holder immediately following reassignment call.",
+    "expected_result": "New user_id is immediately active role holder.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-092",
+    "source_id": "AFR-VH-094 transfer-pending-records-on-reassign",
+    "purpose": "Verify pending records transferred to newly assigned role holder.",
+    "preconditions": "Pending bookings exist awaiting Caretaker review.",
+    "action_or_input": "Reassign Caretaker role.",
+    "expected_result": "Pending records visible and manageable by new Caretaker.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "FR-TEST-093",
+    "source_id": "AFR-VH-095 transfer-ongoing-records-on-reassign",
+    "purpose": "Verify ongoing active stay records transferred to newly assigned role holder.",
+    "preconditions": "Checked-in guests exist under previous Caretaker.",
+    "action_or_input": "Reassign Caretaker role.",
+    "expected_result": "Ongoing stay records managed and checkouts executed by new Caretaker.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "FR-TEST-094",
+    "source_id": "AFR-VH-100 auditability-booking-records",
+    "purpose": "Verify auditability of booking records across lifecycle changes.",
+    "preconditions": "Booking changes state from pending to approved.",
+    "action_or_input": "Inspect audit history or notification logs.",
+    "expected_result": "State transitions and timestamps preserved for audit.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-095",
+    "source_id": "AFR-VH-108 unambiguous-tariff-selection",
+    "purpose": "Verify unambiguous tariff selection based on category, occupancy, and date.",
+    "preconditions": "Tariffs configured with distinct category and occupancy keys.",
+    "action_or_input": "Query tariff for category B, double occupancy.",
+    "expected_result": "Unique exact tariff record returned without ambiguity.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-TEST-096",
+    "source_id": "AFR-VH-109 role-boundary-enforcement",
+    "purpose": "Verify role boundaries are enforced strictly against unauthorized actions.",
+    "preconditions": "Indenter client authenticated.",
+    "action_or_input": "Indenter attempts to route or approve booking.",
+    "expected_result": "HTTP 403 Forbidden refusal.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-TEST-097",
+    "source_id": "AFR-VH-113 exclude-dynamic-pricing-discounts",
+    "purpose": "Verify exclusion of dynamic pricing or discounts beyond approved tariffs.",
+    "preconditions": "Bill calculation requested.",
+    "action_or_input": "Bill generated strictly according to standard daily rate without discount fields.",
+    "expected_result": "Bill contains no unauthorized discount parameters.",
+    "test_type": "validation"
+  }
+]

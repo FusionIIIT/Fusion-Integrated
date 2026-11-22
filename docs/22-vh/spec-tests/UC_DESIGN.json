@@ -1,0 +1,344 @@
+[
+  {
+    "test_id": "UC-TEST-001",
+    "source_id": "UC-VH-001 Main Flow",
+    "purpose": "Verify Indenter successfully submits an online booking request.",
+    "preconditions": "Indenter is authenticated community member.",
+    "action_or_input": "Indenter posts valid requisition data with all required fields.",
+    "expected_result": "HTTP 201 Created, booking recorded with status Pending.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-002",
+    "source_id": "UC-VH-001 Alternative Flow 1",
+    "purpose": "Verify request is rejected when required information is incomplete.",
+    "preconditions": "Indenter attempts submission with missing visitor name.",
+    "action_or_input": "POST to /api/v1/vh/bookings/ omitting visitor_name.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal; no booking created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "UC-TEST-003",
+    "source_id": "UC-VH-001 Alternative Flow 2",
+    "purpose": "Verify request is rejected when billing responsibility is outside permitted values.",
+    "preconditions": "Indenter attempts submission with invalid billing responsibility.",
+    "action_or_input": "POST to /api/v1/vh/bookings/ with billing_responsibility=invalid_resp.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal; no booking created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "UC-TEST-004",
+    "source_id": "UC-VH-002 Main Flow",
+    "purpose": "Verify Indenter tracks, views, and prints submitted booking details.",
+    "preconditions": "Submitted booking exists for Indenter.",
+    "action_or_input": "GET /api/v1/vh/bookings/{id}/.",
+    "expected_result": "HTTP 200 OK with booking status, dates, and printable confirmation fields.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-005",
+    "source_id": "UC-VH-002 Alternative Flow 1",
+    "purpose": "Verify behavior when no submitted booking exists for Indenter.",
+    "preconditions": "Indenter has not submitted any booking.",
+    "action_or_input": "GET /api/v1/vh/bookings/.",
+    "expected_result": "HTTP 200 OK with empty booking list.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-006",
+    "source_id": "UC-VH-003 Main Flow",
+    "purpose": "Verify Caretaker reviews submitted request and forwards eligible booking to VH In-Charge.",
+    "preconditions": "Pending booking exists with available rooms.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/route/ with action=forward.",
+    "expected_result": "HTTP 200 OK with status=forwarded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-007",
+    "source_id": "UC-VH-003 Alternative Flow 1",
+    "purpose": "Verify Caretaker reviews submitted request and rejects booking directly.",
+    "preconditions": "Pending booking exists.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/route/ with action=reject and reason.",
+    "expected_result": "HTTP 200 OK with status=rejected and reason recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-008",
+    "source_id": "UC-VH-004 Main Flow",
+    "purpose": "Verify VH In-Charge approves forwarded booking request.",
+    "preconditions": "Forwarded booking exists.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/decide/ with action=approve.",
+    "expected_result": "HTTP 200 OK with status=approved.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-009",
+    "source_id": "UC-VH-004 Alternative Flow 1",
+    "purpose": "Verify VH In-Charge rejects forwarded booking request.",
+    "preconditions": "Forwarded booking exists.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/decide/ with action=reject and reason.",
+    "expected_result": "HTTP 200 OK with status=rejected and reason recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-010",
+    "source_id": "UC-VH-005 Main Flow",
+    "purpose": "Verify Caretaker records valid offline booking (telephonic or walk-in).",
+    "preconditions": "Caretaker receives offline request.",
+    "action_or_input": "POST /api/v1/vh/bookings/offline/ with booking_source=walk_in.",
+    "expected_result": "HTTP 201 Created with status=pending, is_offline=True.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-011",
+    "source_id": "UC-VH-005 Alternative Flow 1",
+    "purpose": "Verify offline booking with incomplete information is refused.",
+    "preconditions": "Caretaker enters incomplete offline booking data.",
+    "action_or_input": "POST /api/v1/vh/bookings/offline/ without visitor_name.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "UC-TEST-012",
+    "source_id": "UC-VH-006 Main Flow",
+    "purpose": "Verify Indenter requests booking modification before arrival.",
+    "preconditions": "Approved booking exists prior to arrival date.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/modify/ with new departure_date.",
+    "expected_result": "HTTP 200 OK with updated stay duration.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-013",
+    "source_id": "UC-VH-006 Alternative Flow 1",
+    "purpose": "Verify booking modification requested after arrival is refused.",
+    "preconditions": "Booking has checked in or arrival date has passed.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/modify/ after check-in.",
+    "expected_result": "HTTP 409 Conflict / 422 Unprocessable Entity refusal.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "UC-TEST-014",
+    "source_id": "UC-VH-007 Main Flow",
+    "purpose": "Verify Indenter requests booking cancellation before arrival.",
+    "preconditions": "Approved booking exists prior to arrival.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/cancel/ with cancellation reason.",
+    "expected_result": "HTTP 200 OK with status=cancellation_requested.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-015",
+    "source_id": "UC-VH-007 Alternative Flow 1",
+    "purpose": "Verify cancellation exactly 7 days before arrival carries 0% charge.",
+    "preconditions": "Approved booking with arrival exactly 7 days from today.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/cancel/.",
+    "expected_result": "Cancellation requested with cancellation_charge_percentage=0.00.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "UC-TEST-016",
+    "source_id": "UC-VH-007 Alternative Flow 2",
+    "purpose": "Verify cancellation within 7 days before arrival carries 25% charge.",
+    "preconditions": "Approved booking with arrival 2 days from today.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/cancel/.",
+    "expected_result": "Cancellation requested with cancellation_charge_percentage=25.00.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "UC-TEST-017",
+    "source_id": "UC-VH-007 Alternative Flow 3",
+    "purpose": "Verify same-day cancellation carries 50% charge.",
+    "preconditions": "Approved booking with arrival today.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/cancel/ on arrival day.",
+    "expected_result": "Cancellation requested with cancellation_charge_percentage=50.00.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "UC-TEST-018",
+    "source_id": "UC-VH-008 Main Flow",
+    "purpose": "Verify Caretaker allots rooms to Approved booking.",
+    "preconditions": "Approved booking and active available rooms exist.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/allot-rooms/ with room_ids.",
+    "expected_result": "HTTP 200 OK with room allotment created and occupancy recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-019",
+    "source_id": "UC-VH-008 Alternative Flow 1",
+    "purpose": "Verify room allotment is rejected if booking is not in Approved state.",
+    "preconditions": "Booking in pending state.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/allot-rooms/.",
+    "expected_result": "HTTP 409 Conflict / 422 Unprocessable Entity refusal.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "UC-TEST-020",
+    "source_id": "UC-VH-009 Main Flow",
+    "purpose": "Verify Caretaker records guest check-in.",
+    "preconditions": "Approved booking with allotted room.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/checkin/.",
+    "expected_result": "HTTP 200 OK with status=checked_in and checkin_time set.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-021",
+    "source_id": "UC-VH-011 Main Flow",
+    "purpose": "Verify maintaining visitor category and tariff configuration.",
+    "preconditions": "Tariff configuration endpoint accessed.",
+    "action_or_input": "POST /api/v1/vh/tariffs/ with category, occupancy, rate, effective_from.",
+    "expected_result": "HTTP 201 Created with new TariffConfig.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-022",
+    "source_id": "UC-VH-012 Main Flow",
+    "purpose": "Verify Caretaker records meal booking for active staying guest.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/meals/ with meal_date and meal_option.",
+    "expected_result": "HTTP 201 Created with MealBooking recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-023",
+    "source_id": "UC-VH-012 Alternative Flow 1",
+    "purpose": "Verify meal booking outside guest stay duration is rejected.",
+    "preconditions": "Checked-in booking with stay Nov 1 to Nov 3.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/meals/ with meal_date Nov 10.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "UC-TEST-024",
+    "source_id": "UC-VH-013 Main Flow",
+    "purpose": "Verify Caretaker generates bill and records offline cash settlement.",
+    "preconditions": "Checked-in booking with stay and meal charges.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/bill/ then POST /api/v1/vh/bills/{bill_id}/settle/.",
+    "expected_result": "Bill generated and settled with payment_mode=offline_cash.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-025",
+    "source_id": "UC-VH-013 Alternative Flow 1",
+    "purpose": "Verify bill generation for cancelled booking includes cancellation charge component.",
+    "preconditions": "Cancelled booking with confirmed charge.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/bill/.",
+    "expected_result": "Bill generated with cancellation charge line item.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-026",
+    "source_id": "UC-VH-014 Main Flow",
+    "purpose": "Verify Caretaker maintains inventory records and threshold levels.",
+    "preconditions": "Caretaker accesses inventory.",
+    "action_or_input": "POST /api/v1/vh/inventory/ with item_name, current_quantity, minimum_threshold.",
+    "expected_result": "HTTP 201 Created with InventoryItem persisted.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-027",
+    "source_id": "UC-VH-015 Main Flow",
+    "purpose": "Verify VH In-Charge reviews and approves replenishment requirement.",
+    "preconditions": "Pending inventory replenishment request exists.",
+    "action_or_input": "POST /api/v1/vh/inventory/replenishments/{id}/approve/.",
+    "expected_result": "HTTP 200 OK with status=approved and approved_by set.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-028",
+    "source_id": "UC-VH-017 Main Flow",
+    "purpose": "Verify VH In-Charge generates and views operational summary reports.",
+    "preconditions": "Bookings, stays, and inventory records exist.",
+    "action_or_input": "GET /api/v1/vh/reports/incharge/?report_type=booking_summary.",
+    "expected_result": "HTTP 200 OK with report data structure.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-029",
+    "source_id": "UC-VH-018 Main Flow",
+    "purpose": "Verify Caretaker generates and views daily reports.",
+    "preconditions": "Daily occupancy and arrival data exist.",
+    "action_or_input": "GET /api/v1/vh/reports/caretaker/?report_type=daily_occupancy.",
+    "expected_result": "HTTP 200 OK with daily occupancy records.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-030",
+    "source_id": "UC-VH-019 Main Flow",
+    "purpose": "Verify operational role reassignment and immediate transfer of records.",
+    "preconditions": "Current Caretaker role holder exists.",
+    "action_or_input": "POST /api/v1/vh/roles/reassign/ with new user_id and role_name=caretaker.",
+    "expected_result": "HTTP 200 OK, previous role holder deactivated, new holder active immediately.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-031",
+    "source_id": "UC-VH-020 Main Flow",
+    "purpose": "Verify Caretaker reviews and confirms booking cancellation.",
+    "preconditions": "Booking with status=cancellation_requested exists.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/confirm-cancellation/.",
+    "expected_result": "HTTP 200 OK with status=cancelled.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-032",
+    "source_id": "UC-VH-021 Main Flow",
+    "purpose": "Verify Caretaker records guest check-out and bill verification.",
+    "preconditions": "Checked-in booking with generated bill.",
+    "action_or_input": "POST /api/v1/vh/bookings/{id}/checkout/.",
+    "expected_result": "HTTP 200 OK with status=checked_out and checkout_time recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-033",
+    "source_id": "UC-VH-022 Main Flow",
+    "purpose": "Verify recording confirmed booking modification outcome and adjusting billing.",
+    "preconditions": "Modified booking dates.",
+    "action_or_input": "Confirm modification and regenerate bill.",
+    "expected_result": "Bill calculations reflect adjusted dates and room-rent total.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-034",
+    "source_id": "UC-VH-023 Main Flow",
+    "purpose": "Verify system generates booking lifecycle notifications.",
+    "preconditions": "Booking transitions through lifecycle states.",
+    "action_or_input": "Perform submission, approval, cancellation.",
+    "expected_result": "BookingNotificationLog records corresponding events.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-035",
+    "source_id": "UC-VH-024 Main Flow",
+    "purpose": "Verify system generates stay reminders and exception alerts (no-show, overstay).",
+    "preconditions": "Stay timing passed without check-in or checkout.",
+    "action_or_input": "Evaluate stay exception alerts.",
+    "expected_result": "StayAlert created with alert_type no_show or overstay.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-036",
+    "source_id": "UC-VH-024 Alternative Flow 1",
+    "purpose": "Verify no-show alert is suppressed when guest checked in on time.",
+    "preconditions": "Booking checked in on arrival date.",
+    "action_or_input": "Evaluate stay alerts.",
+    "expected_result": "No no_show StayAlert generated.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-037",
+    "source_id": "UC-VH-025 Main Flow",
+    "purpose": "Verify system generates inventory threshold alert and notification when quantity < threshold.",
+    "preconditions": "Item quantity drops below threshold.",
+    "action_or_input": "Update inventory quantity below threshold.",
+    "expected_result": "is_threshold_alert becomes True and notification dispatched.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "UC-TEST-038",
+    "source_id": "UC-VH-025 Alternative Flow 1",
+    "purpose": "Verify no threshold alert is generated when quantity is at or above threshold.",
+    "preconditions": "Item current_quantity >= minimum_threshold.",
+    "action_or_input": "Check threshold alert state.",
+    "expected_result": "is_threshold_alert is False.",
+    "test_type": "functional"
+  }
+]

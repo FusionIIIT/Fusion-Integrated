@@ -38,3 +38,29 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `vh`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `vh.booking.create` | Submit an online booking request | `VhCaretaker`, `faculty`, `staff`, `student` |
+| `vh.booking.view` | View visible booking details and history | `VhCaretaker`, `VhIncharge`, `faculty`, `staff`, `student` |
+| `vh.booking.update` | Request modification to a submitted booking | `faculty`, `staff`, `student` |
+| `vh.booking.delete` | Request cancellation of a booking | `faculty`, `staff`, `student` |
+| `vh.booking.review` | Review pending bookings, check availability, route or reject | `VhCaretaker` |
+| `vh.booking.approve` | Approve or reject forwarded bookings | `VhIncharge` |
+| `vh.room.assign` | Allot rooms to approved bookings | `VhCaretaker` |
+| `vh.stay.manage` | Record check-in, check-out, and stay exceptions | `VhCaretaker` |
+| `vh.meal.manage` | Manage mess and meal bookings for staying guests | `VhCaretaker` |
+| `vh.meal.view` | View meal records | `VhCaretaker`, `VhIncharge` |
+| `vh.bill.create` | Generate stay and cancellation bills | `VhCaretaker` |
+| `vh.bill.view` | View generated bills | `VhCaretaker`, `VhIncharge` |
+| `vh.bill.manage` | Record offline cash settlement and checkout verification | `VhCaretaker` |
+| `vh.inventory.view` | View inventory quantities and threshold alerts | `VhCaretaker`, `VhIncharge` |
+| `vh.inventory.manage` | Record and update inventory stocks | `VhCaretaker` |
+| `vh.inventory.approve` | Approve inventory replenishment requirements | `VhIncharge` |
+| `vh.tariff.view` | View active and published tariff rates | `VhCaretaker`, `VhIncharge`, `faculty`, `staff`, `student` |
+| `vh.tariff.manage` | Configure effective-dated visitor category tariffs | `VhIncharge` |
+| `vh.report.view` | View caretaker operational reports and logs | `VhCaretaker` |
+| `vh.report.manage` | View supervisory summary and revenue reports | `VhIncharge` |
+| `vh.role.assign` | Reassign operational Caretaker and In-Charge roles | `VhIncharge` |

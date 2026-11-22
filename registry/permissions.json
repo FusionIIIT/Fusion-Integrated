@@ -278,6 +278,263 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "vh": {
+      "grants": {
+        "VhCaretaker": [
+          "vh.bill.create",
+          "vh.bill.manage",
+          "vh.bill.view",
+          "vh.booking.create",
+          "vh.booking.review",
+          "vh.booking.view",
+          "vh.inventory.manage",
+          "vh.inventory.view",
+          "vh.meal.manage",
+          "vh.meal.view",
+          "vh.report.view",
+          "vh.room.assign",
+          "vh.stay.manage",
+          "vh.tariff.view"
+        ],
+        "VhIncharge": [
+          "vh.bill.view",
+          "vh.booking.approve",
+          "vh.booking.view",
+          "vh.inventory.approve",
+          "vh.inventory.view",
+          "vh.meal.view",
+          "vh.report.manage",
+          "vh.role.assign",
+          "vh.tariff.manage",
+          "vh.tariff.view"
+        ],
+        "faculty": [
+          "vh.booking.create",
+          "vh.booking.delete",
+          "vh.booking.update",
+          "vh.booking.view",
+          "vh.tariff.view"
+        ],
+        "staff": [
+          "vh.booking.create",
+          "vh.booking.delete",
+          "vh.booking.update",
+          "vh.booking.view",
+          "vh.tariff.view"
+        ],
+        "student": [
+          "vh.booking.create",
+          "vh.booking.delete",
+          "vh.booking.update",
+          "vh.booking.view",
+          "vh.tariff.view"
+        ]
+      },
+      "module_grants": [
+        "VhCaretaker",
+        "VhIncharge",
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/vh",
+        "icon": "Buildings",
+        "items": [
+          {
+            "code": "vh.new_booking",
+            "icon": "PlusCircle",
+            "label": "New Booking",
+            "required_permission": "vh.booking.create",
+            "sort_order": 10,
+            "to": "/vh/booking/new"
+          },
+          {
+            "code": "vh.my_bookings",
+            "icon": "ClockCounterClockwise",
+            "label": "My Bookings",
+            "required_permission": "vh.booking.view",
+            "sort_order": 20,
+            "to": "/vh/my-bookings"
+          },
+          {
+            "code": "vh.tariffs",
+            "icon": "Receipt",
+            "label": "Tariff Card",
+            "required_permission": "vh.tariff.view",
+            "sort_order": 30,
+            "to": "/vh/tariffs"
+          },
+          {
+            "code": "vh.bookings",
+            "icon": "Inbox",
+            "label": "Requisitions",
+            "required_permission": "vh.booking.review",
+            "sort_order": 40,
+            "to": "/vh/bookings"
+          },
+          {
+            "code": "vh.stays",
+            "icon": "Key",
+            "label": "Stay & Check-in",
+            "required_permission": "vh.stay.manage",
+            "sort_order": 50,
+            "to": "/vh/stays"
+          },
+          {
+            "code": "vh.meals",
+            "icon": "ForkKnife",
+            "label": "Mess & Meals",
+            "required_permission": "vh.meal.manage",
+            "sort_order": 60,
+            "to": "/vh/meals"
+          },
+          {
+            "code": "vh.billing",
+            "icon": "CurrencyInr",
+            "label": "Billing & Cash",
+            "required_permission": "vh.bill.manage",
+            "sort_order": 70,
+            "to": "/vh/billing"
+          },
+          {
+            "code": "vh.inventory",
+            "icon": "Package",
+            "label": "Hostel Inventory",
+            "required_permission": "vh.inventory.manage",
+            "sort_order": 80,
+            "to": "/vh/inventory"
+          },
+          {
+            "code": "vh.caretaker_reports",
+            "icon": "FileText",
+            "label": "Operational Logs",
+            "required_permission": "vh.report.view",
+            "sort_order": 90,
+            "to": "/vh/caretaker-reports"
+          },
+          {
+            "code": "vh.approvals",
+            "icon": "CheckSquareOffset",
+            "label": "Executive Approvals",
+            "required_permission": "vh.booking.approve",
+            "sort_order": 100,
+            "to": "/vh/approvals"
+          },
+          {
+            "code": "vh.supervisor_reports",
+            "icon": "ChartBar",
+            "label": "Executive Reports",
+            "required_permission": "vh.report.manage",
+            "sort_order": 110,
+            "to": "/vh/supervisor-reports"
+          },
+          {
+            "code": "vh.role_admin",
+            "icon": "UsersThree",
+            "label": "Role Reassignment",
+            "required_permission": "vh.role.assign",
+            "sort_order": 120,
+            "to": "/vh/roles"
+          }
+        ],
+        "label": "Visitors Hostel",
+        "nav_section": "Facilities",
+        "sort_order": 22,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "vh.booking.create",
+          "label": "Submit an online booking request"
+        },
+        {
+          "code": "vh.booking.view",
+          "label": "View visible booking details and history"
+        },
+        {
+          "code": "vh.booking.update",
+          "label": "Request modification to a submitted booking"
+        },
+        {
+          "code": "vh.booking.delete",
+          "label": "Request cancellation of a booking"
+        },
+        {
+          "code": "vh.booking.review",
+          "label": "Review pending bookings, check availability, route or reject"
+        },
+        {
+          "code": "vh.booking.approve",
+          "label": "Approve or reject forwarded bookings"
+        },
+        {
+          "code": "vh.room.assign",
+          "label": "Allot rooms to approved bookings"
+        },
+        {
+          "code": "vh.stay.manage",
+          "label": "Record check-in, check-out, and stay exceptions"
+        },
+        {
+          "code": "vh.meal.manage",
+          "label": "Manage mess and meal bookings for staying guests"
+        },
+        {
+          "code": "vh.meal.view",
+          "label": "View meal records"
+        },
+        {
+          "code": "vh.bill.create",
+          "label": "Generate stay and cancellation bills"
+        },
+        {
+          "code": "vh.bill.view",
+          "label": "View generated bills"
+        },
+        {
+          "code": "vh.bill.manage",
+          "label": "Record offline cash settlement and checkout verification"
+        },
+        {
+          "code": "vh.inventory.view",
+          "label": "View inventory quantities and threshold alerts"
+        },
+        {
+          "code": "vh.inventory.manage",
+          "label": "Record and update inventory stocks"
+        },
+        {
+          "code": "vh.inventory.approve",
+          "label": "Approve inventory replenishment requirements"
+        },
+        {
+          "code": "vh.tariff.view",
+          "label": "View active and published tariff rates"
+        },
+        {
+          "code": "vh.tariff.manage",
+          "label": "Configure effective-dated visitor category tariffs"
+        },
+        {
+          "code": "vh.report.view",
+          "label": "View caretaker operational reports and logs"
+        },
+        {
+          "code": "vh.report.manage",
+          "label": "View supervisory summary and revenue reports"
+        },
+        {
+          "code": "vh.role.assign",
+          "label": "Reassign operational Caretaker and In-Charge roles"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "vh.inventory.monitor",
+        "vh.stay.monitor"
+      ]
     }
   },
   "publisher": "integrated",
