@@ -8,6 +8,11 @@ export interface Account {
 }
 
 export const ACCOUNTS = {
+  lmsFaculty: { username: "fac00021", role: "faculty", grants: [] },
+  lmsStudent: { username: "stu03009", role: "student", grants: [] },
+  lmsTa: { username: "stu03008", role: "lms_ta", grants: ["lms_ta"] },
+  lmsObserver: { username: "stf00001", role: "lms_observer", grants: ["lms_observer"] },
+  lmsPlain: { username: "stu00001", role: "student", grants: [] },
   student: { username: "stu00001", role: "ug_student", grants: [] },
   placementOfficer: {
     username: "stf00062", role: "placement_officer", grants: ["placement_officer"],

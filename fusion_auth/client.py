@@ -205,6 +205,72 @@ class IamClient:
                           headers={"Authorization": f"Token {auth_token}"},
                           timeout=self.timeout)
 
+    def _course_pages(self, resource, params):
+        """Consume the real paginated academic contract; partial pages fail closed."""
+        rows = []
+        offset = 0
+        count = None
+        while True:
+            page = self._get(f"iam/v1/academics/{resource}",
+                             params={**params, "limit": 200, "offset": offset})
+            if not isinstance(page, dict) or not isinstance(page.get("results"), list):
+                raise IamUnavailable("Invalid academic course response")
+            total = page.get("count")
+            if type(total) is not int or total < 0 or page.get("offset") != offset or (
+                count is not None and count != total
+            ):
+                raise IamUnavailable("Inconsistent academic course pagination")
+            count = total
+            batch = page["results"]
+            for row in batch:
+                key = row.get("offering_key", "") if isinstance(row, dict) else ""
+                if len(key) != 68 or not key.startswith("cof_") or any(
+                    ch not in "0123456789abcdef" for ch in key[4:]
+                ):
+                    raise IamUnavailable("Invalid academic offering key")
+                if resource == "course-associations" and (
+                    type(row.get("user_id")) is not int or row.get("course_role") not in (
+                        "STUDENT", "FACULTY", "TA", "OBSERVER"
+                    ) or row.get("source_origin") not in (
+                        "fusion_registration", "synthetic_fixture"
+                    )
+                ):
+                    raise IamUnavailable("Invalid academic course association")
+            rows.extend(batch)
+            offset += len(batch)
+            if offset == count:
+                return rows
+            if not batch or offset > count:
+                raise IamUnavailable("Incomplete academic course response")
+
+    def get_course_offerings(self, offering_keys=None):
+        if offering_keys is not None:
+            keys = list(dict.fromkeys(offering_keys))
+            if not keys:
+                return []
+            return [row for start in range(0, len(keys), 200)
+                    for row in self._course_pages("course-offerings", {
+                        "offering_keys": ",".join(keys[start:start + 200])})]
+        return self._course_pages("course-offerings", {})
+
+    def get_course_associations(self, user_ids, *, offering_keys=None, course_role=None):
+        ids = list(dict.fromkeys(user_ids))
+        if not ids:
+            return []
+        if len(ids) > 500:
+            raise ValueError("At most 500 course association users per request")
+        params = {"user_ids": ",".join(str(uid) for uid in ids)}
+        if course_role is not None:
+            params["course_role"] = course_role
+        if offering_keys is not None:
+            keys = list(dict.fromkeys(offering_keys))
+            if not keys:
+                return []
+            return [row for start in range(0, len(keys), 200)
+                    for row in self._course_pages("course-associations", {
+                        **params, "offering_keys": ",".join(keys[start:start + 200])})]
+        return self._course_pages("course-associations", params)
+
     # -- directory (batched by design) ------------------------------------
     def get_users(self, user_ids: Sequence[int]) -> dict[int, UserRef]:
         """Directory data for several people at once. There is intentionally
