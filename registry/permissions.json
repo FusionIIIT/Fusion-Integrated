@@ -34,6 +34,279 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "iaa": {
+      "grants": {
+        "Dean": [
+          "iaa.anomaly.resolve",
+          "iaa.anomaly.view",
+          "iaa.report.view",
+          "iaa.request.approve",
+          "iaa.request.create",
+          "iaa.request.view_all",
+          "iaa.request.view_self",
+          "iaa.travel.approve",
+          "iaa.travel.create",
+          "iaa.travel.view_all",
+          "iaa.travel.view_self"
+        ],
+        "Director": [
+          "iaa.anomaly.resolve",
+          "iaa.anomaly.view",
+          "iaa.report.view",
+          "iaa.request.approve",
+          "iaa.request.create",
+          "iaa.request.view_all",
+          "iaa.request.view_self",
+          "iaa.travel.approve",
+          "iaa.travel.create",
+          "iaa.travel.view_all",
+          "iaa.travel.view_self"
+        ],
+        "HOD": [
+          "iaa.anomaly.resolve",
+          "iaa.anomaly.view",
+          "iaa.report.view",
+          "iaa.request.approve",
+          "iaa.request.create",
+          "iaa.request.view_all",
+          "iaa.request.view_self",
+          "iaa.travel.approve",
+          "iaa.travel.create",
+          "iaa.travel.view_all",
+          "iaa.travel.view_self"
+        ],
+        "admin": [
+          "iaa.config.manage"
+        ],
+        "auditor": [
+          "iaa.anomaly.flag",
+          "iaa.anomaly.view",
+          "iaa.audit.close",
+          "iaa.audit.raise",
+          "iaa.audit.view",
+          "iaa.report.view",
+          "iaa.request.view_all",
+          "iaa.travel.view_all"
+        ],
+        "faculty": [
+          "iaa.audit.respond",
+          "iaa.request.create",
+          "iaa.request.view_self",
+          "iaa.travel.create",
+          "iaa.travel.view_self"
+        ],
+        "finance_staff": [
+          "iaa.anomaly.flag",
+          "iaa.anomaly.resolve",
+          "iaa.anomaly.view",
+          "iaa.report.view",
+          "iaa.request.create",
+          "iaa.request.record",
+          "iaa.request.validate",
+          "iaa.request.view_all",
+          "iaa.request.view_self",
+          "iaa.travel.create",
+          "iaa.travel.record",
+          "iaa.travel.verify",
+          "iaa.travel.view_all",
+          "iaa.travel.view_self"
+        ],
+        "staff": [
+          "iaa.audit.respond",
+          "iaa.request.create",
+          "iaa.request.view_self",
+          "iaa.travel.create",
+          "iaa.travel.view_self"
+        ],
+        "student": [
+          "iaa.audit.respond",
+          "iaa.request.create",
+          "iaa.request.view_self",
+          "iaa.travel.create",
+          "iaa.travel.view_self"
+        ],
+        "system_admin": [
+          "iaa.config.manage"
+        ]
+      },
+      "module_grants": [
+        "Dean",
+        "Director",
+        "HOD",
+        "admin",
+        "auditor",
+        "faculty",
+        "finance_staff",
+        "staff",
+        "student",
+        "system_admin"
+      ],
+      "nav": {
+        "base_path": "/iaa",
+        "icon": "Receipt",
+        "items": [
+          {
+            "code": "iaa.requests",
+            "icon": "FileText",
+            "label": "Expense & Vouchers",
+            "required_permission": "iaa.request.view_self",
+            "sort_order": 10,
+            "to": "/iaa/requests"
+          },
+          {
+            "code": "iaa.travel",
+            "icon": "AirplaneTilt",
+            "label": "Travel Claims",
+            "required_permission": "iaa.travel.view_self",
+            "sort_order": 20,
+            "to": "/iaa/travel"
+          },
+          {
+            "code": "iaa.approvals",
+            "icon": "CheckSquareOffset",
+            "label": "Approval Queue",
+            "required_permission": "iaa.request.approve",
+            "sort_order": 30,
+            "to": "/iaa/approvals"
+          },
+          {
+            "code": "iaa.anomalies",
+            "icon": "WarningCircle",
+            "label": "Anomalies",
+            "required_permission": "iaa.anomaly.view",
+            "sort_order": 40,
+            "to": "/iaa/anomalies"
+          },
+          {
+            "code": "iaa.audit",
+            "icon": "ShieldCheck",
+            "label": "Audit Observations",
+            "required_permission": "iaa.audit.view",
+            "sort_order": 50,
+            "to": "/iaa/audit"
+          },
+          {
+            "code": "iaa.reports",
+            "icon": "ChartBar",
+            "label": "Reports & Analytics",
+            "required_permission": "iaa.report.view",
+            "sort_order": 60,
+            "to": "/iaa/reports"
+          },
+          {
+            "code": "iaa.config",
+            "icon": "GearSix",
+            "label": "IAA Configuration",
+            "required_permission": "iaa.config.manage",
+            "sort_order": 70,
+            "to": "/iaa/config"
+          }
+        ],
+        "label": "Institute Accounts & Audits",
+        "nav_section": "Administration",
+        "sort_order": 15,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "iaa.request.create",
+          "label": "Create and submit expense/voucher requests"
+        },
+        {
+          "code": "iaa.request.view_self",
+          "label": "View one's own expense/voucher requests"
+        },
+        {
+          "code": "iaa.request.view_all",
+          "label": "View all expense/voucher requests"
+        },
+        {
+          "code": "iaa.request.validate",
+          "label": "Validate financial documents and budget availability"
+        },
+        {
+          "code": "iaa.request.approve",
+          "label": "Record approval or rejection decisions on requests"
+        },
+        {
+          "code": "iaa.request.record",
+          "label": "Record internal governance completion of requests"
+        },
+        {
+          "code": "iaa.travel.create",
+          "label": "Create and submit travel allowance claims"
+        },
+        {
+          "code": "iaa.travel.view_self",
+          "label": "View one's own travel allowance claims"
+        },
+        {
+          "code": "iaa.travel.view_all",
+          "label": "View all travel allowance claims"
+        },
+        {
+          "code": "iaa.travel.verify",
+          "label": "Verify travel claims and documentary evidence"
+        },
+        {
+          "code": "iaa.travel.approve",
+          "label": "Approve or reject high-value travel claims"
+        },
+        {
+          "code": "iaa.travel.record",
+          "label": "Record internal governance completion of travel claims"
+        },
+        {
+          "code": "iaa.anomaly.view",
+          "label": "View flagged anomalies"
+        },
+        {
+          "code": "iaa.anomaly.flag",
+          "label": "Flag material anomalies manually"
+        },
+        {
+          "code": "iaa.anomaly.resolve",
+          "label": "Resolve or escalate material anomalies"
+        },
+        {
+          "code": "iaa.audit.view",
+          "label": "View audit observations and audit review data"
+        },
+        {
+          "code": "iaa.audit.raise",
+          "label": "Raise audit observations"
+        },
+        {
+          "code": "iaa.audit.respond",
+          "label": "Submit response and evidence to audit observations"
+        },
+        {
+          "code": "iaa.audit.close",
+          "label": "Verify response and close audit observations"
+        },
+        {
+          "code": "iaa.report.view",
+          "label": "View financial status reports and dashboards"
+        },
+        {
+          "code": "iaa.config.manage",
+          "label": "Configure approval hierarchy, thresholds, and parameters"
+        },
+        {
+          "code": "iaa.approval.timeout_escalate",
+          "label": "Autonomous system approval timeout escalation"
+        },
+        {
+          "code": "iaa.anomaly.auto_create",
+          "label": "Autonomous system anomaly creation"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "iaa.anomaly.auto_create",
+        "iaa.approval.timeout_escalate"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

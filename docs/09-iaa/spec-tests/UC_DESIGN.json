@@ -1,0 +1,416 @@
+[
+  {
+    "test_id": "T-UC-01",
+    "source_id": "IAA-UC-101 Main Flow",
+    "purpose": "Create complete draft expense request",
+    "preconditions": "User authenticated",
+    "action_or_input": "Call create_expense_request with complete parameters",
+    "expected_result": "Draft created with status DRAFT",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-02",
+    "source_id": "IAA-UC-101 Alternative A1",
+    "purpose": "Save incomplete draft expense request",
+    "preconditions": "User inputs partial details",
+    "action_or_input": "Call create_expense_request with empty items",
+    "expected_result": "Draft saved successfully",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-03",
+    "source_id": "IAA-UC-102 Main Flow",
+    "purpose": "Submit complete expense request",
+    "preconditions": "Draft exists with items",
+    "action_or_input": "Call submit_expense_request",
+    "expected_result": "Status becomes SUBMITTED and is_locked is True",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-04",
+    "source_id": "IAA-UC-102 Exception E1",
+    "purpose": "Block submission of incomplete request",
+    "preconditions": "Draft has 0 items",
+    "action_or_input": "Call submit_expense_request",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-05",
+    "source_id": "IAA-UC-102 Exception E2",
+    "purpose": "Block submission by non-owner",
+    "preconditions": "Draft owned by user 1001",
+    "action_or_input": "user 2002 calls submit_expense_request",
+    "expected_result": "ConflictError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-06",
+    "source_id": "IAA-UC-103 Main Flow",
+    "purpose": "Finance validate request and route",
+    "preconditions": "Request submitted and budget sufficient",
+    "action_or_input": "Call review_and_validate_request",
+    "expected_result": "Status becomes FINANCE_VALIDATED and route assigned",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-07",
+    "source_id": "IAA-UC-103 Alternative A1",
+    "purpose": "Finance raises clarification query",
+    "preconditions": "Request submitted",
+    "action_or_input": "Call raise_request_clarification",
+    "expected_result": "Status becomes QUERY_RAISED and query pending",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-08",
+    "source_id": "IAA-UC-103 Alternative A2",
+    "purpose": "Finance triggers anomaly on insufficient budget",
+    "preconditions": "Request amount exceeds budget",
+    "action_or_input": "Call review_and_validate_request",
+    "expected_result": "Material anomaly created and logged",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-09",
+    "source_id": "IAA-UC-104 Main Flow",
+    "purpose": "Creator responds to clarification query",
+    "preconditions": "Query pending",
+    "action_or_input": "Call respond_to_request_clarification",
+    "expected_result": "Status becomes QUERY_RESPONDED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-10",
+    "source_id": "IAA-UC-104 Exception E1",
+    "purpose": "Block empty query response text",
+    "preconditions": "Query pending",
+    "action_or_input": "Call respond_to_request_clarification with empty text",
+    "expected_result": "BadRequestError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-11",
+    "source_id": "IAA-UC-105 Main Flow",
+    "purpose": "Process and record approved request",
+    "preconditions": "Request approved",
+    "action_or_input": "Call record_request_processing",
+    "expected_result": "Status becomes RECORDED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-12",
+    "source_id": "IAA-UC-105 Exception E1",
+    "purpose": "Block recording unapproved request",
+    "preconditions": "Request in SUBMITTED status",
+    "action_or_input": "Call record_request_processing",
+    "expected_result": "InvalidStateTransitionError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-13",
+    "source_id": "IAA-UC-201 Main Flow",
+    "purpose": "Approver approves request with remarks",
+    "preconditions": "Request in FINANCE_VALIDATED",
+    "action_or_input": "Call record_request_decision with approve and remarks",
+    "expected_result": "Request approved or advanced to next level",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-14",
+    "source_id": "IAA-UC-201 Alternative A1",
+    "purpose": "Approver rejects request with remarks",
+    "preconditions": "Request in FINANCE_VALIDATED",
+    "action_or_input": "Call record_request_decision with reject and remarks",
+    "expected_result": "Status becomes REJECTED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-15",
+    "source_id": "IAA-UC-201 Exception E1",
+    "purpose": "Enforce segregation of duties against self-approval",
+    "preconditions": "Approver equals creator",
+    "action_or_input": "Creator attempts to approve request",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-16",
+    "source_id": "IAA-UC-201 Exception E2",
+    "purpose": "Reject decision without remarks",
+    "preconditions": "Approver decides without remarks",
+    "action_or_input": "remarks=''",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-17",
+    "source_id": "IAA-UC-202 Main Flow",
+    "purpose": "Next authority approves escalated request",
+    "preconditions": "Request in ESCALATED status",
+    "action_or_input": "Director records approval decision",
+    "expected_result": "Escalated request approved",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-18",
+    "source_id": "IAA-UC-202 Alternative A1",
+    "purpose": "Authority rejects escalated request",
+    "preconditions": "Request in ESCALATED status",
+    "action_or_input": "Director records rejection decision",
+    "expected_result": "Status becomes REJECTED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-19",
+    "source_id": "IAA-UC-203 Main Flow",
+    "purpose": "System escalates overdue approval",
+    "preconditions": "Approval assigned earlier than SLA cutoff",
+    "action_or_input": "Run escalate_overdue_approvals",
+    "expected_result": "Request status becomes ESCALATED",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-UC-20",
+    "source_id": "IAA-UC-203 Condition False",
+    "purpose": "Recent approval within SLA is not escalated",
+    "preconditions": "Approval assigned 1 hour ago",
+    "action_or_input": "Run escalate_overdue_approvals",
+    "expected_result": "Status remains unchanged",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-UC-21",
+    "source_id": "IAA-UC-302 Main Flow",
+    "purpose": "Manually flag material anomaly",
+    "preconditions": "Finance staff identifies issue",
+    "action_or_input": "Call create_anomaly",
+    "expected_result": "Anomaly created in OPEN status",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-22",
+    "source_id": "IAA-UC-303 Main Flow",
+    "purpose": "Resolve open anomaly with remarks",
+    "preconditions": "Anomaly in OPEN status",
+    "action_or_input": "Call resolve_or_escalate_anomaly with resolve",
+    "expected_result": "Status becomes RESOLVED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-23",
+    "source_id": "IAA-UC-303 Alternative A1",
+    "purpose": "Escalate open anomaly to higher review",
+    "preconditions": "Anomaly in OPEN status",
+    "action_or_input": "Call resolve_or_escalate_anomaly with escalate",
+    "expected_result": "Status becomes ESCALATED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-24",
+    "source_id": "IAA-UC-304 Main Flow",
+    "purpose": "Automatic anomaly created on budget overdraft",
+    "preconditions": "Budget insufficient",
+    "action_or_input": "Finance review executed",
+    "expected_result": "Automatic anomaly logged with reference",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-25",
+    "source_id": "IAA-UC-401 Main Flow",
+    "purpose": "Submit travel allowance claim",
+    "preconditions": "Valid dates and amount",
+    "action_or_input": "Call submit_travel_claim",
+    "expected_result": "Status becomes SUBMITTED and is_locked is True",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-26",
+    "source_id": "IAA-UC-401 Exception E1",
+    "purpose": "Block TA claim with return date earlier than departure",
+    "preconditions": "departure > arrival",
+    "action_or_input": "Call submit_travel_claim",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-27",
+    "source_id": "IAA-UC-402 Main Flow",
+    "purpose": "Verify standard TA claim (< threshold)",
+    "preconditions": "Claim amount < 50000",
+    "action_or_input": "Call verify_travel_claim",
+    "expected_result": "Status becomes VERIFIED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-28",
+    "source_id": "IAA-UC-402 Alternative A1",
+    "purpose": "Route high-value TA claim (>= threshold) to approval",
+    "preconditions": "Claim amount >= 50000",
+    "action_or_input": "Call verify_travel_claim",
+    "expected_result": "Status becomes APPROVAL_PENDING and is_high_value is True",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-29",
+    "source_id": "IAA-UC-402 Alternative A2",
+    "purpose": "Raise clarification query on TA claim",
+    "preconditions": "Claim in SUBMITTED",
+    "action_or_input": "Call raise_travel_clarification",
+    "expected_result": "Status becomes QUERY_RAISED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-30",
+    "source_id": "IAA-UC-403 Main Flow",
+    "purpose": "Approve high-value TA claim",
+    "preconditions": "Claim in APPROVAL_PENDING",
+    "action_or_input": "Dean calls record_travel_decision with approve",
+    "expected_result": "Status becomes APPROVED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-31",
+    "source_id": "IAA-UC-403 Alternative A1",
+    "purpose": "Reject high-value TA claim",
+    "preconditions": "Claim in APPROVAL_PENDING",
+    "action_or_input": "Dean calls record_travel_decision with reject",
+    "expected_result": "Status becomes REJECTED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-32",
+    "source_id": "IAA-UC-403 Exception E1",
+    "purpose": "Block self-approval on high-value TA claim",
+    "preconditions": "Claimant is approver",
+    "action_or_input": "Claimant calls record_travel_decision",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-33",
+    "source_id": "IAA-UC-404 Main Flow",
+    "purpose": "Record verified or approved TA claim",
+    "preconditions": "Claim in VERIFIED or APPROVED",
+    "action_or_input": "Call record_travel_processing",
+    "expected_result": "Status becomes RECORDED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-34",
+    "source_id": "IAA-UC-501 Main Flow",
+    "purpose": "Auditor raises audit observation",
+    "preconditions": "Auditor authenticated",
+    "action_or_input": "Call raise_audit_observation",
+    "expected_result": "Observation created in OPEN status",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-35",
+    "source_id": "IAA-UC-502 Main Flow",
+    "purpose": "Respond to audit observation",
+    "preconditions": "Observation in OPEN status",
+    "action_or_input": "Call respond_to_audit_observation",
+    "expected_result": "Status becomes RESPONDED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-36",
+    "source_id": "IAA-UC-503 Main Flow",
+    "purpose": "Close observation when response is satisfactory",
+    "preconditions": "Observation in RESPONDED status",
+    "action_or_input": "Call review_and_close_observation with is_satisfactory=True",
+    "expected_result": "Status becomes CLOSED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-37",
+    "source_id": "IAA-UC-503 Alternative A1",
+    "purpose": "Reopen observation when response is unsatisfactory",
+    "preconditions": "Observation in RESPONDED status",
+    "action_or_input": "Call review_and_close_observation with is_satisfactory=False",
+    "expected_result": "Status transitions back to OPEN",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-38",
+    "source_id": "IAA-UC-504 Main Flow",
+    "purpose": "Auditor inspects historical records in read-only mode",
+    "preconditions": "Auditor queries records",
+    "action_or_input": "Call audit_selectors.list_audit_observations",
+    "expected_result": "Returns observation records",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-39",
+    "source_id": "IAA-UC-601 Main Flow",
+    "purpose": "View department expenditure report",
+    "preconditions": "Expenditures exist",
+    "action_or_input": "Call report_selectors.get_expenditure_summary",
+    "expected_result": "Returns aggregated expenditure summary",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-40",
+    "source_id": "IAA-UC-602 Main Flow",
+    "purpose": "Export summary report to CSV",
+    "preconditions": "User authenticated",
+    "action_or_input": "GET /api/v1/iaa/reports/export/?type=summary",
+    "expected_result": "Returns streaming CSV response",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-UC-41",
+    "source_id": "IAA-UC-603 Main Flow",
+    "purpose": "Basic User tracks own requests",
+    "preconditions": "Requests exist for user",
+    "action_or_input": "scope_requests evaluated for basic_user",
+    "expected_result": "Returns only user's own requests",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-42",
+    "source_id": "IAA-UC-604 Main Flow",
+    "purpose": "View pending approval queue",
+    "preconditions": "Pending approvals exist",
+    "action_or_input": "Query approvals for active role",
+    "expected_result": "Returns pending approval items",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-43",
+    "source_id": "IAA-UC-701 Main Flow",
+    "purpose": "Switch active IAA role",
+    "preconditions": "User has multiple roles",
+    "action_or_input": "Active role set in session",
+    "expected_result": "Permissions and audit reflect new active role",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-44",
+    "source_id": "IAA-UC-702 Main Flow",
+    "purpose": "System Admin manages role assignments",
+    "preconditions": "Admin authenticated",
+    "action_or_input": "Assign role to user",
+    "expected_result": "Role assignment persisted",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-45",
+    "source_id": "IAA-UC-703 Main Flow",
+    "purpose": "Configure approval hierarchy rules",
+    "preconditions": "Admin authenticated",
+    "action_or_input": "Call add_approval_hierarchy_rule",
+    "expected_result": "ApprovalHierarchyRule created",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-UC-46",
+    "source_id": "IAA-UC-704 Main Flow",
+    "purpose": "Configure financial year and policy parameters",
+    "preconditions": "Admin authenticated",
+    "action_or_input": "Call update_iaa_configuration",
+    "expected_result": "IAAConfiguration updated successfully",
+    "test_type": "unit"
+  }
+]

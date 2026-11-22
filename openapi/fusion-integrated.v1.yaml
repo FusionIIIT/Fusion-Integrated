@@ -63,6 +63,642 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/iaa/anomalies/:
+    get:
+      operationId: iaa_anomalies_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Anomaly'
+          description: ''
+    post:
+      operationId: iaa_anomalies_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAnomalyInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateAnomalyInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateAnomalyInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anomaly'
+          description: ''
+  /api/v1/iaa/anomalies/{id}/resolve/:
+    post:
+      operationId: iaa_anomalies_resolve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnomalyResolutionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AnomalyResolutionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AnomalyResolutionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Anomaly'
+          description: ''
+  /api/v1/iaa/audit/:
+    get:
+      operationId: iaa_audit_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditObservation'
+          description: ''
+    post:
+      operationId: iaa_audit_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RaiseAuditObservationInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RaiseAuditObservationInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RaiseAuditObservationInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditObservation'
+          description: ''
+  /api/v1/iaa/audit/{id}/close/:
+    post:
+      operationId: iaa_audit_close
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditObservationClosureInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuditObservationClosureInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuditObservationClosureInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditObservation'
+          description: ''
+  /api/v1/iaa/audit/{id}/respond/:
+    post:
+      operationId: iaa_audit_respond
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditObservationResponseInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuditObservationResponseInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuditObservationResponseInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditObservation'
+          description: ''
+  /api/v1/iaa/config/:
+    get:
+      operationId: iaa_config_get
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IAAConfiguration'
+          description: ''
+    put:
+      operationId: iaa_config_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IAAConfiguration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IAAConfiguration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IAAConfiguration'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IAAConfiguration'
+          description: ''
+  /api/v1/iaa/config/budgets/:
+    get:
+      operationId: iaa_budgets_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepartmentBudget'
+          description: ''
+    post:
+      operationId: iaa_budgets_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentBudget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DepartmentBudget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepartmentBudget'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentBudget'
+          description: ''
+  /api/v1/iaa/reports/:
+    get:
+      operationId: iaa_reports_summary
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/iaa/reports/export/:
+    get:
+      operationId: iaa_reports_export
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: ''
+  /api/v1/iaa/requests/:
+    get:
+      operationId: iaa_requests_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExpenseVoucherRequest'
+          description: ''
+    post:
+      operationId: iaa_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExpenseRequestInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateExpenseRequestInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateExpenseRequestInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseVoucherRequest'
+          description: ''
+  /api/v1/iaa/requests/{id}/:
+    get:
+      operationId: iaa_requests_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseVoucherRequest'
+          description: ''
+  /api/v1/iaa/requests/{id}/decide/:
+    post:
+      operationId: iaa_requests_decide
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecisionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecisionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecisionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseVoucherRequest'
+          description: ''
+  /api/v1/iaa/requests/{id}/query/:
+    post:
+      operationId: iaa_requests_query
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClarificationQueryInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClarificationQueryInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClarificationQueryInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClarificationQuery'
+          description: ''
+  /api/v1/iaa/requests/{id}/record/:
+    post:
+      operationId: iaa_requests_record
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseVoucherRequest'
+          description: ''
+  /api/v1/iaa/requests/{id}/submit/:
+    post:
+      operationId: iaa_requests_submit
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseVoucherRequest'
+          description: ''
+  /api/v1/iaa/requests/{id}/validate/:
+    post:
+      operationId: iaa_requests_validate
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseVoucherRequest'
+          description: ''
+  /api/v1/iaa/requests/queries/{query_id}/respond/:
+    post:
+      operationId: iaa_requests_respond_query
+      parameters:
+      - in: path
+        name: query_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClarificationResponseInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClarificationResponseInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClarificationResponseInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseVoucherRequest'
+          description: ''
+  /api/v1/iaa/travel/:
+    get:
+      operationId: iaa_travel_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TAClaim'
+          description: ''
+    post:
+      operationId: iaa_travel_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitTAClaimInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmitTAClaimInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmitTAClaimInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TAClaim'
+          description: ''
+  /api/v1/iaa/travel/{id}/:
+    get:
+      operationId: iaa_travel_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TAClaim'
+          description: ''
+  /api/v1/iaa/travel/{id}/decide/:
+    post:
+      operationId: iaa_travel_decide
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecisionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecisionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ApprovalDecisionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TAClaim'
+          description: ''
+  /api/v1/iaa/travel/{id}/record/:
+    post:
+      operationId: iaa_travel_record
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TAClaim'
+          description: ''
+  /api/v1/iaa/travel/{id}/verify/:
+    post:
+      operationId: iaa_travel_verify
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TAClaim'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +2399,14 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - resolve
+      - escalate
+      type: string
+      description: |-
+        * `resolve` - resolve
+        * `escalate` - escalate
     AddCandidates:
       type: object
       properties:
@@ -1827,6 +2471,79 @@ components:
       - title
       - topic
       - withdrawn_reason
+    Anomaly:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        description:
+          type: string
+        reference_type:
+          type: string
+          maxLength: 32
+        reference_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: '#/components/schemas/AnomalyStatusEnum'
+        flagged_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        flagged_by_role:
+          type: string
+          maxLength: 64
+        resolver_role:
+          type: string
+          maxLength: 64
+        resolved_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        resolution_remarks:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - category
+      - created_at
+      - description
+      - id
+      - reference_id
+      - reference_type
+    AnomalyResolutionInput:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        remarks:
+          type: string
+          minLength: 1
+      required:
+      - action
+      - remarks
+    AnomalyStatusEnum:
+      enum:
+      - open
+      - resolved
+      - escalated
+      type: string
+      description: |-
+        * `open` - Open
+        * `resolved` - Resolved
+        * `escalated` - Escalated
     Application:
       type: object
       properties:
@@ -1971,6 +2688,17 @@ components:
           type: string
           default: ''
           maxLength: 300
+    ApprovalDecisionInput:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        remarks:
+          type: string
+          minLength: 1
+      required:
+      - decision
+      - remarks
     ApprovalStatusEnum:
       enum:
       - pending
@@ -1993,6 +2721,91 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuditObservation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        auditor_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        department:
+          type: string
+          maxLength: 64
+        reference_type:
+          type: string
+          maxLength: 32
+        reference_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/AuditObservationStatusEnum'
+        response_text:
+          type: string
+        responded_by_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        responded_at:
+          type: string
+          format: date-time
+          nullable: true
+        closure_remarks:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        closed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - auditor_id
+      - created_at
+      - department
+      - description
+      - id
+      - title
+    AuditObservationClosureInput:
+      type: object
+      properties:
+        is_satisfactory:
+          type: boolean
+        remarks:
+          type: string
+          minLength: 1
+      required:
+      - is_satisfactory
+      - remarks
+    AuditObservationResponseInput:
+      type: object
+      properties:
+        response_text:
+          type: string
+          minLength: 1
+      required:
+      - response_text
+    AuditObservationStatusEnum:
+      enum:
+      - open
+      - responded
+      - closed
+      type: string
+      description: |-
+        * `open` - Open
+        * `responded` - Responded
+        * `closed` - Closed
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +2895,82 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - budget_insufficient
+      - policy_violation
+      - duplicate_claim
+      - manual_flag
+      type: string
+      description: |-
+        * `budget_insufficient` - Department Budget Insufficient
+        * `policy_violation` - Policy Violation
+        * `duplicate_claim` - Duplicate Claim Suspected
+        * `manual_flag` - Manual Flag
+    ClarificationQuery:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        content_type:
+          $ref: '#/components/schemas/ContentTypeEnum'
+        object_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        sender_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        sender_role:
+          type: string
+          maxLength: 64
+        query_text:
+          type: string
+        response_text:
+          type: string
+        status:
+          $ref: '#/components/schemas/ClarificationQueryStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        responded_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - content_type
+      - created_at
+      - id
+      - object_id
+      - query_text
+      - sender_id
+    ClarificationQueryInput:
+      type: object
+      properties:
+        query_text:
+          type: string
+          minLength: 1
+      required:
+      - query_text
+    ClarificationQueryStatusEnum:
+      enum:
+      - pending
+      - responded
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `responded` - Responded
+    ClarificationResponseInput:
+      type: object
+      properties:
+        response_text:
+          type: string
+          minLength: 1
+      required:
+      - response_text
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3204,102 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    ContentTypeEnum:
+      enum:
+      - request
+      - travel
+      type: string
+      description: |-
+        * `request` - Request
+        * `travel` - Travel
+    CreateAnomalyInput:
+      type: object
+      properties:
+        category:
+          type: string
+          maxLength: 64
+        description:
+          type: string
+          minLength: 1
+        reference_type:
+          type: string
+          maxLength: 32
+        reference_id:
+          type: integer
+      required:
+      - category
+      - description
+      - reference_id
+      - reference_type
+    CreateExpenseRequestInput:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 64
+        request_type:
+          $ref: '#/components/schemas/CreateExpenseRequestInputRequestTypeEnum'
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          default: ''
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - department
+      - request_type
+      - title
+    CreateExpenseRequestInputRequestTypeEnum:
+      enum:
+      - expense
+      - voucher
+      type: string
+      description: |-
+        * `expense` - expense
+        * `voucher` - voucher
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+    DepartmentBudget:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          maxLength: 64
+        financial_year:
+          type: string
+          default: 2026-2027
+          maxLength: 16
+        allocated_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        utilized_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+        available_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - available_amount
+      - department
+      - id
     Detail:
       type: object
       properties:
@@ -2407,6 +3392,142 @@ components:
       - season_decision
       - semester
       - standing
+    ExpenseItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        description:
+          type: string
+          maxLength: 255
+        category:
+          type: string
+          maxLength: 64
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        receipt_reference:
+          type: string
+          maxLength: 128
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - description
+      - id
+    ExpenseVoucherRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          maxLength: 64
+        request_type:
+          $ref: '#/components/schemas/ExpenseVoucherRequestRequestTypeEnum'
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ExpenseVoucherRequestStatusEnum'
+          readOnly: true
+        current_approval_level:
+          type: integer
+          readOnly: true
+        required_approval_levels:
+          type: integer
+          readOnly: true
+        assigned_approver_role:
+          type: string
+          readOnly: true
+        assigned_approver_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        approval_assigned_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_locked:
+          type: boolean
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseItem'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - approval_assigned_at
+      - assigned_approver_id
+      - assigned_approver_role
+      - created_at
+      - current_approval_level
+      - department
+      - id
+      - is_locked
+      - items
+      - required_approval_levels
+      - status
+      - title
+      - updated_at
+      - user_id
+    ExpenseVoucherRequestRequestTypeEnum:
+      enum:
+      - expense
+      - voucher
+      type: string
+      description: |-
+        * `expense` - Expense Request
+        * `voucher` - Voucher Request
+    ExpenseVoucherRequestStatusEnum:
+      enum:
+      - draft
+      - submitted
+      - query_raised
+      - query_responded
+      - finance_validated
+      - approval_pending
+      - approved
+      - rejected
+      - escalated
+      - recorded
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `query_raised` - Query Raised
+        * `query_responded` - Query Responded
+        * `finance_validated` - Finance Validated
+        * `approval_pending` - Approval Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `escalated` - Escalated
+        * `recorded` - Recorded
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +3544,32 @@ components:
       - fee_reference
       - season
       - user_id
+    IAAConfiguration:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        financial_year:
+          type: string
+          maxLength: 16
+        high_value_ta_threshold:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        approval_timeout_days:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_active:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - id
+      - updated_at
     IncidentRecorded:
       type: object
       properties:
@@ -3201,6 +4348,29 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    RaiseAuditObservationInput:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          minLength: 1
+        reference_type:
+          type: string
+          default: ''
+          maxLength: 32
+        reference_id:
+          type: integer
+          nullable: true
+      required:
+      - department
+      - description
+      - title
     Recommendation:
       type: object
       description: |-
@@ -3698,6 +4868,176 @@ components:
           type: integer
       required:
       - document_id
+    SubmitTAClaimInput:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 64
+        purpose:
+          type: string
+          maxLength: 255
+        departure_date:
+          type: string
+          format: date
+        arrival_date:
+          type: string
+          format: date
+        source_location:
+          type: string
+          maxLength: 128
+        destination_location:
+          type: string
+          maxLength: 128
+        claimed_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - arrival_date
+      - claimed_amount
+      - department
+      - departure_date
+      - destination_location
+      - purpose
+      - source_location
+    TAClaim:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          maxLength: 64
+        purpose:
+          type: string
+          maxLength: 255
+        departure_date:
+          type: string
+          format: date
+        arrival_date:
+          type: string
+          format: date
+        source_location:
+          type: string
+          maxLength: 128
+        destination_location:
+          type: string
+          maxLength: 128
+        claimed_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TAClaimStatusEnum'
+          readOnly: true
+        is_high_value:
+          type: boolean
+          readOnly: true
+        assigned_approver_role:
+          type: string
+          readOnly: true
+        assigned_approver_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        approval_assigned_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_locked:
+          type: boolean
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TAExpenseItem'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - approval_assigned_at
+      - arrival_date
+      - assigned_approver_id
+      - assigned_approver_role
+      - claimed_amount
+      - created_at
+      - department
+      - departure_date
+      - destination_location
+      - id
+      - is_high_value
+      - is_locked
+      - items
+      - purpose
+      - source_location
+      - status
+      - updated_at
+      - user_id
+    TAClaimStatusEnum:
+      enum:
+      - submitted
+      - query_raised
+      - query_responded
+      - verified
+      - approval_pending
+      - approved
+      - rejected
+      - escalated
+      - recorded
+      type: string
+      description: |-
+        * `submitted` - Submitted
+        * `query_raised` - Query Raised
+        * `query_responded` - Query Responded
+        * `verified` - Verified
+        * `approval_pending` - Approval Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `escalated` - Escalated
+        * `recorded` - Recorded
+    TAExpenseItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        expense_type:
+          type: string
+          maxLength: 64
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        details:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - expense_type
+      - id
     TopicEnum:
       enum:
       - drive

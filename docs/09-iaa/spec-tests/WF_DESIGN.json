@@ -1,0 +1,227 @@
+[
+  {
+    "test_id": "T-WF-01",
+    "source_id": "BW-IAA-01 Standard Success",
+    "purpose": "Execute full standard expense lifecycle draft to recorded",
+    "preconditions": "Budget sufficient",
+    "action_or_input": "draft -> submit -> finance_validate -> approve -> record",
+    "expected_result": "Voucher reaches RECORDED status",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-02",
+    "source_id": "BW-IAA-02 Multi-Level Approval",
+    "purpose": "Execute 2-level approval workflow",
+    "preconditions": "Amount >= 25000",
+    "action_or_input": "finance_validate -> approve (level 1) -> approve (level 2) -> record",
+    "expected_result": "Voucher approved through 2 levels and recorded",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-03",
+    "source_id": "BW-IAA-03 Direct Rejection",
+    "purpose": "Execute rejection at finance validation",
+    "preconditions": "Request in FINANCE_VALIDATED",
+    "action_or_input": "Approver rejects request",
+    "expected_result": "Request reaches REJECTED status",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-04",
+    "source_id": "BW-IAA-03 Approval Level Rejection",
+    "purpose": "Execute rejection during approval pending level",
+    "preconditions": "Request in APPROVAL_PENDING",
+    "action_or_input": "Approver rejects request",
+    "expected_result": "Request reaches REJECTED status",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-05",
+    "source_id": "BW-IAA-04 Clarification Loop",
+    "purpose": "Execute clarification query and response loop before validation",
+    "preconditions": "Request submitted",
+    "action_or_input": "submitted -> query_raised -> query_responded -> finance_validated",
+    "expected_result": "Request transitions successfully through clarification loop",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-06",
+    "source_id": "BW-IAA-05 Escalated Approval",
+    "purpose": "Execute timed escalation and subsequent approval",
+    "preconditions": "Request overdue in APPROVAL_PENDING",
+    "action_or_input": "timeout_escalate -> approve -> record",
+    "expected_result": "Escalated request approved by Director and recorded",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-07",
+    "source_id": "BW-IAA-06 Escalated Rejection",
+    "purpose": "Execute rejection on escalated request",
+    "preconditions": "Request in ESCALATED",
+    "action_or_input": "Director rejects escalated request",
+    "expected_result": "Request reaches REJECTED status",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-08",
+    "source_id": "CW-IAA-01 Terminal Recorded Lock",
+    "purpose": "Verify RECORDED is terminal state in expense lifecycle",
+    "preconditions": "Request in RECORDED status",
+    "action_or_input": "Attempt any state transition on recorded request",
+    "expected_result": "InvalidStateTransitionError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-WF-09",
+    "source_id": "CW-IAA-01 Terminal Rejected Lock",
+    "purpose": "Verify REJECTED is terminal state in expense lifecycle",
+    "preconditions": "Request in REJECTED status",
+    "action_or_input": "Attempt any state transition on rejected request",
+    "expected_result": "InvalidStateTransitionError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-WF-10",
+    "source_id": "BW-IAA-07 Standard TA Success",
+    "purpose": "Execute standard TA lifecycle submission to recorded",
+    "preconditions": "Claim amount < 50000",
+    "action_or_input": "submit -> verify_standard -> record",
+    "expected_result": "TA claim reaches RECORDED status",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-11",
+    "source_id": "BW-IAA-08 High-Value TA Approval",
+    "purpose": "Execute high-value TA lifecycle through authority approval",
+    "preconditions": "Claim amount >= 50000",
+    "action_or_input": "submit -> verify_high_value -> approve -> record",
+    "expected_result": "High-value TA approved by Dean and recorded",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-12",
+    "source_id": "BW-IAA-09 High-Value Multi-Level",
+    "purpose": "Execute multi-level high-value TA approval",
+    "preconditions": "High-value claim requiring 2 levels",
+    "action_or_input": "verify_high_value -> approve (level 1) -> approve (level 2) -> record",
+    "expected_result": "TA approved across 2 levels and recorded",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-13",
+    "source_id": "BW-IAA-10 TA Finance Rejection",
+    "purpose": "Execute TA rejection during verification",
+    "preconditions": "Claim in SUBMITTED",
+    "action_or_input": "Finance staff rejects claim",
+    "expected_result": "TA claim reaches REJECTED status",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-14",
+    "source_id": "BW-IAA-10 TA Approval Rejection",
+    "purpose": "Execute TA rejection during authority approval",
+    "preconditions": "Claim in APPROVAL_PENDING",
+    "action_or_input": "Dean rejects high-value claim",
+    "expected_result": "TA claim reaches REJECTED status",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-15",
+    "source_id": "BW-IAA-11 TA Clarification Loop",
+    "purpose": "Execute TA clarification query and response loop",
+    "preconditions": "Claim submitted",
+    "action_or_input": "submitted -> query_raised -> query_responded -> verify_standard -> record",
+    "expected_result": "Claim successfully verified and recorded after clarification",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-16",
+    "source_id": "BW-IAA-16 Escalated High-Value TA Approval",
+    "purpose": "Execute timed escalation and approval on high-value TA",
+    "preconditions": "TA claim overdue in APPROVAL_PENDING",
+    "action_or_input": "timeout_escalate -> approve -> record",
+    "expected_result": "Escalated TA approved by Director and recorded",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-17",
+    "source_id": "CW-IAA-02 TA Terminal Lock",
+    "purpose": "Verify RECORDED is terminal state in TA lifecycle",
+    "preconditions": "TA claim in RECORDED",
+    "action_or_input": "Attempt verification or approval on recorded claim",
+    "expected_result": "InvalidStateTransitionError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-WF-18",
+    "source_id": "BW-IAA-12 Automatic Anomaly Flag",
+    "purpose": "Execute automatic anomaly trigger workflow",
+    "preconditions": "Budget overdraft during finance review",
+    "action_or_input": "Finance validates overdrawn request",
+    "expected_result": "Anomaly transitions none -> open automatically",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-19",
+    "source_id": "BW-IAA-12 Manual Anomaly Flag",
+    "purpose": "Execute manual anomaly trigger workflow",
+    "preconditions": "Discrepancy identified",
+    "action_or_input": "Finance or auditor flags anomaly",
+    "expected_result": "Anomaly transitions none -> open manually",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-WF-20",
+    "source_id": "BW-IAA-12 Anomaly Direct Resolution",
+    "purpose": "Execute direct anomaly resolution path",
+    "preconditions": "Anomaly in OPEN status",
+    "action_or_input": "Resolver resolves anomaly",
+    "expected_result": "Anomaly transitions open -> resolved",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-WF-21",
+    "source_id": "BW-IAA-13 Anomaly Escalation Traversal",
+    "purpose": "Execute anomaly escalation and resolution path",
+    "preconditions": "Anomaly in OPEN status",
+    "action_or_input": "open -> escalate -> resolve",
+    "expected_result": "Anomaly transitions open -> escalated -> resolved",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-WF-22",
+    "source_id": "CW-IAA-03 Anomaly Terminal Lock",
+    "purpose": "Verify RESOLVED is terminal state in anomaly lifecycle",
+    "preconditions": "Anomaly in RESOLVED status",
+    "action_or_input": "Attempt to escalate resolved anomaly",
+    "expected_result": "InvalidStateTransitionError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-WF-23",
+    "source_id": "BW-IAA-14 Audit Straight Closure",
+    "purpose": "Execute audit observation straight closure path",
+    "preconditions": "Auditor creates observation",
+    "action_or_input": "create (open) -> respond (responded) -> close (closed)",
+    "expected_result": "Observation transitions cleanly to CLOSED",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-24",
+    "source_id": "BW-IAA-15 Audit Revision Traversal",
+    "purpose": "Execute audit observation revision cyclic loop path",
+    "preconditions": "First response unsatisfactory",
+    "action_or_input": "open -> respond -> reject_response (open) -> respond -> close (closed)",
+    "expected_result": "Observation cycles through open -> responded -> open -> responded -> closed",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-WF-25",
+    "source_id": "CW-IAA-04 Audit Terminal Lock",
+    "purpose": "Verify CLOSED is terminal state in audit observation lifecycle",
+    "preconditions": "Observation in CLOSED status",
+    "action_or_input": "Attempt to respond to closed observation",
+    "expected_result": "InvalidStateTransitionError raised",
+    "test_type": "unit"
+  }
+]

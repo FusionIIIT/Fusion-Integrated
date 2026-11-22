@@ -13,6 +13,34 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `iaa`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `iaa.request.create` | Create and submit expense/voucher requests | `Dean`, `Director`, `HOD`, `faculty`, `finance_staff`, `staff`, `student` |
+| `iaa.request.view_self` | View one's own expense/voucher requests | `Dean`, `Director`, `HOD`, `faculty`, `finance_staff`, `staff`, `student` |
+| `iaa.request.view_all` | View all expense/voucher requests | `Dean`, `Director`, `HOD`, `auditor`, `finance_staff` |
+| `iaa.request.validate` | Validate financial documents and budget availability | `finance_staff` |
+| `iaa.request.approve` | Record approval or rejection decisions on requests | `Dean`, `Director`, `HOD` |
+| `iaa.request.record` | Record internal governance completion of requests | `finance_staff` |
+| `iaa.travel.create` | Create and submit travel allowance claims | `Dean`, `Director`, `HOD`, `faculty`, `finance_staff`, `staff`, `student` |
+| `iaa.travel.view_self` | View one's own travel allowance claims | `Dean`, `Director`, `HOD`, `faculty`, `finance_staff`, `staff`, `student` |
+| `iaa.travel.view_all` | View all travel allowance claims | `Dean`, `Director`, `HOD`, `auditor`, `finance_staff` |
+| `iaa.travel.verify` | Verify travel claims and documentary evidence | `finance_staff` |
+| `iaa.travel.approve` | Approve or reject high-value travel claims | `Dean`, `Director`, `HOD` |
+| `iaa.travel.record` | Record internal governance completion of travel claims | `finance_staff` |
+| `iaa.anomaly.view` | View flagged anomalies | `Dean`, `Director`, `HOD`, `auditor`, `finance_staff` |
+| `iaa.anomaly.flag` | Flag material anomalies manually | `auditor`, `finance_staff` |
+| `iaa.anomaly.resolve` | Resolve or escalate material anomalies | `Dean`, `Director`, `HOD`, `finance_staff` |
+| `iaa.audit.view` | View audit observations and audit review data | `auditor` |
+| `iaa.audit.raise` | Raise audit observations | `auditor` |
+| `iaa.audit.respond` | Submit response and evidence to audit observations | `faculty`, `staff`, `student` |
+| `iaa.audit.close` | Verify response and close audit observations | `auditor` |
+| `iaa.report.view` | View financial status reports and dashboards | `Dean`, `Director`, `HOD`, `auditor`, `finance_staff` |
+| `iaa.config.manage` | Configure approval hierarchy, thresholds, and parameters | `admin`, `system_admin` |
+| `iaa.approval.timeout_escalate` | Autonomous system approval timeout escalation | _service only_ |
+| `iaa.anomaly.auto_create` | Autonomous system anomaly creation | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
