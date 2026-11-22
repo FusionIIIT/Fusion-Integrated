@@ -34,6 +34,186 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "oap": {
+      "grants": {
+        "Dean Academic": [
+          "oap.branchchange.approve",
+          "oap.leave.approve",
+          "oap.nodues.finalize"
+        ],
+        "academic_admin": [
+          "oap.bonafide.issue",
+          "oap.branchchange.manage",
+          "oap.nodues.finalize"
+        ],
+        "custodian": [
+          "oap.nodues.signoff"
+        ],
+        "faculty": [
+          "oap.leave.recommend"
+        ],
+        "hod": [
+          "oap.leave.approve",
+          "oap.nodues.signoff"
+        ],
+        "student": [
+          "oap.bonafide.create",
+          "oap.bonafide.view_self",
+          "oap.branchchange.apply",
+          "oap.leave.create",
+          "oap.leave.view_self",
+          "oap.nodues.initiate",
+          "oap.nodues.view",
+          "oap.request.view_self"
+        ]
+      },
+      "module_grants": [
+        "Dean Academic",
+        "academic_admin",
+        "custodian",
+        "faculty",
+        "hod",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/oap",
+        "icon": "GraduationCap",
+        "items": [
+          {
+            "code": "oap.dashboard",
+            "icon": "SquaresFour",
+            "label": "OAP Overview",
+            "required_permission": "oap.request.view_self",
+            "sort_order": 10,
+            "to": "/oap"
+          },
+          {
+            "code": "oap.leave",
+            "icon": "CalendarBlank",
+            "label": "Student Leave",
+            "required_permission": "oap.leave.create",
+            "sort_order": 20,
+            "to": "/oap/leave"
+          },
+          {
+            "code": "oap.bonafide",
+            "icon": "Certificate",
+            "label": "Bonafide Certificate",
+            "required_permission": "oap.bonafide.create",
+            "sort_order": 30,
+            "to": "/oap/bonafide"
+          },
+          {
+            "code": "oap.nodues",
+            "icon": "CheckSquare",
+            "label": "No-Dues Clearance",
+            "required_permission": "oap.nodues.view",
+            "sort_order": 40,
+            "to": "/oap/no-dues"
+          },
+          {
+            "code": "oap.branch_change",
+            "icon": "Shuffle",
+            "label": "Branch Change",
+            "required_permission": "oap.branchchange.apply",
+            "sort_order": 50,
+            "to": "/oap/branch-change"
+          },
+          {
+            "code": "oap.approvals",
+            "icon": "UserCheck",
+            "label": "Approval Queue",
+            "required_permission": "oap.leave.approve",
+            "sort_order": 60,
+            "to": "/oap/approvals"
+          },
+          {
+            "code": "oap.admin_bonafide",
+            "icon": "Stamp",
+            "label": "Issue Bonafide",
+            "required_permission": "oap.bonafide.issue",
+            "sort_order": 70,
+            "to": "/oap/admin/bonafide"
+          },
+          {
+            "code": "oap.admin_nodues",
+            "icon": "ClipboardText",
+            "label": "No-Dues Registry",
+            "required_permission": "oap.nodues.finalize",
+            "sort_order": 80,
+            "to": "/oap/admin/no-dues"
+          }
+        ],
+        "label": "Other Academic Procedures",
+        "nav_section": "Academics",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "oap.request.view_self",
+          "label": "View one's own academic procedure requests"
+        },
+        {
+          "code": "oap.leave.create",
+          "label": "Submit student leave application"
+        },
+        {
+          "code": "oap.leave.view_self",
+          "label": "View personal leave applications"
+        },
+        {
+          "code": "oap.leave.recommend",
+          "label": "Recommend leave as faculty advisor or supervisor"
+        },
+        {
+          "code": "oap.leave.approve",
+          "label": "Approve or reject leave application as HoD"
+        },
+        {
+          "code": "oap.bonafide.create",
+          "label": "Apply for bonafide certificate"
+        },
+        {
+          "code": "oap.bonafide.view_self",
+          "label": "View personal bonafide certificate requests"
+        },
+        {
+          "code": "oap.bonafide.issue",
+          "label": "Verify and issue bonafide certificate"
+        },
+        {
+          "code": "oap.nodues.view",
+          "label": "View no-dues clearance status"
+        },
+        {
+          "code": "oap.nodues.initiate",
+          "label": "Initiate no-dues clearance process"
+        },
+        {
+          "code": "oap.nodues.signoff",
+          "label": "Record departmental dues sign-off"
+        },
+        {
+          "code": "oap.nodues.finalize",
+          "label": "Finalize and issue consolidated no-dues certificate"
+        },
+        {
+          "code": "oap.branchchange.apply",
+          "label": "Submit branch change application"
+        },
+        {
+          "code": "oap.branchchange.manage",
+          "label": "Validate eligibility and allocate branch change seats"
+        },
+        {
+          "code": "oap.branchchange.approve",
+          "label": "Sanction final branch change decisions"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

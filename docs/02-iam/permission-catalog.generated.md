@@ -13,6 +13,26 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `oap`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `oap.request.view_self` | View one's own academic procedure requests | `student` |
+| `oap.leave.create` | Submit student leave application | `student` |
+| `oap.leave.view_self` | View personal leave applications | `student` |
+| `oap.leave.recommend` | Recommend leave as faculty advisor or supervisor | `faculty` |
+| `oap.leave.approve` | Approve or reject leave application as HoD | `Dean Academic`, `hod` |
+| `oap.bonafide.create` | Apply for bonafide certificate | `student` |
+| `oap.bonafide.view_self` | View personal bonafide certificate requests | `student` |
+| `oap.bonafide.issue` | Verify and issue bonafide certificate | `academic_admin` |
+| `oap.nodues.view` | View no-dues clearance status | `student` |
+| `oap.nodues.initiate` | Initiate no-dues clearance process | `student` |
+| `oap.nodues.signoff` | Record departmental dues sign-off | `custodian`, `hod` |
+| `oap.nodues.finalize` | Finalize and issue consolidated no-dues certificate | `Dean Academic`, `academic_admin` |
+| `oap.branchchange.apply` | Submit branch change application | `student` |
+| `oap.branchchange.manage` | Validate eligibility and allocate branch change seats | `academic_admin` |
+| `oap.branchchange.approve` | Sanction final branch change decisions | `Dean Academic` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

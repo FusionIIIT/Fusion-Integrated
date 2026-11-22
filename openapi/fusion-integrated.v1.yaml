@@ -105,6 +105,965 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/oap/bonafide/:
+    get:
+      operationId: v1_oap_bonafide_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBonafideRequestList'
+          description: ''
+    post:
+      operationId: v1_oap_bonafide_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+  /api/v1/oap/bonafide/{id}/:
+    get:
+      operationId: v1_oap_bonafide_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bonafide request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+    put:
+      operationId: v1_oap_bonafide_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bonafide request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+    patch:
+      operationId: v1_oap_bonafide_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bonafide request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBonafideRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBonafideRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBonafideRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+    delete:
+      operationId: v1_oap_bonafide_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bonafide request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/oap/bonafide/{id}/approve_and_issue/:
+    post:
+      operationId: v1_oap_bonafide_approve_and_issue_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bonafide request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+  /api/v1/oap/bonafide/{id}/download/:
+    get:
+      operationId: v1_oap_bonafide_download_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bonafide request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+  /api/v1/oap/bonafide/{id}/reject/:
+    post:
+      operationId: v1_oap_bonafide_reject_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bonafide request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BonafideRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BonafideRequest'
+          description: ''
+  /api/v1/oap/branch-change/:
+    get:
+      operationId: v1_oap_branch_change_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBranchChangeRequestList'
+          description: ''
+    post:
+      operationId: v1_oap_branch_change_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BranchChangeRequest'
+          description: ''
+  /api/v1/oap/branch-change/{id}/:
+    get:
+      operationId: v1_oap_branch_change_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this branch change request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BranchChangeRequest'
+          description: ''
+    put:
+      operationId: v1_oap_branch_change_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this branch change request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BranchChangeRequest'
+          description: ''
+    patch:
+      operationId: v1_oap_branch_change_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this branch change request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBranchChangeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBranchChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBranchChangeRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BranchChangeRequest'
+          description: ''
+    delete:
+      operationId: v1_oap_branch_change_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this branch change request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/oap/branch-change/{id}/allocate/:
+    post:
+      operationId: v1_oap_branch_change_allocate_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this branch change request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BranchChangeRequest'
+          description: ''
+  /api/v1/oap/branch-change/{id}/verify/:
+    post:
+      operationId: v1_oap_branch_change_verify_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this branch change request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BranchChangeRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BranchChangeRequest'
+          description: ''
+  /api/v1/oap/leave/:
+    get:
+      operationId: v1_oap_leave_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStudentLeaveRequestList'
+          description: ''
+    post:
+      operationId: v1_oap_leave_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveRequest'
+          description: ''
+  /api/v1/oap/leave/{id}/:
+    get:
+      operationId: v1_oap_leave_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this student leave request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveRequest'
+          description: ''
+    put:
+      operationId: v1_oap_leave_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this student leave request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveRequest'
+          description: ''
+    patch:
+      operationId: v1_oap_leave_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this student leave request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentLeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentLeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentLeaveRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveRequest'
+          description: ''
+    delete:
+      operationId: v1_oap_leave_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this student leave request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/oap/leave/{id}/cancel/:
+    post:
+      operationId: v1_oap_leave_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this student leave request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveRequest'
+          description: ''
+  /api/v1/oap/leave/{id}/hod_approve/:
+    post:
+      operationId: v1_oap_leave_hod_approve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this student leave request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveRequest'
+          description: ''
+  /api/v1/oap/leave/{id}/hod_reject/:
+    post:
+      operationId: v1_oap_leave_hod_reject_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this student leave request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveRequest'
+          description: ''
+  /api/v1/oap/leave/{id}/recommend/:
+    post:
+      operationId: v1_oap_leave_recommend_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this student leave request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentLeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentLeaveRequest'
+          description: ''
+  /api/v1/oap/no-dues/:
+    get:
+      operationId: v1_oap_no_dues_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNoDuesRequestList'
+          description: ''
+    post:
+      operationId: v1_oap_no_dues_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
+  /api/v1/oap/no-dues/{id}/:
+    get:
+      operationId: v1_oap_no_dues_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this no dues request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
+    put:
+      operationId: v1_oap_no_dues_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this no dues request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
+    patch:
+      operationId: v1_oap_no_dues_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this no dues request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNoDuesRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNoDuesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNoDuesRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
+    delete:
+      operationId: v1_oap_no_dues_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this no dues request.
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/oap/no-dues/{id}/department_signoff/:
+    post:
+      operationId: v1_oap_no_dues_department_signoff_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this no dues request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
+  /api/v1/oap/no-dues/{id}/finalize/:
+    post:
+      operationId: v1_oap_no_dues_finalize_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this no dues request.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NoDuesRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoDuesRequest'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -1993,6 +2952,140 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BonafideRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: string
+          maxLength: 32
+        purpose:
+          $ref: '#/components/schemas/PurposeEnum'
+        details:
+          type: string
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BonafideRequestStatusEnum'
+          readOnly: true
+        certificate_number:
+          type: string
+          readOnly: true
+          nullable: true
+        issued_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        issued_by:
+          type: string
+          readOnly: true
+          nullable: true
+        rejection_reason:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - certificate_number
+      - created_at
+      - id
+      - issued_at
+      - issued_by
+      - rejection_reason
+      - status
+      - student_id
+    BonafideRequestStatusEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - Pending Verification
+        * `APPROVED` - Approved & Issued
+        * `REJECTED` - Rejected
+    BranchChangeRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: string
+          maxLength: 32
+        current_branch:
+          type: string
+          maxLength: 32
+        preferred_branch_1:
+          type: string
+          maxLength: 32
+        preferred_branch_2:
+          type: string
+          nullable: true
+          maxLength: 32
+        current_cpi:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+        credits_completed:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        has_backlogs:
+          type: boolean
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BranchChangeRequestStatusEnum'
+          readOnly: true
+        allocated_branch:
+          type: string
+          readOnly: true
+          nullable: true
+        approved_by:
+          type: string
+          readOnly: true
+          nullable: true
+        remarks:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - allocated_branch
+      - approved_by
+      - created_at
+      - current_branch
+      - current_cpi
+      - id
+      - preferred_branch_1
+      - remarks
+      - status
+      - student_id
+    BranchChangeRequestStatusEnum:
+      enum:
+      - SUBMITTED
+      - VERIFIED_ELIGIBLE
+      - INELIGIBLE
+      - ALLOCATED
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `SUBMITTED` - Submitted by Student
+        * `VERIFIED_ELIGIBLE` - Verified Eligible
+        * `INELIGIBLE` - Ineligible per Policy
+        * `ALLOCATED` - Seat Allocated
+        * `APPROVED` - Sanctioned by Dean
+        * `REJECTED` - Rejected / Unallocated
     BulkOutcome:
       type: object
       properties:
@@ -2315,6 +3408,22 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DepartmentEnum:
+      enum:
+      - LIBRARY
+      - HOSTEL
+      - ACCOUNTS
+      - SPORTS
+      - LABORATORY
+      - DISCIPLINE
+      type: string
+      description: |-
+        * `LIBRARY` - Central Library
+        * `HOSTEL` - Hall of Residence
+        * `ACCOUNTS` - Accounts & Finance Section
+        * `SPORTS` - Sports Officer / Gymkhana
+        * `LABORATORY` - Departmental Laboratories
+        * `DISCIPLINE` - Proctorial / Disciplinary Committee
     Detail:
       type: object
       properties:
@@ -2637,6 +3746,18 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveTypeEnum:
+      enum:
+      - CASUAL
+      - MEDICAL
+      - SHORT
+      - SEMESTER_LEAVE
+      type: string
+      description: |-
+        * `CASUAL` - Casual Leave
+        * `MEDICAL` - Medical Leave
+        * `SHORT` - Short Leave
+        * `SEMESTER_LEAVE` - Semester Leave of Absence
     LiftSanction:
       type: object
       properties:
@@ -2708,6 +3829,92 @@ components:
       - icon
       - label
       - to
+    NoDuesDepartmentalSignoff:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        department:
+          $ref: '#/components/schemas/DepartmentEnum'
+        status:
+          $ref: '#/components/schemas/NoDuesDepartmentalSignoffStatusEnum'
+        dues_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        remarks:
+          type: string
+          nullable: true
+        signoff_by:
+          type: string
+          nullable: true
+          maxLength: 32
+        signoff_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - department
+      - id
+      - signoff_at
+    NoDuesDepartmentalSignoffStatusEnum:
+      enum:
+      - PENDING
+      - CLEARED
+      - DUES_PENDING
+      type: string
+      description: |-
+        * `PENDING` - Pending Clearance
+        * `CLEARED` - No Dues Outstanding
+        * `DUES_PENDING` - Dues / Fine Owed
+    NoDuesRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: string
+          maxLength: 32
+        reason:
+          $ref: '#/components/schemas/ReasonEnum'
+        overall_status:
+          allOf:
+          - $ref: '#/components/schemas/OverallStatusEnum'
+          readOnly: true
+        clearance_certificate_number:
+          type: string
+          readOnly: true
+          nullable: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        finalized_by:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        signoffs:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoDuesDepartmentalSignoff'
+          readOnly: true
+      required:
+      - clearance_certificate_number
+      - completed_at
+      - created_at
+      - finalized_by
+      - id
+      - overall_status
+      - signoffs
+      - student_id
     NotJoining:
       type: object
       properties:
@@ -2886,6 +4093,16 @@ components:
           maxLength: 300
       required:
       - season
+    OverallStatusEnum:
+      enum:
+      - PENDING
+      - CLEARED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - Pending Departmental Sign-offs
+        * `CLEARED` - Fully Cleared
+        * `REJECTED` - Rejected / Outstanding Dues
     PaginatedAnnouncementList:
       type: object
       required:
@@ -2924,6 +4141,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
+    PaginatedBonafideRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BonafideRequest'
+    PaginatedBranchChangeRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BranchChangeRequest'
     PaginatedCompanyList:
       type: object
       required:
@@ -2981,6 +4236,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedNoDuesRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoDuesRequest'
     PaginatedOfferList:
       type: object
       required:
@@ -3000,6 +4274,113 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedStudentLeaveRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentLeaveRequest'
+    PatchedBonafideRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: string
+          maxLength: 32
+        purpose:
+          $ref: '#/components/schemas/PurposeEnum'
+        details:
+          type: string
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BonafideRequestStatusEnum'
+          readOnly: true
+        certificate_number:
+          type: string
+          readOnly: true
+          nullable: true
+        issued_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        issued_by:
+          type: string
+          readOnly: true
+          nullable: true
+        rejection_reason:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedBranchChangeRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: string
+          maxLength: 32
+        current_branch:
+          type: string
+          maxLength: 32
+        preferred_branch_1:
+          type: string
+          maxLength: 32
+        preferred_branch_2:
+          type: string
+          nullable: true
+          maxLength: 32
+        current_cpi:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+        credits_completed:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        has_backlogs:
+          type: boolean
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BranchChangeRequestStatusEnum'
+          readOnly: true
+        allocated_branch:
+          type: string
+          readOnly: true
+          nullable: true
+        approved_by:
+          type: string
+          readOnly: true
+          nullable: true
+        remarks:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedJobPosting:
       type: object
       properties:
@@ -3080,11 +4461,109 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedNoDuesRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: string
+          maxLength: 32
+        reason:
+          $ref: '#/components/schemas/ReasonEnum'
+        overall_status:
+          allOf:
+          - $ref: '#/components/schemas/OverallStatusEnum'
+          readOnly: true
+        clearance_certificate_number:
+          type: string
+          readOnly: true
+          nullable: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        finalized_by:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        signoffs:
+          type: array
+          items:
+            $ref: '#/components/schemas/NoDuesDepartmentalSignoff'
+          readOnly: true
     PatchedRole:
       type: object
       properties:
         active_role:
           type: string
+    PatchedStudentLeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: string
+          maxLength: 32
+        student_name:
+          type: string
+          maxLength: 128
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        duration_days:
+          type: integer
+          readOnly: true
+        reason:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StudentLeaveRequestStatusEnum'
+          readOnly: true
+        supervisor_id:
+          type: string
+          readOnly: true
+          nullable: true
+        supervisor_remarks:
+          type: string
+          readOnly: true
+          nullable: true
+        hod_id:
+          type: string
+          readOnly: true
+          nullable: true
+        hod_remarks:
+          type: string
+          readOnly: true
+          nullable: true
+        document_url:
+          nullable: true
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 512
+          - type: string
+            maxLength: 0
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3201,6 +4680,30 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    PurposeEnum:
+      enum:
+      - BANK_LOAN
+      - PASSPORT
+      - VISA
+      - INTERNSHIP
+      - GENERAL
+      type: string
+      description: |-
+        * `BANK_LOAN` - Bank Loan Application
+        * `PASSPORT` - Passport Verification
+        * `VISA` - Visa Application
+        * `INTERNSHIP` - Internship / External Project
+        * `GENERAL` - General Verification
+    ReasonEnum:
+      enum:
+      - GRADUATION
+      - WITHDRAWAL
+      - MIGRATION
+      type: string
+      description: |-
+        * `GRADUATION` - Graduation / Convocation
+        * `WITHDRAWAL` - Program Withdrawal
+        * `MIGRATION` - Institute Migration / Transfer
     Recommendation:
       type: object
       description: |-
@@ -3691,6 +5194,96 @@ components:
       required:
       - available
       - season
+    StudentLeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: string
+          maxLength: 32
+        student_name:
+          type: string
+          maxLength: 128
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        duration_days:
+          type: integer
+          readOnly: true
+        reason:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StudentLeaveRequestStatusEnum'
+          readOnly: true
+        supervisor_id:
+          type: string
+          readOnly: true
+          nullable: true
+        supervisor_remarks:
+          type: string
+          readOnly: true
+          nullable: true
+        hod_id:
+          type: string
+          readOnly: true
+          nullable: true
+        hod_remarks:
+          type: string
+          readOnly: true
+          nullable: true
+        document_url:
+          nullable: true
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 512
+          - type: string
+            maxLength: 0
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - duration_days
+      - end_date
+      - hod_id
+      - hod_remarks
+      - id
+      - reason
+      - start_date
+      - status
+      - student_id
+      - student_name
+      - supervisor_id
+      - supervisor_remarks
+      - updated_at
+    StudentLeaveRequestStatusEnum:
+      enum:
+      - PENDING
+      - RECOMMENDED
+      - APPROVED
+      - REJECTED
+      - CANCELLED
+      type: string
+      description: |-
+        * `PENDING` - Pending Review
+        * `RECOMMENDED` - Recommended by Supervisor
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `CANCELLED` - Cancelled by Student
     SubmitOfferLetter:
       type: object
       properties:
