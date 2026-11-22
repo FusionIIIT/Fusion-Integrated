@@ -549,7 +549,7 @@ def test_validate_submission_details_valid_text():
     validate_submission_details(
         assignment_submission_type="text",
         submission_type="text",
-        content_text="   print('Hello World')   ",
+        content_text="   echo 'Hello World'   ",
     )
 
 
@@ -709,3 +709,80 @@ def test_grading_domain_errors():
     assert issubclass(ScoreValidationError, GradingError)
     assert issubclass(GradingPermissionDeniedError, GradingError)
     assert issubclass(GradingConflictError, GradingError)
+
+
+def test_domain_validation_boundary_conditions():
+    from unittest.mock import MagicMock
+
+    from modules.lms.domain.entities import (
+        validate_assignment_details,
+        validate_extension_details,
+        validate_material_details,
+        validate_submission_details,
+    )
+    from modules.lms.domain.errors import ExtensionDeniedError, SubmissionTypeError
+
+    # Material title length
+    with pytest.raises(LMSRuleError, match="Material title cannot exceed 200 characters"):
+        validate_material_details(
+            title="A" * 201, section_title="Sec", section_type="module", material_type="link", status="draft", link_url="https://test.edu"
+        )
+
+    # Section title length
+    with pytest.raises(LMSRuleError, match="Section title cannot exceed 100 characters"):
+        validate_material_details(
+            title="Title", section_title="S" * 101, section_type="module", material_type="link", status="draft", link_url="https://test.edu"
+        )
+
+    # Invalid section type
+    with pytest.raises(LMSRuleError, match="Invalid section type"):
+        validate_material_details(
+            title="Title", section_title="Sec", section_type="invalid_sec", material_type="link", status="draft", link_url="https://test.edu"
+        )
+
+    # Assignment invalid points possible
+    with pytest.raises(LMSRuleError, match="Points possible must be a valid positive number"):
+        validate_assignment_details(
+            title="A", instructions="I", submission_type="text", status="draft", points_possible="not_a_num"
+        )
+
+    with pytest.raises(LMSRuleError, match="Points possible must be greater than zero"):
+        validate_assignment_details(
+            title="A", instructions="I", submission_type="text", status="draft", points_possible=0
+        )
+
+    # closes_at < due_at
+    now = datetime.now(UTC)
+    with pytest.raises(LMSRuleError, match="Closing cutoff date cannot be earlier than the due date"):
+        validate_assignment_details(
+            title="A", instructions="I", submission_type="text", status="draft", points_possible=100,
+            due_at=now + timedelta(days=2), closes_at=now + timedelta(days=1)
+        )
+
+    # Extension None extended_due_at
+    with pytest.raises(ExtensionDeniedError, match="Extended due date cannot be empty"):
+        validate_extension_details(
+            student_user_id=101, assignment_due_at=now, extended_due_at=None
+        )
+
+    # Invalid submission type
+    with pytest.raises(SubmissionTypeError, match="Invalid submission type"):
+        validate_submission_details(
+            assignment_submission_type="text", submission_type="unsupported_type"
+        )
+
+    # File submission exceeding 50 MB
+    mock_big_file = MagicMock()
+    mock_big_file.size = 51 * 1024 * 1024
+    with pytest.raises(SubmissionTypeError, match="exceeds maximum limit of 50 MB"):
+        validate_submission_details(
+            assignment_submission_type="file", submission_type="file", file=mock_big_file
+        )
+
+    # Link URL exceeding 500 chars
+    long_url = "https://example.com/" + "a" * 500
+    with pytest.raises(SubmissionTypeError, match="cannot exceed 500 characters"):
+        validate_submission_details(
+            assignment_submission_type="link", submission_type="link", link_url=long_url
+        )
+

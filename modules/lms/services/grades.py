@@ -14,6 +14,7 @@ from modules.lms.models import (
     CourseMembership,
     CourseSubmission,
     CourseSubmissionGrade,
+    GradeAuditLog,
 )
 from modules.lms.services.authz import require
 
@@ -75,7 +76,21 @@ def record_submission_grade(
     except LMSRuleError as exc:
         raise ConflictError(str(exc), code="invalid_score") from exc
 
+    existing_grade = CourseSubmissionGrade.objects.filter(submission=submission).first()
+    if existing_grade is not None and existing_grade.status == GradeStatus.RELEASED:
+        GradeAuditLog.objects.create(
+            submission=submission,
+            old_score=existing_grade.score,
+            new_score=validated_score,
+            actor_user_id=actor.user_id,
+        )
+
     now = timezone.now()
+    target_status = (
+        GradeStatus.RELEASED
+        if (existing_grade and existing_grade.status == GradeStatus.RELEASED)
+        else GradeStatus.DRAFT
+    )
 
     grade, _created = CourseSubmissionGrade.objects.update_or_create(
         submission=submission,
@@ -83,10 +98,53 @@ def record_submission_grade(
             "assignment": assignment,
             "student_user_id": submission.student_user_id,
             "score": validated_score,
-            "status": GradeStatus.DRAFT,
+            "status": target_status,
             "graded_by_user_id": actor.user_id,
             "graded_at": now,
         },
     )
 
     return grade
+
+
+@transaction.atomic
+def release_assignment_grades(
+    *,
+    actor,
+    course_code: str,
+    assignment_id: int,
+) -> int:
+    """Release all draft grades for a course assignment to students.
+
+    Enforces:
+    - Actor holds `lms.grade.grade` permission.
+    - Actor is Faculty for the course (BR-LMS-017, UC-LMS-013).
+    - Assignment belongs to the specified course.
+    - Transitions all draft grades for this assignment to RELEASED status.
+    """
+    require(actor, P_GRADE)
+
+    membership = (
+        CourseMembership.objects.filter(course__code=course_code, user_id=actor.user_id)
+        .select_related("course")
+        .first()
+    )
+    if membership is None:
+        raise NotFoundError("Course not found or actor is not enrolled.")
+
+    if membership.role != CourseRole.FACULTY:
+        raise PermissionDeniedError(
+            "Only Faculty assigned to this course can release assignment grades."
+        )
+
+    assignment = CourseAssignment.objects.filter(
+        id=assignment_id, course=membership.course
+    ).first()
+    if assignment is None:
+        raise NotFoundError("Course assignment not found.")
+
+    return CourseSubmissionGrade.objects.filter(
+        assignment=assignment,
+        status=GradeStatus.DRAFT,
+    ).update(status=GradeStatus.RELEASED)
+

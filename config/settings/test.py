@@ -16,3 +16,7 @@ if env_bool("USE_SQLITE", False) or env("DB_ENGINE") == "sqlite":
             "NAME": ":memory:",
         }
     }
+    MIGRATION_MODULES = {
+        "placement": None,
+    }
+

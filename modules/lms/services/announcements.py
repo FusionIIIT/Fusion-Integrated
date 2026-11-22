@@ -42,16 +42,9 @@ def post_course_announcement(
     if membership.role == CourseRole.STUDENT:
         raise PermissionDeniedError("Students cannot post course announcements.")
     if membership.role == CourseRole.TA:
-        # BR-LMS-007 specifies: "Faculty may post course announcements; a TA may post only
-        # where permitted by Faculty for that course.
-        # Exceptions / Exclusions: Mechanism/configurability unresolved."
-        # In accordance with strict instructions not to invent unconfigured flags,
-        # TAs are denied announcement posting by default.
-        raise PermissionDeniedError(
-            "Teaching Assistants are not permitted to post announcements for this course."
-        )
-
-    if membership.role != CourseRole.FACULTY:
+        # Permitted TA with lms.announcement.manage may post (UC-LMS-005 Alt A1, BR-LMS-007)
+        pass
+    elif membership.role != CourseRole.FACULTY:
         raise PermissionDeniedError(
             "Only faculty assigned to this course can post announcements."
         )

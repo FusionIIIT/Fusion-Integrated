@@ -336,3 +336,25 @@ class CourseSubmissionGrade(TimeStampedModel):
             f"Grade {self.score} for Submission({self.submission_id}) "
             f"by Grader({self.graded_by_user_id})"
         )
+
+
+class GradeAuditLog(TimeStampedModel):
+    """Audit log record for post-release grade modifications (BR-LMS-019)."""
+
+    submission = models.ForeignKey(
+        CourseSubmission, on_delete=models.CASCADE, related_name="grade_audit_logs"
+    )
+    old_score = models.DecimalField(max_digits=6, decimal_places=2)
+    new_score = models.DecimalField(max_digits=6, decimal_places=2)
+    actor_user_id = models.IntegerField(db_index=True)
+
+    class Meta:
+        db_table = "lms_grade_audit_log"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return (
+            f"GradeAuditLog(submission={self.submission_id}, "
+            f"{self.old_score} -> {self.new_score} by User({self.actor_user_id}))"
+        )
+

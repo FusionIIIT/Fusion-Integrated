@@ -407,16 +407,15 @@ def test_unauthorized_roles_cannot_post_announcement():
             content="Testing unauthorized post",
         )
 
-    # TA cannot post without permitted mechanism (AFR-LMS-005.2, AFR-LMS-014.2, BR-LMS-007)
-    with pytest.raises(
-        PermissionDeniedError, match="Teaching Assistants are not permitted to post announcements"
-    ):
-        announcement_service.post_course_announcement(
-            actor=ta,
-            course_code="CS502",
-            title="TA Announcement",
-            content="Testing TA post",
-        )
+    # Permitted TA can post course announcements (UC-LMS-005 Alt A1, BR-LMS-007)
+    ta_ann = announcement_service.post_course_announcement(
+        actor=ta,
+        course_code="CS502",
+        title="TA Announcement",
+        content="Testing TA post",
+    )
+    assert ta_ann.id is not None
+    assert ta_ann.author_role == CourseRole.TA
 
     # Observer has read-only access (AFR-LMS-015.4)
     with pytest.raises(
