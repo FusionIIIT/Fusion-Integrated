@@ -6,13 +6,14 @@ write-only; reads return ``***`` (or empty when unset).
 from __future__ import annotations
 
 from core.api.exceptions import BadRequestError, NotFoundError
-from modules.vms.models import IntegrationSetting
+from modules.vms.models import IntegrationSetting, Zone
 from modules.vms.services.common import audit, authz
 
 PERM = "vms.integration.manage"
 MASK = "***"
 
 _STR, _BOOL, _INT, _SECRET = "str", "bool", "int", "secret"
+_ZONE_IDS = "zone_ids"
 
 _SERVICE = {"enabled": _BOOL, "base_url": _STR, "api_key": _SECRET}
 #: key -> {field: type}. Unknown fields are rejected so a typo cannot
@@ -23,7 +24,9 @@ SCHEMAS: dict[str, dict[str, str]] = {
                     "sender_id": _STR, "api_key": _SECRET},
     "access_control_readers": dict(_SERVICE),
     "event_management": dict(_SERVICE),
-    "hostel_management": dict(_SERVICE),
+    #: AFR-225, UC-020: ``zone_ids`` is the explicit scope — only visitor-log events in these
+    #: zones are made available to Hostel Management (contracts.get_hostel_visit_log).
+    "hostel_management": {**_SERVICE, "zone_ids": _ZONE_IDS},
     "notification_channels": {"inapp": _BOOL, "email": _BOOL, "sms": _BOOL,
                               "push": _BOOL},
     #: D-15: upper bound for a zone elevation time-box.
@@ -56,6 +59,9 @@ def _validate(key: str, value) -> dict:
         if field not in value:
             continue
         v = value[field]
+        if kind == _ZONE_IDS:
+            out[field] = _validate_zone_ids(v)
+            continue
         ok = ((kind == _BOOL and isinstance(v, bool))
               or (kind in (_STR, _SECRET) and isinstance(v, str))
               or (kind == _INT and isinstance(v, int) and not isinstance(v, bool)))
@@ -73,6 +79,19 @@ def _validate(key: str, value) -> dict:
             raise BadRequestError("An enabled integration needs an http(s) base_url.",
                                   code="validation_error")
     return out
+
+
+def _validate_zone_ids(value) -> list[int]:
+    """A list of ids of existing, active zones, without duplicates."""
+    if (not isinstance(value, list)
+            or any(not isinstance(i, int) or isinstance(i, bool) for i in value)):
+        raise BadRequestError("zone_ids must be a list of zone ids.", code="validation_error")
+    ids = sorted(set(value))
+    found = set(Zone.objects.filter(pk__in=ids, is_active=True).values_list("pk", flat=True))
+    if found != set(ids):
+        raise BadRequestError("zone_ids must name existing, active zones.",
+                              code="validation_error")
+    return ids
 
 
 def _masked(key: str, value: dict) -> dict:
@@ -119,6 +138,16 @@ def set_value(*, actor, key: str, value: dict) -> dict:
         audit.record(actor=actor, action="vms.integration.updated", entity=row,
                      detail={"key": key, "changed_fields": changed})
     return get(actor=actor, key=key)
+
+
+def hostel_scope() -> list[int]:
+    """Zone ids whose visitor-log events Hostel Management may read; empty unless the
+    integration is enabled (AFR-225, UC-020 step 4)."""
+    row = IntegrationSetting.objects.filter(key="hostel_management").first()
+    value = (row.value or {}) if row else {}
+    if not value.get("enabled"):
+        return []
+    return [i for i in value.get("zone_ids", []) if isinstance(i, int)]
 
 
 def max_elevation_minutes() -> int:

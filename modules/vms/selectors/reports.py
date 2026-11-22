@@ -11,8 +11,8 @@ zone), plus report specific keys. Aggregation happens in the database
 flag ``truncated``. Identity columns are returned raw: anonymisation is the
 service's job (D-9).
 
-TODO(integration): ``event_attendance`` (needs lane G's selectors/events.py) and
-``muster_history`` (needs lane F's muster data) are added at integration.
+``event_attendance`` and ``muster_history`` are implemented below; they read the event and
+muster tables directly.
 """
 from __future__ import annotations
 
