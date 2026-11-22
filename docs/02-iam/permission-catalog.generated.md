@@ -13,6 +13,33 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `iaa`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `iaa.request.create` | Create expense/voucher drafts | `Basic User` |
+| `iaa.request.view_self` | View own expense/voucher requests | `Basic User` |
+| `iaa.request.view` | View role-scoped expense/voucher requests | `Auditor`, `Basic User`, `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Dean_s`, `Director`, `Finance Staff`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `iaa.request.submit` | Submit expense/voucher requests | `Basic User` |
+| `iaa.finance.validate` | Validate financial requests | `Finance Staff` |
+| `iaa.finance.record` | Record internal processing completion | `Finance Staff` |
+| `iaa.approval.decide` | Approve or reject assigned requests | `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Dean_s`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `iaa.approval.escalate` | Process escalated approvals | _service only_ |
+| `iaa.ta.create` | Submit travel allowance claims | `Basic User` |
+| `iaa.ta.view_self` | View own travel allowance claims | `Basic User` |
+| `iaa.ta.view` | View role-scoped travel allowance claims | `Auditor`, `Basic User`, `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Dean_s`, `Director`, `Finance Staff`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `iaa.ta.verify` | Verify travel allowance claims | `Finance Staff` |
+| `iaa.anomaly.flag` | Flag material anomalies | `Auditor`, `Finance Staff` |
+| `iaa.anomaly.resolve` | Resolve assigned anomalies | `Auditor`, `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Dean_s`, `Director`, `Finance Staff`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `iaa.audit.review` | Review financial records for audit | `Auditor` |
+| `iaa.observation.respond` | Respond to assigned observations | `Basic User` |
+| `iaa.observation.verify` | Verify observation responses | `Auditor` |
+| `iaa.report.view` | View role-scoped IAA reports | `Auditor`, `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Dean_s`, `Director`, `Finance Staff`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `iaa.report.export` | Export role-scoped IAA reports | `Auditor`, `Finance Staff` |
+| `iaa.notification.view` | View assigned IAA notifications | `Auditor`, `Basic User`, `Dean (P&D)`, `Dean (R&D)`, `Dean Academic`, `Dean_s`, `Director`, `Finance Staff`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `iaa.admin.configure` | Configure IAA roles and policies | `System Admin` |
+| `iaa.role.switch` | Switch active IAA role | `Auditor`, `Basic User`, `Finance Staff`, `System Admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

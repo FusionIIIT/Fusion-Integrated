@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from modules.iaa.models import (
@@ -15,12 +16,42 @@ from modules.iaa.models import (
 )
 
 
+class AuditEventSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    actor_user_id = serializers.IntegerField(allow_null=True)
+    active_role = serializers.CharField(allow_blank=True)
+    action = serializers.CharField()
+    from_status = serializers.CharField(allow_blank=True)
+    to_status = serializers.CharField(allow_blank=True)
+    details = serializers.JSONField()
+    occurred_at = serializers.DateTimeField()
+
+
 class ExpenseReadSerializer(serializers.ModelSerializer):
     supporting_documents = serializers.SerializerMethodField()
 
     class Meta:
         model = ExpenseRequest
-        fields = "__all__"
+        fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "creator_user_id",
+            "request_type",
+            "amount",
+            "department",
+            "description",
+            "supporting_documents",
+            "status",
+            "assigned_finance_user_id",
+            "assigned_route",
+            "clarification",
+            "finance_notes",
+            "decision_remarks",
+            "recorded_at",
+            "recorded_by_user_id",
+            "lock_version",
+        )
         read_only_fields = (
             "id",
             "created_at",
@@ -37,6 +68,7 @@ class ExpenseReadSerializer(serializers.ModelSerializer):
             "lock_version",
         )
 
+    @extend_schema_field(serializers.ListField(child=serializers.DictField()))
     def get_supporting_documents(self, obj):
         return document_references(obj.supporting_documents)
 
@@ -57,7 +89,26 @@ class TravelClaimReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TravelClaim
-        fields = "__all__"
+        fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "claimant_user_id",
+            "department",
+            "trip_start",
+            "trip_end",
+            "purpose",
+            "amount",
+            "supporting_documents",
+            "status",
+            "assigned_finance_user_id",
+            "assigned_route",
+            "clarification",
+            "finance_notes",
+            "decision_remarks",
+            "recorded_at",
+            "recorded_by_user_id",
+        )
         read_only_fields = (
             "id",
             "created_at",
@@ -73,6 +124,7 @@ class TravelClaimReadSerializer(serializers.ModelSerializer):
             "recorded_by_user_id",
         )
 
+    @extend_schema_field(serializers.ListField(child=serializers.DictField()))
     def get_supporting_documents(self, obj):
         return document_references(obj.supporting_documents)
 
@@ -102,9 +154,25 @@ class TravelClaimWriteSerializer(serializers.ModelSerializer):
 
 
 class ApprovalStepSerializer(serializers.ModelSerializer):
+    record_type = serializers.CharField(read_only=True)
+
     class Meta:
         model = ApprovalStep
-        fields = "__all__"
+        fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "record_type",
+            "record_id",
+            "route",
+            "level",
+            "authority_role",
+            "assignee_user_id",
+            "status",
+            "due_at",
+            "decided_at",
+            "remarks",
+        )
         read_only_fields = (
             "id",
             "created_at",
@@ -123,9 +191,24 @@ class ApprovalStepSerializer(serializers.ModelSerializer):
 
 
 class AnomalySerializer(serializers.ModelSerializer):
+    record_type = serializers.CharField(read_only=True)
+
     class Meta:
         model = Anomaly
-        fields = "__all__"
+        fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "record_type",
+            "record_id",
+            "category",
+            "description",
+            "is_automatic",
+            "status",
+            "resolver_role",
+            "resolver_user_id",
+            "resolution_remarks",
+        )
         read_only_fields = (
             "id",
             "created_at",
@@ -144,10 +227,23 @@ class AnomalySerializer(serializers.ModelSerializer):
 
 class ObservationSerializer(serializers.ModelSerializer):
     responses = serializers.SerializerMethodField()
+    record_type = serializers.CharField(read_only=True)
 
     class Meta:
         model = AuditObservation
-        fields = "__all__"
+        fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "record_type",
+            "record_id",
+            "auditor_user_id",
+            "owner_user_id",
+            "department",
+            "finding",
+            "status",
+            "responses",
+        )
         read_only_fields = (
             "id",
             "created_at",
@@ -161,6 +257,7 @@ class ObservationSerializer(serializers.ModelSerializer):
             "status",
         )
 
+    @extend_schema_field(serializers.ListField(child=serializers.DictField()))
     def get_responses(self, obj):
         return [
             {
@@ -180,7 +277,16 @@ class ObservationSerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = IaaNotificationOutbox
-        fields = "__all__"
+        fields = (
+            "id",
+            "recipient_user_id",
+            "record_type",
+            "record_id",
+            "event",
+            "payload",
+            "created_at",
+            "delivered_at",
+        )
         read_only_fields = (
             "id",
             "recipient_user_id",
@@ -191,6 +297,15 @@ class NotificationSerializer(serializers.ModelSerializer):
             "created_at",
             "delivered_at",
         )
+
+
+class ProcessingIssueSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    record_type = serializers.CharField()
+    record_id = serializers.IntegerField()
+    operation = serializers.CharField()
+    reason = serializers.CharField()
+    created_at = serializers.DateTimeField()
 
 
 class ActionSerializer(serializers.Serializer):
@@ -216,12 +331,17 @@ class ObservationReviewSerializer(serializers.Serializer):
 
 
 class AnomalyCreateSerializer(serializers.Serializer):
-    record_type = serializers.ChoiceField(choices=("expense", "ta"))
+    record_type = serializers.CharField()
     record_id = serializers.IntegerField(min_value=1)
     category = serializers.CharField(max_length=80)
     description = serializers.CharField()
     resolver_role = serializers.CharField(max_length=20)
     resolver_user_id = serializers.IntegerField(min_value=1, required=False, allow_null=True)
+
+    def validate_record_type(self, value):
+        if value not in {"expense", "ta"}:
+            raise serializers.ValidationError("Use 'expense' or 'ta'.")
+        return value
 
     def validate_resolver_role(self, value):
         role = value.strip().lower()
@@ -240,9 +360,14 @@ class AnomalyResolutionSerializer(serializers.Serializer):
 
 
 class ObservationCreateSerializer(serializers.Serializer):
-    record_type = serializers.ChoiceField(choices=("expense", "ta"))
+    record_type = serializers.CharField()
     record_id = serializers.IntegerField(min_value=1)
     finding = serializers.CharField()
+
+    def validate_record_type(self, value):
+        if value not in {"expense", "ta"}:
+            raise serializers.ValidationError("Use 'expense' or 'ta'.")
+        return value
 
 
 class PolicySerializer(serializers.ModelSerializer):

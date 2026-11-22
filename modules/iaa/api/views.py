@@ -6,6 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Avg, Count, DurationField, ExpressionWrapper, F
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
@@ -20,6 +22,7 @@ from modules.iaa.domain.workflow import WorkflowError
 from modules.iaa.models import (
     ApprovalRoute,
     ApprovalStep,
+    AuditObservation,
     BudgetAllocation,
     ExpenseRequest,
     IaaAuditEvent,
@@ -40,6 +43,7 @@ class IaaCursorPagination(CursorPagination):
     ordering = "-created_at"
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 class _View(APIView):
     permission_classes = [IAA]
 
@@ -47,7 +51,7 @@ class _View(APIView):
     def actor(self):
         return self.request.principal
 
-    def action(self, call):
+    def call_service(self, call):
         try:
             return call()
         except BudgetReferenceUnavailable as exc:
@@ -76,6 +80,7 @@ class _View(APIView):
 class ExpenseListView(_View):
     pagination_class = IaaCursorPagination
 
+    @extend_schema(operation_id="iaa_expense_list", responses=OpenApiTypes.OBJECT)
     def get(self, request):
         role = active_role(request.principal)
         code = "iaa.request.view_self" if role == "basic_user" else "iaa.request.view"
@@ -85,10 +90,17 @@ class ExpenseListView(_View):
         page = paginator.paginate_queryset(queryset, request, view=self)
         return paginator.get_paginated_response(s.ExpenseReadSerializer(page, many=True).data)
 
+    @extend_schema(
+        operation_id="iaa_expense_create",
+        request=s.ExpenseDraftSerializer,
+        responses=s.ExpenseReadSerializer,
+    )
     def post(self, request):
         data = s.ExpenseDraftSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        record = self.action(lambda: services.create_expense_draft(self.actor, data.validated_data))
+        record = self.call_service(
+            lambda: services.create_expense_draft(self.actor, data.validated_data)
+        )
         return Response(
             s.ExpenseReadSerializer(record).data,
             status=status.HTTP_201_CREATED,
@@ -105,37 +117,60 @@ class ExpenseDetailView(_View):
         require(self.actor, "iaa.request.view_self" if role == "basic_user" else "iaa.request.view")
         return record
 
+    @extend_schema(operation_id="iaa_expense_detail", responses=s.ExpenseReadSerializer)
     def get(self, request, pk):
         return Response(s.ExpenseReadSerializer(self.get_object(pk)).data)
 
+    @extend_schema(
+        operation_id="iaa_expense_update_draft",
+        request=s.ExpenseDraftSerializer,
+        responses=s.ExpenseReadSerializer,
+    )
     def patch(self, request, pk):
         data = s.ExpenseDraftSerializer(data=request.data, partial=True)
         data.is_valid(raise_exception=True)
-        record = self.action(
+        record = self.call_service(
             lambda: services.update_expense_draft(self.actor, pk, data.validated_data)
         )
         return Response(s.ExpenseReadSerializer(record).data)
 
 
 class ExpenseSubmitView(_View):
+    @extend_schema(
+        operation_id="iaa_expense_submit",
+        request=None,
+        responses=s.ExpenseReadSerializer,
+    )
     def post(self, request, pk):
-        record = self.action(lambda: services.submit_expense(self.actor, pk))
+        record = self.call_service(lambda: services.submit_expense(self.actor, pk))
         return Response(s.ExpenseReadSerializer(record).data)
 
 
 class ExpenseFinanceReviewView(_View):
+    @extend_schema(
+        operation_id="iaa_expense_finance_review",
+        request=s.ActionSerializer,
+        responses=s.ExpenseReadSerializer,
+    )
     def post(self, request, pk):
         data = s.ActionSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        record = self.action(
+        record = self.call_service(
             lambda: services.finance_review_expense(self.actor, pk, **data.validated_data)
         )
         return Response(s.ExpenseReadSerializer(record).data)
 
 
 class FinancialRecordView(_View):
+    @extend_schema(
+        operation_id="iaa_financial_record",
+        request=None,
+        responses=OpenApiTypes.OBJECT,
+    )
     def post(self, request, record_type, pk):
-        record = self.action(lambda: services.record_financial_item(self.actor, record_type, pk))
+        record = self.call_service(
+            lambda: services.record_financial_item(self.actor, record_type, pk)
+        )
         serializer = (
             s.ExpenseReadSerializer if record_type == "expense" else s.TravelClaimReadSerializer
         )
@@ -145,6 +180,7 @@ class FinancialRecordView(_View):
 class TravelClaimListView(_View):
     pagination_class = IaaCursorPagination
 
+    @extend_schema(operation_id="iaa_ta_claim_list", responses=OpenApiTypes.OBJECT)
     def get(self, request):
         role = active_role(self.actor)
         require(self.actor, "iaa.ta.view_self" if role == "basic_user" else "iaa.ta.view")
@@ -154,10 +190,17 @@ class TravelClaimListView(_View):
         )
         return paginator.get_paginated_response(s.TravelClaimReadSerializer(page, many=True).data)
 
+    @extend_schema(
+        operation_id="iaa_ta_claim_create",
+        request=s.TravelClaimWriteSerializer,
+        responses=s.TravelClaimReadSerializer,
+    )
     def post(self, request):
         data = s.TravelClaimWriteSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        record = self.action(lambda: services.submit_ta_claim(self.actor, data.validated_data))
+        record = self.call_service(
+            lambda: services.submit_ta_claim(self.actor, data.validated_data)
+        )
         return Response(
             s.TravelClaimReadSerializer(record).data,
             status=201,
@@ -166,16 +209,22 @@ class TravelClaimListView(_View):
 
 
 class TravelClaimFinanceReviewView(_View):
+    @extend_schema(
+        operation_id="iaa_ta_claim_finance_review",
+        request=s.ActionSerializer,
+        responses=s.TravelClaimReadSerializer,
+    )
     def post(self, request, pk):
         data = s.ActionSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        record = self.action(
+        record = self.call_service(
             lambda: services.finance_review_ta(self.actor, pk, **data.validated_data)
         )
         return Response(s.TravelClaimReadSerializer(record).data)
 
 
 class TravelClaimDetailView(_View):
+    @extend_schema(operation_id="iaa_ta_claim_detail", responses=s.TravelClaimReadSerializer)
     def get(self, request, pk):
         role = active_role(self.actor)
         require(self.actor, "iaa.ta.view_self" if role == "basic_user" else "iaa.ta.view")
@@ -186,6 +235,9 @@ class TravelClaimDetailView(_View):
 
 
 class SupportingDocumentView(_View):
+    @extend_schema(
+        operation_id="iaa_document_list", responses=s.SupportingDocumentSerializer(many=True)
+    )
     def get(self, request):
         role = active_role(self.actor)
         require(self.actor, "iaa.request.view_self" if role == "basic_user" else "iaa.request.view")
@@ -194,10 +246,17 @@ class SupportingDocumentView(_View):
             s.SupportingDocumentSerializer(rows.order_by("-created_at"), many=True).data
         )
 
+    @extend_schema(
+        operation_id="iaa_document_create",
+        request=s.SupportingDocumentWriteSerializer,
+        responses=s.SupportingDocumentSerializer,
+    )
     def post(self, request):
         data = s.SupportingDocumentWriteSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        document = self.action(lambda: services.attach_document(self.actor, **data.validated_data))
+        document = self.call_service(
+            lambda: services.attach_document(self.actor, **data.validated_data)
+        )
         return Response(
             s.SupportingDocumentSerializer(document).data,
             status=201,
@@ -206,10 +265,14 @@ class SupportingDocumentView(_View):
 
 
 class ClarificationResponseView(_View):
+    @extend_schema(
+        request=s.ClarificationSerializer,
+        responses=OpenApiTypes.OBJECT,
+    )
     def post(self, request, record_type, pk):
         data = s.ClarificationSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        record = self.action(
+        record = self.call_service(
             lambda: services.respond_to_clarification(
                 self.actor, record_type, pk, **data.validated_data
             )
@@ -224,6 +287,7 @@ class ApprovalQueueView(generics.ListAPIView):
     permission_classes = [IAA]
     serializer_class = s.ApprovalStepSerializer
     pagination_class = IaaCursorPagination
+    queryset = ApprovalStep.objects.none()
 
     def get_queryset(self):
         require(self.request.principal, "iaa.approval.decide", roles={"hod", "dean", "director"})
@@ -231,10 +295,15 @@ class ApprovalQueueView(generics.ListAPIView):
 
 
 class ApprovalDecisionView(_View):
+    @extend_schema(
+        operation_id="iaa_approval_decide",
+        request=s.ActionSerializer,
+        responses=OpenApiTypes.OBJECT,
+    )
     def post(self, request, pk):
         data = s.ActionSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        record = self.action(
+        record = self.call_service(
             lambda: services.decide_approval(
                 self.actor,
                 pk,
@@ -253,6 +322,7 @@ class ApprovalDecisionView(_View):
 class AnomalyListCreateView(_View):
     pagination_class = IaaCursorPagination
 
+    @extend_schema(operation_id="iaa_anomaly_list", responses=OpenApiTypes.OBJECT)
     def get(self, request):
         require(self.actor, "iaa.anomaly.resolve")
         paginator = self.pagination_class()
@@ -261,18 +331,30 @@ class AnomalyListCreateView(_View):
         )
         return paginator.get_paginated_response(s.AnomalySerializer(page, many=True).data)
 
+    @extend_schema(
+        operation_id="iaa_anomaly_create",
+        request=s.AnomalyCreateSerializer,
+        responses=s.AnomalySerializer,
+    )
     def post(self, request):
         data = s.AnomalyCreateSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        anomaly = self.action(lambda: services.flag_anomaly(self.actor, **data.validated_data))
+        anomaly = self.call_service(
+            lambda: services.flag_anomaly(self.actor, **data.validated_data)
+        )
         return Response(s.AnomalySerializer(anomaly).data, status=201)
 
 
 class AnomalyResolveView(_View):
+    @extend_schema(
+        operation_id="iaa_anomaly_resolve",
+        request=s.AnomalyResolutionSerializer,
+        responses=s.AnomalySerializer,
+    )
     def post(self, request, pk):
         data = s.AnomalyResolutionSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        anomaly = self.action(
+        anomaly = self.call_service(
             lambda: services.resolve_anomaly(self.actor, pk, **data.validated_data)
         )
         return Response(s.AnomalySerializer(anomaly).data)
@@ -282,6 +364,7 @@ class ObservationListView(generics.ListAPIView):
     permission_classes = [IAA]
     serializer_class = s.ObservationSerializer
     pagination_class = IaaCursorPagination
+    queryset = AuditObservation.objects.none()
 
     def get_queryset(self):
         role = active_role(self.request.principal)
@@ -293,20 +376,30 @@ class ObservationListView(generics.ListAPIView):
 
 
 class ObservationCreateView(_View):
+    @extend_schema(
+        operation_id="iaa_observation_create",
+        request=s.ObservationCreateSerializer,
+        responses=s.ObservationSerializer,
+    )
     def post(self, request):
         data = s.ObservationCreateSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        observation = self.action(
+        observation = self.call_service(
             lambda: services.raise_observation(self.actor, **data.validated_data)
         )
         return Response(s.ObservationSerializer(observation).data, status=201)
 
 
 class ObservationResponseView(_View):
+    @extend_schema(
+        operation_id="iaa_observation_respond",
+        request=s.ObservationResponseSerializer,
+        responses=OpenApiTypes.OBJECT,
+    )
     def post(self, request, pk):
         data = s.ObservationResponseSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        response = self.action(
+        response = self.call_service(
             lambda: services.respond_observation(self.actor, pk, **data.validated_data)
         )
         return Response(
@@ -320,16 +413,22 @@ class ObservationResponseView(_View):
 
 
 class ObservationReviewView(_View):
+    @extend_schema(
+        operation_id="iaa_observation_review",
+        request=s.ObservationReviewSerializer,
+        responses=s.ObservationSerializer,
+    )
     def post(self, request, pk, response_id):
         data = s.ObservationReviewSerializer(data=request.data)
         data.is_valid(raise_exception=True)
-        observation = self.action(
+        observation = self.call_service(
             lambda: services.verify_observation(self.actor, pk, response_id, **data.validated_data)
         )
         return Response(s.ObservationSerializer(observation).data)
 
 
 class NotificationListView(_View):
+    @extend_schema(operation_id="iaa_notification_list", responses=OpenApiTypes.OBJECT)
     def get(self, request):
         require(self.actor, "iaa.notification.view")
         role = active_role(self.actor)
@@ -405,6 +504,10 @@ class NotificationListView(_View):
 
 
 class ProcessingIssuesView(_View):
+    @extend_schema(
+        operation_id="iaa_processing_issues",
+        responses=s.ProcessingIssueSerializer(many=True),
+    )
     def get(self, request):
         require(self.actor, "iaa.finance.validate", roles={"finance_staff"})
         rows = IaaProcessingIssue.objects.filter(
@@ -416,6 +519,7 @@ class ProcessingIssuesView(_View):
 
 
 class AuditRecordsView(_View):
+    @extend_schema(operation_id="iaa_audit_records", responses=OpenApiTypes.OBJECT)
     def get(self, request):
         require(self.actor, "iaa.audit.review", roles={"auditor"})
         expenses = ExpenseRequest.objects.order_by("-created_at")[:100]
@@ -429,6 +533,7 @@ class AuditRecordsView(_View):
 
 
 class RecordHistoryView(_View):
+    @extend_schema(responses=s.AuditEventSerializer(many=True))
     def get(self, request, record_type, pk):
         if record_type == "expense":
             record = selectors.expenses_for(self.actor).filter(pk=pk).first()
@@ -466,6 +571,7 @@ class RecordHistoryView(_View):
 
 
 class IaaPolicyView(_View):
+    @extend_schema(operation_id="iaa_policy_get", responses=OpenApiTypes.OBJECT)
     def get(self, request):
         require(self.actor, "iaa.admin.configure", roles={"system_admin"})
         policy = IaaPolicy.objects.filter(is_active=True).order_by("-updated_at").first()
@@ -473,6 +579,11 @@ class IaaPolicyView(_View):
             return Response(None)
         return Response(s.PolicySerializer(policy).data)
 
+    @extend_schema(
+        operation_id="iaa_policy_update",
+        request=s.PolicySerializer,
+        responses=s.PolicySerializer,
+    )
     def put(self, request):
         require(self.actor, "iaa.admin.configure", roles={"system_admin"})
         policy = IaaPolicy.objects.filter(is_active=True).order_by("-updated_at").first()
@@ -491,6 +602,9 @@ class IaaPolicyView(_View):
 
 
 class ApprovalRouteListCreateView(_View):
+    @extend_schema(
+        operation_id="iaa_approval_route_list", responses=s.ApprovalRouteSerializer(many=True)
+    )
     def get(self, request):
         require(self.actor, "iaa.admin.configure", roles={"system_admin"})
         return Response(
@@ -499,6 +613,11 @@ class ApprovalRouteListCreateView(_View):
             ).data
         )
 
+    @extend_schema(
+        operation_id="iaa_approval_route_create",
+        request=s.ApprovalRouteSerializer,
+        responses=s.ApprovalRouteSerializer,
+    )
     def post(self, request):
         require(self.actor, "iaa.admin.configure", roles={"system_admin"})
         data = s.ApprovalRouteSerializer(data=request.data)
@@ -520,6 +639,11 @@ class ApprovalRouteListCreateView(_View):
 
 
 class ApprovalRouteDetailView(_View):
+    @extend_schema(
+        operation_id="iaa_approval_route_update",
+        request=s.ApprovalRouteSerializer,
+        responses=s.ApprovalRouteSerializer,
+    )
     def patch(self, request, pk):
         require(self.actor, "iaa.admin.configure", roles={"system_admin"})
         route = get_object_or_404(ApprovalRoute, pk=pk)
@@ -538,11 +662,19 @@ class ApprovalRouteDetailView(_View):
 
 
 class BudgetAllocationListCreateView(_View):
+    @extend_schema(
+        operation_id="iaa_budget_list", responses=s.BudgetAllocationSerializer(many=True)
+    )
     def get(self, request):
         require(self.actor, "iaa.admin.configure", roles={"system_admin"})
         rows = BudgetAllocation.objects.order_by("financial_year", "department", "budget_code")
         return Response(s.BudgetAllocationSerializer(rows, many=True).data)
 
+    @extend_schema(
+        operation_id="iaa_budget_create",
+        request=s.BudgetAllocationSerializer,
+        responses=s.BudgetAllocationSerializer,
+    )
     def post(self, request):
         require(self.actor, "iaa.admin.configure", roles={"system_admin"})
         data = s.BudgetAllocationSerializer(data=request.data)
@@ -560,6 +692,11 @@ class BudgetAllocationListCreateView(_View):
 
 
 class BudgetAllocationDetailView(_View):
+    @extend_schema(
+        operation_id="iaa_budget_update",
+        request=s.BudgetAllocationSerializer,
+        responses=s.BudgetAllocationSerializer,
+    )
     def patch(self, request, pk):
         require(self.actor, "iaa.admin.configure", roles={"system_admin"})
         budget = get_object_or_404(BudgetAllocation, pk=pk)
@@ -578,6 +715,7 @@ class BudgetAllocationDetailView(_View):
 
 
 class ReportSummaryView(_View):
+    @extend_schema(operation_id="iaa_report_summary", responses=OpenApiTypes.OBJECT)
     def get(self, request):
         require(self.actor, "iaa.report.view")
         # Reports expose aggregate status data only; they never return financial records.
@@ -621,6 +759,10 @@ class ReportSummaryView(_View):
 
 
 class ReportExportView(_View):
+    @extend_schema(
+        operation_id="iaa_report_export",
+        responses={(200, "text/csv"): OpenApiTypes.BINARY},
+    )
     def get(self, request):
         require(self.actor, "iaa.report.export")
         role = active_role(self.actor)

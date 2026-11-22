@@ -1,6 +1,9 @@
 """Server-discoverable IAA module metadata and permission catalogue."""
 
+from modules.iaa import permissions as _permissions
 from modules.iaa.permissions import ROLE_PERMISSIONS
+
+PERMISSIONS = _permissions.PERMISSIONS
 
 MODULE = {
     "code": "iaa",
@@ -11,6 +14,8 @@ MODULE = {
     "sort_order": 40,
     "status": "planned",
 }
+
+# Expose the module's permission catalogue to Fusion IAM's manifest generator.
 
 NAV_ITEMS = [
     {
@@ -113,4 +118,5 @@ ROLE_GRANTS.update({name: list(_AUTHORITY) for name in _AUTHORITY_DESIGNATIONS})
 ROLE_GRANTS["Finance Staff"] = list(_FINANCE)
 ROLE_GRANTS["Auditor"] = list(_AUDITOR)
 ROLE_GRANTS["System Admin"] = list(_ADMIN)
-SYSTEM_PERMISSIONS = []
+# The scheduled timeout worker escalates approvals without a user principal.
+SYSTEM_PERMISSIONS = ["iaa.approval.escalate"]
