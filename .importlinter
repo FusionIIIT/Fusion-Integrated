@@ -13,6 +13,7 @@ name = Modules may reach each other ONLY through contracts.py
 type = forbidden
 source_modules =
     modules.placement
+    modules.hr
     modules.directory
     modules.accesscontrol
 forbidden_modules =
@@ -21,6 +22,11 @@ forbidden_modules =
     modules.placement.selectors
     modules.placement.api
     modules.placement.domain
+    modules.hr.models
+    modules.hr.services
+    modules.hr.selectors
+    modules.hr.api
+    modules.hr.domain
     modules.directory.models
     modules.directory.services
     modules.directory.api
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.hr.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +73,13 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:hr-layers]
+name = Layering inside hr
+type = layers
+layers =
+    modules.hr.api
+    modules.hr.services
+    modules.hr.selectors
+    modules.hr.models
+    modules.hr.domain
