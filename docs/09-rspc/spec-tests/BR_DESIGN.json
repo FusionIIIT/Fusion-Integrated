@@ -1,0 +1,704 @@
+[
+ {
+  "test_id": "TC-BR-001",
+  "source_id": "BR-RSPC-004 condition-true (Director required)",
+  "purpose": "Dean forwards request to Director when the represented path requires Director action",
+  "preconditions": "Eligible routed request at Dean-RSPC stage; represented path includes Director",
+  "action_or_input": "Dean-RSPC forwards the request",
+  "expected_result": "Request moves to Director stage and is not finalized at Dean-RSPC",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-002",
+  "source_id": "BR-RSPC-004 condition-false (Director not required)",
+  "purpose": "Request whose represented path has no Director stage is not sent to Director",
+  "preconditions": "Eligible request at Dean-RSPC; represented path excludes Director",
+  "action_or_input": "Dean-RSPC completes review",
+  "expected_result": "Request is handled at Dean-RSPC and does not enter Director stage",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-003",
+  "source_id": "BR-RSPC-005 Director records approval",
+  "purpose": "Director records final approval for a large funding request meeting the represented condition",
+  "preconditions": "Funding request routed to Director; represented condition for Director approval met",
+  "action_or_input": "Director approves",
+  "expected_result": "Director approval is recorded at that stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-004",
+  "source_id": "BR-RSPC-005 non-Director actor prohibited",
+  "purpose": "Only Director may record the Director approval",
+  "preconditions": "Same large funding request at Director stage",
+  "action_or_input": "Dean-RSPC / Faculty / RSPC Admin attempts to record the Director approval",
+  "expected_result": "Action blocked; no Director approval recorded",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-005",
+  "source_id": "BR-RSPC-006 Director records authorization",
+  "purpose": "Director records authorization for a high-value expenditure meeting the represented condition",
+  "preconditions": "Expenditure request routed to Director; condition met",
+  "action_or_input": "Director authorizes",
+  "expected_result": "Director authorization is recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-006",
+  "source_id": "BR-RSPC-006 non-Director actor prohibited",
+  "purpose": "Only Director may record the authorization",
+  "preconditions": "Same expenditure at Director stage",
+  "action_or_input": "Non-Director role attempts to record authorization",
+  "expected_result": "Action blocked; no authorization recorded",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-007",
+  "source_id": "BR-RSPC-012 Main route with Director applicable",
+  "purpose": "Proposal advances Faculty->HoD->RSPC Admin->Dean-RSPC->Director when Director applicable",
+  "preconditions": "Valid proposal; Director stage applicable per represented rules",
+  "action_or_input": "Faculty submits; each stage in order approves/forwards",
+  "expected_result": "Proposal passes HoD, RSPC Admin, Dean-RSPC in this order and then reaches Director",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-008",
+  "source_id": "BR-RSPC-012 Director stage not applicable",
+  "purpose": "Director stage is skipped when not applicable",
+  "preconditions": "Valid proposal; Director not applicable",
+  "action_or_input": "Faculty submits; HoD, RSPC Admin, Dean-RSPC process in order",
+  "expected_result": "Proposal passes through HoD, RSPC Admin, Dean-RSPC and does not enter Director stage",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-BR-009",
+  "source_id": "BR-RSPC-012 stage order enforced",
+  "purpose": "Stages cannot be skipped",
+  "preconditions": "Submitted proposal at HoD stage",
+  "action_or_input": "Attempt to record Dean-RSPC decision before HoD and RSPC Admin stages",
+  "expected_result": "Action rejected; proposal remains at current stage",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-010",
+  "source_id": "BR-RSPC-013 condition-false (incomplete)",
+  "purpose": "Submission blocked when a mandatory field is missing",
+  "preconditions": "Faculty proposal draft with a mandatory field (e.g. objectives, timelines, budget, funding source, resource requirements) empty",
+  "action_or_input": "Faculty submits",
+  "expected_result": "Submission rejected with validation error; proposal not advanced as submitted",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-011",
+  "source_id": "BR-RSPC-013 condition-true (complete)",
+  "purpose": "Submission accepted when all mandatory fields filled",
+  "preconditions": "Draft with all mandatory fields completed",
+  "action_or_input": "Faculty submits",
+  "expected_result": "Validation passes; proposal advances as submitted to first review stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-012",
+  "source_id": "BR-RSPC-014 represented validation fails",
+  "purpose": "Invalid advancement prevented where a configured policy validation fails",
+  "preconditions": "A proposal policy validation is configured; proposal violates it",
+  "action_or_input": "Submit/advance proposal",
+  "expected_result": "Validation evaluated; advancement prevented",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-013",
+  "source_id": "BR-RSPC-014 represented validation passes",
+  "purpose": "Proposal satisfying configured validation advances",
+  "preconditions": "Configured validation; compliant proposal",
+  "action_or_input": "Submit/advance proposal",
+  "expected_result": "Validation passes and proposal advances",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-014",
+  "source_id": "BR-RSPC-014 no represented validation",
+  "purpose": "No policy validation invented when none configured",
+  "preconditions": "No policy validation configured; proposal otherwise complete",
+  "action_or_input": "Submit proposal",
+  "expected_result": "No policy-based rejection occurs; proposal advances",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-BR-015",
+  "source_id": "BR-RSPC-015 timestamp recorded",
+  "purpose": "Each proposal review/approval decision record has a timestamp",
+  "preconditions": "Proposal at a review stage",
+  "action_or_input": "Reviewer records a decision (approve, then separately reject on another proposal)",
+  "expected_result": "Each decision record contains a timestamp",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-016",
+  "source_id": "BR-RSPC-016 remarks recorded",
+  "purpose": "Each proposal decision record includes remarks",
+  "preconditions": "Proposal at a review stage",
+  "action_or_input": "Reviewer records decision with remarks",
+  "expected_result": "Decision record stores the supplied remarks",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-017",
+  "source_id": "BR-RSPC-022 applicable stages only (HoD/Director applicable)",
+  "purpose": "Consultancy routed through all stages represented as applicable",
+  "preconditions": "Consultancy record; represented path includes HoD and Director",
+  "action_or_input": "Faculty submits consultancy",
+  "expected_result": "Record routes through each applicable stage in order",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-018",
+  "source_id": "BR-RSPC-022 conditional stages not applicable",
+  "purpose": "HoD/Director stages omitted where not applicable",
+  "preconditions": "Consultancy record; represented path excludes HoD and/or Director",
+  "action_or_input": "Faculty submits consultancy",
+  "expected_result": "Record advances only through applicable stages; excluded stages not entered",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-BR-019",
+  "source_id": "BR-RSPC-026 Director applicable",
+  "purpose": "Staff appointment routed to Dean-RSPC and Director where applicable",
+  "preconditions": "Eligible appointment request in approval phase; Director applicable",
+  "action_or_input": "Request reaches approval phase",
+  "expected_result": "Routed to Dean-RSPC then Director",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-020",
+  "source_id": "BR-RSPC-026 Director not applicable",
+  "purpose": "Appointment routed to Dean-RSPC only when Director not applicable",
+  "preconditions": "Eligible appointment request; Director not applicable",
+  "action_or_input": "Request reaches approval phase",
+  "expected_result": "Routed to Dean-RSPC and not to Director",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-BR-021",
+  "source_id": "BR-RSPC-032 within delegated powers",
+  "purpose": "Dean approves financial request within delegated powers",
+  "preconditions": "Verified financial request at Dean-RSPC; amount within represented delegated powers",
+  "action_or_input": "Dean-RSPC approves",
+  "expected_result": "Approval recorded at Dean-RSPC",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-022",
+  "source_id": "BR-RSPC-032 beyond delegated powers",
+  "purpose": "Dean cannot approve request beyond delegated powers",
+  "preconditions": "Verified financial request exceeding represented delegated powers",
+  "action_or_input": "Dean-RSPC attempts to approve",
+  "expected_result": "Approval blocked; request follows represented escalation path",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-023",
+  "source_id": "BR-RSPC-032 delegated limit boundary",
+  "purpose": "Request exactly at the represented delegated limit",
+  "preconditions": "Delegated limit configured; verified request amount equal to limit",
+  "action_or_input": "Dean-RSPC approves",
+  "expected_result": "Treated per the represented limit (approval permitted at limit, escalation above)",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-BR-024",
+  "source_id": "BR-RSPC-033 escalation condition met",
+  "purpose": "High-value verified financial request escalated to Director",
+  "preconditions": "Verified request meets represented Director-escalation condition",
+  "action_or_input": "Request processed at approval stage",
+  "expected_result": "Routed to Director",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-025",
+  "source_id": "BR-RSPC-033 condition not met",
+  "purpose": "Request below escalation condition not sent to Director",
+  "preconditions": "Verified request not meeting condition",
+  "action_or_input": "Request processed",
+  "expected_result": "Not routed to Director",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-026",
+  "source_id": "BR-RSPC-034 lifecycle events logged",
+  "purpose": "Audit log retains request, verification, approval, escalation, transaction-record events",
+  "preconditions": "Financial request moved through creation, verification, approval, escalation, and transaction-record entry",
+  "action_or_input": "Each event occurs, then audit/reporting record queried",
+  "expected_result": "Audit record contains an entry for each lifecycle event",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-027",
+  "source_id": "BR-RSPC-035 within sanctioned budget",
+  "purpose": "Procurement within sanctioned budget advances as eligible",
+  "preconditions": "Sanctioned project budget represented; request amount within remaining budget",
+  "action_or_input": "Submit/verify procurement request",
+  "expected_result": "Validation passes; advanced as eligible",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-028",
+  "source_id": "BR-RSPC-035 exceeds sanctioned budget",
+  "purpose": "Procurement exceeding budget not advanced as eligible",
+  "preconditions": "Sanctioned budget represented; request exceeds it",
+  "action_or_input": "Submit/verify procurement request",
+  "expected_result": "Validation fails; not advanced as eligible",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-029",
+  "source_id": "BR-RSPC-035 budget boundary",
+  "purpose": "Request equal to sanctioned budget",
+  "preconditions": "Request amount equals sanctioned budget remaining",
+  "action_or_input": "Submit/verify request",
+  "expected_result": "Validated per represented budget; equal amount accepted as within budget",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-BR-030",
+  "source_id": "BR-RSPC-035 budget not represented",
+  "purpose": "No budget limit invented when none represented",
+  "preconditions": "Project without represented sanctioned budget data",
+  "action_or_input": "Submit procurement request",
+  "expected_result": "No budget-based rejection is applied",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-BR-031",
+  "source_id": "BR-RSPC-036 applicable hierarchy",
+  "purpose": "Procurement routed only through represented stages",
+  "preconditions": "Eligible procurement request; hierarchy represented",
+  "action_or_input": "Request advances to approval",
+  "expected_result": "Routed through only the represented applicable stages in order",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-032",
+  "source_id": "BR-RSPC-036 stage not in hierarchy",
+  "purpose": "Non-represented stage bypassed/unauthorized approver blocked",
+  "preconditions": "Eligible procurement request",
+  "action_or_input": "Approval attempted by role/stage not in represented hierarchy",
+  "expected_result": "Action rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-033",
+  "source_id": "BR-RSPC-037 schedule represented",
+  "purpose": "Due/pending status and reminders follow represented schedule",
+  "preconditions": "Project with configured reporting schedule; report period past due date",
+  "action_or_input": "Evaluate report status",
+  "expected_result": "Report shown as pending/due per schedule and reminder triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-034",
+  "source_id": "BR-RSPC-037 report submitted before due",
+  "purpose": "Status not pending when report submitted on schedule",
+  "preconditions": "Configured schedule; report submitted before due date",
+  "action_or_input": "Evaluate status",
+  "expected_result": "Report is not pending; no overdue reminder",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-BR-035",
+  "source_id": "BR-RSPC-037 no schedule represented",
+  "purpose": "No schedule invented when none configured",
+  "preconditions": "Project without reporting schedule",
+  "action_or_input": "Evaluate report status",
+  "expected_result": "No due/pending status or reminders generated",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-036",
+  "source_id": "BR-RSPC-038 authorized actor",
+  "purpose": "Authorized actor views historical progress reports",
+  "preconditions": "Project with historical progress reports; Faculty owner of project",
+  "action_or_input": "Request progress report history",
+  "expected_result": "Reports displayed",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-037",
+  "source_id": "BR-RSPC-038 unauthorized actor",
+  "purpose": "Actor outside role/project scope denied",
+  "preconditions": "Same project; Faculty of a different project",
+  "action_or_input": "Request progress report history",
+  "expected_result": "Reports not displayed; access denied",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-038",
+  "source_id": "BR-RSPC-039 authorized actor",
+  "purpose": "Authorized actor views historical utilization reports",
+  "preconditions": "Project with utilization reports; authorized owner",
+  "action_or_input": "Request utilization history",
+  "expected_result": "Reports displayed",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-039",
+  "source_id": "BR-RSPC-039 unauthorized actor",
+  "purpose": "Out-of-scope actor denied",
+  "preconditions": "Same project; unauthorized user",
+  "action_or_input": "Request utilization history",
+  "expected_result": "Reports not displayed; access denied",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-040",
+  "source_id": "BR-RSPC-043 closure approved",
+  "purpose": "Completed project archived on closure approval with audit trail",
+  "preconditions": "Completed project; closure approval recorded",
+  "action_or_input": "Record closure approval",
+  "expected_result": "Project archived as closed; full RSPC audit trail retained",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-041",
+  "source_id": "BR-RSPC-043 closure not approved",
+  "purpose": "Project not archived without closure approval",
+  "preconditions": "Project with closure pending or rejected",
+  "action_or_input": "Evaluate project state",
+  "expected_result": "Project not archived as closed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-042",
+  "source_id": "BR-RSPC-043 no external operations",
+  "purpose": "Archival performs no external settlement/inventory operation",
+  "preconditions": "Closure approved",
+  "action_or_input": "Archive project",
+  "expected_result": "No external settlement or inventory operation is performed; only RSPC archival occurs",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-043",
+  "source_id": "BR-RSPC-045 configured integration",
+  "purpose": "Configured integration information processed",
+  "preconditions": "Integration explicitly configured",
+  "action_or_input": "Integration supplies RSPC-relevant information",
+  "expected_result": "Information processed as RSPC integration",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-044",
+  "source_id": "BR-RSPC-045 unconfigured integration",
+  "purpose": "Unconfigured integration ignored",
+  "preconditions": "No configuration for the integration",
+  "action_or_input": "Integration supplies information",
+  "expected_result": "Information not processed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-045",
+  "source_id": "BR-RSPC-048 in-scope data",
+  "purpose": "User sees data within role and record scope",
+  "preconditions": "User with RSPC role; record in scope",
+  "action_or_input": "Request project data",
+  "expected_result": "Data displayed",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-046",
+  "source_id": "BR-RSPC-048 out-of-scope data",
+  "purpose": "Data outside scope withheld",
+  "preconditions": "User with RSPC role; record outside authorized scope",
+  "action_or_input": "Request that data",
+  "expected_result": "Data not displayed/made available",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-047",
+  "source_id": "BR-RSPC-049 permitted action",
+  "purpose": "Action allowed by role succeeds",
+  "preconditions": "User with role permitting action",
+  "action_or_input": "Perform action",
+  "expected_result": "Action succeeds",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-048",
+  "source_id": "BR-RSPC-049 unauthorized action",
+  "purpose": "Action not allowed by role blocked",
+  "preconditions": "User whose role does not allow the action (e.g. Faculty approving as Dean-RSPC)",
+  "action_or_input": "Attempt action",
+  "expected_result": "Action blocked; state unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-049",
+  "source_id": "BR-RSPC-050 auditable event logged",
+  "purpose": "Audit log retained for auditable RSPC event",
+  "preconditions": "RSPC record exists",
+  "action_or_input": "Change an RSPC record/event (e.g. decision recorded)",
+  "expected_result": "Log entry retained for the event",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-050",
+  "source_id": "BR-RSPC-050 non-RSPC info excluded",
+  "purpose": "Logging limited to RSPC-owned information",
+  "preconditions": "Event in an external system not represented in RSPC",
+  "action_or_input": "Event occurs",
+  "expected_result": "No RSPC audit entry created for it",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-051",
+  "source_id": "BR-RSPC-053 authorized mechanism",
+  "purpose": "Role assignment via authorized mechanism applied",
+  "preconditions": "User without role; authorized mechanism supplies assignment",
+  "action_or_input": "Supply role assignment",
+  "expected_result": "Role applied to RSPC access",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-052",
+  "source_id": "BR-RSPC-053 unauthorized source",
+  "purpose": "Role assignment from other source rejected",
+  "preconditions": "Same user",
+  "action_or_input": "Role assignment supplied outside authorized mechanism",
+  "expected_result": "Not applied; access unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-053",
+  "source_id": "BR-RSPC-054 authorized mechanism",
+  "purpose": "Role reassignment via authorized mechanism applied",
+  "preconditions": "User with role A",
+  "action_or_input": "Authorized mechanism supplies reassignment to role B",
+  "expected_result": "Role B applied",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-054",
+  "source_id": "BR-RSPC-054 unauthorized source",
+  "purpose": "Reassignment from other source rejected",
+  "preconditions": "User with role A",
+  "action_or_input": "Reassignment supplied outside authorized mechanism",
+  "expected_result": "Not applied; role A remains",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-055",
+  "source_id": "BR-RSPC-055 immediate effect on assignment",
+  "purpose": "New role effective immediately",
+  "preconditions": "User without role; authorized role assigned",
+  "action_or_input": "Immediately after receipt, user attempts action permitted by new role",
+  "expected_result": "Action permitted without delay or re-login lag",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-056",
+  "source_id": "BR-RSPC-055 immediate effect on reassignment",
+  "purpose": "Old role privileges removed immediately",
+  "preconditions": "User with role A; authorized reassignment to role B",
+  "action_or_input": "Immediately after, attempt role-A-only action and role-B action",
+  "expected_result": "Role-A-only action blocked; role-B action permitted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-057",
+  "source_id": "BR-RSPC-058 no HR/payroll execution",
+  "purpose": "RSPC does not execute payroll or manage HR master data",
+  "preconditions": "Staff appointment record with stipend information",
+  "action_or_input": "Process appointment and stipend records",
+  "expected_result": "Only request, selection, stipend status/records, compliance, approval tracking supported; no payroll payment or HR master-data operation performed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-058",
+  "source_id": "BR-RSPC-059 no accounting/bank execution",
+  "purpose": "RSPC does not execute payments or ledger",
+  "preconditions": "Financial/settlement information",
+  "action_or_input": "Process financial request through approval",
+  "expected_result": "Only request, verification, approval, tracking, status, transaction-record, reporting; no ledger/bank/disbursement execution",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-059",
+  "source_id": "BR-RSPC-060 no procurement/inventory execution",
+  "purpose": "RSPC does not execute purchases or manage vendors/stock",
+  "preconditions": "Procurement/asset-declaration information",
+  "action_or_input": "Process procurement request",
+  "expected_result": "Only request, validation, approval, status tracking, recorded asset info; no purchase, vendor or stock operation",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-060",
+  "source_id": "BR-RSPC-061 notification triggered",
+  "purpose": "RSPC triggers dashboard/email notification event",
+  "preconditions": "Triggering RSPC event (e.g. proposal submitted)",
+  "action_or_input": "Event occurs",
+  "expected_result": "Notification recorded/triggered via Fusion channels",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-061",
+  "source_id": "BR-RSPC-061 delivery failure",
+  "purpose": "External delivery failure does not alter RSPC scope",
+  "preconditions": "Email delivery fails externally",
+  "action_or_input": "Notification event triggered",
+  "expected_result": "RSPC event/record remains; RSPC does not take over email delivery or retry infrastructure",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-BR-062",
+  "source_id": "BR-RSPC-062 external agency info",
+  "purpose": "Only represented funding-agency info stored/tracked",
+  "preconditions": "External agency submission/disbursement status represented",
+  "action_or_input": "RSPC receives agency information",
+  "expected_result": "Represented info stored/tracked; no agency decision/submission/disbursement executed",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-063",
+  "source_id": "BR-RSPC-062 unrepresented info",
+  "purpose": "Unrepresented agency action not executed",
+  "preconditions": "Agency process not represented",
+  "action_or_input": "Attempt to execute agency decision/submission/disbursement in RSPC",
+  "expected_result": "No such execution capability; nothing executed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-064",
+  "source_id": "BR-RSPC-063 no platform admin",
+  "purpose": "RSPC consumes but does not administer roles/accounts",
+  "preconditions": "RSPC user with Fusion role info",
+  "action_or_input": "Attempt to create user account or platform-wide role in RSPC",
+  "expected_result": "Not possible in RSPC; RSPC only enforces role/action restrictions from Fusion mechanism",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-065",
+  "source_id": "BR-RSPC-063 enforces supplied role info",
+  "purpose": "RSPC enforces supplied role information",
+  "preconditions": "Fusion supplies role information",
+  "action_or_input": "User acts",
+  "expected_result": "Restrictions applied per supplied role",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-066",
+  "source_id": "BR-RSPC-065 update permitted by lifecycle",
+  "purpose": "Faculty update saved when lifecycle permits",
+  "preconditions": "Existing project in a state permitting updates",
+  "action_or_input": "Faculty updates details/milestone/progress/utilization",
+  "expected_result": "Update saved",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-067",
+  "source_id": "BR-RSPC-065 update not permitted",
+  "purpose": "Update blocked when lifecycle prohibits",
+  "preconditions": "Existing project in a state not permitting update (e.g. archived/closed)",
+  "action_or_input": "Faculty attempts update",
+  "expected_result": "Update not exposed/saved",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-068",
+  "source_id": "BR-RSPC-066 eligible outcome",
+  "purpose": "Eligible request forwarded by RSPC Admin",
+  "preconditions": "Request verified with eligible outcome",
+  "action_or_input": "RSPC Admin forwards",
+  "expected_result": "Request advances to next approving authority",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-069",
+  "source_id": "BR-RSPC-066 ineligible outcome",
+  "purpose": "Ineligible request not advanced",
+  "preconditions": "Verification produced ineligible outcome",
+  "action_or_input": "RSPC Admin attempts to forward",
+  "expected_result": "Request does not advance as eligible",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-070",
+  "source_id": "BR-RSPC-067 recommended",
+  "purpose": "Recommended request forwarded by HoD",
+  "preconditions": "Request at HoD review",
+  "action_or_input": "HoD records recommended",
+  "expected_result": "Request advances to next stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-071",
+  "source_id": "BR-RSPC-067 not recommended",
+  "purpose": "Non-recommended recorded but not forwarded",
+  "preconditions": "Request at HoD review",
+  "action_or_input": "HoD records not recommended",
+  "expected_result": "Decision recorded; request not forwarded as recommended",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-072",
+  "source_id": "BR-RSPC-068 within authority",
+  "purpose": "Dean approves eligible request within authority",
+  "preconditions": "Eligible routed request within represented authority",
+  "action_or_input": "Dean-RSPC approves",
+  "expected_result": "Approval recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-073",
+  "source_id": "BR-RSPC-068 outside authority",
+  "purpose": "Dean forwards/escalates rather than approves outside authority",
+  "preconditions": "Eligible request outside represented authority",
+  "action_or_input": "Dean-RSPC attempts approval",
+  "expected_result": "Approval not recorded; request forwarded/escalated per represented path",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-074",
+  "source_id": "BR-RSPC-068 ineligible request",
+  "purpose": "Dean cannot approve ineligible request",
+  "preconditions": "Request not eligible",
+  "action_or_input": "Dean-RSPC attempts approval",
+  "expected_result": "Approval not recorded",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-075",
+  "source_id": "BR-RSPC-069 condition met",
+  "purpose": "Director stage entered for applicable request",
+  "preconditions": "Request meets represented Director-routing condition",
+  "action_or_input": "Consider for Director routing",
+  "expected_result": "Request enters Director stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-076",
+  "source_id": "BR-RSPC-069 condition not met",
+  "purpose": "Director stage not entered otherwise",
+  "preconditions": "Request does not meet condition",
+  "action_or_input": "Consider for Director routing",
+  "expected_result": "Request does not enter Director stage",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-BR-077",
+  "source_id": "BR-RSPC-070 represented policy applied",
+  "purpose": "Represented policy value affects behavior",
+  "preconditions": "A policy/threshold explicitly configured as validation/routing",
+  "action_or_input": "Process request violating/meeting it",
+  "expected_result": "Behavior follows the configured rule",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-BR-078",
+  "source_id": "BR-RSPC-070 unrepresented policy",
+  "purpose": "Unrepresented external policy has no effect",
+  "preconditions": "External policy value not configured in RSPC",
+  "action_or_input": "Process request that would be affected by that policy",
+  "expected_result": "No behavior change; RSPC does not apply the policy",
+  "test_type": "negative"
+ }
+]

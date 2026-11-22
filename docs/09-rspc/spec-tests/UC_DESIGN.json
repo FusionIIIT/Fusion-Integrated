@@ -1,0 +1,1064 @@
+[
+ {
+  "test_id": "TC-UC-001",
+  "source_id": "RSPC-UC-001 Main Success Scenario",
+  "purpose": "Faculty views own portfolio, project status, history, approval history, audit trail and financial records",
+  "preconditions": "Faculty authenticated; has RSPC access to own ongoing and completed projects with history, approval, audit and financial records",
+  "action_or_input": "Open project portfolio; select one project",
+  "expected_result": "Ongoing and completed projects listed; for the selected project current status, project history, approval history, available audit-trail entries and financial transaction records are displayed; no project state or financial record changes",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-002",
+  "source_id": "RSPC-UC-001 Alternative Flow A1",
+  "purpose": "Filtering or changing the selected project refreshes the view within authorized scope",
+  "preconditions": "Faculty has access to two or more own projects",
+  "action_or_input": "View project 1, then filter/change selection to project 2",
+  "expected_result": "View refreshes to project 2 data; only projects within Faculty's authorized scope appear",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-003",
+  "source_id": "RSPC-UC-001 Exception Flow E1",
+  "purpose": "Project outside Faculty's authorized scope is denied",
+  "preconditions": "Faculty authenticated; project belongs to another Faculty with no access granted",
+  "action_or_input": "Request the other Faculty's project record",
+  "expected_result": "Access denied; no project data disclosed; no state changed",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-004",
+  "source_id": "RSPC-UC-001 Exception Flow E2",
+  "purpose": "Missing requested record reports no corresponding record",
+  "preconditions": "Faculty has access to a project that has no audit-trail/financial transaction record (or a nonexistent record is requested)",
+  "action_or_input": "Request the record that does not exist",
+  "expected_result": "RSPC reports that no corresponding record is available; no state altered",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-005",
+  "source_id": "RSPC-UC-002 Main Success Scenario",
+  "purpose": "Valid research proposal is submitted and routed to first review stage",
+  "preconditions": "Faculty authenticated and authorized for proposal submission",
+  "action_or_input": "Open new proposal form; enter objectives, timelines, budget, funding source, resource requirements; submit",
+  "expected_result": "Mandatory/policy validations pass; proposal recorded in Submitted state, routed to first review stage and visible to next review actor; proposal-submission notification event triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-006",
+  "source_id": "RSPC-UC-002 Alternative Flow A1",
+  "purpose": "Draft can be saved and revised before submission",
+  "preconditions": "Faculty authorized; proposal form partly filled",
+  "action_or_input": "Save as draft; reopen; revise fields; save again",
+  "expected_result": "Draft saved and revised values retained; proposal not in Submitted state and not routed",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-007",
+  "source_id": "RSPC-UC-002 Alternative Flow A2",
+  "purpose": "Proposal requiring correction under a configured validation remains unsubmitted until corrected",
+  "preconditions": "A policy validation is configured; proposal violates it",
+  "action_or_input": "Submit; then correct the violation and resubmit",
+  "expected_result": "First submit leaves proposal unsubmitted; after correction resubmission succeeds with Submitted state",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-008",
+  "source_id": "RSPC-UC-002 Exception Flow E1 mandatory field missing",
+  "purpose": "Submission blocked when mandatory field missing",
+  "preconditions": "Faculty authorized; draft exists with a mandatory field blank",
+  "action_or_input": "Submit proposal",
+  "expected_result": "Submission blocked with error identifying the missing field; draft preserved; not advanced; no submission notification",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-009",
+  "source_id": "RSPC-UC-002 Exception Flow E1 policy validation failure",
+  "purpose": "Submission blocked when a represented policy validation fails",
+  "preconditions": "A policy validation is configured; proposal violates it",
+  "action_or_input": "Submit proposal",
+  "expected_result": "Submission blocked; existing draft preserved; proposal not advanced beyond submission stage",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-010",
+  "source_id": "RSPC-UC-002 Exception Flow E2",
+  "purpose": "Unauthorized user cannot submit proposal",
+  "preconditions": "User authenticated without proposal-submission authorization",
+  "action_or_input": "Attempt to submit a research proposal",
+  "expected_result": "Submission blocked (access denied); no proposal recorded",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-011",
+  "source_id": "RSPC-UC-003 Main Success Scenario recommended",
+  "purpose": "HoD recommends request and it is forwarded",
+  "preconditions": "HoD authorized; request at department-review stage",
+  "action_or_input": "Open assigned request; record Recommended with remarks",
+  "expected_result": "Recommendation and remarks recorded; request forwarded to next stage; review/pending-action notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-012",
+  "source_id": "RSPC-UC-003 Main Success Scenario non-recommended",
+  "purpose": "Non-recommended outcome recorded without advancing as recommended",
+  "preconditions": "HoD authorized; request at department-review stage",
+  "action_or_input": "Open request; record Not Recommended with remarks",
+  "expected_result": "Outcome recorded; request state reflects non-recommendation and is not advanced as a recommended request; non-recommendation notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-013",
+  "source_id": "RSPC-UC-003 Alternative Flow A1",
+  "purpose": "Consultancy goes through HoD review only when stage is represented",
+  "preconditions": "Case (a) consultancy path includes HoD stage; case (b) path does not",
+  "action_or_input": "Submit consultancy in each case",
+  "expected_result": "(a) consultancy is at HoD review and HoD can act; (b) HoD stage not applied and request goes to next represented stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-014",
+  "source_id": "RSPC-UC-003 Exception Flow E1",
+  "purpose": "Unauthorized user cannot review at HoD stage",
+  "preconditions": "Request at department-review stage; user lacking HoD authorization",
+  "action_or_input": "Attempt to record recommendation",
+  "expected_result": "Action blocked; request state and data unchanged",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-015",
+  "source_id": "RSPC-UC-003 Exception Flow E2",
+  "purpose": "Request not in HoD-review state cannot be acted on",
+  "preconditions": "HoD authorized; request in another state (e.g. already forwarded/approved)",
+  "action_or_input": "Attempt to record recommendation via HoD review",
+  "expected_result": "Action rejected; prior request state and data intact",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-016",
+  "source_id": "RSPC-UC-004 Main Success Scenario",
+  "purpose": "RSPC Admin verifies eligible request and forwards it",
+  "preconditions": "RSPC Admin authorized; complete, compliant request at verification state",
+  "action_or_input": "Open request; verify completeness and compliance; record verification outcome Verified",
+  "expected_result": "Completeness/compliance information displayed; outcome recorded; request forwarded to applicable approving authority; pending-action/compliance notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-017",
+  "source_id": "RSPC-UC-004 Alternative Flow A1",
+  "purpose": "Consultancy verified without preceding department stage when path does not require it",
+  "preconditions": "Consultancy request with no HoD stage in represented path; at Admin verification",
+  "action_or_input": "Verify the request",
+  "expected_result": "Verification proceeds without HoD stage; eligible request forwarded per represented path",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-018",
+  "source_id": "RSPC-UC-004 Exception Flow E1",
+  "purpose": "Incomplete/non-compliant request not forwarded as eligible",
+  "preconditions": "Request with missing information or compliance failure at verification",
+  "action_or_input": "Record verification for the request",
+  "expected_result": "Request not forwarded as eligible; outcome recorded; state not advanced",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-019",
+  "source_id": "RSPC-UC-004 Exception Flow E2",
+  "purpose": "Unauthorized verification or forwarding blocked",
+  "preconditions": "Request at verification; user without RSPC Admin authorization",
+  "action_or_input": "Attempt to verify and forward",
+  "expected_result": "Blocked; request not advanced",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-020",
+  "source_id": "RSPC-UC-005 Main Success Scenario approve",
+  "purpose": "Dean-RSPC approves request within delegated limits",
+  "preconditions": "Dean-RSPC authorized; eligible request at Dean stage within delegated limits",
+  "action_or_input": "Open request and history; record approval",
+  "expected_result": "Approval recorded; request enters approved state; approval notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-021",
+  "source_id": "RSPC-UC-005 Main Success Scenario forward to Director",
+  "purpose": "Dean-RSPC forwards request requiring Director action",
+  "preconditions": "Request at Dean stage; represented path requires Director action",
+  "action_or_input": "Forward to Director",
+  "expected_result": "Request forwarded; state reflects Director stage; escalation/pending-action notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-022",
+  "source_id": "RSPC-UC-005 Main Success Scenario not approved",
+  "purpose": "Dean-RSPC not approving records outcome",
+  "preconditions": "Request at Dean stage",
+  "action_or_input": "Record non-approval (reject) decision",
+  "expected_result": "Decision outcome recorded; request enters rejected state; rejection notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-023",
+  "source_id": "RSPC-UC-005 Alternative Flow A1",
+  "purpose": "Director-routing threshold applied only when configured",
+  "preconditions": "Case (a) threshold configured, request above it; case (b) no threshold configured",
+  "action_or_input": "Process the request at Dean stage in each case",
+  "expected_result": "(a) Director routing applied; (b) no routing threshold is applied or invented",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-024",
+  "source_id": "RSPC-UC-005 Exception Flow E1",
+  "purpose": "Unauthorized decision blocked",
+  "preconditions": "Request at Dean stage; user lacking Dean-RSPC authorization",
+  "action_or_input": "Attempt to approve",
+  "expected_result": "Blocked; request data remains auditable and unchanged",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-025",
+  "source_id": "RSPC-UC-005 Exception Flow E2",
+  "purpose": "Request outside Dean stage cannot be decided",
+  "preconditions": "Dean authorized; request at another stage (e.g. HoD review)",
+  "action_or_input": "Attempt to decide via this use case",
+  "expected_result": "Rejected; state unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-026",
+  "source_id": "RSPC-UC-006 Main Success Scenario decision recorded",
+  "purpose": "Director decides routed request",
+  "preconditions": "Director authorized; request routed to Director stage",
+  "action_or_input": "Open request and history; review compliance info; record decision (approve)",
+  "expected_result": "Decision recorded; request reaches corresponding terminal decision state; approval notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-027",
+  "source_id": "RSPC-UC-006 Main Success Scenario rejection",
+  "purpose": "Director rejection recorded",
+  "preconditions": "Request at Director stage",
+  "action_or_input": "Record rejection with remarks",
+  "expected_result": "Rejection recorded; request in rejected terminal state; rejection notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-028",
+  "source_id": "RSPC-UC-006 Main Success Scenario high-value requirement",
+  "purpose": "Director authorization requirement applied for large funding / high-value expenditure",
+  "preconditions": "High-value expenditure or large funding request routed to Director per represented path",
+  "action_or_input": "Director decides the request",
+  "expected_result": "Represented Director-approval/authorization requirement applied; resulting state recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-029",
+  "source_id": "RSPC-UC-006 Alternative Flow A1",
+  "purpose": "Request type and threshold follow represented path",
+  "preconditions": "Different request types (e.g. financial, staff, procurement, closure) routed to Director",
+  "action_or_input": "Director decides each",
+  "expected_result": "Each is handled per its represented path/threshold; no unrepresented threshold invented",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-030",
+  "source_id": "RSPC-UC-006 Exception Flow E1",
+  "purpose": "Unauthorized Director action blocked",
+  "preconditions": "Request at Director stage; non-Director user",
+  "action_or_input": "Attempt to decide",
+  "expected_result": "Blocked; request and prior review records intact",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-031",
+  "source_id": "RSPC-UC-006 Exception Flow E2",
+  "purpose": "Request not routed to Director cannot be decided",
+  "preconditions": "Director authorized; request at Dean stage",
+  "action_or_input": "Attempt to decide",
+  "expected_result": "Rejected; state unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-032",
+  "source_id": "RSPC-UC-007 Main Success Scenario",
+  "purpose": "Consultancy registered and routed",
+  "preconditions": "Faculty authorized for consultancy registration",
+  "action_or_input": "Open registration; enter client, scope, deliverables, timelines, financial terms; submit",
+  "expected_result": "Consultancy recorded as submitted and positioned at next approval stage per represented path",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-033",
+  "source_id": "RSPC-UC-007 Alternative Flow A1",
+  "purpose": "Routing to HoD when department stage represented, else next stage",
+  "preconditions": "Case (a) HoD stage represented; case (b) not represented",
+  "action_or_input": "Register consultancy in each case",
+  "expected_result": "(a) routed to HoD; (b) proceeds to next represented stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-034",
+  "source_id": "RSPC-UC-007 Exception Flow E1",
+  "purpose": "Unauthorized registration blocked",
+  "preconditions": "User without consultancy registration authorization",
+  "action_or_input": "Attempt to register",
+  "expected_result": "Blocked; no record created",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-035",
+  "source_id": "RSPC-UC-007 Exception Flow E2",
+  "purpose": "Record failing required validation not advanced",
+  "preconditions": "Faculty authorized; record violates a represented required validation (e.g. missing required term)",
+  "action_or_input": "Submit",
+  "expected_result": "Not advanced beyond submission; error reported",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-036",
+  "source_id": "RSPC-UC-008 Main Success Scenario",
+  "purpose": "Faculty tracks consultancy payments, deliverables, settlements and histories",
+  "preconditions": "Faculty authorized; consultancy exists with payment/deliverable/settlement and history records",
+  "action_or_input": "Open consultancy project",
+  "expected_result": "Payment, deliverable, settlement status and approval/financial history displayed; no external payment/settlement state changed",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-037",
+  "source_id": "RSPC-UC-008 Alternative Flow A1",
+  "purpose": "RSPC Admin or Dean-RSPC views the same histories within role scope",
+  "preconditions": "Authorized RSPC Admin and Dean-RSPC; consultancy exists",
+  "action_or_input": "Each opens the consultancy",
+  "expected_result": "Histories displayed within role scope",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-038",
+  "source_id": "RSPC-UC-008 Exception Flow E1",
+  "purpose": "Unauthorized access blocked",
+  "preconditions": "User not authorized for the consultancy record",
+  "action_or_input": "Open the consultancy",
+  "expected_result": "Access blocked; nothing disclosed",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-039",
+  "source_id": "RSPC-UC-008 Exception Flow E2",
+  "purpose": "RSPC does not execute external payment or settlement",
+  "preconditions": "Consultancy with pending payment/settlement",
+  "action_or_input": "Use tracking view and look for payment/settlement execution",
+  "expected_result": "No payment/settlement execution available or performed; external state unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-040",
+  "source_id": "RSPC-UC-009 Main Success Scenario",
+  "purpose": "Staff appointment request submitted",
+  "preconditions": "Faculty authorized; request associated with RSPC project",
+  "action_or_input": "Open new staff-appointment request; enter info; submit",
+  "expected_result": "Request recorded as submitted and available to next appointment-processing stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-041",
+  "source_id": "RSPC-UC-009 Exception Flow E1",
+  "purpose": "Unauthorized submission blocked",
+  "preconditions": "User lacking authorization",
+  "action_or_input": "Attempt to submit",
+  "expected_result": "Blocked; no request recorded",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-042",
+  "source_id": "RSPC-UC-009 Exception Flow E2",
+  "purpose": "No HR/payroll execution",
+  "preconditions": "Appointment request submitted",
+  "action_or_input": "Inspect result of submission",
+  "expected_result": "No HR/payroll action executed; only RSPC request record created",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-043",
+  "source_id": "RSPC-UC-010 Main Success Scenario",
+  "purpose": "RSPC Admin verifies and manages appointment records and forwards",
+  "preconditions": "RSPC Admin authorized; submitted, complete, compliant request",
+  "action_or_input": "Open request; verify; manage advertisement/application/stipend/selection/duration/payment/compliance records; record outcome",
+  "expected_result": "Outcome and records saved; eligible request forwarded to next selection/approval step; pending-action/compliance notification may trigger",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-044",
+  "source_id": "RSPC-UC-010 Alternative Flow A1",
+  "purpose": "Operational records updated as process progresses within role permissions",
+  "preconditions": "Appointment in progress; Admin with permission and a user without",
+  "action_or_input": "Update an operational record at a later stage by each",
+  "expected_result": "Permitted role updates succeed and reflect current state; non-permitted role is blocked",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-045",
+  "source_id": "RSPC-UC-010 Exception Flow E1",
+  "purpose": "Incomplete/ineligible request not forwarded",
+  "preconditions": "Incomplete request",
+  "action_or_input": "Verify and attempt to forward",
+  "expected_result": "Not forwarded as eligible",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-046",
+  "source_id": "RSPC-UC-010 Exception Flow E2",
+  "purpose": "HR/payroll execution remains outside RSPC",
+  "preconditions": "Appointment with stipend/payment records",
+  "action_or_input": "Manage payment-related records",
+  "expected_result": "Only RSPC records change; no HR/payroll execution",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-047",
+  "source_id": "RSPC-UC-011 Main Success Scenario",
+  "purpose": "Fund-utilization or expenditure request submitted and routed to Admin",
+  "preconditions": "Faculty authorized; project/fund context exists",
+  "action_or_input": "Open new financial request; identify type (fund-utilization or expenditure); enter info; submit",
+  "expected_result": "Request recorded as submitted and routed to RSPC Admin for initial verification",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-048",
+  "source_id": "RSPC-UC-011 Exception Flow E1",
+  "purpose": "Unauthorized submission blocked",
+  "preconditions": "User lacking authorization",
+  "action_or_input": "Attempt to submit",
+  "expected_result": "Blocked; no request recorded",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-049",
+  "source_id": "RSPC-UC-011 Exception Flow E2",
+  "purpose": "No bank payment/ledger operations",
+  "preconditions": "Financial request submitted",
+  "action_or_input": "Inspect result of submission",
+  "expected_result": "No payment, disbursement or ledger operation executed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-050",
+  "source_id": "RSPC-UC-012 Main Success Scenario",
+  "purpose": "RSPC Admin verifies financial request, logs to audit trail, forwards",
+  "preconditions": "Admin authorized; complete, compliant submitted financial request",
+  "action_or_input": "Open; verify completeness and initial financial verification; check compliance; forward",
+  "expected_result": "Verification result recorded in financial audit trail; request forwarded to approval stage; notifications may trigger",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-051",
+  "source_id": "RSPC-UC-012 Exception Flow E1",
+  "purpose": "Ineligible/incomplete request not forwarded",
+  "preconditions": "Incomplete financial request",
+  "action_or_input": "Verify and attempt to forward",
+  "expected_result": "Not forwarded as eligible",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-052",
+  "source_id": "RSPC-UC-012 Exception Flow E2",
+  "purpose": "No accounting/payment execution",
+  "preconditions": "Financial request verified",
+  "action_or_input": "Inspect effect of verification",
+  "expected_result": "No accounting/payment action executed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-053",
+  "source_id": "RSPC-UC-013 Main Success Scenario",
+  "purpose": "Procurement request submitted, checked and status made available",
+  "preconditions": "Faculty authorized; project and sanctioned budget exist; requested cost within budget",
+  "action_or_input": "Open request; identify equipment/consumables; submit; later reopen to view",
+  "expected_result": "Request recorded; budget/approval-path checks applied; current status available and updated on reopen",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-054",
+  "source_id": "RSPC-UC-013 Alternative Flow A1",
+  "purpose": "Status-view does not change request state",
+  "preconditions": "Procurement request exists",
+  "action_or_input": "View status repeatedly",
+  "expected_result": "Request state and data unchanged",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-055",
+  "source_id": "RSPC-UC-013 Exception Flow E1",
+  "purpose": "Request failing sanctioned-budget validation not advanced",
+  "preconditions": "Request cost exceeds sanctioned project budget",
+  "action_or_input": "Submit",
+  "expected_result": "Not advanced as eligible",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-056",
+  "source_id": "RSPC-UC-013 Exception Flow E2",
+  "purpose": "No procurement execution, vendor/stock management",
+  "preconditions": "Procurement request submitted",
+  "action_or_input": "Inspect effects",
+  "expected_result": "No purchase, vendor, stock or inventory operation executed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-057",
+  "source_id": "RSPC-UC-014 Main Success Scenario",
+  "purpose": "Progress/utilization report submitted and status updated",
+  "preconditions": "Faculty authorized; active project with represented reporting period; report pending",
+  "action_or_input": "Open pending item; view schedule/deadline; submit report",
+  "expected_result": "Schedule displayed; submission stored in project history; report status updated",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-058",
+  "source_id": "RSPC-UC-014 Alternative Flow A1",
+  "purpose": "Reminder notification triggered when report pending at represented deadline",
+  "preconditions": "Report pending; represented deadline reached",
+  "action_or_input": "Deadline condition occurs",
+  "expected_result": "Applicable reminder notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-059",
+  "source_id": "RSPC-UC-014 Exception Flow E1",
+  "purpose": "Unauthorized report submission blocked",
+  "preconditions": "User lacking authorization",
+  "action_or_input": "Attempt to submit",
+  "expected_result": "Blocked; no report recorded",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-060",
+  "source_id": "RSPC-UC-014 Exception Flow E2",
+  "purpose": "Submission outside represented project/reporting context not accepted",
+  "preconditions": "Project/period not represented (e.g. inactive or non-existent)",
+  "action_or_input": "Submit report",
+  "expected_result": "Not accepted; no unrelated state changed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-061",
+  "source_id": "RSPC-UC-015 Main Success Scenario",
+  "purpose": "Closure report submitted and routed to closure verification",
+  "preconditions": "Faculty authorized; project at completion/closure point",
+  "action_or_input": "Open closure function; submit completion/closure information",
+  "expected_result": "Closure record stored as submitted and routed to closure-verification stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-062",
+  "source_id": "RSPC-UC-015 Exception Flow E1",
+  "purpose": "Unauthorized submission blocked",
+  "preconditions": "User lacking authorization",
+  "action_or_input": "Attempt to submit",
+  "expected_result": "Blocked; no closure record",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-063",
+  "source_id": "RSPC-UC-015 Exception Flow E2",
+  "purpose": "No accounting settlement or inventory operations",
+  "preconditions": "Closure submitted",
+  "action_or_input": "Inspect effects",
+  "expected_result": "No accounting settlement or physical inventory operation executed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-064",
+  "source_id": "RSPC-UC-016 Main Success Scenario",
+  "purpose": "Authorized user receives and views notification",
+  "preconditions": "User authorized for referenced record; event notification generated; email configured",
+  "action_or_input": "Open Fusion dashboard; open the notification",
+  "expected_result": "Notification shown on dashboard; email triggered via platform delivery service; opening shows notification and authorized RSPC context",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-065",
+  "source_id": "RSPC-UC-016 Alternative Flow A1",
+  "purpose": "Applicable event categories produce notifications",
+  "preconditions": "Events of each category occur: proposal submission/review/approval/rejection, pending action, escalation, reporting deadline, financial approval, compliance requirement",
+  "action_or_input": "Trigger each event",
+  "expected_result": "Corresponding notification available to relevant user",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-066",
+  "source_id": "RSPC-UC-016 Exception Flow E1",
+  "purpose": "Unauthorized notification context not disclosed",
+  "preconditions": "User not authorized for referenced record",
+  "action_or_input": "Open notification area/notification",
+  "expected_result": "Record context not disclosed",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-067",
+  "source_id": "RSPC-UC-016 Exception Flow E2",
+  "purpose": "Email infrastructure failure does not make RSPC run own email infrastructure",
+  "preconditions": "External email delivery unavailable",
+  "action_or_input": "Generate notification",
+  "expected_result": "Dashboard notification still available; RSPC does not itself deliver email",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-068",
+  "source_id": "RSPC-UC-017 Main Success Scenario",
+  "purpose": "RSPC Admin reviews reports, logs, audit and integration tracking records",
+  "preconditions": "Admin authorized; records exist",
+  "action_or_input": "Open reporting/history view",
+  "expected_result": "Historical progress/utilization reports, audit/compliance logs and integration tracking records displayed; no external system or record changed",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-069",
+  "source_id": "RSPC-UC-017 Alternative Flow A1",
+  "purpose": "Faculty/Dean/Director see only permitted subset",
+  "preconditions": "Faculty, Dean-RSPC, Director with assigned roles",
+  "action_or_input": "Each opens the view",
+  "expected_result": "Each sees only records permitted by assigned role",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-070",
+  "source_id": "RSPC-UC-017 Exception Flow E1",
+  "purpose": "Unauthorized access blocked",
+  "preconditions": "User not authorized for record set",
+  "action_or_input": "Open view",
+  "expected_result": "Blocked",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-071",
+  "source_id": "RSPC-UC-017 Exception Flow E2",
+  "purpose": "No external funding-agency/Fusion module execution from view",
+  "preconditions": "Integration tracking records exist",
+  "action_or_input": "Use the view",
+  "expected_result": "No external execution possible or performed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-072",
+  "source_id": "RSPC-UC-018 Main Success Scenario",
+  "purpose": "Authorized role assignment applied immediately and logged",
+  "preconditions": "Change originates from authorized role-management mechanism",
+  "action_or_input": "Send role assignment for a user",
+  "expected_result": "Source validated; RSPC role/action restrictions updated; effective immediately; change logged",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-073",
+  "source_id": "RSPC-UC-018 Alternative Flow A1",
+  "purpose": "Reassignment event handled",
+  "preconditions": "User holds a role; authorized reassignment event",
+  "action_or_input": "Send reassignment",
+  "expected_result": "New role restrictions applied, old removed; change logged",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-074",
+  "source_id": "RSPC-UC-018 Exception Flow E1",
+  "purpose": "RSPC does not administer platform accounts or RBAC",
+  "preconditions": "Role-change event received",
+  "action_or_input": "Inspect effect on platform-wide accounts/RBAC",
+  "expected_result": "Only RSPC access changes; platform accounts/RBAC unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-075",
+  "source_id": "RSPC-UC-018 Exception Flow E2",
+  "purpose": "Unauthorized/unrecognized source not applied",
+  "preconditions": "Role change from unrecognized source",
+  "action_or_input": "Send change",
+  "expected_result": "Not applied; user's RSPC access unchanged",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-076",
+  "source_id": "RSPC-UC-021 Main Success Scenario",
+  "purpose": "Permitted project update saved",
+  "preconditions": "Faculty authorized; update permitted in current lifecycle state",
+  "action_or_input": "Open project; view editable fields; update details/milestones/progress/utilization; save",
+  "expected_result": "Editable fields shown; update validated, saved and retained in record/history",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-077",
+  "source_id": "RSPC-UC-021 Alternative Flow A1",
+  "purpose": "Only permitted subset updatable",
+  "preconditions": "Lifecycle state permits only some fields",
+  "action_or_input": "Update permitted and non-permitted fields",
+  "expected_result": "Only permitted subset saved; others blocked",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-078",
+  "source_id": "RSPC-UC-021 Exception Flow E1",
+  "purpose": "Update not permitted in lifecycle state blocked",
+  "preconditions": "Project in state disallowing update",
+  "action_or_input": "Attempt update",
+  "expected_result": "Blocked; prior record intact",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-079",
+  "source_id": "RSPC-UC-021 Exception Flow E2",
+  "purpose": "Unauthorized update blocked",
+  "preconditions": "User not authorized for project",
+  "action_or_input": "Attempt update",
+  "expected_result": "Blocked; prior record intact",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-080",
+  "source_id": "RSPC-UC-022 Main Success Scenario",
+  "purpose": "Faculty records selection participation and recommendation",
+  "preconditions": "Faculty authorized; appointment at selection stage requiring Faculty",
+  "action_or_input": "Open appointment/selection record; record participation; submit recommendation",
+  "expected_result": "Stored; appointment advanced to next approval stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-081",
+  "source_id": "RSPC-UC-022 Exception Flow E1",
+  "purpose": "Unauthorized selection records blocked",
+  "preconditions": "User lacking authorization",
+  "action_or_input": "Attempt to record",
+  "expected_result": "Blocked",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-082",
+  "source_id": "RSPC-UC-022 Exception Flow E2",
+  "purpose": "No HR master-data/payroll execution",
+  "preconditions": "Recommendation recorded",
+  "action_or_input": "Inspect effects",
+  "expected_result": "No HR master-data or payroll action executed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-083",
+  "source_id": "RSPC-UC-023 Main Success Scenario approve",
+  "purpose": "Dean approves staff appointment within authority",
+  "preconditions": "Dean authorized; eligible request at Dean stage",
+  "action_or_input": "Open with records; review; approve",
+  "expected_result": "Approval recorded; approval notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-084",
+  "source_id": "RSPC-UC-023 Main Success Scenario forward to Director",
+  "purpose": "Dean forwards when Director action required",
+  "preconditions": "Represented path requires Director",
+  "action_or_input": "Forward",
+  "expected_result": "Forwarded to Director; escalation notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-085",
+  "source_id": "RSPC-UC-023 Main Success Scenario not approved",
+  "purpose": "Non-approval outcome recorded",
+  "preconditions": "Request at Dean stage",
+  "action_or_input": "Not approve",
+  "expected_result": "Decision outcome recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-086",
+  "source_id": "RSPC-UC-023 Exception Flow E1",
+  "purpose": "Unauthorized action blocked",
+  "preconditions": "User not Dean-RSPC",
+  "action_or_input": "Attempt decision",
+  "expected_result": "Blocked; records auditable",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-087",
+  "source_id": "RSPC-UC-023 Exception Flow E2",
+  "purpose": "No HR/payroll execution",
+  "preconditions": "Approval recorded",
+  "action_or_input": "Inspect effects",
+  "expected_result": "No HR/payroll execution",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-088",
+  "source_id": "RSPC-UC-024 Main Success Scenario approve",
+  "purpose": "Dean approves financial request within powers",
+  "preconditions": "Dean authorized; request verified by Admin",
+  "action_or_input": "Open with verification history; review; approve",
+  "expected_result": "Approval recorded; decision logged for audit; financial-approval notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-089",
+  "source_id": "RSPC-UC-024 Main Success Scenario forward to Director",
+  "purpose": "High-value request forwarded to Director",
+  "preconditions": "Verified high-value request",
+  "action_or_input": "Forward",
+  "expected_result": "Forwarded; event logged; escalation notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-090",
+  "source_id": "RSPC-UC-024 Exception Flow E1",
+  "purpose": "Unauthorized action blocked",
+  "preconditions": "User not Dean-RSPC",
+  "action_or_input": "Attempt",
+  "expected_result": "Blocked",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-091",
+  "source_id": "RSPC-UC-024 Exception Flow E2",
+  "purpose": "No bank payment/ledger/disbursement",
+  "preconditions": "Approved financial request",
+  "action_or_input": "Inspect effects",
+  "expected_result": "No bank, ledger or disbursement operation executed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-092",
+  "source_id": "RSPC-UC-025 Main Success Scenario",
+  "purpose": "Admin verifies procurement request with sanctioned-budget validation",
+  "preconditions": "Admin authorized; submitted request within sanctioned budget",
+  "action_or_input": "Open; verify completeness/compliance; budget validation; record; forward",
+  "expected_result": "Budget validation passes; outcome recorded; forwarded to approval stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-093",
+  "source_id": "RSPC-UC-025 Exception Flow E1",
+  "purpose": "Incomplete/non-compliant/over-budget not advanced",
+  "preconditions": "Incomplete, non-compliant, or over-budget request",
+  "action_or_input": "Verify",
+  "expected_result": "Not advanced as eligible",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-094",
+  "source_id": "RSPC-UC-025 Exception Flow E2",
+  "purpose": "No procurement/inventory execution",
+  "preconditions": "Verified request",
+  "action_or_input": "Inspect effects",
+  "expected_result": "No vendor, purchase or stock operation",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-095",
+  "source_id": "RSPC-UC-026 Main Success Scenario approve",
+  "purpose": "Dean approves procurement",
+  "preconditions": "Dean authorized; verified request",
+  "action_or_input": "Review; approve",
+  "expected_result": "Approval recorded; notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-096",
+  "source_id": "RSPC-UC-026 Main Success Scenario forward to Director",
+  "purpose": "Dean forwards per hierarchy",
+  "preconditions": "Hierarchy requires Director",
+  "action_or_input": "Forward",
+  "expected_result": "Forwarded; escalation notification",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-097",
+  "source_id": "RSPC-UC-026 Main Success Scenario not approved",
+  "purpose": "Non-approval recorded",
+  "preconditions": "Verified request at Dean stage",
+  "action_or_input": "Not approve",
+  "expected_result": "Decision outcome recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-098",
+  "source_id": "RSPC-UC-026 Exception Flow E1",
+  "purpose": "Unauthorized blocked",
+  "preconditions": "User not Dean-RSPC",
+  "action_or_input": "Attempt",
+  "expected_result": "Blocked",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-099",
+  "source_id": "RSPC-UC-026 Exception Flow E2",
+  "purpose": "No procurement/vendor/inventory",
+  "preconditions": "Approved",
+  "action_or_input": "Inspect effects",
+  "expected_result": "No external operations",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-100",
+  "source_id": "RSPC-UC-027 Main Success Scenario",
+  "purpose": "Admin verifies closure record, settlement and asset declaration",
+  "preconditions": "Admin authorized; submitted complete closure record",
+  "action_or_input": "Open; verify completeness; record settlement and asset-declaration verification; check compliance; forward",
+  "expected_result": "Outcome recorded; eligible closure forwarded to approval stage",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-101",
+  "source_id": "RSPC-UC-027 Exception Flow E1",
+  "purpose": "Incomplete closure not forwarded",
+  "preconditions": "Incomplete closure record",
+  "action_or_input": "Verify",
+  "expected_result": "Not forwarded as eligible",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-102",
+  "source_id": "RSPC-UC-027 Exception Flow E2",
+  "purpose": "No accounting settlement/inventory operations",
+  "preconditions": "Verified closure",
+  "action_or_input": "Inspect effects",
+  "expected_result": "No actual settlement or inventory operation executed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-103",
+  "source_id": "RSPC-UC-028 Main Success Scenario approve and archive",
+  "purpose": "Dean approves closure; project archived",
+  "preconditions": "Dean authorized; verified closure within authority",
+  "action_or_input": "Review; record decision and remarks; approve",
+  "expected_result": "Closure approval recorded with remarks; completed project archived with audit trail; notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-104",
+  "source_id": "RSPC-UC-028 Main Success Scenario forward to Director",
+  "purpose": "Closure forwarded to Director",
+  "preconditions": "Closure needs Director action",
+  "action_or_input": "Forward",
+  "expected_result": "Forwarded; not archived yet; escalation notification",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-105",
+  "source_id": "RSPC-UC-028 Alternative Flow A1",
+  "purpose": "Non-approved closure not archived",
+  "preconditions": "Verified closure",
+  "action_or_input": "Not approve",
+  "expected_result": "Decision outcome recorded; not archived as approved closed project",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-106",
+  "source_id": "RSPC-UC-028 Exception Flow E1",
+  "purpose": "Unauthorized closure decision blocked",
+  "preconditions": "User not Dean-RSPC",
+  "action_or_input": "Attempt",
+  "expected_result": "Blocked; no archive",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-107",
+  "source_id": "RSPC-UC-028 Exception Flow E2",
+  "purpose": "No financial settlement/inventory operations",
+  "preconditions": "Closure approved",
+  "action_or_input": "Inspect effects",
+  "expected_result": "No settlement or inventory operation executed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-108",
+  "source_id": "RSPC-UC-029 Main Success Scenario",
+  "purpose": "Configured integration exchange recorded and tracked",
+  "preconditions": "Integration explicitly configured",
+  "action_or_input": "Integrated module sends/requests configured info",
+  "expected_result": "Context and role/scope validated; only represented info exchanged; tracking recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-109",
+  "source_id": "RSPC-UC-029 Exception Flow E1",
+  "purpose": "Unconfigured integration not processed",
+  "preconditions": "No configuration for the module/info",
+  "action_or_input": "Send request",
+  "expected_result": "Not processed as authorized integration; nothing executed",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-110",
+  "source_id": "RSPC-UC-029 Exception Flow E2",
+  "purpose": "RSPC does not take over other module's process",
+  "preconditions": "Configured exchange",
+  "action_or_input": "Inspect effects",
+  "expected_result": "No other-module business process executed by RSPC",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-111",
+  "source_id": "RSPC-UC-030 Main Success Scenario",
+  "purpose": "External funding-agency tracking recorded and visible",
+  "preconditions": "Tracking integration configured; RSPC record exists",
+  "action_or_input": "Integration supplies submission/disbursement status",
+  "expected_result": "Context validated; recorded against RSPC record; visible to authorized actors",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-112",
+  "source_id": "RSPC-UC-030 Exception Flow E1",
+  "purpose": "No external decisions or disbursements",
+  "preconditions": "Tracking status supplied",
+  "action_or_input": "Inspect effects",
+  "expected_result": "RSPC makes no agency decision, executes no disbursement",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-113",
+  "source_id": "RSPC-UC-030 Exception Flow E2",
+  "purpose": "Unconfigured agency actions not assumed RSPC-owned",
+  "preconditions": "Action not represented/configured",
+  "action_or_input": "Send it",
+  "expected_result": "Not recorded as RSPC-owned action",
+  "test_type": "security"
+ },
+ {
+  "test_id": "TC-UC-114",
+  "source_id": "RSPC-UC-031 Main Success Scenario",
+  "purpose": "Notification generated and dispatched for supported event",
+  "preconditions": "Source record exists; recipients resolvable; email configured",
+  "action_or_input": "Supported event (e.g. proposal submission) occurs",
+  "expected_result": "Category and record identified; recipients resolved; dashboard event created; email triggered; status retained in audit/log",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-115",
+  "source_id": "RSPC-UC-031 Alternative Flow A1",
+  "purpose": "Single applicable channel used without inventing another",
+  "preconditions": "Only dashboard channel represented",
+  "action_or_input": "Event occurs",
+  "expected_result": "Only dashboard used; no email invented",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-116",
+  "source_id": "RSPC-UC-031 Alternative Flow A2",
+  "purpose": "Reporting reminders follow BR-RSPC-037 schedule",
+  "preconditions": "Reporting schedule configured; deadline due",
+  "action_or_input": "Due condition occurs",
+  "expected_result": "Reminder generated per configured schedule",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "TC-UC-117",
+  "source_id": "RSPC-UC-031 Exception Flow E1",
+  "purpose": "No invented values",
+  "preconditions": "Schedule/recipient/delivery rule not configured",
+  "action_or_input": "Event occurs",
+  "expected_result": "No fabricated reminders, recipients or rules",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-UC-118",
+  "source_id": "RSPC-UC-031 Exception Flow E2",
+  "purpose": "Email delivery stays outside RSPC; business state not altered on dispatch failure",
+  "preconditions": "Email service fails",
+  "action_or_input": "Event occurs",
+  "expected_result": "Business record state unchanged; RSPC runs no email infrastructure",
+  "test_type": "negative"
+ }
+]

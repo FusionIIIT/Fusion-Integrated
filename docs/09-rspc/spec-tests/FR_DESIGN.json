@@ -1,0 +1,1361 @@
+[
+ {
+  "test_id": "TC-FR-001",
+  "source_id": "RSPC-FR-004 (parent RSPC-CFR-001)",
+  "purpose": "Faculty can view ongoing and completed project portfolio",
+  "preconditions": "Faculty user F1 authenticated with the RSPC Faculty role; F1 owns an ongoing and a completed project with status, approval history, history, audit-trail and financial transaction records; Faculty user F2 owns a different project.",
+  "action_or_input": "F1 opens the own-projects list",
+  "expected_result": "both the ongoing and the completed project of F1 are listed and F2's project is not listed",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-002",
+  "source_id": "RSPC-FR-005",
+  "purpose": "Faculty can view approval history of own project",
+  "preconditions": "Faculty user F1 authenticated with the RSPC Faculty role; F1 owns an ongoing and a completed project with status, approval history, history, audit-trail and financial transaction records; Faculty user F2 owns a different project.",
+  "action_or_input": "F1 opens the approval history of an own project",
+  "expected_result": "the approval decisions recorded for that project are displayed",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-003",
+  "source_id": "RSPC-FR-006",
+  "purpose": "Faculty can view financial transaction records of own project",
+  "preconditions": "Faculty user F1 authenticated with the RSPC Faculty role; F1 owns an ongoing and a completed project with status, approval history, history, audit-trail and financial transaction records; Faculty user F2 owns a different project.",
+  "action_or_input": "F1 opens the financial transaction records of an own project",
+  "expected_result": "the financial transaction records recorded for that project are displayed",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-004",
+  "source_id": "RSPC-FR-107",
+  "purpose": "Faculty can view current status of own project",
+  "preconditions": "Faculty user F1 authenticated with the RSPC Faculty role; F1 owns an ongoing and a completed project with status, approval history, history, audit-trail and financial transaction records; Faculty user F2 owns a different project.",
+  "action_or_input": "F1 opens the status view of an own project",
+  "expected_result": "the current status of the project is displayed and matches the stored status",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-005",
+  "source_id": "RSPC-FR-108",
+  "purpose": "Faculty can view history of own project",
+  "preconditions": "Faculty user F1 authenticated with the RSPC Faculty role; F1 owns an ongoing and a completed project with status, approval history, history, audit-trail and financial transaction records; Faculty user F2 owns a different project.",
+  "action_or_input": "F1 opens the history view of an own project",
+  "expected_result": "the recorded history of the project is displayed",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-006",
+  "source_id": "RSPC-FR-109",
+  "purpose": "Faculty can view audit trail of own project",
+  "preconditions": "Faculty user F1 authenticated with the RSPC Faculty role; F1 owns an ongoing and a completed project with status, approval history, history, audit-trail and financial transaction records; Faculty user F2 owns a different project.",
+  "action_or_input": "F1 opens the audit trail of an own project",
+  "expected_result": "the audit-trail entries recorded for that project are displayed",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-007",
+  "source_id": "RSPC-CFR-001 unauthorized scope not exposed",
+  "purpose": "Faculty cannot view another Faculty member's project information",
+  "preconditions": "Faculty user F1 authenticated with the RSPC Faculty role; F1 owns an ongoing and a completed project with status, approval history, history, audit-trail and financial transaction records; Faculty user F2 owns a different project.",
+  "action_or_input": "F1 requests the project list, status, history, approval history, audit trail and financial records of F2's project",
+  "expected_result": "F2's project data is not returned to F1 for any of the views (access denied or empty result)",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "TC-FR-008",
+  "source_id": "RSPC-FR-007 (parent RSPC-CFR-002)",
+  "purpose": "RSPC Admin can maintain structured audit/compliance records",
+  "preconditions": "RSPC Admin user authenticated; a submitted RSPC record (for example a research proposal) exists",
+  "action_or_input": "RSPC Admin creates or updates a structured audit/compliance record for that RSPC record",
+  "expected_result": "The record is persisted with its content and is retrievable afterwards",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-009",
+  "source_id": "RSPC-FR-088",
+  "purpose": "RSPC maintains logs for audit, transparency and regulatory compliance",
+  "preconditions": "A supported RSPC event is triggered (for example proposal submission or a role change); authorized auditor user exists",
+  "action_or_input": "Perform the event, then an authorized user retrieves the RSPC logs",
+  "expected_result": "A log entry for the event is persisted and retrievable by the authorized user; BR-RSPC-050 log content is present",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-010",
+  "source_id": "RSPC-CFR-002 roll-up",
+  "purpose": "Audit logs are retrievable by authorized users and not by unauthorized roles",
+  "preconditions": "Log entries exist; one authorized user and one user without a log-viewing RSPC role",
+  "action_or_input": "Both users request the audit logs",
+  "expected_result": "Authorized user receives the entries; the unauthorized user is denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "TC-FR-011",
+  "source_id": "RSPC-FR-008 (parent RSPC-CFR-003)",
+  "purpose": "HoD can review assigned project and consultancy requests",
+  "preconditions": "HoD user authenticated; a research proposal (CW-RSPC-01) and a consultancy request (CW-RSPC-02) are assigned to the HoD department-level review stage.",
+  "action_or_input": "HoD opens each assigned request",
+  "expected_result": "Both the research proposal and the consultancy request details are displayed to the HoD",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-012",
+  "source_id": "RSPC-FR-009",
+  "purpose": "HoD can record a departmental recommendation (BR-RSPC-067)",
+  "preconditions": "HoD user authenticated; a research proposal (CW-RSPC-01) and a consultancy request (CW-RSPC-02) are assigned to the HoD department-level review stage.",
+  "action_or_input": "HoD records a recommendation on the proposal and on the consultancy request",
+  "expected_result": "Each recommendation is persisted against its request and is retrievable",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-013",
+  "source_id": "RSPC-FR-118",
+  "purpose": "HoD can evaluate departmental feasibility",
+  "preconditions": "HoD user authenticated; a research proposal (CW-RSPC-01) and a consultancy request (CW-RSPC-02) are assigned to the HoD department-level review stage.",
+  "action_or_input": "HoD records a feasibility evaluation for an assigned request",
+  "expected_result": "The feasibility evaluation is persisted against the request",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-014",
+  "source_id": "RSPC-FR-119",
+  "purpose": "HoD can evaluate departmental alignment",
+  "preconditions": "HoD user authenticated; a research proposal (CW-RSPC-01) and a consultancy request (CW-RSPC-02) are assigned to the HoD department-level review stage.",
+  "action_or_input": "HoD records an alignment evaluation for an assigned request",
+  "expected_result": "The alignment evaluation is persisted against the request",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-015",
+  "source_id": "RSPC-CFR-003 progression according to recommendation",
+  "purpose": "Request progresses according to HoD recommendation (CW-RSPC-01 T2-T3, CW-RSPC-02 T2-T3)",
+  "preconditions": "HoD user authenticated; a research proposal (CW-RSPC-01) and a consultancy request (CW-RSPC-02) are assigned to the HoD department-level review stage.",
+  "action_or_input": "HoD records a positive recommendation on the proposal and on the consultancy request",
+  "expected_result": "Each request progresses to the next stage of its workflow and the state change is recorded",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-016",
+  "source_id": "RSPC-FR-010 (parent RSPC-CFR-004)",
+  "purpose": "Dean-RSPC can review routed research and consultancy matters",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A research proposal and a consultancy request are routed.",
+  "action_or_input": "Dean-RSPC opens each routed matter",
+  "expected_result": "Both matters are displayed for review",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-017",
+  "source_id": "RSPC-FR-011",
+  "purpose": "Dean-RSPC can approve project proposals (BR-RSPC-068)",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A research proposal within Dean-RSPC authority is routed.",
+  "action_or_input": "Dean-RSPC approves the proposal",
+  "expected_result": "The approval is recorded and the proposal state is updated per CW-RSPC-01",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-018",
+  "source_id": "RSPC-FR-012",
+  "purpose": "Dean-RSPC can forward high-value or strategic requests to Director (BR-RSPC-004)",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A high-value or strategic request is routed.",
+  "action_or_input": "Dean-RSPC forwards the request to the Director",
+  "expected_result": "The request is routed to the Director stage and the forwarding is recorded",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-019",
+  "source_id": "RSPC-FR-120",
+  "purpose": "Dean-RSPC can review routed staff-appointment requests",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A staff-appointment request (CW-RSPC-03) is routed to the Dean-RSPC stage.",
+  "action_or_input": "Dean-RSPC opens the routed item",
+  "expected_result": "The item is displayed for review",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-020",
+  "source_id": "RSPC-FR-121",
+  "purpose": "Dean-RSPC can review routed budget allocations",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A budget allocation (CW-RSPC-04) is routed to the Dean-RSPC stage.",
+  "action_or_input": "Dean-RSPC opens the routed item",
+  "expected_result": "The item is displayed for review",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-021",
+  "source_id": "RSPC-FR-122",
+  "purpose": "Dean-RSPC can review routed financial requests",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A financial request (CW-RSPC-04) is routed to the Dean-RSPC stage.",
+  "action_or_input": "Dean-RSPC opens the routed item",
+  "expected_result": "The item is displayed for review",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-022",
+  "source_id": "RSPC-FR-123",
+  "purpose": "Dean-RSPC can review routed procurement requests",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A procurement request (CW-RSPC-05) is routed to the Dean-RSPC stage.",
+  "action_or_input": "Dean-RSPC opens the routed item",
+  "expected_result": "The item is displayed for review",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-023",
+  "source_id": "RSPC-FR-124",
+  "purpose": "Dean-RSPC can review routed project-closure records",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A project-closure record (CW-RSPC-06) is routed to the Dean-RSPC stage.",
+  "action_or_input": "Dean-RSPC opens the routed item",
+  "expected_result": "The item is displayed for review",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-024",
+  "source_id": "RSPC-FR-125",
+  "purpose": "Dean-RSPC can review policy compliance (BR-RSPC-070)",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A routed request with represented institutional and funding-agency policy data.",
+  "action_or_input": "Dean-RSPC opens the compliance view of the request",
+  "expected_result": "The represented policy compliance information is displayed for the request",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-025",
+  "source_id": "RSPC-FR-126 within limits",
+  "purpose": "Dean-RSPC can approve eligible requests within delegated or defined limits (BR-RSPC-068)",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A request whose value is within the defined Dean-RSPC limit.",
+  "action_or_input": "Dean-RSPC approves the request",
+  "expected_result": "Approval is accepted and recorded",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-FR-026",
+  "source_id": "RSPC-FR-126 beyond limits",
+  "purpose": "Dean-RSPC cannot approve requests beyond delegated or defined limits",
+  "preconditions": "Dean-RSPC user authenticated; the relevant record is routed to the Dean-RSPC stage. A request whose value exceeds the defined Dean-RSPC limit.",
+  "action_or_input": "Dean-RSPC attempts to approve the request",
+  "expected_result": "Approval is rejected and the request is not finally approved at the Dean-RSPC stage",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-027",
+  "source_id": "RSPC-FR-013 (parent RSPC-CFR-005)",
+  "purpose": "Director can approve large funding requests (BR-RSPC-005)",
+  "preconditions": "Director user authenticated; the request is routed to the Director stage. A large funding request (CW-RSPC-04).",
+  "action_or_input": "Director approves the request",
+  "expected_result": "The approval is recorded and the request state is updated",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-028",
+  "source_id": "RSPC-FR-014",
+  "purpose": "Director can authorize high-value expenditures (BR-RSPC-006)",
+  "preconditions": "Director user authenticated; the request is routed to the Director stage. A high-value expenditure request.",
+  "action_or_input": "Director authorizes the expenditure",
+  "expected_result": "The authorization is recorded against the request",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-029",
+  "source_id": "RSPC-FR-127",
+  "purpose": "Director can review significant, high-value, strategic or escalated requests (BR-RSPC-069)",
+  "preconditions": "Director user authenticated; the request is routed to the Director stage. An escalated request.",
+  "action_or_input": "Director opens the request",
+  "expected_result": "The request is displayed for review",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-030",
+  "source_id": "RSPC-FR-128",
+  "purpose": "Director can review adherence to institutional and external funding regulations (BR-RSPC-070)",
+  "preconditions": "Director user authenticated; the request is routed to the Director stage. A request with represented regulation data.",
+  "action_or_input": "Director opens the regulation adherence view",
+  "expected_result": "The represented regulation adherence information is displayed",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-031",
+  "source_id": "RSPC-CFR-005 authorization recorded",
+  "purpose": "Director-stage authorization decision is recorded with the request",
+  "preconditions": "Director user authenticated; the request is routed to the Director stage.",
+  "action_or_input": "Director records authorization",
+  "expected_result": "Authorization outcome is persisted with the Director's identity and the request state is updated",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-032",
+  "source_id": "RSPC-FR-015 (parent RSPC-CFR-006)",
+  "purpose": "Faculty can submit a research project proposal (BR-RSPC-013)",
+  "preconditions": "Faculty user authenticated; submission form for a research project proposal is open.",
+  "action_or_input": "Faculty submits a proposal with all mandatory fields filled",
+  "expected_result": "The proposal is created and submitted (CW-RSPC-01 T1) and is retrievable",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-033",
+  "source_id": "RSPC-FR-016",
+  "purpose": "Proposal objectives is captured at submission",
+  "preconditions": "Faculty user authenticated; submission form for a research project proposal is open.",
+  "action_or_input": "Faculty enters objectives text and submits the proposal",
+  "expected_result": "The entered objectives is persisted on the submitted proposal record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-034",
+  "source_id": "RSPC-FR-017",
+  "purpose": "Proposal timeline is captured at submission",
+  "preconditions": "Faculty user authenticated; submission form for a research project proposal is open.",
+  "action_or_input": "Faculty enters start and end dates and submits the proposal",
+  "expected_result": "The entered timeline is persisted on the submitted proposal record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-035",
+  "source_id": "RSPC-FR-018",
+  "purpose": "Proposal budget is captured at submission",
+  "preconditions": "Faculty user authenticated; submission form for a research project proposal is open.",
+  "action_or_input": "Faculty enters budget amount and submits the proposal",
+  "expected_result": "The entered budget is persisted on the submitted proposal record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-036",
+  "source_id": "RSPC-FR-019",
+  "purpose": "Proposal funding source is captured at submission",
+  "preconditions": "Faculty user authenticated; submission form for a research project proposal is open.",
+  "action_or_input": "Faculty enters funding source and submits the proposal",
+  "expected_result": "The entered funding source is persisted on the submitted proposal record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-037",
+  "source_id": "RSPC-FR-020",
+  "purpose": "Proposal resource requirements is captured at submission",
+  "preconditions": "Faculty user authenticated; submission form for a research project proposal is open.",
+  "action_or_input": "Faculty enters resource requirements and submits the proposal",
+  "expected_result": "The entered resource requirements is persisted on the submitted proposal record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-038",
+  "source_id": "RSPC-FR-021 (parent RSPC-CFR-007)",
+  "purpose": "Proposal is routed Faculty-HoD-RSPC Admin-Dean-RSPC-Director (BR-RSPC-012)",
+  "preconditions": "A valid proposal submitted; HoD, RSPC Admin, Dean-RSPC and Director users available; proposal requires Director action",
+  "action_or_input": "Each actor in turn approves/forwards the proposal",
+  "expected_result": "The proposal moves in order Faculty, HoD, RSPC Admin, Dean-RSPC, Director and each hand-off state is recorded",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-039",
+  "source_id": "RSPC-FR-021 Director not applicable",
+  "purpose": "Director stage is used only when applicable",
+  "preconditions": "A valid proposal for which Director action is not applicable under the represented path",
+  "action_or_input": "Proposal is approved at Dean-RSPC",
+  "expected_result": "The proposal does not require a Director stage and no Director task is created",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-FR-040",
+  "source_id": "RSPC-FR-022",
+  "purpose": "Mandatory field validation on research proposals (BR-RSPC-013)",
+  "preconditions": "Faculty user authenticated; submission form for a research project proposal is open.",
+  "action_or_input": "Submit the proposal with a mandatory field left empty",
+  "expected_result": "Submission is rejected with a validation error identifying the missing field and the proposal does not advance",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-041",
+  "source_id": "RSPC-FR-023 policy represented",
+  "purpose": "Policy validation enforced when represented as system validation (BR-RSPC-014)",
+  "preconditions": "Faculty user authenticated; submission form for a research project proposal is open. A policy is configured as a system validation.",
+  "action_or_input": "Submit a proposal that violates the policy",
+  "expected_result": "Submission is rejected/blocked according to the validation and the proposal does not advance",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-042",
+  "source_id": "RSPC-FR-023 policy not represented",
+  "purpose": "Policy not represented as system validation is not enforced by RSPC",
+  "preconditions": "Faculty user authenticated; submission form for a research project proposal is open. A policy exists only outside the system validation configuration.",
+  "action_or_input": "Submit a proposal otherwise valid",
+  "expected_result": "No system validation error is raised for that policy and the proposal advances",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-FR-043",
+  "source_id": "RSPC-FR-024 (parent RSPC-CFR-008)",
+  "purpose": "Proposal approval decisions recorded with timestamps (BR-RSPC-015)",
+  "preconditions": "A proposal under review by HoD, RSPC Admin, Dean-RSPC and Director",
+  "action_or_input": "Each reviewer records a decision",
+  "expected_result": "Each decision is stored with a timestamp and is retrievable",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-044",
+  "source_id": "RSPC-FR-025",
+  "purpose": "Proposal approval decisions recorded with remarks (BR-RSPC-016)",
+  "preconditions": "A proposal under review",
+  "action_or_input": "A reviewer records a decision with remarks",
+  "expected_result": "The decision is stored with the entered remarks and is retrievable",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-045",
+  "source_id": "RSPC-FR-027 (parent RSPC-CFR-009)",
+  "purpose": "Faculty can register a consultancy project",
+  "preconditions": "Faculty user authenticated; consultancy registration form open.",
+  "action_or_input": "Faculty submits a consultancy registration",
+  "expected_result": "The registration is created (CW-RSPC-02 T1) and retrievable",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-046",
+  "source_id": "RSPC-FR-028",
+  "purpose": "Consultancy client details captured at registration",
+  "preconditions": "Faculty user authenticated; consultancy registration form open.",
+  "action_or_input": "Faculty enters client details and registers",
+  "expected_result": "The entered client details is persisted on the consultancy record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-047",
+  "source_id": "RSPC-FR-029",
+  "purpose": "Consultancy scope captured at registration",
+  "preconditions": "Faculty user authenticated; consultancy registration form open.",
+  "action_or_input": "Faculty enters scope and registers",
+  "expected_result": "The entered scope is persisted on the consultancy record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-048",
+  "source_id": "RSPC-FR-030",
+  "purpose": "Consultancy deliverables captured at registration",
+  "preconditions": "Faculty user authenticated; consultancy registration form open.",
+  "action_or_input": "Faculty enters deliverables and registers",
+  "expected_result": "The entered deliverables is persisted on the consultancy record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-049",
+  "source_id": "RSPC-FR-031",
+  "purpose": "Consultancy timeline captured at registration",
+  "preconditions": "Faculty user authenticated; consultancy registration form open.",
+  "action_or_input": "Faculty enters timeline and registers",
+  "expected_result": "The entered timeline is persisted on the consultancy record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-050",
+  "source_id": "RSPC-FR-032",
+  "purpose": "Consultancy financial terms captured at registration",
+  "preconditions": "Faculty user authenticated; consultancy registration form open.",
+  "action_or_input": "Faculty enters financial terms and registers",
+  "expected_result": "The entered financial terms is persisted on the consultancy record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-051",
+  "source_id": "RSPC-FR-033 (parent RSPC-CFR-010)",
+  "purpose": "Consultancy registration is routed per institutional approval policy (BR-RSPC-022)",
+  "preconditions": "A submitted consultancy registration; approver users per CW-RSPC-02",
+  "action_or_input": "Registration is submitted and approvers act in turn",
+  "expected_result": "The registration follows the represented approval path only in order and each hand-off is recorded",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-052",
+  "source_id": "RSPC-CFR-010 path not bypassed",
+  "purpose": "Consultancy cannot skip the represented approval path",
+  "preconditions": "A submitted consultancy registration awaiting HoD review",
+  "action_or_input": "An actor attempts to approve at a later stage out of order",
+  "expected_result": "The action is rejected and the record stays at its current stage",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-053",
+  "source_id": "RSPC-FR-034 (parent RSPC-CFR-011)",
+  "purpose": "RSPC tracks consultancy payments",
+  "preconditions": "Authorized user authenticated; a consultancy project with payment, deliverable, settlement, financial and approval history exists.",
+  "action_or_input": "Record and then view consultancy payments",
+  "expected_result": "Consultancy payments are stored as project records and displayed",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-054",
+  "source_id": "RSPC-FR-035",
+  "purpose": "RSPC tracks consultancy deliverables",
+  "preconditions": "Authorized user authenticated; a consultancy project with payment, deliverable, settlement, financial and approval history exists.",
+  "action_or_input": "Record and then view consultancy deliverables",
+  "expected_result": "Consultancy deliverables are stored as project records and displayed",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-055",
+  "source_id": "RSPC-FR-036",
+  "purpose": "RSPC tracks consultancy settlements",
+  "preconditions": "Authorized user authenticated; a consultancy project with payment, deliverable, settlement, financial and approval history exists.",
+  "action_or_input": "Record and then view consultancy settlements",
+  "expected_result": "Consultancy settlements are stored as project records and displayed",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-056",
+  "source_id": "RSPC-FR-037",
+  "purpose": "Consultancy financial history maintained for authorized users",
+  "preconditions": "Authorized user authenticated; a consultancy project with payment, deliverable, settlement, financial and approval history exists.",
+  "action_or_input": "Authorized user opens the financial history",
+  "expected_result": "Complete financial history is displayed",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-057",
+  "source_id": "RSPC-FR-038",
+  "purpose": "Consultancy approval history maintained for authorized users",
+  "preconditions": "Authorized user authenticated; a consultancy project with payment, deliverable, settlement, financial and approval history exists.",
+  "action_or_input": "Authorized user opens the approval history",
+  "expected_result": "Complete approval history is displayed",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-058",
+  "source_id": "RSPC-CFR-011 unauthorized",
+  "purpose": "Consultancy history not available to unauthorized users",
+  "preconditions": "Authorized user authenticated; a consultancy project with payment, deliverable, settlement, financial and approval history exists. A user without an authorizing role exists.",
+  "action_or_input": "Unauthorized user requests the histories",
+  "expected_result": "Access is denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "TC-FR-059",
+  "source_id": "RSPC-FR-039 (parent RSPC-CFR-012)",
+  "purpose": "Faculty can request a project-based staff appointment",
+  "preconditions": "Faculty user authenticated with an eligible project",
+  "action_or_input": "Faculty submits an appointment request",
+  "expected_result": "The request is created (CW-RSPC-03 T1) and retrievable",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-060",
+  "source_id": "RSPC-FR-040",
+  "purpose": "RSPC Admin can manage advertisement records",
+  "preconditions": "RSPC Admin authenticated; an appointment request exists.",
+  "action_or_input": "RSPC Admin creates and then updates a advertisement record",
+  "expected_result": "The advertisement record is persisted and the update is reflected",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-061",
+  "source_id": "RSPC-FR-041",
+  "purpose": "RSPC Admin can manage application records",
+  "preconditions": "RSPC Admin authenticated; an appointment request exists.",
+  "action_or_input": "RSPC Admin creates and then updates a application record",
+  "expected_result": "The application record is persisted and the update is reflected",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-062",
+  "source_id": "RSPC-FR-042",
+  "purpose": "RSPC Admin can manage stipend structure records",
+  "preconditions": "RSPC Admin authenticated; an appointment request exists.",
+  "action_or_input": "RSPC Admin creates and then updates a stipend structure record",
+  "expected_result": "The stipend structure record is persisted and the update is reflected",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-063",
+  "source_id": "RSPC-FR-129",
+  "purpose": "RSPC Admin can manage staff-selection records",
+  "preconditions": "RSPC Admin authenticated; an appointment request exists.",
+  "action_or_input": "RSPC Admin creates and then updates a staff-selection record",
+  "expected_result": "The staff-selection record is persisted and the update is reflected",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-064",
+  "source_id": "RSPC-FR-131",
+  "purpose": "RSPC Admin can manage stipend-workflow records",
+  "preconditions": "RSPC Admin authenticated; an appointment request exists.",
+  "action_or_input": "RSPC Admin creates and then updates a stipend-workflow record",
+  "expected_result": "The stipend-workflow record is persisted and the update is reflected",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-065",
+  "source_id": "RSPC-FR-046",
+  "purpose": "RSPC maintains appointment duration records for staff appointments",
+  "preconditions": "RSPC Admin authenticated; an appointment request exists.",
+  "action_or_input": "Record appointment duration information for the appointment and retrieve it",
+  "expected_result": "The appointment duration record is persisted and retrievable",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-066",
+  "source_id": "RSPC-FR-047",
+  "purpose": "RSPC maintains payment records for staff appointments",
+  "preconditions": "RSPC Admin authenticated; an appointment request exists.",
+  "action_or_input": "Record payment information for the appointment and retrieve it",
+  "expected_result": "The payment record is persisted and retrievable",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-067",
+  "source_id": "RSPC-FR-048",
+  "purpose": "RSPC maintains compliance records for staff appointments",
+  "preconditions": "RSPC Admin authenticated; an appointment request exists.",
+  "action_or_input": "Record compliance information for the appointment and retrieve it",
+  "expected_result": "The compliance record is persisted and retrievable",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-068",
+  "source_id": "RSPC-FR-043 (parent RSPC-CFR-013)",
+  "purpose": "Faculty can record participation in selection",
+  "preconditions": "Faculty user authenticated; appointment process requires Faculty involvement (CW-RSPC-03 T4)",
+  "action_or_input": "Faculty records participation in the selection process",
+  "expected_result": "Participation is persisted",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-069",
+  "source_id": "RSPC-FR-044",
+  "purpose": "Faculty can submit staff selection recommendation",
+  "preconditions": "As above",
+  "action_or_input": "Faculty submits a recommendation",
+  "expected_result": "Recommendation is persisted against the appointment",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-070",
+  "source_id": "RSPC-FR-045 (parent RSPC-CFR-014)",
+  "purpose": "Staff appointment approvals routed via Dean-RSPC and Director as applicable (BR-RSPC-026)",
+  "preconditions": "Appointment request forwarded; Director applicable",
+  "action_or_input": "Dean-RSPC approves and forwards, Director acts",
+  "expected_result": "Approvals follow Dean-RSPC then Director and are recorded (CW-RSPC-03 T5-T9)",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-071",
+  "source_id": "RSPC-FR-045 Director not applicable",
+  "purpose": "Director stage skipped where not applicable",
+  "preconditions": "Appointment request for which Director is not applicable",
+  "action_or_input": "Dean-RSPC approves",
+  "expected_result": "No Director stage is created",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-FR-072",
+  "source_id": "RSPC-FR-049 (parent RSPC-CFR-015)",
+  "purpose": "Faculty can submit fund utilization request",
+  "preconditions": "Faculty authenticated",
+  "action_or_input": "Submit fund utilization request",
+  "expected_result": "Request created (CW-RSPC-04 T1)",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-073",
+  "source_id": "RSPC-FR-050",
+  "purpose": "Faculty can submit expenditure request",
+  "preconditions": "Faculty authenticated",
+  "action_or_input": "Submit expenditure request",
+  "expected_result": "Request created (CW-RSPC-04 T1)",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-074",
+  "source_id": "RSPC-FR-051",
+  "purpose": "RSPC Admin performs initial financial verification of fund requests",
+  "preconditions": "RSPC Admin authenticated; fund request submitted",
+  "action_or_input": "Verify the request",
+  "expected_result": "Verification outcome recorded and request progresses (CW-RSPC-04 T2-T3)",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-075",
+  "source_id": "RSPC-FR-052",
+  "purpose": "RSPC Admin performs initial financial verification of expenditure requests",
+  "preconditions": "RSPC Admin authenticated; expenditure request submitted",
+  "action_or_input": "Verify the request",
+  "expected_result": "Verification outcome recorded and request progresses",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-076",
+  "source_id": "RSPC-FR-053 (parent RSPC-CFR-016)",
+  "purpose": "Dean-RSPC approves financial requests within delegated powers (BR-RSPC-032)",
+  "preconditions": "Dean-RSPC authenticated; financial request within delegated powers",
+  "action_or_input": "Dean-RSPC approves",
+  "expected_result": "Approval recorded",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-077",
+  "source_id": "RSPC-FR-053 beyond delegated powers",
+  "purpose": "Dean-RSPC cannot approve beyond delegated powers",
+  "preconditions": "Financial request exceeding delegated powers",
+  "action_or_input": "Dean-RSPC attempts approval",
+  "expected_result": "Approval is not granted at Dean-RSPC stage",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-078",
+  "source_id": "RSPC-FR-054",
+  "purpose": "High-value financial requests escalated to Director (BR-RSPC-033)",
+  "preconditions": "Verified high-value financial request",
+  "action_or_input": "Dean-RSPC stage processes the request",
+  "expected_result": "Request is escalated to the Director and escalation recorded",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-079",
+  "source_id": "RSPC-FR-054 not high-value",
+  "purpose": "Non-high-value request not escalated",
+  "preconditions": "Verified financial request within delegated powers",
+  "action_or_input": "Dean-RSPC approves",
+  "expected_result": "No escalation to Director occurs",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-FR-080",
+  "source_id": "RSPC-FR-055",
+  "purpose": "Financial request lifecycle logged (BR-RSPC-034)",
+  "preconditions": "A financial request goes through verification, approval, escalation and transaction recording",
+  "action_or_input": "Retrieve the audit log of the request",
+  "expected_result": "Request, verification, approval, escalation and transaction-record entries are all present",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-081",
+  "source_id": "RSPC-FR-056 (parent RSPC-CFR-017)",
+  "purpose": "Faculty can request equipment procurement",
+  "preconditions": "Faculty authenticated; project with sanctioned budget.",
+  "action_or_input": "Submit an equipment procurement request",
+  "expected_result": "Request created (CW-RSPC-05 T1)",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-082",
+  "source_id": "RSPC-FR-057",
+  "purpose": "Faculty can request consumables procurement",
+  "preconditions": "Faculty authenticated; project with sanctioned budget.",
+  "action_or_input": "Submit a consumables procurement request",
+  "expected_result": "Request created",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-083",
+  "source_id": "RSPC-FR-058 within budget",
+  "purpose": "Procurement validated against sanctioned budget (BR-RSPC-035)",
+  "preconditions": "Faculty authenticated; project with sanctioned budget.",
+  "action_or_input": "Submit a request within sanctioned budget",
+  "expected_result": "Request passes validation and advances",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-084",
+  "source_id": "RSPC-FR-058 exceeds budget",
+  "purpose": "Procurement exceeding sanctioned budget is rejected",
+  "preconditions": "Faculty authenticated; project with sanctioned budget.",
+  "action_or_input": "Submit a request exceeding sanctioned budget",
+  "expected_result": "Request fails validation and does not advance",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-085",
+  "source_id": "RSPC-FR-058 equals budget",
+  "purpose": "Procurement equal to sanctioned budget boundary",
+  "preconditions": "Faculty authenticated; project with sanctioned budget.",
+  "action_or_input": "Submit a request equal to the remaining sanctioned budget",
+  "expected_result": "Request is validated as within budget (no unspecified rejection)",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "TC-FR-086",
+  "source_id": "RSPC-FR-059",
+  "purpose": "Procurement approval hierarchy enforced (BR-RSPC-036)",
+  "preconditions": "Validated procurement request",
+  "action_or_input": "Approvers act in the represented order",
+  "expected_result": "Request advances only along the hierarchy",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-087",
+  "source_id": "RSPC-FR-059 bypass",
+  "purpose": "Procurement hierarchy cannot be bypassed",
+  "preconditions": "Validated request at an earlier stage",
+  "action_or_input": "Actor at a later stage attempts approval",
+  "expected_result": "Action rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-088",
+  "source_id": "RSPC-FR-060",
+  "purpose": "Faculty can track procurement request status",
+  "preconditions": "Faculty has a procurement request",
+  "action_or_input": "Open the request status",
+  "expected_result": "Current status displayed and updates after each stage",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-089",
+  "source_id": "RSPC-FR-061 (parent RSPC-CFR-018)",
+  "purpose": "Faculty can submit periodic progress report",
+  "preconditions": "Faculty authenticated; project with active reporting schedule.",
+  "action_or_input": "Submit progress report",
+  "expected_result": "Report stored",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-090",
+  "source_id": "RSPC-FR-062",
+  "purpose": "Faculty can submit periodic utilization report",
+  "preconditions": "Faculty authenticated; project with active reporting schedule.",
+  "action_or_input": "Submit utilization report",
+  "expected_result": "Report stored",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-091",
+  "source_id": "RSPC-FR-063 in schedule",
+  "purpose": "Reporting schedule enforced (BR-RSPC-037)",
+  "preconditions": "Faculty authenticated; project with active reporting schedule.",
+  "action_or_input": "Submit a report within the scheduled period",
+  "expected_result": "Accepted",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-092",
+  "source_id": "RSPC-FR-063 outside schedule",
+  "purpose": "Report outside represented schedule not accepted as scheduled",
+  "preconditions": "Faculty authenticated; project with active reporting schedule.",
+  "action_or_input": "Submit a report outside the represented schedule",
+  "expected_result": "Submission is handled per the schedule rule (rejected or flagged) and not accepted as on schedule",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-093",
+  "source_id": "RSPC-FR-066 (parent RSPC-CFR-019)",
+  "purpose": "Authorized stakeholders access historical progress reports (BR-RSPC-038)",
+  "preconditions": "Past progress reports exist",
+  "action_or_input": "Authorized stakeholder opens history",
+  "expected_result": "Historical progress reports listed",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-094",
+  "source_id": "RSPC-FR-067",
+  "purpose": "Authorized stakeholders access historical utilization reports (BR-RSPC-039)",
+  "preconditions": "Past utilization reports exist",
+  "action_or_input": "Authorized stakeholder opens history",
+  "expected_result": "Historical utilization reports listed",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-095",
+  "source_id": "RSPC-CFR-019 unauthorized",
+  "purpose": "Unauthorized users cannot access historical reports",
+  "preconditions": "Past reports exist",
+  "action_or_input": "User without authorization requests reports",
+  "expected_result": "Access denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "TC-FR-096",
+  "source_id": "RSPC-FR-068 (parent RSPC-CFR-020)",
+  "purpose": "Faculty can submit closure report",
+  "preconditions": "Faculty authenticated; project eligible for closure.",
+  "action_or_input": "Submit closure report",
+  "expected_result": "Stored (CW-RSPC-06 T1)",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-097",
+  "source_id": "RSPC-FR-069",
+  "purpose": "Faculty can submit completion report",
+  "preconditions": "Faculty authenticated; project eligible for closure.",
+  "action_or_input": "Submit completion report",
+  "expected_result": "Stored",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-098",
+  "source_id": "RSPC-FR-070",
+  "purpose": "Financial settlement verified during closure",
+  "preconditions": "Closure submitted; RSPC Admin authenticated",
+  "action_or_input": "Verify settlement records",
+  "expected_result": "Verification outcome recorded (CW-RSPC-06 T2-T3)",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-099",
+  "source_id": "RSPC-FR-071",
+  "purpose": "Asset declarations verified during closure",
+  "preconditions": "Closure submitted",
+  "action_or_input": "Verify asset declaration records",
+  "expected_result": "Verification outcome recorded",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-100",
+  "source_id": "RSPC-FR-072",
+  "purpose": "Closure approvals recorded",
+  "preconditions": "Closure at Dean-RSPC stage",
+  "action_or_input": "Dean-RSPC approves closure",
+  "expected_result": "Approval recorded with decision",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-101",
+  "source_id": "RSPC-FR-073",
+  "purpose": "Closed projects archived with complete audit trails (BR-RSPC-043)",
+  "preconditions": "Closure approved",
+  "action_or_input": "Closure completes",
+  "expected_result": "Project archived and its complete audit trail is retrievable",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-102",
+  "source_id": "RSPC-FR-130",
+  "purpose": "Closure-related remarks recorded",
+  "preconditions": "Closure under review",
+  "action_or_input": "Reviewer enters remarks",
+  "expected_result": "Remarks persisted",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-103",
+  "source_id": "RSPC-CFR-020 full path",
+  "purpose": "Closure path from submission to archival",
+  "preconditions": "Closure submitted",
+  "action_or_input": "Verify, approve and archive in order",
+  "expected_result": "Project goes Submitted, Verified, Approved, Archived with each step recorded",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-104",
+  "source_id": "RSPC-FR-026 (parent RSPC-CFR-021)",
+  "purpose": "RSPC generates research-proposal review-stage notifications",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: proposal reaches a review stage",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-105",
+  "source_id": "RSPC-FR-064",
+  "purpose": "RSPC generates pending progress report reminders",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: progress report is pending",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-106",
+  "source_id": "RSPC-FR-065",
+  "purpose": "RSPC generates pending utilization report reminders",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: utilization report is pending",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-107",
+  "source_id": "RSPC-FR-074",
+  "purpose": "RSPC generates proposal submission notifications",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: proposal is submitted",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-108",
+  "source_id": "RSPC-FR-075",
+  "purpose": "RSPC generates proposal approval notifications",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: proposal is approved",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-109",
+  "source_id": "RSPC-FR-076",
+  "purpose": "RSPC generates pending-action notifications",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: an action is pending on a stakeholder",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-110",
+  "source_id": "RSPC-FR-077",
+  "purpose": "RSPC generates escalation notifications",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: a request is escalated",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-111",
+  "source_id": "RSPC-FR-078",
+  "purpose": "RSPC generates reporting-deadline notifications",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: a reporting deadline approaches",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-112",
+  "source_id": "RSPC-FR-079",
+  "purpose": "RSPC generates financial approval notifications",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: a financial request is approved",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-113",
+  "source_id": "RSPC-FR-080",
+  "purpose": "RSPC generates compliance-requirement notifications",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: a represented compliance requirement applies",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-114",
+  "source_id": "RSPC-FR-132",
+  "purpose": "RSPC generates proposal rejection notifications",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger the event: proposal is rejected",
+  "expected_result": "A notification for the event is created for the relevant stakeholders",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-115",
+  "source_id": "RSPC-FR-081",
+  "purpose": "Notifications delivered via Fusion dashboard (BR-RSPC-061)",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger a supported event",
+  "expected_result": "Notification appears on the recipient's Fusion dashboard",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-116",
+  "source_id": "RSPC-FR-082",
+  "purpose": "System-generated email notifications triggered (BR-RSPC-061)",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger a supported event",
+  "expected_result": "An email notification event is handed to the email channel",
+  "test_type": "notification"
+ },
+ {
+  "test_id": "TC-FR-117",
+  "source_id": "RSPC-FR-099",
+  "purpose": "Notification delivery infrastructure is external",
+  "preconditions": "Recipient stakeholder exists; RSPC notification configuration supports dashboard and email channels.",
+  "action_or_input": "Trigger an event and inspect RSPC",
+  "expected_result": "RSPC triggers the notification event only and offers no email delivery infrastructure itself",
+  "test_type": "scope-boundary"
+ },
+ {
+  "test_id": "TC-FR-118",
+  "source_id": "RSPC-FR-083 (parent RSPC-CFR-022)",
+  "purpose": "RSPC exchanges info with other Fusion modules where configured (BR-RSPC-045)",
+  "preconditions": "Integration configured with another Fusion module",
+  "action_or_input": "Trigger an RSPC workflow event",
+  "expected_result": "Information is exchanged, referenced or recorded through the configured integration",
+  "test_type": "integration"
+ },
+ {
+  "test_id": "TC-FR-119",
+  "source_id": "RSPC-FR-083 not configured",
+  "purpose": "No exchange where integration not configured",
+  "preconditions": "No explicit integration configured",
+  "action_or_input": "Trigger the event",
+  "expected_result": "No exchange occurs",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-120",
+  "source_id": "RSPC-FR-084",
+  "purpose": "Submission tracking from external funding agency recorded",
+  "preconditions": "Integration supplies submission tracking",
+  "action_or_input": "Receive submission tracking data",
+  "expected_result": "Recorded in RSPC",
+  "test_type": "integration"
+ },
+ {
+  "test_id": "TC-FR-121",
+  "source_id": "RSPC-FR-085",
+  "purpose": "Disbursement tracking from external funding agency recorded",
+  "preconditions": "Integration supplies disbursement data",
+  "action_or_input": "Receive disbursement data",
+  "expected_result": "Recorded in RSPC",
+  "test_type": "integration"
+ },
+ {
+  "test_id": "TC-FR-122",
+  "source_id": "RSPC-FR-100",
+  "purpose": "RSPC does not own external agency processes (BR-RSPC-062)",
+  "preconditions": "Tracking records exist",
+  "action_or_input": "Look for functionality to submit or decide on behalf of the agency",
+  "expected_result": "No such capability exists; tracking records remain available",
+  "test_type": "scope-boundary"
+ },
+ {
+  "test_id": "TC-FR-123",
+  "source_id": "RSPC-FR-086 (parent RSPC-CFR-023)",
+  "purpose": "RBAC enforced for project data (BR-RSPC-048)",
+  "preconditions": "Users with and without a role for a project",
+  "action_or_input": "Each requests project data",
+  "expected_result": "Permitted role gets data; others denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "TC-FR-124",
+  "source_id": "RSPC-FR-087",
+  "purpose": "Users restricted to actions permitted by RSPC roles (BR-RSPC-049)",
+  "preconditions": "User with Faculty role",
+  "action_or_input": "Attempt an action reserved for Dean-RSPC",
+  "expected_result": "Action denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "TC-FR-125",
+  "source_id": "RSPC-FR-101",
+  "purpose": "RSPC does not own authentication or RBAC administration (BR-RSPC-063)",
+  "preconditions": "RSPC deployed",
+  "action_or_input": "Look for RSPC functions for authentication or role administration",
+  "expected_result": "None exist beyond RSPC role/action restrictions",
+  "test_type": "scope-boundary"
+ },
+ {
+  "test_id": "TC-FR-126",
+  "source_id": "RSPC-FR-091 (parent RSPC-CFR-024)",
+  "purpose": "Role assignment info consumed (BR-RSPC-053)",
+  "preconditions": "Role-management mechanism supplies assignment",
+  "action_or_input": "Supply a role assignment for user U",
+  "expected_result": "RSPC holds the role for U",
+  "test_type": "integration"
+ },
+ {
+  "test_id": "TC-FR-127",
+  "source_id": "RSPC-FR-092",
+  "purpose": "Role reassignment info consumed (BR-RSPC-054)",
+  "preconditions": "U holds a role",
+  "action_or_input": "Supply a reassignment",
+  "expected_result": "RSPC holds the new role for U",
+  "test_type": "integration"
+ },
+ {
+  "test_id": "TC-FR-128",
+  "source_id": "RSPC-FR-093",
+  "purpose": "Role changes effective immediately (BR-RSPC-055)",
+  "preconditions": "U performs an action allowed by old role",
+  "action_or_input": "Reassign role, U immediately retries actions",
+  "expected_result": "New role permissions apply at once; old ones denied",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-129",
+  "source_id": "RSPC-FR-094",
+  "purpose": "Role assignments logged",
+  "preconditions": "Assignment supplied",
+  "action_or_input": "Retrieve role log",
+  "expected_result": "Assignment entry present",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-130",
+  "source_id": "RSPC-FR-095",
+  "purpose": "Role reassignments logged",
+  "preconditions": "Reassignment supplied",
+  "action_or_input": "Retrieve role log",
+  "expected_result": "Reassignment entry present",
+  "test_type": "record"
+ },
+ {
+  "test_id": "TC-FR-131",
+  "source_id": "RSPC-FR-096 (parent RSPC-CFR-025)",
+  "purpose": "No HR/payroll processing (BR-RSPC-058)",
+  "preconditions": "Appointment with payment records",
+  "action_or_input": "Look for payroll or HR master-data processing",
+  "expected_result": "None exists; appointment records and statuses remain available",
+  "test_type": "scope-boundary"
+ },
+ {
+  "test_id": "TC-FR-132",
+  "source_id": "RSPC-FR-097 (parent RSPC-CFR-026)",
+  "purpose": "No accounts payment execution (BR-RSPC-059)",
+  "preconditions": "Approved financial request",
+  "action_or_input": "Look for payment execution",
+  "expected_result": "None exists; request, approval, status and transaction records remain available",
+  "test_type": "scope-boundary"
+ },
+ {
+  "test_id": "TC-FR-133",
+  "source_id": "RSPC-FR-098 (parent RSPC-CFR-027)",
+  "purpose": "No procurement execution or stock operations (BR-RSPC-060)",
+  "preconditions": "Approved procurement request",
+  "action_or_input": "Look for purchase or stock operations",
+  "expected_result": "None exist; request and status tracking remain available",
+  "test_type": "scope-boundary"
+ },
+ {
+  "test_id": "TC-FR-134",
+  "source_id": "RSPC-FR-103 (parent RSPC-CFR-028)",
+  "purpose": "Faculty can update project details when lifecycle permits (BR-RSPC-065)",
+  "preconditions": "Faculty authenticated; project in a lifecycle state that permits updates.",
+  "action_or_input": "Update details",
+  "expected_result": "Update persisted",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-135",
+  "source_id": "RSPC-FR-104",
+  "purpose": "Faculty can update project milestones when lifecycle permits (BR-RSPC-065)",
+  "preconditions": "Faculty authenticated; project in a lifecycle state that permits updates.",
+  "action_or_input": "Update milestones",
+  "expected_result": "Update persisted",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-136",
+  "source_id": "RSPC-FR-105",
+  "purpose": "Faculty can update project progress information when lifecycle permits (BR-RSPC-065)",
+  "preconditions": "Faculty authenticated; project in a lifecycle state that permits updates.",
+  "action_or_input": "Update progress information",
+  "expected_result": "Update persisted",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-137",
+  "source_id": "RSPC-FR-106",
+  "purpose": "Faculty can update project utilization information when lifecycle permits (BR-RSPC-065)",
+  "preconditions": "Faculty authenticated; project in a lifecycle state that permits updates.",
+  "action_or_input": "Update utilization information",
+  "expected_result": "Update persisted",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-138",
+  "source_id": "RSPC-FR-103 lifecycle not permitting",
+  "purpose": "Faculty cannot update project details when lifecycle does not permit",
+  "preconditions": "Faculty authenticated; project in a lifecycle state that does not permit updates (for example archived)",
+  "action_or_input": "Attempt update of details",
+  "expected_result": "Update is rejected and stored data unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-139",
+  "source_id": "RSPC-FR-104 lifecycle not permitting",
+  "purpose": "Faculty cannot update project milestones when lifecycle does not permit",
+  "preconditions": "Faculty authenticated; project in a lifecycle state that does not permit updates (for example archived)",
+  "action_or_input": "Attempt update of milestones",
+  "expected_result": "Update is rejected and stored data unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-140",
+  "source_id": "RSPC-FR-105 lifecycle not permitting",
+  "purpose": "Faculty cannot update project progress information when lifecycle does not permit",
+  "preconditions": "Faculty authenticated; project in a lifecycle state that does not permit updates (for example archived)",
+  "action_or_input": "Attempt update of progress information",
+  "expected_result": "Update is rejected and stored data unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-141",
+  "source_id": "RSPC-FR-106 lifecycle not permitting",
+  "purpose": "Faculty cannot update project utilization information when lifecycle does not permit",
+  "preconditions": "Faculty authenticated; project in a lifecycle state that does not permit updates (for example archived)",
+  "action_or_input": "Attempt update of utilization information",
+  "expected_result": "Update is rejected and stored data unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-142",
+  "source_id": "RSPC-FR-110 (parent RSPC-CFR-029)",
+  "purpose": "RSPC Admin verifies completeness of research-project proposals",
+  "preconditions": "RSPC Admin authenticated; submitted record present.",
+  "action_or_input": "Admin verifies completeness of research-project proposals",
+  "expected_result": "Completeness result recorded",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-143",
+  "source_id": "RSPC-FR-111",
+  "purpose": "RSPC Admin verifies completeness of consultancy records",
+  "preconditions": "RSPC Admin authenticated; submitted record present.",
+  "action_or_input": "Admin verifies completeness of consultancy records",
+  "expected_result": "Completeness result recorded",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-144",
+  "source_id": "RSPC-FR-112",
+  "purpose": "RSPC Admin verifies completeness of project-based staff-appointment requests",
+  "preconditions": "RSPC Admin authenticated; submitted record present.",
+  "action_or_input": "Admin verifies completeness of project-based staff-appointment requests",
+  "expected_result": "Completeness result recorded",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-145",
+  "source_id": "RSPC-FR-113",
+  "purpose": "RSPC Admin verifies completeness of fund-utilization and expenditure requests",
+  "preconditions": "RSPC Admin authenticated; submitted record present.",
+  "action_or_input": "Admin verifies completeness of fund-utilization and expenditure requests",
+  "expected_result": "Completeness result recorded",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-146",
+  "source_id": "RSPC-FR-114",
+  "purpose": "RSPC Admin verifies completeness of procurement requests",
+  "preconditions": "RSPC Admin authenticated; submitted record present.",
+  "action_or_input": "Admin verifies completeness of procurement requests",
+  "expected_result": "Completeness result recorded",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-147",
+  "source_id": "RSPC-FR-115",
+  "purpose": "RSPC Admin verifies completeness of project-closure records",
+  "preconditions": "RSPC Admin authenticated; submitted record present.",
+  "action_or_input": "Admin verifies completeness of project-closure records",
+  "expected_result": "Completeness result recorded",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-148",
+  "source_id": "RSPC-FR-116",
+  "purpose": "RSPC Admin checks records against institutional and funding-agency requirements",
+  "preconditions": "RSPC Admin authenticated; submitted record present. Requirements configured.",
+  "action_or_input": "Admin runs the requirements check",
+  "expected_result": "Result of the check recorded against the record",
+  "test_type": "functional"
+ },
+ {
+  "test_id": "TC-FR-149",
+  "source_id": "RSPC-FR-117 eligible",
+  "purpose": "RSPC Admin forwards eligible requests along the approval path",
+  "preconditions": "RSPC Admin authenticated; submitted record present. Request is complete and eligible.",
+  "action_or_input": "Admin forwards the request",
+  "expected_result": "Request moves to the applicable approving authority",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-FR-150",
+  "source_id": "RSPC-FR-117 ineligible",
+  "purpose": "Ineligible requests are not forwarded",
+  "preconditions": "RSPC Admin authenticated; submitted record present. Request incomplete or failing requirement check.",
+  "action_or_input": "Admin attempts to forward",
+  "expected_result": "Request is not forwarded",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "TC-FR-151",
+  "source_id": "RSPC-CFR-029 forwarding by type",
+  "purpose": "Eligible requests of each type reach the applicable authority",
+  "preconditions": "Eligible records of each type: proposal, consultancy, staff appointment, financial, procurement, closure",
+  "action_or_input": "Admin forwards each",
+  "expected_result": "Each reaches its represented approving authority only",
+  "test_type": "workflow"
+ }
+]

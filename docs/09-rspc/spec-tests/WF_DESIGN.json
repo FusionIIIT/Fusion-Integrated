@@ -1,0 +1,308 @@
+[
+ {
+  "test_id": "TC-WF-001",
+  "source_id": "BW-RSPC-01 main path (also exercises CW-RSPC-01 rows 1,2,4,6)",
+  "purpose": "Verify end-to-end success path: Research Proposal Approved at Dean-RSPC",
+  "preconditions": "Records exist for the actors (Faculty, HoD, RSPC Admin, Dean-RSPC) with required roles; the request is in state 'Proposal Draft'; all guards for the path are satisfied",
+  "action_or_input": "RSPC-UC-002 (valid mandatory fields) then HoD recommends (UC-003), RSPC Admin verifies as eligible (UC-004), Dean-RSPC approves with Director action not required (UC-005)",
+  "expected_result": "Each step succeeds and the request moves in order through: Proposal Draft -> Proposal Submitted -> Department Recommended -> Admin Verified -> Approved; final state is 'Approved'",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-002",
+  "source_id": "BW-RSPC-02 main path (also exercises CW-RSPC-01 rows 7,9)",
+  "purpose": "Verify end-to-end success path: Research Proposal Approved via Director",
+  "preconditions": "Records exist for the actors (Faculty, HoD, RSPC Admin, Dean-RSPC, Director) with required roles; the request is in state 'Proposal Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty submits valid proposal; HoD recommends; Admin verifies eligible; Dean-RSPC decides Director action is required; Director records approval (UC-006)",
+  "expected_result": "Each step succeeds and the request moves in order through: Proposal Draft -> Proposal Submitted -> Department Recommended -> Admin Verified -> Forwarded to Director -> Approved; final state is 'Approved'",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-003",
+  "source_id": "BW-RSPC-03 main path (also exercises CW-RSPC-02 rows 1,2,5,7)",
+  "purpose": "Verify end-to-end success path: Consultancy Approved at Dean-RSPC",
+  "preconditions": "Records exist for the actors (Faculty, HoD, RSPC Admin, Dean-RSPC) with required roles; the request is in state 'Consultancy Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty registers consultancy (UC-007); HoD recommends positively (department stage applicable); Admin verifies eligible; Dean-RSPC approves, Director not required",
+  "expected_result": "Each step succeeds and the request moves in order through: Consultancy Draft -> Consultancy Submitted -> Department Recommended -> Admin Verified -> Approved; final state is 'Approved'",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-004",
+  "source_id": "BW-RSPC-04 main path (also exercises CW-RSPC-02 rows 8,10)",
+  "purpose": "Verify end-to-end success path: Consultancy Approved via Director",
+  "preconditions": "Records exist for the actors (Faculty, HoD, RSPC Admin, Dean-RSPC, Director) with required roles; the request is in state 'Consultancy Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty registers consultancy; HoD recommends; Admin verifies eligible; Dean-RSPC decides Director action required; Director records approval",
+  "expected_result": "Each step succeeds and the request moves in order through: Consultancy Draft -> Consultancy Submitted -> Department Recommended -> Admin Verified -> Forwarded to Director -> Approved; final state is 'Approved'",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-005",
+  "source_id": "BW-RSPC-05 main path (also exercises CW-RSPC-03 rows 1,2,4,5)",
+  "purpose": "Verify end-to-end success path: Staff Appointment Approved at Dean-RSPC",
+  "preconditions": "Records exist for the actors (Faculty, RSPC Admin, Dean-RSPC) with required roles; the request is in state 'Appointment Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty submits staff appointment request (UC-009); Admin verifies and prepares records (UC-010); Faculty records selection recommendation (UC-022); Dean-RSPC approves, Director not required (UC-023)",
+  "expected_result": "Each step succeeds and the request moves in order through: Appointment Draft -> Appointment Requested -> Admin Verified -> Selection Recommendation Recorded -> Approved; final state is 'Approved'",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-006",
+  "source_id": "BW-RSPC-06 main path (also exercises CW-RSPC-03 rows 6,8)",
+  "purpose": "Verify end-to-end success path: Staff Appointment Approved via Director",
+  "preconditions": "Records exist for the actors (Faculty, RSPC Admin, Dean-RSPC, Director) with required roles; the request is in state 'Appointment Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty submits request; Admin verifies; Faculty records selection recommendation; Dean-RSPC decides Director action required; Director records approval",
+  "expected_result": "Each step succeeds and the request moves in order through: Appointment Draft -> Appointment Requested -> Admin Verified -> Selection Recommendation Recorded -> Forwarded to Director -> Approved; final state is 'Approved'",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-007",
+  "source_id": "BW-RSPC-07 main path (also exercises CW-RSPC-04 rows 1,2,4)",
+  "purpose": "Verify end-to-end success path: Financial Request Approved at Dean-RSPC",
+  "preconditions": "Records exist for the actors (Faculty, RSPC Admin, Dean-RSPC) with required roles; the request is in state 'Financial Request Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty submits fund-utilization/expenditure request (UC-011); Admin verifies (UC-012); Dean-RSPC approves within delegated financial powers (UC-024)",
+  "expected_result": "Each step succeeds and the request moves in order through: Financial Request Draft -> Submitted -> Verified -> Approved; final state is 'Approved'",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-008",
+  "source_id": "BW-RSPC-08 main path (also exercises CW-RSPC-04 rows 5,7)",
+  "purpose": "Verify end-to-end success path: Financial Request Approved via Director",
+  "preconditions": "Records exist for the actors (Faculty, RSPC Admin, Dean-RSPC, Director) with required roles; the request is in state 'Financial Request Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty submits high-value request; Admin verifies; Dean-RSPC forwards due to high-value/Director condition; Director records approval/authorization",
+  "expected_result": "Each step succeeds and the request moves in order through: Financial Request Draft -> Submitted -> Verified -> Forwarded to Director -> Approved; final state is 'Approved'",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-009",
+  "source_id": "BW-RSPC-09 main path (also exercises CW-RSPC-05 rows 1,2,4)",
+  "purpose": "Verify end-to-end success path: Procurement Request Approved at Dean-RSPC",
+  "preconditions": "Records exist for the actors (Faculty, RSPC Admin, Dean-RSPC) with required roles; the request is in state 'Procurement Request Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty submits equipment/consumables request (UC-013) within sanctioned budget; Admin verification and budget validation pass (UC-025); Dean-RSPC approves within authority (UC-026)",
+  "expected_result": "Each step succeeds and the request moves in order through: Procurement Request Draft -> Submitted -> Verified -> Approved; final state is 'Approved'",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-010",
+  "source_id": "BW-RSPC-10 main path (also exercises CW-RSPC-05 rows 5,7)",
+  "purpose": "Verify end-to-end success path: Procurement Request Approved via Director",
+  "preconditions": "Records exist for the actors (Faculty, RSPC Admin, Dean-RSPC, Director) with required roles; the request is in state 'Procurement Request Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty submits request; Admin verification and budget validation pass; Dean-RSPC forwards because hierarchy requires Director; Director approves",
+  "expected_result": "Each step succeeds and the request moves in order through: Procurement Request Draft -> Submitted -> Verified -> Forwarded to Director -> Approved; final state is 'Approved'",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-011",
+  "source_id": "BW-RSPC-11 main path (also exercises CW-RSPC-06 rows 1,2,4)",
+  "purpose": "Verify end-to-end success path: Project Closure Approved and Archived at Dean-RSPC",
+  "preconditions": "Records exist for the actors (Faculty, RSPC Admin, Dean-RSPC) with required roles; the request is in state 'Closure Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty submits closure/completion record (UC-015); Admin verifies closure completeness and settlement/asset/compliance records (UC-027); Dean-RSPC approves within authority (UC-028)",
+  "expected_result": "Each step succeeds and the request moves in order through: Closure Draft -> Closure Submitted -> Closure Verified -> Archived; final state is 'Archived'; project is completed and archived",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-012",
+  "source_id": "BW-RSPC-12 main path (also exercises CW-RSPC-06 rows 5,7)",
+  "purpose": "Verify end-to-end success path: Project Closure Approved and Archived via Director",
+  "preconditions": "Records exist for the actors (Faculty, RSPC Admin, Dean-RSPC, Director) with required roles; the request is in state 'Closure Draft'; all guards for the path are satisfied",
+  "action_or_input": "Faculty submits closure record; Admin verifies; Dean-RSPC decides Director action required; Director approves closure",
+  "expected_result": "Each step succeeds and the request moves in order through: Closure Draft -> Closure Submitted -> Closure Verified -> Forwarded to Director -> Archived; final state is 'Archived'; project is completed and archived",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-013",
+  "source_id": "CW-RSPC-01 row 3 (Not recommended)",
+  "purpose": "Verify decision outcome 'Department Not Recommended' from 'Proposal Submitted'",
+  "preconditions": "Request exists in state 'Proposal Submitted'; HoD is authorized to act",
+  "action_or_input": "HoD performs the review/verification/decision with outcome: Not recommended",
+  "expected_result": "State becomes 'Department Not Recommended'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-014",
+  "source_id": "CW-RSPC-01 row 5 (Verification outcome is not eligible for forwarding)",
+  "purpose": "Verify decision outcome 'Not Eligible for Forwarding' from 'Department Recommended'",
+  "preconditions": "Request exists in state 'Department Recommended'; RSPC Admin is authorized to act",
+  "action_or_input": "RSPC Admin performs the review/verification/decision with outcome: Verification outcome is not eligible for forwarding",
+  "expected_result": "State becomes 'Not Eligible for Forwarding'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-015",
+  "source_id": "CW-RSPC-01 row 8 (Dean-RSPC does not approve)",
+  "purpose": "Verify decision outcome 'Dean Not Approved' from 'Admin Verified'",
+  "preconditions": "Request exists in state 'Admin Verified'; Dean-RSPC is authorized to act",
+  "action_or_input": "Dean-RSPC performs the review/verification/decision with outcome: Dean-RSPC does not approve",
+  "expected_result": "State becomes 'Dean Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-016",
+  "source_id": "CW-RSPC-01 row 10 (Director does not approve)",
+  "purpose": "Verify decision outcome 'Director Not Approved' from 'Forwarded to Director'",
+  "preconditions": "Request exists in state 'Forwarded to Director'; Director is authorized to act",
+  "action_or_input": "Director performs the review/verification/decision with outcome: Director does not approve",
+  "expected_result": "State becomes 'Director Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-017",
+  "source_id": "CW-RSPC-02 row 3 (Department stage applicable and not recommended)",
+  "purpose": "Verify decision outcome 'Department Not Recommended' from 'Consultancy Submitted'",
+  "preconditions": "Request exists in state 'Consultancy Submitted'; HoD is authorized to act",
+  "action_or_input": "HoD performs the review/verification/decision with outcome: Department stage applicable and not recommended",
+  "expected_result": "State becomes 'Department Not Recommended'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-018",
+  "source_id": "CW-RSPC-02 row 4 (Department stage not applicable; verification eligible)",
+  "purpose": "Verify decision outcome 'Admin Verified' from 'Consultancy Submitted'",
+  "preconditions": "Request exists in state 'Consultancy Submitted'; RSPC Admin is authorized to act ; department stage is not applicable (HoD step skipped)",
+  "action_or_input": "RSPC Admin performs the review/verification/decision with outcome: Department stage not applicable; verification eligible",
+  "expected_result": "State becomes 'Admin Verified'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-019",
+  "source_id": "CW-RSPC-02 row 6 (from Consultancy Submitted) (Verification not eligible for forwarding)",
+  "purpose": "Verify decision outcome 'Not Eligible for Forwarding' from 'Consultancy Submitted'",
+  "preconditions": "Request exists in state 'Consultancy Submitted'; RSPC Admin is authorized to act",
+  "action_or_input": "RSPC Admin performs the review/verification/decision with outcome: Verification not eligible for forwarding",
+  "expected_result": "State becomes 'Not Eligible for Forwarding'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-020",
+  "source_id": "CW-RSPC-02 row 6 (from Department Recommended) (Verification not eligible for forwarding)",
+  "purpose": "Verify decision outcome 'Not Eligible for Forwarding' from 'Department Recommended'",
+  "preconditions": "Request exists in state 'Department Recommended'; RSPC Admin is authorized to act",
+  "action_or_input": "RSPC Admin performs the review/verification/decision with outcome: Verification not eligible for forwarding",
+  "expected_result": "State becomes 'Not Eligible for Forwarding'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-021",
+  "source_id": "CW-RSPC-02 row 9 (Dean-RSPC does not approve)",
+  "purpose": "Verify decision outcome 'Dean Not Approved' from 'Admin Verified'",
+  "preconditions": "Request exists in state 'Admin Verified'; Dean-RSPC is authorized to act",
+  "action_or_input": "Dean-RSPC performs the review/verification/decision with outcome: Dean-RSPC does not approve",
+  "expected_result": "State becomes 'Dean Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-022",
+  "source_id": "CW-RSPC-02 row 11 (Director does not approve)",
+  "purpose": "Verify decision outcome 'Director Not Approved' from 'Forwarded to Director'",
+  "preconditions": "Request exists in state 'Forwarded to Director'; Director is authorized to act",
+  "action_or_input": "Director performs the review/verification/decision with outcome: Director does not approve",
+  "expected_result": "State becomes 'Director Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-023",
+  "source_id": "CW-RSPC-03 row 3 (Verification not eligible for forwarding)",
+  "purpose": "Verify decision outcome 'Not Eligible for Forwarding' from 'Appointment Requested'",
+  "preconditions": "Request exists in state 'Appointment Requested'; RSPC Admin is authorized to act",
+  "action_or_input": "RSPC Admin performs the review/verification/decision with outcome: Verification not eligible for forwarding",
+  "expected_result": "State becomes 'Not Eligible for Forwarding'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-024",
+  "source_id": "CW-RSPC-03 row 7 (Dean-RSPC does not approve)",
+  "purpose": "Verify decision outcome 'Dean Not Approved' from 'Selection Recommendation Recorded'",
+  "preconditions": "Request exists in state 'Selection Recommendation Recorded'; Dean-RSPC is authorized to act",
+  "action_or_input": "Dean-RSPC performs the review/verification/decision with outcome: Dean-RSPC does not approve",
+  "expected_result": "State becomes 'Dean Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-025",
+  "source_id": "CW-RSPC-03 row 9 (Director does not approve)",
+  "purpose": "Verify decision outcome 'Director Not Approved' from 'Forwarded to Director'",
+  "preconditions": "Request exists in state 'Forwarded to Director'; Director is authorized to act",
+  "action_or_input": "Director performs the review/verification/decision with outcome: Director does not approve",
+  "expected_result": "State becomes 'Director Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-026",
+  "source_id": "CW-RSPC-04 row 3 (Verification not eligible for forwarding)",
+  "purpose": "Verify decision outcome 'Not Eligible for Forwarding' from 'Submitted'",
+  "preconditions": "Request exists in state 'Submitted'; RSPC Admin is authorized to act",
+  "action_or_input": "RSPC Admin performs the review/verification/decision with outcome: Verification not eligible for forwarding",
+  "expected_result": "State becomes 'Not Eligible for Forwarding'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-027",
+  "source_id": "CW-RSPC-04 row 6 (Dean-RSPC does not approve)",
+  "purpose": "Verify decision outcome 'Dean Not Approved' from 'Verified'",
+  "preconditions": "Request exists in state 'Verified'; Dean-RSPC is authorized to act",
+  "action_or_input": "Dean-RSPC performs the review/verification/decision with outcome: Dean-RSPC does not approve",
+  "expected_result": "State becomes 'Dean Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-028",
+  "source_id": "CW-RSPC-04 row 8 (Director does not approve/authorize)",
+  "purpose": "Verify decision outcome 'Director Not Approved' from 'Forwarded to Director'",
+  "preconditions": "Request exists in state 'Forwarded to Director'; Director is authorized to act",
+  "action_or_input": "Director performs the review/verification/decision with outcome: Director does not approve/authorize",
+  "expected_result": "State becomes 'Director Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-029",
+  "source_id": "CW-RSPC-05 row 3 (Verification or represented budget validation fails)",
+  "purpose": "Verify decision outcome 'Not Eligible for Forwarding' from 'Submitted'",
+  "preconditions": "Request exists in state 'Submitted'; RSPC Admin is authorized to act ; procurement amount exceeds the sanctioned budget",
+  "action_or_input": "RSPC Admin performs the review/verification/decision with outcome: Verification or represented budget validation fails",
+  "expected_result": "State becomes 'Not Eligible for Forwarding'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-030",
+  "source_id": "CW-RSPC-05 row 6 (Dean-RSPC does not approve)",
+  "purpose": "Verify decision outcome 'Dean Not Approved' from 'Verified'",
+  "preconditions": "Request exists in state 'Verified'; Dean-RSPC is authorized to act",
+  "action_or_input": "Dean-RSPC performs the review/verification/decision with outcome: Dean-RSPC does not approve",
+  "expected_result": "State becomes 'Dean Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-031",
+  "source_id": "CW-RSPC-05 row 8 (Director does not approve/authorize)",
+  "purpose": "Verify decision outcome 'Director Not Approved' from 'Forwarded to Director'",
+  "preconditions": "Request exists in state 'Forwarded to Director'; Director is authorized to act",
+  "action_or_input": "Director performs the review/verification/decision with outcome: Director does not approve/authorize",
+  "expected_result": "State becomes 'Director Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-032",
+  "source_id": "CW-RSPC-06 row 3 (Verification not eligible for forwarding)",
+  "purpose": "Verify decision outcome 'Not Eligible for Forwarding' from 'Closure Submitted'",
+  "preconditions": "Request exists in state 'Closure Submitted'; RSPC Admin is authorized to act",
+  "action_or_input": "RSPC Admin performs the review/verification/decision with outcome: Verification not eligible for forwarding",
+  "expected_result": "State becomes 'Not Eligible for Forwarding'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-033",
+  "source_id": "CW-RSPC-06 row 6 (Dean-RSPC does not approve closure)",
+  "purpose": "Verify decision outcome 'Dean Not Approved' from 'Closure Verified'",
+  "preconditions": "Request exists in state 'Closure Verified'; Dean-RSPC is authorized to act",
+  "action_or_input": "Dean-RSPC performs the review/verification/decision with outcome: Dean-RSPC does not approve closure",
+  "expected_result": "State becomes 'Dean Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ },
+ {
+  "test_id": "TC-WF-034",
+  "source_id": "CW-RSPC-06 row 8 (Director does not approve closure)",
+  "purpose": "Verify decision outcome 'Director Not Approved' from 'Forwarded to Director'",
+  "preconditions": "Request exists in state 'Forwarded to Director'; Director is authorized to act",
+  "action_or_input": "Director performs the review/verification/decision with outcome: Director does not approve closure",
+  "expected_result": "State becomes 'Director Not Approved'; request does not proceed to the next success state",
+  "test_type": "workflow"
+ }
+]
