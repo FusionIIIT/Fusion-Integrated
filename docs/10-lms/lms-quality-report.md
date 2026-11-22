@@ -14,13 +14,21 @@ Both coverage runs from Step 5.14, with totals:
 - Module coverage ≥ 90%, domain coverage ≥ 95% — in progress (14 tests passing today; coverage targets not yet met).
 
 ## 3. Test counts per file; journey tests mapped to use-case ids
+Student 1's existing tests (14 passing):
 - `test_domain.py` — state machine transitions
 - `test_api.py` — smoke tests
 - `test_privilege_escalation.py` — permission gates
 - `test_scoping.py` — isolation
 - `test_query_budgets.py` — N+1 detection
 - `test_journeys.py` — UC main success scenarios
+
+Student 2's spec tests (Step 8, all four strategies designed + written, ruff clean):
+- `docs/10-lms/spec-tests/br/BR_DESIGN.json` + `modules/lms/tests/spec/br/test_br.py` — 19 tests (BR-LMS-001..019)
+- `docs/10-lms/spec-tests/uc/UC_DESIGN.json` + `modules/lms/tests/spec/uc/test_uc.py` — 15 tests (UC-LMS-001..015)
+- `docs/10-lms/spec-tests/fr/FR_DESIGN.json` + `modules/lms/tests/spec/fr/test_fr.py` — 10 tests (FR-LMS-3.1..3.6)
+- `docs/10-lms/spec-tests/wf/WF_DESIGN.json` + `modules/lms/tests/spec/wf/test_wf.py` — 9 tests (BW-LMS-01..05, CW-LMS-01, CW-LMS-02)
 Journey tests for every live use case: not yet complete (Step 5.12).
+Spec test execution: blocked — test DB hangs in this WSL env (Docker Desktop WSL integration not activated). Not faked.
 
 ## 4. Five broken-on-purpose rules and the test that caught each
 Step 5.15: not yet executed.
