@@ -1,6 +1,6 @@
 # HR-EIS quality report — builder evidence
 
-This report records builder evidence; it is not an independent review scorecard or a claim that the assignment has passed. The branch is `module/hr_eis`; commit `28e4815389a234b6e51bc32eca82846c8db3d1ff` removes the shared enum override and updates an obsolete navigation-test fixture. A generated OpenAPI file remains modified in the worktree and was intentionally not included in that commit. Semantic comparison found 29 HR API paths and 53 HR schemas added, with no existing paths deleted or changed; existing entries were reordered by regeneration. `.venv-system/` is an untracked local environment excluded from commits and reviewer copies.
+This report records builder evidence; it is not an independent review scorecard or a claim that the assignment has passed. The branch is `module/hr_eis`; commit `28e4815389a234b6e51bc32eca82846c8db3d1ff` removes the shared enum override and updates an obsolete navigation-test fixture, and `0ba97d9e37fbb98a1b932b2b2550675215455875` aligns the client folder and names HR schema components locally. A generated OpenAPI file remains modified in the worktree and was intentionally not included in either commit. Semantic comparison found 29 HR API paths and 53 HR schemas added, with no existing paths deleted or changed; existing entries were reordered by regeneration. `.venv-system/` is an untracked local environment excluded from commits and reviewer copies.
 
 ## 1. Repository gates
 
@@ -65,7 +65,7 @@ No Python or npm dependency was added to the repository manifests. The missing p
 
 ## 12. Review rounds
 
-No completed prescribed review scorecard is recorded. A fresh reviewer session was started against commit `19f2847`; its first checkout was rejected because it lived beneath the home `.codex` instruction tree. A clean checkout was recreated under `C:\Temp`, but the reviewer could not run required gates because `make`, the project `.venv`, and DOCX tooling were unavailable; no scorecard was returned. `new-module-prompt.md` §10 prohibits the builder from scoring its own work. The current remediation changes need a separate commit and fresh reviewer session.
+No completed prescribed review scorecard is recorded. A fresh reviewer session was started against commit `19f2847`; its first checkout was rejected because it lived beneath the home `.codex` instruction tree. A clean checkout was recreated under `C:\Temp`, but the reviewer could not run required gates because `make`, the project `.venv`, and DOCX tooling were unavailable; no scorecard was returned. `new-module-prompt.md` §10 prohibits the builder from scoring its own work. The later changes are now committed at `0ba97d9`; the official review must use a fresh clean checkout of that revision.
 
 ## Gate results
 
