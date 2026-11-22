@@ -41,6 +41,14 @@ Categories below are Student 2's proposal; both students confirm them.
 | BR skips (44 cases: 001, 003-008, 017, 019-026, 030-039, 043, 044, 050, 057-062, 066-069, 073, 075-078) | review stages and authority limits; appointments; financial approval; procurement hierarchy; reports and reminders; integrations; external execution; agency status; project updates; configurable policy | BR | Confirmed implementation defect (proposed) | NOT_AUTOMATED skips | open |
 
 ## Notes
-- Related finding, not from the spec tests: `make check` fails on the 10/10 commit with ruff F403 at modules/rspc/tests/test_settings.py line 1 (`from config.settings.test import *`). To send to Student 1.
+- Related finding, not from the spec tests: `make check` fails on the 10/10 commit with ruff F403 at modules/rspc/tests/test_settings.py line 1 (`from config.settings.test import *`). Confirmed by the Q1 review as R-Q1-06. For Student 1.
 - Mapping choices the test writers made (closest fit to what exists): a consultancy request is a Proposal with proposal_type consultancy; BR-027 to 029 test a disburse request against a head's remaining balance as the procurement-against-budget case.
 - A rebase gives every commit a new hash. After one, update every hash in this file.
+
+## Q1 review
+- Reviewed commit: 5e59325 (this branch's HEAD, no drift from upstream/main 5595be6). Reviewer: Claude (Sonnet 5), module-review-prompt.md, round Q1. Not Gemini, so a different provider from Student 1's builder.
+- Verdict: not yet, 25 findings (R-Q1-01 to R-Q1-25). None are in modules/rspc/tests/spec/ or docs/09-rspc/spec-tests/, so all go to Student 1. The reviewer found that every spec-test commit touches only those two folders.
+- Findings that match rows above: R-Q1-05 is TC-WF-013 (reject at HoD and at Dean collapse to one state); R-Q1-07 is the six failures (TC-UC-008, TC-BR-010, TC-BR-012, TC-BR-028, TC-FR-040, TC-WF-013); R-Q1-01 and R-Q1-02 are the disburse/disburse-approve skips (UC 047, 049, 088, 091; FR financial-request rows); R-Q1-03 and R-Q1-21 are the missing-workflow skip rows. The reviewer reproduced the WF-013 failure and the fund-approve stub (it returns 200 for an unknown tx_id) independently.
+- Gates red at Q1: make check (ruff F403), pytest (6 failed), module coverage 87.36% against 90%, each spec strategy run alone, and 283 skips. These stay red until the missing features are built and their skipped tests are replaced.
+- Partial round: make e2e, the fresh-install proof and the CSRF/login replay did not finish at Q1. Run them in Q2.
+- Round log: Q1 results sent to Student 1 (date and message to fill in when sent). Next: Student 1 fixes, then re-run the four suites, replace each NOT_AUTOMATED skip whose feature now exists, update the Outcome column, and run Q2.
