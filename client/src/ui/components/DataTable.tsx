@@ -47,7 +47,7 @@ export function DataTable<T>({
           </ThemeIcon>
           <Text fw={600} mt="md">{empty.title}</Text>
           {empty.description && (
-            <Text c="dimmed" size="sm" mt={4}>{empty.description}</Text>
+            <Text c="gray.7" size="sm" mt={4}>{empty.description}</Text>
           )}
         </div>
       </Center>

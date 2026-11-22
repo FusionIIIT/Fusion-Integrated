@@ -13,6 +13,30 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `phc`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `phc.schedule.view` | View the published doctor schedule and attendance | `employee`, `student` |
+| `phc.schedule.manage` | Create, maintain and publish doctor schedules | `PHC Staff`, `phc_staff` |
+| `phc.records.view_self` | View one's own medical history and prescriptions | `employee`, `student` |
+| `phc.records.manage` | Create patient visit and prescription records | `PHC Staff`, `phc_staff` |
+| `phc.reimbursement.submit` | Submit a medical bill reimbursement claim | `employee` |
+| `phc.reimbursement.view_self` | Track one's own reimbursement claims | `employee` |
+| `phc.reimbursement.review` | PHC-stage review of submitted claims | `PHC Staff`, `phc_staff` |
+| `phc.reimbursement.verify` | Accounts & Audit financial verification | `Accounts & Audit`, `accounts_audit` |
+| `phc.reimbursement.sanction` | Approve or reject a reimbursement sanction | `Approving Authority`, `approving_authority` |
+| `phc.reimbursement.payment` | Process final reimbursement payment | `Accounts & Audit`, `accounts_audit` |
+| `phc.inventory.adjust` | Add to or deduct from inventory stock | `PHC Staff`, `phc_staff` |
+| `phc.requisition.submit` | Create and submit procurement requisitions | `PHC Staff`, `phc_staff` |
+| `phc.requisition.decide` | Approve or reject a pending requisition | `Approving Authority`, `approving_authority` |
+| `phc.requisition.fulfill` | Mark an approved requisition fulfilled | `PHC Staff`, `phc_staff` |
+| `phc.ambulance.log` | Record ambulance usage | `PHC Staff`, `phc_staff` |
+| `phc.advisory.view` | View published health advisories | `employee`, `student` |
+| `phc.advisory.publish` | Publish health advisories to patient dashboards | `PHC Staff`, `phc_staff` |
+| `phc.reports.generate` | Generate anonymized administrative reports | `PHC Staff`, `phc_staff` |
+| `phc.audit.view` | View the immutable audit trail | `Accounts & Audit`, `accounts_audit` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

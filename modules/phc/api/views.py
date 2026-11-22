@@ -1,40 +1,60 @@
-"""PHC API views — direct, prompt-generated style.
-
-Each endpoint handles its own validation and writes inline so the code reads
-like it came straight out of an LLM prompt: straightforward, repetitive, and
-easy to trace. Role checks use the permission codes from registry.py.
-"""
+"""PHC API: thin permission gates that delegate to services and selectors."""
 from __future__ import annotations
 
-from django.utils import timezone
-from drf_spectacular.utils import extend_schema
+from django.http import HttpResponse
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.api.exceptions import BadRequestError, NotFoundError
+from core.api.exceptions import BadRequestError
 from fusion_auth.permissions import HasModuleGrant
 from modules.phc.api import serializers as s
 from modules.phc.api.permissions import HasPhcPermission
-from modules.phc.models import (
-    AmbulanceLog,
-    AuditLog,
-    DoctorAttendance,
-    DoctorSchedule,
-    HealthAdvisory,
-    InventoryItem,
-    Patient,
-    Prescription,
-    ReimbursementClaim,
-    Requisition,
-    RequisitionItem,
-    StockAdjustment,
-    Visit,
+from modules.phc.selectors import scoping
+from modules.phc.services import (
+    advisories,
+    ambulance,
+    claims,
+    inventory,
+    records,
+    reports,
+    schedules,
 )
+
+_EX_SCHEDULE = [OpenApiExample("schedule", value={
+    "doctor_name": "Dr A", "day_of_week": 0, "start_time": "09:00:00",
+    "end_time": "13:00:00", "is_published": True}, response_only=True)]
+_EX_ATT = [OpenApiExample("attendance", value={
+    "doctor_name": "Dr A", "status": "available"}, response_only=True)]
+_EX_OBJECT = [OpenApiExample("results", value={"results": []},
+                             response_only=True)]
+_EX_VISIT = [OpenApiExample("visit", value={"id": 1, "patient": 2001},
+                            response_only=True)]
+_EX_RX = [OpenApiExample("prescription", value={"id": 1,
+          "medicine": "Paracetamol"}, response_only=True)]
+_EX_CLAIM = [OpenApiExample("claim", value={"claim_id": 1,
+             "state": "submitted"}, response_only=True)]
+_EX_STOCK = [OpenApiExample("adjustment", value={"item": 1,
+             "direction": "deduct", "quantity": 2}, response_only=True)]
+_EX_ITEM = [OpenApiExample("item", value={"name": "Gloves", "quantity": 25},
+                           response_only=True)]
+_EX_REQ = [OpenApiExample("requisition", value={"requisition_id": 1,
+           "state": "pending_approval"}, response_only=True)]
+_EX_AMB = [OpenApiExample("ambulance", value={
+    "patient_name": "Asha", "destination": "City Hospital"},
+    response_only=True)]
+_EX_ADV = [OpenApiExample("advisory", value={"title": "Flu season",
+           "is_published": True}, response_only=True)]
+_EX_REPORT = [OpenApiExample("report", value={
+    "category": "demographics", "patient_count_by_kind": {"student": 10}},
+    response_only=True)]
+_EX_AUDIT = [OpenApiExample("audit", value={"action": "claim.submit",
+             "target_type": "claim"}, response_only=True)]
+
 
 MODULE = HasModuleGrant("phc")
 
-# permission codes
 P_SCHEDULE_VIEW = "phc.schedule.view"
 P_SCHEDULE_MANAGE = "phc.schedule.manage"
 P_RECORDS_VIEW_SELF = "phc.records.view_self"
@@ -46,9 +66,9 @@ P_CLAIM_VERIFY = "phc.reimbursement.verify"
 P_CLAIM_SANCTION = "phc.reimbursement.sanction"
 P_CLAIM_PAYMENT = "phc.reimbursement.payment"
 P_INV_ADJUST = "phc.inventory.adjust"
-P_INV_REQ_SUBMIT = "phc.inventory.requisition.submit"
-P_INV_REQ_DECIDE = "phc.inventory.requisition.decide"
-P_INV_REQ_FULFILL = "phc.inventory.requisition.fulfill"
+P_INV_REQ_SUBMIT = "phc.requisition.submit"
+P_INV_REQ_DECIDE = "phc.requisition.decide"
+P_INV_REQ_FULFILL = "phc.requisition.fulfill"
 P_AMBULANCE_LOG = "phc.ambulance.log"
 P_ADVISORY_VIEW = "phc.advisory.view"
 P_ADVISORY_PUBLISH = "phc.advisory.publish"
@@ -60,590 +80,402 @@ def _actor(request):
     return getattr(request, "principal", None)
 
 
-def _audit(actor, action, target_type, target_id, detail=None):
-    AuditLog.objects.create(
-        actor=actor.user_id if actor else None,
-        actor_role=getattr(actor, "active_role", "") or "",
-        action=action,
-        target_type=target_type,
-        target_id=target_id,
-        detail=detail or {},
-    )
+def _positive_limit(raw, default=50, maximum=200) -> int:
+    if raw is None:
+        return default
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        raise BadRequestError(
+            "limit must be a whole number between 1 and 200; omit it for the default."
+        ) from None
+    if not 1 <= value <= maximum:
+        raise BadRequestError(f"limit must be between 1 and {maximum}.")
+    return value
 
 
-# ---------------- Doctor schedule & availability (CFR-001 / AFR-001..005) ----------------
+# ---- Doctor schedule & availability (CFR-001 / AFR-001..005) ----------------
 
 
-@extend_schema(responses=s.DoctorScheduleSerializer(many=True))
+@extend_schema(
+    request=None,
+    responses=s.DoctorScheduleSerializer(many=True),
+    examples=[OpenApiExample(
+        "published schedule",
+        value={"schedules": [{"doctor_name": "Dr A", "day_of_week": 0,
+                              "start_time": "09:00:00", "end_time": "13:00:00",
+                              "is_published": True}],
+               "attendance": {"Dr A": "available"}},
+        response_only=True,
+    )],
+)
 class DoctorScheduleListView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_SCHEDULE_VIEW)]
+    permission_classes = [MODULE, HasPhcPermission(P_SCHEDULE_VIEW)]
 
     def get(self, request):
-        schedules = DoctorSchedule.objects.filter(is_published=True)
-        today = timezone.now().date()
-        attendance = {
-            a.doctor_name: a.status
-            for a in DoctorAttendance.objects.filter(date=today)
-        }
-        data = s.DoctorScheduleSerializer(schedules, many=True).data
-        return Response({"schedules": data, "attendance": attendance})
+        from django.utils import timezone
+        return Response({
+            "schedules": s.DoctorScheduleSerializer(
+                scoping.published_schedules(), many=True).data,
+            "attendance": {
+                a.doctor_name: a.status
+                for a in scoping.attendance_on(timezone.now().date())
+            },
+        })
 
 
+@extend_schema(request=s.DoctorScheduleCreateSerializer,
+               responses=s.DoctorScheduleSerializer,
+               examples=_EX_SCHEDULE)
 class DoctorScheduleCreateView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_SCHEDULE_MANAGE)]
+    permission_classes = [MODULE, HasPhcPermission(P_SCHEDULE_MANAGE)]
 
     def post(self, request):
         ser = s.DoctorScheduleCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        schedule = DoctorSchedule.objects.create(
-            doctor_name=v["doctor_name"],
-            day_of_week=v["day_of_week"],
-            start_time=v["start_time"],
-            end_time=v["end_time"],
-            is_published=True,
-            published_by=_actor(request).user_id if _actor(request) else None,
-        )
-        _audit(_actor(request), "schedule.create", "schedule", schedule.id, v)
+        schedule = schedules.create(_actor(request), ser.validated_data)
         return Response(s.DoctorScheduleSerializer(schedule).data,
                         status=status.HTTP_201_CREATED)
 
 
+@extend_schema(request=s.DoctorScheduleMaintainSerializer,
+               responses=s.DoctorScheduleSerializer,
+               examples=_EX_SCHEDULE)
 class DoctorScheduleMaintainView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_SCHEDULE_MANAGE)]
+    permission_classes = [MODULE, HasPhcPermission(P_SCHEDULE_MANAGE)]
 
     def patch(self, request, pk):
         ser = s.DoctorScheduleMaintainSerializer(data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        schedule = DoctorSchedule.objects.filter(pk=pk).first()
-        if schedule is None:
-            raise NotFoundError("schedule not found.", code="not_found")
-        if "day_of_week" in v:
-            schedule.day_of_week = v["day_of_week"]
-        if "start_time" in v:
-            schedule.start_time = v["start_time"]
-        if "end_time" in v:
-            schedule.end_time = v["end_time"]
-        _audit(_actor(request), "schedule.maintain", "schedule", pk, v)
+        schedule = schedules.maintain(_actor(request), pk, ser.validated_data)
         return Response(s.DoctorScheduleSerializer(schedule).data)
 
 
+@extend_schema(request=None, responses=s.DoctorScheduleSerializer,
+               examples=_EX_SCHEDULE)
 class DoctorSchedulePublishView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_SCHEDULE_MANAGE)]
+    permission_classes = [MODULE, HasPhcPermission(P_SCHEDULE_MANAGE)]
 
     def post(self, request, pk):
-        schedule = DoctorSchedule.objects.filter(pk=pk).first()
-        if schedule is None:
-            raise NotFoundError("schedule not found.", code="not_found")
-        schedule.is_published = False
-        schedule.published_at = timezone.now()
-        schedule.published_by = _actor(request).user_id if _actor(request) else None
-        schedule.save()
-        _audit(_actor(request), "schedule.publish", "schedule", pk, {})
+        schedule = schedules.publish(_actor(request), pk)
         return Response(s.DoctorScheduleSerializer(schedule).data)
 
 
+@extend_schema(request=s.DoctorAttendanceMarkSerializer,
+               responses=s.DoctorAttendanceSerializer,
+               examples=_EX_ATT)
 class DoctorAttendanceMarkView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_SCHEDULE_MANAGE)]
+    permission_classes = [MODULE, HasPhcPermission(P_SCHEDULE_MANAGE)]
 
     def post(self, request):
         ser = s.DoctorAttendanceMarkSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        att, _ = DoctorAttendance.objects.update_or_create(
-            doctor_name=v["doctor_name"], date=v["date"],
-            defaults={"status": "available",
-                      "updated_by": _actor(request).user_id if _actor(request) else None},
-        )
-        _audit(_actor(request), "attendance.mark", "attendance", att.id, v)
-        return Response(s.DoctorAttendanceSerializer(att).data,
+        attendance = schedules.mark_attendance(_actor(request), ser.validated_data)
+        return Response(s.DoctorAttendanceSerializer(attendance).data,
                         status=status.HTTP_201_CREATED)
 
 
-# ---------------- Patient records & prescriptions (CFR-002 / AFR-006..012) ----------------
+# ---- Patient records & prescriptions (CFR-002 / AFR-006..012) --------------
 
 
+@extend_schema(request=None, responses=OpenApiTypes.OBJECT, examples=_EX_OBJECT)
 class PatientSearchView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_RECORDS_MANAGE)]
+    permission_classes = [MODULE, HasPhcPermission(P_RECORDS_MANAGE)]
 
     def get(self, request):
-        q = (request.query_params.get("q") or "").strip()
-        if len(q) < 2:
-            return Response({"results": []})
-        rows = Patient.objects.filter(
-            display_name__icontains=q
-        ).order_by("display_name")[:25]
+        rows = records.search((request.query_params.get("q") or "").strip())
         return Response({"results": [
             {"user_id": r.user_id, "display_name": r.display_name, "kind": r.kind}
             for r in rows
         ]})
 
 
+@extend_schema(request=s.VisitCreateSerializer, responses=s.VisitSerializer,
+               examples=_EX_VISIT)
 class VisitCreateView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_RECORDS_MANAGE)]
+    permission_classes = [MODULE, HasPhcPermission(P_RECORDS_MANAGE)]
 
     def post(self, request):
         ser = s.VisitCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        patient = Patient.objects.filter(pk=v["patient_id"]).first()
-        if patient is None:
-            raise NotFoundError("patient not found.", code="not_found")
-        visit = Visit.objects.create(
-            patient=patient,
-            user_id=patient.user_id,
-            recorded_by=_actor(request).user_id if _actor(request) else None,
-            notes=v.get("notes", ""),
-        )
-        _audit(_actor(request), "visit.create", "visit", visit.id,
-               {"patient_id": visit.patient_id})
+        visit = records.create_visit(_actor(request), ser.validated_data)
         return Response(s.VisitSerializer(visit).data,
                         status=status.HTTP_201_CREATED)
 
 
+@extend_schema(request=s.PrescriptionCreateSerializer,
+               responses=s.PrescriptionSerializer,
+               examples=_EX_RX)
 class PrescriptionCreateView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_RECORDS_MANAGE)]
+    permission_classes = [MODULE, HasPhcPermission(P_RECORDS_MANAGE)]
 
     def post(self, request):
         ser = s.PrescriptionCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        visit = Visit.objects.filter(pk=v["visit_id"]).first()
-        if visit is None:
-            raise NotFoundError("visit not found for this patient.", code="not_found")
-        prescription = Prescription.objects.create(
-            visit=visit,
-            patient_id=v["patient_id"],
-            user_id=v["patient_id"],
-            medicine=v["medicine"],
-            dosage=v.get("dosage", ""),
-            recorded_by=_actor(request).user_id if _actor(request) else None,
-        )
-        _audit(_actor(request), "prescription.create", "prescription",
-               prescription.id, {"patient_id": prescription.patient_id})
+        prescription = records.create_prescription(_actor(request), ser.validated_data)
         return Response(s.PrescriptionSerializer(prescription).data,
                         status=status.HTTP_201_CREATED)
 
 
+@extend_schema(request=None, responses=s.VisitSerializer, examples=_EX_VISIT)
 class PatientRecordsView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_RECORDS_VIEW_SELF)]
+    permission_classes = [MODULE, HasPhcPermission(P_RECORDS_VIEW_SELF)]
 
     def get(self, request):
-        principal = _actor(request)
-        visits = Visit.objects.all().order_by("-visit_date")
-        return Response({"results": s.VisitSerializer(visits, many=True).data})
+        return Response({"results": s.VisitSerializer(
+            scoping.visits_for(_actor(request)), many=True).data})
 
 
+@extend_schema(request=None, responses=s.PrescriptionSerializer, examples=_EX_RX)
 class PatientPrescriptionsView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_RECORDS_VIEW_SELF)]
+    permission_classes = [MODULE, HasPhcPermission(P_RECORDS_VIEW_SELF)]
 
     def get(self, request):
-        principal = _actor(request)
-        prescriptions = Prescription.objects.all().order_by("-created_at")
-        return Response({"results": s.PrescriptionSerializer(prescriptions, many=True).data})
+        return Response({"results": s.PrescriptionSerializer(
+            scoping.prescriptions_for(_actor(request)), many=True).data})
 
 
+@extend_schema(
+    request=None,
+    responses={(200, "application/pdf"): OpenApiTypes.BINARY,
+               404: OpenApiResponse(description="No record owned by this user.")},
+    examples=[OpenApiExample("pdf copy", value="%PDF-1.4 ...", response_only=True)],
+)
 class RecordDownloadView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_RECORDS_VIEW_SELF)]
+    permission_classes = [MODULE, HasPhcPermission(P_RECORDS_VIEW_SELF)]
 
     def get(self, request, pk):
-        principal = _actor(request)
-        visit = Visit.objects.filter(pk=pk).first()
-        if visit is None:
-            raise NotFoundError("record not found or not yours.", code="not_found")
-        prescriptions = Prescription.objects.filter(patient_id=principal.user_id,
-                                                    visit=visit)
-        payload = {
-            "record_id": visit.id,
-            "patient_id": visit.patient_id,
-            "visit_date": visit.visit_date.isoformat(),
-            "notes": visit.notes,
-            "prescriptions": [
-                {"medicine": p.medicine, "dosage": p.dosage} for p in prescriptions
-            ],
-        }
-        return Response(payload)
+        pdf = records.record_copy(_actor(request), pk)
+        return HttpResponse(
+            pdf, content_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="phc-record-{pk}.pdf"'},
+        )
 
 
-# ---------------- Reimbursement (CFR-003, CFR-004, CFR-005 / AFR-013..023, 038) ----------------
+# ---- Reimbursement (CFR-003..005 / AFR-013..023, 038) ----------------------
 
 
+@extend_schema(
+    request=s.ReimbursementClaimCreateSerializer,
+    responses=s.ReimbursementClaimSerializer,
+    examples=[OpenApiExample(
+        "submit claim",
+        value={"prescription_id": 12, "expense_date": "2026-11-01",
+               "amount": "1250.00", "description": "Consultation and medicine"},
+        request_only=True,
+    )],
+)
 class ReimbursementClaimCreateView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_CLAIM_SUBMIT)]
+    permission_classes = [MODULE, HasPhcPermission(P_CLAIM_SUBMIT)]
+    throttle_scope = "phc_submit"
 
     def post(self, request):
-        principal = _actor(request)
-        kind = getattr(principal, "kind", "")
-        if kind not in ("employee", "staff", "faculty"):
-            raise BadRequestError("reimbursement is employee-only.", code="forbidden")
         ser = s.ReimbursementClaimCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        window_days = 7
-        if (timezone.now().date() - v["expense_date"]).days > window_days:
-            raise BadRequestError("expense outside submission window.", code="forbidden")
-        prescription = Prescription.objects.filter(
-            pk=v["prescription_id"], patient_id=principal.user_id).first()
-        if prescription is None:
-            raise BadRequestError("invalid prescription link.", code="forbidden")
-        claim = ReimbursementClaim.objects.create(
-            employee_id=principal.user_id,
-            user_id=principal.user_id,
-            prescription=prescription,
-            expense_date=v["expense_date"],
-            amount=v["amount"],
-            description=v.get("description", ""),
-            state="submitted",
-            stage_actor="PHC Staff",
-            action_history=["submitted by employee"],
-        )
-        _audit(principal, "claim.submit", "claim", claim.claim_id,
-               {"state": claim.state})
+        claim = claims.submit(_actor(request), ser.validated_data)
         return Response(s.ReimbursementClaimSerializer(claim).data,
                         status=status.HTTP_201_CREATED)
 
 
+@extend_schema(request=None, responses=s.ReimbursementClaimSerializer,
+               examples=_EX_CLAIM)
 class MyClaimsView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_CLAIM_VIEW_SELF)]
+    permission_classes = [MODULE, HasPhcPermission(P_CLAIM_VIEW_SELF)]
 
     def get(self, request):
-        principal = _actor(request)
-        claims = ReimbursementClaim.objects.filter(
-            employee_id=principal.user_id).order_by("-created_at")
-        return Response({"results": s.ReimbursementClaimSerializer(claims, many=True).data})
+        return Response({"results": s.ReimbursementClaimSerializer(
+            scoping.claims_for(_actor(request)), many=True).data})
 
 
+@extend_schema(request=None, responses=s.ReimbursementClaimSerializer,
+               examples=_EX_CLAIM)
 class ClaimReviewView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_CLAIM_REVIEW)]
-
-    def patch(self, request, pk):
-        claim = ReimbursementClaim.objects.filter(pk=pk, state="submitted").first()
-        if claim is None:
-            raise NotFoundError("claim not found or not submitted.", code="not_found")
-        ser = s.ReimbursementClaimCreateSerializer(data=request.data, partial=True)
-        ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        if "amount" in v:
-            claim.amount = v["amount"]
-        if "description" in v:
-            claim.description = v["description"]
-        claim.save()
-        _audit(_actor(request), "claim.modify", "claim", claim.claim_id,
-               {"amount": claim.amount})
-        return Response(s.ReimbursementClaimSerializer(claim).data)
+    permission_classes = [MODULE, HasPhcPermission(P_CLAIM_REVIEW)]
 
     def post(self, request, pk):
-        principal = _actor(request)
-        claim = ReimbursementClaim.objects.filter(
-            pk=pk, state="submitted").first()
-        if claim is None:
-            raise NotFoundError("claim not found or not at review stage.",
-                                code="not_found")
-        claim.state = "pending_sanction"
-        claim.action_history = [*list(claim.action_history or []),
-                                "PHC review forwarded to sanction (skipping audit)"]
-        claim.stage_actor = ""
-        _audit(principal, "claim.review", "claim", claim.claim_id,
-               {"state": claim.state})
+        claim = claims.advance(_actor(request), pk, "review",
+                               expected_updated_at=request.data.get("expected_updated_at"))
         return Response(s.ReimbursementClaimSerializer(claim).data)
 
 
+@extend_schema(request=None, responses=s.ReimbursementClaimSerializer,
+               examples=_EX_CLAIM)
 class ClaimVerifyView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_CLAIM_VERIFY)]
+    permission_classes = [MODULE, HasPhcPermission(P_CLAIM_VERIFY)]
 
     def post(self, request, pk):
-        principal = _actor(request)
-        claim = ReimbursementClaim.objects.filter(
-            pk=pk, state="pending_audit").first()
-        if claim is None:
-            raise NotFoundError("claim not found or not at verification stage.",
-                                code="not_found")
-        claim.state = "pending_sanction"
-        claim.action_history = [*list(claim.action_history or []),
-                                "Accounts & Audit verified, forwarded for sanction"]
-        claim.stage_actor = ""
-        _audit(principal, "claim.verify", "claim", claim.claim_id,
-               {"state": claim.state})
+        claim = claims.advance(_actor(request), pk, "verify",
+                               expected_updated_at=request.data.get("expected_updated_at"))
         return Response(s.ReimbursementClaimSerializer(claim).data)
 
 
+@extend_schema(request=s.SanctionDecisionSerializer,
+               responses=s.ReimbursementClaimSerializer,
+               examples=_EX_CLAIM)
 class ClaimSanctionView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_CLAIM_SANCTION)]
+    permission_classes = [MODULE, HasPhcPermission(P_CLAIM_SANCTION)]
 
     def post(self, request, pk):
-        principal = _actor(request)
         ser = s.SanctionDecisionSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        claim = ReimbursementClaim.objects.filter(
-            pk=pk, state="pending_sanction").first()
-        if claim is None:
-            raise NotFoundError("claim not found or not at sanction stage.",
-                                code="not_found")
-        if v["decision"] == "approve":
-            claim.state = "approved_for_payment"
-            claim.action_history = [*list(claim.action_history or []),
-                                    "Sanction approved"]
-            claim.stage_actor = ""
-            _audit(principal, "claim.sanction_approve", "claim",
-                   claim.claim_id, {"state": claim.state})
-        else:
-            claim.state = "rejected"
-            claim.action_history = [*list(claim.action_history or []),
-                                    "Sanction rejected (terminal)"]
-            claim.stage_actor = ""
-            _audit(principal, "claim.sanction_reject", "claim",
-                   claim.claim_id, {"state": claim.state})
+        action = ("sanction_approve" if ser.validated_data["decision"] == "approve"
+                  else "sanction_reject")
+        claim = claims.advance(_actor(request), pk, action,
+                               ser.validated_data.get("note", ""),
+                               expected_updated_at=request.data.get("expected_updated_at"))
         return Response(s.ReimbursementClaimSerializer(claim).data)
 
 
+@extend_schema(request=None, responses=s.ReimbursementClaimSerializer,
+               examples=_EX_CLAIM)
 class ClaimPaymentView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_CLAIM_PAYMENT)]
+    permission_classes = [MODULE, HasPhcPermission(P_CLAIM_PAYMENT)]
 
     def post(self, request, pk):
-        principal = _actor(request)
-        claim = ReimbursementClaim.objects.filter(
-            pk=pk, state="approved_for_payment").first()
-        if claim is None:
-            raise NotFoundError("claim not found or not approved for payment.",
-                                code="not_found")
-        claim.state = "reimbursed"
-        claim.action_history = [*list(claim.action_history or []),
-                                "Payment processed, claim reimbursed"]
-        claim.stage_actor = ""
-        claim.save()
-        _audit(principal, "claim.payment", "claim", claim.claim_id,
-               {"state": claim.state})
+        claim = claims.advance(_actor(request), pk, "payment",
+                               expected_updated_at=request.data.get("expected_updated_at"))
         return Response(s.ReimbursementClaimSerializer(claim).data)
 
 
-# ---------------- Inventory & procurement (CFR-006, CFR-007 / AFR-024..031) ----------------
+# ---- Inventory & procurement (CFR-006..007 / AFR-024..031) -----------------
 
 
+@extend_schema(request=s.StockAdjustmentCreateSerializer,
+               responses=s.StockAdjustmentSerializer,
+               examples=_EX_STOCK)
 class StockAdjustView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_INV_ADJUST)]
+    permission_classes = [MODULE, HasPhcPermission(P_INV_ADJUST)]
 
     def post(self, request):
-        principal = _actor(request)
         ser = s.StockAdjustmentCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        item = InventoryItem.objects.filter(pk=v["item_id"]).first()
-        if item is None:
-            raise NotFoundError("item not found.", code="not_found")
-        delta = v["quantity"] if v["direction"] == "add" else -v["quantity"]
-        item.quantity = item.quantity + delta
-        item.save()
-        adjustment = StockAdjustment.objects.create(
-            item=item, quantity=v["quantity"], direction=v["direction"],
-            user_id=principal.user_id if principal else None,
-            adjusted_by=principal.user_id if principal else None,
-            reason=v.get("reason", ""),
-        )
-        below = item.quantity <= item.reorder_threshold
-        if not below:
-            _audit(principal, "inventory.adjust", "inventory", item.id,
-               {"direction": v["direction"], "quantity": v["quantity"],
-                "below_threshold": below})
+        adjustment, _ = inventory.adjust_stock(_actor(request), ser.validated_data)
         return Response(s.StockAdjustmentSerializer(adjustment).data,
                         status=status.HTTP_201_CREATED)
 
 
+@extend_schema(request=s.InventoryItemCreateSerializer,
+               responses=s.InventoryItemSerializer,
+               examples=_EX_ITEM)
 class InventoryItemListCreateView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_INV_ADJUST)]
+    permission_classes = [MODULE, HasPhcPermission(P_INV_ADJUST)]
 
     def get(self, request):
-        rows = InventoryItem.objects.order_by("name")
-        return Response({"results": s.InventoryItemSerializer(rows, many=True).data})
+        return Response({"results": s.InventoryItemSerializer(
+            scoping.inventory_items(), many=True).data})
 
     def post(self, request):
         ser = s.InventoryItemCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        item = InventoryItem.objects.create(
-            name=v["name"],
-            unit=v.get("unit", "units"),
-            reorder_threshold=v.get("reorder_threshold", 0),
-        )
+        item = inventory.create_item(ser.validated_data)
         return Response(s.InventoryItemSerializer(item).data,
                         status=status.HTTP_201_CREATED)
 
 
+@extend_schema(request=s.RequisitionCreateSerializer,
+               responses=s.RequisitionSerializer,
+               examples=_EX_REQ)
 class RequisitionCreateView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_INV_REQ_SUBMIT)]
+    permission_classes = [MODULE, HasPhcPermission(P_INV_REQ_SUBMIT)]
+    throttle_scope = "phc_submit"
 
     def post(self, request):
-        principal = _actor(request)
         ser = s.RequisitionCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        requisition = Requisition.objects.create(
-            originator_id=principal.user_id if principal else None,
-            user_id=principal.user_id if principal else None,
-            state="pending_approval",
-        )
-        pass
-        _audit(principal, "requisition.submit", "requisition",
-               requisition.requisition_id, {"state": requisition.state})
+        requisition = inventory.submit_requisition(_actor(request), ser.validated_data)
         return Response(s.RequisitionSerializer(requisition).data,
                         status=status.HTTP_201_CREATED)
 
 
+@extend_schema(request=s.RequisitionDecisionSerializer,
+               responses=s.RequisitionSerializer,
+               examples=_EX_REQ)
 class RequisitionDecideView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_INV_REQ_DECIDE)]
+    permission_classes = [MODULE, HasPhcPermission(P_INV_REQ_DECIDE)]
 
     def post(self, request, pk):
-        principal = _actor(request)
         ser = s.RequisitionDecisionSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        requisition = Requisition.objects.filter(
-            pk=pk, state="pending_approval").first()
-        if requisition is None:
-            raise NotFoundError("requisition not found or not pending.",
-                                code="not_found")
-        requisition.state = "approved" if v["decision"] == "approve" else "rejected"
-        requisition.decided_by = None
-        requisition.decided_at = timezone.now()
-        requisition.decision_note = v.get("note", "")
-        action = "requisition.approve" if requisition.state == "approved" \
-            else "requisition.reject"
-        _audit(principal, action, "requisition", requisition.requisition_id,
-               {"state": requisition.state})
+        requisition = inventory.decide_requisition(
+            _actor(request), pk, ser.validated_data["decision"],
+            ser.validated_data.get("note", ""),
+            request.data.get("expected_updated_at"))
         return Response(s.RequisitionSerializer(requisition).data)
 
 
+@extend_schema(request=None, responses=s.RequisitionSerializer, examples=_EX_REQ)
 class RequisitionFulfillView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_INV_REQ_FULFILL)]
+    permission_classes = [MODULE, HasPhcPermission(P_INV_REQ_FULFILL)]
 
     def post(self, request, pk):
-        principal = _actor(request)
-        requisition = Requisition.objects.filter(
-            pk=pk, state="approved").first()
-        if requisition is None:
-            raise NotFoundError("requisition not found or not approved.",
-                                code="not_found")
-        requisition.state = "fulfilled"
-        for line in requisition.lines.all():
-            item = line.item
-            item.quantity += line.quantity
-            item.save()
-        requisition.save()
-        _audit(principal, "requisition.fulfill", "requisition",
-               requisition.requisition_id, {"state": requisition.state,
-                                            "auto_posted_stock": True})
+        requisition = inventory.fulfill_requisition(
+            _actor(request), pk, request.data.get("expected_updated_at"))
         return Response(s.RequisitionSerializer(requisition).data)
 
 
-# ---------------- Ambulance (CFR-008 / AFR-032) ----------------
+# ---- Ambulance (CFR-008 / AFR-032) ----------------------------------------
 
 
+@extend_schema(request=s.AmbulanceLogCreateSerializer,
+               responses=s.AmbulanceLogSerializer,
+               examples=_EX_AMB)
 class AmbulanceLogCreateView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_AMBULANCE_LOG)]
+    permission_classes = [MODULE, HasPhcPermission(P_AMBULANCE_LOG)]
 
     def post(self, request):
-        principal = _actor(request)
         ser = s.AmbulanceLogCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        log = AmbulanceLog.objects.create(
-            timestamp=v["timestamp"],
-            patient_name=v["patient_name"],
-            destination=v["destination"],
-            user_id=principal.user_id if principal else None,
-            logged_by=principal.user_id if principal else None,
-        )
-        _audit(principal, "ambulance.log", "ambulance", log.id,
-               {"patient_name": log.patient_name})
-        return Response(s.AmbulanceLogSerializer(log).data,
+        entry = ambulance.log_usage(_actor(request), ser.validated_data)
+        return Response(s.AmbulanceLogSerializer(entry).data,
                         status=status.HTTP_201_CREATED)
 
 
-# ---------------- Health advisories (CFR-009 / AFR-033) ----------------
+# ---- Health advisories (CFR-009 / AFR-033) --------------------------------
 
 
+@extend_schema(request=s.HealthAdvisoryCreateSerializer,
+               responses=s.HealthAdvisorySerializer,
+               examples=_EX_ADV)
 class HealthAdvisoryCreateView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_ADVISORY_PUBLISH)]
+    permission_classes = [MODULE, HasPhcPermission(P_ADVISORY_PUBLISH)]
 
     def post(self, request):
-        principal = _actor(request)
         ser = s.HealthAdvisoryCreateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
-        v = ser.validated_data
-        advisory = HealthAdvisory.objects.create(
-            title=v["title"],
-            content=v["content"],
-            user_id=principal.user_id if principal else None,
-            is_published=False,
-            published_at=timezone.now(),
-            published_by=principal.user_id if principal else None,
-        )
-        _audit(principal, "advisory.publish", "advisory", advisory.id,
-               {"title": advisory.title})
+        advisory = advisories.publish(_actor(request), ser.validated_data)
         return Response(s.HealthAdvisorySerializer(advisory).data,
                         status=status.HTTP_201_CREATED)
 
 
+@extend_schema(request=None, responses=s.HealthAdvisorySerializer, examples=_EX_ADV)
 class HealthAdvisoryListView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_ADVISORY_VIEW)]
+    permission_classes = [MODULE, HasPhcPermission(P_ADVISORY_VIEW)]
 
     def get(self, request):
-        rows = HealthAdvisory.objects.all().order_by("-published_at")
-        return Response({"results": s.HealthAdvisorySerializer(rows, many=True).data})
+        return Response({"results": s.HealthAdvisorySerializer(
+            scoping.published_advisories(), many=True).data})
 
 
-# ---------------- Reports (CFR-010 / AFR-034..035) ----------------
+# ---- Reports (CFR-010 / AFR-034..035) -------------------------------------
 
 
+@extend_schema(request=None, responses=OpenApiTypes.OBJECT, examples=_EX_REPORT)
 class AdminReportView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_REPORTS_GENERATE)]
+    permission_classes = [MODULE, HasPhcPermission(P_REPORTS_GENERATE)]
 
     def get(self, request):
         category = request.query_params.get("category", "demographics")
-        if category == "demographics":
-            kinds = {}
-            for p in Patient.objects.all():
-                kinds[p.kind] = kinds.get(p.kind, 0) + 1
-            report = {
-                "category": "demographics",
-                "patient_count_by_kind": kinds,
-                "note": "counts only; no patient-identifiable information",
-            }
-        elif category == "utilization":
-            report = {
-                "category": "utilization",
-                "visits": Visit.objects.count(),
-                "prescriptions": Prescription.objects.count(),
-                "ambulance_logs": AmbulanceLog.objects.count(),
-                "claims": ReimbursementClaim.objects.count(),
-                "requisitions": Requisition.objects.count(),
-                "note": "aggregate counts only",
-            }
-        elif category == "inventory":
-            low = [i.name for i in InventoryItem.objects.all()
-                   if i.quantity < i.reorder_threshold]
-            report = {
-                "category": "inventory",
-                "stock_adjustments": StockAdjustment.objects.count(),
-                "items": InventoryItem.objects.count(),
-                "low_stock_items": low,
-                "note": "item names only; no patient data",
-            }
-        else:
-            report = {"category": category, "error": "unknown report category"}
-        _audit(_actor(request), "report.generate", "report", 0,
-               {"category": category})
-        return Response(report)
+        return Response(reports.generate(_actor(request), category))
 
 
-# ---------------- Audit trail (CFR-012 / AFR-037) ----------------
+# ---- Audit trail (CFR-012 / AFR-037) --------------------------------------
 
 
+@extend_schema(request=None, responses=s.AuditLogSerializer, examples=_EX_AUDIT)
 class AuditLogView(APIView):
-    permission_classes = [HasModuleGrant("phc"), HasPhcPermission(P_AUDIT_VIEW)]
+    permission_classes = [MODULE, HasPhcPermission(P_AUDIT_VIEW)]
 
     def get(self, request):
-        limit = int(request.query_params.get("limit", 50))
-        rows = AuditLog.objects.all()[:limit]
-        return Response({"results": s.AuditLogSerializer(rows, many=True).data})
+        limit = _positive_limit(request.query_params.get("limit"))
+        return Response({"results": s.AuditLogSerializer(
+            scoping.audit_logs(limit), many=True).data})

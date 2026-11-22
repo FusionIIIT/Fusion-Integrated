@@ -1,7 +1,8 @@
-"""PHC serializers — thin, explicit allow-lists. `fields = "__all__"` never used.
-"""
+"""PHC serializers: explicit allow-lists, never `fields = "__all__"`."""
+from django.utils import timezone
 from rest_framework import serializers
 
+from modules.phc.domain.policy import MAX_INT4
 from modules.phc.models import (
     AmbulanceLog,
     AuditLog,
@@ -71,7 +72,7 @@ class VisitSerializer(serializers.ModelSerializer):
 
 
 class VisitCreateSerializer(serializers.Serializer):
-    patient_id = serializers.IntegerField()
+    patient_id = serializers.IntegerField(max_value=MAX_INT4)
     notes = serializers.CharField(required=False, allow_blank=True)
 
 
@@ -84,10 +85,10 @@ class PrescriptionSerializer(serializers.ModelSerializer):
 
 
 class PrescriptionCreateSerializer(serializers.Serializer):
-    visit_id = serializers.IntegerField()
-    patient_id = serializers.IntegerField()
+    visit_id = serializers.IntegerField(max_value=MAX_INT4)
+    patient_id = serializers.IntegerField(max_value=MAX_INT4)
     medicine = serializers.CharField(max_length=200)
-    dosage = serializers.CharField(required=False, allow_blank=True)
+    dosage = serializers.CharField(required=False, allow_blank=True, max_length=120)
 
 
 class ReimbursementClaimSerializer(serializers.ModelSerializer):
@@ -101,10 +102,15 @@ class ReimbursementClaimSerializer(serializers.ModelSerializer):
 
 
 class ReimbursementClaimCreateSerializer(serializers.Serializer):
-    prescription_id = serializers.IntegerField()
+    prescription_id = serializers.IntegerField(max_value=MAX_INT4)
     expense_date = serializers.DateField()
     amount = serializers.DecimalField(max_digits=10, decimal_places=2)
     description = serializers.CharField(required=False, allow_blank=True)
+
+    def validate_expense_date(self, value):
+        if value > timezone.localdate():
+            raise serializers.ValidationError("The expense date cannot be in the future.")
+        return value
 
 
 class ClaimTransitionSerializer(serializers.Serializer):
@@ -127,8 +133,10 @@ class InventoryItemSerializer(serializers.ModelSerializer):
 
 class InventoryItemCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=120)
-    unit = serializers.CharField(required=False, allow_blank=True, default="units")
-    reorder_threshold = serializers.IntegerField(required=False, default=0)
+    unit = serializers.CharField(required=False, allow_blank=True, default="units",
+                                 max_length=40)
+    reorder_threshold = serializers.IntegerField(
+        required=False, default=0, min_value=0, max_value=MAX_INT4)
 
 
 class StockAdjustmentSerializer(serializers.ModelSerializer):
@@ -140,10 +148,10 @@ class StockAdjustmentSerializer(serializers.ModelSerializer):
 
 
 class StockAdjustmentCreateSerializer(serializers.Serializer):
-    item_id = serializers.IntegerField()
-    quantity = serializers.IntegerField(min_value=1)
+    item_id = serializers.IntegerField(max_value=MAX_INT4)
+    quantity = serializers.IntegerField(min_value=1, max_value=MAX_INT4)
     direction = serializers.ChoiceField(choices=["add", "deduct"])
-    reason = serializers.CharField(required=False, allow_blank=True)
+    reason = serializers.CharField(required=False, allow_blank=True, max_length=200)
 
 
 class RequisitionSerializer(serializers.ModelSerializer):
@@ -155,9 +163,13 @@ class RequisitionSerializer(serializers.ModelSerializer):
                             "state", "decision_note", "created_at", "updated_at")
 
 
+class RequisitionLineSerializer(serializers.Serializer):
+    item_id = serializers.IntegerField(min_value=1, max_value=MAX_INT4)
+    quantity = serializers.IntegerField(min_value=1, max_value=MAX_INT4)
+
+
 class RequisitionCreateSerializer(serializers.Serializer):
-    items = serializers.ListField(child=serializers.DictField(),
-                                  allow_empty=False)
+    items = RequisitionLineSerializer(many=True, allow_empty=False)
 
 
 class RequisitionDecisionSerializer(serializers.Serializer):

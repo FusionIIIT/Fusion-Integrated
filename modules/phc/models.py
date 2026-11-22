@@ -1,9 +1,4 @@
-"""PHC domain models — one row per persisted requirement artefact.
-
-No cross-module ForeignKeys: `user_id` is the IAM id kept unconstrained so the
-module can be extracted without schema surgery. Every writeable row records the
-actor who caused it so the audit trail (AFR-PHC-037) can append an entry.
-"""
+"""PHC models: IAM ids stored unconstrained, with no cross-module foreign keys."""
 from django.db import models
 
 from core.db.mixins import TimeStampedModel, UserScopedModel
@@ -114,12 +109,7 @@ class Prescription(TimeStampedModel, UserScopedModel):
 
 
 class ReimbursementClaim(TimeStampedModel, UserScopedModel):
-    """A medical bill reimbursement claim progressing through fixed stages.
-
-    Forward-only lifecycle per AFR-PHC-017 / AFR-PHC-038: submission is the
-    only entry, rejection at sanction is terminal, and any later application is
-    a fresh claim — never an edit or reopen.
-    """
+    """Forward-only claim: rejection is terminal; reapplication is a new claim."""
     STATE = [
         ("submitted", "Submitted / Pending PHC Review"),
         ("pending_audit", "Pending Accounts & Audit Verification"),
@@ -192,11 +182,7 @@ class StockAdjustment(TimeStampedModel, UserScopedModel):
 
 
 class Requisition(TimeStampedModel, UserScopedModel):
-    """An inventory procurement requisition routed to the Approving Authority.
-
-    States: Pending Approval -> Approved / Rejected -> Fulfilled.
-    Fulfillment never auto-posts stock (AFR-PHC-031 note).
-    """
+    """Requisition routed to the Approving Authority; fulfillment never posts stock."""
     STATE = [
         ("pending_approval", "Pending Approval"),
         ("approved", "Approved"),
@@ -271,9 +257,7 @@ class HealthAdvisory(TimeStampedModel, UserScopedModel):
 
 
 class AuditLog(TimeStampedModel):
-    """Immutable append-only trail for sensitive patient / inventory / claim
-    changes (AFR-PHC-037). Never updated or deleted after creation.
-    """
+    """Append-only trail for sensitive changes; never updated or deleted."""
 
     actor = models.IntegerField(null=True, blank=True)  # IAM id who acted
     actor_role = models.CharField(max_length=40, blank=True)
@@ -290,3 +274,32 @@ class AuditLog(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.action} {self.target_type}#{self.target_id}"
+
+
+class NotificationOutbox(TimeStampedModel):
+    """Durable, deduplicated PHC notifications written with their source event."""
+
+    topic = models.CharField(max_length=48, db_index=True)
+    dedupe_key = models.CharField(max_length=200, unique=True)
+    subject = models.CharField(max_length=200)
+    body = models.TextField()
+    recipient_user_id = models.IntegerField(null=True, blank=True, db_index=True)
+    recipient_role = models.CharField(max_length=40, blank=True, db_index=True)
+    status = models.CharField(max_length=16, default="pending", db_index=True)
+    attempts = models.PositiveIntegerField(default=0)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.TextField(blank=True)
+    payload = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        db_table = "phc_notification_outbox"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["status", "created_at"],
+                         name="phc_notify_status_created_idx"),
+            models.Index(fields=["topic", "recipient_user_id"],
+                         name="phc_notify_topic_recipient_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.topic} -> {self.recipient_user_id or self.recipient_role}"

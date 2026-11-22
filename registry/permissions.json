@@ -34,6 +34,290 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "phc": {
+      "grants": {
+        "Accounts & Audit": [
+          "phc.audit.view",
+          "phc.reimbursement.payment",
+          "phc.reimbursement.verify"
+        ],
+        "Approving Authority": [
+          "phc.reimbursement.sanction",
+          "phc.requisition.decide"
+        ],
+        "PHC Staff": [
+          "phc.advisory.publish",
+          "phc.ambulance.log",
+          "phc.inventory.adjust",
+          "phc.records.manage",
+          "phc.reimbursement.review",
+          "phc.reports.generate",
+          "phc.requisition.fulfill",
+          "phc.requisition.submit",
+          "phc.schedule.manage"
+        ],
+        "accounts_audit": [
+          "phc.audit.view",
+          "phc.reimbursement.payment",
+          "phc.reimbursement.verify"
+        ],
+        "approving_authority": [
+          "phc.reimbursement.sanction",
+          "phc.requisition.decide"
+        ],
+        "employee": [
+          "phc.advisory.view",
+          "phc.records.view_self",
+          "phc.reimbursement.submit",
+          "phc.reimbursement.view_self",
+          "phc.schedule.view"
+        ],
+        "phc_staff": [
+          "phc.advisory.publish",
+          "phc.ambulance.log",
+          "phc.inventory.adjust",
+          "phc.records.manage",
+          "phc.reimbursement.review",
+          "phc.reports.generate",
+          "phc.requisition.fulfill",
+          "phc.requisition.submit",
+          "phc.schedule.manage"
+        ],
+        "student": [
+          "phc.advisory.view",
+          "phc.records.view_self",
+          "phc.schedule.view"
+        ]
+      },
+      "module_grants": [
+        "Accounts & Audit",
+        "Approving Authority",
+        "PHC Staff",
+        "accounts_audit",
+        "approving_authority",
+        "employee",
+        "phc_staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/phc",
+        "icon": "Stethoscope",
+        "items": [
+          {
+            "code": "phc.schedule",
+            "icon": "Calendar",
+            "label": "Doctor Schedule",
+            "required_permission": "phc.schedule.view",
+            "sort_order": 5,
+            "to": "/phc/schedule"
+          },
+          {
+            "code": "phc.records",
+            "icon": "FileText",
+            "label": "My Medical Records",
+            "required_permission": "phc.records.view_self",
+            "sort_order": 10,
+            "to": "/phc/records"
+          },
+          {
+            "code": "phc.claims",
+            "icon": "CurrencyDollar",
+            "label": "My Reimbursement Claims",
+            "required_permission": "phc.reimbursement.view_self",
+            "sort_order": 15,
+            "to": "/phc/claims"
+          },
+          {
+            "code": "phc.advisories",
+            "icon": "Megaphone",
+            "label": "Health Advisories",
+            "required_permission": "phc.advisory.view",
+            "sort_order": 20,
+            "to": "/phc/advisories"
+          },
+          {
+            "code": "phc.schedule-manage",
+            "icon": "Gear",
+            "label": "Manage Doctor Schedule",
+            "required_permission": "phc.schedule.manage",
+            "sort_order": 55,
+            "to": "/phc/staff/schedule"
+          },
+          {
+            "code": "phc.attendance",
+            "icon": "UserCheck",
+            "label": "Doctor Attendance",
+            "required_permission": "phc.schedule.manage",
+            "sort_order": 60,
+            "to": "/phc/staff/attendance"
+          },
+          {
+            "code": "phc.patient-records",
+            "icon": "Users",
+            "label": "Patient Records",
+            "required_permission": "phc.records.manage",
+            "sort_order": 65,
+            "to": "/phc/staff/patients"
+          },
+          {
+            "code": "phc.inventory",
+            "icon": "Package",
+            "label": "Inventory Stock",
+            "required_permission": "phc.inventory.adjust",
+            "sort_order": 70,
+            "to": "/phc/staff/inventory"
+          },
+          {
+            "code": "phc.requisitions",
+            "icon": "ShoppingCart",
+            "label": "Procurement Requisitions",
+            "required_permission": "phc.requisition.submit",
+            "sort_order": 75,
+            "to": "/phc/staff/requisitions"
+          },
+          {
+            "code": "phc.ambulance",
+            "icon": "Ambulance",
+            "label": "Ambulance Logs",
+            "required_permission": "phc.ambulance.log",
+            "sort_order": 80,
+            "to": "/phc/staff/ambulance"
+          },
+          {
+            "code": "phc.advisories-manage",
+            "icon": "Broadcast",
+            "label": "Publish Health Advisory",
+            "required_permission": "phc.advisory.publish",
+            "sort_order": 85,
+            "to": "/phc/staff/advisories"
+          },
+          {
+            "code": "phc.reports",
+            "icon": "ChartBar",
+            "label": "Administrative Reports",
+            "required_permission": "phc.reports.generate",
+            "sort_order": 90,
+            "to": "/phc/staff/reports"
+          },
+          {
+            "code": "phc.audit-verify",
+            "icon": "CheckCircle",
+            "label": "Verify Claims",
+            "required_permission": "phc.reimbursement.verify",
+            "sort_order": 100,
+            "to": "/phc/audit/claims"
+          },
+          {
+            "code": "phc.audit-pay",
+            "icon": "CreditCard",
+            "label": "Process Payments",
+            "required_permission": "phc.reimbursement.payment",
+            "sort_order": 105,
+            "to": "/phc/audit/payments"
+          },
+          {
+            "code": "phc.approve-requisition",
+            "icon": "Gavel",
+            "label": "Decide Requisitions",
+            "required_permission": "phc.requisition.decide",
+            "sort_order": 110,
+            "to": "/phc/approver/requisitions"
+          },
+          {
+            "code": "phc.approve-sanction",
+            "icon": "Gavel",
+            "label": "Decide Sanctions",
+            "required_permission": "phc.reimbursement.sanction",
+            "sort_order": 115,
+            "to": "/phc/approver/sanctions"
+          }
+        ],
+        "label": "PHC",
+        "nav_section": "PHC",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "phc.schedule.view",
+          "label": "View the published doctor schedule and attendance"
+        },
+        {
+          "code": "phc.schedule.manage",
+          "label": "Create, maintain and publish doctor schedules"
+        },
+        {
+          "code": "phc.records.view_self",
+          "label": "View one's own medical history and prescriptions"
+        },
+        {
+          "code": "phc.records.manage",
+          "label": "Create patient visit and prescription records"
+        },
+        {
+          "code": "phc.reimbursement.submit",
+          "label": "Submit a medical bill reimbursement claim"
+        },
+        {
+          "code": "phc.reimbursement.view_self",
+          "label": "Track one's own reimbursement claims"
+        },
+        {
+          "code": "phc.reimbursement.review",
+          "label": "PHC-stage review of submitted claims"
+        },
+        {
+          "code": "phc.reimbursement.verify",
+          "label": "Accounts & Audit financial verification"
+        },
+        {
+          "code": "phc.reimbursement.sanction",
+          "label": "Approve or reject a reimbursement sanction"
+        },
+        {
+          "code": "phc.reimbursement.payment",
+          "label": "Process final reimbursement payment"
+        },
+        {
+          "code": "phc.inventory.adjust",
+          "label": "Add to or deduct from inventory stock"
+        },
+        {
+          "code": "phc.requisition.submit",
+          "label": "Create and submit procurement requisitions"
+        },
+        {
+          "code": "phc.requisition.decide",
+          "label": "Approve or reject a pending requisition"
+        },
+        {
+          "code": "phc.requisition.fulfill",
+          "label": "Mark an approved requisition fulfilled"
+        },
+        {
+          "code": "phc.ambulance.log",
+          "label": "Record ambulance usage"
+        },
+        {
+          "code": "phc.advisory.view",
+          "label": "View published health advisories"
+        },
+        {
+          "code": "phc.advisory.publish",
+          "label": "Publish health advisories to patient dashboards"
+        },
+        {
+          "code": "phc.reports.generate",
+          "label": "Generate anonymized administrative reports"
+        },
+        {
+          "code": "phc.audit.view",
+          "label": "View the immutable audit trail"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
