@@ -1,0 +1,317 @@
+[
+  {
+    "test_id": "TC-FR-001",
+    "source_id": "AFR-GYM-001",
+    "purpose": "Verify Student Admin can create a new club with required fields",
+    "preconditions": "Student Admin authenticated, valid student leaders and faculty councillor exist",
+    "action_or_input": "Call create_club with name='Robotics Club', category='Technical', coordinator_id=101, co_coordinator_id=102, faculty_councillor_id=201, description='Technical robotics club'",
+    "expected_result": "Club is created with status 'open' and active leadership record is created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-002",
+    "source_id": "AFR-GYM-002",
+    "purpose": "Verify validation rejects club creation when coordinator or co-coordinator is invalid",
+    "preconditions": "Student Admin authenticated",
+    "action_or_input": "Call create_club with coordinator_id=-1 or co_coordinator_id=0 or identical IDs",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-003",
+    "source_id": "AFR-GYM-003",
+    "purpose": "Verify validation rejects club creation when faculty councillor is invalid",
+    "preconditions": "Student Admin authenticated",
+    "action_or_input": "Call create_club with faculty_councillor_id=-5",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-004",
+    "source_id": "AFR-GYM-004",
+    "purpose": "Verify club category is strictly restricted to Technical, Sports, or Cultural",
+    "preconditions": "Student Admin authenticated",
+    "action_or_input": "Call create_club with category='Academic'",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-005",
+    "source_id": "AFR-GYM-005",
+    "purpose": "Verify newly created club is recorded in 'open' status pending approval",
+    "preconditions": "Club created via create_club",
+    "action_or_input": "Inspect club.status immediately after creation",
+    "expected_result": "Club status is exactly 'open'",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-FR-006",
+    "source_id": "AFR-GYM-006",
+    "purpose": "Verify Student Admin can approve an open club and record it as confirmed",
+    "preconditions": "Club exists with status 'open'",
+    "action_or_input": "Call confirm_club(club_id=club.id)",
+    "expected_result": "Club status transitions to 'confirmed'",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-FR-007",
+    "source_id": "AFR-GYM-007",
+    "purpose": "Verify authorized Club Head can replace club coordinator and co-coordinator",
+    "preconditions": "Confirmed club exists with active leadership (coord 101, co-coord 102)",
+    "action_or_input": "Call change_club_leadership(club_id=club.id, actor_id=101, new_coordinator_id=103, new_co_coordinator_id=104)",
+    "expected_result": "New leadership record created with coordinator 103 and co-coordinator 104",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-008",
+    "source_id": "AFR-GYM-008",
+    "purpose": "Verify leadership change validates that new leaders are valid student IDs",
+    "preconditions": "Club exists with active leadership",
+    "action_or_input": "Call change_club_leadership with actor_id=101, new_coordinator_id=-1, new_co_coordinator_id=104",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-009",
+    "source_id": "AFR-GYM-009",
+    "purpose": "Verify when leadership changes, only current leadership remains active and superseded is deactivated",
+    "preconditions": "Club exists with active leadership (coord 101, co-coord 102)",
+    "action_or_input": "Call change_club_leadership and query all ClubLeadership rows for the club",
+    "expected_result": "Superseded leadership has is_active=False; new leadership has is_active=True",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-FR-010",
+    "source_id": "AFR-GYM-010",
+    "purpose": "Verify Club Head can book a club session with configured venue, date, and time range",
+    "preconditions": "Confirmed club exists with active coordinator 101",
+    "action_or_input": "Call book_venue with booking_type='session', venue_name='Student Activity Center (SAC)', booking_date=tomorrow, start_time=10:00, end_time=12:00, actor_id=101",
+    "expected_result": "VenueBooking created with booking_type='session'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-011",
+    "source_id": "AFR-GYM-011",
+    "purpose": "Verify booking is accepted only when start time precedes end time",
+    "preconditions": "Confirmed club exists with active coordinator 101",
+    "action_or_input": "Call book_venue with start_time=14:00, end_time=13:00",
+    "expected_result": "Operation rejected with ValueError indicating start time must precede end time",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-012",
+    "source_id": "AFR-GYM-012",
+    "purpose": "Verify system prevents booking that overlaps existing booking on same venue and date",
+    "preconditions": "Existing booking from 10:00 to 12:00 at SAC on booking_date",
+    "action_or_input": "Call book_venue for SAC on same date from 11:00 to 13:00",
+    "expected_result": "Operation rejected with ValueError indicating overlap conflict",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-013",
+    "source_id": "AFR-GYM-013",
+    "purpose": "Verify observable outcome/notification trigger when session is successfully booked",
+    "preconditions": "Confirmed club exists",
+    "action_or_input": "Book session via API or service endpoint",
+    "expected_result": "Booking record is persisted and observable by student recipients",
+    "test_type": "notification/service"
+  },
+  {
+    "test_id": "TC-FR-014",
+    "source_id": "AFR-GYM-014",
+    "purpose": "Verify Club Head can book a club event with event details, configured venue, date, and time",
+    "preconditions": "Confirmed club exists with active coordinator 101",
+    "action_or_input": "Call book_venue with booking_type='event', venue_name='Open Air Theatre (OAT)', start_time=17:00, end_time=20:00, actor_id=101",
+    "expected_result": "VenueBooking created with booking_type='event'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-015",
+    "source_id": "AFR-GYM-015",
+    "purpose": "Verify observable outcome/notification trigger when event is successfully booked",
+    "preconditions": "Confirmed club exists",
+    "action_or_input": "Book event via API or service endpoint",
+    "expected_result": "Event booking persisted and observable by student audience",
+    "test_type": "notification/service"
+  },
+  {
+    "test_id": "TC-FR-016",
+    "source_id": "AFR-GYM-016",
+    "purpose": "Verify student can apply for membership in a confirmed club",
+    "preconditions": "Confirmed club exists, student_id=301 authenticated",
+    "action_or_input": "Call apply_club_membership(club_id=club.id, student_id=301)",
+    "expected_result": "ClubMembership record created with status 'open'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-017",
+    "source_id": "AFR-GYM-017",
+    "purpose": "Verify student can maintain membership applications to multiple different clubs",
+    "preconditions": "Two confirmed clubs (club A, club B) exist, student_id=301 has applied to club A",
+    "action_or_input": "Call apply_club_membership(club_id=club_B.id, student_id=301)",
+    "expected_result": "Application to club B succeeds with status 'open'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-018",
+    "source_id": "AFR-GYM-018",
+    "purpose": "Verify system prevents student from submitting duplicate membership application to same club",
+    "preconditions": "Student 301 already has membership application in club A",
+    "action_or_input": "Call apply_club_membership(club_id=club_A.id, student_id=301) second time",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-019",
+    "source_id": "AFR-GYM-019",
+    "purpose": "Verify newly submitted membership application is recorded with 'open' status",
+    "preconditions": "Application created via apply_club_membership",
+    "action_or_input": "Inspect membership.status immediately after submission",
+    "expected_result": "Membership status is 'open'",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-FR-020",
+    "source_id": "AFR-GYM-020",
+    "purpose": "Verify Club Head can access pending membership applications for the applicable club",
+    "preconditions": "Club A has 2 open membership applications; Club B has 1",
+    "action_or_input": "Query ClubMembership where club=club_A and status='open'",
+    "expected_result": "Only the 2 applications for Club A are returned",
+    "test_type": "info-access"
+  },
+  {
+    "test_id": "TC-FR-021",
+    "source_id": "AFR-GYM-021",
+    "purpose": "Verify applicable Club Head can approve an open membership application",
+    "preconditions": "Open membership application exists for Club A, actor_id=101 is coordinator",
+    "action_or_input": "Call approve_club_membership(membership_id=mem.id, actor_id=101)",
+    "expected_result": "Membership is approved and confirmed_at timestamp is populated",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-022",
+    "source_id": "AFR-GYM-022",
+    "purpose": "Verify approved membership application changes status from 'open' to 'confirmed'",
+    "preconditions": "Membership approved via approve_club_membership",
+    "action_or_input": "Inspect mem.status after approval",
+    "expected_result": "Status is 'confirmed'",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-FR-023",
+    "source_id": "AFR-GYM-023",
+    "purpose": "Verify Club Head can create a voting poll with title, expiration date, choices, and target groups",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call create_voting_poll(club_id=club.id, actor_id=101, title='Club T-Shirt', options=['Blue', 'Black'], expires_at=future, target_batch='2024', target_branch='CSE')",
+    "expected_result": "VotingPoll created with is_active=True and 2 PollOption records",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-024",
+    "source_id": "AFR-GYM-024",
+    "purpose": "Verify system requires at least two choices for a voting poll",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call create_voting_poll with options=['OnlyOneChoice']",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-025",
+    "source_id": "AFR-GYM-025",
+    "purpose": "Verify target audience notification obligation when voting poll is created",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Create voting poll with target_batch='2024', target_branch='CSE'",
+    "expected_result": "Poll created and target group metadata is correctly stored for notification routing",
+    "test_type": "notification/service"
+  },
+  {
+    "test_id": "TC-FR-026",
+    "source_id": "AFR-GYM-026",
+    "purpose": "Verify eligible targeted student can access active voting poll and its choices",
+    "preconditions": "Active poll exists with options and target batch '2024', branch 'CSE'",
+    "action_or_input": "Query poll and options for student from batch '2024', branch 'CSE'",
+    "expected_result": "Poll details and all choices are returned",
+    "test_type": "info-access"
+  },
+  {
+    "test_id": "TC-FR-027",
+    "source_id": "AFR-GYM-027",
+    "purpose": "Verify eligible targeted student can cast one choice in an active voting poll",
+    "preconditions": "Active unexpired poll exists, student 301 belongs to target audience and has not voted",
+    "action_or_input": "Call cast_poll_vote(poll_id=poll.id, student_id=301, option_id=opt1.id, student_batch='2024', student_branch='CSE')",
+    "expected_result": "PollVote record created for student 301 and option 1",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-028",
+    "source_id": "AFR-GYM-028",
+    "purpose": "Verify system prevents more than one vote by same student in same poll and updates tally",
+    "preconditions": "Student 301 has already voted in poll",
+    "action_or_input": "Call cast_poll_vote for student 301 in same poll a second time",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-FR-029",
+    "source_id": "AFR-GYM-029",
+    "purpose": "Verify Club Head can submit club budget request with amount, purpose, description, supporting file",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call submit_budget_request(club_id=club.id, actor_id=101, requested_amount=5000.0, description='Annual robotics workshop', supporting_file='workshop_budget.pdf')",
+    "expected_result": "ClubBudgetRequest record created with requested_amount=5000.0",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-030a",
+    "source_id": "AFR-GYM-030",
+    "purpose": "Verify system rejects club budget request when amount is negative",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call submit_budget_request with requested_amount=-100.0",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-030b",
+    "source_id": "AFR-GYM-030",
+    "purpose": "Verify system rejects club budget request when supporting file is missing",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call submit_budget_request with supporting_file=''",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "validation/negative"
+  },
+  {
+    "test_id": "TC-FR-031",
+    "source_id": "AFR-GYM-031",
+    "purpose": "Verify submitted club budget request is stored as an open request for tracking",
+    "preconditions": "Budget request created via submit_budget_request",
+    "action_or_input": "Inspect budget_request.status",
+    "expected_result": "Budget request status is 'open'",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-FR-032",
+    "source_id": "AFR-GYM-032",
+    "purpose": "Verify Club Head can submit club event report with required details and file",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call submit_event_report(club_id=club.id, actor_id=101, event_name='RoboWars 2026', event_date=today, report_file='robowars_report.pdf')",
+    "expected_result": "ClubEventReport record created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-033",
+    "source_id": "AFR-GYM-033",
+    "purpose": "Verify system requires report file when club event report is submitted",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call submit_event_report with report_file=''",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "validation/negative"
+  },
+  {
+    "test_id": "TC-FR-034",
+    "source_id": "AFR-GYM-034",
+    "purpose": "Verify assigned Club Faculty Councillor can access and review submitted event reports",
+    "preconditions": "Event report exists for club with faculty councillor 201",
+    "action_or_input": "Call review_event_report(report_id=report.id, faculty_id=201)",
+    "expected_result": "Report is returned successfully",
+    "test_type": "info-access/positive"
+  }
+]

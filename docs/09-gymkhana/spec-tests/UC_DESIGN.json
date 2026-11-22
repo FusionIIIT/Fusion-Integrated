@@ -1,0 +1,308 @@
+[
+  {
+    "test_id": "TC-UC-001-MF",
+    "source_id": "UC-GYM-001 Main Flow",
+    "purpose": "Verify Student Admin successfully creates a new club in open status",
+    "preconditions": "Student Admin authenticated, valid student leaders and faculty councillor",
+    "action_or_input": "Call create_club with name='Astronomy Club', category='Technical', coordinator_id=101, co_coordinator_id=102, faculty_councillor_id=201",
+    "expected_result": "Club created with status 'open'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-001-ALT",
+    "source_id": "UC-GYM-001 Alternative Flow",
+    "purpose": "Verify system identifies invalid leader or faculty record and rejects club creation",
+    "preconditions": "Student Admin authenticated",
+    "action_or_input": "Call create_club with invalid coordinator_id=-1",
+    "expected_result": "Operation rejected with ValueError; no club created",
+    "test_type": "alternative/negative"
+  },
+  {
+    "test_id": "TC-UC-001-EXC",
+    "source_id": "UC-GYM-001 Exception Flow",
+    "purpose": "Verify invalid category causes failure and prevents club record creation",
+    "preconditions": "Student Admin authenticated",
+    "action_or_input": "Call create_club with category='InvalidCategory'",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-002-MF",
+    "source_id": "UC-GYM-002 Main Flow",
+    "purpose": "Verify Club Head successfully books a club session in configured venue",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call book_venue with booking_type='session', venue_name='Student Activity Center (SAC)', start_time=10:00, end_time=11:30, actor_id=101",
+    "expected_result": "Session booking created successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-002-ALT",
+    "source_id": "UC-GYM-002 Alternative Flow",
+    "purpose": "Verify system rejects session booking when requested slot overlaps an existing booking",
+    "preconditions": "Existing booking from 10:00 to 12:00 at SAC",
+    "action_or_input": "Call book_venue for SAC on same date from 10:30 to 11:30",
+    "expected_result": "Operation rejected with ValueError due to slot overlap",
+    "test_type": "alternative/negative"
+  },
+  {
+    "test_id": "TC-UC-002-EXC",
+    "source_id": "UC-GYM-002 Exception Flow",
+    "purpose": "Verify session booking is rejected when venue is unconfigured or time range is inverted",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call book_venue with start_time=12:00, end_time=10:00",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-003-MF",
+    "source_id": "UC-GYM-003 Main Flow",
+    "purpose": "Verify Club Head successfully books a club event in configured venue",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call book_venue with booking_type='event', venue_name='Main Football Ground', start_time=16:00, end_time=19:00, actor_id=101",
+    "expected_result": "Event booking created successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-003-ALT",
+    "source_id": "UC-GYM-003 Alternative Flow",
+    "purpose": "Verify event booking is rejected when overlapping an existing session",
+    "preconditions": "Existing session booking from 16:00 to 18:00 at Main Football Ground",
+    "action_or_input": "Call book_venue with booking_type='event' from 17:00 to 19:00 for same venue and date",
+    "expected_result": "Operation rejected with ValueError due to cross-type overlap",
+    "test_type": "alternative/negative"
+  },
+  {
+    "test_id": "TC-UC-003-EXC",
+    "source_id": "UC-GYM-003 Exception Flow",
+    "purpose": "Verify event booking is rejected when venue is not in configured venues",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call book_venue with venue_name='Unknown Auditorium'",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-004-MF",
+    "source_id": "UC-GYM-004 Main Flow",
+    "purpose": "Verify student successfully applies for membership in a confirmed club",
+    "preconditions": "Confirmed club exists, student 301 authenticated",
+    "action_or_input": "Call apply_club_membership(club_id=club.id, student_id=301)",
+    "expected_result": "Membership application created with status 'open'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-004-ALT",
+    "source_id": "UC-GYM-004 Alternative Flow",
+    "purpose": "Verify student may apply to another different club even when an open application exists",
+    "preconditions": "Student 301 has applied to Club A",
+    "action_or_input": "Call apply_club_membership(club_id=club_B.id, student_id=301)",
+    "expected_result": "Application to Club B succeeds with status 'open'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-004-EXC",
+    "source_id": "UC-GYM-004 Exception Flow",
+    "purpose": "Verify system rejects duplicate same-club membership application",
+    "preconditions": "Student 301 already applied to Club A",
+    "action_or_input": "Call apply_club_membership(club_id=club_A.id, student_id=301) second time",
+    "expected_result": "Operation rejected with ValueError; existing record unchanged",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-005-MF",
+    "source_id": "UC-GYM-005 Main Flow",
+    "purpose": "Verify Club Head successfully approves open membership application",
+    "preconditions": "Confirmed club exists with coordinator 101; open membership application exists",
+    "action_or_input": "Call approve_club_membership(membership_id=mem.id, actor_id=101)",
+    "expected_result": "Application status changes to 'confirmed'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-005-ALT",
+    "source_id": "UC-GYM-005 Alternative Flow",
+    "purpose": "Verify Club Head can sequentially approve multiple pending applications independently",
+    "preconditions": "Two open membership applications exist for Club A",
+    "action_or_input": "Call approve_club_membership for app 1 and app 2",
+    "expected_result": "Both applications change status to 'confirmed'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-005-EXC",
+    "source_id": "UC-GYM-005 Exception Flow",
+    "purpose": "Verify non-coordinator actor cannot approve membership application",
+    "preconditions": "Open membership application exists, actor 999 is not coordinator",
+    "action_or_input": "Call approve_club_membership(membership_id=mem.id, actor_id=999)",
+    "expected_result": "Operation rejected with PermissionError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-006-MF",
+    "source_id": "UC-GYM-006 Main Flow",
+    "purpose": "Verify Club Head successfully creates a voting poll with options and target audience",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call create_voting_poll(club_id=club.id, actor_id=101, title='Event Theme', options=['Option A', 'Option B'], expires_at=future, target_batch='2025', target_branch='ECE')",
+    "expected_result": "Poll created with is_active=True and 2 options",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-006-ALT",
+    "source_id": "UC-GYM-006 Alternative Flow",
+    "purpose": "Verify poll creation supports target branch representing all branches ('ALL')",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call create_voting_poll with target_batch='2025', target_branch='ALL'",
+    "expected_result": "Poll created with target_branch='ALL'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-006-EXC",
+    "source_id": "UC-GYM-006 Exception Flow",
+    "purpose": "Verify poll creation is rejected when fewer than two choices are provided",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call create_voting_poll with options=['Single Choice']",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-007-MF",
+    "source_id": "UC-GYM-007 Main Flow",
+    "purpose": "Verify eligible targeted student casts vote in active poll and updates tally",
+    "preconditions": "Active poll exists, student 301 is in target audience and has not voted",
+    "action_or_input": "Call cast_poll_vote(poll_id=poll.id, student_id=301, option_id=opt1.id, student_batch='2025', student_branch='ECE')",
+    "expected_result": "PollVote created and recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-007-EXC1",
+    "source_id": "UC-GYM-007 Exception Flow",
+    "purpose": "Verify system rejects duplicate vote by same student in same poll",
+    "preconditions": "Student 301 has already voted in poll",
+    "action_or_input": "Call cast_poll_vote for student 301 in same poll a second time",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-007-EXC2",
+    "source_id": "UC-GYM-007 Exception Flow",
+    "purpose": "Verify system rejects vote when poll has expired",
+    "preconditions": "Poll expires_at is in the past",
+    "action_or_input": "Call cast_poll_vote on expired poll",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-007-EXC3",
+    "source_id": "UC-GYM-007 Exception Flow",
+    "purpose": "Verify system rejects vote when student does not belong to targeted batch/branch",
+    "preconditions": "Poll targets batch '2024' branch 'CSE', student is batch '2025' branch 'ME'",
+    "action_or_input": "Call cast_poll_vote with mismatched batch/branch",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-008-MF",
+    "source_id": "UC-GYM-008 Main Flow",
+    "purpose": "Verify Club Head successfully changes club coordinator and co-coordinator",
+    "preconditions": "Club exists with active leadership (coord 101, co-coord 102)",
+    "action_or_input": "Call change_club_leadership(club_id=club.id, actor_id=101, new_coordinator_id=105, new_co_coordinator_id=106)",
+    "expected_result": "New leadership is active, superseded leadership is deactivated",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-008-EXC1",
+    "source_id": "UC-GYM-008 Exception Flow",
+    "purpose": "Verify unauthorized user cannot change club leadership",
+    "preconditions": "Club exists with active leadership, actor 999 is not coordinator",
+    "action_or_input": "Call change_club_leadership with actor_id=999",
+    "expected_result": "Operation rejected with PermissionError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-008-EXC2",
+    "source_id": "UC-GYM-008 Exception Flow",
+    "purpose": "Verify leadership change is rejected when new leader IDs are invalid",
+    "preconditions": "Club exists with active leadership",
+    "action_or_input": "Call change_club_leadership with actor_id=101, new_coordinator_id=-1, new_co_coordinator_id=106",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-009-MF",
+    "source_id": "UC-GYM-009 Main Flow",
+    "purpose": "Verify Club Head submits club budget request with non-negative amount and supporting file",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call submit_budget_request(club_id=club.id, actor_id=101, requested_amount=15000.0, description='Festival budget', supporting_file='budget.pdf')",
+    "expected_result": "ClubBudgetRequest record created with status 'open'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-009-EXC1",
+    "source_id": "UC-GYM-009 Exception Flow",
+    "purpose": "Verify budget request is rejected when amount is negative",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call submit_budget_request with requested_amount=-500.0",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-009-EXC2",
+    "source_id": "UC-GYM-009 Exception Flow",
+    "purpose": "Verify budget request is rejected when supporting file is missing",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call submit_budget_request with supporting_file=''",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-010-MF",
+    "source_id": "UC-GYM-010 Main Flow",
+    "purpose": "Verify Club Head successfully submits club event report with details and report file",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call submit_event_report(club_id=club.id, actor_id=101, event_name='Coding Contest', event_date=today, report_file='report.pdf')",
+    "expected_result": "ClubEventReport record created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-010-EXC",
+    "source_id": "UC-GYM-010 Exception Flow",
+    "purpose": "Verify event report submission is rejected when report file is missing",
+    "preconditions": "Confirmed club exists with coordinator 101",
+    "action_or_input": "Call submit_event_report with report_file=''",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-011-MF",
+    "source_id": "UC-GYM-011 Main Flow",
+    "purpose": "Verify Student Admin approves an open club and confirms it",
+    "preconditions": "Club exists with status 'open'",
+    "action_or_input": "Call confirm_club(club_id=club.id)",
+    "expected_result": "Club status transitions to 'confirmed'",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-011-EXC",
+    "source_id": "UC-GYM-011 Exception Flow",
+    "purpose": "Verify approval of an already confirmed club is rejected",
+    "preconditions": "Club exists with status 'confirmed'",
+    "action_or_input": "Call confirm_club(club_id=club.id)",
+    "expected_result": "Operation rejected with ValueError",
+    "test_type": "exception/negative"
+  },
+  {
+    "test_id": "TC-UC-012-MF",
+    "source_id": "UC-GYM-012 Main Flow",
+    "purpose": "Verify assigned Club Faculty Councillor successfully accesses and reviews submitted report",
+    "preconditions": "Club exists with faculty councillor 201; event report exists",
+    "action_or_input": "Call review_event_report(report_id=report.id, faculty_id=201)",
+    "expected_result": "Event report returned successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-012-EXC",
+    "source_id": "UC-GYM-012 Exception Flow",
+    "purpose": "Verify faculty member not assigned to the club cannot review event report",
+    "preconditions": "Club has councillor 201; actor is faculty 999",
+    "action_or_input": "Call review_event_report(report_id=report.id, faculty_id=999)",
+    "expected_result": "Operation rejected with PermissionError",
+    "test_type": "exception/negative"
+  }
+]
