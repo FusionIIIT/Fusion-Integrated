@@ -38,3 +38,13 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `vms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `vms.visit.create` | Request or register visitor passes | `admin`, `faculty`, `staff`, `student` |
+| `vms.visit.approve` | Approve or reject pending visit requests | `admin`, `faculty`, `staff` |
+| `vms.gate.scan` | Scan QR codes, process check-ins and check-outs | `Dean`, `admin`, `security_guard`, `security_officer` |
+| `vms.security.admin` | Manage blacklist and view security alerts | `Dean`, `admin`, `security_officer` |
+| `vms.emergency.muster` | Trigger and oversee emergency muster roll-call | `Dean`, `admin`, `security_officer` |
