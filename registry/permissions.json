@@ -278,6 +278,179 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "vms": {
+      "grants": {
+        "Super Admin": [
+          "vms.analytics.view",
+          "vms.blacklist.manage",
+          "vms.bulk.manage",
+          "vms.emergency.rollcall",
+          "vms.emergency.trigger",
+          "vms.gate.override",
+          "vms.gate.validate",
+          "vms.policy.manage",
+          "vms.preauth.manage",
+          "vms.visit.decide",
+          "vms.visit.preregister",
+          "vms.visit.view"
+        ],
+        "admin": [
+          "vms.analytics.view",
+          "vms.blacklist.manage",
+          "vms.bulk.manage",
+          "vms.emergency.rollcall",
+          "vms.emergency.trigger",
+          "vms.gate.override",
+          "vms.gate.validate",
+          "vms.policy.manage",
+          "vms.preauth.manage",
+          "vms.visit.decide",
+          "vms.visit.preregister",
+          "vms.visit.view"
+        ],
+        "faculty": [
+          "vms.preauth.manage",
+          "vms.visit.decide",
+          "vms.visit.view"
+        ],
+        "security_personnel": [
+          "vms.emergency.rollcall",
+          "vms.gate.validate",
+          "vms.visit.view"
+        ],
+        "staff": [
+          "vms.preauth.manage",
+          "vms.visit.decide",
+          "vms.visit.view"
+        ],
+        "student": [
+          "vms.preauth.manage",
+          "vms.visit.decide",
+          "vms.visit.view"
+        ]
+      },
+      "module_grants": [
+        "Super Admin",
+        "admin",
+        "faculty",
+        "security_personnel",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/vms",
+        "icon": "UserCheck",
+        "items": [
+          {
+            "code": "vms.passes",
+            "icon": "IdentificationCard",
+            "label": "Visitor Passes",
+            "required_permission": "vms.visit.view",
+            "sort_order": 10,
+            "to": "/vms/passes"
+          },
+          {
+            "code": "vms.approvals",
+            "icon": "Checks",
+            "label": "Host Approvals",
+            "required_permission": "vms.visit.decide",
+            "sort_order": 20,
+            "to": "/vms/approvals"
+          },
+          {
+            "code": "vms.gate",
+            "icon": "QrCode",
+            "label": "Security Gate Scanner",
+            "required_permission": "vms.gate.validate",
+            "sort_order": 30,
+            "to": "/vms/gate"
+          },
+          {
+            "code": "vms.blacklist",
+            "icon": "ShieldWarning",
+            "label": "Blacklist Registry",
+            "required_permission": "vms.blacklist.manage",
+            "sort_order": 40,
+            "to": "/vms/blacklist"
+          },
+          {
+            "code": "vms.emergency",
+            "icon": "WarningCircle",
+            "label": "Emergency Muster",
+            "required_permission": "vms.emergency.trigger",
+            "sort_order": 50,
+            "to": "/vms/emergency"
+          },
+          {
+            "code": "vms.analytics",
+            "icon": "ChartBar",
+            "label": "Visitor Analytics",
+            "required_permission": "vms.analytics.view",
+            "sort_order": 60,
+            "to": "/vms/analytics"
+          }
+        ],
+        "label": "Visitor Management",
+        "nav_section": "Operations",
+        "sort_order": 35,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "vms.visit.view",
+          "label": "View visitor passes and status"
+        },
+        {
+          "code": "vms.visit.preregister",
+          "label": "Pre-register a visitor"
+        },
+        {
+          "code": "vms.visit.decide",
+          "label": "Approve or reject visit requests"
+        },
+        {
+          "code": "vms.preauth.manage",
+          "label": "Manage recurring visitor pre-authorizations"
+        },
+        {
+          "code": "vms.gate.validate",
+          "label": "Scan and validate visitor passes at gate"
+        },
+        {
+          "code": "vms.gate.override",
+          "label": "Authorize manual gate override"
+        },
+        {
+          "code": "vms.blacklist.manage",
+          "label": "Manage blacklist and safe-list entries"
+        },
+        {
+          "code": "vms.emergency.trigger",
+          "label": "Trigger emergency evacuation muster"
+        },
+        {
+          "code": "vms.emergency.rollcall",
+          "label": "Mark visitor roll call during muster"
+        },
+        {
+          "code": "vms.analytics.view",
+          "label": "View visitor traffic reports and analytics"
+        },
+        {
+          "code": "vms.policy.manage",
+          "label": "Version and configure access policies"
+        },
+        {
+          "code": "vms.bulk.manage",
+          "label": "Manage bulk event visitor uploads"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "vms.request.expire",
+        "vms.visit.auto_checkout"
+      ]
     }
   },
   "publisher": "integrated",

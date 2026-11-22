@@ -38,3 +38,20 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `vms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `vms.visit.view` | View visitor passes and status | `Super Admin`, `admin`, `faculty`, `security_personnel`, `staff`, `student` |
+| `vms.visit.preregister` | Pre-register a visitor | `Super Admin`, `admin` |
+| `vms.visit.decide` | Approve or reject visit requests | `Super Admin`, `admin`, `faculty`, `staff`, `student` |
+| `vms.preauth.manage` | Manage recurring visitor pre-authorizations | `Super Admin`, `admin`, `faculty`, `staff`, `student` |
+| `vms.gate.validate` | Scan and validate visitor passes at gate | `Super Admin`, `admin`, `security_personnel` |
+| `vms.gate.override` | Authorize manual gate override | `Super Admin`, `admin` |
+| `vms.blacklist.manage` | Manage blacklist and safe-list entries | `Super Admin`, `admin` |
+| `vms.emergency.trigger` | Trigger emergency evacuation muster | `Super Admin`, `admin` |
+| `vms.emergency.rollcall` | Mark visitor roll call during muster | `Super Admin`, `admin`, `security_personnel` |
+| `vms.analytics.view` | View visitor traffic reports and analytics | `Super Admin`, `admin` |
+| `vms.policy.manage` | Version and configure access policies | `Super Admin`, `admin` |
+| `vms.bulk.manage` | Manage bulk event visitor uploads | `Super Admin`, `admin` |

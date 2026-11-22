@@ -15,16 +15,23 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.vms
 forbidden_modules =
     modules.placement.models
     modules.placement.services
     modules.placement.selectors
     modules.placement.api
     modules.placement.domain
+    modules.vms.domain
     modules.directory.models
     modules.directory.services
     modules.directory.api
     modules.accesscontrol.models
+    modules.vms.models
+    modules.vms.services
+    modules.vms.selectors
+    modules.vms.api
+    modules.vms.domain
 # DIRECT imports only. contracts.py legitimately imports its OWN module's
 # models and services, so following the chain transitively would make this
 # contract impossible to satisfy. What we forbid is a module reaching straight
@@ -38,6 +45,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.vms.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +74,14 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+    modules.vms.domain
+
+[importlinter:contract:vms-layers]
+name = Layering inside vms
+type = layers
+layers =
+    modules.vms.api
+    modules.vms.services
+    modules.vms.selectors
+    modules.vms.models
+    modules.vms.domain

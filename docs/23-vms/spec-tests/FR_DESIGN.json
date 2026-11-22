@@ -1,0 +1,353 @@
+[
+  {
+    "test_id": "FR-001",
+    "source_id": "VMS-CFR-001 authoritative-record-creation",
+    "purpose": "Verify VMS creates authoritative digital visitor records replacing manual entry.",
+    "preconditions": "Visitor pre-registers with valid contact and visit details.",
+    "action_or_input": "Submit visit registration via VMS endpoint.",
+    "expected_result": "Authoritative Visitor and VisitRequest record created in system with PENDING status.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-002",
+    "source_id": "VMS-AFR-002 digital-registry-scoping",
+    "purpose": "Verify operational records are queryable through authoritative registry.",
+    "preconditions": "Visit requests exist in system.",
+    "action_or_input": "Query visitor registry with authorized role.",
+    "expected_result": "Registry returns complete digital visit history without manual log dependency.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-003",
+    "source_id": "VMS-CFR-002 role-assignment-duration",
+    "purpose": "Verify Super Admin can assign VMS operational roles with defined scope and duration.",
+    "preconditions": "Authenticated user is Super Admin; target staff user exists.",
+    "action_or_input": "Assign Security Personnel role for Zone 1 with expiration date.",
+    "expected_result": "Role assignment persisted with zone scope and valid time window.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-004",
+    "source_id": "VMS-AFR-003 role-reassignment-handoff",
+    "purpose": "Verify pending operational work is handed off when roles are reassigned.",
+    "preconditions": "Staff member A has pending visit reviews.",
+    "action_or_input": "Reassign role and pending work queue to staff member B.",
+    "expected_result": "Pending reviews successfully transferred to staff member B.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-005",
+    "source_id": "VMS-CFR-002 non-superadmin-denial",
+    "purpose": "Verify non-Super Admin cannot assign or modify VMS operational roles.",
+    "preconditions": "Authenticated user is regular Host or Visitor.",
+    "action_or_input": "Attempt POST /api/vms/roles/assign/.",
+    "expected_result": "HTTP 403 Forbidden; role assignment rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-006",
+    "source_id": "VMS-CFR-003 external-boundary-isolation",
+    "purpose": "Verify VMS treats Campus ID and external modules as external collaborators without foreign keys.",
+    "preconditions": "External host ID provided in pre-registration.",
+    "action_or_input": "Create visit linking host by username/string ID without direct DB foreign key.",
+    "expected_result": "Visit created referencing external host identifier cleanly.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-007",
+    "source_id": "VMS-AFR-007 event-hostel-coordination",
+    "purpose": "Verify VMS accepts event/hostel coordination metadata via designated boundary payloads.",
+    "preconditions": "Event ID or hostel booking reference provided.",
+    "action_or_input": "Register visitor with external reference 'EVENT-2026-X'.",
+    "expected_result": "External reference stored in visit metadata without cross-module FK.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-008",
+    "source_id": "VMS-CFR-004 vip-permission-grant",
+    "purpose": "Verify Super Admin can grant VIP permissions with fast-track check-in.",
+    "preconditions": "Super Admin is logged in; visitor profile exists.",
+    "action_or_input": "Flag visitor profile as VIP with designated override reason.",
+    "expected_result": "VIP flag active; visitor eligible for auto-approval and expedited gate clearance.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-009",
+    "source_id": "VMS-AFR-005 vip-override-effect",
+    "purpose": "Verify VIP visit pre-registration bypasses manual host approval.",
+    "preconditions": "Visitor has active VIP designation.",
+    "action_or_input": "Submit visit registration for VIP visitor.",
+    "expected_result": "Visit transitions directly to APPROVED / Pass Issued without host approval delay.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-010",
+    "source_id": "VMS-CFR-005 audit-trail-logging",
+    "purpose": "Verify operational actions (approval, gate checks, overrides) produce immutable audit logs.",
+    "preconditions": "Security gate check performed.",
+    "action_or_input": "Log gate check-in event for pass.",
+    "expected_result": "Audit log entry created with timestamp, actor, pass ID, and gate location.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "FR-011",
+    "source_id": "VMS-AFR-006 audit-trail-retrieval",
+    "purpose": "Verify Security Admin can retrieve audit trails filtered by date and entity.",
+    "preconditions": "Audit logs exist in database.",
+    "action_or_input": "Query GET /api/vms/audit/ with date range.",
+    "expected_result": "Returns list of audit events matching query parameters.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-012",
+    "source_id": "VMS-CFR-006 policy-versioning",
+    "purpose": "Verify Admin can create and version access policies (visiting hours, max duration).",
+    "preconditions": "Admin user authenticated.",
+    "action_or_input": "Create Policy v1 (visiting hours 08:00-20:00, max duration 8h).",
+    "expected_result": "Policy saved with version 1, marked draft or published.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-013",
+    "source_id": "VMS-AFR-008 policy-runtime-enforcement",
+    "purpose": "Verify runtime gate checks use only the latest active published policy version.",
+    "preconditions": "Policy v1 published; v2 is in draft.",
+    "action_or_input": "Validate pass during hours permitted by v1 but excluded by draft v2.",
+    "expected_result": "Validation succeeds based on active published policy v1.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-014",
+    "source_id": "VMS-CFR-007 blacklist-addition",
+    "purpose": "Verify Admin can add individuals to blacklist with name, ID number, and justification.",
+    "preconditions": "Admin user authenticated.",
+    "action_or_input": "POST /api/vms/blacklist/ with ID document and reason.",
+    "expected_result": "BlacklistEntry created with ACTIVE status.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-015",
+    "source_id": "VMS-AFR-009 blacklist-check-denial",
+    "purpose": "Verify visitor registration matching blacklisted ID is rejected immediately.",
+    "preconditions": "Active blacklist entry exists for ID 'ABC1234567'.",
+    "action_or_input": "Visitor submits pre-registration with ID 'ABC1234567'.",
+    "expected_result": "HTTP 400/409 error; registration rejected with blacklist alert.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-016",
+    "source_id": "VMS-AFR-010 safe-list-override",
+    "purpose": "Verify temporary safe-list entry allows registration for otherwise flagged visitor.",
+    "preconditions": "Visitor matches watchlist but has active temporary safe-list entry from Admin.",
+    "action_or_input": "Visitor submits pre-registration.",
+    "expected_result": "Registration permitted; safe-list bypass logged in audit trail.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-017",
+    "source_id": "VMS-CFR-008 analytics-generation",
+    "purpose": "Verify Admin can generate visitor statistics and traffic analytics.",
+    "preconditions": "Multiple check-in and check-out records exist.",
+    "action_or_input": "GET /api/vms/analytics/dashboard/.",
+    "expected_result": "Returns counts of current on-site visitors, completed visits, peak hours.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-018",
+    "source_id": "VMS-CFR-009 bulk-visitor-upload",
+    "purpose": "Verify Admin can upload bulk visitor list for campus events.",
+    "preconditions": "Admin user authenticated; valid CSV/JSON list of attendees.",
+    "action_or_input": "POST /api/vms/visits/bulk/ with 5 visitor records.",
+    "expected_result": "All 5 visitors registered and batch pass generation initiated.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-019",
+    "source_id": "VMS-CFR-010 pre-registration-mandatory-fields",
+    "purpose": "Verify pre-registration enforces mandatory fields (name, phone, host, purpose, ID).",
+    "preconditions": "Visitor submits request missing host or contact details.",
+    "action_or_input": "POST /api/vms/visits/pre-register/ with missing fields.",
+    "expected_result": "HTTP 400 Bad Request with validation errors indicating missing fields.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-020",
+    "source_id": "VMS-AFR-011 duplicate-visit-check",
+    "purpose": "Verify system prevents duplicate overlapping visit requests for same visitor and date.",
+    "preconditions": "Active approved visit exists for Visitor A today.",
+    "action_or_input": "Submit second visit request for Visitor A for overlapping schedule.",
+    "expected_result": "HTTP 409 Conflict; duplicate request rejected.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "FR-021",
+    "source_id": "VMS-CFR-011 visit-status-tracking",
+    "purpose": "Verify visitor can track visit status and download QR pass once approved.",
+    "preconditions": "Visit request is in APPROVED status.",
+    "action_or_input": "GET /api/vms/passes/<pass_id>/.",
+    "expected_result": "Returns digital pass details including secure token/QR payload and validity window.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-022",
+    "source_id": "VMS-CFR-012 host-approval-decision",
+    "purpose": "Verify Host can approve or reject pending visit requests.",
+    "preconditions": "Visit request pending approval for Host X.",
+    "action_or_input": "Host X posts approval decision (APPROVE or REJECT).",
+    "expected_result": "Visit transitions to APPROVED (pass generated) or REJECTED.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-023",
+    "source_id": "VMS-AFR-012 pre-authorization-creation",
+    "purpose": "Verify Host can create pre-authorization for frequent visitor.",
+    "preconditions": "Host authenticated.",
+    "action_or_input": "POST /api/vms/pre-authorizations/ with visitor email and validity window.",
+    "expected_result": "Pre-authorization saved; subsequent visits automatically approved.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-024",
+    "source_id": "VMS-CFR-013 gate-pass-validation",
+    "purpose": "Verify Security Personnel can validate pass at gate and check-in visitor.",
+    "preconditions": "Visitor presents valid approved QR pass at main gate.",
+    "action_or_input": "POST /api/vms/gate/check-in/ with pass token.",
+    "expected_result": "Gate validation passes; visit status transitions to CHECKED_IN (on-site).",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-025",
+    "source_id": "VMS-AFR-013 expired-pass-gate-denial",
+    "purpose": "Verify gate check-in denies expired passes.",
+    "preconditions": "Pass validity window ended 1 hour ago.",
+    "action_or_input": "Attempt gate check-in with expired pass token.",
+    "expected_result": "HTTP 400/422 validation failure; entry denied; event logged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-026",
+    "source_id": "VMS-CFR-014 manual-gate-override",
+    "purpose": "Verify Admin can authorize manual gate override with mandatory audit reason.",
+    "preconditions": "Visitor cannot present QR pass due to dead phone battery.",
+    "action_or_input": "Admin performs POST /api/vms/gate/override/ with justification.",
+    "expected_result": "Override granted; check-in recorded with Admin identity and reason in audit trail.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-027",
+    "source_id": "VMS-CFR-015 gate-check-out",
+    "purpose": "Verify Security Personnel or Visitor self-checkout transitions visit to CHECKED_OUT.",
+    "preconditions": "Visitor currently has CHECKED_IN status.",
+    "action_or_input": "POST /api/vms/gate/check-out/.",
+    "expected_result": "Status updated to CHECKED_OUT; pass deactivated; checkout timestamp recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-028",
+    "source_id": "VMS-CFR-016 live-dashboard-roster",
+    "purpose": "Verify Security Personnel have real-time visibility into all on-site visitors.",
+    "preconditions": "Two visitors checked in, one checked out.",
+    "action_or_input": "GET /api/vms/dashboard/live/.",
+    "expected_result": "Returns list of exactly 2 on-site visitors with active zones and host details.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-029",
+    "source_id": "VMS-CFR-017 zone-permission-check",
+    "purpose": "Verify system checks visitor zone authorization before granting zone entry.",
+    "preconditions": "Visitor pass is authorized for 'Academic Block' only.",
+    "action_or_input": "POST /api/vms/zones/validate/ with zone 'Server Room'.",
+    "expected_result": "Access denied; zone violation alert triggered and recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-030",
+    "source_id": "VMS-AFR-014 temporary-zone-elevation",
+    "purpose": "Verify Admin can grant temporary time-boxed zone elevation.",
+    "preconditions": "Visitor has standard access.",
+    "action_or_input": "Admin POST /api/vms/zones/elevate/ for zone 'Server Room' valid for 2 hours.",
+    "expected_result": "Temporary zone elevation active; subsequent access to Server Room allowed within 2h.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-031",
+    "source_id": "VMS-CFR-018 emergency-muster-trigger",
+    "purpose": "Verify Admin or Security Personnel can trigger emergency muster and snapshot on-site roster.",
+    "preconditions": "Active on-site visitors exist.",
+    "action_or_input": "POST /api/vms/emergency/muster/ with assembly point details.",
+    "expected_result": "Emergency muster initiated; snapshot roster generated of all current on-site visitors.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-032",
+    "source_id": "VMS-AFR-015 emergency-roll-call",
+    "purpose": "Verify Security Personnel can mark accountability status (ACCOUNTED / UNACCOUNTED).",
+    "preconditions": "Emergency muster active with roster of 3 visitors.",
+    "action_or_input": "POST /api/vms/emergency/roll-call/ marking Visitor 1 as ACCOUNTED.",
+    "expected_result": "Visitor 1 status updated to ACCOUNTED; remaining 2 remain UNACCOUNTED.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-033",
+    "source_id": "VMS-CFR-019 offline-batch-reconciliation",
+    "purpose": "Verify offline gate check-in logs can be reconciled when connectivity is restored.",
+    "preconditions": "Security gate app records offline check-in payload with signed timestamp.",
+    "action_or_input": "POST /api/vms/gate/offline-sync/ with batched events.",
+    "expected_result": "Batch events processed, validated against pass registry, and merged into live log.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-034",
+    "source_id": "VMS-CFR-020 walkin-registration",
+    "purpose": "Verify Security Personnel can register walk-in visitor at gate.",
+    "preconditions": "Unscheduled visitor arrives at gate with valid ID document.",
+    "action_or_input": "POST /api/vms/visits/walk-in/ with visitor ID and selected host.",
+    "expected_result": "Walk-in visit created with WALK_IN pass type; host notification dispatched.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-035",
+    "source_id": "VMS-AFR-016 walkin-contingency-approval",
+    "purpose": "Verify Admin can provide contingency approval if host is unavailable for walk-in.",
+    "preconditions": "Walk-in request pending host response past SLA window.",
+    "action_or_input": "Admin performs POST /api/vms/visits/<id>/contingency-approve/.",
+    "expected_result": "Visit approved under contingency rules; pass activated for gate entry.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-036",
+    "source_id": "VMS-CFR-021 visit-extension",
+    "purpose": "Verify Host or Admin can extend visit duration for on-site visitor.",
+    "preconditions": "Visitor is checked in; approaching pass expiration.",
+    "action_or_input": "Host requests 2-hour extension; Admin approves.",
+    "expected_result": "Pass valid_to extended by 2 hours; status remains CHECKED_IN.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-037",
+    "source_id": "VMS-AFR-017 early-visit-termination",
+    "purpose": "Verify Host or Admin can terminate active visit early for security or scheduling reasons.",
+    "preconditions": "Visitor currently on-site.",
+    "action_or_input": "Host POST /api/vms/visits/<id>/terminate/ with reason.",
+    "expected_result": "Pass revoked immediately; visit marked TERMINATED_EARLY; security notified.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-038",
+    "source_id": "VMS-CFR-022 approval-timeout-expiration",
+    "purpose": "Verify pending visit requests expire automatically if host does not respond within timeout window.",
+    "preconditions": "Visit request pending for > 24 hours (or configured timeout).",
+    "action_or_input": "Execute periodic task expire_pending_requests().",
+    "expected_result": "Visit request transitioned to EXPIRED; visitor and host notified.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "FR-039",
+    "source_id": "VMS-AFR-018 automatic-checkout-overstay",
+    "purpose": "Verify system flags overstays and performs automatic checkout past daily cut-off.",
+    "preconditions": "Visitor checked in yesterday did not check out.",
+    "action_or_input": "Execute periodic task auto_checkout_overstays().",
+    "expected_result": "Visit transitioned to AUTO_CHECKED_OUT; flagged as overstay in security audit.",
+    "test_type": "lifecycle"
+  }
+]
