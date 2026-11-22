@@ -1,0 +1,110 @@
+[
+  {
+    "test_id": "TC-WF-001",
+    "source_id": "BW-HM-01 step-1",
+    "purpose": "Student submits accommodation request starting the initial allotment path",
+    "preconditions": "Student has no active accommodation request",
+    "action_or_input": "POST /api/v1/hostel/requests with preferences",
+    "expected_result": "Accommodation request state transitions from None to submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-002",
+    "source_id": "BW-HM-01 step-2",
+    "purpose": "Super Admin records allotment decision progressing request to allotted",
+    "preconditions": "Accommodation request is in submitted state; target room has capacity",
+    "action_or_input": "POST /api/v1/hostel/allotments/batch",
+    "expected_result": "State transitions from submitted to allotted; room allotment active",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-003",
+    "source_id": "BW-HM-02 leave-approval-path",
+    "purpose": "Submitted leave request transitions to approved on Caretaker decision",
+    "preconditions": "Leave request is in submitted state",
+    "action_or_input": "POST /api/v1/hostel/leaves/{id}/decide with decision=approved",
+    "expected_result": "State transitions from submitted to approved; student notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-004",
+    "source_id": "BW-HM-03 leave-rejection-path",
+    "purpose": "Submitted leave request transitions to rejected on Caretaker decision",
+    "preconditions": "Leave request is in submitted state",
+    "action_or_input": "POST /api/v1/hostel/leaves/{id}/decide with decision=rejected",
+    "expected_result": "State transitions from submitted to rejected; student notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-005",
+    "source_id": "CW-HM-01 invalid-transition",
+    "purpose": "Approved leave request cannot be directly rejected",
+    "preconditions": "Leave request is already in approved state",
+    "action_or_input": "Attempt to transition approved leave to rejected",
+    "expected_result": "InvalidStateTransitionError raised and rejected",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-WF-006",
+    "source_id": "BW-HM-04 complaint-resolution-path",
+    "purpose": "Submitted complaint transitions directly to resolved on Caretaker action",
+    "preconditions": "Complaint is in submitted state",
+    "action_or_input": "PATCH /api/v1/hostel/complaints/{id} with status=resolved",
+    "expected_result": "State transitions from submitted to resolved; resolved_at timestamp set",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-007",
+    "source_id": "BW-HM-05 complaint-escalation-path",
+    "purpose": "Submitted complaint transitions to escalated to Warden",
+    "preconditions": "Complaint is in submitted state",
+    "action_or_input": "PATCH /api/v1/hostel/complaints/{id} with status=escalated",
+    "expected_result": "State transitions from submitted to escalated; escalated_at timestamp set",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-008",
+    "source_id": "CW-HM-02 unresolved-then-resolved",
+    "purpose": "Complaint transitions from submitted to unresolved, then to resolved",
+    "preconditions": "Complaint is in submitted state",
+    "action_or_input": "Step 1: update to unresolved; Step 2: update to resolved",
+    "expected_result": "Transitions submitted -> unresolved -> resolved successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-009",
+    "source_id": "BW-HM-06 guest-booking-approval-path",
+    "purpose": "Submitted guest room booking transitions to approved",
+    "preconditions": "Guest room booking is in submitted state",
+    "action_or_input": "POST /api/v1/hostel/guest-rooms/{id}/decide with decision=approved",
+    "expected_result": "State transitions from submitted to approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-010",
+    "source_id": "BW-HM-07 guest-booking-rejection-path",
+    "purpose": "Submitted guest room booking transitions to rejected",
+    "preconditions": "Guest room booking is in submitted state",
+    "action_or_input": "POST /api/v1/hostel/guest-rooms/{id}/decide with decision=rejected",
+    "expected_result": "State transitions from submitted to rejected",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-011",
+    "source_id": "BW-HM-08 extended-stay-approval-path",
+    "purpose": "Submitted extended stay transitions to approved on Warden decision",
+    "preconditions": "Extended stay request is in submitted state",
+    "action_or_input": "POST /api/v1/hostel/extended-stays/{id}/decide with decision=approved",
+    "expected_result": "State transitions from submitted to approved with charge recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-WF-012",
+    "source_id": "BW-HM-09 extended-stay-rejection-path",
+    "purpose": "Submitted extended stay transitions to rejected on Warden decision",
+    "preconditions": "Extended stay request is in submitted state",
+    "action_or_input": "POST /api/v1/hostel/extended-stays/{id}/decide with decision=rejected",
+    "expected_result": "State transitions from submitted to rejected",
+    "test_type": "positive"
+  }
+]
