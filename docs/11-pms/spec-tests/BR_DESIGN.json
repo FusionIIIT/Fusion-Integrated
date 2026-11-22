@@ -1,0 +1,758 @@
+[
+  {
+    "test_id": "BR-PMS-003",
+    "source_id": "BR-PMS-003",
+    "purpose": "Verify the business rule: Reporting. Applicants may access report information only for their own patent applications.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Applicants may access report information only for their own patent applications.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-005",
+    "source_id": "BR-PMS-005",
+    "purpose": "Verify the business rule: Reporting. Directors may access PMS reports and analytics only within their authorized PMS scope.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Directors may access PMS reports and analytics only within their authorized PMS scope.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-006",
+    "source_id": "BR-PMS-006",
+    "purpose": "Verify the business rule: Oversight. Director workflow-oversight access is limited to application workflows in the Director's domain.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Director workflow-oversight access is limited to application workflows in the Director's domain.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-014",
+    "source_id": "BR-PMS-014",
+    "purpose": "Verify the business rule: Document validation. Application supporting documents accepted for submission must be PDF files.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Application supporting documents accepted for submission must be PDF files.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-015",
+    "source_id": "BR-PMS-015",
+    "purpose": "Verify the business rule: Document validation. An application document must be under 50 MB to be accepted.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "An application document must be under 50 MB to be accepted.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-016",
+    "source_id": "BR-PMS-016",
+    "purpose": "Verify the business rule: Document validation. A submitted application document must pass malware validation before it is accepted.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "A submitted application document must pass malware validation before it is accepted.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-017",
+    "source_id": "BR-PMS-017",
+    "purpose": "Verify the business rule: Application validation. Required application fields must be complete before PMS accepts the application submission.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Required application fields must be complete before PMS accepts the application submission.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-020",
+    "source_id": "BR-PMS-020",
+    "purpose": "Verify the business rule: Agreement prerequisite. Inventor agreements must be completed before external filing.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Inventor agreements must be completed before external filing.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-022",
+    "source_id": "BR-PMS-022",
+    "purpose": "Verify the business rule: Assignment. Automatic Director assignment may be used only when configured assignment rules are available, and it must apply the same governing assignment criteria.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Automatic Director assignment may be used only when configured assignment rules are available, and it must apply the same governing assignment criteria. Exception/condition: Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-023",
+    "source_id": "BR-PMS-023",
+    "purpose": "Verify the business rule: Assignment rule. Director expertise matching with the application domain is an assignment criterion.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Director expertise matching with the application domain is an assignment criterion.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-024",
+    "source_id": "BR-PMS-024",
+    "purpose": "Verify the business rule: Assignment rule. Director workload balance is an assignment criterion.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Director workload balance is an assignment criterion.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-025",
+    "source_id": "BR-PMS-025",
+    "purpose": "Verify the business rule: Conflict of interest. PMS must perform a conflict-of-interest check before Director assignment.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PMS must perform a conflict-of-interest check before Director assignment.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-026",
+    "source_id": "BR-PMS-026",
+    "purpose": "Verify the business rule: Conflict of interest. A Director must not review an application in which that Director is listed as an inventor.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "A Director must not review an application in which that Director is listed as an inventor.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-027",
+    "source_id": "BR-PMS-027",
+    "purpose": "Verify the business rule: Conflict of interest. PCC_ADMIN must not act as reviewer for an application in which PCC_ADMIN is listed as an inventor.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PCC_ADMIN must not act as reviewer for an application in which PCC_ADMIN is listed as an inventor.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-029",
+    "source_id": "BR-PMS-029",
+    "purpose": "Verify the business rule: Decision. A Director review decision must be exactly one of: Approve, Reject, or Needs Revision.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "A Director review decision must be exactly one of: Approve, Reject, or Needs Revision.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-030",
+    "source_id": "BR-PMS-030",
+    "purpose": "Verify the business rule: Decision validation. Every Director review decision must include a justification of at least 50 characters.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Every Director review decision must include a justification of at least 50 characters.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-031",
+    "source_id": "BR-PMS-031",
+    "purpose": "Verify the business rule: Review deadline. Director review must be completed within 15 business days of assignment.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Director review must be completed within 15 business days of assignment.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-033",
+    "source_id": "BR-PMS-033",
+    "purpose": "Verify the business rule: Revision. Application revision is permitted when the application status is Needs Revision.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Application revision is permitted when the application status is Needs Revision.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-034",
+    "source_id": "BR-PMS-034",
+    "purpose": "Verify the business rule: Revision. Application revision is permitted when the application status is Rejected.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Application revision is permitted when the application status is Rejected.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-035",
+    "source_id": "BR-PMS-035",
+    "purpose": "Verify the business rule: Revision deadline. A revised application must be resubmitted within 60 days from the relevant rejection or revision-request decision date.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "A revised application must be resubmitted within 60 days from the relevant rejection or revision-request decision date.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-036",
+    "source_id": "BR-PMS-036",
+    "purpose": "Verify the business rule: Revision validation. A resubmitted revision must address the recorded Director feedback.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "A resubmitted revision must address the recorded Director feedback.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-038",
+    "source_id": "BR-PMS-038",
+    "purpose": "Verify the business rule: Status update. When the applicable 60-day resubmission period expires without valid resubmission, PMS changes the application status to Expired.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "When the applicable 60-day resubmission period expires without valid resubmission, PMS changes the application status to Expired.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-040",
+    "source_id": "BR-PMS-040",
+    "purpose": "Verify the business rule: Attorney assignment. Only PCC_ADMIN may assign an Attorney to an Approved application.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Only PCC_ADMIN may assign an Attorney to an Approved application.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-041",
+    "source_id": "BR-PMS-041",
+    "purpose": "Verify the business rule: Attorney panel rule. An assigned Attorney must be selected from the approved panel unless an institutional exception is recorded or allowed.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "An assigned Attorney must be selected from the approved panel unless an institutional exception is recorded or allowed. Exception/condition: unless an institutional exception is recorded or allowed",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-042",
+    "source_id": "BR-PMS-042",
+    "purpose": "Verify the business rule: Assignment criterion. Attorney expertise matching the application domain is an assignment criterion.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Attorney expertise matching the application domain is an assignment criterion.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-043",
+    "source_id": "BR-PMS-043",
+    "purpose": "Verify the business rule: Assignment criterion. Attorney current workload is an assignment criterion.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Attorney current workload is an assignment criterion.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-044",
+    "source_id": "BR-PMS-044",
+    "purpose": "Verify the business rule: Conflict of interest. PMS must perform a conflict-of-interest check before Attorney assignment.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PMS must perform a conflict-of-interest check before Attorney assignment.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-045",
+    "source_id": "BR-PMS-045",
+    "purpose": "Verify the business rule: Preference rule. Applicant Attorney preference may be considered only when the preferred Attorney is in the approved panel.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Applicant Attorney preference may be considered only when the preferred Attorney is in the approved panel. Exception/condition: Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-046",
+    "source_id": "BR-PMS-046",
+    "purpose": "Verify the business rule: Opinion validation. A finalized Attorney patentability opinion must contain exactly one recommendation: File Patent, Do Not File, or Needs Amendment.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "A finalized Attorney patentability opinion must contain exactly one recommendation: File Patent, Do Not File, or Needs Amendment.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-048",
+    "source_id": "BR-PMS-048",
+    "purpose": "Verify the business rule: Budget data. Budget information must include filing fees.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Budget information must include filing fees.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-049",
+    "source_id": "BR-PMS-049",
+    "purpose": "Verify the business rule: Budget data. Budget information must include attorney fees.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Budget information must include attorney fees.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-050",
+    "source_id": "BR-PMS-050",
+    "purpose": "Verify the business rule: Budget data. Budget information must include administrative costs.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Budget information must include administrative costs.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-051",
+    "source_id": "BR-PMS-051",
+    "purpose": "Verify the business rule: Budget escalation. When total patent cost exceeds the configured threshold, PMS must route/escalate the case to the applicable higher authority.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "When total patent cost exceeds the configured threshold, PMS must route/escalate the case to the applicable higher authority.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-052",
+    "source_id": "BR-PMS-052",
+    "purpose": "Verify the business rule: Budget approval rule. Budget approval is permitted only when the application status is Approved.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Budget approval is permitted only when the application status is Approved. Exception/condition: Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-053",
+    "source_id": "BR-PMS-053",
+    "purpose": "Verify the business rule: Budget validation. Where budget-availability information is available to PMS, budget availability must be validated before approval.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Where budget-availability information is available to PMS, budget availability must be validated before approval. Exception/condition: Applies only under the stated availability/configuration/legal condition.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-055",
+    "source_id": "BR-PMS-055",
+    "purpose": "Verify the business rule: Format validation. Where corresponding validation rules are available, the filing package must satisfy the applicable patent-office format standards before PMS records compliant readiness.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Where corresponding validation rules are available, the filing package must satisfy the applicable patent-office format standards before PMS records compliant readiness. Exception/condition: Applies only under the stated availability/configuration/legal condition.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-056",
+    "source_id": "BR-PMS-056",
+    "purpose": "Verify the business rule: International filing rule. An international filing must include additional justification recorded in PMS.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "An international filing must include additional justification recorded in PMS.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-059",
+    "source_id": "BR-PMS-059",
+    "purpose": "Verify the business rule: Post-grant rule. Post-grant tracking is activated only when patent status is Granted.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Post-grant tracking is activated only when patent status is Granted. Exception/condition: Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-060",
+    "source_id": "BR-PMS-060",
+    "purpose": "Verify the business rule: Maintenance schedule. Where applicable schedule rules are available, the maintenance-fee schedule is determined from grant date and jurisdiction.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Where applicable schedule rules are available, the maintenance-fee schedule is determined from grant date and jurisdiction. Exception/condition: Applies only under the stated availability/configuration/legal condition.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-061",
+    "source_id": "BR-PMS-061",
+    "purpose": "Verify the business rule: Renewal decision rule. An explicit Renew or Do Not Renew decision is required before each maintenance deadline.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "An explicit Renew or Do Not Renew decision is required before each maintenance deadline.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-065",
+    "source_id": "BR-PMS-065",
+    "purpose": "Verify the business rule: Response submission. An office-action response must be recorded as submitted within the applicable deadline unless a permitted extension applies.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "An office-action response must be recorded as submitted within the applicable deadline unless a permitted extension applies. Exception/condition: unless a permitted extension applies",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-066",
+    "source_id": "BR-PMS-066",
+    "purpose": "Verify the business rule: Deadline tracking. Office-action response deadline tracking is automated only where applicable deadline data/rules are available to PMS.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Office-action response deadline tracking is automated only where applicable deadline data/rules are available to PMS. Exception/condition: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-067",
+    "source_id": "BR-PMS-067",
+    "purpose": "Verify the business rule: Withdrawal. Withdrawal is permitted only before the filing stage.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Withdrawal is permitted only before the filing stage.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-068",
+    "source_id": "BR-PMS-068",
+    "purpose": "Verify the business rule: Withdrawal validation. Withdrawal is permitted only when the current application status is withdrawal-eligible under the applicable PMS rule/configuration.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Withdrawal is permitted only when the current application status is withdrawal-eligible under the applicable PMS rule/configuration. Exception/condition: Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-069",
+    "source_id": "BR-PMS-069",
+    "purpose": "Verify the business rule: Withdrawal validation. A withdrawal request must include an Applicant-provided reason.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "A withdrawal request must include an Applicant-provided reason.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-070",
+    "source_id": "BR-PMS-070",
+    "purpose": "Verify the business rule: Withdrawal consent. Co-inventor consent for withdrawal must be recorded when the applicable process requires such consent.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Co-inventor consent for withdrawal must be recorded when the applicable process requires such consent.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-073",
+    "source_id": "BR-PMS-073",
+    "purpose": "Verify the business rule: Inventor validation. Inventor information must pass PMS validation before the change is accepted.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Inventor information must pass PMS validation before the change is accepted.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-074",
+    "source_id": "BR-PMS-074",
+    "purpose": "Verify the business rule: Ownership validation. Inventor ownership percentages must pass PMS validation before the change is accepted.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Inventor ownership percentages must pass PMS validation before the change is accepted.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-075",
+    "source_id": "BR-PMS-075",
+    "purpose": "Verify the business rule: Consent rule. Required inventor consent must be obtained before filing.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Required inventor consent must be obtained before filing.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-076",
+    "source_id": "BR-PMS-076",
+    "purpose": "Verify the business rule: Electronic signature. Electronic signatures for inventor consent/agreement may be collected only where legally permitted and configured.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Electronic signatures for inventor consent/agreement may be collected only where legally permitted and configured. Exception/condition: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-077",
+    "source_id": "BR-PMS-077",
+    "purpose": "Verify the business rule: Electronic signature validation. Electronic-signature validation applies only where legally permitted and configured.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Electronic-signature validation applies only where legally permitted and configured. Exception/condition: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-078",
+    "source_id": "BR-PMS-078",
+    "purpose": "Verify the business rule: Agreement prerequisite. Inventor agreements must be complete before filing.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Inventor agreements must be complete before filing.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-082",
+    "source_id": "BR-PMS-082",
+    "purpose": "Verify the business rule: Document versioning. PMS assigns automatic version numbers to new document versions.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PMS assigns automatic version numbers to new document versions.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-084",
+    "source_id": "BR-PMS-084",
+    "purpose": "Verify the business rule: Document access. Access to previous document versions is limited by applicable role and application-status access rules.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Access to previous document versions is limited by applicable role and application-status access rules.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-086",
+    "source_id": "BR-PMS-086",
+    "purpose": "Verify the business rule: Access control. Document access is controlled by user role and application status.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Document access is controlled by user role and application status.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-087",
+    "source_id": "BR-PMS-087",
+    "purpose": "Verify the business rule: Document edit rule. Applicants may edit application documents only while the application status is Needs Revision.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Applicants may edit application documents only while the application status is Needs Revision.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-088",
+    "source_id": "BR-PMS-088",
+    "purpose": "Verify the business rule: Request routing. Licensing/technology-transfer requests are routed to the appropriate committee or Director according to the applicable institutional process.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Licensing/technology-transfer requests are routed to the appropriate committee or Director according to the applicable institutional process.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-091",
+    "source_id": "BR-PMS-091",
+    "purpose": "Verify the business rule: License records. License records are subject to confidentiality controls.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "License records are subject to confidentiality controls.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-092",
+    "source_id": "BR-PMS-092",
+    "purpose": "Verify the business rule: Appeal. Only an application in Rejected status is eligible for an Applicant appeal.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Only an application in Rejected status is eligible for an Applicant appeal.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-093",
+    "source_id": "BR-PMS-093",
+    "purpose": "Verify the business rule: Appeal deadline. An appeal must be filed within the applicable configured or institutionally defined allowed period.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "An appeal must be filed within the applicable configured or institutionally defined allowed period.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-094",
+    "source_id": "BR-PMS-094",
+    "purpose": "Verify the business rule: Appeal validation. An appeal must include Applicant-provided grounds and justification.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "An appeal must include Applicant-provided grounds and justification.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-095",
+    "source_id": "BR-PMS-095",
+    "purpose": "Verify the business rule: Appeal decision. A Director appeal outcome must be exactly one of: Uphold Rejection, Remand for Amendment, or Modify Decision.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "A Director appeal outcome must be exactly one of: Uphold Rejection, Remand for Amendment, or Modify Decision.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-097",
+    "source_id": "BR-PMS-097",
+    "purpose": "Verify the business rule: Deadline tracking. PMS calculates/monitors the Director review deadline using the applicable review-deadline rule.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PMS calculates/monitors the Director review deadline using the applicable review-deadline rule.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-098",
+    "source_id": "BR-PMS-098",
+    "purpose": "Verify the business rule: Deadline tracking. PMS calculates/monitors the revision deadline using the applicable revision-deadline rule.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PMS calculates/monitors the revision deadline using the applicable revision-deadline rule.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-099",
+    "source_id": "BR-PMS-099",
+    "purpose": "Verify the business rule: Deadline tracking. PMS calculates/monitors office-action response deadlines only where applicable deadline rules/data are available.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PMS calculates/monitors office-action response deadlines only where applicable deadline rules/data are available. Exception/condition: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-100",
+    "source_id": "BR-PMS-100",
+    "purpose": "Verify the business rule: Deadline tracking. PMS calculates/monitors maintenance-fee deadlines only where applicable jurisdictional schedule rules/data are available.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PMS calculates/monitors maintenance-fee deadlines only where applicable jurisdictional schedule rules/data are available. Exception/condition: Applies only under the stated availability/configuration/legal condition. Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-101",
+    "source_id": "BR-PMS-101",
+    "purpose": "Verify the business rule: Deadline notification. Where applicable, PMS generates an alert 30 days before a tracked deadline.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Where applicable, PMS generates an alert 30 days before a tracked deadline. Exception/condition: Applies only under the stated availability/configuration/legal condition.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-102",
+    "source_id": "BR-PMS-102",
+    "purpose": "Verify the business rule: Deadline notification. Where applicable, PMS generates an alert 15 days before a tracked deadline.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Where applicable, PMS generates an alert 15 days before a tracked deadline. Exception/condition: Applies only under the stated availability/configuration/legal condition.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-103",
+    "source_id": "BR-PMS-103",
+    "purpose": "Verify the business rule: Deadline notification. Where applicable, PMS generates an alert 5 days before a tracked deadline.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Where applicable, PMS generates an alert 5 days before a tracked deadline. Exception/condition: Applies only under the stated availability/configuration/legal condition.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-104",
+    "source_id": "BR-PMS-104",
+    "purpose": "Verify the business rule: Escalation. A missed tracked deadline triggers escalation according to the configured escalation chain.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "A missed tracked deadline triggers escalation according to the configured escalation chain.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-116",
+    "source_id": "BR-PMS-116",
+    "purpose": "Verify the business rule: Scope boundary. PMS responsibility for email notifications is limited to triggering system-generated emails; external delivery infrastructure is outside PMS.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PMS responsibility for email notifications is limited to triggering system-generated emails; external delivery infrastructure is outside PMS.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-121",
+    "source_id": "BR-PMS-121",
+    "purpose": "Verify the business rule: Audit log. Where applicable, audit records include user ID, action type, timestamp, application ID, previous state, and new state.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Where applicable, audit records include user ID, action type, timestamp, application ID, previous state, and new state. Exception/condition: Applies only under the stated availability/configuration/legal condition.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-122",
+    "source_id": "BR-PMS-122",
+    "purpose": "Verify the business rule: Audit log. Critical PMS operations create immutable audit records.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Critical PMS operations create immutable audit records.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-126",
+    "source_id": "BR-PMS-126",
+    "purpose": "Verify the business rule: Access control. A valid PMS role assignment is required before a user may access patent-management functions.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "A valid PMS role assignment is required before a user may access patent-management functions.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-127",
+    "source_id": "BR-PMS-127",
+    "purpose": "Verify the business rule: Sequential workflow rule. Attorney assignment must not occur before Director approval is recorded.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Attorney assignment must not occur before Director approval is recorded.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-128",
+    "source_id": "BR-PMS-128",
+    "purpose": "Verify the business rule: Sequential workflow rule. External filing must not occur until required approvals and budget allocation are complete.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "External filing must not occur until required approvals and budget allocation are complete.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-130",
+    "source_id": "BR-PMS-130",
+    "purpose": "Verify the business rule: Confidentiality. Confidential patent information is protected by role-based access control.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Confidential patent information is protected by role-based access control.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-131",
+    "source_id": "BR-PMS-131",
+    "purpose": "Verify the business rule: Role management. PMS maintains exactly one active PCC_ADMIN oversight role.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PMS maintains exactly one active PCC_ADMIN oversight role.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-138",
+    "source_id": "BR-PMS-138",
+    "purpose": "Verify the business rule: Scope boundary. Patent-office systems are external; PMS may validate, record, track, notify, log, or report based on filing/status/communication data but does not control patent-office processing or decisions.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Patent-office systems are external; PMS may validate, record, track, notify, log, or report based on filing/status/communication data but does not control patent-office processing or decisions.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-139",
+    "source_id": "BR-PMS-139",
+    "purpose": "Verify the business rule: Scope boundary. Financial systems and payment/accounting execution are external; PMS may record, validate, approve, track, log, or exchange financial metadata where integration is available.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Financial systems and payment/accounting execution are external; PMS may record, validate, approve, track, log, or exchange financial metadata where integration is available. Exception/condition: Applies only under the stated availability/configuration/legal condition.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-140",
+    "source_id": "BR-PMS-140",
+    "purpose": "Verify the business rule: Scope boundary. Document-management systems are external; PMS owns only the document/version/access/audit behavior explicitly represented within PMS or an available integration.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Document-management systems are external; PMS owns only the document/version/access/audit behavior explicitly represented within PMS or an available integration.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-141",
+    "source_id": "BR-PMS-141",
+    "purpose": "Verify the business rule: Scope boundary. External prior-art databases are query sources and are not PMS-owned repositories.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "External prior-art databases are query sources and are not PMS-owned repositories.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-142",
+    "source_id": "BR-PMS-142",
+    "purpose": "Verify the business rule: Scope boundary. PMS must not treat external patent-office filing success as internally controlled beyond recording submitted filing details and confirmations.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "PMS must not treat external patent-office filing success as internally controlled beyond recording submitted filing details and confirmations.",
+    "test_type": "pytest-django backend test"
+  },
+  {
+    "test_id": "BR-PMS-146",
+    "source_id": "BR-PMS-146",
+    "purpose": "Verify the business rule: Applicant office-action response approval condition. Applicant review and approval of an office-action response is required only when the applicable process requires Applicant review.",
+    "preconditions": "Establish the applicable actor, lifecycle state, and configuration named by the rule.",
+    "action_or_input": "Attempt the operation under the stated condition. Exercise each materially different outcome, threshold side, or stated exception that the rule explicitly defines.",
+    "expected_result": "Applicant review and approval of an office-action response is required only when the applicable process requires Applicant review. Exception/condition: Outside the stated condition, the rule does not authorize the action.",
+    "test_type": "pytest-django backend test"
+  }
+]

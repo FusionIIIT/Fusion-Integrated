@@ -1,0 +1,191 @@
+[
+  {
+    "test_id": "BW-PMS-01",
+    "source_id": "BW-PMS-01",
+    "purpose": "Exercise workflow path: One finite successful path from a new application to Director approval.",
+    "preconditions": "Trigger: Applicant is ready to submit a patent application.. Participants: Applicant; PCC_ADMIN; Director.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Initial Review Approval Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-02",
+    "source_id": "BW-PMS-02",
+    "purpose": "Exercise workflow path: One traversal of the Director-requested revision loop ending in approval.",
+    "preconditions": "Trigger: Director review results in Needs Revision.. Participants: Director; Applicant; PCC_ADMIN.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Revision and Re-Approval Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-03",
+    "source_id": "BW-PMS-03",
+    "purpose": "Exercise workflow path: Rejection followed by an Applicant appeal ending in Remand for Amendment.",
+    "preconditions": "Trigger: A Director rejects an application and the Applicant chooses to appeal.. Participants: Director; Applicant.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Appeal Remand Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-04",
+    "source_id": "BW-PMS-04",
+    "purpose": "Exercise workflow path: Rejection followed by an Applicant appeal ending in Uphold Rejection.",
+    "preconditions": "Trigger: A Director rejects an application and the Applicant chooses to appeal.. Participants: Director; Applicant.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Appeal Rejection-Upheld Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-05",
+    "source_id": "BW-PMS-05",
+    "purpose": "Exercise workflow path: Rejection followed by an Applicant appeal ending in Modify Decision.",
+    "preconditions": "Trigger: A Director rejects an application and the Applicant chooses to appeal.. Participants: Director; Applicant.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Appeal Modified-Decision Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-06",
+    "source_id": "BW-PMS-06",
+    "purpose": "Exercise workflow path: Assign an eligible Attorney and record acceptance.",
+    "preconditions": "Trigger: An Approved application is ready for Attorney assignment.. Participants: PCC_ADMIN; Attorney.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Attorney Assignment Acceptance Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-07",
+    "source_id": "BW-PMS-07",
+    "purpose": "Exercise workflow path: Represent one Attorney-decline/reassignment loop traversal.",
+    "preconditions": "Trigger: An assigned Attorney declines the assignment.. Participants: PCC_ADMIN; Attorney.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Attorney Decline and One Reassignment Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-08",
+    "source_id": "BW-PMS-08",
+    "purpose": "Exercise workflow path: Record a within-scope budget approval outcome for an Approved application.",
+    "preconditions": "Trigger: Director reviews the budget for an Approved application.. Participants: Director.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Budget Approval Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-09",
+    "source_id": "BW-PMS-09",
+    "purpose": "Exercise workflow path: Record a budget rejection outcome without inventing further escalation.",
+    "preconditions": "Trigger: Director reviews the budget for an Approved application.. Participants: Director.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Budget Rejection Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-10",
+    "source_id": "BW-PMS-10",
+    "purpose": "Exercise workflow path: Route an above-threshold budget case and track the escalation without modeling the unnamed higher authority as a PMS actor.",
+    "preconditions": "Trigger: Director reviews a budget whose total cost exceeds the configured threshold.. Participants: Director; PCC_ADMIN.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Budget Escalation Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-11",
+    "source_id": "BW-PMS-11",
+    "purpose": "Exercise workflow path: Record successful external filing after explicit filing prerequisites are satisfied.",
+    "preconditions": "Trigger: Attorney initiates external filing for a pre-filing-ready application.. Participants: Attorney.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for External Filing Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-12",
+    "source_id": "BW-PMS-12",
+    "purpose": "Exercise workflow path: Handle an office action when the applicable process requires Applicant review/approval of the response.",
+    "preconditions": "Trigger: An office action is received after filing.. Participants: Attorney; Applicant.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Office-Action Response with Applicant Review [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-13",
+    "source_id": "BW-PMS-13",
+    "purpose": "Exercise workflow path: Handle an office action when Applicant review is not required.",
+    "preconditions": "Trigger: An office action is received and the applicable process does not require Applicant review.. Participants: Attorney.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Office-Action Response without Applicant Review [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-14",
+    "source_id": "BW-PMS-14",
+    "purpose": "Exercise workflow path: One maintenance cycle ending in renewal and scheduling of the next cycle.",
+    "preconditions": "Trigger: A maintenance deadline approaches for a Granted patent.. Participants: Attorney; Director.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Maintenance Renewal Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-15",
+    "source_id": "BW-PMS-15",
+    "purpose": "Exercise workflow path: One maintenance cycle ending in a Do Not Renew decision.",
+    "preconditions": "Trigger: A maintenance deadline approaches for a Granted patent.. Participants: Attorney; Director.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Maintenance Non-Renewal Path [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "BW-PMS-16",
+    "source_id": "BW-PMS-16",
+    "purpose": "Exercise workflow path: Represent the cross-cutting withdrawal action without inventing a fixed eligibility list not supplied by the PS.",
+    "preconditions": "Trigger: Applicant requests withdrawal before filing.. Participants: Applicant.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Generic Pre-Filing Withdrawal Transition [Basis]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "CW-PMS-01",
+    "source_id": "CW-PMS-01",
+    "purpose": "Exercise workflow path: Combine initial review, one revision loop, and appeal outcomes into a coherent review/disposition view.",
+    "preconditions": "Trigger: Application enters submission/review lifecycle.. Participants: Applicant; PCC_ADMIN; Director.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Application Review and Disposition [Composite]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "CW-PMS-02",
+    "source_id": "CW-PMS-02",
+    "purpose": "Exercise workflow path: Show the related pre-filing governance paths without imposing an unsupported total order among independent pre-filing activities.",
+    "preconditions": "Trigger: Application is Approved.. Participants: PCC_ADMIN; Attorney; Director.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Pre-Filing Assignment, Budget, and Filing Governance [Composite]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "CW-PMS-03",
+    "source_id": "CW-PMS-03",
+    "purpose": "Exercise workflow path: Combine office-action response paths with and without Applicant review.",
+    "preconditions": "Trigger: An office action is recorded after filing.. Participants: Attorney; Applicant.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Office-Action Handling [Composite]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "CW-PMS-04",
+    "source_id": "CW-PMS-04",
+    "purpose": "Exercise workflow path: Combine Renew and Do Not Renew maintenance paths.",
+    "preconditions": "Trigger: A maintenance decision is due for a Granted patent.. Participants: Attorney; Director.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Post-Grant Maintenance Decision Cycle [Composite]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  },
+  {
+    "test_id": "CW-PMS-05",
+    "source_id": "CW-PMS-05",
+    "purpose": "Exercise workflow path: Make the cross-cutting withdrawal transition visible across explicit pre-filing application states while preserving the source's status-eligibility guard.",
+    "preconditions": "Trigger: Applicant requests withdrawal before filing.. Participants: Applicant.",
+    "action_or_input": "Execute the specified workflow path in order, including each listed actor action and transition. Follow the explicitly described purpose and trigger.",
+    "expected_result": "Complete the explicitly specified workflow path for Cross-Cutting Pre-Filing Withdrawal [Composite]. Verify each stated state transition and decision outcome.",
+    "test_type": "pytest-django integration test"
+  }
+]
