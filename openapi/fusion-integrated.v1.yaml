@@ -122,7 +122,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -165,7 +166,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -183,7 +185,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -377,7 +380,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -407,7 +411,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -454,7 +459,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -497,7 +503,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -607,7 +614,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -720,7 +728,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -828,7 +837,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -940,7 +950,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -970,7 +981,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -1089,7 +1101,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -1126,6 +1139,31 @@ paths:
                     valid_from: '2026-12-01T00:00:00+05:30'
                     valid_to: '2029-11-30T00:00:00+05:30'
                     in_effect: false
+          description: ''
+  /api/v1/department/role-assignments/vacancies:
+    get:
+      operationId: v1_department_role_assignments_vacancies_list
+      description: 'Q1 mitigation for BR-DEPT-022: vacant or ending roles in the departments
+        you can see.'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptRoleWarning'
+              examples:
+                Vacant:
+                  value:
+                  - department: SM
+                    role: hod
+                    problem: vacant
+                    message: SM has no HOD in effect.
           description: ''
   /api/v1/department/stock-movements:
     get:
@@ -1228,7 +1266,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -1274,7 +1313,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -1385,7 +1425,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -1432,7 +1473,8 @@ paths:
       - in: path
         name: id
         schema:
-          type: integer
+          type: string
+          pattern: ^[0-9]{1,9}$
         required: true
       tags:
       - v1
@@ -3823,6 +3865,8 @@ components:
           maxLength: 80
         batch_year:
           type: integer
+          maximum: 2100
+          minimum: 2000
           nullable: true
       required:
       - audience_role
@@ -4084,6 +4128,8 @@ components:
           maxLength: 20
         quantity:
           type: integer
+          maximum: 1000000
+          minimum: 1
         note:
           type: string
           default: ''
@@ -4296,6 +4342,8 @@ components:
           maxLength: 20
         user_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
           nullable: true
         display_name:
           type: string
@@ -4329,6 +4377,8 @@ components:
       properties:
         quantity:
           type: integer
+          maximum: 1000000
+          minimum: 1
         note:
           type: string
           default: ''
@@ -4398,6 +4448,8 @@ components:
           $ref: '#/components/schemas/DeptRoleTenureWriteRoleEnum'
         user_id:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         valid_from:
           type: string
           format: date-time
@@ -4418,6 +4470,26 @@ components:
       description: |-
         * `hod` - hod
         * `dept_admin` - dept_admin
+    DeptRoleWarning:
+      type: object
+      properties:
+        department:
+          type: string
+          readOnly: true
+        role:
+          type: string
+          readOnly: true
+        problem:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+      required:
+      - department
+      - message
+      - problem
+      - role
     DeptStockMovement:
       type: object
       properties:
@@ -4545,8 +4617,12 @@ components:
       properties:
         item:
           type: integer
+          maximum: 2147483647
+          minimum: 1
         quantity:
           type: integer
+          maximum: 1000000
+          minimum: 1
         purpose:
           type: string
           default: ''
@@ -4611,6 +4687,8 @@ components:
           maxLength: 40
         batch_year:
           type: integer
+          maximum: 2100
+          minimum: 2000
           nullable: true
         course_code:
           type: string
@@ -5354,6 +5432,8 @@ components:
           maxLength: 80
         batch_year:
           type: integer
+          maximum: 2100
+          minimum: 2000
           nullable: true
     PatchedDeptGeneralUpdate:
       type: object
@@ -5398,6 +5478,7 @@ components:
           maxLength: 5000
         capacity:
           type: integer
+          maximum: 100000
           minimum: 0
           nullable: true
         status:
@@ -5444,6 +5525,8 @@ components:
           maxLength: 40
         batch_year:
           type: integer
+          maximum: 2100
+          minimum: 2000
           nullable: true
         course_code:
           type: string

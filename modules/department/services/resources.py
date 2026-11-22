@@ -128,7 +128,9 @@ def create_profile(
             home = normalise_department(user.discipline if kind == "student" else user.department)
         if user is None or user.kind != kind or home != dept.code:
             raise DomainError(
-                f"That person is not a {kind} of {dept.code}.", code="not_in_department"
+                f"That person is not a {kind} of {dept.code}. "
+                f"Choose a {kind} who belongs to {dept.code}.",
+                code="not_in_department",
             )
         display_name = display_name or user.display_name
     if not (display_name or "").strip():

@@ -3,7 +3,7 @@
 Module code `department` · docs folder `docs/10-department/` · environment `module-only` ·
 spec `06-DEPT` v1.2 STUDENT BASELINE (`specs/06-DEPT`, not committed).
 
-**Status: approved by Student 2 (Shubham Kulkarni, 24BCS236) on 2026-11-22, WhatsApp. See the approval record at the end.**
+**Status: approved by Student 2 on 2026-11-22, WhatsApp. See the approval record at the end.**
 
 ---
 
@@ -454,6 +454,7 @@ rule refusal gives 422 (`api-conventions.md`).
 | GET | `profiles`, `profiles/{id}` | `profile.view` | tiered | BR-019 |
 | POST / PATCH | `profiles[/{id}]` | `profile.update` | 201 / updated | AFR-024 |
 | GET | `role-assignments` | `role_assignment.view` | tenures | BR-021..023 |
+| GET | `role-assignments/vacancies` | `role_assignment.view` | each vacant or ending role in the viewer's departments (Q1 mitigation) | BR-022 |
 | POST | `role-assignments` | `role_assignment.assign` | 201 / 409 `tenure_overlap` / 422 `not_employee` | BR-021..023, AFR-047 |
 | PATCH | `role-assignments/{id}` | `role_assignment.assign` | changed validity interval / 409 `tenure_overlap` | UC-020 ("create or change"), BR-023 |
 
@@ -463,7 +464,7 @@ All write endpoints carry `throttle_scope = "department_write"` and the platform
 
 | Route | Nav label | Guard (`RequirePermission`) |
 |---|---|---|
-| `/department` | Overview | `department.department.view` (details; official-change panel shown by permission) |
+| `/department/overview` (the bare `/department` redirects here) | Overview | `department.department.view` (details; official-change panel shown by permission) |
 | `/department/announcements` | Announcements | `department.announcement.view` |
 | `/department/inventory` | Inventory & Stock | `department.inventory_item.view` |
 | `/department/feedback` | Feedback | `department.feedback.view` |
@@ -477,7 +478,7 @@ Record details open in a drawer on the list page. No detail route exists.
 ### `Fusion-client` sidebar entry (cannot be added in `module-only`)
 
 ```js
-{ id: "department", label: "Department", icon: "Buildings", to: "/department", section: "Academics" }
+{ id: "department", label: "Department", icon: "Buildings", to: "/department/overview", section: "Academics" }
 ```
 
 ---
@@ -647,6 +648,18 @@ No new dependency is planned.
 
 | Item | Approved by | Date | Where (link or quote) |
 |---|---|---|---|
-| Blueprint (§1–§7) | Shubham Kulkarni (24BCS236), Student 2 | 2026-11-22, 19:41 IST | WhatsApp message to Student 1 (shown as edited): "I approve the Department blueprint and Q1-Q14 as proposed, including the changes outside the module's folders. Shubham Kulkarni (24BCS236)" |
-| Q1..Q14 rulings: every proposal as written | Shubham Kulkarni (24BCS236), Student 2 | 2026-11-22, 19:41 IST | same message |
-| Changes outside module folders (§8 list) | Shubham Kulkarni (24BCS236), Student 2 | 2026-11-22, 19:41 IST | same message |
+| Blueprint (§1–§7) | Student 2 | 2026-11-22, 19:41 IST | WhatsApp message to Student 1 (shown as edited): "I approve the Department blueprint and Q1-Q14 as proposed, including the changes outside the module's folders." [name and roll number omitted] |
+| Q1..Q14 rulings: every proposal as written | Student 2 | 2026-11-22, 19:41 IST | same message |
+| Changes outside module folders (§8 list) | Student 2 | 2026-11-22, 19:41 IST | same message |
+
+## Changes after approval (review round 1)
+
+These implement what was approved; none changes a ruling.
+
+- The Q1 mitigation is now built: `check_department_readiness` and `GET role-assignments/vacancies`
+  (shown on the HOD & Dept_Admin page) name every role with nobody in effect, or ending within
+  30 days with no successor.
+- BR-DEPT-022 and BR-DEPT-010 are also enforced by the database: triggers in `0001_initial` refuse an
+  overlapping tenure or a clashing slot, under a per-department advisory lock. No extension or
+  dependency is added.
+- The Overview route is `/department/overview`.

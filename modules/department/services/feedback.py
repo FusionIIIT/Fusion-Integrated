@@ -91,7 +91,7 @@ def dispose(ctx: ActorContext, feedback_id: int, *, outcome: str, note: str = ""
     fb = get_scoped(scoping.feedback_for(ctx), feedback_id, lock=True, what="feedback")
     if outcome not in TERMINAL:
         raise ConflictError(
-            "Feedback can only be marked resolved or closed.", code="invalid_transition"
+            "Choose resolved or closed as the outcome and try again.", code="invalid_transition"
         )
     _dispose(ctx, fb, outcome, note)
     fb.save()

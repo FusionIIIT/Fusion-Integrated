@@ -116,11 +116,13 @@ export interface FeedbackNote {
   created_at: string;
 }
 
+export type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
+
 export interface Feedback {
   id: number;
   subject: string;
   body: string;
-  category: string;
+  category: FeedbackCategory | "";
   status: FeedbackStatus;
   submitter_id: number;
   submitter_kind: string;
@@ -207,4 +209,11 @@ export interface TenureInput {
   user_id: number;
   valid_from: string;
   valid_to: string;
+}
+
+export interface RoleWarning {
+  department: string;
+  role: Tenure["role"];
+  problem: "vacant" | "ending";
+  message: string;
 }

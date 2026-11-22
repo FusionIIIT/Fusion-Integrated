@@ -204,3 +204,11 @@ def test_hod_tenures_list_is_own_department_and_central_sees_all(world, act):
     assert {
         t["department"] for t in act("central").get(f"{API}/role-assignments").json()["results"]
     } == {"CSE", "ECE"}
+
+
+def test_vacancies_are_scoped_to_the_viewers_departments(world, act):
+    # Q1: the HOD sees their own department's warnings; the central authority sees all
+    hod_view = act("hod").get(f"{API}/role-assignments/vacancies").json()
+    assert hod_view == []
+    central_view = act("central").get(f"{API}/role-assignments/vacancies").json()
+    assert {w["department"] for w in central_view} == {"Design", "LA", "ME", "NS", "SM"}

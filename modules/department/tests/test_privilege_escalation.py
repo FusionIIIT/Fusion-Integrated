@@ -53,6 +53,7 @@ ENDPOINTS = [
     ("post", "profiles", "department.profile.update"),
     ("patch", "profiles/1", "department.profile.update"),
     ("get", "role-assignments", "department.role_assignment.view"),
+    ("get", "role-assignments/vacancies", "department.role_assignment.view"),
     ("post", "role-assignments", "department.role_assignment.assign"),
     ("patch", "role-assignments/1", "department.role_assignment.assign"),
 ]
@@ -213,3 +214,21 @@ def test_cookie_write_without_csrf_token_is_403(world, stub_iam):
 def test_no_view_loosens_authentication_or_permissions():
     src = (Path(__file__).resolve().parents[1] / "api" / "views.py").read_text()
     assert "AllowAny" not in src and "authentication_classes" not in src
+
+
+GETS = [e for e in ENDPOINTS if e[0] == "get"]
+
+
+@pytest.mark.parametrize(("method", "path", "code"), GETS)
+def test_head_and_options_need_the_read_permission_too(world, stub_iam, method, path, code):
+    # R1-01: HEAD and OPTIONS run the GET gate, so they cannot probe for rows
+    c = _client(stub_iam, session_for("hod", permissions=DECLARED - {code}))
+    assert c.head(f"{API}/{path}").status_code == 403
+    assert c.options(f"{API}/{path}").status_code == 403
+
+
+def test_a_method_without_a_named_permission_is_refused(world, act):
+    # R1-01: an unmapped method fails closed instead of falling through to the module gate
+    r = act("hod").put(f"{API}/announcements/1", {}, format="json")
+    assert r.status_code in (403, 405)
+    assert act("hod").post(f"{API}/departments", {}, format="json").status_code in (403, 405)

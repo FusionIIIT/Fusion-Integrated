@@ -1,9 +1,9 @@
-import { Badge, Button, NumberInput, Select, Stack, Table, TextInput } from "@mantine/core";
+import { Alert, Badge, Button, List, NumberInput, Select, Stack, Table, TextInput } from "@mantine/core";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { useAssignTenure, useChangeTenure, useDepartments, useTenures } from "../api/hooks";
+import { useAssignTenure, useChangeTenure, useDepartments, useRoleWarnings, useTenures } from "../api/hooks";
 import type { Tenure, TenureInput } from "../api/types";
 import { PageBody, useDialog } from "../components/PageBody";
 
@@ -15,6 +15,7 @@ export default function RolesPage() {
   const { can } = useAuth();
   const { data, isPending, error } = useTenures();
   const departments = useDepartments();
+  const warnings = useRoleWarnings();
   const assign = useAssignTenure();
   const change = useChangeTenure();
   const { dialog: dialog, setDialog: setDialog, opened } = useDialog<Dialog>();
@@ -74,6 +75,13 @@ export default function RolesPage() {
         </FormModal>
       )}
     >
+      {(warnings.data ?? []).length > 0 && (
+        <Alert color="orange" variant="light" title="Roles that need a holder" mb="md">
+          <List size="sm">
+            {(warnings.data ?? []).map((w) => <List.Item key={`${w.department}-${w.role}`}>{w.message}</List.Item>)}
+          </List>
+        </Alert>
+      )}
       <Table striped withTableBorder>
         <Table.Thead>
           <Table.Tr><Table.Th>Department</Table.Th><Table.Th>Role</Table.Th><Table.Th>Holder</Table.Th>

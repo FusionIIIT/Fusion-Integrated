@@ -147,7 +147,7 @@ def test_uc_dept_019_alternate_invalid_stock_data_changes_nothing(world, act):
     r = act("admin").post(
         f"{API}/inventory-items/{item_id}/receipts", {"quantity": 0}, format="json"
     )
-    assert r.status_code == 422
+    assert r.status_code == 400  # refused with validation feedback
     assert InventoryItem.objects.get(pk=item_id).current_quantity == 3
     assert StockMovement.objects.count() == 1
 

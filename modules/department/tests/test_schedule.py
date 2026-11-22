@@ -47,7 +47,7 @@ def test_role_transition_task_twice_in_a_row_takes_effect_once(world):
 def test_a_future_tenure_is_not_applied_early(world):
     start = timezone.now() + timedelta(days=2)
     RoleTenure.objects.create(
-        department=world["CSE"],
+        department=Department.objects.get(code="ME"),
         role="hod",
         user_id=7,
         valid_from=start,
@@ -142,3 +142,45 @@ def test_headship_contract_is_plural_and_follows_the_tenure(world):
     heads = get_headships(["CSE", "ECE", "SM", "NOPE"])
     assert heads["CSE"].hod_user_id == 3010 and heads["SM"].hod_user_id is None
     assert "NOPE" not in heads
+
+
+@pytest.mark.django_db
+def test_q1_vacant_and_ending_roles_are_named(world):
+    # BR-DEPT-022, AFR-DEPT-051, AFR-DEPT-052: Q1's approved mitigation
+    from modules.department.selectors.readiness import role_warnings
+
+    now = timezone.now()
+    warnings = {(w["department"], w["role"], w["problem"]) for w in role_warnings(now=now)}
+    assert ("CSE", "hod", "vacant") not in warnings
+    assert {("SM", "hod", "vacant"), ("SM", "dept_admin", "vacant")} <= warnings
+    sm = next(w for w in role_warnings(now=now) if w["department"] == "SM" and w["role"] == "hod")
+    assert "no HOD designation" in sm["message"]
+
+    hod = RoleTenure.objects.get(department=world["CSE"], role="hod")
+    hod.valid_to = now + timedelta(days=10)
+    hod.save()
+    ending = [w for w in role_warnings(now=now) if w["department"] == "CSE" and w["role"] == "hod"]
+    assert [w["problem"] for w in ending] == ["ending"] and "Record the next tenure" in ending[0][
+        "message"
+    ]
+
+    RoleTenure.objects.create(
+        department=world["CSE"],
+        role="hod",
+        user_id=7,
+        valid_from=hod.valid_to,
+        valid_to=hod.valid_to + timedelta(days=300),
+        assigned_by=1,
+    )
+    assert not [
+        w for w in role_warnings(now=now) if w["department"] == "CSE" and w["role"] == "hod"
+    ]
+
+
+@pytest.mark.django_db
+def test_readiness_command_prints_each_vacancy_but_stays_ready(world):
+    out = StringIO()
+    call_command("check_department_readiness", stdout=out)
+    text = out.getvalue()
+    assert "SM has no HOD in effect" in text and "Department module is ready." in text
+    assert "CSE has no HOD" not in text

@@ -5,6 +5,7 @@ from __future__ import annotations
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import status
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,6 +18,7 @@ from modules.department.models import Feedback, StockRequest
 from modules.department.selectors import profiles as profile_selectors
 from modules.department.selectors import scoping
 from modules.department.selectors.actors import context_for
+from modules.department.selectors.readiness import role_warnings
 from modules.department.services import announcements as announcement_service
 from modules.department.services import departments as department_service
 from modules.department.services import feedback as feedback_service
@@ -25,6 +27,17 @@ from modules.department.services import resources as resource_service
 from modules.department.services import roles as role_service
 
 MODULE = HasModuleGrant("department")
+
+
+class DenyAll(BasePermission):
+    """A method with no permission named for it is refused, never left to the module gate alone."""
+
+    message = "You do not have permission to perform this action."
+
+    def has_permission(self, request, view):
+        return False
+
+
 SAFE = frozenset({"GET", "HEAD", "OPTIONS"})
 
 
@@ -50,11 +63,11 @@ class DepartmentView(APIView):
     throttle_scope = "department_write"
 
     def get_permissions(self):
-        code = self.perms.get(self.request.method)
-        gates = [MODULE()]
-        if code:
-            gates.append(HasPermission(code)())
-        return gates
+        method = self.request.method
+        code = self.perms.get("GET" if method in ("HEAD", "OPTIONS") else method)
+        if code is None:
+            return [MODULE(), DenyAll()]
+        return [MODULE(), HasPermission(code)()]
 
     def get_throttles(self):
         return [] if self.request.method in SAFE else super().get_throttles()
@@ -771,3 +784,27 @@ class RoleTenureDetailView(DepartmentView):
         payload.is_valid(raise_exception=True)
         tenure = role_service.change(self.ctx, pk, valid_to=payload.validated_data["valid_to"])
         return Response(s.DeptRoleTenureSerializer(tenure, context={"now": timezone.now()}).data)
+
+
+class RoleVacancyView(DepartmentView):
+    """Q1 mitigation for BR-DEPT-022: vacant or ending roles in the departments you can see."""
+
+    perms = {"GET": "department.role_assignment.view"}
+
+    @extend_schema(
+        responses=s.DeptRoleWarningSerializer(many=True),
+        examples=[
+            _ex(
+                "Vacant",
+                {
+                    "department": "SM",
+                    "role": "hod",
+                    "problem": "vacant",
+                    "message": "SM has no HOD in effect.",
+                },
+            )
+        ],
+    )
+    def get(self, request):
+        depts = list(scoping.departments_for(self.ctx))
+        return Response(s.DeptRoleWarningSerializer(role_warnings(depts), many=True).data)

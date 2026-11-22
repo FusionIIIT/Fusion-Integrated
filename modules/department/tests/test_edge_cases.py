@@ -398,3 +398,72 @@ def test_a_pending_request_cannot_be_issued_before_the_hod_decides(world, act):
     r = act("admin").post(f"{API}/stock-requests/{req}/issue")
     assert r.status_code == 409 and r.json()["error"]["code"] == "invalid_transition"
     assert InventoryItem.objects.get(pk=item).current_quantity == 5
+
+
+HUGE = 10**12
+
+
+@pytest.mark.parametrize(
+    ("who", "path", "body"),
+    [
+        ("admin", "inventory-items", {"name": "Big", "quantity": HUGE}),
+        ("admin", "lab-resources", {"name": "Big", "capacity": HUGE}),
+        (
+            "admin",
+            "timetable-slots",
+            {
+                "slots": [
+                    {
+                        "kind": "class",
+                        "course_code": "C",
+                        "day_of_week": 0,
+                        "starts_at": "09:00",
+                        "ends_at": "10:00",
+                        "batch_year": HUGE,
+                    }
+                ]
+            },
+        ),
+        ("faculty", "stock-requests", {"item": HUGE, "quantity": 1}),
+        (
+            "faculty",
+            "announcements",
+            {"title": "t", "body": "b", "audience_role": "all", "batch_year": HUGE},
+        ),
+        ("admin", "profiles", {"kind": "faculty", "user_id": HUGE}),
+        (
+            "central",
+            "role-assignments",
+            {
+                "department": "CSE",
+                "role": "hod",
+                "user_id": HUGE,
+                "valid_from": "2030-01-01T00:00:00Z",
+                "valid_to": "2031-01-01T00:00:00Z",
+            },
+        ),
+    ],
+)
+def test_out_of_range_numbers_are_400_not_500(world, act, who, path, body):
+    # R1-02: every integer input is bounded to fit its column
+    r = act(who).post(f"{API}/{path}", body, format="json")
+    assert r.status_code == 400, r.content
+
+
+def test_huge_receipt_and_huge_row_id_are_not_500(world, act):
+    item = (
+        act("admin")
+        .post(f"{API}/inventory-items", {"name": "Kit", "quantity": 1}, format="json")
+        .json()["id"]
+    )
+    assert (
+        act("admin")
+        .post(f"{API}/inventory-items/{item}/receipts", {"quantity": HUGE}, format="json")
+        .status_code
+        == 400
+    )
+    assert act("admin").get(f"{API}/feedback/{HUGE * 10**8}").status_code == 404
+    assert (
+        act("admin").patch(f"{API}/profiles/{HUGE}", {"office": "x"}, format="json").status_code
+        == 404
+    )

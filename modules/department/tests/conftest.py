@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import timedelta
+from io import StringIO
 
 import pytest
 from django.core.management import call_command
@@ -87,7 +88,7 @@ def session_for(name: str, *, permissions=None, modules=("department",), active_
 
 @pytest.fixture
 def world(db):
-    call_command("seed_departments", stdout=open("/dev/null", "w"))  # noqa: SIM115
+    call_command("seed_departments", stdout=StringIO())
     now = timezone.now()
     cse, ece = Department.objects.get(code="CSE"), Department.objects.get(code="ECE")
     long = timedelta(days=365)

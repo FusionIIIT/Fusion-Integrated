@@ -31,6 +31,14 @@ describe("RolesPage", () => {
     expect(await screen.findByText("Server exploded.")).toBeInTheDocument();
   });
 
+  it("names each vacant or ending role", async () => {
+    setup(["department.role_assignment.view"], { "/role-assignments": page([TENURE]), "/departments": [],
+      "/role-assignments/vacancies": [{ department: "SM", role: "hod", problem: "vacant",
+        message: "SM has no HOD in effect." }] });
+    renderPage(<RolesPage />);
+    expect(await screen.findByText("SM has no HOD in effect.")).toBeInTheDocument();
+  });
+
   it("gives the HOD a read-only view", async () => {
     setup(["department.role_assignment.view"], { "/role-assignments": page([TENURE]), "/departments": [] });
     renderPage(<RolesPage />);

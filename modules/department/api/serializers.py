@@ -22,6 +22,10 @@ from modules.department.models import (
     TimetableSlot,
 )
 
+# Column limits: a larger number is a 400, never a database error (500).
+MAX_ID = 2_147_483_647
+MAX_QUANTITY = 1_000_000
+
 
 def _one_of(values, **kwargs):
     """A choice kept out of the schema's shared enum names, which other modules also use."""
@@ -123,7 +127,9 @@ class DeptAnnouncementWriteSerializer(serializers.Serializer):
     body = serializers.CharField(allow_blank=True, max_length=10000)
     audience_role = serializers.CharField(max_length=20)
     programme = serializers.CharField(required=False, allow_blank=True, max_length=80, default="")
-    batch_year = serializers.IntegerField(required=False, allow_null=True, default=None)
+    batch_year = serializers.IntegerField(
+        required=False, allow_null=True, default=None, min_value=2000, max_value=2100
+    )
 
 
 class DeptAnnouncementEditSerializer(serializers.Serializer):
@@ -131,7 +137,9 @@ class DeptAnnouncementEditSerializer(serializers.Serializer):
     body = serializers.CharField(required=False, allow_blank=True, max_length=10000)
     audience_role = serializers.CharField(required=False, max_length=20)
     programme = serializers.CharField(required=False, allow_blank=True, max_length=80)
-    batch_year = serializers.IntegerField(required=False, allow_null=True)
+    batch_year = serializers.IntegerField(
+        required=False, allow_null=True, min_value=2000, max_value=2100
+    )
 
 
 class DeptInventoryItemSerializer(serializers.ModelSerializer):
@@ -144,12 +152,12 @@ class DeptInventoryItemSerializer(serializers.ModelSerializer):
 class DeptInventoryItemWriteSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=120)
     unit = serializers.CharField(max_length=20, required=False, default="unit")
-    quantity = serializers.IntegerField()
+    quantity = serializers.IntegerField(min_value=1, max_value=MAX_QUANTITY)
     note = serializers.CharField(required=False, allow_blank=True, max_length=300, default="")
 
 
 class DeptReceiptSerializer(serializers.Serializer):
-    quantity = serializers.IntegerField()
+    quantity = serializers.IntegerField(min_value=1, max_value=MAX_QUANTITY)
     note = serializers.CharField(required=False, allow_blank=True, max_length=300, default="")
 
 
@@ -199,8 +207,8 @@ class DeptStockRequestSerializer(serializers.ModelSerializer):
 
 
 class DeptStockRequestWriteSerializer(serializers.Serializer):
-    item = serializers.IntegerField()
-    quantity = serializers.IntegerField()
+    item = serializers.IntegerField(min_value=1, max_value=MAX_ID)
+    quantity = serializers.IntegerField(min_value=1, max_value=MAX_QUANTITY)
     purpose = serializers.CharField(required=False, allow_blank=True, max_length=300, default="")
 
 
@@ -278,7 +286,9 @@ class DeptTimetableSlotSerializer(serializers.ModelSerializer):
 class DeptTimetableSlotWriteSerializer(serializers.Serializer):
     kind = _one_of(("class", "lab"))
     programme = serializers.CharField(required=False, allow_blank=True, max_length=40, default="")
-    batch_year = serializers.IntegerField(required=False, allow_null=True, default=None)
+    batch_year = serializers.IntegerField(
+        required=False, allow_null=True, default=None, min_value=2000, max_value=2100
+    )
     course_code = serializers.CharField(max_length=20)
     day_of_week = serializers.IntegerField(min_value=0, max_value=6)
     starts_at = serializers.TimeField()
@@ -293,7 +303,9 @@ class DeptTimetableUploadSerializer(serializers.Serializer):
 class DeptTimetableSlotEditSerializer(serializers.Serializer):
     kind = _one_of(("class", "lab"), required=False)
     programme = serializers.CharField(required=False, allow_blank=True, max_length=40)
-    batch_year = serializers.IntegerField(required=False, allow_null=True)
+    batch_year = serializers.IntegerField(
+        required=False, allow_null=True, min_value=2000, max_value=2100
+    )
     course_code = serializers.CharField(required=False, max_length=20)
     day_of_week = serializers.IntegerField(required=False, min_value=0, max_value=6)
     starts_at = serializers.TimeField(required=False)
@@ -312,7 +324,9 @@ class DeptLabResourceEditSerializer(serializers.Serializer):
     name = serializers.CharField(required=False, allow_blank=True, max_length=120)
     location = serializers.CharField(required=False, allow_blank=True, max_length=120)
     equipment = serializers.CharField(required=False, allow_blank=True, max_length=5000)
-    capacity = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    capacity = serializers.IntegerField(
+        required=False, allow_null=True, min_value=0, max_value=100_000
+    )
     status = serializers.ChoiceField(choices=[c for c, _ in LabResource.STATUS], required=False)
 
 
@@ -343,7 +357,9 @@ class DeptProfileViewSerializer(serializers.Serializer):
 
 class DeptProfileWriteSerializer(serializers.Serializer):
     kind = _one_of(PROFILE_KINDS)
-    user_id = serializers.IntegerField(required=False, allow_null=True, default=None)
+    user_id = serializers.IntegerField(
+        required=False, allow_null=True, default=None, min_value=1, max_value=MAX_ID
+    )
     display_name = serializers.CharField(
         required=False, allow_blank=True, max_length=150, default=""
     )
@@ -399,10 +415,17 @@ class DeptRoleTenureSerializer(serializers.ModelSerializer):
 class DeptRoleTenureWriteSerializer(serializers.Serializer):
     department = serializers.CharField(max_length=12)
     role = serializers.ChoiceField(choices=["hod", "dept_admin"])
-    user_id = serializers.IntegerField()
+    user_id = serializers.IntegerField(min_value=1, max_value=MAX_ID)
     valid_from = serializers.DateTimeField()
     valid_to = serializers.DateTimeField()
 
 
 class DeptRoleTenureEditSerializer(serializers.Serializer):
     valid_to = serializers.DateTimeField()
+
+
+class DeptRoleWarningSerializer(serializers.Serializer):
+    department = serializers.CharField(read_only=True)
+    role = serializers.CharField(read_only=True)
+    problem = serializers.CharField(read_only=True)
+    message = serializers.CharField(read_only=True)

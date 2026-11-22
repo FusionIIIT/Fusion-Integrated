@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { http } from "../../../lib/http";
 import type {
   Announcement, AnnouncementInput, Department, Feedback, FeedbackNote, GeneralUpdate,
-  InventoryItem, LabInput, LabResource, OfficialChange, Page, Profile, ProfileInput,
+  InventoryItem, LabInput, LabResource, OfficialChange, Page, Profile, ProfileInput, RoleWarning,
   StockMovement, StockRequest, Tenure, TenureInput, TimetableSlot, TimetableSlotInput,
 } from "./types";
 
@@ -174,3 +174,10 @@ export const useAssignTenure = () =>
 export const useChangeTenure = () =>
   useWrite(async ({ id, valid_to }: { id: number; valid_to: string }) =>
     (await http.patch<Tenure>(`${BASE}/role-assignments/${id}`, { valid_to })).data);
+
+export function useRoleWarnings() {
+  return useQuery({
+    queryKey: [KEY, "role-vacancies"],
+    queryFn: async () => (await http.get<RoleWarning[]>(`${BASE}/role-assignments/vacancies`)).data,
+  });
+}

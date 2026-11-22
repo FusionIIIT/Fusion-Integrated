@@ -38,10 +38,12 @@ def assign(
     """BR-DEPT-021 by permission, BR-DEPT-022/023 dates, AFR-DEPT-047 employees only."""
     now = now or timezone.now()
     if role not in rules.ASSIGNABLE_ROLES:
-        raise DomainError("Role must be hod or dept_admin.", code="invalid_role")
+        raise DomainError("Choose the role hod or dept_admin and try again.", code="invalid_role")
     dept = Department.objects.select_for_update().filter(code=department_code).first()
     if dept is None:
-        raise NotFoundError(f"There is no department {department_code}.")
+        raise NotFoundError(
+            f"There is no department {department_code}. Choose one of the listed departments."
+        )
     with translated():
         rules.validate_interval(valid_from, valid_to)
     if valid_from < now - BACKDATE_GRACE:
@@ -90,7 +92,8 @@ def change(ctx: ActorContext, tenure_id: int, *, valid_to, now=None) -> RoleTenu
     ]
     if tenure.valid_to <= now:
         raise ConflictError(
-            "This tenure has already ended and cannot be changed.", code="tenure_ended"
+            "This tenure has already ended. Record a new tenure instead of changing it.",
+            code="tenure_ended",
         )
     with translated():
         rules.validate_interval(tenure.valid_from, valid_to)
@@ -98,7 +101,10 @@ def change(ctx: ActorContext, tenure_id: int, *, valid_to, now=None) -> RoleTenu
             current=_as_tenure(tenure), new_valid_to=valid_to, successors=others, now=now
         )
     if valid_to < now:
-        raise DomainError("A tenure cannot be ended in the past.", code="backdated_tenure")
+        raise DomainError(
+            "Choose an end date from now onwards; a tenure cannot end in the past.",
+            code="backdated_tenure",
+        )
     moved = rules.Tenure(
         key=tenure.pk, user_id=tenure.user_id, valid_from=tenure.valid_from, valid_to=valid_to
     )

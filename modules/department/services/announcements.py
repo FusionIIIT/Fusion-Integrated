@@ -64,7 +64,9 @@ def _active(ctx: ActorContext, pk: int) -> Announcement:
     ann = get_scoped(scoping.announcements_for(ctx), pk, lock=True, what="announcement")
     if ann.status != Announcement.ACTIVE:
         raise ConflictError(
-            "Only an active announcement can be changed.", code="announcement_not_active"
+            "This announcement is hidden or deleted, so it cannot be changed. "
+            "Publish a new one instead.",
+            code="announcement_not_active",
         )
     return ann
 

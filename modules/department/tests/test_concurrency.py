@@ -2,6 +2,7 @@
 
 import threading
 from datetime import timedelta
+from io import StringIO
 
 import pytest
 from django.core.management import call_command
@@ -50,7 +51,7 @@ def _race(fn, n=2):
 
 @pytest.fixture
 def cse():
-    call_command("seed_departments", stdout=open("/dev/null", "w"))  # noqa: SIM115
+    call_command("seed_departments", stdout=StringIO())
     dept = Department.objects.get(code="CSE")
     now = timezone.now()
     for uid, role in ((3010, "hod"), (4010, "dept_admin")):
@@ -161,3 +162,62 @@ def test_delivery_run_twice_at_once_sends_each_row_once(cse, stub_iam, mailoutbo
     _race(lambda i: str(notifications.deliver_pending()))
     assert len(mailoutbox) == 1
     assert DepartmentNotification.objects.get().status == "sent"
+
+
+def test_the_database_refuses_overlapping_tenures_written_around_the_service(cse):
+    # R1-04, BR-DEPT-022: two raw ORM writes at once, with no lock taken by Python
+    from django.db import IntegrityError
+
+    start = timezone.now() + timedelta(days=60)
+
+    def write(i):
+        try:
+            RoleTenure.objects.create(
+                department=cse,
+                role="hod",
+                user_id=3200 + i,
+                valid_from=start,
+                valid_to=start + timedelta(days=5),
+                assigned_by=1,
+            )
+        except IntegrityError:
+            return "refused"
+        return "written"
+
+    results = _race(write)
+    assert sorted(r[1] for r in results) == ["refused", "written"]
+    assert RoleTenure.objects.filter(valid_from=start).count() == 1
+
+
+def test_the_database_refuses_clashing_slots_written_around_the_service(cse):
+    # R1-04, BR-DEPT-010: inserted directly, so only the database can refuse them
+    from datetime import time
+
+    from django.db import IntegrityError, transaction
+
+    from modules.department.models import TimetableSlot
+
+    def slot(code, start, end, room="", programme="", batch_year=None):
+        return TimetableSlot.objects.create(
+            department=cse,
+            kind="class",
+            course_code=code,
+            day_of_week=0,
+            starts_at=start,
+            ends_at=end,
+            room=room,
+            programme=programme,
+            batch_year=batch_year,
+            updated_by=1,
+        )
+
+    slot("A", time(9), time(10), room="L-1", programme="B.Tech", batch_year=2024)
+    with pytest.raises(IntegrityError), transaction.atomic():
+        slot("B", time(9, 30), time(11), room=" l-1 ")  # same room, case and spaces ignored
+    with pytest.raises(IntegrityError), transaction.atomic():
+        slot(
+            "C", time(9, 30), time(11), room="L-2", programme="B.Tech", batch_year=2024
+        )  # same group
+    slot("D", time(10), time(11), room="L-1")  # touching end-to-start is allowed
+    slot("E", time(9), time(10), room="L-3", programme="M.Tech", batch_year=2024)  # nothing shared
+    assert TimetableSlot.objects.count() == 3

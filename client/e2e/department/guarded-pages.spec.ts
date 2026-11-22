@@ -1,16 +1,22 @@
+import { type AccountKey } from "../accounts";
 import { expect, signedInAs, test } from "../support/test";
 
-// Pages whose nav permission a student does not hold, opened directly.
-const OFFICE_PAGES = ["inventory", "labs", "roles"];
+// Each guarded page, opened directly by a granted role whose nav permission it lacks.
+const CASES: { account: AccountKey; paths: string[] }[] = [
+  { account: "deptStudent", paths: ["inventory", "labs", "roles"] },
+  { account: "deptCentral", paths: ["announcements", "feedback", "timetable", "profiles", "inventory", "labs"] },
+];
 
-test.describe("department: guarded pages", () => {
-  test.use(signedInAs("deptStudent"));
+for (const { account, paths } of CASES) {
+  test.describe(`department: guarded pages for ${account}`, () => {
+    test.use(signedInAs(account));
 
-  for (const path of OFFICE_PAGES) {
-    test(`a student who opens /department/${path} is told it is not for them`, async ({ page }) => {
-      await page.goto(`/department/${path}`);
-      await expect(page.getByText("Not available to your role")).toBeVisible();
-      await expect(page.getByRole("main").getByRole("button")).toHaveCount(0);
-    });
-  }
-});
+    for (const path of paths) {
+      test(`${account} who opens /department/${path} is told it is not for them`, async ({ page }) => {
+        await page.goto(`/department/${path}`);
+        await expect(page.getByText("Not available to your role")).toBeVisible();
+        await expect(page.getByRole("main").getByRole("button")).toHaveCount(0);
+      });
+    }
+  });
+}
