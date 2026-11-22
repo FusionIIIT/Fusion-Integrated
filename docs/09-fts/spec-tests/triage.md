@@ -3,7 +3,7 @@
 Student 1 (git author name): Varun Jalagam
 Student 2 (git author name): Kanthala Nava Samith Reddy
 Design commit (hash and subject): 7a32530 spec-tests: freeze FR/UC/BR/WF design for FTS module (202 cases)
-Baseline commit (hash and subject): fe10f6b spec-tests: FTS baseline — 202/202 tests passing
+Baseline commit (hash and subject): afa1a67 spec-tests: FTS baseline — 202/202 tests passing
 Student 1's 10/10 commit the baseline ran on (hash): dc8842f
 
 ## Results
