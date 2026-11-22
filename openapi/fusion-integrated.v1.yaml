@@ -1674,6 +1674,727 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/vh/bills/{bill_id}/settle/:
+    post:
+      operationId: v1_vh_bills_settle_create
+      parameters:
+      - in: path
+        name: bill_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillSettlementCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BillSettlementCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BillSettlementCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillSettlement'
+          description: ''
+  /api/v1/vh/bookings/:
+    get:
+      operationId: v1_vh_bookings_list
+      parameters:
+      - in: query
+        name: is_offline
+        schema:
+          type: boolean
+        description: Filter offline bookings
+      - in: query
+        name: status
+        schema:
+          type: string
+        description: Filter by status
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingDetail'
+          description: ''
+    post:
+      operationId: v1_vh_bookings_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BookingCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BookingCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/:
+    get:
+      operationId: v1_vh_bookings_retrieve
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/allot-rooms/:
+    post:
+      operationId: v1_vh_bookings_allot_rooms_create
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomAllotmentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoomAllotmentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoomAllotmentCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomAllotment'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/bill/:
+    get:
+      operationId: v1_vh_bookings_bill_retrieve
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillDetail'
+          description: ''
+    post:
+      operationId: v1_vh_bookings_bill_create
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillDetail'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/cancel/:
+    post:
+      operationId: v1_vh_bookings_cancel_create
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCancel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BookingCancel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BookingCancel'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/checkin/:
+    post:
+      operationId: v1_vh_bookings_checkin_create
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckIn'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CheckIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CheckIn'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/checkout/:
+    post:
+      operationId: v1_vh_bookings_checkout_create
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckOut'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CheckOut'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CheckOut'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/confirm-cancellation/:
+    post:
+      operationId: v1_vh_bookings_confirm_cancellation_create
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/decide/:
+    post:
+      operationId: v1_vh_bookings_decide_create
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingDecide'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BookingDecide'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BookingDecide'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/meals/:
+    get:
+      operationId: v1_vh_bookings_meals_list
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MealBooking'
+          description: ''
+    post:
+      operationId: v1_vh_bookings_meals_create
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealBookingCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MealBookingCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MealBookingCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealBooking'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/modify/:
+    post:
+      operationId: v1_vh_bookings_modify_create
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingModify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BookingModify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BookingModify'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+          description: ''
+  /api/v1/vh/bookings/{booking_id}/route/:
+    post:
+      operationId: v1_vh_bookings_route_create
+      parameters:
+      - in: path
+        name: booking_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingRoute'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BookingRoute'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BookingRoute'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+          description: ''
+  /api/v1/vh/bookings/offline/:
+    post:
+      operationId: v1_vh_bookings_offline_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineBookingCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfflineBookingCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfflineBookingCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetail'
+          description: ''
+  /api/v1/vh/inventory/:
+    get:
+      operationId: v1_vh_inventory_list
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+          description: ''
+    post:
+      operationId: v1_vh_inventory_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+  /api/v1/vh/inventory/{item_id}/replenish/:
+    post:
+      operationId: v1_vh_inventory_replenish_create
+      parameters:
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryReplenishmentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryReplenishmentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryReplenishmentCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryReplenishment'
+          description: ''
+  /api/v1/vh/inventory/replenishments/{replenishment_id}/approve/:
+    post:
+      operationId: v1_vh_inventory_replenishments_approve_create
+      parameters:
+      - in: path
+        name: replenishment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryReplenishmentApprove'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryReplenishmentApprove'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryReplenishmentApprove'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryReplenishment'
+          description: ''
+  /api/v1/vh/reports/caretaker/:
+    get:
+      operationId: v1_vh_reports_caretaker_retrieve
+      parameters:
+      - in: query
+        name: date
+        schema:
+          type: string
+      - in: query
+        name: report_type
+        schema:
+          type: string
+        description: occupancy|arrivals|pending|exceptions
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/vh/reports/incharge/:
+    get:
+      operationId: v1_vh_reports_incharge_retrieve
+      parameters:
+      - in: query
+        name: report_type
+        schema:
+          type: string
+        description: summary|occupancy|revenue|inventory
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/vh/roles/reassign/:
+    post:
+      operationId: v1_vh_roles_reassign_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleReassignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleReassignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleReassignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/vh/rooms/availability/:
+    get:
+      operationId: v1_vh_rooms_availability_list
+      parameters:
+      - in: query
+        name: arrival_date
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: departure_date
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: room_type
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+          description: ''
+  /api/v1/vh/tariffs/:
+    get:
+      operationId: v1_vh_tariffs_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TariffConfig'
+          description: ''
+    post:
+      operationId: v1_vh_tariffs_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TariffConfig'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TariffConfig'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TariffConfig'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TariffConfig'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1993,6 +2714,386 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BillDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        booking_id:
+          type: integer
+          readOnly: true
+        bill_number:
+          type: string
+          maxLength: 32
+        visitor_category:
+          type: string
+          maxLength: 1
+        room_rent_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        meal_charge_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        cancellation_charge_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        billing_responsibility:
+          type: string
+          maxLength: 20
+        status:
+          $ref: '#/components/schemas/BillDetailStatusEnum'
+        is_immutable:
+          type: boolean
+        verified_by:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        verified_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        finalized_at:
+          type: string
+          format: date-time
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillLineItem'
+          readOnly: true
+        settlement:
+          allOf:
+          - $ref: '#/components/schemas/BillSettlement'
+          readOnly: true
+      required:
+      - bill_number
+      - billing_responsibility
+      - booking_id
+      - created_at
+      - id
+      - items
+      - settlement
+      - visitor_category
+    BillDetailStatusEnum:
+      enum:
+      - generated
+      - verified
+      - settled
+      type: string
+      description: |-
+        * `generated` - Generated
+        * `verified` - Verified
+        * `settled` - Settled
+    BillLineItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item_type:
+          $ref: '#/components/schemas/ItemTypeEnum'
+        description:
+          type: string
+          maxLength: 255
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+      required:
+      - description
+      - id
+      - item_type
+      - total_price
+      - unit_price
+    BillSettlement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        payment_mode:
+          type: string
+          maxLength: 20
+        amount_paid:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        settled_by:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        settled_at:
+          type: string
+          format: date-time
+          readOnly: true
+        receipt_number:
+          type: string
+          maxLength: 50
+        notes:
+          type: string
+      required:
+      - amount_paid
+      - id
+      - settled_at
+      - settled_by
+    BillSettlementCreate:
+      type: object
+      properties:
+        amount_paid:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        receipt_number:
+          type: string
+          default: ''
+          maxLength: 50
+        notes:
+          type: string
+          default: ''
+      required:
+      - amount_paid
+    BillingResponsibilityEnum:
+      enum:
+      - visitor
+      - indenter
+      - institute
+      - project
+      type: string
+      description: |-
+        * `visitor` - Visitor
+        * `indenter` - Indenter
+        * `institute` - Institute
+        * `project` - Project
+    BlankEnum:
+      enum:
+      - ''
+    BookingCancel:
+      type: object
+      properties:
+        reason:
+          type: string
+          default: ''
+    BookingCreate:
+      type: object
+      properties:
+        visitor_name:
+          type: string
+          default: Primary Guest
+          maxLength: 120
+        visitor_email:
+          type: string
+          format: email
+          default: ''
+        visitor_phone:
+          type: string
+          default: ''
+          maxLength: 20
+        visitor_category:
+          allOf:
+          - $ref: '#/components/schemas/VisitorCategoryEnum'
+          default: A
+        visit_purpose:
+          type: string
+        arrival_date:
+          type: string
+          format: date
+        departure_date:
+          type: string
+          format: date
+        number_of_rooms:
+          type: integer
+          minimum: 1
+          default: 1
+        number_of_occupants:
+          type: integer
+          minimum: 1
+          default: 1
+        billing_responsibility:
+          allOf:
+          - $ref: '#/components/schemas/BillingResponsibilityEnum'
+          default: visitor
+        visitors:
+          type: array
+          items:
+            $ref: '#/components/schemas/VisitorDetail'
+      required:
+      - arrival_date
+      - departure_date
+      - visit_purpose
+    BookingDecide:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/BookingDecideActionEnum'
+        reason:
+          type: string
+          default: ''
+      required:
+      - action
+    BookingDecideActionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+    BookingDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        booking_reference:
+          type: string
+          maxLength: 32
+        indenter_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        is_offline:
+          type: boolean
+        booking_source:
+          $ref: '#/components/schemas/BookingDetailBookingSourceEnum'
+        status:
+          type: string
+          maxLength: 32
+        visitor_category:
+          $ref: '#/components/schemas/VisitorCategoryEnum'
+        visit_purpose:
+          type: string
+        arrival_date:
+          type: string
+          format: date
+        departure_date:
+          type: string
+          format: date
+        checkin_time:
+          type: string
+          format: date-time
+          nullable: true
+        checkout_time:
+          type: string
+          format: date-time
+          nullable: true
+        number_of_rooms:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        number_of_occupants:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        billing_responsibility:
+          $ref: '#/components/schemas/BillingResponsibilityEnum'
+        rejection_reason:
+          type: string
+        cancellation_reason:
+          type: string
+        cancellation_charge_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        cancellation_requested_at:
+          type: string
+          format: date-time
+          nullable: true
+        cancellation_confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        visitors:
+          type: array
+          items:
+            $ref: '#/components/schemas/VisitorDetail'
+          readOnly: true
+        allotments:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoomAllotment'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - allotments
+      - arrival_date
+      - booking_reference
+      - created_at
+      - departure_date
+      - id
+      - indenter_id
+      - visit_purpose
+      - visitors
+    BookingDetailBookingSourceEnum:
+      enum:
+      - online
+      - telephonic
+      - walk_in
+      type: string
+      description: |-
+        * `online` - Online
+        * `telephonic` - Telephonic
+        * `walk_in` - Walk-in
+    BookingModify:
+      type: object
+      properties:
+        arrival_date:
+          type: string
+          format: date
+        departure_date:
+          type: string
+          format: date
+        visit_purpose:
+          type: string
+        number_of_rooms:
+          type: integer
+          minimum: 1
+        number_of_occupants:
+          type: integer
+          minimum: 1
+        billing_responsibility:
+          $ref: '#/components/schemas/BillingResponsibilityEnum'
+    BookingRoute:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/BookingRouteActionEnum'
+        reason:
+          type: string
+          default: ''
+      required:
+      - action
+    BookingRouteActionEnum:
+      enum:
+      - reject
+      - forward
+      type: string
+      description: |-
+        * `reject` - reject
+        * `forward` - forward
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +3183,21 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CheckIn:
+      type: object
+      properties:
+        checkin_time:
+          type: string
+          format: date-time
+    CheckOut:
+      type: object
+      properties:
+        checkout_time:
+          type: string
+          format: date-time
+        verified_by_guest:
+          type: boolean
+          default: true
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3431,14 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `approved` - approved
+        * `rejected` - rejected
     Detail:
       type: object
       properties:
@@ -2508,6 +3632,132 @@ components:
         * `tech` - Technical interview
         * `hr` - HR interview
         * `other` - Other
+    InventoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          maxLength: 100
+        category:
+          $ref: '#/components/schemas/InventoryItemCategoryEnum'
+        current_quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        minimum_threshold:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        unit:
+          type: string
+          maxLength: 20
+        is_threshold_alert:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - item_name
+    InventoryItemCategoryEnum:
+      enum:
+      - linen
+      - utensils
+      - consumables
+      - other
+      type: string
+      description: |-
+        * `linen` - Linen
+        * `utensils` - Utensils
+        * `consumables` - Consumables
+        * `other` - Other
+    InventoryReplenishment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item:
+          allOf:
+          - $ref: '#/components/schemas/InventoryItem'
+          readOnly: true
+        requested_quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        status:
+          $ref: '#/components/schemas/InventoryReplenishmentStatusEnum'
+        requested_by:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        approved_by:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        approved_at:
+          type: string
+          format: date-time
+          nullable: true
+        remarks:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - item
+      - requested_by
+      - requested_quantity
+    InventoryReplenishmentApprove:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        remarks:
+          type: string
+          default: ''
+      required:
+      - decision
+    InventoryReplenishmentCreate:
+      type: object
+      properties:
+        requested_quantity:
+          type: integer
+          minimum: 1
+        remarks:
+          type: string
+          default: ''
+      required:
+      - requested_quantity
+    InventoryReplenishmentStatusEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+    ItemTypeEnum:
+      enum:
+      - room
+      - meal
+      - cancellation
+      type: string
+      description: |-
+        * `room` - Room Rent
+        * `meal` - Meal
+        * `cancellation` - Cancellation Charge
     JobPosting:
       type: object
       properties:
@@ -2663,6 +3913,133 @@ components:
       required:
       - password
       - username
+    MealBooking:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        booking_id:
+          type: integer
+          readOnly: true
+        meal_date:
+          type: string
+          format: date
+        meal_option:
+          $ref: '#/components/schemas/MealBookingMealOptionEnum'
+        individual_type:
+          oneOf:
+          - $ref: '#/components/schemas/MealBookingIndividualTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        add_on_type:
+          oneOf:
+          - $ref: '#/components/schemas/MealBookingAddOnTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        rate:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - booking_id
+      - created_at
+      - id
+      - meal_date
+      - meal_option
+      - rate
+    MealBookingAddOnTypeEnum:
+      enum:
+      - tea
+      - milk
+      type: string
+      description: |-
+        * `tea` - Tea
+        * `milk` - Milk
+    MealBookingCreate:
+      type: object
+      properties:
+        meal_date:
+          type: string
+          format: date
+        meal_option:
+          $ref: '#/components/schemas/MealBookingCreateMealOptionEnum'
+        individual_type:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/MealBookingCreateIndividualTypeEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        add_on_type:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/MealBookingCreateAddOnTypeEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        quantity:
+          type: integer
+          minimum: 1
+          default: 1
+      required:
+      - meal_date
+      - meal_option
+    MealBookingCreateAddOnTypeEnum:
+      enum:
+      - tea
+      - milk
+      type: string
+      description: |-
+        * `tea` - tea
+        * `milk` - milk
+    MealBookingCreateIndividualTypeEnum:
+      enum:
+      - breakfast
+      - lunch
+      - dinner
+      type: string
+      description: |-
+        * `breakfast` - breakfast
+        * `lunch` - lunch
+        * `dinner` - dinner
+    MealBookingCreateMealOptionEnum:
+      enum:
+      - full_day
+      - individual
+      - add_on
+      type: string
+      description: |-
+        * `full_day` - full_day
+        * `individual` - individual
+        * `add_on` - add_on
+    MealBookingIndividualTypeEnum:
+      enum:
+      - breakfast
+      - lunch
+      - dinner
+      type: string
+      description: |-
+        * `breakfast` - Breakfast
+        * `lunch` - Lunch
+        * `dinner` - Dinner
+    MealBookingMealOptionEnum:
+      enum:
+      - full_day
+      - individual
+      - add_on
+      type: string
+      description: |-
+        * `full_day` - Full-day
+        * `individual` - Individual
+        * `add_on` - Add-on
     ModeEnum:
       enum:
       - online
@@ -2732,6 +4109,17 @@ components:
       - is_late
       - message
       - record
+    NullEnum:
+      enum:
+      - null
+    OccupancyTypeEnum:
+      enum:
+      - single
+      - double
+      type: string
+      description: |-
+        * `single` - Single
+        * `double` - Double
     OffCampusRecord:
       type: object
       properties:
@@ -2864,6 +4252,62 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfflineBookingCreate:
+      type: object
+      properties:
+        booking_source:
+          $ref: '#/components/schemas/OfflineBookingCreateBookingSourceEnum'
+        visitor_name:
+          type: string
+          maxLength: 120
+        visitor_email:
+          type: string
+          format: email
+          default: ''
+        visitor_phone:
+          type: string
+          default: ''
+          maxLength: 20
+        visitor_category:
+          allOf:
+          - $ref: '#/components/schemas/VisitorCategoryEnum'
+          default: A
+        visit_purpose:
+          type: string
+        arrival_date:
+          type: string
+          format: date
+        departure_date:
+          type: string
+          format: date
+        number_of_rooms:
+          type: integer
+          minimum: 1
+          default: 1
+        number_of_occupants:
+          type: integer
+          minimum: 1
+          default: 1
+        billing_responsibility:
+          allOf:
+          - $ref: '#/components/schemas/BillingResponsibilityEnum'
+          default: visitor
+        indenter_id:
+          type: integer
+      required:
+      - arrival_date
+      - booking_source
+      - departure_date
+      - visit_purpose
+      - visitor_name
+    OfflineBookingCreateBookingSourceEnum:
+      enum:
+      - telephonic
+      - walk_in
+      type: string
+      description: |-
+        * `telephonic` - telephonic
+        * `walk_in` - walk_in
     Ok:
       type: object
       properties:
@@ -3466,6 +4910,100 @@ components:
       - message
       - reason
       - route
+    RoleNameEnum:
+      enum:
+      - caretaker
+      - incharge
+      type: string
+      description: |-
+        * `caretaker` - caretaker
+        * `incharge` - incharge
+    RoleReassignment:
+      type: object
+      properties:
+        role_name:
+          $ref: '#/components/schemas/RoleNameEnum'
+        new_user_id:
+          type: integer
+        valid_from:
+          type: string
+          format: date-time
+        valid_to:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - new_user_id
+      - role_name
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        room_number:
+          type: string
+          maxLength: 20
+        room_type:
+          $ref: '#/components/schemas/RoomTypeEnum'
+        floor:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_active:
+          type: boolean
+      required:
+      - id
+      - room_number
+    RoomAllotment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        room:
+          allOf:
+          - $ref: '#/components/schemas/Room'
+          readOnly: true
+        occupancy_type:
+          $ref: '#/components/schemas/OccupancyTypeEnum'
+        allotted_by:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        allotted_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - allotted_at
+      - allotted_by
+      - id
+      - room
+    RoomAllotmentCreate:
+      type: object
+      properties:
+        room_ids:
+          type: array
+          items:
+            type: integer
+        occupancy_type:
+          $ref: '#/components/schemas/OccupancyTypeEnum'
+      required:
+      - occupancy_type
+      - room_ids
+    RoomTypeEnum:
+      enum:
+      - suite
+      - non_suite
+      type: string
+      description: |-
+        * `suite` - Suite
+        * `non_suite` - Non-suite
     RoundOutcome:
       type: object
       properties:
@@ -3698,6 +5236,34 @@ components:
           type: integer
       required:
       - document_id
+    TariffConfig:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/VisitorCategoryEnum'
+        room_type:
+          $ref: '#/components/schemas/RoomTypeEnum'
+        occupancy:
+          $ref: '#/components/schemas/OccupancyTypeEnum'
+        daily_rate:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        effective_from:
+          type: string
+          format: date
+        is_active:
+          type: boolean
+      required:
+      - category
+      - daily_rate
+      - effective_from
+      - id
+      - occupancy
+      - room_type
     TopicEnum:
       enum:
       - drive
@@ -3814,6 +5380,49 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VisitorCategoryEnum:
+      enum:
+      - A
+      - B
+      - C
+      - D
+      type: string
+      description: |-
+        * `A` - Category A
+        * `B` - Category B
+        * `C` - Category C
+        * `D` - Category D
+    VisitorDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          maxLength: 20
+        organization:
+          type: string
+          maxLength: 150
+        designation:
+          type: string
+          maxLength: 100
+        gender:
+          type: string
+          maxLength: 10
+      required:
+      - id
+      - name
     WaiveIncident:
       type: object
       properties:

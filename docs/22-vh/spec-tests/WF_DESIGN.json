@@ -1,0 +1,245 @@
+[
+  {
+    "test_id": "WF-TEST-001",
+    "source_id": "BW-VH-01 S1 submission-accepted",
+    "purpose": "Verify step 1 of BW-VH-01: online submission creates pending booking record.",
+    "preconditions": "No prior booking record.",
+    "action_or_input": "Indenter submits valid online booking requisition.",
+    "expected_result": "Booking created in Pending state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-002",
+    "source_id": "BW-VH-01 S2 caretaker-reject",
+    "purpose": "Verify step 2 of BW-VH-01: Caretaker rejects pending booking directly.",
+    "preconditions": "Booking in Pending state.",
+    "action_or_input": "Caretaker sends reject route action with reason.",
+    "expected_result": "Booking transitions from Pending to Rejected state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-003",
+    "source_id": "BW-VH-02 S1 submission-accepted",
+    "purpose": "Verify step 1 of BW-VH-02: online submission creates pending booking record.",
+    "preconditions": "No prior booking record.",
+    "action_or_input": "Indenter submits valid online booking requisition.",
+    "expected_result": "Booking created in Pending state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-004",
+    "source_id": "BW-VH-02 S2 caretaker-forward",
+    "purpose": "Verify step 2 of BW-VH-02: Caretaker forwards pending booking to VH In-Charge.",
+    "preconditions": "Booking in Pending state.",
+    "action_or_input": "Caretaker sends forward route action.",
+    "expected_result": "Booking transitions from Pending to Forwarded state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-005",
+    "source_id": "BW-VH-02 S3 incharge-approve",
+    "purpose": "Verify step 3 of BW-VH-02: VH In-Charge approves forwarded booking.",
+    "preconditions": "Booking in Forwarded state.",
+    "action_or_input": "VH In-Charge sends approve decision action.",
+    "expected_result": "Booking transitions from Forwarded to Approved state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-006",
+    "source_id": "BW-VH-03 S1 submission-accepted",
+    "purpose": "Verify step 1 of BW-VH-03: online submission creates pending booking record.",
+    "preconditions": "No prior booking record.",
+    "action_or_input": "Indenter submits valid online booking requisition.",
+    "expected_result": "Booking created in Pending state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-007",
+    "source_id": "BW-VH-03 S2 caretaker-forward",
+    "purpose": "Verify step 2 of BW-VH-03: Caretaker forwards pending booking to VH In-Charge.",
+    "preconditions": "Booking in Pending state.",
+    "action_or_input": "Caretaker sends forward route action.",
+    "expected_result": "Booking transitions from Pending to Forwarded state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-008",
+    "source_id": "BW-VH-03 S3 incharge-reject",
+    "purpose": "Verify step 3 of BW-VH-03: VH In-Charge rejects forwarded booking.",
+    "preconditions": "Booking in Forwarded state.",
+    "action_or_input": "VH In-Charge sends reject decision action with reason.",
+    "expected_result": "Booking transitions from Forwarded to Rejected state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-009",
+    "source_id": "BW-VH-04 S1 offline-recorded",
+    "purpose": "Verify step 1 of BW-VH-04: offline booking recorded in Pending state.",
+    "preconditions": "No prior booking record.",
+    "action_or_input": "Caretaker records offline telephonic or walk-in booking.",
+    "expected_result": "Booking created in Pending state with is_offline=True.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-010",
+    "source_id": "BW-VH-04 S2 caretaker-reject",
+    "purpose": "Verify step 2 of BW-VH-04: Caretaker rejects pending offline booking directly.",
+    "preconditions": "Offline booking in Pending state.",
+    "action_or_input": "Caretaker sends reject route action with reason.",
+    "expected_result": "Offline booking transitions from Pending to Rejected state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-011",
+    "source_id": "BW-VH-05 S1 offline-recorded",
+    "purpose": "Verify step 1 of BW-VH-05: offline booking recorded in Pending state.",
+    "preconditions": "No prior booking record.",
+    "action_or_input": "Caretaker records offline booking.",
+    "expected_result": "Booking created in Pending state with is_offline=True.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-012",
+    "source_id": "BW-VH-05 S2 caretaker-forward",
+    "purpose": "Verify step 2 of BW-VH-05: Caretaker forwards offline booking to VH In-Charge.",
+    "preconditions": "Offline booking in Pending state.",
+    "action_or_input": "Caretaker sends forward route action.",
+    "expected_result": "Offline booking transitions from Pending to Forwarded state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-013",
+    "source_id": "BW-VH-05 S3 incharge-approve",
+    "purpose": "Verify step 3 of BW-VH-05: VH In-Charge approves forwarded offline booking.",
+    "preconditions": "Offline booking in Forwarded state.",
+    "action_or_input": "VH In-Charge sends approve decision action.",
+    "expected_result": "Offline booking transitions from Forwarded to Approved state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-014",
+    "source_id": "BW-VH-06 S1 offline-recorded",
+    "purpose": "Verify step 1 of BW-VH-06: offline booking recorded in Pending state.",
+    "preconditions": "No prior booking record.",
+    "action_or_input": "Caretaker records offline booking.",
+    "expected_result": "Booking created in Pending state with is_offline=True.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-015",
+    "source_id": "BW-VH-06 S2 caretaker-forward",
+    "purpose": "Verify step 2 of BW-VH-06: Caretaker forwards offline booking to VH In-Charge.",
+    "preconditions": "Offline booking in Pending state.",
+    "action_or_input": "Caretaker sends forward route action.",
+    "expected_result": "Offline booking transitions from Pending to Forwarded state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-016",
+    "source_id": "BW-VH-06 S3 incharge-reject",
+    "purpose": "Verify step 3 of BW-VH-06: VH In-Charge rejects forwarded offline booking.",
+    "preconditions": "Offline booking in Forwarded state.",
+    "action_or_input": "VH In-Charge sends reject decision action with reason.",
+    "expected_result": "Offline booking transitions from Forwarded to Rejected state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-017",
+    "source_id": "BW-VH-07 S1 request-cancellation",
+    "purpose": "Verify step 1 of BW-VH-07: Approved booking cancellation requested 7 days before.",
+    "preconditions": "Approved booking with arrival exactly 7 days from today.",
+    "action_or_input": "Indenter requests cancellation.",
+    "expected_result": "Booking transitions to cancellation_requested with 0% charge.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-018",
+    "source_id": "BW-VH-07 S2 confirm-cancellation",
+    "purpose": "Verify step 2 of BW-VH-07: Caretaker confirms cancellation.",
+    "preconditions": "Booking in cancellation_requested state with 0% charge.",
+    "action_or_input": "Caretaker confirms cancellation.",
+    "expected_result": "Booking transitions to Cancelled state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-019",
+    "source_id": "BW-VH-08 S1 request-cancellation",
+    "purpose": "Verify step 1 of BW-VH-08: Approved booking cancellation requested within 7 days.",
+    "preconditions": "Approved booking with arrival within 7 days.",
+    "action_or_input": "Indenter requests cancellation.",
+    "expected_result": "Booking transitions to cancellation_requested with 25% charge.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-020",
+    "source_id": "BW-VH-08 S2 confirm-cancellation",
+    "purpose": "Verify step 2 of BW-VH-08: Caretaker confirms cancellation.",
+    "preconditions": "Booking in cancellation_requested state with 25% charge.",
+    "action_or_input": "Caretaker confirms cancellation.",
+    "expected_result": "Booking transitions to Cancelled state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-021",
+    "source_id": "BW-VH-09 S1 request-cancellation",
+    "purpose": "Verify step 1 of BW-VH-09: Same-day cancellation or recorded no-show.",
+    "preconditions": "Approved booking with arrival today or recorded no-show.",
+    "action_or_input": "Indenter requests same-day cancellation.",
+    "expected_result": "Booking transitions to cancellation_requested with 50% charge.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-022",
+    "source_id": "BW-VH-09 S2 confirm-cancellation",
+    "purpose": "Verify step 2 of BW-VH-09: Caretaker confirms cancellation.",
+    "preconditions": "Booking in cancellation_requested state with 50% charge.",
+    "action_or_input": "Caretaker confirms cancellation.",
+    "expected_result": "Booking transitions to Cancelled state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-023",
+    "source_id": "BW-VH-10 S1 allot-rooms",
+    "purpose": "Verify step 1 of BW-VH-10: Caretaker allots rooms to Approved booking.",
+    "preconditions": "Approved booking exists.",
+    "action_or_input": "Caretaker allots rooms.",
+    "expected_result": "Rooms allotted and occupancy records created.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-024",
+    "source_id": "BW-VH-10 S2 guest-checkin",
+    "purpose": "Verify step 2 of BW-VH-10: Caretaker records guest check-in.",
+    "preconditions": "Approved booking with room allotted.",
+    "action_or_input": "Caretaker records check-in.",
+    "expected_result": "Booking transitions to Checked-In state with checkin_time.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-025",
+    "source_id": "BW-VH-10 S3 guest-checkout",
+    "purpose": "Verify step 3 of BW-VH-10: Caretaker records guest check-out and bill verification.",
+    "preconditions": "Booking in Checked-In state with generated bill.",
+    "action_or_input": "Caretaker records check-out.",
+    "expected_result": "Booking transitions to Checked-Out state with checkout_time.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-026",
+    "source_id": "CW-VH-01 composite-booking-approval",
+    "purpose": "Verify composite workflow CW-VH-01 from submission to routing and approval.",
+    "preconditions": "Indenter and Caretaker and VH In-Charge actors available.",
+    "action_or_input": "Submit online booking, forward by caretaker, approve by incharge.",
+    "expected_result": "Complete booking lifecycle transitions cleanly to Approved state.",
+    "test_type": "state_transition"
+  },
+  {
+    "test_id": "WF-TEST-027",
+    "source_id": "CW-VH-02 composite-cancellation-billing",
+    "purpose": "Verify composite workflow CW-VH-02 from cancellation request to confirmation and bill settlement.",
+    "preconditions": "Approved booking exists.",
+    "action_or_input": "Request cancellation within 7 days, caretaker confirms, generate bill, settle offline cash.",
+    "expected_result": "Booking cancelled, bill generated with 25% charge and settled offline.",
+    "test_type": "state_transition"
+  }
+]

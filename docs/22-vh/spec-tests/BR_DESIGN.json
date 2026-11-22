@@ -1,0 +1,416 @@
+[
+  {
+    "test_id": "BR-TEST-001",
+    "source_id": "BR-VH-002 permitted-values",
+    "purpose": "Verify permitted billing responsibility values (visitor, indenter, institute, project).",
+    "preconditions": "Valid booking submission payload.",
+    "action_or_input": "Submit booking with billing_responsibility in [visitor, indenter, institute, project].",
+    "expected_result": "Requisition accepted and persisted with specified billing responsibility.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-002",
+    "source_id": "BR-VH-002 prohibited-value",
+    "purpose": "Verify refusal of unpermitted billing responsibility value.",
+    "preconditions": "Booking payload with invalid billing responsibility.",
+    "action_or_input": "Submit booking with billing_responsibility=corporate_sponsor.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal; action refused.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-003",
+    "source_id": "BR-VH-003 same-routing",
+    "purpose": "Verify offline bookings follow same approval routing as online requests.",
+    "preconditions": "Offline booking recorded by Caretaker.",
+    "action_or_input": "Route offline booking through forward and incharge approval.",
+    "expected_result": "Offline booking transitions pending -> forwarded -> approved.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-TEST-004",
+    "source_id": "BR-VH-004 same-availability",
+    "purpose": "Verify offline bookings are subject to same room availability check.",
+    "preconditions": "Rooms fully booked for date range.",
+    "action_or_input": "Query room availability for requested dates.",
+    "expected_result": "Room availability returns 0 available rooms.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-005",
+    "source_id": "BR-VH-005 flag-offline",
+    "purpose": "Verify offline bookings are clearly flagged for audit and reporting.",
+    "preconditions": "Offline booking recorded.",
+    "action_or_input": "Inspect booking attributes.",
+    "expected_result": "is_offline is True and booking_source in [telephonic, walk_in].",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-006",
+    "source_id": "BR-VH-006 schedule-calculation",
+    "purpose": "Verify cancellation charge is calculated according to the stated schedule.",
+    "preconditions": "Approved booking with daily rate Decimal(600.00).",
+    "action_or_input": "Compute cancellation charge for given cancellation timing.",
+    "expected_result": "Accurate charge calculated based on days prior to arrival.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-007",
+    "source_id": "BR-VH-007 7-day-zero-charge",
+    "purpose": "Verify cancellation occurring exactly 7 days before arrival has 0% charge.",
+    "preconditions": "Arrival is exactly 7 days from today.",
+    "action_or_input": "Submit cancellation request.",
+    "expected_result": "cancellation_charge_percentage is 0.00.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-TEST-008",
+    "source_id": "BR-VH-008 within-7-days-25-percent",
+    "purpose": "Verify cancellation occurring within 7 days before arrival has 25% charge.",
+    "preconditions": "Arrival is 4 days from today.",
+    "action_or_input": "Submit cancellation request.",
+    "expected_result": "cancellation_charge_percentage is 25.00.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-TEST-009",
+    "source_id": "BR-VH-009 same-day-50-percent",
+    "purpose": "Verify same-day cancellation or recorded no-show has 50% charge.",
+    "preconditions": "Arrival is today or no-show recorded.",
+    "action_or_input": "Submit cancellation request on arrival day.",
+    "expected_result": "cancellation_charge_percentage is 50.00.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-TEST-010",
+    "source_id": "BR-VH-010 adjust-modification-billing",
+    "purpose": "Verify billing information is adjusted according to confirmed modification.",
+    "preconditions": "Stay duration modified from 1 day to 3 days.",
+    "action_or_input": "Generate bill for modified booking.",
+    "expected_result": "Bill room rent reflects 3 days at tariff rate.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-011",
+    "source_id": "BR-VH-011 adjust-cancellation-billing",
+    "purpose": "Verify billing information adjusted using confirmed cancellation charge.",
+    "preconditions": "Cancelled booking with 50% charge of 800.00 daily rate.",
+    "action_or_input": "Generate bill for cancelled booking.",
+    "expected_result": "Bill contains cancellation charge of 400.00.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-012",
+    "source_id": "BR-VH-012 approved-allotment-permitted",
+    "purpose": "Verify room allotment is permitted when booking is in Approved state.",
+    "preconditions": "Booking status is Approved and room is active/available.",
+    "action_or_input": "Allot room to booking.",
+    "expected_result": "RoomAllotment record created successfully.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-013",
+    "source_id": "BR-VH-012 non-approved-allotment-prohibited",
+    "purpose": "Verify room allotment is prohibited when booking is not Approved.",
+    "preconditions": "Booking status is pending or rejected.",
+    "action_or_input": "Attempt to allot room to non-approved booking.",
+    "expected_result": "Action refused with HTTP 409 Conflict / 422 Unprocessable Entity.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-TEST-014",
+    "source_id": "BR-VH-013 single-occupancy",
+    "purpose": "Verify Single occupancy records are supported.",
+    "preconditions": "Approved booking exists.",
+    "action_or_input": "Create RoomAllotment with occupancy_type=single.",
+    "expected_result": "RoomAllotment saved with occupancy_type=single.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-015",
+    "source_id": "BR-VH-014 double-occupancy",
+    "purpose": "Verify Double occupancy records are supported.",
+    "preconditions": "Approved booking exists.",
+    "action_or_input": "Create RoomAllotment with occupancy_type=double.",
+    "expected_result": "RoomAllotment saved with occupancy_type=double.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-016",
+    "source_id": "BR-VH-015 suite-room",
+    "purpose": "Verify Suite room records are supported.",
+    "preconditions": "Room configuration.",
+    "action_or_input": "Create Room with room_type=suite.",
+    "expected_result": "Room saved with room_type=suite.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-017",
+    "source_id": "BR-VH-016 non-suite-room",
+    "purpose": "Verify Non-suite room records are supported.",
+    "preconditions": "Room configuration.",
+    "action_or_input": "Create Room with room_type=non_suite.",
+    "expected_result": "Room saved with room_type=non_suite.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-018",
+    "source_id": "BR-VH-017 no-show-alert",
+    "purpose": "Verify no-show alert generated when expected guest has not checked in.",
+    "preconditions": "Booking arrival date/time has passed with no checkin.",
+    "action_or_input": "Run stay exception check.",
+    "expected_result": "StayAlert generated with alert_type=no_show.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-019",
+    "source_id": "BR-VH-018 overstay-alert",
+    "purpose": "Verify overstay alert generated when stay exceeds approved duration.",
+    "preconditions": "Checked-in booking whose departure date has passed.",
+    "action_or_input": "Run stay exception check.",
+    "expected_result": "StayAlert generated with alert_type=overstay.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-020",
+    "source_id": "BR-VH-019 category-permitted",
+    "purpose": "Verify visitor category values A, B, C, D are permitted.",
+    "preconditions": "Booking creation.",
+    "action_or_input": "Submit bookings with visitor_category in [A, B, C, D].",
+    "expected_result": "All categories successfully accepted and stored.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-021",
+    "source_id": "BR-VH-019 category-prohibited",
+    "purpose": "Verify visitor category outside A, B, C, D is rejected.",
+    "preconditions": "Booking creation.",
+    "action_or_input": "Submit booking with visitor_category=E.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-022",
+    "source_id": "BR-VH-023 select-tariff",
+    "purpose": "Verify tariff selected using category, occupancy, and effective date.",
+    "preconditions": "Tariff configuration exists for Category A Single.",
+    "action_or_input": "Calculate room rent for Category A Single stay.",
+    "expected_result": "Accurate tariff rate matched and applied to bill.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-023",
+    "source_id": "BR-VH-024 immutable-bills",
+    "purpose": "Verify tariff changes do not affect already generated historical bills.",
+    "preconditions": "Finalized bill exists based on old tariff.",
+    "action_or_input": "Add new tariff with updated rate.",
+    "expected_result": "Finalized bill amount remains unchanged.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-TEST-024",
+    "source_id": "BR-VH-025 guest-staying-meal-permitted",
+    "purpose": "Verify meal bookings permitted for guests currently staying in VH.",
+    "preconditions": "Guest has active checked-in booking.",
+    "action_or_input": "Record meal booking for guest.",
+    "expected_result": "MealBooking record created successfully.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-025",
+    "source_id": "BR-VH-025 non-staying-meal-prohibited",
+    "purpose": "Verify meal bookings prohibited for guests not staying in VH.",
+    "preconditions": "Booking is in pending or rejected or checked_out state.",
+    "action_or_input": "Attempt to record meal booking.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-026",
+    "source_id": "BR-VH-029 meal-options-permitted",
+    "purpose": "Verify individual meal options restricted to Breakfast, Lunch, Dinner.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "Record meal with individual_type in [breakfast, lunch, dinner].",
+    "expected_result": "Meal booking created successfully.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-027",
+    "source_id": "BR-VH-029 meal-options-prohibited",
+    "purpose": "Verify unpermitted individual meal option is rejected.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "Record meal with individual_type=supper.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-028",
+    "source_id": "BR-VH-030 addon-options-permitted",
+    "purpose": "Verify add-on options restricted to Tea and Milk.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "Record meal with add_on_type in [tea, milk].",
+    "expected_result": "Meal booking created successfully.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-029",
+    "source_id": "BR-VH-030 addon-options-prohibited",
+    "purpose": "Verify unpermitted add-on option is rejected.",
+    "preconditions": "Checked-in booking exists.",
+    "action_or_input": "Record meal with add_on_type=juice.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-030",
+    "source_id": "BR-VH-031 meal-date-within-stay",
+    "purpose": "Verify meal booking date within stay duration is accepted.",
+    "preconditions": "Stay from 2026-11-20 to 2026-11-25.",
+    "action_or_input": "Book meal for 2026-11-22.",
+    "expected_result": "Meal booking created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-031",
+    "source_id": "BR-VH-031 meal-date-outside-stay",
+    "purpose": "Verify meal booking date outside stay duration is rejected.",
+    "preconditions": "Stay from 2026-11-20 to 2026-11-25.",
+    "action_or_input": "Book meal for 2026-11-28.",
+    "expected_result": "HTTP 422 Unprocessable Entity refusal.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-TEST-032",
+    "source_id": "BR-VH-032 meal-included-in-billing",
+    "purpose": "Verify recorded meal bookings are included in VHMS billing.",
+    "preconditions": "Stay with recorded meals.",
+    "action_or_input": "Generate bill for stay.",
+    "expected_result": "Bill contains meal line items and meal_charge_total.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-033",
+    "source_id": "BR-VH-033 room-rent-billing",
+    "purpose": "Verify VHMS generates bills based on room rent.",
+    "preconditions": "Stay completed.",
+    "action_or_input": "Generate bill.",
+    "expected_result": "Bill contains room_rent_total matching stay days * rate.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-034",
+    "source_id": "BR-VH-034 meal-consumption-billing",
+    "purpose": "Verify VHMS generates bills based on meal consumption.",
+    "preconditions": "Stay completed with meals.",
+    "action_or_input": "Generate bill.",
+    "expected_result": "Bill total includes meal consumption total.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-035",
+    "source_id": "BR-VH-035 cancellation-charge-billing",
+    "purpose": "Verify VHMS generates bills based on applicable cancellation charges.",
+    "preconditions": "Confirmed cancellation with charge.",
+    "action_or_input": "Generate bill.",
+    "expected_result": "Bill total equals cancellation charge total.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-036",
+    "source_id": "BR-VH-036 offline-cash-settlement",
+    "purpose": "Verify settlement is recorded as offline cash settlement.",
+    "preconditions": "Bill exists.",
+    "action_or_input": "Settle bill.",
+    "expected_result": "Settlement record specifies payment_mode=offline_cash.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-037",
+    "source_id": "BR-VH-037 immutable-billing-records",
+    "purpose": "Verify VHMS maintains immutable billing records for audit.",
+    "preconditions": "Settled bill exists.",
+    "action_or_input": "Attempt update to settled bill.",
+    "expected_result": "Bill remains immutable and unaltered.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-TEST-038",
+    "source_id": "BR-VH-041 below-threshold-alert",
+    "purpose": "Verify alert generated when quantity falls below minimum threshold.",
+    "preconditions": "Item quantity reduced below minimum threshold.",
+    "action_or_input": "Check is_threshold_alert attribute on item.",
+    "expected_result": "is_threshold_alert is True.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-TEST-039",
+    "source_id": "BR-VH-041 above-threshold-no-alert",
+    "purpose": "Verify no alert generated when quantity is at or above minimum threshold.",
+    "preconditions": "Item quantity at or above threshold.",
+    "action_or_input": "Check is_threshold_alert attribute on item.",
+    "expected_result": "is_threshold_alert is False.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-TEST-040",
+    "source_id": "BR-VH-043 threshold-notification",
+    "purpose": "Verify inventory threshold alert triggers system-generated notification.",
+    "preconditions": "Item quantity drops below threshold.",
+    "action_or_input": "Trigger threshold check.",
+    "expected_result": "Notification event dispatched for threshold alert.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-041",
+    "source_id": "BR-VH-045 caretaker-cardinality",
+    "purpose": "Verify exactly one active Caretaker is maintained at a time.",
+    "preconditions": "Active Caretaker A exists.",
+    "action_or_input": "Assign Caretaker B.",
+    "expected_result": "Caretaker A is deactivated, Caretaker B is active; active count is 1.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-042",
+    "source_id": "BR-VH-046 incharge-cardinality",
+    "purpose": "Verify exactly one active VH In-Charge is maintained at a time.",
+    "preconditions": "Active In-Charge A exists.",
+    "action_or_input": "Assign In-Charge B.",
+    "expected_result": "In-Charge A is deactivated, In-Charge B is active; active count is 1.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-043",
+    "source_id": "BR-VH-047 time-bound-role",
+    "purpose": "Verify Caretaker and In-Charge role assignments are time-bound.",
+    "preconditions": "Role reassignment requested.",
+    "action_or_input": "POST to /api/v1/vh/roles/reassign/ with valid_from and valid_to.",
+    "expected_result": "Role holder saved with valid_from and valid_to timestamps.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-044",
+    "source_id": "BR-VH-048 immediate-role-reassignment",
+    "purpose": "Verify role reassignment takes effect immediately.",
+    "preconditions": "Role reassignment performed.",
+    "action_or_input": "Query current active role holder immediately.",
+    "expected_result": "Newly assigned user is immediately active.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "BR-TEST-045",
+    "source_id": "BR-VH-049 transfer-pending-records",
+    "purpose": "Verify transfer of pending records to newly assigned role holder.",
+    "preconditions": "Pending bookings exist awaiting Caretaker review.",
+    "action_or_input": "Reassign Caretaker role.",
+    "expected_result": "New Caretaker accesses and processes pending bookings.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-TEST-046",
+    "source_id": "BR-VH-050 transfer-ongoing-records",
+    "purpose": "Verify transfer of ongoing records to newly assigned role holder.",
+    "preconditions": "Ongoing checked-in stays exist under old Caretaker.",
+    "action_or_input": "Reassign Caretaker role.",
+    "expected_result": "New Caretaker manages stays and processes checkout and billing.",
+    "test_type": "lifecycle"
+  }
+]
