@@ -8,7 +8,7 @@ Design commit:
 test(lms): freeze specification test designs
 
 Baseline commit:
-Pending — record after the baseline commit is created.
+97476e478bf81c47882195cc3ec0fd75db4d1b53 test(lms): add specification-based test suites and baseline
 
 Student 1's 10/10 commit the baseline ran on:
 4cf66e841e2954a343a2a6c0d049b6082aef0988
