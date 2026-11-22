@@ -3,12 +3,19 @@
 Student 1 (git author name): chatur veda
 Student 2 (git author name): Pranayasheela
 Design commit (hash and subject): 3ada512 Add placement spec test designs
-Baseline commit (hash and subject): 3ada512 Add placement spec test designs
-Student 1's 10/10 commit the baseline ran on (hash): 610e58c feat(placement): align implementation and tests with 17-Placement Cell folder specifications
+Baseline commit (hash and subject): Not created. The first complete suite runs were made after Student 1's implementation changes were already on the branch, so they are final/recheck results rather than a pre-fix baseline.
+Student 1's 10/10 commit the baseline ran on (hash): Not applicable; no pre-fix baseline run was captured.
 
 ## Results
+
 | Run | Strategy | Cases | Passed | Failed | Skipped | Line % | Branch % |
 |-----|----------|-------|--------|--------|---------|--------|----------|
+| Post-Student-1 fix | UC | 71 | 71 | 0 | 0 | 62.0 | 28.7 |
+| Post-Student-1 fix | WF | 8 | 8 | 0 | 0 | 28.1 | 17.3 |
+| Post-Student-1 fix | BR | 42 | 42 | 0 | 0 | 30.6 | 19.9 |
+| Post-Student-1 fix | FR | 60 automated | 60 | 0 | 0 | 66.2 | 33.9 |
+
+The frozen FR design contains 64 entries. AFR-001, AFR-002, AFR-003, and AFR-005 are jointly recorded below as out of PCMS scope, so they are not collected as skipped tests; the frozen design remains unchanged.
 
 ## Failures and skips
 | Test id | Source id | Strategies | Category | Evidence | Outcome (fixing commit, covering test, or agreed reading with the spec sentence) | Open? |
