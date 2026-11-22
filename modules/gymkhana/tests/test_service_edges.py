@@ -85,3 +85,17 @@ def test_managed_polls_club_filter(actors, club, other_club):
     c = actors.student(COORD)
     assert c.get(f"{API}/polls/managed?club={other_club.pk}").json()["results"] == []
     assert c.get(f"{API}/polls/managed?club={club.pk}").status_code == 200
+
+
+def test_r2_02_a_missing_report_says_what_to_do(actors, club):
+    r = actors.faculty().get(f"{API}/event-reports/999999")
+    assert r.status_code == 404
+    assert r.json()["error"]["code"] == "report_not_found"
+    assert "report list" in r.json()["error"]["message"]
+
+
+def test_r2_03_a_bad_batch_year_names_the_accepted_range():
+    from modules.gymkhana.domain import rules
+    with pytest.raises(rules.RuleViolation) as exc:
+        rules.check_targets([rules.Target(1800)])
+    assert "from 2000 to 2100" in exc.value.message

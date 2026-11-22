@@ -9,14 +9,14 @@ Written by `ops/docs/gymkhana_reference.py`; do not edit by hand.
 | BR-GYM-003 | Category is Technical, Sports or Cultural | [modules/gymkhana/domain/rules.py:36](../../modules/gymkhana/domain/rules.py#L36) |
 | BR-GYM-004 | Open on creation, confirmed by Student Admin | [modules/gymkhana/domain/state_machine.py:49](../../modules/gymkhana/domain/state_machine.py#L49) |
 | BR-GYM-005 | Start before end | [modules/gymkhana/domain/rules.py:56](../../modules/gymkhana/domain/rules.py#L56) |
-| BR-GYM-006 | No overlap in a venue on a date | [modules/gymkhana/services/bookings.py:81](../../modules/gymkhana/services/bookings.py#L81) |
+| BR-GYM-006 | No overlap in a venue on a date | [modules/gymkhana/services/bookings.py:70](../../modules/gymkhana/services/bookings.py#L70) |
 | BR-GYM-007 | Apply only to a confirmed club | [modules/gymkhana/services/memberships.py:31](../../modules/gymkhana/services/memberships.py#L31) |
 | BR-GYM-008 | Different clubs remain open | [modules/gymkhana/models/memberships.py:25](../../modules/gymkhana/models/memberships.py#L25) |
 | BR-GYM-009 | No duplicate same-club application | [modules/gymkhana/models/memberships.py:26](../../modules/gymkhana/models/memberships.py#L26) |
 | BR-GYM-010 | Only the club's current leaders act as Club Head | [modules/gymkhana/selectors/scoping.py:39](../../modules/gymkhana/selectors/scoping.py#L39) |
 | BR-GYM-011 | Approval moves open to confirmed with remarks | [modules/gymkhana/services/memberships.py:94](../../modules/gymkhana/services/memberships.py#L94) |
 | BR-GYM-012 | At least two choices | [modules/gymkhana/domain/rules.py:108](../../modules/gymkhana/domain/rules.py#L108) |
-| BR-GYM-013 | Poll audience by batch and branch | [modules/gymkhana/domain/rules.py:179](../../modules/gymkhana/domain/rules.py#L179) |
+| BR-GYM-013 | Poll audience by batch and branch | [modules/gymkhana/domain/rules.py:180](../../modules/gymkhana/domain/rules.py#L180) |
 | BR-GYM-014 | Only an active, unexpired poll | [modules/gymkhana/services/polls.py:74](../../modules/gymkhana/services/polls.py#L74) |
 | BR-GYM-015 | One vote per student per poll | [modules/gymkhana/models/polls.py:69](../../modules/gymkhana/models/polls.py#L69) |
 | BR-GYM-016 | Superseded leaders stop being current | [modules/gymkhana/services/leadership.py:46](../../modules/gymkhana/services/leadership.py#L46) |
@@ -26,8 +26,8 @@ Written by `ops/docs/gymkhana_reference.py`; do not edit by hand.
 | BR-GYM-020 | Configured venue only | [modules/gymkhana/services/bookings.py:31](../../modules/gymkhana/services/bookings.py#L31) |
 | BR-GYM-021 | Councillor reads only their club's reports | [modules/gymkhana/selectors/scoping.py:108](../../modules/gymkhana/selectors/scoping.py#L108) |
 | UC-GYM-001 | Create New Club | [modules/gymkhana/services/clubs.py:30](../../modules/gymkhana/services/clubs.py#L30) |
-| UC-GYM-002 | Book Club Session | [modules/gymkhana/services/bookings.py:118](../../modules/gymkhana/services/bookings.py#L118) |
-| UC-GYM-003 | Book Club Event | [modules/gymkhana/services/bookings.py:125](../../modules/gymkhana/services/bookings.py#L125) |
+| UC-GYM-002 | Book Club Session | [modules/gymkhana/services/bookings.py:128](../../modules/gymkhana/services/bookings.py#L128) |
+| UC-GYM-003 | Book Club Event | [modules/gymkhana/services/bookings.py:135](../../modules/gymkhana/services/bookings.py#L135) |
 | UC-GYM-004 | Apply for Club Membership | [modules/gymkhana/services/memberships.py:26](../../modules/gymkhana/services/memberships.py#L26) |
 | UC-GYM-005 | Approve Club Membership | [modules/gymkhana/services/memberships.py:63](../../modules/gymkhana/services/memberships.py#L63) |
 | UC-GYM-006 | Create Voting Poll | [modules/gymkhana/services/polls.py:34](../../modules/gymkhana/services/polls.py#L34) |
@@ -42,7 +42,7 @@ Written by `ops/docs/gymkhana_reference.py`; do not edit by hand.
 | BW-GYM-03 | Club Establishment and Confirmation | [modules/gymkhana/domain/state_machine.py:47](../../modules/gymkhana/domain/state_machine.py#L47) |
 | CFR-GYM-001 | Club establishment | [modules/gymkhana/services/clubs.py:30](../../modules/gymkhana/services/clubs.py#L30) |
 | CFR-GYM-002 | Leadership change | [modules/gymkhana/services/leadership.py:20](../../modules/gymkhana/services/leadership.py#L20) |
-| CFR-GYM-003 | Session and event booking | [modules/gymkhana/services/bookings.py:47](../../modules/gymkhana/services/bookings.py#L47) |
+| CFR-GYM-003 | Session and event booking | [modules/gymkhana/services/bookings.py:82](../../modules/gymkhana/services/bookings.py#L82) |
 | CFR-GYM-004 | Membership enrolment | [modules/gymkhana/services/memberships.py:26](../../modules/gymkhana/services/memberships.py#L26) |
 | CFR-GYM-005 | Targeted polling | [modules/gymkhana/services/polls.py:34](../../modules/gymkhana/services/polls.py#L34) |
 | CFR-GYM-006 | Budget request submission | [modules/gymkhana/services/budget.py:29](../../modules/gymkhana/services/budget.py#L29) |
@@ -56,12 +56,12 @@ Written by `ops/docs/gymkhana_reference.py`; do not edit by hand.
 | AFR-GYM-007 | Club Head replaces leaders | [modules/gymkhana/services/leadership.py:20](../../modules/gymkhana/services/leadership.py#L20) |
 | AFR-GYM-008 | New leaders valid students | [modules/gymkhana/services/leadership.py:32](../../modules/gymkhana/services/leadership.py#L32) |
 | AFR-GYM-009 | Only current leaders remain | [modules/gymkhana/models/clubs.py:69](../../modules/gymkhana/models/clubs.py#L69) |
-| AFR-GYM-010 | Book a session | [modules/gymkhana/services/bookings.py:118](../../modules/gymkhana/services/bookings.py#L118) |
+| AFR-GYM-010 | Book a session | [modules/gymkhana/services/bookings.py:128](../../modules/gymkhana/services/bookings.py#L128) |
 | AFR-GYM-011 | Start precedes end | [modules/gymkhana/domain/rules.py:56](../../modules/gymkhana/domain/rules.py#L56) |
-| AFR-GYM-012 | No overlapping booking | [modules/gymkhana/services/bookings.py:84](../../modules/gymkhana/services/bookings.py#L84) |
-| AFR-GYM-013 | Notify on session booked | [modules/gymkhana/services/bookings.py:103](../../modules/gymkhana/services/bookings.py#L103) |
-| AFR-GYM-014 | Book an event | [modules/gymkhana/services/bookings.py:125](../../modules/gymkhana/services/bookings.py#L125) |
-| AFR-GYM-015 | Notify on event booked | [modules/gymkhana/services/bookings.py:106](../../modules/gymkhana/services/bookings.py#L106) |
+| AFR-GYM-012 | No overlapping booking | [modules/gymkhana/services/bookings.py:73](../../modules/gymkhana/services/bookings.py#L73) |
+| AFR-GYM-013 | Notify on session booked | [modules/gymkhana/services/bookings.py:113](../../modules/gymkhana/services/bookings.py#L113) |
+| AFR-GYM-014 | Book an event | [modules/gymkhana/services/bookings.py:135](../../modules/gymkhana/services/bookings.py#L135) |
+| AFR-GYM-015 | Notify on event booked | [modules/gymkhana/services/bookings.py:116](../../modules/gymkhana/services/bookings.py#L116) |
 | AFR-GYM-016 | Apply to a confirmed club | [modules/gymkhana/services/memberships.py:26](../../modules/gymkhana/services/memberships.py#L26) |
 | AFR-GYM-017 | Applications to several clubs | [modules/gymkhana/models/memberships.py:25](../../modules/gymkhana/models/memberships.py#L25) |
 | AFR-GYM-018 | No duplicate application | [modules/gymkhana/services/memberships.py:42](../../modules/gymkhana/services/memberships.py#L42) |

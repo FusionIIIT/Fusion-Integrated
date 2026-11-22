@@ -9,7 +9,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.api.exceptions import BadRequestError
+from core.api.exceptions import BadRequestError, NotFoundError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.gymkhana.api import serializers as s
 from modules.gymkhana.domain import state_machine as sm
@@ -527,6 +527,14 @@ class ReportDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return scoping.reports_for(_actor(self.request))
+
+    def get_object(self):
+        report = self.get_queryset().filter(pk=self.kwargs["pk"]).first()
+        if report is None:
+            raise NotFoundError("No such event report among the clubs you lead or review. "
+                                "Open one from the report list instead.",
+                                code="report_not_found")
+        return report
 
     def retrieve(self, request, *args, **kwargs):
         report = self.get_object()

@@ -148,7 +148,8 @@ def check_targets(targets: Sequence[Target]) -> list[Target]:
         discipline = (t.discipline or "").strip()
         if not MIN_BATCH_YEAR <= t.batch_year <= MAX_BATCH_YEAR:
             raise RuleViolation("invalid_target",
-                                f"{t.batch_year} is not a batch year.",
+                                f"{t.batch_year} is not a batch year. Enter a year from "
+                                f"{MIN_BATCH_YEAR} to {MAX_BATCH_YEAR}, such as 2023.",
                                 field="targets")
         if len(discipline) > MAX_DISCIPLINE_LENGTH:
             raise RuleViolation("invalid_target",

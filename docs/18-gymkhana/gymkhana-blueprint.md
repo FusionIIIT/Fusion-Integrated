@@ -332,12 +332,12 @@ invalid input; 429 throttled.
 | Method | Path | Permission | Returns | Rules |
 |---|---|---|---|---|
 | GET | `clubs?status=&category=` | `club.view` | Clubs in scope: Student Admin all; others confirmed only | BR-GYM-004, 007 |
-| POST | `clubs` | `club.create` | 201 club (open) | UC-GYM-001, BR-GYM-001…004, AFR-GYM-001…005 |
+| POST | `clubs/create` | `club.create` | 201 club (open) | UC-GYM-001, BR-GYM-001…004, AFR-GYM-001…005 |
 | POST | `clubs/{id}/approve` | `club.approve` | 200 club (confirmed) | UC-GYM-011, BR-GYM-004, AFR-GYM-006 |
 | GET | `me/clubs` | `club.view` | `{leading: [...], member_of: [...]}` — drives "My Clubs" and the empty state | BR-GYM-010 |
 | POST | `clubs/{id}/leadership` | `leadership.assign` | 200 the new current leaders | UC-GYM-008, BR-GYM-001, 010, 016, AFR-GYM-007…009 |
 | GET | `memberships?club=&status=` | `membership.view` | Own applications ∪ applications to clubs I lead | AFR-GYM-020 |
-| POST | `memberships` | `membership.create` | 201 application (open) | UC-GYM-004, BR-GYM-007…009, AFR-GYM-016…019 |
+| POST | `memberships/apply` | `membership.create` | 201 application (open) | UC-GYM-004, BR-GYM-007…009, AFR-GYM-016…019 |
 | POST | `memberships/approve` | `membership.approve` | 200 `[{id, outcome, code, message}]`, each independent | UC-GYM-005, BR-GYM-010, 011, AFR-GYM-021, 022 |
 | GET | `venues` | `booking.create` | Current venue names | BR-GYM-020 |
 | GET | `bookings?club=&from=&to=` | `booking.view` | Bookings of clubs I lead or am a confirmed member of (R8) | — |
@@ -345,13 +345,13 @@ invalid input; 429 throttled.
 | POST | `events` | `booking.create` | 201 booking | UC-GYM-003, BR-GYM-002, 005, 006, 010, 020, AFR-GYM-014, 015 |
 | GET | `polls` | `poll.view` | Active polls I am targeted by, with my own vote's choice id | UC-GYM-007, BR-GYM-013, 014, AFR-GYM-026 |
 | GET | `polls/managed?club=` | `poll.create` | Polls of clubs I lead, with per-choice counts (R8) | AFR-GYM-028 |
-| POST | `polls` | `poll.create` | 201 poll | UC-GYM-006, BR-GYM-010, 012, 013, AFR-GYM-023…025 |
+| POST | `polls/create` | `poll.create` | 201 poll | UC-GYM-006, BR-GYM-010, 012, 013, AFR-GYM-023…025 |
 | POST | `polls/{id}/votes` | `vote.create` | 201 `{choice_id}` | UC-GYM-007, BR-GYM-013…015, AFR-GYM-027, 028 |
 | GET | `budget-requests?club=` | `budget_request.view` | Requests of clubs I lead | AFR-GYM-031 |
-| POST | `budget-requests` | `budget_request.create` | 201 request (open) | UC-GYM-009, BR-GYM-010, 017, 018, AFR-GYM-029…031 |
+| POST | `budget-requests/create` | `budget_request.create` | 201 request (open) | UC-GYM-009, BR-GYM-010, 017, 018, AFR-GYM-029…031 |
 | GET | `event-reports?club=` | `event_report.view` or `event_report.review` | Reports of clubs I lead ∪ clubs I am councillor of | UC-GYM-012, BR-GYM-021, AFR-GYM-034 |
 | GET | `event-reports/{id}` | `event_report.view` or `event_report.review` | One report with its Drive link | UC-GYM-012, BR-GYM-021 |
-| POST | `event-reports` | `event_report.create` | 201 report | UC-GYM-010, BR-GYM-010, 019, AFR-GYM-032, 033 |
+| POST | `event-reports/create` | `event_report.create` | 201 report | UC-GYM-010, BR-GYM-010, 019, AFR-GYM-032, 033 |
 | GET | `people?q=&kind=student\|faculty` | `club.create` or `leadership.assign` or `event_report.create` | Up to 25 `{user_id, username, display_name, kind}` | Picker; the service further requires Student Admin or a current leader of a confirmed club, so a plain student gets 403 |
 
 The bookings list is narrower than the "Club Schedule" page's permission. A student who is neither

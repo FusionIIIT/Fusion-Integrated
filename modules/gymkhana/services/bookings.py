@@ -43,40 +43,29 @@ def _venue(requested: str) -> str:
                       details=[{"field": "venue", "message": "Not a configured venue."}])
 
 
-@transaction.atomic
-def _book(*, actor, kind: str, club_id: int, venue: str, day: date, start: time,
-          end: time, description: str, poster_url: str = "",
-          event_name: str = "") -> Booking:
-    require(actor, P_BOOK)
-    club = scoping.led_clubs(actor).filter(pk=club_id).first()
-    if club is None:
-        raise NotFoundError("No such club among the clubs you lead.")
+def _check_slot(day: date, start: time, end: time) -> None:
+    """BR-GYM-005 and the booking-date window."""
     try:
         rules.check_time_range(start, end)
         rules.check_booking_date(day, timezone.localdate())
     except RuleViolation as exc:
         raise refused(exc) from exc
-    description = _text(description, "description", "Describe the booking.")
-    if kind == Booking.EVENT:
-        event_name = _text(event_name, "event_name", "Enter the event's name.")
-    poster = links.parse_link(
-        poster_url, field="poster_url", missing_code="poster_required",
-        missing_message="An event needs a poster. Paste its Google Drive link.",
-        required=kind == Booking.EVENT)
-    faculty_id = None
-    if kind == Booking.EVENT:
-        # BR-GYM-002 in event context: the club's assigned councillor, still valid faculty.
-        try:
-            people.require_faculty(
-                {"faculty_councillor_user_id": club.faculty_councillor_user_id})
-        except DomainError as exc:
-            raise ConflictError(
-                "The club's faculty councillor is no longer listed as faculty, so an "
-                "event cannot be booked. Ask Student Admin to review the club.",
-                code="councillor_invalid", details=exc.details) from exc
-        faculty_id = club.faculty_councillor_user_id
-    venue_name = _venue(venue)
 
+
+def _event_faculty(club: Club) -> int:
+    """BR-GYM-002 in event context: the club's assigned councillor, still valid faculty."""
+    try:
+        people.require_faculty({"faculty_councillor_user_id": club.faculty_councillor_user_id})
+    except DomainError as exc:
+        raise ConflictError(
+            "The club's faculty councillor is no longer listed as faculty, so an "
+            "event cannot be booked. Ask Student Admin to review the club.",
+            code="councillor_invalid", details=exc.details) from exc
+    return club.faculty_councillor_user_id
+
+
+def _reserve(venue_name: str, day: date, start: time, end: time) -> None:
+    """BR-GYM-006: lock the venue-day, then refuse any overlap with what is already there."""
     VenueDay.objects.get_or_create(venue_name=venue_name, date=day)
     VenueDay.objects.select_for_update().get(venue_name=venue_name, date=day)
     taken = Booking.objects.filter(venue_name=venue_name, date=day).values_list(
@@ -88,6 +77,27 @@ def _book(*, actor, kind: str, club_id: int, venue: str, day: date, start: time,
             f"{clash.end:%H:%M} on {day:%d %b %Y}. Choose another time or venue.",
             code="venue_slot_taken")
 
+
+@transaction.atomic
+def _book(*, actor, kind: str, club_id: int, venue: str, day: date, start: time,
+          end: time, description: str, poster_url: str = "",
+          event_name: str = "") -> Booking:
+    require(actor, P_BOOK)
+    club = scoping.led_clubs(actor).filter(pk=club_id).first()
+    if club is None:
+        raise NotFoundError("No such club among the clubs you lead.")
+    is_event = kind == Booking.EVENT
+    _check_slot(day, start, end)
+    description = _text(description, "description", "Describe the booking.")
+    if is_event:
+        event_name = _text(event_name, "event_name", "Enter the event's name.")
+    poster = links.parse_link(
+        poster_url, field="poster_url", missing_code="poster_required",
+        missing_message="An event needs a poster. Paste its Google Drive link.",
+        required=is_event)
+    faculty_id = _event_faculty(club) if is_event else None
+    venue_name = _venue(venue)
+    _reserve(venue_name, day, start, end)
     booking = Booking.objects.create(
         club=club, kind=kind, venue_name=venue_name, date=day, start_time=start,
         end_time=end, description=description,

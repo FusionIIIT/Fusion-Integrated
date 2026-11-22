@@ -234,6 +234,17 @@ output; 409 and 403 are the refusals the row checks for. No 5xx in any row.
 [22/Nov/2026 20:31:13] "POST /api/v1/gymkhana/event-reports/create HTTP/1.1" 201 347
 ```
 
+Same Club Head, a successful event booking and a successful leadership change (UC-GYM-003,
+UC-GYM-008), replayed the same way:
+
+```
+[22/Nov/2026 20:51:47] "POST /api/v1/auth/login HTTP/1.1" 200 91
+[22/Nov/2026 20:51:47] "GET /api/v1/me HTTP/1.1" 200 2092
+[22/Nov/2026 20:51:47] "GET /api/v1/gymkhana/me/clubs HTTP/1.1" 200 3893
+[22/Nov/2026 20:51:47] "POST /api/v1/gymkhana/events HTTP/1.1" 201 374
+[22/Nov/2026 20:51:47] "POST /api/v1/gymkhana/clubs/10/leadership HTTP/1.1" 200 42
+```
+
 **Student (voter) and Club Head (results) · stu00004, stu00002 · UC-GYM-007**
 
 ```
@@ -333,6 +344,12 @@ Shared-file changes made under Step 4.0's pre-approval: `config/settings/base.py
 `openapi/fusion-integrated.v1.yaml`, `registry/permissions.json` and
 `docs/02-iam/permission-catalog.generated.md`.
 
+Approver answers to round 2's questions, agreed by Student 2 and Student 1 on 2026-11-22:
+
+- Q1: poll expiry has no upper limit; the spec sets none, so none is invented.
+- Q2: the `~/.claude` files in the home directory are tool-managed caches, not instruction
+  files; no `CLAUDE.md` exists.
+
 Departures from the blueprint, confirmed by Student 2:
 
 > "I confirm departures 1–3. — Saroj Aman, 22 Nov 2026" (written, WhatsApp, 2026-11-22)
@@ -367,3 +384,21 @@ Findings and what was done:
 
 Every gate re-run afterwards: `make check` exit 0 (698 passed), `make check-client` exit 0
 (82 passed), coverage 99.89% and 100%, reference 77 ids, deploy check clean.
+
+Round 2, reviewing commit `8f68bb2`:
+
+| Spec | Arch | Code | Security | Backend tests | E2E | Frontend | Ops | Hygiene |
+|---|---|---|---|---|---|---|---|---|
+| 10 | 10 | 7 (R2-02..04) | 10 | 10 | 7 (R2-01) | 10 | 9 (R2-05) | 10 |
+
+Verdict: not yet, 5 findings. Fixes:
+
+- R2-01: the Club Head row in section 8 now has a 201 event booking and a 200 leadership change.
+- R2-02: a report outside one's scope (or missing) answers 404 `report_not_found`, "No such
+  event report among the clubs you lead or review. Open one from the report list instead."
+  Tested.
+- R2-03: a bad batch year now says "Enter a year from 2000 to 2100, such as 2023." Tested.
+- R2-04: `_book` is 29 lines, split into `_check_slot`, `_event_faculty` and `_reserve`, still
+  one transaction.
+- R2-05: the blueprint's endpoint table now names `clubs/create`, `memberships/apply`,
+  `polls/create`, `budget-requests/create` and `event-reports/create`, matching `api/urls.py`.
