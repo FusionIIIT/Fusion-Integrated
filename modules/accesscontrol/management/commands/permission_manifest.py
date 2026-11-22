@@ -153,6 +153,8 @@ def known_gaps(manifest: dict) -> list[str]:
 #: immediately instead of joining a pile nobody counts. Deleting a line
 #: here is the definition of done for that feature.
 KNOWN_UNENFORCED = frozenset({
+    # vms: declared in Phase 0 (0c); each line is removed by the lane that
+    # adds its endpoint.
 })
 
 
