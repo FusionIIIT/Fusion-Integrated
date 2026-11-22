@@ -63,6 +63,331 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/hostel/accommodations/:
+    get:
+      operationId: v1_hostel_accommodations_list
+      summary: List accommodations
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccommodationRequest'
+          description: ''
+    post:
+      operationId: v1_hostel_accommodations_create
+      summary: Submit accommodation request
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccommodationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccommodationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AccommodationRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccommodationRequest'
+          description: ''
+  /api/v1/hostel/attendances/:
+    post:
+      operationId: v1_hostel_attendances_create
+      summary: Record attendance
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentAttendance'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentAttendance'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentAttendance'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentAttendance'
+          description: ''
+  /api/v1/hostel/complaints/:
+    get:
+      operationId: v1_hostel_complaints_list
+      summary: List complaints
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HostelComplaint'
+          description: ''
+    post:
+      operationId: v1_hostel_complaints_create
+      summary: Submit complaint
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HostelComplaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HostelComplaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HostelComplaint'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostelComplaint'
+          description: ''
+  /api/v1/hostel/complaints/{id}/action/:
+    post:
+      operationId: v1_hostel_complaints_action_create
+      summary: Take action on complaint
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HostelComplaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HostelComplaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HostelComplaint'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostelComplaint'
+          description: ''
+  /api/v1/hostel/fines/:
+    get:
+      operationId: v1_hostel_fines_list
+      summary: List fines
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HostelFine'
+          description: ''
+    post:
+      operationId: v1_hostel_fines_create
+      summary: Impose fine
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HostelFine'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HostelFine'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HostelFine'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostelFine'
+          description: ''
+  /api/v1/hostel/hostels/:
+    get:
+      operationId: v1_hostel_hostels_list
+      summary: List visible hostels
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Hostel'
+          description: ''
+  /api/v1/hostel/leaves/:
+    get:
+      operationId: v1_hostel_leaves_list
+      summary: List leaves
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    post:
+      operationId: v1_hostel_leaves_create
+      summary: Submit leave request
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/hostel/leaves/{id}/action/:
+    post:
+      operationId: v1_hostel_leaves_action_create
+      summary: Approve or reject leave
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/hostel/notices/:
+    get:
+      operationId: v1_hostel_notices_list
+      summary: List notices
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HostelNotice'
+          description: ''
+    post:
+      operationId: v1_hostel_notices_create
+      summary: Publish notice
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HostelNotice'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HostelNotice'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HostelNotice'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostelNotice'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +2088,47 @@ components:
       - semester
       - semester_type
       - user_id
+    AccommodationRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        preferred_hostel:
+          type: integer
+          nullable: true
+        academic_year:
+          type: string
+          maxLength: 20
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AccommodationRequestStatusEnum'
+          readOnly: true
+        remarks:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - academic_year
+      - created_at
+      - id
+      - status
+      - user_id
+    AccommodationRequestStatusEnum:
+      enum:
+      - SUBMITTED
+      - ALLOCATED
+      - REJECTED
+      type: string
+      description: |-
+        * `SUBMITTED` - Submitted
+        * `ALLOCATED` - Allocated
+        * `REJECTED` - Rejected
     AddCandidates:
       type: object
       properties:
@@ -2423,6 +2789,162 @@ components:
       - fee_reference
       - season
       - user_id
+    Hostel:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        code:
+          type: string
+          maxLength: 20
+        description:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - code
+      - created_at
+      - id
+      - name
+    HostelComplaint:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        hostel:
+          type: integer
+        category:
+          type: string
+          maxLength: 50
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/HostelComplaintStatusEnum'
+          readOnly: true
+        resolution_remarks:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - description
+      - hostel
+      - id
+      - status
+      - title
+      - user_id
+    HostelComplaintStatusEnum:
+      enum:
+      - LOGGED
+      - IN_PROGRESS
+      - ESCALATED
+      - RESOLVED
+      - CLOSED
+      type: string
+      description: |-
+        * `LOGGED` - Logged
+        * `IN_PROGRESS` - In Progress
+        * `ESCALATED` - Escalated
+        * `RESOLVED` - Resolved
+        * `CLOSED` - Closed
+    HostelFine:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        hostel:
+          type: integer
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        reason:
+          type: string
+        status:
+          $ref: '#/components/schemas/HostelFineStatusEnum'
+        imposed_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - hostel
+      - id
+      - imposed_by_user_id
+      - reason
+      - user_id
+    HostelFineStatusEnum:
+      enum:
+      - IMPOSED
+      - PAID
+      - WAIVED
+      type: string
+      description: |-
+        * `IMPOSED` - Imposed
+        * `PAID` - Paid
+        * `WAIVED` - Waived
+    HostelNotice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        hostel:
+          type: integer
+        title:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+        topic:
+          type: string
+          maxLength: 50
+        published_by_user_id:
+          type: integer
+          readOnly: true
+        published_by_role:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - created_at
+      - hostel
+      - id
+      - published_by_role
+      - published_by_user_id
+      - title
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +3159,56 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        hostel:
+          type: integer
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequestStatusEnum'
+          readOnly: true
+        action_remarks:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - end_date
+      - hostel
+      - id
+      - reason
+      - start_date
+      - status
+      - user_id
+    LeaveRequestStatusEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      - CANCELLED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `CANCELLED` - Cancelled
     LiftSanction:
       type: object
       properties:
@@ -3691,6 +4263,42 @@ components:
       required:
       - available
       - season
+    StudentAttendance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        hostel:
+          type: integer
+        date:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/StudentAttendanceStatusEnum'
+        marked_by_user_id:
+          type: integer
+          readOnly: true
+      required:
+      - date
+      - hostel
+      - id
+      - marked_by_user_id
+      - user_id
+    StudentAttendanceStatusEnum:
+      enum:
+      - PRESENT
+      - ABSENT
+      - ON_LEAVE
+      type: string
+      description: |-
+        * `PRESENT` - Present
+        * `ABSENT` - Absent
+        * `ON_LEAVE` - On Leave
     SubmitOfferLetter:
       type: object
       properties:
