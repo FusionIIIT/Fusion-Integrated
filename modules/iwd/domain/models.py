@@ -1,7 +1,14 @@
+"""Domain models and permission definitions for IWD."""
 from enum import Enum
 from decimal import Decimal
-from dataclasses import dataclass
-from typing import Optional
+
+# Permission codes enforced across IWD endpoints and services
+PERM_VIEW = "iwd.complaint.view"
+PERM_CREATE = "iwd.complaint.create"
+PERM_MANAGE = "iwd.complaint.manage"
+PERM_APPROVE = "iwd.complaint.approve"
+PERM_AUDIT = "iwd.complaint.audit"
+PERM_SETTLE = "iwd.complaint.settle"
 
 class Role(str, Enum):
     EMPLOYEE = "employee"

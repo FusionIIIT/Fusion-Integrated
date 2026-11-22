@@ -52,7 +52,10 @@ ROLE_GRANTS = {
     "student": _USER_PERMS,
     "faculty": _USER_PERMS,
     "staff": _USER_PERMS,
-    "Director": _APPROVER_PERMS,
+    "Director": _APPROVER_PERMS + ["iwd.complaint.settle"],
     "HOD": _APPROVER_PERMS,
     "Dean": ["iwd.complaint.view"],
+    "iwd_engineer": _ENGINEER_PERMS,
+    "iwd_auditor": ["iwd.complaint.view", "iwd.complaint.audit"],
+    "iwd_admin": ["iwd.complaint.view", "iwd.complaint.manage", "iwd.complaint.settle"],
 }
