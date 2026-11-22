@@ -2,9 +2,9 @@
 
 Student 1 (git author name): Niteesh
 Student 2 (git author name): Rohan
-Design commit (hash and subject): 9ec9e85ee6a9fdec937545e11a8eab9d7cff9c20 spec(tests): freeze FR, UC, BR, and WF test designs
-Baseline commit (hash and subject): aa4ea164b360a8769dbec1fa89f3c3d526e4e09f spec(tests): add automated spec test suites and initial baseline triage
-Student 1's 10/10 commit the baseline ran on (hash): 108c9e5a456f796bdcd1b71ab6226a9a3c5f3ace docs(placement): add approved module blueprint and initial quality report
+Design commit (hash and subject): b7e00f5c12469105b19255415ae32b8f0dd2abd1 spec(tests): freeze FR, UC, BR, and WF test designs
+Baseline commit (hash and subject): 73c2b637628123c6cd0d338e8c5e6d974c7ef33c spec(tests): add automated spec test suites and initial baseline triage
+Student 1's 10/10 commit the baseline ran on (hash): f1dce95fa4943123c22cc6f32d2067a018b9c71b docs(placement): add approved module blueprint and initial quality report
 
 ## Results
 | Run | Strategy | Cases | Passed | Failed | Skipped | Line % | Branch % |
