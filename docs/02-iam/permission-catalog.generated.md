@@ -13,6 +13,38 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `phc`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `phc.doctor_schedule.view` | View published doctor schedules | `Compounder`, `faculty`, `staff`, `student` |
+| `phc.doctor_schedule.create` | Create doctor schedule slots | `Compounder` |
+| `phc.doctor_schedule.update` | Maintain doctor schedule slots | `Compounder` |
+| `phc.doctor_schedule.publish` | Publish doctor schedule slots | `Compounder` |
+| `phc.doctor_attendance.update` | Update doctor attendance | `Compounder` |
+| `phc.patient_record.view` | View patient records in the caller's permitted scope | `Compounder`, `faculty`, `staff`, `student` |
+| `phc.patient_record.create` | Record patient visits and prescriptions | `Compounder` |
+| `phc.record.export` | Download own medical records as PDF | `faculty`, `staff`, `student` |
+| `phc.reimbursement.view` | View claims in the caller's permitted scope | `Accounts Admin`, `Compounder`, `Registrar`, `faculty`, `staff` |
+| `phc.reimbursement.create` | Submit a medical reimbursement claim | `faculty`, `staff` |
+| `phc.reimbursement.review` | Review and forward a reimbursement claim | `Compounder` |
+| `phc.reimbursement.manage` | Verify and process reimbursement claims | `Accounts Admin` |
+| `phc.reimbursement.approve` | Approve or reject reimbursement sanction | `Registrar` |
+| `phc.inventory.view` | View inventory and low-stock alerts | `Compounder` |
+| `phc.inventory.create` | Create inventory items | `Compounder` |
+| `phc.inventory.update` | Record inventory stock adjustments | `Compounder` |
+| `phc.requisition.view` | View requisitions in the caller's permitted scope | `Compounder`, `Registrar` |
+| `phc.requisition.create` | Submit inventory requisitions | `Compounder` |
+| `phc.requisition.approve` | Approve or reject an inventory requisition | `Registrar` |
+| `phc.requisition.update` | Mark an approved requisition fulfilled | `Compounder` |
+| `phc.ambulance_usage.view` | View ambulance usage records | `Compounder` |
+| `phc.ambulance_usage.create` | Record ambulance usage | `Compounder` |
+| `phc.advisory.view` | View published health advisories | `Compounder`, `faculty`, `staff`, `student` |
+| `phc.advisory.publish` | Publish health advisories | `Compounder` |
+| `phc.report.view` | Generate aggregate-only PHC reports | `Compounder` |
+| `phc.notification.view` | View caller-addressed PHC notifications | `Accounts Admin`, `Compounder`, `Registrar`, `faculty`, `staff` |
+| `phc.notification.manage` | Deliver PHC notifications as scheduled work | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

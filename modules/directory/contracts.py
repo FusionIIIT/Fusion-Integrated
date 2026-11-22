@@ -73,6 +73,18 @@ def held_employee_ids() -> set[int]:
     )
 
 
+def is_employee(user_ids: Sequence[int]) -> set[int]:
+    """Return requested IDs present in the local iter_employees projection."""
+    ids = {int(user_id) for user_id in user_ids if user_id is not None}
+    if not ids:
+        return set()
+    return set(
+        UserRef.objects.filter(
+            user_id__in=ids, kind__in=("faculty", "staff"), is_active=True
+        ).values_list("user_id", flat=True)
+    )
+
+
 def employee_projection_disagreement() -> tuple[list[int], list[int]] | None:
     """Where this service and the identity service disagree about the payroll."""
     held = held_employee_ids()
