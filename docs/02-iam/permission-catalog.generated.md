@@ -13,6 +13,31 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `mms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `mms.announcement.publish` | Publish mess announcements | `mess_caretaker`, `mess_warden` |
+| `mms.announcement.view` | View mess announcements | `mess_caretaker`, `mess_warden`, `student` |
+| `mms.feedback.self` | Submit feedback | `student` |
+| `mms.feedback.view` | Review feedback | `mess_caretaker`, `mess_warden` |
+| `mms.menu.manage` | Maintain the weekly menu | `mess_caretaker` |
+| `mms.menu.view` | View the weekly menu | `mess_caretaker`, `mess_warden`, `student` |
+| `mms.rebate.decide` | Decide rebate requests | `mess_caretaker` |
+| `mms.rebate.self` | Submit and track own rebates | `student` |
+| `mms.rebate.view` | View rebate requests | `mess_caretaker`, `mess_warden` |
+| `mms.registration.decide` | Decide mess registration requests | `mess_caretaker` |
+| `mms.registration.self` | Submit own mess registration requests | `student` |
+| `mms.registration.view` | View mess registration requests | `mess_caretaker`, `mess_warden` |
+| `mms.report.view` | View MMS operational reports | `mess_caretaker`, `mess_warden` |
+| `mms.role.assign` | Assign Caretaker and Warden roles | `mess_admin` |
+| `mms.special_food.decide` | Decide and record special food fulfillment | `mess_caretaker` |
+| `mms.special_food.self` | Submit and track own special food requests | `student` |
+| `mms.special_food.view` | View special food requests | `mess_caretaker`, `mess_warden` |
+| `mms.vacation.manage` | Create vacation surveys | `mess_caretaker` |
+| `mms.vacation.self` | Respond to own vacation surveys | `student` |
+| `mms.vacation.view` | View vacation survey summaries | `mess_caretaker`, `mess_warden` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

@@ -1,0 +1,1 @@
+"""Pure MMS business rules."""
