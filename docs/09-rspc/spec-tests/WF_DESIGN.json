@@ -1,0 +1,290 @@
+[
+  {
+    "test_id": "TEST-WF-001",
+    "source_id": "BW-RSPC-01 Transition 1",
+    "purpose": "Faculty submits research proposal from Draft to Submitted",
+    "preconditions": "Proposal created in Draft status",
+    "action_or_input": "Validate transition from PROPOSAL_STATUS_DRAFT to PROPOSAL_STATUS_SUBMITTED_HOD",
+    "expected_result": "Both status constants are defined and distinct",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-002",
+    "source_id": "BW-RSPC-01 Transition 2",
+    "purpose": "HoD recommends research proposal advancing to RECOMMENDED_HOD",
+    "preconditions": "Proposal is in SUBMITTED_HOD",
+    "action_or_input": "Verify HoD recommend permission and target status RECOMMENDED_HOD",
+    "expected_result": "RECOMMENDED_HOD status is valid in choices",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-003",
+    "source_id": "BW-RSPC-01 Transition 3",
+    "purpose": "RSPC Admin verifies proposal advancing to VERIFIED_ADMIN",
+    "preconditions": "Proposal is in RECOMMENDED_HOD",
+    "action_or_input": "Verify admin verify permission and target status VERIFIED_ADMIN",
+    "expected_result": "VERIFIED_ADMIN status is valid in choices",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-004",
+    "source_id": "BW-RSPC-01 Transition 4",
+    "purpose": "Dean-RSPC approves proposal advancing to APPROVED_DEAN",
+    "preconditions": "Proposal budget < 10 Lakhs and admin verified",
+    "action_or_input": "Check is_director_approval_required is False and status APPROVED_DEAN",
+    "expected_result": "APPROVED_DEAN status is reached",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-005",
+    "source_id": "BW-RSPC-02 Transition 4",
+    "purpose": "Dean-RSPC forwards large funding proposal to Director",
+    "preconditions": "Proposal budget >= 10 Lakhs and admin verified",
+    "action_or_input": "Check is_director_approval_required is True and status FORWARDED_DIRECTOR",
+    "expected_result": "FORWARDED_DIRECTOR status is valid in choices",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-006",
+    "source_id": "BW-RSPC-02 Transition 5",
+    "purpose": "Director authorizes large funding proposal advancing to APPROVED_DIRECTOR",
+    "preconditions": "Proposal in FORWARDED_DIRECTOR",
+    "action_or_input": "Verify director authorization permission and APPROVED_DIRECTOR status",
+    "expected_result": "APPROVED_DIRECTOR status is valid in choices",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-007",
+    "source_id": "BW-RSPC-03 Transition 1-4",
+    "purpose": "Consultancy project approved at Dean-RSPC level",
+    "preconditions": "Consultancy within standard limits",
+    "action_or_input": "Verify CONSULTANCY_STATUS_APPROVED_DEAN and Dean approval permission",
+    "expected_result": "Consultancy Dean approval path is valid",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-008",
+    "source_id": "BW-RSPC-04 Transition 4-5",
+    "purpose": "High-value consultancy (>= 10 Lakhs) routed to Director for approval",
+    "preconditions": "Consultancy cost is 15 Lakhs",
+    "action_or_input": "Call is_director_approval_required('consultancy', 1500000)",
+    "expected_result": "Returns True requiring Director approval for consultancy",
+    "test_type": "workflow_escalation"
+  },
+  {
+    "test_id": "TEST-WF-009",
+    "source_id": "BW-RSPC-05 Transition 1-4",
+    "purpose": "Staff appointment approved at Dean-RSPC level",
+    "preconditions": "Staff appointment requested and selection recorded",
+    "action_or_input": "Inspect ProjectStaffAppointment status and Dean management permissions",
+    "expected_result": "Staff appointment captures REQUESTED status and Dean has manage permission",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-010",
+    "source_id": "BW-RSPC-06 Transition 4-5",
+    "purpose": "High-value staff appointment routed to Director",
+    "preconditions": "Staff appointment with senior position requiring Director sanction",
+    "action_or_input": "Call is_director_approval_required('staff', 50000)",
+    "expected_result": "Workflow rules must support Director escalation guard for staff appointments",
+    "test_type": "workflow_escalation"
+  },
+  {
+    "test_id": "TEST-WF-011",
+    "source_id": "BW-RSPC-07 Transition 1-3",
+    "purpose": "Financial request approved at Dean-RSPC level (< 2 Lakhs)",
+    "preconditions": "Expenditure amount < 200,000 and verified by admin",
+    "action_or_input": "Verify is_director_approval_required is False and status APPROVED_DEAN",
+    "expected_result": "FINANCIAL_STATUS_APPROVED_DEAN is reached",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-012",
+    "source_id": "BW-RSPC-08 Transition 3-4",
+    "purpose": "Financial request escalated and approved via Director (>= 2 Lakhs)",
+    "preconditions": "Expenditure amount >= 200,000 and verified by admin",
+    "action_or_input": "Call is_director_approval_required('financial', 250000) and verify ESCALATED_DIRECTOR",
+    "expected_result": "Returns True and FINANCIAL_STATUS_ESCALATED_DIRECTOR is reached",
+    "test_type": "workflow_escalation"
+  },
+  {
+    "test_id": "TEST-WF-013",
+    "source_id": "BW-RSPC-09 Transition 1-3",
+    "purpose": "Procurement request approved at Dean-RSPC level (< 2 Lakhs)",
+    "preconditions": "Procurement cost < 200,000 and verified by admin",
+    "action_or_input": "Verify is_director_approval_required('procurement', 150000) is False",
+    "expected_result": "Returns False allowing Dean approval",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-014",
+    "source_id": "BW-RSPC-10 Transition 3-4",
+    "purpose": "Procurement request escalated to Director (>= 2 Lakhs)",
+    "preconditions": "Procurement cost >= 200,000",
+    "action_or_input": "Call is_director_approval_required('procurement', 300000)",
+    "expected_result": "Returns True requiring Director authorization",
+    "test_type": "workflow_escalation"
+  },
+  {
+    "test_id": "TEST-WF-015",
+    "source_id": "BW-RSPC-11 Transition 1-3",
+    "purpose": "Project closure approved and archived at Dean-RSPC level",
+    "preconditions": "Closure verified with settled liabilities and assets declared",
+    "action_or_input": "Validate closure requirements and inspect CLOSURE_STATUS_ARCHIVED",
+    "expected_result": "Validation succeeds and ARCHIVED status is defined",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-016",
+    "source_id": "BW-RSPC-12 Transition 3-4",
+    "purpose": "Project closure forwarded to Director for institutional archival",
+    "preconditions": "Significant project closure forwarded to Director",
+    "action_or_input": "Inspect CLOSURE_STATUS_FORWARDED_DIRECTOR and CLOSURE_STATUS_APPROVED_DIRECTOR",
+    "expected_result": "Both status constants are defined and distinct",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "TEST-WF-017",
+    "source_id": "CW-RSPC-01 Outcome Department Not Recommended",
+    "purpose": "Research proposal rejected by HoD with non-recommendation outcome",
+    "preconditions": "Proposal in SUBMITTED_HOD",
+    "action_or_input": "Verify PROPOSAL_STATUS_REJECTED_HOD constant and audit trail support",
+    "expected_result": "REJECTED_HOD status is defined",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-018",
+    "source_id": "CW-RSPC-01 Outcome Admin Not Verified",
+    "purpose": "Research proposal rejected by Admin as not eligible for forwarding",
+    "preconditions": "Proposal in RECOMMENDED_HOD",
+    "action_or_input": "Verify PROPOSAL_STATUS_REJECTED_ADMIN constant",
+    "expected_result": "REJECTED_ADMIN status is defined",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-019",
+    "source_id": "CW-RSPC-01 Outcome Dean Not Approved",
+    "purpose": "Research proposal rejected by Dean-RSPC",
+    "preconditions": "Proposal in VERIFIED_ADMIN",
+    "action_or_input": "Verify PROPOSAL_STATUS_REJECTED_DEAN constant",
+    "expected_result": "REJECTED_DEAN status is defined",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-020",
+    "source_id": "CW-RSPC-01 Outcome Director Not Approved",
+    "purpose": "Research proposal rejected by Director",
+    "preconditions": "Proposal in FORWARDED_DIRECTOR",
+    "action_or_input": "Verify PROPOSAL_STATUS_REJECTED_DIRECTOR constant",
+    "expected_result": "REJECTED_DIRECTOR status is defined",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-021",
+    "source_id": "CW-RSPC-02 Outcome Department Not Recommended",
+    "purpose": "Consultancy rejected at department level",
+    "preconditions": "Consultancy in SUBMITTED_HOD",
+    "action_or_input": "Verify CONSULTANCY_STATUS_REJECTED constant and HoD recommend permission",
+    "expected_result": "REJECTED status is defined",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-022",
+    "source_id": "CW-RSPC-02 Optional Department Stage Skip",
+    "purpose": "Consultancy submitted directly to Admin verified when department stage not applicable",
+    "preconditions": "Consultancy policy permits direct admin verification",
+    "action_or_input": "Verify CONSULTANCY_STATUS_VERIFIED_ADMIN constant",
+    "expected_result": "VERIFIED_ADMIN status is defined and valid",
+    "test_type": "workflow_alternative"
+  },
+  {
+    "test_id": "TEST-WF-023",
+    "source_id": "CW-RSPC-02 Outcome Dean Not Approved",
+    "purpose": "Consultancy rejected by Dean-RSPC",
+    "preconditions": "Consultancy in VERIFIED_ADMIN",
+    "action_or_input": "Check CONSULTANCY_STATUS_REJECTED constant",
+    "expected_result": "REJECTED status is reached",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-024",
+    "source_id": "CW-RSPC-03 Outcome Admin Not Verified",
+    "purpose": "Staff appointment rejected by Admin as not eligible",
+    "preconditions": "Staff appointment requested",
+    "action_or_input": "Inspect ProjectStaffAppointment status choices and admin manage permission",
+    "expected_result": "Admin has permission to update staff appointment status",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-025",
+    "source_id": "CW-RSPC-03 Outcome Dean Not Approved",
+    "purpose": "Staff appointment rejected by Dean-RSPC",
+    "preconditions": "Staff appointment recommended",
+    "action_or_input": "Inspect Dean role grants for staff management",
+    "expected_result": "Dean has rspc.staff.manage permission",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-026",
+    "source_id": "CW-RSPC-04 Outcome Financial Admin Rejected",
+    "purpose": "Financial request rejected by Admin during initial verification",
+    "preconditions": "Financial request in SUBMITTED",
+    "action_or_input": "Check FINANCIAL_STATUS_REJECTED constant",
+    "expected_result": "FINANCIAL_STATUS_REJECTED is defined",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-027",
+    "source_id": "CW-RSPC-04 Outcome Financial Dean Rejected",
+    "purpose": "Financial request rejected by Dean-RSPC",
+    "preconditions": "Financial request in VERIFIED_ADMIN",
+    "action_or_input": "Verify FINANCIAL_STATUS_REJECTED constant",
+    "expected_result": "REJECTED status is defined",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-028",
+    "source_id": "CW-RSPC-05 Outcome Procurement Admin Rejected",
+    "purpose": "Procurement request rejected during admin verification",
+    "preconditions": "Procurement in REQUESTED",
+    "action_or_input": "Inspect ProcurementRequest status field choices",
+    "expected_result": "Procurement status field can represent rejection",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-029",
+    "source_id": "CW-RSPC-05 Outcome Procurement Dean Rejected",
+    "purpose": "Procurement request rejected by Dean-RSPC",
+    "preconditions": "Procurement verified by admin",
+    "action_or_input": "Inspect Dean procurement permissions",
+    "expected_result": "Dean has rspc.procurement.approve permission",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-030",
+    "source_id": "CW-RSPC-06 Outcome Closure Admin Rejected",
+    "purpose": "Project closure rejected by Admin due to incomplete records",
+    "preconditions": "Closure requested with unsettled liabilities",
+    "action_or_input": "Call validate_project_closure and check CLOSURE_STATUS_REJECTED",
+    "expected_result": "Validation fails and CLOSURE_STATUS_REJECTED is defined",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-031",
+    "source_id": "CW-RSPC-06 Outcome Closure Dean Rejected",
+    "purpose": "Project closure rejected by Dean-RSPC",
+    "preconditions": "Closure verified by admin",
+    "action_or_input": "Verify CLOSURE_STATUS_REJECTED constant",
+    "expected_result": "CLOSURE_STATUS_REJECTED is defined",
+    "test_type": "workflow_rejection"
+  },
+  {
+    "test_id": "TEST-WF-032",
+    "source_id": "CW-RSPC-01 Workflow State Machine Guard",
+    "purpose": "Workflow state machine must reject illegal direct state jump from DRAFT to APPROVED_DIRECTOR",
+    "preconditions": "Proposal is in DRAFT state",
+    "action_or_input": "Check domain rules module for validate_workflow_transition state machine guard",
+    "expected_result": "Rules module must provide validate_workflow_transition preventing illegal transitions",
+    "test_type": "workflow_guard"
+  }
+]

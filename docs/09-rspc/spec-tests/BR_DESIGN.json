@@ -1,0 +1,299 @@
+[
+  {
+    "test_id": "TEST-BR-001",
+    "source_id": "BR-RSPC-004 condition-strategic",
+    "purpose": "Verify strategic research proposal escalates to Director regardless of budget",
+    "preconditions": "Proposal is marked is_strategic=True with budget 50,000",
+    "action_or_input": "Call is_director_approval_required('proposal', 50000, is_strategic=True)",
+    "expected_result": "Returns True for strategic proposal",
+    "test_type": "rule_condition"
+  },
+  {
+    "test_id": "TEST-BR-002",
+    "source_id": "BR-RSPC-005 threshold-true",
+    "purpose": "Verify Director approval required for proposal budget >= 10 Lakhs threshold",
+    "preconditions": "Proposal budget is 1,000,000",
+    "action_or_input": "Call is_director_approval_required('proposal', 1000000)",
+    "expected_result": "Returns True indicating Director approval required",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-BR-003",
+    "source_id": "BR-RSPC-005 threshold-false",
+    "purpose": "Verify Director approval not required for proposal budget < 10 Lakhs threshold",
+    "preconditions": "Proposal budget is 999,999.99",
+    "action_or_input": "Call is_director_approval_required('proposal', 999999.99)",
+    "expected_result": "Returns False allowing Dean approval",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-BR-004",
+    "source_id": "BR-RSPC-006 threshold-true",
+    "purpose": "Verify Director authorization required for high-value expenditure >= 2 Lakhs",
+    "preconditions": "Financial expenditure amount is 200,000",
+    "action_or_input": "Call is_director_approval_required('expenditure', 200000)",
+    "expected_result": "Returns True indicating Director authorization required",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-BR-005",
+    "source_id": "BR-RSPC-006 threshold-false",
+    "purpose": "Verify Director authorization not required for expenditure < 2 Lakhs",
+    "preconditions": "Financial expenditure amount is 199,999",
+    "action_or_input": "Call is_director_approval_required('expenditure', 199999)",
+    "expected_result": "Returns False",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-BR-006",
+    "source_id": "BR-RSPC-012 sequence-valid",
+    "purpose": "Verify research proposal approval route sequence statuses",
+    "preconditions": "Proposal lifecycle routing",
+    "action_or_input": "Inspect PROPOSAL_STATUS_CHOICES ordering constants",
+    "expected_result": "Route contains Faculty, HoD, Admin, Dean, and Director states",
+    "test_type": "rule_workflow"
+  },
+  {
+    "test_id": "TEST-BR-007",
+    "source_id": "BR-RSPC-013 mandatory-valid",
+    "purpose": "Verify mandatory research proposal fields validation passes with all fields present",
+    "preconditions": "All mandatory proposal fields provided",
+    "action_or_input": "Pass complete dictionary to validate_research_proposal",
+    "expected_result": "Empty errors list",
+    "test_type": "rule_validation"
+  },
+  {
+    "test_id": "TEST-BR-008",
+    "source_id": "BR-RSPC-013 mandatory-missing",
+    "purpose": "Verify proposal validation rejects missing title, pi_id, dept, agency, or objectives",
+    "preconditions": "Payload with missing mandatory fields",
+    "action_or_input": "Pass empty/invalid fields to validate_research_proposal",
+    "expected_result": "Returns validation error for each missing field",
+    "test_type": "rule_negative"
+  },
+  {
+    "test_id": "TEST-BR-009",
+    "source_id": "BR-RSPC-014 timeline-duration-positive",
+    "purpose": "Verify proposal validation enforces strictly positive timeline duration (timeline_months > 0)",
+    "preconditions": "Proposal with timeline_months=0 or negative duration",
+    "action_or_input": "Call validate_research_proposal with timeline_months=0",
+    "expected_result": "Errors list must flag non-positive timeline duration per BR-RSPC-014",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-BR-010",
+    "source_id": "BR-RSPC-015 timestamp-captured",
+    "purpose": "Verify review decisions capture automatic timestamp",
+    "preconditions": "RSPCAuditTrail record created",
+    "action_or_input": "Inspect RSPCAuditTrail timestamp field definition",
+    "expected_result": "timestamp field has auto_now_add=True and db_index=True",
+    "test_type": "rule_compliance"
+  },
+  {
+    "test_id": "TEST-BR-011",
+    "source_id": "BR-RSPC-016 remarks-captured",
+    "purpose": "Verify review decisions capture optional or required reviewer remarks",
+    "preconditions": "Decision made by reviewer",
+    "action_or_input": "Set remarks on RSPCAuditTrail instance",
+    "expected_result": "remarks text is properly stored",
+    "test_type": "rule_compliance"
+  },
+  {
+    "test_id": "TEST-BR-012",
+    "source_id": "BR-RSPC-022 routing-defined",
+    "purpose": "Verify consultancy approval routing statuses follow institutional policy",
+    "preconditions": "Consultancy registration",
+    "action_or_input": "Check CONSULTANCY_STATUS_DRAFT and CONSULTANCY_STATUS_APPROVED_DEAN",
+    "expected_result": "Status constants are defined and active",
+    "test_type": "rule_workflow"
+  },
+  {
+    "test_id": "TEST-BR-013",
+    "source_id": "BR-RSPC-022 institutional-share-minimum",
+    "purpose": "Verify consultancy validation enforces minimum 20% institutional share",
+    "preconditions": "Consultancy with institutional share below 20% of total cost",
+    "action_or_input": "Call validate_consultancy_project with 0% institutional share",
+    "expected_result": "Validation must reject insufficient institutional share per BR-RSPC-022",
+    "test_type": "rule_negative"
+  },
+  {
+    "test_id": "TEST-BR-014",
+    "source_id": "BR-RSPC-022 director-escalation-consultancy",
+    "purpose": "Verify high-value consultancy (>= 10 Lakhs) escalates to Director",
+    "preconditions": "Consultancy total cost is 1,200,000",
+    "action_or_input": "Call is_director_approval_required('consultancy', 1200000)",
+    "expected_result": "Returns True requiring Director approval for high-value consultancy",
+    "test_type": "rule_escalation"
+  },
+  {
+    "test_id": "TEST-BR-015",
+    "source_id": "BR-RSPC-026 staff-routing",
+    "purpose": "Verify staff appointment routing through Dean and Director permissions",
+    "preconditions": "Staff appointment submitted",
+    "action_or_input": "Check staff management permissions in registry",
+    "expected_result": "rspc.staff.manage is assigned to admin and dean",
+    "test_type": "rule_workflow"
+  },
+  {
+    "test_id": "TEST-BR-016",
+    "source_id": "BR-RSPC-032 dean-financial-limit",
+    "purpose": "Verify Dean financial approval is strictly bounded by delegation limit (2 Lakhs)",
+    "preconditions": "Financial delegation configuration",
+    "action_or_input": "Verify DEAN_FINANCIAL_DELEGATION_LIMIT constant value",
+    "expected_result": "Limit equals Decimal('200000.00')",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-BR-017",
+    "source_id": "BR-RSPC-033 financial-escalation-director",
+    "purpose": "Verify financial request >= 2 Lakhs escalates to Director",
+    "preconditions": "Financial request amount is 250,000",
+    "action_or_input": "Call is_director_approval_required('financial', 250000)",
+    "expected_result": "Returns True indicating Director escalation",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-BR-018",
+    "source_id": "BR-RSPC-034 financial-audit-logging",
+    "purpose": "Verify financial request lifecycle events are audited",
+    "preconditions": "Financial request state change",
+    "action_or_input": "Instantiate RSPCAuditTrail for financial request verification",
+    "expected_result": "Audit entry captures entity_type financial and action",
+    "test_type": "rule_compliance"
+  },
+  {
+    "test_id": "TEST-BR-019",
+    "source_id": "BR-RSPC-035 procurement-budget-valid",
+    "purpose": "Verify procurement within budget passes validation",
+    "preconditions": "Estimated cost <= available budget",
+    "action_or_input": "Call validate_procurement_request(cost=80000, budget=100000)",
+    "expected_result": "Empty errors list",
+    "test_type": "rule_validation"
+  },
+  {
+    "test_id": "TEST-BR-020",
+    "source_id": "BR-RSPC-035 procurement-budget-exceeded",
+    "purpose": "Verify procurement exceeding budget fails validation",
+    "preconditions": "Estimated cost > available budget",
+    "action_or_input": "Call validate_procurement_request(cost=120000, budget=100000)",
+    "expected_result": "Returns error indicating budget exceeded",
+    "test_type": "rule_negative"
+  },
+  {
+    "test_id": "TEST-BR-021",
+    "source_id": "BR-RSPC-036 procurement-approval-hierarchy",
+    "purpose": "Verify procurement approval permissions in Dean role grants",
+    "preconditions": "Procurement request submitted",
+    "action_or_input": "Check rspc.procurement.approve in ROLE_GRANTS['dean_rspc']",
+    "expected_result": "Permission is present",
+    "test_type": "rule_rbac"
+  },
+  {
+    "test_id": "TEST-BR-022",
+    "source_id": "BR-RSPC-037 progress-reporting-schedule",
+    "purpose": "Verify progress reporting model tracks period start and end dates",
+    "preconditions": "Progress report filing",
+    "action_or_input": "Inspect ProgressReport period_start and period_end fields",
+    "expected_result": "Fields exist as DateFields",
+    "test_type": "rule_model"
+  },
+  {
+    "test_id": "TEST-BR-023",
+    "source_id": "BR-RSPC-038 progress-report-access",
+    "purpose": "Verify authorized access to historical progress reports",
+    "preconditions": "Progress report inquiry",
+    "action_or_input": "Check report submission permission and ordering",
+    "expected_result": "Ordering is by -created_at and faculty has report.submit",
+    "test_type": "rule_rbac"
+  },
+  {
+    "test_id": "TEST-BR-024",
+    "source_id": "BR-RSPC-039 utilization-report-access",
+    "purpose": "Verify progress report captures funds utilized for compliance",
+    "preconditions": "Utilization reporting",
+    "action_or_input": "Inspect ProgressReport funds_utilized field",
+    "expected_result": "funds_utilized is DecimalField with max_digits=14",
+    "test_type": "rule_model"
+  },
+  {
+    "test_id": "TEST-BR-025",
+    "source_id": "BR-RSPC-043 closure-archival-constraints",
+    "purpose": "Verify project closure rejects archival when financial settlement is pending",
+    "preconditions": "Unsettled financial liabilities",
+    "action_or_input": "Call validate_project_closure(financial_settled=False, has_asset_declaration=True)",
+    "expected_result": "Rejection error returned",
+    "test_type": "rule_negative"
+  },
+  {
+    "test_id": "TEST-BR-026",
+    "source_id": "BR-RSPC-045 integration-explicit-only",
+    "purpose": "Verify RSPC module does not declare undeclared external foreign keys (ADR-0013)",
+    "preconditions": "Model architecture inspection",
+    "action_or_input": "Inspect foreign keys on all RSPC models",
+    "expected_result": "No cross-module ForeignKey fields exist on any RSPC model",
+    "test_type": "rule_architecture"
+  },
+  {
+    "test_id": "TEST-BR-027",
+    "source_id": "BR-RSPC-048 rbac-enforcement",
+    "purpose": "Verify role-based access control maps all operations to permissions",
+    "preconditions": "RBAC mapping table",
+    "action_or_input": "Inspect OPERATION_PERMISSIONS size and naming",
+    "expected_result": "Contains 22 distinct operation mappings",
+    "test_type": "rule_rbac"
+  },
+  {
+    "test_id": "TEST-BR-028",
+    "source_id": "BR-RSPC-049 actions-restricted-by-role",
+    "purpose": "Verify faculty cannot approve proposals or financial requests",
+    "preconditions": "Faculty role permissions",
+    "action_or_input": "Check if approval permissions exist in faculty ROLE_GRANTS",
+    "expected_result": "Neither proposal.approve_dean nor financial.approve_dean is in faculty grants",
+    "test_type": "rule_rbac"
+  },
+  {
+    "test_id": "TEST-BR-029",
+    "source_id": "BR-RSPC-050 audit-compliance-logging",
+    "purpose": "Verify structured audit trail table exists and stores required fields",
+    "preconditions": "Audit table metadata",
+    "action_or_input": "Inspect RSPCAuditTrail._meta.db_table",
+    "expected_result": "db_table is rspc_audit_trail",
+    "test_type": "rule_model"
+  },
+  {
+    "test_id": "TEST-BR-030",
+    "source_id": "BR-RSPC-058 boundary-no-payroll",
+    "purpose": "Verify staff model does not perform payroll execution",
+    "preconditions": "ProjectStaffAppointment model inspection",
+    "action_or_input": "Check for absence of salary payment fields",
+    "expected_result": "No salary disbursement execution fields present",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-BR-031",
+    "source_id": "BR-RSPC-059 boundary-no-bank-payment",
+    "purpose": "Verify financial request does not process banking transactions",
+    "preconditions": "FinancialRequest model inspection",
+    "action_or_input": "Check for absence of payment transaction IDs",
+    "expected_result": "No bank execution fields present",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-BR-032",
+    "source_id": "BR-RSPC-060 boundary-no-inventory-execution",
+    "purpose": "Verify procurement request does not manage physical warehouse bins",
+    "preconditions": "ProcurementRequest model inspection",
+    "action_or_input": "Check for absence of warehouse bin fields",
+    "expected_result": "No physical warehouse execution fields present",
+    "test_type": "rule_boundary"
+  },
+  {
+    "test_id": "TEST-BR-033",
+    "source_id": "BR-RSPC-065 lifecycle-permitted-updates",
+    "purpose": "Verify project updates are restricted to valid active lifecycle states",
+    "preconditions": "Project is in ARCHIVED status",
+    "action_or_input": "Check domain rules for can_update_project guard",
+    "expected_result": "Domain rules must provide can_update_project guard enforcing lifecycle update constraints",
+    "test_type": "rule_lifecycle"
+  }
+]
