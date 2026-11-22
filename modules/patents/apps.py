@@ -1,0 +1,7 @@
+from django.apps import AppConfig
+
+
+class PatentsConfig(AppConfig):
+    name = "modules.patents"
+    label = "patents"
+    verbose_name = "Patents"

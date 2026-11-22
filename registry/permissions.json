@@ -34,6 +34,298 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "patents": {
+      "grants": {
+        "Director": [
+          "patents.application.decide_appeal",
+          "patents.application.review",
+          "patents.application.view",
+          "patents.budget.approve",
+          "patents.budget.view",
+          "patents.maintenance.decide",
+          "patents.report.view",
+          "patents.tech_transfer.review"
+        ],
+        "attorney": [
+          "patents.application.view",
+          "patents.assessment.perform",
+          "patents.attorney.respond_assignment",
+          "patents.filing.record",
+          "patents.maintenance.track",
+          "patents.office_action.record",
+          "patents.office_action.respond",
+          "patents.prior_art.search"
+        ],
+        "faculty": [
+          "patents.application.appeal",
+          "patents.application.create",
+          "patents.application.update",
+          "patents.application.view_self",
+          "patents.application.withdraw",
+          "patents.office_action.approve",
+          "patents.prior_art.search",
+          "patents.tech_transfer.create"
+        ],
+        "pcc_admin": [
+          "patents.application.assign_director",
+          "patents.application.view",
+          "patents.attorney.assign",
+          "patents.audit.view",
+          "patents.budget.view",
+          "patents.panel.manage",
+          "patents.report.view"
+        ],
+        "staff": [
+          "patents.application.appeal",
+          "patents.application.create",
+          "patents.application.update",
+          "patents.application.view_self",
+          "patents.application.withdraw",
+          "patents.office_action.approve",
+          "patents.prior_art.search",
+          "patents.tech_transfer.create"
+        ],
+        "student": [
+          "patents.application.appeal",
+          "patents.application.create",
+          "patents.application.update",
+          "patents.application.view_self",
+          "patents.application.withdraw",
+          "patents.office_action.approve",
+          "patents.prior_art.search",
+          "patents.tech_transfer.create"
+        ]
+      },
+      "module_grants": [
+        "Director",
+        "attorney",
+        "faculty",
+        "pcc_admin",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/patents",
+        "icon": "Certificate",
+        "items": [
+          {
+            "code": "patents.mine",
+            "icon": "Files",
+            "label": "My Applications",
+            "required_permission": "patents.application.view_self",
+            "sort_order": 10,
+            "to": "/patents/mine"
+          },
+          {
+            "code": "patents.new",
+            "icon": "FilePlus",
+            "label": "New Application",
+            "required_permission": "patents.application.create",
+            "sort_order": 20,
+            "to": "/patents/new"
+          },
+          {
+            "code": "patents.prior_art",
+            "icon": "MagnifyingGlass",
+            "label": "Prior Art Search",
+            "required_permission": "patents.prior_art.search",
+            "sort_order": 30,
+            "to": "/patents/prior-art"
+          },
+          {
+            "code": "patents.director_reviews",
+            "icon": "ClipboardText",
+            "label": "Review Queue",
+            "required_permission": "patents.application.review",
+            "sort_order": 40,
+            "to": "/patents/reviews"
+          },
+          {
+            "code": "patents.director_budgets",
+            "icon": "CurrencyInr",
+            "label": "Budget Approvals",
+            "required_permission": "patents.budget.approve",
+            "sort_order": 50,
+            "to": "/patents/budget-approvals"
+          },
+          {
+            "code": "patents.director_renewals",
+            "icon": "ClockCounterClockwise",
+            "label": "Maintenance Renewals",
+            "required_permission": "patents.maintenance.decide",
+            "sort_order": 55,
+            "to": "/patents/maintenance-decisions"
+          },
+          {
+            "code": "patents.attorney_assignments",
+            "icon": "Briefcase",
+            "label": "Attorney Docket",
+            "required_permission": "patents.assessment.perform",
+            "sort_order": 60,
+            "to": "/patents/docket"
+          },
+          {
+            "code": "patents.office_actions",
+            "icon": "WarningCircle",
+            "label": "Office Actions",
+            "required_permission": "patents.office_action.respond",
+            "sort_order": 70,
+            "to": "/patents/office-actions"
+          },
+          {
+            "code": "patents.admin_queue",
+            "icon": "Folders",
+            "label": "All Applications",
+            "required_permission": "patents.application.view",
+            "sort_order": 80,
+            "to": "/patents/all"
+          },
+          {
+            "code": "patents.attorney_panel",
+            "icon": "Scales",
+            "label": "Attorney Panel",
+            "required_permission": "patents.panel.manage",
+            "sort_order": 90,
+            "to": "/patents/attorney-panel"
+          },
+          {
+            "code": "patents.reports",
+            "icon": "ChartBar",
+            "label": "Reports & Analytics",
+            "required_permission": "patents.report.view",
+            "sort_order": 100,
+            "to": "/patents/reports"
+          }
+        ],
+        "label": "Patent Management",
+        "nav_section": "Research",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "patents.application.create",
+          "label": "Submit a new patent application"
+        },
+        {
+          "code": "patents.application.view_self",
+          "label": "View one's own patent applications and reports"
+        },
+        {
+          "code": "patents.application.view",
+          "label": "View patent applications within authorized scope"
+        },
+        {
+          "code": "patents.application.update",
+          "label": "Revise and update an application"
+        },
+        {
+          "code": "patents.application.withdraw",
+          "label": "Withdraw an application before filing"
+        },
+        {
+          "code": "patents.application.assign_director",
+          "label": "Assign submitted application to Director"
+        },
+        {
+          "code": "patents.application.review",
+          "label": "Review technical merit and decide application"
+        },
+        {
+          "code": "patents.application.appeal",
+          "label": "File an appeal against a rejection"
+        },
+        {
+          "code": "patents.application.decide_appeal",
+          "label": "Adjudicate an appeal"
+        },
+        {
+          "code": "patents.attorney.assign",
+          "label": "Assign attorney to approved application"
+        },
+        {
+          "code": "patents.attorney.respond_assignment",
+          "label": "Accept or decline attorney assignment"
+        },
+        {
+          "code": "patents.assessment.perform",
+          "label": "Conduct patentability and prior-art assessment"
+        },
+        {
+          "code": "patents.filing.record",
+          "label": "Record external patent office filing details"
+        },
+        {
+          "code": "patents.office_action.record",
+          "label": "Record external office actions"
+        },
+        {
+          "code": "patents.office_action.respond",
+          "label": "Prepare and submit office action responses"
+        },
+        {
+          "code": "patents.office_action.approve",
+          "label": "Review and approve office action response"
+        },
+        {
+          "code": "patents.budget.approve",
+          "label": "Review and approve patent filing and prosecution budgets"
+        },
+        {
+          "code": "patents.budget.view",
+          "label": "View patent budget and expenditure records"
+        },
+        {
+          "code": "patents.maintenance.track",
+          "label": "Track post-grant maintenance schedules and fees"
+        },
+        {
+          "code": "patents.maintenance.decide",
+          "label": "Make patent maintenance renewal decisions"
+        },
+        {
+          "code": "patents.tech_transfer.create",
+          "label": "Submit technology transfer or licensing request"
+        },
+        {
+          "code": "patents.tech_transfer.review",
+          "label": "Review technology transfer agreements"
+        },
+        {
+          "code": "patents.prior_art.search",
+          "label": "Search and attach prior-art references"
+        },
+        {
+          "code": "patents.panel.manage",
+          "label": "Manage attorney panel roster and expertise mappings"
+        },
+        {
+          "code": "patents.audit.view",
+          "label": "View audit trail and compliance logs"
+        },
+        {
+          "code": "patents.report.view",
+          "label": "Generate and view reports and analytics"
+        },
+        {
+          "code": "patents.application.expire",
+          "label": "System revision expiration"
+        },
+        {
+          "code": "patents.maintenance.sweep",
+          "label": "System maintenance deadline sweep"
+        }
+      ],
+      "scope_permissions": [
+        "patents.application.review",
+        "patents.application.view",
+        "patents.report.view"
+      ],
+      "system_permissions": [
+        "patents.application.expire",
+        "patents.maintenance.sweep"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
