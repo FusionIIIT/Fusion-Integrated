@@ -63,6 +63,652 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/lms/announcements/:
+    get:
+      operationId: lms_announcement_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseAnnouncement'
+          description: ''
+    post:
+      operationId: lms_announcement_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseAnnouncement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseAnnouncement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseAnnouncement'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseAnnouncement'
+          description: ''
+  /api/v1/lms/announcements/{announcement_id}/:
+    patch:
+      operationId: lms_announcement_update
+      parameters:
+      - in: path
+        name: announcement_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseAnnouncement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseAnnouncement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseAnnouncement'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseAnnouncement'
+          description: ''
+    delete:
+      operationId: lms_announcement_delete
+      parameters:
+      - in: path
+        name: announcement_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/lms/assignments/:
+    get:
+      operationId: lms_assignment_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Assignment'
+          description: ''
+    post:
+      operationId: lms_assignment_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+          description: ''
+  /api/v1/lms/assignments/{assignment_id}/:
+    get:
+      operationId: lms_assignment_retrieve
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+          description: ''
+    patch:
+      operationId: lms_assignment_update
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAssignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAssignment'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+          description: ''
+    delete:
+      operationId: lms_assignment_delete
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/lms/assignments/{assignment_id}/grades/:
+    get:
+      operationId: lms_assignment_grades_list
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubmissionGrade'
+          description: ''
+  /api/v1/lms/assignments/{assignment_id}/publish/:
+    post:
+      operationId: lms_assignment_publish
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+          description: ''
+  /api/v1/lms/assignments/{assignment_id}/publish-grades/:
+    post:
+      operationId: lms_grade_publish
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishGradesRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PublishGradesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PublishGradesRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishGradesResponse'
+          description: ''
+  /api/v1/lms/assignments/{assignment_id}/submissions/:
+    get:
+      operationId: lms_submission_list
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssignmentSubmission'
+          description: ''
+    post:
+      operationId: lms_submission_create
+      parameters:
+      - in: path
+        name: assignment_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignmentSubmission'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssignmentSubmission'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssignmentSubmission'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignmentSubmission'
+          description: ''
+  /api/v1/lms/courses/:
+    get:
+      operationId: lms_workspace_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseWorkspace'
+          description: ''
+  /api/v1/lms/courses/{course_id}/:
+    get:
+      operationId: lms_workspace_detail
+      parameters:
+      - in: path
+        name: course_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseWorkspace'
+          description: ''
+    patch:
+      operationId: lms_workspace_update
+      parameters:
+      - in: path
+        name: course_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseWorkspaceUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseWorkspaceUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseWorkspaceUpdate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseWorkspace'
+          description: ''
+  /api/v1/lms/materials/:
+    get:
+      operationId: lms_material_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseMaterial'
+          description: ''
+    post:
+      operationId: lms_material_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseMaterial'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseMaterial'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseMaterial'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseMaterial'
+          description: ''
+  /api/v1/lms/materials/{material_id}/:
+    get:
+      operationId: lms_material_retrieve
+      parameters:
+      - in: path
+        name: material_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseMaterial'
+          description: ''
+    patch:
+      operationId: lms_material_update
+      parameters:
+      - in: path
+        name: material_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseMaterial'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseMaterial'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseMaterial'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseMaterial'
+          description: ''
+    delete:
+      operationId: lms_material_delete
+      parameters:
+      - in: path
+        name: material_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/lms/submissions/{submission_id}/:
+    get:
+      operationId: lms_submission_retrieve
+      parameters:
+      - in: path
+        name: submission_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignmentSubmission'
+          description: ''
+  /api/v1/lms/submissions/{submission_id}/grade/:
+    get:
+      operationId: lms_grade_retrieve
+      parameters:
+      - in: path
+        name: submission_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionGrade'
+          description: ''
+    post:
+      operationId: lms_grade_create
+      parameters:
+      - in: path
+        name: submission_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmissionGrade'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmissionGrade'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmissionGrade'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionGrade'
+          description: ''
+    patch:
+      operationId: lms_grade_update
+      parameters:
+      - in: path
+        name: submission_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSubmissionGrade'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSubmissionGrade'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSubmissionGrade'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionGrade'
+          description: ''
+  /api/v1/lms/submissions/{submission_id}/grade-audit/:
+    get:
+      operationId: lms_grade_audit_history
+      parameters:
+      - in: path
+        name: submission_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GradeChangeAudit'
+          description: ''
+  /api/v1/lms/submissions/{submission_id}/grade-detail/:
+    get:
+      operationId: lms_submission_grade_detail
+      parameters:
+      - in: path
+        name: submission_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionGrade'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1981,6 +2627,125 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    Assignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        title:
+          type: string
+          maxLength: 255
+        instructions:
+          type: string
+        points_possible:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        submission_type:
+          $ref: '#/components/schemas/SubmissionTypeEnum'
+        due_date:
+          type: string
+          format: date-time
+        release_date:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AssignmentStatusEnum'
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - course_id
+      - created_at
+      - created_by
+      - due_date
+      - id
+      - instructions
+      - points_possible
+      - status
+      - submission_type
+      - title
+      - updated_at
+    AssignmentStatusEnum:
+      enum:
+      - DRAFT
+      - SCHEDULED
+      - PUBLISHED
+      - CLOSED
+      - ARCHIVED
+      type: string
+      description: |-
+        * `DRAFT` - DRAFT
+        * `SCHEDULED` - SCHEDULED
+        * `PUBLISHED` - PUBLISHED
+        * `CLOSED` - CLOSED
+        * `ARCHIVED` - ARCHIVED
+    AssignmentSubmission:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        assignment:
+          type: integer
+        student_id:
+          type: integer
+          readOnly: true
+        submission_type:
+          $ref: '#/components/schemas/SubmissionTypeEnum'
+        content_text:
+          type: string
+        content_link:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        file_attachment:
+          type: string
+          format: uri
+          nullable: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        attempt_number:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AssignmentSubmissionStatusEnum'
+          readOnly: true
+      required:
+      - assignment
+      - attempt_number
+      - id
+      - status
+      - student_id
+      - submission_type
+      - submitted_at
+    AssignmentSubmissionStatusEnum:
+      enum:
+      - SUBMITTED
+      type: string
+      description: '* `SUBMITTED` - SUBMITTED'
     AudienceEnum:
       enum:
       - students
@@ -2315,6 +3080,145 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CourseAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        title:
+          type: string
+          maxLength: 255
+        content:
+          type: string
+        author_id:
+          type: integer
+          readOnly: true
+        author_role:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_id
+      - author_role
+      - content
+      - course_id
+      - created_at
+      - id
+      - title
+    CourseMaterial:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        material_type:
+          $ref: '#/components/schemas/MaterialTypeEnum'
+        content_text:
+          type: string
+        external_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        file_attachment:
+          type: string
+          format: uri
+          nullable: true
+        section_name:
+          type: string
+          maxLength: 128
+        sort_order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CourseMaterialStatusEnum'
+          readOnly: true
+        release_date:
+          type: string
+          format: date-time
+          nullable: true
+        uploaded_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - course_id
+      - created_at
+      - id
+      - material_type
+      - status
+      - title
+      - uploaded_by
+    CourseMaterialStatusEnum:
+      enum:
+      - DRAFT
+      - SCHEDULED
+      - PUBLISHED
+      - ARCHIVED
+      type: string
+      description: |-
+        * `DRAFT` - DRAFT
+        * `SCHEDULED` - SCHEDULED
+        * `PUBLISHED` - PUBLISHED
+        * `ARCHIVED` - ARCHIVED
+    CourseWorkspace:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course_id:
+          type: integer
+          readOnly: true
+        course_code:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        syllabus:
+          type: string
+        schedule_info:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - course_code
+      - course_id
+      - created_at
+      - id
+      - title
+      - updated_at
     Detail:
       type: object
       properties:
@@ -2423,6 +3327,55 @@ components:
       - fee_reference
       - season
       - user_id
+    GradeChangeAudit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        grade:
+          type: integer
+          readOnly: true
+        submission_id:
+          type: integer
+          readOnly: true
+        old_points:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        new_points:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        old_feedback:
+          type: string
+          readOnly: true
+        new_feedback:
+          type: string
+          readOnly: true
+        changed_by:
+          type: integer
+          readOnly: true
+        changed_at:
+          type: string
+          format: date-time
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+      required:
+      - changed_at
+      - changed_by
+      - grade
+      - id
+      - new_feedback
+      - new_points
+      - old_feedback
+      - old_points
+      - reason
+      - submission_id
     IncidentRecorded:
       type: object
       properties:
@@ -2663,6 +3616,16 @@ components:
       required:
       - password
       - username
+    MaterialTypeEnum:
+      enum:
+      - FILE
+      - LINK
+      - NOTE
+      type: string
+      description: |-
+        * `FILE` - FILE
+        * `LINK` - LINK
+        * `NOTE` - NOTE
     ModeEnum:
       enum:
       - online
@@ -3000,6 +3963,135 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        title:
+          type: string
+          maxLength: 255
+        instructions:
+          type: string
+        points_possible:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        submission_type:
+          $ref: '#/components/schemas/SubmissionTypeEnum'
+        due_date:
+          type: string
+          format: date-time
+        release_date:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/AssignmentStatusEnum'
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCourseAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        title:
+          type: string
+          maxLength: 255
+        content:
+          type: string
+        author_id:
+          type: integer
+          readOnly: true
+        author_role:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCourseMaterial:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        material_type:
+          $ref: '#/components/schemas/MaterialTypeEnum'
+        content_text:
+          type: string
+        external_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        file_attachment:
+          type: string
+          format: uri
+          nullable: true
+        section_name:
+          type: string
+          maxLength: 128
+        sort_order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CourseMaterialStatusEnum'
+          readOnly: true
+        release_date:
+          type: string
+          format: date-time
+          nullable: true
+        uploaded_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCourseWorkspaceUpdate:
+      type: object
+      properties:
+        syllabus:
+          type: string
+          default: ''
+        schedule_info:
+          type: string
+          default: ''
     PatchedJobPosting:
       type: object
       properties:
@@ -3085,6 +4177,41 @@ components:
       properties:
         active_role:
           type: string
+    PatchedSubmissionGrade:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        submission:
+          type: integer
+          readOnly: true
+        points_awarded:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        feedback_text:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SubmissionGradeStatusEnum'
+          readOnly: true
+        graded_by:
+          type: integer
+          readOnly: true
+        graded_at:
+          type: string
+          format: date-time
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        published_by:
+          type: integer
+          readOnly: true
+          nullable: true
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3201,6 +4328,20 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    PublishGradesRequest:
+      type: object
+      properties:
+        submission_ids:
+          type: array
+          items:
+            type: integer
+    PublishGradesResponse:
+      type: object
+      properties:
+        published_count:
+          type: integer
+      required:
+      - published_count
     Recommendation:
       type: object
       description: |-
@@ -3691,6 +4832,68 @@ components:
       required:
       - available
       - season
+    SubmissionGrade:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        submission:
+          type: integer
+          readOnly: true
+        points_awarded:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        feedback_text:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SubmissionGradeStatusEnum'
+          readOnly: true
+        graded_by:
+          type: integer
+          readOnly: true
+        graded_at:
+          type: string
+          format: date-time
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        published_by:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - graded_at
+      - graded_by
+      - id
+      - points_awarded
+      - published_at
+      - published_by
+      - status
+      - submission
+    SubmissionGradeStatusEnum:
+      enum:
+      - DRAFT
+      - PUBLISHED
+      type: string
+      description: |-
+        * `DRAFT` - DRAFT
+        * `PUBLISHED` - PUBLISHED
+    SubmissionTypeEnum:
+      enum:
+      - FILE
+      - TEXT
+      - LINK
+      type: string
+      description: |-
+        * `FILE` - FILE
+        * `TEXT` - TEXT
+        * `LINK` - LINK
     SubmitOfferLetter:
       type: object
       properties:
