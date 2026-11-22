@@ -1,0 +1,31 @@
+name: One-time IAA formatting pass
+on:
+  push:
+    branches: [iaa-implementation-v2]
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: iaa-implementation-v2
+      - uses: astral-sh/setup-uv@v3
+      - run: uv venv --python 3.12 .venv
+      - run: uv pip install --python .venv/bin/python -e ".[dev]"
+      - name: Apply Ruff safe fixes and formatter
+        run: |
+          .venv/bin/ruff check --fix config/celery.py modules/iaa
+          .venv/bin/ruff format config/celery.py modules/iaa
+      - name: Commit formatter output
+        run: |
+          if git diff --quiet; then
+            echo "No formatter changes needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config/celery.py modules/iaa
+          git commit -m "Format IAA module for repository lint"
+          git push origin iaa-implementation-v2
