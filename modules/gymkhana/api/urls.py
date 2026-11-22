@@ -1,0 +1,38 @@
+from django.urls import path
+
+from modules.gymkhana.api import views
+
+urlpatterns = [
+    path("venues", views.VenueListView.as_view(), name="gymkhana-venues"),
+    path("people", views.PeopleSearchView.as_view(), name="gymkhana-people"),
+    path("clubs", views.ClubListCreateView.as_view(), name="gymkhana-clubs"),
+    path("clubs/<int:club_id>/approve", views.ClubApprovalView.as_view(),
+         name="gymkhana-club-approve"),
+    path("clubs/<int:club_id>/leadership", views.LeadershipView.as_view(),
+         name="gymkhana-club-leadership"),
+    path("clubs/<int:club_id>/sessions", views.SessionListCreateView.as_view(),
+         name="gymkhana-sessions"),
+    path("clubs/<int:club_id>/events", views.EventListCreateView.as_view(),
+         name="gymkhana-events"),
+    path("clubs/<int:club_id>/memberships",
+         views.MembershipApplicationListCreateView.as_view(),
+         name="gymkhana-memberships"),
+    path("memberships/mine", views.MembershipMineView.as_view(),
+         name="gymkhana-memberships-mine"),
+    path("clubs/<int:club_id>/memberships/<int:application_id>/approve",
+         views.MembershipApprovalView.as_view(),
+         name="gymkhana-membership-approve"),
+    path("polls", views.PollListCreateView.as_view(), name="gymkhana-polls"),
+    path("polls/<int:poll_id>/vote", views.PollVoteView.as_view(),
+         name="gymkhana-poll-vote"),
+    path("clubs/<int:club_id>/budgets",
+         views.BudgetRequestListCreateView.as_view(),
+         name="gymkhana-budgets"),
+    path("clubs/<int:club_id>/reports",
+         views.EventReportListCreateView.as_view(),
+         name="gymkhana-reports"),
+    path("reports/assigned", views.AssignedReportsView.as_view(),
+         name="gymkhana-assigned-reports"),
+    path("files/<str:kind>/<int:object_id>", views.AttachmentView.as_view(),
+         name="gymkhana-file"),
+]

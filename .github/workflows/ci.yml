@@ -57,6 +57,8 @@ jobs:
           DJANGO_ALLOWED_HOSTS: ci.invalid
           IAM_SERVICE_TOKEN: ci
           PLACEMENT_UPLOAD_ROOT: /tmp/ci-uploads
+          GYMKHANA_UPLOAD_ROOT: /tmp/ci-gymkhana-uploads
+          GYMKHANA_VENUES: Auditorium
           REDIS_CACHE_URL: redis://127.0.0.1:6379/1
           REDIS_BROKER_URL: redis://127.0.0.1:6380/0
         run: .venv/bin/python manage.py check --deploy --fail-level WARNING
