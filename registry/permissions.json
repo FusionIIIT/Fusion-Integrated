@@ -34,6 +34,108 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "admin": [
+          "elm.leave.apply",
+          "elm.leave.approve",
+          "elm.leave.substitute",
+          "elm.leave.view_self"
+        ],
+        "faculty": [
+          "elm.leave.apply",
+          "elm.leave.substitute",
+          "elm.leave.view_self"
+        ],
+        "staff": [
+          "elm.leave.apply",
+          "elm.leave.substitute",
+          "elm.leave.view_self"
+        ],
+        "unit_head": [
+          "elm.leave.apply",
+          "elm.leave.approve",
+          "elm.leave.substitute",
+          "elm.leave.view_self"
+        ]
+      },
+      "module_grants": [
+        "admin",
+        "faculty",
+        "staff",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "CalendarBlank",
+        "items": [
+          {
+            "code": "elm.dashboard",
+            "icon": "SquaresFour",
+            "label": "Leave Dashboard",
+            "required_permission": "elm.leave.view_self",
+            "sort_order": 10,
+            "to": "/elm"
+          },
+          {
+            "code": "elm.apply",
+            "icon": "CalendarPlus",
+            "label": "Apply Leave",
+            "required_permission": "elm.leave.apply",
+            "sort_order": 20,
+            "to": "/elm/apply"
+          },
+          {
+            "code": "elm.requests",
+            "icon": "ListBullets",
+            "label": "My Requests",
+            "required_permission": "elm.leave.view_self",
+            "sort_order": 30,
+            "to": "/elm/requests"
+          },
+          {
+            "code": "elm.substitute",
+            "icon": "UserSwitch",
+            "label": "Substitute Requests",
+            "required_permission": "elm.leave.substitute",
+            "sort_order": 40,
+            "to": "/elm/substitute"
+          },
+          {
+            "code": "elm.approvals",
+            "icon": "CheckSquare",
+            "label": "Sanctions & Approvals",
+            "required_permission": "elm.leave.approve",
+            "sort_order": 50,
+            "to": "/elm/approvals"
+          }
+        ],
+        "label": "Leave Management",
+        "nav_section": "Administration",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "elm.leave.view_self",
+          "label": "View own leave balances and requests"
+        },
+        {
+          "code": "elm.leave.apply",
+          "label": "Apply for leave and nominate substitute"
+        },
+        {
+          "code": "elm.leave.substitute",
+          "label": "Accept or decline substitute requests"
+        },
+        {
+          "code": "elm.leave.approve",
+          "label": "Review, recommend, and sanction leaves"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
