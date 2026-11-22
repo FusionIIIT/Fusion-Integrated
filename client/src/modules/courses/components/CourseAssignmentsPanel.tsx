@@ -20,7 +20,9 @@ import {
   TbEdit,
   TbPlus,
   TbTrash,
+  TbUpload,
   TbUser,
+  TbUsers,
 } from "react-icons/tb";
 
 import {
@@ -29,19 +31,27 @@ import {
 } from "../api/hooks";
 import type { CourseAssignment } from "../api/types";
 import { AssignmentModal } from "./AssignmentModal";
+import { FacultySubmissionsModal } from "./FacultySubmissionsModal";
+import { StudentSubmissionModal } from "./StudentSubmissionModal";
 
 interface CourseAssignmentsPanelProps {
   workspaceId: number;
   canManage: boolean;
+  viewerRole?: string | null;
 }
 
 export function CourseAssignmentsPanel({
   workspaceId,
   canManage,
+  viewerRole,
 }: CourseAssignmentsPanelProps) {
   const { data, loading, error, refetch } = useCourseAssignments(workspaceId);
   const [modalOpened, setModalOpened] = useState(false);
   const [selectedAssignment, setSelectedAssignment] =
+    useState<CourseAssignment | null>(null);
+  const [studentModalOpened, setStudentModalOpened] = useState(false);
+  const [facultyModalOpened, setFacultyModalOpened] = useState(false);
+  const [activeAssignment, setActiveAssignment] =
     useState<CourseAssignment | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -201,27 +211,58 @@ export function CourseAssignmentsPanel({
                     </Group>
                   </div>
 
-                  {canManage && (
-                    <Group gap="xs">
+                  <Group gap="xs" wrap="wrap">
+                    {canManage && (
+                      <>
+                        <Button
+                          variant="subtle"
+                          size="xs"
+                          leftSection={<TbEdit size={14} />}
+                          onClick={() => handleOpenEdit(asgn)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="subtle"
+                          color="red"
+                          size="xs"
+                          leftSection={<TbTrash size={14} />}
+                          onClick={() => handleDelete(asgn.id)}
+                        >
+                          Delete
+                        </Button>
+                      </>
+                    )}
+
+                    {(canManage || viewerRole === "ta") && (
                       <Button
-                        variant="subtle"
+                        variant="light"
                         size="xs"
-                        leftSection={<TbEdit size={14} />}
-                        onClick={() => handleOpenEdit(asgn)}
+                        leftSection={<TbUsers size={14} />}
+                        onClick={() => {
+                          setActiveAssignment(asgn);
+                          setFacultyModalOpened(true);
+                        }}
                       >
-                        Edit
+                        Submissions
                       </Button>
+                    )}
+
+                    {(viewerRole === "student" || (!canManage && viewerRole !== "observer" && viewerRole !== "ta")) && (
                       <Button
-                        variant="subtle"
-                        color="red"
+                        variant="filled"
+                        color="indigo"
                         size="xs"
-                        leftSection={<TbTrash size={14} />}
-                        onClick={() => handleDelete(asgn.id)}
+                        leftSection={<TbUpload size={14} />}
+                        onClick={() => {
+                          setActiveAssignment(asgn);
+                          setStudentModalOpened(true);
+                        }}
                       >
-                        Delete
+                        Submit Work
                       </Button>
-                    </Group>
-                  )}
+                    )}
+                  </Group>
                 </Group>
 
                 {asgn.description && (
@@ -263,6 +304,22 @@ export function CourseAssignmentsPanel({
         workspaceId={workspaceId}
         assignment={selectedAssignment}
         onSuccess={refetch}
+      />
+
+      <StudentSubmissionModal
+        opened={studentModalOpened}
+        onClose={() => setStudentModalOpened(false)}
+        workspaceId={workspaceId}
+        assignment={activeAssignment}
+        onSuccess={refetch}
+      />
+
+      <FacultySubmissionsModal
+        opened={facultyModalOpened}
+        onClose={() => setFacultyModalOpened(false)}
+        workspaceId={workspaceId}
+        assignment={activeAssignment}
+        viewerRole={viewerRole}
       />
     </Stack>
   );

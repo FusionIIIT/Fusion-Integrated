@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from decimal import Decimal
 import logging
 
 from django.db import transaction
@@ -26,6 +27,7 @@ def create_assignment(
     title: str,
     description: str = "",
     instructions: str = "",
+    max_points: Decimal = Decimal("100.00"),
     due_at: datetime | None = None,
     is_published: bool = False,
 ) -> CourseAssignment:
@@ -38,6 +40,7 @@ def create_assignment(
         title=title,
         description=description,
         instructions=instructions,
+        max_points=max_points,
         due_at=due_at,
         is_published=is_published,
     )
@@ -67,6 +70,7 @@ def create_assignment(
             title=title.strip(),
             description=description.strip(),
             instructions=instructions.strip(),
+            max_points=max_points if max_points is not None else Decimal("100.00"),
             due_at=due_at,
             is_published=is_published,
             published_at=published_at,
@@ -91,6 +95,7 @@ def update_assignment(
     title: str | None = None,
     description: str | None = None,
     instructions: str | None = None,
+    max_points: Decimal | None = None,
     due_at: datetime | None = None,
     clear_due_at: bool = False,
     is_published: bool | None = None,
@@ -100,6 +105,7 @@ def update_assignment(
         title=title,
         description=description,
         instructions=instructions,
+        max_points=max_points,
         due_at=due_at,
         clear_due_at=clear_due_at,
         is_published=is_published,
@@ -136,6 +142,8 @@ def update_assignment(
             assignment.description = description.strip()
         if instructions is not None:
             assignment.instructions = instructions.strip()
+        if max_points is not None:
+            assignment.max_points = max_points
 
         if clear_due_at:
             assignment.due_at = None

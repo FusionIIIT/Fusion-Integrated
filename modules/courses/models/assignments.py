@@ -19,6 +19,11 @@ class CourseAssignment(TimeStampedModel):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     instructions = models.TextField(blank=True)
+    max_points = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        default=100.00,
+    )
     due_at = models.DateTimeField(null=True, blank=True, db_index=True)
     is_published = models.BooleanField(default=False, db_index=True)
     published_at = models.DateTimeField(null=True, blank=True, db_index=True)

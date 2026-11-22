@@ -4,7 +4,16 @@ from __future__ import annotations
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_field
 
-from modules.courses.models import CourseAnnouncement, CourseAssignment, CourseMaterial, CourseMaterialSection, CourseWorkspace
+from modules.courses.models import (
+    CourseAnnouncement,
+    CourseAssignment,
+    CourseGrade,
+    CourseGradeAudit,
+    CourseMaterial,
+    CourseMaterialSection,
+    CourseSubmission,
+    CourseWorkspace,
+)
 from modules.courses.selectors import scoping
 from modules.directory.contracts import get_users
 
@@ -242,6 +251,7 @@ class CourseAssignmentSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "instructions",
+            "max_points",
             "due_at",
             "has_passed",
             "is_published",
@@ -265,6 +275,7 @@ class CourseAssignmentCreateSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=200)
     description = serializers.CharField(required=False, allow_blank=True, default="")
     instructions = serializers.CharField(required=False, allow_blank=True, default="")
+    max_points = serializers.DecimalField(max_digits=6, decimal_places=2, required=False, default=100.00)
     due_at = serializers.DateTimeField(required=False, allow_null=True)
     is_published = serializers.BooleanField(required=False, default=False)
 
@@ -273,9 +284,183 @@ class CourseAssignmentUpdateSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=200, required=False)
     description = serializers.CharField(required=False, allow_blank=True)
     instructions = serializers.CharField(required=False, allow_blank=True)
+    max_points = serializers.DecimalField(max_digits=6, decimal_places=2, required=False)
     due_at = serializers.DateTimeField(required=False, allow_null=True)
     clear_due_at = serializers.BooleanField(required=False, default=False)
     is_published = serializers.BooleanField(required=False)
+
+
+class CourseGradeSerializer(serializers.ModelSerializer):
+    grader_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CourseGrade
+        fields = [
+            "id",
+            "submission_id",
+            "assignment_id",
+            "workspace_id",
+            "student_id",
+            "grader_id",
+            "grader_name",
+            "score",
+            "feedback",
+            "status",
+            "graded_at",
+            "released_at",
+            "released_by_id",
+            "created_at",
+            "updated_at",
+        ]
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_grader_name(self, obj) -> str:
+        if not obj.grader_id:
+            return "Grader"
+        users = get_users([obj.grader_id])
+        user = users.get(obj.grader_id)
+        return user.display_name if user else f"User {obj.grader_id}"
+
+
+class CourseSubmissionSerializer(serializers.ModelSerializer):
+    student_name = serializers.SerializerMethodField()
+    student_username = serializers.SerializerMethodField()
+    file_url = serializers.SerializerMethodField()
+    grade = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CourseSubmission
+        fields = [
+            "id",
+            "assignment_id",
+            "workspace_id",
+            "student_id",
+            "student_name",
+            "student_username",
+            "submission_type",
+            "filename",
+            "file_size",
+            "file_url",
+            "link_url",
+            "content",
+            "submitted_at",
+            "is_late",
+            "attempt_number",
+            "status",
+            "grade",
+            "created_at",
+            "updated_at",
+        ]
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_student_name(self, obj) -> str:
+        if not obj.student_id:
+            return "Unknown Student"
+        users = get_users([obj.student_id])
+        user = users.get(obj.student_id)
+        return user.display_name if user else f"Student {obj.student_id}"
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_student_username(self, obj) -> str:
+        if not obj.student_id:
+            return ""
+        users = get_users([obj.student_id])
+        user = users.get(obj.student_id)
+        return user.username if user else ""
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_file_url(self, obj) -> str | None:
+        if obj.submission_type == "file" and obj.file:
+            return (
+                f"/api/v1/courses/workspaces/{obj.workspace_id}/assignments/"
+                f"{obj.assignment_id}/submissions/{obj.id}/download"
+            )
+        return None
+
+    @extend_schema_field(CourseGradeSerializer(allow_null=True))
+    def get_grade(self, obj) -> dict | None:
+        try:
+            grade = obj.grade
+        except (CourseGrade.DoesNotExist, AttributeError):
+            return None
+        if not grade:
+            return None
+
+        viewer_role = self.context.get("viewer_role")
+        request = self.context.get("request")
+        principal = getattr(request, "principal", None) if request else None
+        actor_id = getattr(principal, "user_id", None) if principal else (
+            getattr(request.user, "id", None) if request and hasattr(request, "user") else None
+        )
+
+        if viewer_role == "observer":
+            return None
+        if viewer_role in ("instructor", "ta"):
+            return CourseGradeSerializer(grade, context=self.context).data
+        if viewer_role == "student" and obj.student_id == actor_id and grade.status == "released":
+            return CourseGradeSerializer(grade, context=self.context).data
+        return None
+
+
+class CourseSubmissionCreateSerializer(serializers.Serializer):
+    submission_type = serializers.ChoiceField(
+        choices=["file", "text", "link"],
+        default="file",
+        required=False,
+    )
+    file = serializers.FileField(required=False, allow_null=True)
+    content = serializers.CharField(required=False, allow_blank=True, default="")
+    link_url = serializers.CharField(required=False, allow_blank=True, default="")
+
+    def validate_file(self, value):
+        if value and value.size > 25 * 1024 * 1024:
+            raise serializers.ValidationError("File size exceeds 25 MB limit.")
+        return value
+
+
+class CourseGradeInputSerializer(serializers.Serializer):
+    score = serializers.DecimalField(max_digits=6, decimal_places=2, min_value=0)
+    feedback = serializers.CharField(required=False, allow_blank=True, default="")
+
+
+class CourseGradeReleaseSerializer(serializers.Serializer):
+    submission_id = serializers.IntegerField(required=False, allow_null=True)
+
+
+class CourseGradeReleaseResponseSerializer(serializers.Serializer):
+    released_count = serializers.IntegerField()
+    results = CourseGradeSerializer(many=True)
+
+
+class CourseGradeAuditSerializer(serializers.ModelSerializer):
+    actor_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CourseGradeAudit
+        fields = [
+            "id",
+            "grade_id",
+            "actor_id",
+            "actor_name",
+            "action",
+            "score_before",
+            "score_after",
+            "feedback_before",
+            "feedback_after",
+            "status_before",
+            "status_after",
+            "created_at",
+        ]
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_actor_name(self, obj) -> str:
+        if not obj.actor_id:
+            return "System"
+        users = get_users([obj.actor_id])
+        user = users.get(obj.actor_id)
+        return user.display_name if user else f"User {obj.actor_id}"
+
+
 
 
 

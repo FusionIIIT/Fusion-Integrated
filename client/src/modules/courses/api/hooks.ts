@@ -6,14 +6,22 @@ import type {
   AssignmentsResponse,
   CourseAnnouncement,
   CourseAssignment,
+  CourseGrade,
+  CourseGradeAudit,
   CourseMaterial,
   CourseMaterialSection,
+  CourseSubmission,
   CourseWorkspaceDetail,
   CreateAnnouncementPayload,
   CreateAssignmentPayload,
   CreateMaterialPayload,
   CreateSectionPayload,
+  GradeSubmissionPayload,
   MaterialsResponse,
+  ReleaseGradesPayload,
+  ReleaseGradesResponse,
+  SubmissionsResponse,
+  SubmitAssignmentPayload,
   UpdateAnnouncementPayload,
   UpdateAssignmentPayload,
   UpdateMaterialPayload,
@@ -349,4 +357,182 @@ export async function deleteAssignment(
     `${BASE}/workspaces/${workspaceId}/assignments/${assignmentId}`,
   );
 }
+
+// ---------------------------------------------------------------------------
+// Submissions hooks & services (UC-LMS-010, BR-LMS-012, BR-LMS-014)
+// ---------------------------------------------------------------------------
+
+export function useAssignmentSubmissions(
+  workspaceId: number | null,
+  assignmentId: number | null,
+) {
+  const [data, setData] = useState<SubmissionsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const refetch = useCallback(async () => {
+    if (!workspaceId || !assignmentId) {
+      setData(null);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.get<SubmissionsResponse>(
+        `${BASE}/workspaces/${workspaceId}/assignments/${assignmentId}/submissions`,
+      );
+      setData(res.data);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to load submissions");
+    } finally {
+      setLoading(false);
+    }
+  }, [workspaceId, assignmentId]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  return { data, loading, error, refetch };
+}
+
+export function useMySubmission(
+  workspaceId: number | null,
+  assignmentId: number | null,
+) {
+  const [data, setData] = useState<CourseSubmission | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const refetch = useCallback(async () => {
+    if (!workspaceId || !assignmentId) {
+      setData(null);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.get<CourseSubmission | null>(
+        `${BASE}/workspaces/${workspaceId}/assignments/${assignmentId}/submissions/mine`,
+      );
+      setData(res.data);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to load your submission");
+    } finally {
+      setLoading(false);
+    }
+  }, [workspaceId, assignmentId]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  return { data, loading, error, refetch };
+}
+
+export async function submitAssignment(
+  workspaceId: number,
+  assignmentId: number,
+  payload: SubmitAssignmentPayload,
+): Promise<CourseSubmission> {
+  const formData = new FormData();
+  formData.append("submission_type", payload.submission_type);
+  if (payload.file) {
+    formData.append("file", payload.file);
+  }
+  if (payload.content) {
+    formData.append("content", payload.content);
+  }
+  if (payload.link_url) {
+    formData.append("link_url", payload.link_url);
+  }
+
+  const { data } = await api.post<CourseSubmission>(
+    `${BASE}/workspaces/${workspaceId}/assignments/${assignmentId}/submissions`,
+    formData,
+  );
+  return data;
+}
+
+export async function downloadSubmissionFile(
+  workspaceId: number,
+  assignmentId: number,
+  submissionId: number,
+  filename?: string,
+): Promise<void> {
+  const res = await api.get(
+    `${BASE}/workspaces/${workspaceId}/assignments/${assignmentId}/submissions/${submissionId}/download`,
+    { responseType: "blob" },
+  );
+  const blob = new Blob([res.data]);
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", filename || `submission-${submissionId}`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+}
+
+export async function gradeSubmission(
+  workspaceId: number,
+  assignmentId: number,
+  submissionId: number,
+  payload: GradeSubmissionPayload,
+): Promise<CourseGrade> {
+  const { data } = await api.post<CourseGrade>(
+    `${BASE}/workspaces/${workspaceId}/assignments/${assignmentId}/submissions/${submissionId}/grade`,
+    payload,
+  );
+  return data;
+}
+
+export async function releaseGrades(
+  workspaceId: number,
+  assignmentId: number,
+  payload: ReleaseGradesPayload = {},
+): Promise<ReleaseGradesResponse> {
+  const { data } = await api.post<ReleaseGradesResponse>(
+    `${BASE}/workspaces/${workspaceId}/assignments/${assignmentId}/release-grades`,
+    payload,
+  );
+  return data;
+}
+
+export function useGradeAudit(
+  workspaceId: number | null,
+  assignmentId: number | null,
+  submissionId: number | null,
+) {
+  const [data, setData] = useState<CourseGradeAudit[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const refetch = useCallback(async () => {
+    if (!workspaceId || !assignmentId || !submissionId) {
+      setData(null);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.get<CourseGradeAudit[]>(
+        `${BASE}/workspaces/${workspaceId}/assignments/${assignmentId}/submissions/${submissionId}/grade-audit`,
+      );
+      setData(res.data);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to load grade audit trail");
+    } finally {
+      setLoading(false);
+    }
+  }, [workspaceId, assignmentId, submissionId]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  return { data, loading, error, refetch };
+}
+
 

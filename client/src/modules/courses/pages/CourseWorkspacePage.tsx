@@ -405,6 +405,7 @@ export default function CourseWorkspacePage() {
                 <CourseAssignmentsPanel
                   workspaceId={workspace.id}
                   canManage={workspace.can_manage}
+                  viewerRole={workspace.viewer_role}
                 />
               </Tabs.Panel>
             </Tabs>

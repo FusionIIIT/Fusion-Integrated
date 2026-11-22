@@ -8,6 +8,9 @@ import {
   deleteAnnouncement,
   deleteAssignment,
   deleteMaterial,
+  gradeSubmission,
+  releaseGrades,
+  submitAssignment,
   updateAnnouncement,
   updateAssignment,
   updateWorkspace,
@@ -256,5 +259,100 @@ describe("courses api client", () => {
       clearPayload,
     );
     expect(updated.due_at).toBeNull();
+  });
+
+  it("submitAssignment calls POST with multipart FormData", async () => {
+    const mockSubmission = {
+      id: 1,
+      assignment_id: 10,
+      workspace_id: 1,
+      student_id: 30,
+      student_name: "Student Thirty",
+      student_username: "24BCS227",
+      submission_type: "file" as const,
+      filename: "lab1.pdf",
+      file_size: 1024,
+      file_url: "/api/v1/courses/workspaces/1/assignments/10/submissions/1/download",
+      link_url: "",
+      content: "Submitted work",
+      submitted_at: "2026-11-10T14:00:00Z",
+      is_late: false,
+      attempt_number: 1,
+      status: "submitted" as const,
+      created_at: "2026-11-10T14:00:00Z",
+      updated_at: "2026-11-10T14:00:00Z",
+    };
+
+    const postSpy = vi.spyOn(api, "post").mockResolvedValue({ data: mockSubmission });
+    const dummyFile = new File(["dummy content"], "lab1.pdf", { type: "application/pdf" });
+
+    const payload = {
+      submission_type: "file" as const,
+      file: dummyFile,
+      content: "Submitted work",
+    };
+
+    const res = await submitAssignment(1, 10, payload);
+
+    expect(postSpy).toHaveBeenCalled();
+    const call = postSpy.mock.calls[0];
+    expect(call).toBeDefined();
+    expect(call![0]).toBe("/api/v1/courses/workspaces/1/assignments/10/submissions");
+    expect(call![1]).toBeInstanceOf(FormData);
+    expect((call![1] as FormData).get("submission_type")).toBe("file");
+    expect((call![1] as FormData).get("content")).toBe("Submitted work");
+    expect(res).toEqual(mockSubmission);
+  });
+
+  it("gradeSubmission calls POST with correct endpoint and payload", async () => {
+    const mockGrade = {
+      id: 5,
+      submission_id: 1,
+      assignment_id: 10,
+      workspace_id: 1,
+      student_id: 30,
+      grader_id: 10,
+      grader_name: "Prof. Alan",
+      score: "95.00",
+      feedback: "Great work!",
+      status: "draft" as const,
+      graded_at: "2026-11-10T16:00:00Z",
+      released_at: null,
+      released_by_id: null,
+      created_at: "2026-11-10T16:00:00Z",
+      updated_at: "2026-11-10T16:00:00Z",
+    };
+
+    const postSpy = vi.spyOn(api, "post").mockResolvedValue({ data: mockGrade });
+
+    const payload = {
+      score: 95,
+      feedback: "Great work!",
+    };
+
+    const res = await gradeSubmission(1, 10, 1, payload);
+
+    expect(postSpy).toHaveBeenCalledWith(
+      "/api/v1/courses/workspaces/1/assignments/10/submissions/1/grade",
+      payload,
+    );
+    expect(res).toEqual(mockGrade);
+  });
+
+  it("releaseGrades calls POST with correct endpoint and payload", async () => {
+    const mockResponse = {
+      released_count: 3,
+      results: [],
+    };
+
+    const postSpy = vi.spyOn(api, "post").mockResolvedValue({ data: mockResponse });
+
+    const res = await releaseGrades(1, 10);
+
+    expect(postSpy).toHaveBeenCalledWith(
+      "/api/v1/courses/workspaces/1/assignments/10/release-grades",
+      {},
+    );
+    expect(res).toEqual(mockResponse);
   });
 });

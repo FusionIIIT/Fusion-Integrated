@@ -57,4 +57,39 @@ urlpatterns = [
         views.CourseAssignmentDetailView.as_view(),
         name="workspace-assignment-detail",
     ),
+    path(
+        "workspaces/<int:workspace_id>/assignments/<int:assignment_id>/submissions",
+        views.CourseSubmissionsView.as_view(),
+        name="workspace-assignment-submissions",
+    ),
+    path(
+        "workspaces/<int:workspace_id>/assignments/<int:assignment_id>/submissions/mine",
+        views.CourseMySubmissionView.as_view(),
+        name="workspace-assignment-my-submission",
+    ),
+    path(
+        "workspaces/<int:workspace_id>/assignments/<int:assignment_id>/submissions/<int:pk>",
+        views.CourseSubmissionDetailView.as_view(),
+        name="workspace-assignment-submission-detail",
+    ),
+    path(
+        "workspaces/<int:workspace_id>/assignments/<int:assignment_id>/submissions/<int:pk>/download",
+        views.CourseSubmissionDownloadView.as_view(),
+        name="workspace-assignment-submission-download",
+    ),
+    path(
+        "workspaces/<int:workspace_id>/assignments/<int:assignment_id>/submissions/<int:pk>/grade",
+        views.CourseSubmissionGradeView.as_view(),
+        name="workspace-assignment-submission-grade",
+    ),
+    path(
+        "workspaces/<int:workspace_id>/assignments/<int:assignment_id>/release-grades",
+        views.CourseAssignmentReleaseGradesView.as_view(),
+        name="workspace-assignment-release-grades",
+    ),
+    path(
+        "workspaces/<int:workspace_id>/assignments/<int:assignment_id>/submissions/<int:pk>/grade-audit",
+        views.CourseGradeAuditView.as_view(),
+        name="workspace-assignment-submission-grade-audit",
+    ),
 ]
