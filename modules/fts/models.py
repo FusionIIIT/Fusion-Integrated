@@ -1,10 +1,9 @@
-from django.conf import settings
 from django.db import models
 
+from core.db.mixins import TimeStampedModel
 
-class File(models.Model):
-    """Core File tracking model representing an official file instance."""
-    
+
+class File(TimeStampedModel):
     class Status(models.TextChoices):
         ACTIVE = "ACTIVE", "Active"
         ARCHIVED = "ARCHIVED", "Archived"
@@ -12,48 +11,28 @@ class File(models.Model):
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    creator = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
-        related_name="created_fts_files"
-    )
-    current_holder = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
-        related_name="held_fts_files"
-    )
+    creator_id = models.IntegerField(db_index=True)
+    current_holder_id = models.IntegerField(db_index=True)
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
-        default=Status.ACTIVE
+        default=Status.ACTIVE,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"[{self.id}] {self.title} ({self.status})"
 
 
 class FileMovement(models.Model):
-    """Append-only movement log tracking the history and routing of files."""
-    
     file = models.ForeignKey(
         File,
         on_delete=models.CASCADE,
-        related_name="movements"
+        related_name="movements",
     )
-    sender = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
-        related_name="sent_file_movements"
-    )
-    recipient = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,
-        related_name="received_file_movements"
-    )
+    sender_id = models.IntegerField(db_index=True)
+    recipient_id = models.IntegerField(db_index=True)
     comment = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"File {self.file_id}: {self.sender_id} -> {self.recipient_id} at {self.timestamp}"
