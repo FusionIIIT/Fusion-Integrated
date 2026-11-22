@@ -13,6 +13,35 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `mms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `mms.role.manage` | Assign and reassign active Caretaker and Warden roles | `mess_admin` |
+| `mms.window.manage` | Open and close mess registration windows | `mess_caretaker` |
+| `mms.registration.self` | Submit mess registration requests | `student` |
+| `mms.registration.review` | Review and approve/reject registration requests | `mess_caretaker` |
+| `mms.registration.view_oversight` | View registration/deregistration for oversight | `mess_warden` |
+| `mms.deregistration.self` | Submit mess deregistration requests | `student` |
+| `mms.deregistration.review` | Review and approve/reject deregistration requests | `mess_caretaker` |
+| `mms.menu.view` | View weekly mess menu | `mess_admin`, `mess_caretaker`, `mess_warden`, `student` |
+| `mms.menu.manage` | Publish and update weekly mess menu | `mess_caretaker` |
+| `mms.rebate.self` | Submit mess rebate requests and view status | `student` |
+| `mms.rebate.review` | Review, modify dates, and decide rebate requests | `mess_caretaker` |
+| `mms.vacation.manage` | Create vacation food continuity surveys and reminders | `mess_caretaker` |
+| `mms.vacation.respond` | Respond to vacation food continuity survey | `student` |
+| `mms.special_food.self` | Submit special food requests and view status | `student` |
+| `mms.special_food.review` | Review and decide special food requests | `mess_caretaker` |
+| `mms.special_food.fulfill` | Update special food fulfillment status to served or cancelled | `mess_caretaker` |
+| `mms.bill.view_self` | View personal monthly mess bills and balances | `student` |
+| `mms.bill.manage` | Review, finalize, and publish monthly mess bills | `mess_caretaker` |
+| `mms.announcement.publish` | Publish mess-related announcements | `mess_caretaker`, `mess_warden` |
+| `mms.announcement.view` | View mess-related announcements | `mess_admin`, `mess_caretaker`, `mess_warden`, `student` |
+| `mms.feedback.submit` | Submit student mess feedback | `student` |
+| `mms.feedback.view` | Review student mess feedback entries | `mess_caretaker`, `mess_warden` |
+| `mms.report.operational` | Generate and view Caretaker operational reports | `mess_caretaker` |
+| `mms.report.supervisory` | View and search Warden supervisory reports | `mess_warden` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

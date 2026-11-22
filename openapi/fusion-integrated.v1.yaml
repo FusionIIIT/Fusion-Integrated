@@ -105,6 +105,118 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/mms/announcements/:
+    get:
+      operationId: v1_mms_announcements_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessAnnouncement'
+          description: ''
+  /api/v1/mms/bills/:
+    get:
+      operationId: v1_mms_bills_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessBill'
+          description: ''
+  /api/v1/mms/deregistrations/:
+    get:
+      operationId: v1_mms_deregistrations_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessDeregistration'
+          description: ''
+  /api/v1/mms/feedback/:
+    get:
+      operationId: v1_mms_feedback_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessFeedback'
+          description: ''
+  /api/v1/mms/menu/:
+    get:
+      operationId: v1_mms_menu_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessMenu'
+          description: ''
+  /api/v1/mms/rebates/:
+    get:
+      operationId: v1_mms_rebates_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessRebate'
+          description: ''
+  /api/v1/mms/registrations/:
+    get:
+      operationId: v1_mms_registrations_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessRegistration'
+          description: ''
+  /api/v1/mms/special-food/:
+    get:
+      operationId: v1_mms_special_food_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialFoodRequest'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -2315,6 +2427,24 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DayOfWeekEnum:
+      enum:
+      - monday
+      - tuesday
+      - wednesday
+      - thursday
+      - friday
+      - saturday
+      - sunday
+      type: string
+      description: |-
+        * `monday` - Monday
+        * `tuesday` - Tuesday
+        * `wednesday` - Wednesday
+        * `thursday` - Thursday
+        * `friday` - Friday
+        * `saturday` - Saturday
+        * `sunday` - Sunday
     Detail:
       type: object
       properties:
@@ -2663,6 +2793,356 @@ components:
       required:
       - password
       - username
+    MealTypeEnum:
+      enum:
+      - breakfast
+      - lunch
+      - dinner
+      type: string
+      description: |-
+        * `breakfast` - Breakfast
+        * `lunch` - Lunch
+        * `dinner` - Dinner
+    MessAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        content:
+          type: string
+        published_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        published_by_role:
+          type: string
+          maxLength: 50
+        is_active:
+          type: boolean
+      required:
+      - content
+      - created_at
+      - id
+      - published_by_role
+      - published_by_user_id
+      - title
+      - updated_at
+    MessBill:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        billing_month:
+          type: string
+          format: date
+        base_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        rebate_discount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        special_food_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/MmsBillStatusEnum'
+        generated_at:
+          type: string
+          format: date-time
+          nullable: true
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        published_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+      required:
+      - billing_month
+      - created_at
+      - id
+      - updated_at
+      - user_id
+    MessDeregistration:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: '#/components/schemas/MmsRequestStatusEnum'
+        reason:
+          type: string
+        effective_date:
+          type: string
+          format: date
+          nullable: true
+        is_active_deregistration:
+          type: boolean
+        reviewed_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        remarks:
+          type: string
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        registration:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - reason
+      - updated_at
+      - user_id
+    MessFeedback:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        description:
+          type: string
+        category:
+          type: string
+          maxLength: 50
+      required:
+      - created_at
+      - description
+      - id
+      - updated_at
+      - user_id
+    MessMenu:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        day_of_week:
+          $ref: '#/components/schemas/DayOfWeekEnum'
+        meal_type:
+          $ref: '#/components/schemas/MealTypeEnum'
+        items: {}
+        is_active:
+          type: boolean
+        updated_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+      required:
+      - created_at
+      - day_of_week
+      - id
+      - meal_type
+      - updated_at
+    MessRebate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        duration_days:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        reason:
+          type: string
+        status:
+          $ref: '#/components/schemas/MmsRequestStatusEnum'
+        original_start_date:
+          type: string
+          format: date
+          nullable: true
+        original_end_date:
+          type: string
+          format: date
+          nullable: true
+        modified_by_caretaker:
+          type: boolean
+        reviewed_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        remarks:
+          type: string
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - created_at
+      - duration_days
+      - end_date
+      - id
+      - reason
+      - start_date
+      - updated_at
+      - user_id
+    MessRegistration:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          $ref: '#/components/schemas/MmsRequestStatusEnum'
+        reason:
+          type: string
+        reviewed_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        remarks:
+          type: string
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        window:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - updated_at
+      - user_id
+    MmsBillStatusEnum:
+      enum:
+      - draft
+      - generated
+      - published
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `generated` - Generated
+        * `published` - Published
+    MmsRequestStatusEnum:
+      enum:
+      - submitted
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `submitted` - Submitted
+        * `approved` - Approved
+        * `rejected` - Rejected
+    MmsSpecialFoodStatusEnum:
+      enum:
+      - requested
+      - approved
+      - rejected
+      - served
+      - cancelled
+      type: string
+      description: |-
+        * `requested` - Requested
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `served` - Served
+        * `cancelled` - Cancelled
     ModeEnum:
       enum:
       - online
@@ -3663,6 +4143,70 @@ components:
       description: |-
         * `campus` - Through the Placement Cell
         * `off_campus` - Off campus (rules 5 and 24)
+    SpecialFoodRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        requested_date:
+          type: string
+          format: date
+        meal_type:
+          type: string
+          maxLength: 20
+        food_details:
+          type: string
+        reason:
+          type: string
+        cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/MmsSpecialFoodStatusEnum'
+        is_default_rejected:
+          type: boolean
+        reviewed_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        remarks:
+          type: string
+        served_at:
+          type: string
+          format: date-time
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - created_at
+      - food_details
+      - id
+      - meal_type
+      - reason
+      - requested_date
+      - updated_at
+      - user_id
     StaffStats:
       type: object
       description: PC-UC-011/012. Operational figures, staff only.
