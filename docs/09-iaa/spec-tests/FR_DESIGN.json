@@ -1,0 +1,677 @@
+[
+  {
+    "test_id": "T-FR-01",
+    "source_id": "AFR-IAA-001",
+    "purpose": "Verify authorized Basic User can create an expense request and save as Draft",
+    "preconditions": "User authenticated as basic_user",
+    "action_or_input": "Call create_expense_request with draft status",
+    "expected_result": "Expense request created in DRAFT status with is_locked=False",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-02",
+    "source_id": "AFR-IAA-002",
+    "purpose": "Verify request creator can specify department, request_type, title, description, and total amount",
+    "preconditions": "Draft request initialized",
+    "action_or_input": "Provide title='Lab Consumables', dept='CSE', type='expense', desc='Lab supplies'",
+    "expected_result": "Attributes saved and retrievable on model",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-03",
+    "source_id": "AFR-IAA-003",
+    "purpose": "Verify request creator can attach itemized line items with receipt references",
+    "preconditions": "Draft request created",
+    "action_or_input": "Add items with description, category, amount, receipt_reference",
+    "expected_result": "ExpenseItems persisted with foreign key relation to request",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-04",
+    "source_id": "AFR-IAA-004",
+    "purpose": "Verify Draft can be saved even when submission-mandatory fields are incomplete",
+    "preconditions": "User creates draft",
+    "action_or_input": "Save draft with empty items list or missing total",
+    "expected_result": "Draft saved successfully without throwing validation error",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-05",
+    "source_id": "AFR-IAA-005",
+    "purpose": "Verify formal submission validates completeness and rejects incomplete requests",
+    "preconditions": "Draft exists with zero line items",
+    "action_or_input": "Call submit_expense_request",
+    "expected_result": "DomainValidationError raised requiring title, department, positive amount and items",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-06",
+    "source_id": "AFR-IAA-006",
+    "purpose": "Verify formal submission locks ordinary post-submission editing",
+    "preconditions": "Draft request submitted",
+    "action_or_input": "Check is_locked attribute and attempt direct modification",
+    "expected_result": "is_locked is True and validate_record_not_locked blocks modification",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-07",
+    "source_id": "AFR-IAA-007",
+    "purpose": "Verify status progression and action history are preserved on request",
+    "preconditions": "Request submitted",
+    "action_or_input": "Check AuditLogEntry and status transitions",
+    "expected_result": "Audit trail records create and submit actions",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-08",
+    "source_id": "AFR-IAA-008",
+    "purpose": "Verify Finance Staff can review submitted request",
+    "preconditions": "Request in SUBMITTED status",
+    "action_or_input": "Finance Staff calls review_and_validate_request",
+    "expected_result": "Request transitions to finance_validated",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-09",
+    "source_id": "AFR-IAA-009",
+    "purpose": "Verify finance review validates department budget availability",
+    "preconditions": "Request total exceeds department budget",
+    "action_or_input": "Finance review executed",
+    "expected_result": "Material anomaly created with category budget_insufficient",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-10",
+    "source_id": "AFR-IAA-010",
+    "purpose": "Verify Finance Staff can raise clarification query",
+    "preconditions": "Request in SUBMITTED status",
+    "action_or_input": "Call raise_request_clarification with query text",
+    "expected_result": "ClarificationQuery created, request status transitions to query_raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-11",
+    "source_id": "AFR-IAA-011",
+    "purpose": "Verify creator can respond to clarification query",
+    "preconditions": "ClarificationQuery in pending status",
+    "action_or_input": "Creator calls respond_to_request_clarification",
+    "expected_result": "Query status updated to responded, request transitions to query_responded",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-12",
+    "source_id": "AFR-IAA-012",
+    "purpose": "Verify Finance Staff can validate request after clarification response",
+    "preconditions": "Request in QUERY_RESPONDED status",
+    "action_or_input": "Finance Staff calls review_and_validate_request",
+    "expected_result": "Request transitions from query_responded to finance_validated",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-13",
+    "source_id": "AFR-IAA-013",
+    "purpose": "Verify validation assigns request into configured approval route",
+    "preconditions": "Request validated by Finance",
+    "action_or_input": "Inspect assigned_approver_role and required_approval_levels",
+    "expected_result": "Approver role and levels set based on amount hierarchy",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-14",
+    "source_id": "AFR-IAA-014",
+    "purpose": "Verify Finance Staff can record approved request",
+    "preconditions": "Request in APPROVED status",
+    "action_or_input": "Call record_request_processing",
+    "expected_result": "Request status transitions to RECORDED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-15",
+    "source_id": "AFR-IAA-015",
+    "purpose": "Verify recorded status is internal non-monetary completion",
+    "preconditions": "Request recorded",
+    "action_or_input": "Inspect audit log details for record_processing",
+    "expected_result": "Audit log records non_monetary=True without payment execution",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-16",
+    "source_id": "AFR-IAA-016",
+    "purpose": "Verify terminal recorded request is retained for audit",
+    "preconditions": "Request in RECORDED status",
+    "action_or_input": "Query request through audit selectors",
+    "expected_result": "Record is persistently accessible in read-only mode",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-17",
+    "source_id": "AFR-IAA-017",
+    "purpose": "Verify approval routing determined by amount and hierarchy rules",
+    "preconditions": "Hierarchy rules configured for expense requests",
+    "action_or_input": "Call determine_approval_route for 10000 and 30000",
+    "expected_result": "Returns 1 level for <25k and 2 levels for >=25k",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-18",
+    "source_id": "AFR-IAA-018",
+    "purpose": "Verify HoD, Dean, and Director preserved as distinct authorities",
+    "preconditions": "Multi-level approval route",
+    "action_or_input": "Check approver roles returned in hierarchy route",
+    "expected_result": "Roles match ['HOD'], ['HOD', 'Dean'], or ['HOD', 'Dean', 'Director']",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-19",
+    "source_id": "AFR-IAA-019",
+    "purpose": "Verify segregation of duties blocks creator from approving own request",
+    "preconditions": "Request created by user_id 1001 in FINANCE_VALIDATED",
+    "action_or_input": "user_id 1001 attempts to record approval decision",
+    "expected_result": "DomainValidationError raised for segregation of duties violation",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-20",
+    "source_id": "AFR-IAA-020",
+    "purpose": "Verify approval decision requires non-empty remarks",
+    "preconditions": "Request in FINANCE_VALIDATED status",
+    "action_or_input": "Approver calls record_request_decision with empty remarks",
+    "expected_result": "DomainValidationError raised requiring mandatory remarks",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-21",
+    "source_id": "AFR-IAA-021",
+    "purpose": "Verify rejection decision transitions request to REJECTED",
+    "preconditions": "Request in FINANCE_VALIDATED status",
+    "action_or_input": "Approver rejects request with valid remarks",
+    "expected_result": "Status updated to REJECTED and ApprovalAction recorded",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-22",
+    "source_id": "AFR-IAA-022",
+    "purpose": "Verify intermediate approval level advances current_approval_level",
+    "preconditions": "Request requiring 2 levels in FINANCE_VALIDATED",
+    "action_or_input": "Level 1 approver approves request",
+    "expected_result": "Status becomes APPROVAL_PENDING and current_approval_level becomes 2",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-23",
+    "source_id": "AFR-IAA-023",
+    "purpose": "Verify final approval level transitions request to APPROVED",
+    "preconditions": "Request at final level in APPROVAL_PENDING",
+    "action_or_input": "Final approver approves request",
+    "expected_result": "Status transitions to APPROVED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-24",
+    "source_id": "AFR-IAA-024",
+    "purpose": "Verify detection of pending approvals exceeding SLA timeout duration",
+    "preconditions": "Request approval assigned 4 days ago with 3-day SLA",
+    "action_or_input": "Run escalate_overdue_approvals task",
+    "expected_result": "Overdue request identified for escalation",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-FR-25",
+    "source_id": "AFR-IAA-025",
+    "purpose": "Verify timed escalation transitions request to ESCALATED",
+    "preconditions": "Overdue approval detected",
+    "action_or_input": "Task executes escalation",
+    "expected_result": "Request status updated to ESCALATED",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-FR-26",
+    "source_id": "AFR-IAA-026",
+    "purpose": "Verify escalation reassigns request to higher authority",
+    "preconditions": "Request escalated by timer",
+    "action_or_input": "Inspect assigned_approver_role on escalated request",
+    "expected_result": "assigned_approver_role set to Director",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-FR-27",
+    "source_id": "AFR-IAA-027",
+    "purpose": "Verify escalation action logged in audit trail",
+    "preconditions": "Escalation completed",
+    "action_or_input": "Query audit logs for target request",
+    "expected_result": "AuditLogEntry with action='timeout_escalate' and resulting_status='escalated'",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-28",
+    "source_id": "AFR-IAA-028",
+    "purpose": "Verify Basic User can submit Travel Allowance claim",
+    "preconditions": "User authenticated as claimant",
+    "action_or_input": "Call submit_travel_claim with valid journey dates and locations",
+    "expected_result": "TAClaim created in SUBMITTED status with is_locked=True",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-29",
+    "source_id": "AFR-IAA-029",
+    "purpose": "Verify TA claim rejects return date earlier than departure date",
+    "preconditions": "Claimant inputs dates",
+    "action_or_input": "departure='2026-05-10', arrival='2026-05-05'",
+    "expected_result": "DomainValidationError raised for invalid journey dates",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-30",
+    "source_id": "AFR-IAA-030",
+    "purpose": "Verify TA claim rejects zero or negative claimed amounts",
+    "preconditions": "Claimant inputs amount",
+    "action_or_input": "claimed_amount=Decimal('0.00')",
+    "expected_result": "DomainValidationError raised requiring positive claimed amount",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-31",
+    "source_id": "AFR-IAA-031",
+    "purpose": "Verify post-submission lock on TA claim",
+    "preconditions": "TA claim submitted",
+    "action_or_input": "Check is_locked attribute",
+    "expected_result": "is_locked is True and blocks direct modifications",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-32",
+    "source_id": "AFR-IAA-032",
+    "purpose": "Verify itemized TA expense legs persisted with claim",
+    "preconditions": "Submit claim with flight and hotel items",
+    "action_or_input": "Query TAExpenseItem objects for claim",
+    "expected_result": "Line items persisted with expense_type, amount, and details",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-33",
+    "source_id": "AFR-IAA-033",
+    "purpose": "Verify Finance Staff can verify submitted TA claim",
+    "preconditions": "TA claim in SUBMITTED status",
+    "action_or_input": "Finance Staff calls verify_travel_claim",
+    "expected_result": "Claim verified against policy parameters",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-34",
+    "source_id": "AFR-IAA-034",
+    "purpose": "Verify standard TA claim (< threshold) transitions to VERIFIED",
+    "preconditions": "Claim amount 15000 with threshold 50000",
+    "action_or_input": "verify_travel_claim called",
+    "expected_result": "Status becomes VERIFIED and is_high_value is False",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-35",
+    "source_id": "AFR-IAA-035",
+    "purpose": "Verify TA clarification query and response cycle",
+    "preconditions": "TA claim in SUBMITTED status",
+    "action_or_input": "Finance raises query; claimant responds",
+    "expected_result": "Status cycles SUBMITTED -> QUERY_RAISED -> QUERY_RESPONDED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-36",
+    "source_id": "AFR-IAA-036",
+    "purpose": "Verify Finance Staff can reject TA claim during verification",
+    "preconditions": "TA claim in SUBMITTED status",
+    "action_or_input": "Transition TA claim with event 'reject'",
+    "expected_result": "Claim transitions to REJECTED status",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-37",
+    "source_id": "AFR-IAA-037",
+    "purpose": "Verify claims >= high_value threshold route to APPROVAL_PENDING",
+    "preconditions": "Claim amount 65000 with threshold 50000",
+    "action_or_input": "verify_travel_claim called",
+    "expected_result": "Status becomes APPROVAL_PENDING, is_high_value=True, assigned_approver_role='Dean'",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-38",
+    "source_id": "AFR-IAA-038",
+    "purpose": "Verify Dean or Director can approve high-value TA claim",
+    "preconditions": "TA claim in APPROVAL_PENDING status",
+    "action_or_input": "Dean calls record_travel_decision with approve and remarks",
+    "expected_result": "Status transitions to APPROVED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-39",
+    "source_id": "AFR-IAA-039",
+    "purpose": "Verify claimant segregation of duties enforced on high-value TA",
+    "preconditions": "Claimant user_id 1001",
+    "action_or_input": "user_id 1001 attempts to record travel approval decision",
+    "expected_result": "DomainValidationError raised for segregation of duties violation",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-40",
+    "source_id": "AFR-IAA-040",
+    "purpose": "Verify Finance Staff can record verified or approved TA claim",
+    "preconditions": "TA claim in VERIFIED or APPROVED status",
+    "action_or_input": "Call record_travel_processing",
+    "expected_result": "Claim status transitions to RECORDED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-41",
+    "source_id": "AFR-IAA-041",
+    "purpose": "Verify TA recording is non-monetary governance record",
+    "preconditions": "TA claim recorded",
+    "action_or_input": "Check audit log for record_travel_processing",
+    "expected_result": "Audit log records action without executing banking payment",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-42",
+    "source_id": "AFR-IAA-042",
+    "purpose": "Verify terminal RECORDED TA claim is retained",
+    "preconditions": "TA claim in RECORDED status",
+    "action_or_input": "Query claim through selectors",
+    "expected_result": "Claim accessible in read-only mode and blocks state transitions",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-43",
+    "source_id": "AFR-IAA-043",
+    "purpose": "Verify automatic anomaly trigger when department budget is exceeded",
+    "preconditions": "Request amount exceeds department available budget",
+    "action_or_input": "Finance review validates request",
+    "expected_result": "Anomaly created with category='budget_insufficient' in OPEN status",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-FR-44",
+    "source_id": "AFR-IAA-044",
+    "purpose": "Verify Finance Staff can manually flag material anomaly",
+    "preconditions": "Finance Staff discovers invoice discrepancy",
+    "action_or_input": "Call create_anomaly with category='duplicate_bill'",
+    "expected_result": "Anomaly created in OPEN status with flagged_by_role='finance_staff'",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-45",
+    "source_id": "AFR-IAA-045",
+    "purpose": "Verify Auditor can manually flag material anomaly",
+    "preconditions": "Auditor inspects transaction",
+    "action_or_input": "Call create_anomaly with category='audit_finding'",
+    "expected_result": "Anomaly created in OPEN status with flagged_by_role='audit_officer'",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-46",
+    "source_id": "AFR-IAA-046",
+    "purpose": "Verify open anomaly references target entity and type",
+    "preconditions": "Anomaly created for request #12",
+    "action_or_input": "Check reference_type and reference_id",
+    "expected_result": "reference_type='request' and reference_id=12",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-47",
+    "source_id": "AFR-IAA-047",
+    "purpose": "Verify anomaly assigns resolver role",
+    "preconditions": "Anomaly created",
+    "action_or_input": "Inspect resolver_role attribute",
+    "expected_result": "resolver_role set to 'finance_staff' or configured role",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-48",
+    "source_id": "AFR-IAA-048",
+    "purpose": "Verify designated resolver can resolve anomaly with remarks",
+    "preconditions": "Anomaly in OPEN status",
+    "action_or_input": "Call resolve_or_escalate_anomaly with action='resolve'",
+    "expected_result": "Status becomes RESOLVED, resolution_remarks saved, resolved_by_id populated",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-49",
+    "source_id": "AFR-IAA-049",
+    "purpose": "Verify resolver can escalate anomaly to higher review",
+    "preconditions": "Anomaly in OPEN status",
+    "action_or_input": "Call resolve_or_escalate_anomaly with action='escalate'",
+    "expected_result": "Status becomes ESCALATED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-50",
+    "source_id": "AFR-IAA-050",
+    "purpose": "Verify escalated anomaly can be resolved",
+    "preconditions": "Anomaly in ESCALATED status",
+    "action_or_input": "Call resolve_or_escalate_anomaly with action='resolve'",
+    "expected_result": "Status transitions from ESCALATED to RESOLVED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-51",
+    "source_id": "AFR-IAA-051",
+    "purpose": "Verify Auditor can raise audit observation on department",
+    "preconditions": "User is auditor",
+    "action_or_input": "Call raise_audit_observation with department='ME', title='Inventory gap'",
+    "expected_result": "AuditObservation created in OPEN status",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-52",
+    "source_id": "AFR-IAA-052",
+    "purpose": "Verify observation title is mandatory",
+    "preconditions": "Auditor submits observation",
+    "action_or_input": "Call raise_audit_observation with empty title",
+    "expected_result": "BadRequestError raised requiring mandatory title",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-53",
+    "source_id": "AFR-IAA-053",
+    "purpose": "Verify department representative can submit response to observation",
+    "preconditions": "AuditObservation in OPEN status",
+    "action_or_input": "Call respond_to_audit_observation with response text",
+    "expected_result": "response_text saved, responded_by_id populated, status becomes RESPONDED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-54",
+    "source_id": "AFR-IAA-054",
+    "purpose": "Verify response text cannot be empty",
+    "preconditions": "Observation in OPEN status",
+    "action_or_input": "Call respond_to_audit_observation with blank text",
+    "expected_result": "BadRequestError raised requiring response text",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-55",
+    "source_id": "AFR-IAA-055",
+    "purpose": "Verify Auditor can review departmental response",
+    "preconditions": "Observation in RESPONDED status",
+    "action_or_input": "Auditor inspects responded observation",
+    "expected_result": "Observation response details visible to auditor",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-56",
+    "source_id": "AFR-IAA-056",
+    "purpose": "Verify satisfactory response transitions observation to CLOSED",
+    "preconditions": "Observation in RESPONDED status",
+    "action_or_input": "Call review_and_close_observation with is_satisfactory=True",
+    "expected_result": "Status becomes CLOSED and closed_at is populated",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-57",
+    "source_id": "AFR-IAA-057",
+    "purpose": "Verify unsatisfactory response returns observation to OPEN",
+    "preconditions": "Observation in RESPONDED status",
+    "action_or_input": "Call review_and_close_observation with is_satisfactory=False",
+    "expected_result": "Status transitions back to OPEN (cyclic loop per IAA-BR-301)",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-58",
+    "source_id": "AFR-IAA-058",
+    "purpose": "Verify department expenditure summary report generation",
+    "preconditions": "Recorded expenses exist across departments",
+    "action_or_input": "Call report_selectors.get_expenditure_summary",
+    "expected_result": "Returns aggregated department expenditure totals",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-59",
+    "source_id": "AFR-IAA-059",
+    "purpose": "Verify budget utilization calculation per department",
+    "preconditions": "Department budgets allocated and vouchers recorded",
+    "action_or_input": "Query DepartmentBudget utilization properties",
+    "expected_result": "available_amount correctly calculated as allocated minus utilized",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-60",
+    "source_id": "AFR-IAA-060",
+    "purpose": "Verify CSV report export streaming",
+    "preconditions": "Authorized user requests export",
+    "action_or_input": "Request GET /api/v1/iaa/reports/export/?type=summary",
+    "expected_result": "Streaming CSV response with appropriate header attachment",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-FR-61",
+    "source_id": "AFR-IAA-061",
+    "purpose": "Verify System Admin can configure active financial year",
+    "preconditions": "System Admin authenticated",
+    "action_or_input": "Call update_iaa_configuration with financial_year='2027-2028'",
+    "expected_result": "Active configuration updated with new financial year",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-62",
+    "source_id": "AFR-IAA-062",
+    "purpose": "Verify System Admin can configure high-value TA threshold",
+    "preconditions": "System Admin updates policy",
+    "action_or_input": "Set high_value_ta_threshold=Decimal('75000.00')",
+    "expected_result": "Configuration threshold updated and reflected in TA verification",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-63",
+    "source_id": "AFR-IAA-063",
+    "purpose": "Verify System Admin can configure approval SLA timeout days",
+    "preconditions": "System Admin updates policy",
+    "action_or_input": "Set approval_timeout_days=5",
+    "expected_result": "Approval timeout days updated to 5",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-64",
+    "source_id": "AFR-IAA-064",
+    "purpose": "Verify System Admin can manage department budget allocations",
+    "preconditions": "System Admin updates budget",
+    "action_or_input": "Call set_department_budget for CSE to 500000",
+    "expected_result": "DepartmentBudget allocated_amount updated",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-65",
+    "source_id": "AFR-IAA-065",
+    "purpose": "Verify Basic User visibility is scoped strictly to own records",
+    "preconditions": "Requests exist for user 1001 and user 2002",
+    "action_or_input": "scope_requests evaluated for user 1001",
+    "expected_result": "Returns only user 1001 records (IAA-BR-501)",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-66",
+    "source_id": "AFR-IAA-066",
+    "purpose": "Verify System Admin restricted from operational transactions",
+    "preconditions": "Principal has active_role='system_admin'",
+    "action_or_input": "scope_requests evaluated for system_admin",
+    "expected_result": "Returns empty queryset (.none()) enforcing operational separation",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-67",
+    "source_id": "AFR-IAA-067",
+    "purpose": "Verify out-of-scope detail endpoint returns 404 rather than 403",
+    "preconditions": "Request #2 belongs to user 2002; client is user 1001",
+    "action_or_input": "GET /api/v1/iaa/requests/2/",
+    "expected_result": "HTTP 404 Not Found returned (ADR-0004 scoping)",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-FR-68",
+    "source_id": "AFR-IAA-068",
+    "purpose": "Verify Finance Staff with view_all permission sees all operational records",
+    "preconditions": "Principal has permission 'iaa.request.view_all'",
+    "action_or_input": "scope_requests evaluated",
+    "expected_result": "Returns complete un-filtered queryset of requests",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-69",
+    "source_id": "AFR-IAA-069",
+    "purpose": "Verify all financial request state transitions generate audit log",
+    "preconditions": "Request submitted and validated",
+    "action_or_input": "Query AuditLogEntry for request",
+    "expected_result": "Entries present for create_request_draft, submit_request, finance_validate",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-70",
+    "source_id": "AFR-IAA-070",
+    "purpose": "Verify TA claim state transitions generate audit log",
+    "preconditions": "TA claim submitted and verified",
+    "action_or_input": "Query AuditLogEntry for travel claim",
+    "expected_result": "Audit log records submit_travel_claim and verify_travel_claim",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-71",
+    "source_id": "AFR-IAA-071",
+    "purpose": "Verify audit log immutably preserves acting role",
+    "preconditions": "Action performed under role 'finance_staff'",
+    "action_or_input": "Inspect acting_role on created AuditLogEntry",
+    "expected_result": "acting_role matches 'finance_staff' preserving historical integrity",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-72",
+    "source_id": "AFR-IAA-072",
+    "purpose": "Verify anomaly and audit observation transitions generate audit log",
+    "preconditions": "Anomaly flagged and observation raised",
+    "action_or_input": "Query AuditLogEntry for anomaly and audit observation",
+    "expected_result": "Audit entries recorded with target_type 'anomaly' and 'audit_observation'",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-73",
+    "source_id": "AFR-IAA-073",
+    "purpose": "Verify notification dispatched on formal submission",
+    "preconditions": "Request formally submitted",
+    "action_or_input": "Check notifications emitted",
+    "expected_result": "Notification logged with target_type 'request' and recipient",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-74",
+    "source_id": "AFR-IAA-074",
+    "purpose": "Verify notification dispatched on approval/rejection decision",
+    "preconditions": "Approver records decision",
+    "action_or_input": "Check notifications emitted",
+    "expected_result": "Notification sent to request creator regarding decision",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-FR-75",
+    "source_id": "AFR-IAA-075",
+    "purpose": "Verify notification dispatched on clarification query",
+    "preconditions": "Finance Staff raises clarification query",
+    "action_or_input": "Check notification dispatch",
+    "expected_result": "Notification sent to creator regarding pending clarification",
+    "test_type": "unit"
+  }
+]

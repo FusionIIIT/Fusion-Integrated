@@ -1,0 +1,353 @@
+[
+  {
+    "test_id": "T-BR-01",
+    "source_id": "IAA-BR-001 prohibited",
+    "purpose": "Verify creator cannot approve own financial request",
+    "preconditions": "Request created by user 1001",
+    "action_or_input": "user 1001 attempts approval",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-02",
+    "source_id": "IAA-BR-001 permitted",
+    "purpose": "Verify distinct user can approve request",
+    "preconditions": "Request created by user 1001",
+    "action_or_input": "user 2002 approves request",
+    "expected_result": "Approval accepted successfully",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-03",
+    "source_id": "IAA-BR-001 claimant prohibited",
+    "purpose": "Verify claimant cannot approve own travel claim",
+    "preconditions": "Claim created by user 1001",
+    "action_or_input": "user 1001 attempts travel approval",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-04",
+    "source_id": "IAA-BR-002 tier-1",
+    "purpose": "Verify amount < 25000 routes to 1 level (HoD)",
+    "preconditions": "Hierarchy rules set",
+    "action_or_input": "Route for amount 15000",
+    "expected_result": "levels=1 and roles=['HOD']",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-05",
+    "source_id": "IAA-BR-002 tier-2",
+    "purpose": "Verify amount >= 25000 routes to 2 levels (HoD, Dean)",
+    "preconditions": "Hierarchy rules set",
+    "action_or_input": "Route for amount 35000",
+    "expected_result": "levels=2 and roles=['HOD', 'Dean']",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-06",
+    "source_id": "IAA-BR-002 tier-3",
+    "purpose": "Verify amount >= 100000 routes to 3 levels (HoD, Dean, Director)",
+    "preconditions": "Hierarchy rules set",
+    "action_or_input": "Route for amount 150000",
+    "expected_result": "levels=3 and roles=['HOD', 'Dean', 'Director']",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-07",
+    "source_id": "IAA-BR-003 active-role",
+    "purpose": "Verify actions authorized and logged under active acting role",
+    "preconditions": "User has active_role='finance_staff'",
+    "action_or_input": "Review request",
+    "expected_result": "Audit log records acting_role='finance_staff'",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-08",
+    "source_id": "IAA-BR-004 sysadmin-isolated",
+    "purpose": "Verify System Admin operational queries return .none()",
+    "preconditions": "Principal has active_role='system_admin'",
+    "action_or_input": "scope_requests evaluated",
+    "expected_result": "Empty queryset returned",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-09",
+    "source_id": "IAA-BR-004 sysadmin-config",
+    "purpose": "Verify System Admin has configuration access",
+    "preconditions": "Admin authenticated",
+    "action_or_input": "Update policy configuration",
+    "expected_result": "Configuration updated successfully",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-10",
+    "source_id": "IAA-BR-005 empty-remarks",
+    "purpose": "Verify empty decision remarks rejected",
+    "preconditions": "Decision submitted",
+    "action_or_input": "remarks=''",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-11",
+    "source_id": "IAA-BR-005 whitespace-remarks",
+    "purpose": "Verify whitespace decision remarks rejected",
+    "preconditions": "Decision submitted",
+    "action_or_input": "remarks='   '",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-12",
+    "source_id": "IAA-BR-005 valid-remarks",
+    "purpose": "Verify non-empty decision remarks accepted",
+    "preconditions": "Decision submitted",
+    "action_or_input": "remarks='Approved as planned'",
+    "expected_result": "Remarks validated without error",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-13",
+    "source_id": "IAA-BR-006 non-monetary",
+    "purpose": "Verify record processing is non-monetary internal completion",
+    "preconditions": "Request approved",
+    "action_or_input": "record_request_processing called",
+    "expected_result": "Status becomes RECORDED with non_monetary=True in audit details",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-14",
+    "source_id": "IAA-BR-101 draft-incomplete",
+    "purpose": "Verify saving incomplete draft permitted",
+    "preconditions": "User creates draft",
+    "action_or_input": "create_expense_request with empty items",
+    "expected_result": "Draft saved in DRAFT status",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-15",
+    "source_id": "IAA-BR-101 submit-missing-title",
+    "purpose": "Verify formal submission requires title",
+    "preconditions": "Draft with empty title",
+    "action_or_input": "submit_expense_request called",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-16",
+    "source_id": "IAA-BR-101 submit-zero-amount",
+    "purpose": "Verify formal submission requires positive amount",
+    "preconditions": "Draft with amount=0",
+    "action_or_input": "submit_expense_request called",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-17",
+    "source_id": "IAA-BR-101 submit-no-items",
+    "purpose": "Verify formal submission requires at least one item",
+    "preconditions": "Draft with 0 items",
+    "action_or_input": "submit_expense_request called",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-18",
+    "source_id": "IAA-BR-102 budget-sufficient",
+    "purpose": "Verify sufficient budget check passes",
+    "preconditions": "Budget available >= requested",
+    "action_or_input": "check_budget_sufficiency called",
+    "expected_result": "Returns True",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-19",
+    "source_id": "IAA-BR-102 budget-insufficient",
+    "purpose": "Verify insufficient budget creates anomaly and allows processing",
+    "preconditions": "Requested > available budget",
+    "action_or_input": "Finance review executed",
+    "expected_result": "Material anomaly created in OPEN status",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-20",
+    "source_id": "IAA-BR-103 anomaly-trigger",
+    "purpose": "Verify anomaly created in OPEN status",
+    "preconditions": "Anomaly flagged",
+    "action_or_input": "create_anomaly called",
+    "expected_result": "Status is OPEN",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-21",
+    "source_id": "IAA-BR-103 anomaly-resolve",
+    "purpose": "Verify open anomaly resolved by resolver",
+    "preconditions": "Anomaly in OPEN",
+    "action_or_input": "resolve_or_escalate_anomaly with resolve",
+    "expected_result": "Status is RESOLVED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-22",
+    "source_id": "IAA-BR-103 anomaly-escalate",
+    "purpose": "Verify open anomaly escalated to higher review",
+    "preconditions": "Anomaly in OPEN",
+    "action_or_input": "resolve_or_escalate_anomaly with escalate",
+    "expected_result": "Status is ESCALATED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-23",
+    "source_id": "IAA-BR-104 edit-draft",
+    "purpose": "Verify unsubmitted draft is not locked",
+    "preconditions": "Request in DRAFT",
+    "action_or_input": "validate_record_not_locked(req.is_locked)",
+    "expected_result": "Validates successfully",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-24",
+    "source_id": "IAA-BR-104 lock-submitted",
+    "purpose": "Verify submitted request is locked against direct edits",
+    "preconditions": "Request submitted",
+    "action_or_input": "validate_record_not_locked(True)",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-25",
+    "source_id": "IAA-BR-201 date-valid",
+    "purpose": "Verify arrival >= departure accepted",
+    "preconditions": "Dates valid",
+    "action_or_input": "validate_travel_completeness called",
+    "expected_result": "Validates successfully",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-26",
+    "source_id": "IAA-BR-201 date-invalid",
+    "purpose": "Verify arrival < departure rejected",
+    "preconditions": "arrival < departure",
+    "action_or_input": "validate_travel_completeness called",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-27",
+    "source_id": "IAA-BR-201 per-diem-negative",
+    "purpose": "Verify negative claimed amount rejected",
+    "preconditions": "Amount < 0",
+    "action_or_input": "validate_travel_completeness called",
+    "expected_result": "DomainValidationError raised",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-28",
+    "source_id": "IAA-BR-202 standard-threshold",
+    "purpose": "Verify claim < 50000 verified directly by finance",
+    "preconditions": "Amount 20000, threshold 50000",
+    "action_or_input": "verify_travel_claim called",
+    "expected_result": "Status becomes VERIFIED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-29",
+    "source_id": "IAA-BR-202 high-threshold",
+    "purpose": "Verify claim >= 50000 requires authority approval",
+    "preconditions": "Amount 60000, threshold 50000",
+    "action_or_input": "verify_travel_claim called",
+    "expected_result": "Status becomes APPROVAL_PENDING",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-30",
+    "source_id": "IAA-BR-301 three-states",
+    "purpose": "Verify audit observation valid states are open, responded, closed",
+    "preconditions": "Observation created",
+    "action_or_input": "Transition through open -> responded -> closed",
+    "expected_result": "All transitions succeed",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-31",
+    "source_id": "IAA-BR-301 loop-to-open",
+    "purpose": "Verify unsatisfactory response returns observation to open",
+    "preconditions": "Observation in RESPONDED",
+    "action_or_input": "review_and_close_observation with is_satisfactory=False",
+    "expected_result": "Status transitions back to OPEN",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-32",
+    "source_id": "IAA-BR-302 close-satisfactory",
+    "purpose": "Verify satisfactory response transitions to closed",
+    "preconditions": "Observation in RESPONDED",
+    "action_or_input": "review_and_close_observation with is_satisfactory=True",
+    "expected_result": "Status transitions to CLOSED",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-33",
+    "source_id": "IAA-BR-401 overdue-escalate",
+    "purpose": "Verify pending approval exceeding timeout escalated to Director",
+    "preconditions": "Assigned 5 days ago, SLA 3 days",
+    "action_or_input": "Run escalate_overdue_approvals",
+    "expected_result": "Status becomes ESCALATED and role set to Director",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-BR-34",
+    "source_id": "IAA-BR-401 recent-no-escalate",
+    "purpose": "Verify recent approval within SLA is not escalated",
+    "preconditions": "Assigned 1 day ago, SLA 3 days",
+    "action_or_input": "Run escalate_overdue_approvals",
+    "expected_result": "Status remains unchanged",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-BR-35",
+    "source_id": "IAA-BR-501 user-isolation",
+    "purpose": "Verify Basic User cannot see other users records",
+    "preconditions": "User 1001 and 2002 records exist",
+    "action_or_input": "scope_requests for user 1001",
+    "expected_result": "Only user 1001 records returned",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-36",
+    "source_id": "IAA-BR-501 out-of-scope-404",
+    "purpose": "Verify detail endpoint returns 404 for out-of-scope record",
+    "preconditions": "Record belongs to user 2002",
+    "action_or_input": "User 1001 requests record detail",
+    "expected_result": "HTTP 404 returned",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "T-BR-37",
+    "source_id": "IAA-BR-502 role-integrity",
+    "purpose": "Verify audit log immutably preserves acting role",
+    "preconditions": "Action executed",
+    "action_or_input": "Check acting_role in AuditLogEntry",
+    "expected_result": "Role matches acting role at time of execution",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-38",
+    "source_id": "IAA-BR-503 complete-logging",
+    "purpose": "Verify state transitions generate audit log entries",
+    "preconditions": "Transitions executed",
+    "action_or_input": "Query audit logs",
+    "expected_result": "Audit entries exist for every transition",
+    "test_type": "unit"
+  },
+  {
+    "test_id": "T-BR-39",
+    "source_id": "IAA-BR-504 notifications",
+    "purpose": "Verify notifications emitted on status changes",
+    "preconditions": "Submission and decisions executed",
+    "action_or_input": "Inspect notification output",
+    "expected_result": "Notifications emitted for relevant actors",
+    "test_type": "unit"
+  }
+]
