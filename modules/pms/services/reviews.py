@@ -51,6 +51,7 @@ def assign_director(
         if app.status not in (
             PatentApplicationStatus.SUBMITTED.value,
             PatentApplicationStatus.RESUBMITTED.value,
+            PatentApplicationStatus.UNDER_REVIEW.value,
         ):
             raise PreconditionNotMetError(
                 f"Application status '{app.status}' is not eligible for Director assignment."
@@ -66,10 +67,15 @@ def assign_director(
         if assigned_by_user_id == app.applicant_user_id or assigned_by_user_id in coinventor_ids:
             raise ConflictOfInterestError("PCC_ADMIN cannot assign an application they authored.")
 
-        validate_transition(
-            app.status, PatentApplicationStatus.UNDER_REVIEW, actor_role="PCC_ADMIN"
-        )
         prev_status = app.status
+        previous_director_user_id = app.assigned_director_user_id
+
+        if app.status != PatentApplicationStatus.UNDER_REVIEW.value:
+            validate_transition(
+                app.status,
+                PatentApplicationStatus.UNDER_REVIEW,
+                actor_role="PCC_ADMIN",
+            )
 
         now = timezone.now()
         app.assigned_director_user_id = director_user_id
@@ -81,10 +87,15 @@ def assign_director(
         log_audit(
             application=app,
             actor_user_id=assigned_by_user_id,
-            action_type="director_assigned",
+            action_type=(
+                "director_reassigned"
+                if previous_director_user_id is not None
+                else "director_assigned"
+            ),
             from_state=prev_status,
             to_state=app.status,
             details={
+                "previous_director_user_id": previous_director_user_id,
                 "assigned_director_user_id": director_user_id,
                 "review_deadline": str(app.review_deadline),
             },

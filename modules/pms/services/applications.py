@@ -310,7 +310,9 @@ def withdraw_application(
             raise WithdrawalNotAllowedError("A withdrawal reason is required (BR-PMS-069).")
 
         # Check co-inventor consent (BR-PMS-070)
-        unconsented = app.coinventors.filter(withdrawal_consent_given=False)
+        unconsented = app.coinventors.filter(
+        withdrawal_consent_given=False
+        ).exclude(user_id=applicant_user_id)
         if unconsented.exists():
             raise WithdrawalNotAllowedError(
                 "All co-inventors must record consent before an application "
