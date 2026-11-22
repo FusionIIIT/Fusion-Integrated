@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.lms",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -191,6 +192,10 @@ PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
 # No multipart endpoints remain, so this only caps the JSON body.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 
+# Media files (uploads)
+MEDIA_ROOT = env("MEDIA_ROOT", str(BASE_DIR / "media"))
+MEDIA_URL = env("MEDIA_URL", "/media/")
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "fusion_auth.authentication.IamSessionAuthentication",
@@ -230,6 +235,10 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "CourseStatusEnum": [("draft", "draft"), ("published", "published")],
+        "ContentStatusEnum": [("draft", "draft"), ("published", "published"), ("scheduled", "scheduled")],
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False
