@@ -1,0 +1,142 @@
+...................................................F.F                   [100%]
+================================== FAILURES ===================================
+_________ test_br_utilization_report_groups_visits_by_calendar_month __________
+
+    @pytest.mark.django_db
+    def test_br_utilization_report_groups_visits_by_calendar_month():
+        from modules.phc.models import PatientVisit
+        from modules.phc.services.operations import generate_report
+    
+        for day in ("2026-10-01", "2026-10-31", "2026-11-01"):
+            PatientVisit.objects.create(
+                user_id=1001, visit_date=day, chief_complaint="Monthly", recorded_by_user_id=900
+            )
+>       report = generate_report("utilization")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+modules\phc\tests\test_br.py:399: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+report_type = 'utilization'
+
+    def generate_report(report_type: str) -> dict:
+        """PHC-UC-13: Generate an anonymized administrative report.
+    
+        PHC-BR-12: patient-identifiable information is NOT exposed.
+        Supported types:
+          - "demographics"      \u2192 patient visit counts by age-group/gender (no names/IDs)
+          - "utilization"       \u2192 visits per day/week
+          - "inventory"         \u2192 current stock levels
+        """
+        from modules.phc.models import InventoryAudit, InventoryItem, PatientVisit
+    
+        if report_type == "demographics":
+            from modules.directory import contracts as directory_contracts
+    
+            total = PatientVisit.objects.count()
+            by_patient = list(
+                PatientVisit.objects.values("user_id")
+                .annotate(visits=models.Count("id"))
+                .order_by("user_id")
+            )
+            user_details = directory_contracts.get_users([row["user_id"] for row in by_patient])
+            groups = {}
+            for row in by_patient:
+                person = user_details.get(row["user_id"])
+                if person is None:
+                    category = "unclassified"
+                elif person.kind == "student":
+                    category = "student"
+                elif person.kind in {"faculty", "staff"}:
+                    category = "employee"
+                else:
+                    category = "unclassified"
+                group = groups.setdefault(category, {"patients": 0, "visits": 0})
+                group["patients"] += 1
+                group["visits"] += row["visits"]
+            return {
+                "report_type": "demographics",
+                "description": (
+                    "Aggregate patient and visit counts by patient category. "
+                    "No patient-identifiable data included."
+                ),
+                "total_visits": total,
+                "patient_groups": [
+                    {"category": category, **counts} for category, counts in sorted(groups.items())
+                ],
+            }
+    
+        if report_type == "utilization":
+            from django.db.models.functions import TruncMonth
+    
+            rows = (
+                PatientVisit.objects.annotate(month=TruncMonth("visit_date"))
+                .values("month")
+                .annotate(visits=models.Count("id"))
+                .order_by("month")
+            )
+            return {
+                "report_type": "utilization",
+                "description": "Visit counts by month. No patient-identifiable data included.",
+                "rows": [
+>                   {"month": str(r["month"].date() if r["month"] else ""), "visits": r["visits"]}
+                                  ^^^^^^^^^^^^^^^
+                    for r in rows
+                ],
+            }
+E           AttributeError: 'datetime.date' object has no attribute 'date'
+
+modules\phc\services\operations.py:144: AttributeError
+___ test_br_inventory_report_marks_only_below_threshold_items_as_low_stock ____
+
+phc_client = <function phc_client.<locals>.make at 0x000001B2DCEEB6A0>
+
+    @pytest.mark.django_db
+    def test_br_inventory_report_marks_only_below_threshold_items_as_low_stock(phc_client):
+>       InventoryItem.objects.create(
+        ^^^^^^^^^^^^^
+            name="Below", stock_quantity=Decimal("1"), reorder_threshold=Decimal("2")
+        )
+E       NameError: name 'InventoryItem' is not defined
+
+modules\phc\tests\test_br.py:415: NameError
+============================== warnings summary ===============================
+modules/phc/tests/test_br.py::test_claim_submit_requires_employee_own_prescription_expense_date
+modules/phc/tests/test_br.py::test_claimant_only_sees_own_claims_and_status_change_notifies
+modules/phc/tests/test_br.py::test_br_claim_submission_window_includes_limit_and_rejects_outside[expense-day]
+modules/phc/tests/test_br.py::test_br_claim_submission_window_includes_limit_and_rejects_outside[last-allowed-day]
+  C:\Users\user\Downloads\assignment9\Fusion-Integrated\.venv\Lib\site-packages\rest_framework\fields.py:1015: UserWarning: min_value should be an integer or Decimal instance.
+    warnings.warn("min_value should be an integer or Decimal instance.")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.4-final-0 _______________
+
+Name                                    Stmts   Miss Branch BrPart  Cover
+-------------------------------------------------------------------------
+modules\phc\api\__init__.py                 0      0      0      0   100%
+modules\phc\api\serializers.py            122      1      6      2    98%
+modules\phc\api\urls.py                     3      0      0      0   100%
+modules\phc\api\views.py                  358    154     18      0    54%
+modules\phc\domain\__init__.py              0      0      0      0   100%
+modules\phc\domain\reimbursement.py        13      0      6      0   100%
+modules\phc\domain\state_machine.py        33      7      8      2    68%
+modules\phc\models.py                     199     16      0      0    92%
+modules\phc\selectors\__init__.py           0      0      0      0   100%
+modules\phc\selectors\scoping.py           44     20      0      0    55%
+modules\phc\services\__init__.py            0      0      0      0   100%
+modules\phc\services\inventory.py          58     29      8      1    52%
+modules\phc\services\notifications.py      45      5      6      1    88%
+modules\phc\services\operations.py         57     10     24      4    83%
+modules\phc\services\pdf.py                54     54     18      0     0%
+modules\phc\services\records.py            25     15      2      0    37%
+modules\phc\services\reimbursement.py      60      6      2      0    90%
+modules\phc\services\schedules.py          23     15      4      0    30%
+-------------------------------------------------------------------------
+TOTAL                                    1094    332    102     10    67%
+Coverage XML written to file docs\09-phc\spec-tests\results\expanded-final\br\coverage.xml
+=========================== short test summary info ===========================
+FAILED modules/phc/tests/test_br.py::test_br_utilization_report_groups_visits_by_calendar_month
+FAILED modules/phc/tests/test_br.py::test_br_inventory_report_marks_only_below_threshold_items_as_low_stock
+2 failed, 52 passed, 4 warnings in 1.65s
+pytest_exit_code=1

@@ -141,7 +141,13 @@ def generate_report(report_type: str) -> dict:
             "report_type": "utilization",
             "description": "Visit counts by month. No patient-identifiable data included.",
             "rows": [
-                {"month": str(r["month"].date() if r["month"] else ""), "visits": r["visits"]}
+                {
+                    "month": str(
+                        (r["month"].date() if isinstance(r["month"], datetime) else r["month"])
+                        or ""
+                    ),
+                    "visits": r["visits"],
+                }
                 for r in rows
             ],
         }

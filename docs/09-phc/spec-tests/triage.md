@@ -16,14 +16,29 @@ This log records the first observed failures and the reruns. “Initial” refer
 | Migration check proposed an expense-date `help_text` alteration after style cleanup. | Initial command output is summarized in `results/initial/environment-and-checks.md`. | Migration/model drift. | Updated the initial PHC migration to match the model; final check reports no changes. |
 | Import Linter found a direct PHC-test import from `modules.directory.models`. | Initial command output is summarized in `results/initial/environment-and-checks.md`. | Test architecture boundary violation. | Replaced it with a stub of the public directory contract. Final import check passes. |
 
-## Final rerun
+## Final expanded rerun
 
 | Strategy | Passed | Failed | Errors | Skipped |
 | --- | ---: | ---: | ---: | ---: |
-| FR | 4 | 0 | 0 | 0 |
-| UC | 7 | 0 | 0 | 0 |
-| BR | 6 | 0 | 0 | 0 |
-| WF | 4 | 0 | 0 | 0 |
-| Combined | 21 | 0 | 0 | 0 |
+| FR | 60 | 0 | 0 | 0 |
+| UC | 76 | 0 | 0 | 0 |
+| BR | 54 | 0 | 0 | 0 |
+| WF | 25 | 0 | 0 | 0 |
+| Combined | 215 | 0 | 0 | 0 |
 
-The final results and machine-generated reports are under `results/`. Remaining specification gaps are listed in [`../quality-report.md`](../quality-report.md); no zero-findings claim is made.
+The final expanded reports are under `results/expanded-final/`. The combined run measured 97.71% line coverage and 93.14% branch coverage. Its log records 15 Django REST Framework `min_value` validator warnings. Remaining limits are listed in [`../quality-report.md`](../quality-report.md); these results do not claim that every possible defect is absent.
+
+## Earlier 160-case run
+
+The first 160-case expansion produced 142 passing and 18 failing test items. All 18 were test-harness `NameError`s: two UC items lacked a `Decimal` import, and 16 WF items lacked a `ReimbursementClaim` import. No PHC product defect was exposed by those failures. The imports were corrected, and the 160-case rerun passed. Its raw reports remain under `results/expanded-initial/` and are superseded by the 215-case reports above.
+
+## Expanded coverage run (initial)
+
+The expanded suite was run against the unchanged implementation before making any new production-code fix. The run produced 215 collected cases: 213 passed, 2 failed, 0 errors, and 0 skipped. The combined coverage report measured 97.71% line coverage and 93.14% branch coverage. These are initial results with failing tests, not final passing results. Machine output is preserved under `results/expanded-initial-coverage/`.
+
+| Finding | Evidence | Classification | Proposed smallest fix |
+| --- | --- | --- | --- |
+| Utilization report raised `AttributeError: 'datetime.date' object has no attribute 'date'` when month aggregation returned a `date`. | `results/expanded-initial-coverage/br/pytest.log`; `results/expanded-initial-coverage/all/pytest.log` | Product defect in the monthly utilization output path. | Format the `TruncMonth` value with a type-safe conversion that accepts both `date` and `datetime`; add a regression assertion for month grouping. |
+| Inventory report test referenced `InventoryItem` without importing it. | `results/expanded-initial-coverage/br/pytest.log` | Test-harness import error; not a product defect. | Import the model in the test, then rerun. |
+
+No production changes were made before preserving this initial evidence. After recording it, the utilization formatting fix was applied and the missing test import was corrected. The post-fix combined run passed all 215 cases; its logs and coverage are under `results/expanded-final/`.

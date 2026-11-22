@@ -1,0 +1,788 @@
+....FFFFFFFFFFFFFFFF.....                                                [100%]
+================================== FAILURES ===================================
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-phc-review-to-verify] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50B2213A0>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'pending_phc_review', action = 'verify'
+permission = 'phc.claim.verify', payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-phc-review-to-decide] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50B2209A0>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'pending_phc_review', action = 'decide'
+permission = 'phc.claim.decide', payload = {'approve': True}
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-phc-review-to-payment] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F507C5AE80>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'pending_phc_review', action = 'payment'
+permission = 'phc.claim.payment', payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[accounts-cannot-reopen-review] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50A97B240>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'pending_accounts_verification', action = 'review'
+permission = 'phc.claim.review_phc', payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-accounts-to-decide] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50A9BE5C0>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'pending_accounts_verification', action = 'decide'
+permission = 'phc.claim.decide', payload = {'approve': True}
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-accounts-to-payment] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50A9BDD00>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'pending_accounts_verification', action = 'payment'
+permission = 'phc.claim.payment', payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[authority-stage-cannot-return-to-phc] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50A9BE840>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'pending_sanction', action = 'review'
+permission = 'phc.claim.review_phc', payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[authority-stage-cannot-reverify] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50A9BC220>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'pending_sanction', action = 'verify', permission = 'phc.claim.verify'
+payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-authority-to-payment] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50A8859E0>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'pending_sanction', action = 'payment'
+permission = 'phc.claim.payment', payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[paid-claim-cannot-return-to-phc] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50A7BB380>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'approved_for_payment', action = 'review'
+permission = 'phc.claim.review_phc', payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[paid-claim-cannot-return-to-accounts] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50A7BB9C0>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'approved_for_payment', action = 'verify'
+permission = 'phc.claim.verify', payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[paid-claim-cannot-be-decided-again] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50A7B7B00>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'approved_for_payment', action = 'decide'
+permission = 'phc.claim.decide', payload = {'approve': False}
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[rejected-claim-cannot-return-to-phc] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50B223880>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'rejected', action = 'review', permission = 'phc.claim.review_phc'
+payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[rejected-claim-cannot-return-to-accounts] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50B223D80>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'rejected', action = 'verify', permission = 'phc.claim.verify'
+payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[rejected-claim-cannot-be-decided-again] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50B220E00>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'rejected', action = 'decide', permission = 'phc.claim.decide'
+payload = {'approve': True}
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+_ test_wf_claim_rejects_out_of_order_or_terminal_state_actions[rejected-claim-cannot-be-paid] _
+
+phc_client = <function phc_client.<locals>.make at 0x000001F50B2A11C0>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+status = 'rejected', action = 'payment', permission = 'phc.claim.payment'
+payload = None
+
+    @pytest.mark.parametrize(
+        "status,action,permission,payload",
+        [
+            ("pending_phc_review", "verify", "phc.claim.verify", None),
+            ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_phc_review", "payment", "phc.claim.payment", None),
+            ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+            ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+            ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+            ("pending_sanction", "review", "phc.claim.review_phc", None),
+            ("pending_sanction", "verify", "phc.claim.verify", None),
+            ("pending_sanction", "payment", "phc.claim.payment", None),
+            ("approved_for_payment", "review", "phc.claim.review_phc", None),
+            ("approved_for_payment", "verify", "phc.claim.verify", None),
+            ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+            ("rejected", "review", "phc.claim.review_phc", None),
+            ("rejected", "verify", "phc.claim.verify", None),
+            ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+            ("rejected", "payment", "phc.claim.payment", None),
+        ],
+        ids=[
+            "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+            "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+            "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+            "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+            "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+        ],
+    )
+    def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+        phc_client, prescription, status, action, permission, payload
+    ):
+>       claim = ReimbursementClaim.objects.create(
+                ^^^^^^^^^^^^^^^^^^
+            user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+        )
+E       NameError: name 'ReimbursementClaim' is not defined
+
+modules\phc\tests\test_wf.py:166: NameError
+============================== warnings summary ===============================
+modules/phc/tests/test_wf.py::test_reimbursement_approved_path_and_terminal_payment
+modules/phc/tests/test_wf.py::test_rejected_claim_cannot_be_reopened_or_paid
+modules/phc/tests/test_wf.py::test_requisition_approval_fulfillment_does_not_change_inventory
+modules/phc/tests/test_wf.py::test_requisition_rejection_is_terminal
+  C:\Users\user\Downloads\assignment9\Fusion-Integrated\.venv\Lib\site-packages\rest_framework\fields.py:1015: UserWarning: min_value should be an integer or Decimal instance.
+    warnings.warn("min_value should be an integer or Decimal instance.")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.4-final-0 _______________
+
+Name                                     Stmts   Miss  Cover
+------------------------------------------------------------
+modules\phc\__init__.py                      0      0   100%
+modules\phc\api\__init__.py                  0      0   100%
+modules\phc\api\serializers.py             122      2    98%
+modules\phc\api\urls.py                      3      0   100%
+modules\phc\api\views.py                   358    150    58%
+modules\phc\apps.py                          6      0   100%
+modules\phc\contracts.py                     0      0   100%
+modules\phc\domain\__init__.py               0      0   100%
+modules\phc\domain\reimbursement.py         13      3    77%
+modules\phc\domain\state_machine.py         33      2    94%
+modules\phc\migrations\0001_initial.py       8      0   100%
+modules\phc\migrations\__init__.py           0      0   100%
+modules\phc\models.py                      199     16    92%
+modules\phc\registry.py                      7      7     0%
+modules\phc\selectors\__init__.py            0      0   100%
+modules\phc\selectors\scoping.py            44     21    52%
+modules\phc\services\__init__.py             0      0   100%
+modules\phc\services\inventory.py           58     15    74%
+modules\phc\services\notifications.py       45     27    40%
+modules\phc\services\operations.py          57     45    21%
+modules\phc\services\pdf.py                 54     54     0%
+modules\phc\services\records.py             25     15    40%
+modules\phc\services\reimbursement.py       60      7    88%
+modules\phc\services\schedules.py           23     15    35%
+modules\phc\tests\__init__.py                0      0   100%
+modules\phc\tests\conftest.py               19      0   100%
+modules\phc\tests\test_br.py               115    115     0%
+modules\phc\tests\test_fr.py                93     93     0%
+modules\phc\tests\test_uc.py               163    163     0%
+modules\phc\tests\test_wf.py                82      6    93%
+------------------------------------------------------------
+TOTAL                                     1587    756    52%
+Coverage XML written to file docs\09-phc\spec-tests\results\expanded-initial\wf\coverage.xml
+=========================== short test summary info ===========================
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-phc-review-to-verify]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-phc-review-to-decide]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-phc-review-to-payment]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[accounts-cannot-reopen-review]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-accounts-to-decide]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-accounts-to-payment]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[authority-stage-cannot-return-to-phc]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[authority-stage-cannot-reverify]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[skip-authority-to-payment]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[paid-claim-cannot-return-to-phc]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[paid-claim-cannot-return-to-accounts]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[paid-claim-cannot-be-decided-again]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[rejected-claim-cannot-return-to-phc]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[rejected-claim-cannot-return-to-accounts]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[rejected-claim-cannot-be-decided-again]
+FAILED modules/phc/tests/test_wf.py::test_wf_claim_rejects_out_of_order_or_terminal_state_actions[rejected-claim-cannot-be-paid]
+16 failed, 9 passed, 4 warnings in 1.36s
+pytest_exit_code=1

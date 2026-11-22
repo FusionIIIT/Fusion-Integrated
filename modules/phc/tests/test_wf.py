@@ -130,3 +130,97 @@ def test_requisition_rejection_is_terminal(phc_client):
         ).status_code
         == 409
     )
+
+
+@pytest.mark.parametrize(
+    "status,action,permission,payload",
+    [
+        ("pending_phc_review", "verify", "phc.claim.verify", None),
+        ("pending_phc_review", "decide", "phc.claim.decide", {"approve": True}),
+        ("pending_phc_review", "payment", "phc.claim.payment", None),
+        ("pending_accounts_verification", "review", "phc.claim.review_phc", None),
+        ("pending_accounts_verification", "decide", "phc.claim.decide", {"approve": True}),
+        ("pending_accounts_verification", "payment", "phc.claim.payment", None),
+        ("pending_sanction", "review", "phc.claim.review_phc", None),
+        ("pending_sanction", "verify", "phc.claim.verify", None),
+        ("pending_sanction", "payment", "phc.claim.payment", None),
+        ("approved_for_payment", "review", "phc.claim.review_phc", None),
+        ("approved_for_payment", "verify", "phc.claim.verify", None),
+        ("approved_for_payment", "decide", "phc.claim.decide", {"approve": False}),
+        ("rejected", "review", "phc.claim.review_phc", None),
+        ("rejected", "verify", "phc.claim.verify", None),
+        ("rejected", "decide", "phc.claim.decide", {"approve": True}),
+        ("rejected", "payment", "phc.claim.payment", None),
+    ],
+    ids=[
+        "skip-phc-review-to-verify", "skip-phc-review-to-decide", "skip-phc-review-to-payment",
+        "accounts-cannot-reopen-review", "skip-accounts-to-decide", "skip-accounts-to-payment",
+        "authority-stage-cannot-return-to-phc", "authority-stage-cannot-reverify", "skip-authority-to-payment",
+        "paid-claim-cannot-return-to-phc", "paid-claim-cannot-return-to-accounts", "paid-claim-cannot-be-decided-again",
+        "rejected-claim-cannot-return-to-phc", "rejected-claim-cannot-return-to-accounts", "rejected-claim-cannot-be-decided-again", "rejected-claim-cannot-be-paid",
+    ],
+)
+def test_wf_claim_rejects_out_of_order_or_terminal_state_actions(
+    phc_client, prescription, status, action, permission, payload
+):
+    from modules.phc.models import ReimbursementClaim
+
+    claim = ReimbursementClaim.objects.create(
+        user_id=1001, prescription=prescription, amount_claimed=Decimal("10.00"), status=status
+    )
+    client = phc_client(uid=901, kind="staff", permissions=(permission,))
+    path = f"/api/v1/phc/claims/{claim.pk}/{action}/"
+    response = client.post(path, payload or {}, format="json")
+    assert response.status_code == 409
+    claim.refresh_from_db()
+    assert claim.status == status
+
+
+@pytest.mark.parametrize(
+    "start_status,action,payload",
+    [
+        ("pending_approval", "fulfill", None),
+        ("rejected", "decide", {"approve": True}),
+        ("rejected", "fulfill", None),
+        ("fulfilled", "decide", {"approve": False}),
+    ],
+    ids=["cannot-fulfill-before-approval", "rejection-cannot-be-reversed", "rejection-cannot-be-fulfilled", "fulfilled-is-terminal"],
+)
+def test_wf_requisition_rejects_invalid_transition_and_preserves_status(
+    phc_client, start_status, action, payload
+):
+    from modules.phc.models import ProcurementRequisition
+
+    req = ProcurementRequisition.objects.create(
+        title="Workflow boundary", submitted_by_user_id=900, status=start_status
+    )
+    if action == "decide":
+        client = phc_client(uid=902, kind="staff", permissions=("phc.requisition.decide",))
+        response = client.post(
+            f"/api/v1/phc/requisitions/{req.pk}/decide/", payload, format="json"
+        )
+    else:
+        client = phc_client(uid=900, kind="staff", permissions=("phc.requisition.fulfill",))
+        response = client.post(f"/api/v1/phc/requisitions/{req.pk}/fulfill/")
+    assert response.status_code == 409
+    req.refresh_from_db()
+    assert req.status == start_status
+
+
+def test_wf_approved_requisition_records_decision_actor_notes_and_fulfillment_time(phc_client):
+    from modules.phc.models import ProcurementRequisition
+
+    req = ProcurementRequisition.objects.create(title="Delivery audit", submitted_by_user_id=900)
+    authority = phc_client(uid=902, kind="staff", permissions=("phc.requisition.decide",))
+    decision = authority.post(
+        f"/api/v1/phc/requisitions/{req.pk}/decide/",
+        {"approve": True, "notes": "Supplier confirmed stock"},
+        format="json",
+    )
+    assert decision.status_code == 200
+    assert decision.json()["decided_by_user_id"] == 902
+    assert decision.json()["decision_notes"] == "Supplier confirmed stock"
+    staff = phc_client(uid=900, kind="staff", permissions=("phc.requisition.fulfill",))
+    fulfilled = staff.post(f"/api/v1/phc/requisitions/{req.pk}/fulfill/")
+    assert fulfilled.status_code == 200
+    assert fulfilled.json()["fulfilled_at"] is not None
