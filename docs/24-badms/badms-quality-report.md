@@ -187,57 +187,65 @@ BADMS is fully ready and operational.
 **Command:** `.venv/bin/pytest modules/badms/tests/ --cov=modules/badms --cov-branch --cov-report=term-missing --cov-fail-under=90`
 
 ```
-Name                                            Stmts   Miss Branch BrPart  Cover
----------------------------------------------------------------------------------
-modules/badms/__init__.py                           0      0      0      0   100%
-modules/badms/api/__init__.py                       0      0      0      0   100%
-modules/badms/api/serializers.py                   96      0      0      0   100%
-modules/badms/api/urls.py                           4      0      0      0   100%
-modules/badms/api/views.py                        207      4      4      2    97%
-modules/badms/apps.py                               4      0      0      0   100%
-modules/badms/contracts.py                         51      0     10      0   100%
-modules/badms/domain/__init__.py                    4      0      0      0   100%
-modules/badms/domain/schedules.py                  15      0      6      0   100%
-modules/badms/domain/state_machine.py              63      1     18      1    98%
-modules/badms/domain/storage.py                    16      0      4      0   100%
-modules/badms/models/__init__.py                    8      0      0      0   100%
-modules/badms/models/archival.py                   42      0      0      0   100%
-modules/badms/models/audit.py                      16      1      0      0    94%
-modules/badms/models/backups.py                    29      0      0      0   100%
-modules/badms/models/policies.py                   14      0      0      0   100%
-modules/badms/models/restoration.py                26      0      0      0   100%
-modules/badms/models/schedules.py                  24      0      0      0   100%
-modules/badms/models/storage.py                    32      0      0      0   100%
-modules/badms/registry.py                          13      0      0      0   100%
-modules/badms/schedule.py                           3      3      0      0     0%
-modules/badms/selectors/__init__.py                 7      0      0      0   100%
-modules/badms/selectors/scoping.py                 71      0     36      0   100%
-modules/badms/services/__init__.py                  9      0      0      0   100%
-modules/badms/services/archival.py                 97     12     16      6    84%
-modules/badms/services/audit.py                     6      0      0      0   100%
-modules/badms/services/backups.py                  32      1      4      1    94%
-modules/badms/services/notifications.py             5      0      0      0   100%
-modules/badms/services/policies.py                 16      0      2      0   100%
-modules/badms/services/restoration.py              52      7      6      3    83%
-modules/badms/services/schedules.py                44      1     12      2    95%
-modules/badms/services/storage.py                  53      4     12      3    89%
-modules/badms/tasks.py                             48      1     12      3    93%
----------------------------------------------------------------------------------
-TOTAL                                            1107     35    142     21    96%
-Required test coverage of 90% reached. Total coverage: 95.52%
-75 passed in 3.15s
+Name                                                                     Stmts   Miss Branch BrPart  Cover   Missing
+--------------------------------------------------------------------------------------------------------------------
+modules/badms/__init__.py                                                    0      0      0      0   100%
+modules/badms/api/__init__.py                                                0      0      0      0   100%
+modules/badms/api/serializers.py                                            96      0      0      0   100%
+modules/badms/api/urls.py                                                    4      0      0      0   100%
+modules/badms/api/views.py                                                 207      4      4      2    97%   267, 341, 344, 356
+modules/badms/apps.py                                                        4      0      0      0   100%
+modules/badms/contracts.py                                                  51      0     10      0   100%
+modules/badms/domain/__init__.py                                             6      0      0      0   100%
+modules/badms/domain/crypto.py                                              97      3     30      2    96%   21->31, 32, 38-39
+modules/badms/domain/retention.py                                           19      0      4      0   100%
+modules/badms/domain/schedules.py                                           15      0      6      0   100%
+modules/badms/domain/state_machine.py                                       63      0     18      0   100%
+modules/badms/domain/storage.py                                             16      0      4      0   100%
+modules/badms/management/__init__.py                                         0      0      0      0   100%
+modules/badms/management/commands/__init__.py                                0      0      0      0   100%
+modules/badms/management/commands/badms_readiness.py                        11     11      4      0     0%   1-15
+modules/badms/management/commands/badms_seed_policies.py                    13     13      4      0     0%   1-39
+modules/badms/management/commands/check_backup_failure_sla.py                7      7      0      0     0%   1-11
+modules/badms/management/commands/evaluate_and_dispatch_due_backups.py       7      7      0      0     0%   1-11
+modules/badms/management/commands/monitor_storage_thresholds.py              7      7      0      0     0%   1-11
+modules/badms/management/commands/purge_expired_archives.py                  7      7      0      0     0%   1-11
+modules/badms/models/__init__.py                                             8      0      0      0   100%
+modules/badms/models/archival.py                                            42      0      0      0   100%
+modules/badms/models/audit.py                                               16      1      0      0    94%   24
+modules/badms/models/backups.py                                             29      0      0      0   100%
+modules/badms/models/policies.py                                            26      0      0      0   100%
+modules/badms/models/restoration.py                                         26      0      0      0   100%
+modules/badms/models/schedules.py                                           24      0      0      0   100%
+modules/badms/models/storage.py                                             46      0      0      0   100%
+modules/badms/registry.py                                                   15      1      0      0    93%   185
+modules/badms/schedule.py                                                    3      3      0      0     0%   1-10
+modules/badms/selectors/__init__.py                                          7      0      0      0   100%
+modules/badms/selectors/scoping.py                                         104      5     52      3    95%   28->37, 35-36, 65-66, 69
+modules/badms/services/__init__.py                                           9      0      0      0   100%
+modules/badms/services/archival.py                                         106     13     14      5    85%   58-59, 93, 121, 124, 129-130, 137, 160, 164-165, 171-172
+modules/badms/services/audit.py                                              7      0      0      0   100%
+modules/badms/services/backups.py                                           32      1      4      1    94%   66
+modules/badms/services/notifications.py                                      5      0      0      0   100%
+modules/badms/services/policies.py                                          16      0      2      0   100%
+modules/badms/services/restoration.py                                       53      5      6      3    86%   24, 49, 54-55, 73
+modules/badms/services/schedules.py                                         44      1     12      2    95%   73->80, 83
+modules/badms/services/storage.py                                           51      4     10      3    89%   37, 78, 86-87, 101->113
+modules/badms/tasks.py                                                      48      1     12      3    93%   27, 45->47, 57->55
+--------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                     1347     94    196     24    92%
+Required test coverage of 90% reached. Total coverage: 91.83%
+91 passed in 3.59s
 ```
 
 ### 2.2 Pure Domain Coverage Run
 **Command:** `.venv/bin/pytest modules/badms/tests/ --cov=modules/badms/domain --cov-branch --cov-report=term-missing --cov-fail-under=95`
 
 ```
-Name                                    Stmts   Miss Branch BrPart  Cover
--------------------------------------------------------------------------
-modules/badms/domain/__init__.py            4      0      0      0   100%
-modules/badms/domain/schedules.py          15      0      6      0   100%
-modules/badms/domain/state_machine.py      63      1     18      1    98%
-modules/badms/domain/crypto.py             97      3     30      2    96%
+Name                                    Stmts   Miss Branch BrPart  Cover   Missing
+-----------------------------------------------------------------------------------
+modules/badms/domain/__init__.py            6      0      0      0   100%
+modules/badms/domain/crypto.py             97      3     30      2    96%   21->31, 32, 38-39
 modules/badms/domain/retention.py          19      0      4      0   100%
 modules/badms/domain/schedules.py          15      0      6      0   100%
 modules/badms/domain/state_machine.py      63      0     18      0   100%
@@ -245,8 +253,20 @@ modules/badms/domain/storage.py            16      0      4      0   100%
 -----------------------------------------------------------------------------------
 TOTAL                                     216      3     62      2    98%
 Required test coverage of 95% reached. Total coverage: 98.20%
-89 passed in 3.19s
+91 passed in 3.00s
 ```
+
+### 2.3 Playwright End-to-End Suite (`make e2e`)
+**Command:** `make e2e` (`cd client && npm run e2e`)
+
+```
+> e2e
+> playwright test
+
+Running 18 tests using 5 workers
+  18 passed (9.7s)
+```
+All 18 Playwright end-to-end tests passing with 0 failures across BADMS archival, backups, office pages, restorations, and storage flows.
 
 ---
 
