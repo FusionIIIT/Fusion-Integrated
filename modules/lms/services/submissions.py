@@ -38,6 +38,16 @@ def _check_submission_eligibility(assignment: Assignment, user_id: int) -> None:
         raise ConflictError("Assignment deadline has passed. Submissions are closed.")
 
 
+def _get_next_attempt_number(assignment: Assignment, user_id: int) -> int:
+    existing = (
+        AssignmentSubmission.objects.select_for_update()
+        .filter(assignment=assignment, student_id=user_id)
+        .order_by("-attempt_number")
+        .first()
+    )
+    return (existing.attempt_number + 1) if existing else 1
+
+
 def submit_assignment(
     assignment_id: int,
     submission_type: str,
@@ -77,14 +87,6 @@ def submit_assignment(
         except ValueError as exc:
             raise BadRequestError(str(exc)) from exc
 
-        existing = (
-            AssignmentSubmission.objects.select_for_update()
-            .filter(assignment=assignment, student_id=user_id)
-            .order_by("-attempt_number")
-            .first()
-        )
-        next_attempt = (existing.attempt_number + 1) if existing else 1
-
         return AssignmentSubmission.objects.create(
             assignment=assignment,
             student_id=user_id,
@@ -92,5 +94,5 @@ def submit_assignment(
             content_text=content_text or "",
             content_link=content_link or "",
             file_attachment=file_attachment,
-            attempt_number=next_attempt,
+            attempt_number=_get_next_attempt_number(assignment, user_id),
         )

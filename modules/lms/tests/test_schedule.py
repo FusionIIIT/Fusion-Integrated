@@ -73,10 +73,14 @@ def test_process_scheduled_content_release():
         created_by=1,
     )
 
-    # Run the Celery task
+    # Run the Celery task twice and assert single effect (idempotency)
     result = process_scheduled_content_release()
     assert result["materials_released"] == 1
     assert result["assignments_released"] == 1
+
+    result_second_run = process_scheduled_content_release()
+    assert result_second_run["materials_released"] == 0
+    assert result_second_run["assignments_released"] == 0
 
     mat_due.refresh_from_db()
     mat_future.refresh_from_db()

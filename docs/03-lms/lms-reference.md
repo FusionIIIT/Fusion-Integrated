@@ -14,12 +14,12 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 | `CFR-LMS-005` | Post and view course-wide announcements | `services` | [services/announcements.py:15](../../modules/lms/services/announcements.py#L15) | `VERIFIED` |
 | `CFR-LMS-006` | Create and edit assignments in Draft state | `services` | [services/assignments.py:20](../../modules/lms/services/assignments.py#L20) | `VERIFIED` |
 | `CFR-LMS-007` | Publish assignments and control release visibility | `services` | [services/assignments.py:101](../../modules/lms/services/assignments.py#L101) | `VERIFIED` |
-| `CFR-LMS-008` | Assignment submission handling (file, text, link) | `services` | [services/submissions.py:41](../../modules/lms/services/submissions.py#L41) | `VERIFIED` |
+| `CFR-LMS-008` | Assignment submission handling (file, text, link) | `services` | [services/submissions.py:51](../../modules/lms/services/submissions.py#L51) | `VERIFIED` |
 | `CFR-LMS-009` | Student submission status and history tracking | `selectors` | [selectors/submissions.py:60](../../modules/lms/selectors/submissions.py#L60) | `VERIFIED` |
 | `CFR-LMS-010` | Grading student submissions with points and feedback | `services` | [services/grading.py:28](../../modules/lms/services/grading.py#L28) | `VERIFIED` |
-| `CFR-LMS-011` | Two-phase grade release workflow (Draft -> Published) | `services` | [services/grading.py:126](../../modules/lms/services/grading.py#L126) | `VERIFIED` |
+| `CFR-LMS-011` | Two-phase grade release workflow (Draft -> Published) | `services` | [services/grading.py:139](../../modules/lms/services/grading.py#L139) | `VERIFIED` |
 | `CFR-LMS-012` | Student access to released grade and feedback | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
-| `CFR-LMS-013` | Audit logging of post-release grade changes | `services` | [services/grading.py:71](../../modules/lms/services/grading.py#L71) | `VERIFIED` |
+| `CFR-LMS-013` | Audit logging of post-release grade changes | `services` | [services/grading.py:91](../../modules/lms/services/grading.py#L91) | `VERIFIED` |
 | `CFR-LMS-014` | Teaching Assistant authority boundaries | `domain` | [domain/rules.py:58](../../modules/lms/domain/rules.py#L58) | `VERIFIED` |
 | `CFR-LMS-015` | Observer read-only isolation and student-data privacy | `selectors` | [selectors/scoping.py:67](../../modules/lms/selectors/scoping.py#L67) | `VERIFIED` |
 
@@ -60,7 +60,7 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 | `AFR-LMS-010.3` | Accurately attribute all grading actions to acting user | `models` | [models/grading.py:22](../../modules/lms/models/grading.py#L22) | `VERIFIED` |
 | `AFR-LMS-011.1` | Hold grades in Draft state upon grading | `domain` | [domain/state_machine.py:128](../../modules/lms/domain/state_machine.py#L128) | `VERIFIED` |
 | `AFR-LMS-011.2` | Prevent students from viewing unreleased draft grades | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
-| `AFR-LMS-011.3` | Allow Faculty to release grades and feedback to students | `services` | [services/grading.py:126](../../modules/lms/services/grading.py#L126) | `VERIFIED` |
+| `AFR-LMS-011.3` | Allow Faculty to release grades and feedback to students | `services` | [services/grading.py:139](../../modules/lms/services/grading.py#L139) | `VERIFIED` |
 | `AFR-LMS-012.1` | Student views own released grade and feedback | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
 | `AFR-LMS-012.2` | Released grade is strictly read-only to Student | `api` | [api/views.py:630](../../modules/lms/api/views.py#L630) | `VERIFIED` |
 | `AFR-LMS-013.1` | Record actor identity on post-release grade modification | `models` | [models/grading.py:56](../../modules/lms/models/grading.py#L56) | `VERIFIED` |
@@ -88,10 +88,10 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 | `UC-LMS-007` | Create or Edit Assignment | `services` | [services/assignments.py:20](../../modules/lms/services/assignments.py#L20) | `VERIFIED` |
 | `UC-LMS-008` | Publish Assignment | `services` | [services/assignments.py:101](../../modules/lms/services/assignments.py#L101) | `VERIFIED` |
 | `UC-LMS-009` | View or Download Published Assignment | `selectors` | [selectors/assignments.py:36](../../modules/lms/selectors/assignments.py#L36) | `VERIFIED` |
-| `UC-LMS-010` | Submit Assignment | `services` | [services/submissions.py:41](../../modules/lms/services/submissions.py#L41) | `VERIFIED` |
+| `UC-LMS-010` | Submit Assignment | `services` | [services/submissions.py:51](../../modules/lms/services/submissions.py#L51) | `VERIFIED` |
 | `UC-LMS-011` | View Submission History and Status | `selectors` | [selectors/submissions.py:60](../../modules/lms/selectors/submissions.py#L60) | `VERIFIED` |
 | `UC-LMS-012` | Grade Submission | `services` | [services/grading.py:28](../../modules/lms/services/grading.py#L28) | `VERIFIED` |
-| `UC-LMS-013` | Release Grades and Feedback | `services` | [services/grading.py:126](../../modules/lms/services/grading.py#L126) | `VERIFIED` |
+| `UC-LMS-013` | Release Grades and Feedback | `services` | [services/grading.py:139](../../modules/lms/services/grading.py#L139) | `VERIFIED` |
 | `UC-LMS-014` | View Released Grade and Feedback | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
 | `UC-LMS-015` | Process Scheduled Content Release | `tasks` | [tasks.py:14](../../modules/lms/tasks.py#L14) | `VERIFIED` |
 
@@ -117,7 +117,7 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 | `BR-LMS-016` | Draft grade visibility | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
 | `BR-LMS-017` | Grade release authority | `domain` | [domain/rules.py:67](../../modules/lms/domain/rules.py#L67) | `VERIFIED` |
 | `BR-LMS-018` | Released grade read-only to Student | `api` | [api/views.py:630](../../modules/lms/api/views.py#L630) | `VERIFIED` |
-| `BR-LMS-019` | Post-release grade-change audit | `services` | [services/grading.py:71](../../modules/lms/services/grading.py#L71) | `VERIFIED` |
+| `BR-LMS-019` | Post-release grade-change audit | `services` | [services/grading.py:91](../../modules/lms/services/grading.py#L91) | `VERIFIED` |
 
 ### Workflows (BWs & CWs)
 

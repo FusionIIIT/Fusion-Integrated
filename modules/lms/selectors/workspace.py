@@ -42,8 +42,7 @@ def get_course_home_details(course_id: int, principal: Any) -> dict[str, Any] | 
     if not workspace:
         return None
 
-    # Teaching staff roster: Instructors and TAs only (AFR-LMS-001.2).
-    # Student roster is strictly excluded to prevent Observer and peer data leakage.
+    # Teaching staff roster: Instructors and TAs only, students excluded (AFR-LMS-001.2).
     staff_memberships = CourseMembership.objects.filter(
         course_id=course_id,
         role__in=[CourseRole.INSTRUCTOR, CourseRole.TA],

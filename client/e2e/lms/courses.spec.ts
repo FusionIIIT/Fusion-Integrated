@@ -9,9 +9,11 @@ test.describe("lms: courses and authorization guards", () => {
     await expect(page.getByRole("main").getByRole("button")).toHaveCount(0);
   });
 
-  test("a student can navigate to /lms/courses", async ({ page }) => {
+  test("a student views enrolled course workspace (UC-LMS-001)", async ({ page }) => {
     await page.goto("/lms/courses");
     await expect(page.getByRole("heading", { name: "Courses & Workspaces" })).toBeVisible();
+    await expect(page.locator(".mantine-Card-root").first()).toBeVisible();
+    await expect(page.getByText("Enrolled", { exact: false })).toBeVisible();
   });
 });
 

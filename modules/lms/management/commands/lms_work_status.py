@@ -20,52 +20,51 @@ class Command(BaseCommand):
             help="Maximum allowed lag in seconds before failing (default: 0).",
         )
 
-    def handle(self, *args, **options):
-        now = timezone.now()
-        problems = []
-
-        overdue_materials = CourseMaterial.objects.filter(
+    def _inspect_materials(self, now, max_lag):
+        overdue = CourseMaterial.objects.filter(
             status=MaterialStatus.SCHEDULED,
             release_date__lt=now,
         )
-        mat_count = overdue_materials.count()
-        oldest_mat = (
-            overdue_materials.order_by("release_date")
-            .values_list("release_date", flat=True)
-            .first()
-        )
-        mat_lag = int((now - oldest_mat).total_seconds()) if oldest_mat else 0
+        count = overdue.count()
+        oldest = overdue.order_by("release_date").values_list("release_date", flat=True).first()
+        lag = int((now - oldest).total_seconds()) if oldest else 0
+        self.stdout.write(f"  overdue materials   {count}")
+        self.stdout.write(f"  oldest material lag {lag}s")
+        if count > 0 and (max_lag == 0 or lag > max_lag):
+            return (
+                f"{count} scheduled material(s) are past release_date "
+                f"(lag: {lag}s) — Celery beat sweep may be stalled."
+            )
+        return None
 
-        self.stdout.write(f"  overdue materials   {mat_count}")
-        self.stdout.write(f"  oldest material lag {mat_lag}s")
-
-        overdue_assignments = Assignment.objects.filter(
+    def _inspect_assignments(self, now, max_lag):
+        overdue = Assignment.objects.filter(
             status=AssignmentStatus.SCHEDULED,
             release_date__lt=now,
         )
-        asg_count = overdue_assignments.count()
-        oldest_asg = (
-            overdue_assignments.order_by("release_date")
-            .values_list("release_date", flat=True)
-            .first()
-        )
-        asg_lag = int((now - oldest_asg).total_seconds()) if oldest_asg else 0
+        count = overdue.count()
+        oldest = overdue.order_by("release_date").values_list("release_date", flat=True).first()
+        lag = int((now - oldest).total_seconds()) if oldest else 0
+        self.stdout.write(f"  overdue assignments {count}")
+        self.stdout.write(f"  oldest assignment lag {lag}s")
+        if count > 0 and (max_lag == 0 or lag > max_lag):
+            return (
+                f"{count} scheduled assignment(s) are past release_date "
+                f"(lag: {lag}s) — Celery beat sweep may be stalled."
+            )
+        return None
 
-        self.stdout.write(f"  overdue assignments {asg_count}")
-        self.stdout.write(f"  oldest assignment lag {asg_lag}s")
-
+    def handle(self, *args, **options):
+        now = timezone.now()
         max_lag = options["max_lag"]
-        if mat_count > 0 and (max_lag == 0 or mat_lag > max_lag):
-            problems.append(
-                f"{mat_count} scheduled material(s) are past release_date "
-                f"(lag: {mat_lag}s) — Celery beat sweep may be stalled."
-            )
-
-        if asg_count > 0 and (max_lag == 0 or asg_lag > max_lag):
-            problems.append(
-                f"{asg_count} scheduled assignment(s) are past release_date "
-                f"(lag: {asg_lag}s) — Celery beat sweep may be stalled."
-            )
+        problems = [
+            p
+            for p in [
+                self._inspect_materials(now, max_lag),
+                self._inspect_assignments(now, max_lag),
+            ]
+            if p
+        ]
 
         if problems:
             self.stdout.write("")

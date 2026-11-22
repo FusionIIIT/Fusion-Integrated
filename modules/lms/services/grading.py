@@ -68,6 +68,26 @@ def grade_submission(
     return grade
 
 
+def _create_grade_audit_record(
+    grade: SubmissionGrade,
+    submission_id: int,
+    old_points: Decimal,
+    old_feedback: str,
+    changed_by: int,
+    reason: str,
+) -> None:
+    GradeChangeAudit.objects.create(
+        grade=grade,
+        submission_id=submission_id,
+        old_points=old_points,
+        new_points=grade.points_awarded,
+        old_feedback=old_feedback,
+        new_feedback=grade.feedback_text,
+        changed_by=changed_by,
+        reason=reason or "",
+    )
+
+
 def update_grade(
     submission_id: int,
     points_awarded: Decimal | float | int,
@@ -109,15 +129,8 @@ def update_grade(
         grade.save(update_fields=["points_awarded", "feedback_text"])
 
         if was_published:
-            GradeChangeAudit.objects.create(
-                grade=grade,
-                submission_id=submission_id,
-                old_points=old_points,
-                new_points=grade.points_awarded,
-                old_feedback=old_feedback,
-                new_feedback=grade.feedback_text,
-                changed_by=user_id,
-                reason=reason or "",
+            _create_grade_audit_record(
+                grade, submission_id, old_points, old_feedback, user_id, reason
             )
 
     return grade

@@ -3,10 +3,11 @@ import { expect, signedInAs, test, uniqueName } from "../support/test";
 test.describe("lms: course announcements", () => {
   test.use(signedInAs("student"));
 
-  test("a student can navigate to /lms/announcements", async ({ page }) => {
+  test("a student views course announcements feed (UC-LMS-005)", async ({ page }) => {
     await page.goto("/lms/announcements");
     await expect(page.getByRole("heading", { name: "Announcements" })).toBeVisible();
     await expect(page.getByRole("button", { name: /new announcement/i })).toHaveCount(0);
+    await expect(page.locator(".mantine-Card-root").first()).toBeVisible();
   });
 });
 
