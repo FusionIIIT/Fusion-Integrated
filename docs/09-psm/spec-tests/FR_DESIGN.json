@@ -1,0 +1,830 @@
+[
+  {
+    "test_id": "TC-FR-001",
+    "source_id": "AFR-PSM-001",
+    "purpose": "Verify requirement AFR-PSM-001: The system shall allow an authenticated employee to create and submit a purchase indent.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-001.",
+    "expected_result": "System satisfies AFR-PSM-001 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-002",
+    "source_id": "AFR-PSM-002",
+    "purpose": "Verify requirement AFR-PSM-002: The system shall capture the item details, quantity, estimated cost, and justification required by t",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-002.",
+    "expected_result": "System satisfies AFR-PSM-002 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-003",
+    "source_id": "AFR-PSM-003",
+    "purpose": "Verify requirement AFR-PSM-003: The system shall validate mandatory indent fields before accepting submission.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-003.",
+    "expected_result": "System satisfies AFR-PSM-003 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-004",
+    "source_id": "AFR-PSM-004",
+    "purpose": "Verify requirement AFR-PSM-004: The system shall detect potential duplicate indents and flag them for review.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-004.",
+    "expected_result": "System satisfies AFR-PSM-004 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-005",
+    "source_id": "AFR-PSM-005",
+    "purpose": "Verify requirement AFR-PSM-005: The system shall assign a unique indent identifier to every submitted indent.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-005.",
+    "expected_result": "System satisfies AFR-PSM-005 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-006",
+    "source_id": "AFR-PSM-006",
+    "purpose": "Verify requirement AFR-PSM-006: The system shall record a submission timestamp for every submitted indent.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-006.",
+    "expected_result": "System satisfies AFR-PSM-006 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-007",
+    "source_id": "AFR-PSM-007",
+    "purpose": "Verify requirement AFR-PSM-007: The system shall log indent creation and subsequent indent actions in the audit trail.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-007.",
+    "expected_result": "System satisfies AFR-PSM-007 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-008",
+    "source_id": "AFR-PSM-008",
+    "purpose": "Verify requirement AFR-PSM-008: The system shall allow an employee to modify an indent only while it is in a permissible state.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-008.",
+    "expected_result": "System satisfies AFR-PSM-008 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-009",
+    "source_id": "AFR-PSM-009",
+    "purpose": "Verify requirement AFR-PSM-009: The system shall allow an employee to withdraw or cancel an indent only while it is in a permissible",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-009.",
+    "expected_result": "System satisfies AFR-PSM-009 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-010",
+    "source_id": "AFR-PSM-010",
+    "purpose": "Verify requirement AFR-PSM-010: The system shall retain each indent modification as a distinct version.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-010.",
+    "expected_result": "System satisfies AFR-PSM-010 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-011",
+    "source_id": "AFR-PSM-011",
+    "purpose": "Verify requirement AFR-PSM-011: The system shall allow an employee to repeat a previous indent as a new draft and change it before s",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-011.",
+    "expected_result": "System satisfies AFR-PSM-011 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-012",
+    "source_id": "AFR-PSM-012",
+    "purpose": "Verify requirement AFR-PSM-012: The system shall make logged indent actions visible to stakeholders authorized for the relevant inde",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-012.",
+    "expected_result": "System satisfies AFR-PSM-012 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-013",
+    "source_id": "AFR-PSM-013",
+    "purpose": "Verify requirement AFR-PSM-013: The system shall automatically check departmental and central stock before an indent proceeds to ext",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-013.",
+    "expected_result": "System satisfies AFR-PSM-013 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-014",
+    "source_id": "AFR-PSM-014",
+    "purpose": "Verify requirement AFR-PSM-014: The system shall inform the requestor when requested items are present in system stock records.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-014.",
+    "expected_result": "System satisfies AFR-PSM-014 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-015",
+    "source_id": "AFR-PSM-015",
+    "purpose": "Verify requirement AFR-PSM-015: The system shall reserve available stock allocated to an indent before internal issue.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-015.",
+    "expected_result": "System satisfies AFR-PSM-015 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-016",
+    "source_id": "AFR-PSM-016",
+    "purpose": "Verify requirement AFR-PSM-016: The system shall account for reservations when determining available stock so that stock is not over",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-016.",
+    "expected_result": "System satisfies AFR-PSM-016 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-017",
+    "source_id": "AFR-PSM-017",
+    "purpose": "Verify requirement AFR-PSM-017: The system shall allow the Department Admin to schedule picking for an approved internal issue.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-017.",
+    "expected_result": "System satisfies AFR-PSM-017 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-018",
+    "source_id": "AFR-PSM-018",
+    "purpose": "Verify requirement AFR-PSM-018: The system shall allow the Department Admin to schedule dispatch for an approved internal issue.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-018.",
+    "expected_result": "System satisfies AFR-PSM-018 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-019",
+    "source_id": "AFR-PSM-019",
+    "purpose": "Verify requirement AFR-PSM-019: The system shall allow the requestor to acknowledge receipt of internally issued goods.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-019.",
+    "expected_result": "System satisfies AFR-PSM-019 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-020",
+    "source_id": "AFR-PSM-020",
+    "purpose": "Verify requirement AFR-PSM-020: The system shall perform final stock posting only after delivery is confirmed.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-020.",
+    "expected_result": "System satisfies AFR-PSM-020 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-021",
+    "source_id": "AFR-PSM-021",
+    "purpose": "Verify requirement AFR-PSM-021: The system shall not complete final stock posting for a receipt that has an unresolved discrepancy.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-021.",
+    "expected_result": "System satisfies AFR-PSM-021 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-022",
+    "source_id": "AFR-PSM-022",
+    "purpose": "Verify requirement AFR-PSM-022: The system shall route indents through the configured approval hierarchy according to applicable cos",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-022.",
+    "expected_result": "System satisfies AFR-PSM-022 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-023",
+    "source_id": "AFR-PSM-023",
+    "purpose": "Verify requirement AFR-PSM-023: The system shall support a more direct approval path for higher-priority indents as permitted by con",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-023.",
+    "expected_result": "System satisfies AFR-PSM-023 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-024",
+    "source_id": "AFR-PSM-024",
+    "purpose": "Verify requirement AFR-PSM-024: The system shall allow the Department Admin to record the criticality or priority of an indent.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-024.",
+    "expected_result": "System satisfies AFR-PSM-024 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-025",
+    "source_id": "AFR-PSM-025",
+    "purpose": "Verify requirement AFR-PSM-025: The system shall use recorded criticality or priority in the SLA notification and approval-queue pri",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-025.",
+    "expected_result": "System satisfies AFR-PSM-025 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-026",
+    "source_id": "AFR-PSM-026",
+    "purpose": "Verify requirement AFR-PSM-026: The system shall require a justification when an approver rejects an indent.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-026.",
+    "expected_result": "System satisfies AFR-PSM-026 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-027",
+    "source_id": "AFR-PSM-027",
+    "purpose": "Verify requirement AFR-PSM-027: The system shall issue SLA-based reminders for pending approval actions.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-027.",
+    "expected_result": "System satisfies AFR-PSM-027 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-028",
+    "source_id": "AFR-PSM-028",
+    "purpose": "Verify requirement AFR-PSM-028: The system shall issue SLA-based escalation notifications when configured escalation conditions are ",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-028.",
+    "expected_result": "System satisfies AFR-PSM-028 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-029",
+    "source_id": "AFR-PSM-029",
+    "purpose": "Verify requirement AFR-PSM-029: The system shall record every approval decision in the audit trail.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-029.",
+    "expected_result": "System satisfies AFR-PSM-029 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-030",
+    "source_id": "AFR-PSM-030",
+    "purpose": "Verify requirement AFR-PSM-030: The system shall route an indent for external procurement when sufficient stock is not available.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-030.",
+    "expected_result": "System satisfies AFR-PSM-030 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-031",
+    "source_id": "AFR-PSM-031",
+    "purpose": "Verify requirement AFR-PSM-031: The system shall determine whether direct procurement or tender procurement applies using configured",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-031.",
+    "expected_result": "System satisfies AFR-PSM-031 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-032",
+    "source_id": "AFR-PSM-032",
+    "purpose": "Verify requirement AFR-PSM-032: The system shall support publication of bids or tender invitations for tender procurements.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-032.",
+    "expected_result": "System satisfies AFR-PSM-032 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-033",
+    "source_id": "AFR-PSM-033",
+    "purpose": "Verify requirement AFR-PSM-033: The system shall support receipt and recording of bids for a tender.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-033.",
+    "expected_result": "System satisfies AFR-PSM-033 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-034",
+    "source_id": "AFR-PSM-034",
+    "purpose": "Verify requirement AFR-PSM-034: The system shall support evaluation of submitted bids against the defined tender evaluation criteria",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-034.",
+    "expected_result": "System satisfies AFR-PSM-034 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-035",
+    "source_id": "AFR-PSM-035",
+    "purpose": "Verify requirement AFR-PSM-035: The system shall support recording committee approval of the tender selection.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-035.",
+    "expected_result": "System satisfies AFR-PSM-035 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-036",
+    "source_id": "AFR-PSM-036",
+    "purpose": "Verify requirement AFR-PSM-036: The system shall retain procurement decisions and their supporting records so that the decision is t",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-036.",
+    "expected_result": "System satisfies AFR-PSM-036 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-037",
+    "source_id": "AFR-PSM-037",
+    "purpose": "Verify requirement AFR-PSM-037: The system shall allow creation of a purchase order only after the required approvals have been comp",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-037.",
+    "expected_result": "System satisfies AFR-PSM-037 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-038",
+    "source_id": "AFR-PSM-038",
+    "purpose": "Verify requirement AFR-PSM-038: The system shall link each purchase order to its originating indent.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-038.",
+    "expected_result": "System satisfies AFR-PSM-038 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-039",
+    "source_id": "AFR-PSM-039",
+    "purpose": "Verify requirement AFR-PSM-039: The system shall link each purchase order to the selected vendor.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-039.",
+    "expected_result": "System satisfies AFR-PSM-039 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-040",
+    "source_id": "AFR-PSM-040",
+    "purpose": "Verify requirement AFR-PSM-040: The system shall validate the vendor master before a purchase order is issued.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-040.",
+    "expected_result": "System satisfies AFR-PSM-040 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-041",
+    "source_id": "AFR-PSM-041",
+    "purpose": "Verify requirement AFR-PSM-041: The system shall track the current status of each purchase order centrally.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-041.",
+    "expected_result": "System satisfies AFR-PSM-041 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-042",
+    "source_id": "AFR-PSM-042",
+    "purpose": "Verify requirement AFR-PSM-042: The system shall track planned and actual delivery schedule information for each purchase order cent",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-042.",
+    "expected_result": "System satisfies AFR-PSM-042 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-043",
+    "source_id": "AFR-PSM-043",
+    "purpose": "Verify requirement AFR-PSM-043: The system shall allow the Requestor, Department Admin, or Department Head, as authorized, to record",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-043.",
+    "expected_result": "System satisfies AFR-PSM-043 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-044",
+    "source_id": "AFR-PSM-044",
+    "purpose": "Verify requirement AFR-PSM-044: The system shall create a Goods Receipt Note (GRN) for recorded deliveries.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-044.",
+    "expected_result": "System satisfies AFR-PSM-044 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-045",
+    "source_id": "AFR-PSM-045",
+    "purpose": "Verify requirement AFR-PSM-045: The system shall support recording a partial receipt against a purchase order.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-045.",
+    "expected_result": "System satisfies AFR-PSM-045 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-046",
+    "source_id": "AFR-PSM-046",
+    "purpose": "Verify requirement AFR-PSM-046: The system shall support rejection of delivered goods during receipt and inspection.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-046.",
+    "expected_result": "System satisfies AFR-PSM-046 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-047",
+    "source_id": "AFR-PSM-047",
+    "purpose": "Verify requirement AFR-PSM-047: The system shall update stock for externally procured goods only after the receipt is accepted.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-047.",
+    "expected_result": "System satisfies AFR-PSM-047 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-048",
+    "source_id": "AFR-PSM-048",
+    "purpose": "Verify requirement AFR-PSM-048: The system shall allow a discrepancy or damage to be logged against a delivery.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-048.",
+    "expected_result": "System satisfies AFR-PSM-048 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-049",
+    "source_id": "AFR-PSM-049",
+    "purpose": "Verify requirement AFR-PSM-049: The system shall retain evidence attached to a logged delivery discrepancy or damage.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-049.",
+    "expected_result": "System satisfies AFR-PSM-049 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-050",
+    "source_id": "AFR-PSM-050",
+    "purpose": "Verify requirement AFR-PSM-050: The system shall support initiation of a return when delivered goods require return under applicable",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-050.",
+    "expected_result": "System satisfies AFR-PSM-050 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-051",
+    "source_id": "AFR-PSM-051",
+    "purpose": "Verify requirement AFR-PSM-051: The system shall support initiation of a replacement when delivered goods require replacement under ",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-051.",
+    "expected_result": "System satisfies AFR-PSM-051 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-052",
+    "source_id": "AFR-PSM-052",
+    "purpose": "Verify requirement AFR-PSM-052: The system shall record vendor communication associated with discrepancy, return, replacement, or wa",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-052.",
+    "expected_result": "System satisfies AFR-PSM-052 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-053",
+    "source_id": "AFR-PSM-053",
+    "purpose": "Verify requirement AFR-PSM-053: The system shall track the current status and resolution of each discrepancy, return, replacement, o",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-053.",
+    "expected_result": "System satisfies AFR-PSM-053 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-054",
+    "source_id": "AFR-PSM-054",
+    "purpose": "Verify requirement AFR-PSM-054: The system shall apply inventory adjustments required by a resolved discrepancy, return, or replacem",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-054.",
+    "expected_result": "System satisfies AFR-PSM-054 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-055",
+    "source_id": "AFR-PSM-055",
+    "purpose": "Verify requirement AFR-PSM-055: The system shall apply accounting adjustments required by a resolved discrepancy, return, or replace",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-055.",
+    "expected_result": "System satisfies AFR-PSM-055 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-056",
+    "source_id": "AFR-PSM-056",
+    "purpose": "Verify requirement AFR-PSM-056: The system shall support three-way matching of Purchase Order, GRN, and Invoice.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-056.",
+    "expected_result": "System satisfies AFR-PSM-056 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-057",
+    "source_id": "AFR-PSM-057",
+    "purpose": "Verify requirement AFR-PSM-057: The system shall permit payment release only after delivery confirmation and required invoice verifi",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-057.",
+    "expected_result": "System satisfies AFR-PSM-057 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-058",
+    "source_id": "AFR-PSM-058",
+    "purpose": "Verify requirement AFR-PSM-058: The system shall place a mismatched invoice on hold.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-058.",
+    "expected_result": "System satisfies AFR-PSM-058 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-059",
+    "source_id": "AFR-PSM-059",
+    "purpose": "Verify requirement AFR-PSM-059: The system shall support partial payments according to configured payment rules.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-059.",
+    "expected_result": "System satisfies AFR-PSM-059 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-060",
+    "source_id": "AFR-PSM-060",
+    "purpose": "Verify requirement AFR-PSM-060: The system shall support onboarding of new vendors.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-060.",
+    "expected_result": "System satisfies AFR-PSM-060 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-061",
+    "source_id": "AFR-PSM-061",
+    "purpose": "Verify requirement AFR-PSM-061: The system shall support maintenance of vendor master data.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-061.",
+    "expected_result": "System satisfies AFR-PSM-061 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-062",
+    "source_id": "AFR-PSM-062",
+    "purpose": "Verify requirement AFR-PSM-062: The system shall validate GST details, bank details, and required compliance documents in vendor mas",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-062.",
+    "expected_result": "System satisfies AFR-PSM-062 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-063",
+    "source_id": "AFR-PSM-063",
+    "purpose": "Verify requirement AFR-PSM-063: The system shall prevent purchase-order issuance to an unverified vendor.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-063.",
+    "expected_result": "System satisfies AFR-PSM-063 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-064",
+    "source_id": "AFR-PSM-064",
+    "purpose": "Verify requirement AFR-PSM-064: The system shall prevent payment to an unverified vendor.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-064.",
+    "expected_result": "System satisfies AFR-PSM-064 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-065",
+    "source_id": "AFR-PSM-065",
+    "purpose": "Verify requirement AFR-PSM-065: The system shall retain version history for vendor master changes.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-065.",
+    "expected_result": "System satisfies AFR-PSM-065 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-066",
+    "source_id": "AFR-PSM-066",
+    "purpose": "Verify requirement AFR-PSM-066: The system shall record vendor master changes in the audit trail.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-066.",
+    "expected_result": "System satisfies AFR-PSM-066 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-067",
+    "source_id": "AFR-PSM-067",
+    "purpose": "Verify requirement AFR-PSM-067: The system shall support creation of an inter-departmental stock transfer request.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-067.",
+    "expected_result": "System satisfies AFR-PSM-067 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-068",
+    "source_id": "AFR-PSM-068",
+    "purpose": "Verify requirement AFR-PSM-068: The system shall reserve approved stock for an inter-departmental transfer.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-068.",
+    "expected_result": "System satisfies AFR-PSM-068 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-069",
+    "source_id": "AFR-PSM-069",
+    "purpose": "Verify requirement AFR-PSM-069: The system shall support dispatch of an approved inter-departmental stock transfer.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-069.",
+    "expected_result": "System satisfies AFR-PSM-069 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-070",
+    "source_id": "AFR-PSM-070",
+    "purpose": "Verify requirement AFR-PSM-070: The system shall support confirmation of receipt for an inter-departmental stock transfer.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-070.",
+    "expected_result": "System satisfies AFR-PSM-070 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-071",
+    "source_id": "AFR-PSM-071",
+    "purpose": "Verify requirement AFR-PSM-071: The system shall update the source stock ledger when a transfer is completed.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-071.",
+    "expected_result": "System satisfies AFR-PSM-071 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-072",
+    "source_id": "AFR-PSM-072",
+    "purpose": "Verify requirement AFR-PSM-072: The system shall update the destination stock ledger when a transfer is completed.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-072.",
+    "expected_result": "System satisfies AFR-PSM-072 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-073",
+    "source_id": "AFR-PSM-073",
+    "purpose": "Verify requirement AFR-PSM-073: The system shall retain an audit trail for inter-departmental stock transfers.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-073.",
+    "expected_result": "System satisfies AFR-PSM-073 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-074",
+    "source_id": "AFR-PSM-074",
+    "purpose": "Verify requirement AFR-PSM-074: The system shall provide operational reports for purchase and stores activities.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-074.",
+    "expected_result": "System satisfies AFR-PSM-074 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-075",
+    "source_id": "AFR-PSM-075",
+    "purpose": "Verify requirement AFR-PSM-075: The system shall provide procurement reports.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-075.",
+    "expected_result": "System satisfies AFR-PSM-075 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-076",
+    "source_id": "AFR-PSM-076",
+    "purpose": "Verify requirement AFR-PSM-076: The system shall provide stock reports.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-076.",
+    "expected_result": "System satisfies AFR-PSM-076 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-077",
+    "source_id": "AFR-PSM-077",
+    "purpose": "Verify requirement AFR-PSM-077: The system shall provide financial reports related to procurement and payments.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-077.",
+    "expected_result": "System satisfies AFR-PSM-077 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-078",
+    "source_id": "AFR-PSM-078",
+    "purpose": "Verify requirement AFR-PSM-078: The system shall allow report data to be filtered by supported report criteria.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-078.",
+    "expected_result": "System satisfies AFR-PSM-078 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-079",
+    "source_id": "AFR-PSM-079",
+    "purpose": "Verify requirement AFR-PSM-079: The system shall allow generated reports to be exported.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-079.",
+    "expected_result": "System satisfies AFR-PSM-079 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-080",
+    "source_id": "AFR-PSM-080",
+    "purpose": "Verify requirement AFR-PSM-080: The system shall support scheduled report generation.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-080.",
+    "expected_result": "System satisfies AFR-PSM-080 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-081",
+    "source_id": "AFR-PSM-081",
+    "purpose": "Verify requirement AFR-PSM-081: The system shall provide dashboards showing real-time process status and key metrics.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-081.",
+    "expected_result": "System satisfies AFR-PSM-081 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-082",
+    "source_id": "AFR-PSM-082",
+    "purpose": "Verify requirement AFR-PSM-082: The system shall log every report generation event.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-082.",
+    "expected_result": "System satisfies AFR-PSM-082 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-083",
+    "source_id": "AFR-PSM-083",
+    "purpose": "Verify requirement AFR-PSM-083: The system shall send automated notifications for indent submission and approval events.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-083.",
+    "expected_result": "System satisfies AFR-PSM-083 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-084",
+    "source_id": "AFR-PSM-084",
+    "purpose": "Verify requirement AFR-PSM-084: The system shall send alerts for dispatch, receipt, invoice, and payment status events.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-084.",
+    "expected_result": "System satisfies AFR-PSM-084 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-085",
+    "source_id": "AFR-PSM-085",
+    "purpose": "Verify requirement AFR-PSM-085: The system shall send SLA reminder and escalation notifications.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-085.",
+    "expected_result": "System satisfies AFR-PSM-085 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-086",
+    "source_id": "AFR-PSM-086",
+    "purpose": "Verify requirement AFR-PSM-086: The system shall retain the communication history generated by the module.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-086.",
+    "expected_result": "System satisfies AFR-PSM-086 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-087",
+    "source_id": "AFR-PSM-087",
+    "purpose": "Verify requirement AFR-PSM-087: The system shall maintain a complete audit trail of module actions.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-087.",
+    "expected_result": "System satisfies AFR-PSM-087 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-088",
+    "source_id": "AFR-PSM-088",
+    "purpose": "Verify requirement AFR-PSM-088: The system shall support internal audit of purchase and stores records.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-088.",
+    "expected_result": "System satisfies AFR-PSM-088 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  },
+  {
+    "test_id": "TC-FR-089",
+    "source_id": "AFR-PSM-089",
+    "purpose": "Verify requirement AFR-PSM-089: The system shall support statutory audit of purchase and stores records.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-089.",
+    "expected_result": "System satisfies AFR-PSM-089 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-090",
+    "source_id": "AFR-PSM-090",
+    "purpose": "Verify requirement AFR-PSM-090: The system shall enforce role-based access control for module functions and information.",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-090.",
+    "expected_result": "System satisfies AFR-PSM-090 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-091",
+    "source_id": "AFR-PSM-091",
+    "purpose": "Verify requirement AFR-PSM-091: The system shall enforce applicable procurement-policy constraints represented in configured busines",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-091.",
+    "expected_result": "System satisfies AFR-PSM-091 without raising unexpected errors.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-FR-092",
+    "source_id": "AFR-PSM-092",
+    "purpose": "Verify requirement AFR-PSM-092: The system shall enforce applicable financial-policy constraints represented in configured business ",
+    "preconditions": "Authenticated user with required PSM role and clean test database state.",
+    "action_or_input": "Invoke backend service/endpoint corresponding to AFR-PSM-092.",
+    "expected_result": "System satisfies AFR-PSM-092 without raising unexpected errors.",
+    "test_type": "boundary/negative"
+  }
+]
