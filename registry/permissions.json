@@ -278,6 +278,175 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "system_admin": {
+      "grants": {
+        "Director": [
+          "system_admin.archive.manage",
+          "system_admin.archive.view",
+          "system_admin.audit.view",
+          "system_admin.config.change",
+          "system_admin.role.manage",
+          "system_admin.role.view",
+          "system_admin.user.add",
+          "system_admin.user.change",
+          "system_admin.user.view"
+        ],
+        "IT Head": [
+          "system_admin.archive.manage",
+          "system_admin.archive.view"
+        ],
+        "Registrar": [
+          "system_admin.archive.manage",
+          "system_admin.archive.view",
+          "system_admin.audit.view",
+          "system_admin.config.change",
+          "system_admin.role.manage",
+          "system_admin.role.view",
+          "system_admin.user.add",
+          "system_admin.user.change",
+          "system_admin.user.view"
+        ],
+        "System Administrator": [
+          "system_admin.archive.manage",
+          "system_admin.archive.view",
+          "system_admin.audit.view",
+          "system_admin.config.change",
+          "system_admin.role.manage",
+          "system_admin.role.view",
+          "system_admin.user.add",
+          "system_admin.user.change",
+          "system_admin.user.view"
+        ],
+        "faculty": [
+          "system_admin.archive.manage",
+          "system_admin.archive.view",
+          "system_admin.audit.view",
+          "system_admin.config.change",
+          "system_admin.role.manage",
+          "system_admin.role.view",
+          "system_admin.user.add",
+          "system_admin.user.change",
+          "system_admin.user.view"
+        ],
+        "unit_head": [
+          "system_admin.archive.manage",
+          "system_admin.archive.view",
+          "system_admin.audit.view",
+          "system_admin.config.change",
+          "system_admin.role.manage",
+          "system_admin.role.view",
+          "system_admin.user.add",
+          "system_admin.user.change",
+          "system_admin.user.view"
+        ]
+      },
+      "module_grants": [
+        "Director",
+        "IT Head",
+        "Registrar",
+        "System Administrator",
+        "faculty",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/system_admin",
+        "icon": "ShieldCheck",
+        "items": [
+          {
+            "code": "system_admin.dashboard",
+            "icon": "Gauge",
+            "label": "Dashboard",
+            "required_permission": "system_admin.user.view",
+            "sort_order": 1,
+            "to": "/system_admin"
+          },
+          {
+            "code": "system_admin.users",
+            "icon": "Users",
+            "label": "User Management",
+            "required_permission": "system_admin.user.view",
+            "sort_order": 10,
+            "to": "/system_admin/users"
+          },
+          {
+            "code": "system_admin.roles",
+            "icon": "IdentificationBadge",
+            "label": "Role Directory",
+            "required_permission": "system_admin.role.view",
+            "sort_order": 20,
+            "to": "/system_admin/roles"
+          },
+          {
+            "code": "system_admin.archives",
+            "icon": "Archive",
+            "label": "Archive Control",
+            "required_permission": "system_admin.archive.view",
+            "sort_order": 30,
+            "to": "/system_admin/archives"
+          },
+          {
+            "code": "system_admin.audit",
+            "icon": "ListBullets",
+            "label": "Audit Logs",
+            "required_permission": "system_admin.audit.view",
+            "sort_order": 40,
+            "to": "/system_admin/audit"
+          },
+          {
+            "code": "system_admin.config",
+            "icon": "Gear",
+            "label": "System Parameters",
+            "required_permission": "system_admin.config.change",
+            "sort_order": 50,
+            "to": "/system_admin/config"
+          }
+        ],
+        "label": "System Admin",
+        "nav_section": "Administration",
+        "sort_order": 1,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "system_admin.user.view",
+          "label": "View users and profiles"
+        },
+        {
+          "code": "system_admin.user.add",
+          "label": "Create basic user accounts"
+        },
+        {
+          "code": "system_admin.user.change",
+          "label": "Update profiles and activation status"
+        },
+        {
+          "code": "system_admin.role.view",
+          "label": "View role definitions and availability"
+        },
+        {
+          "code": "system_admin.role.manage",
+          "label": "Assign, reassign, revoke, and extend roles"
+        },
+        {
+          "code": "system_admin.archive.view",
+          "label": "View archived users and historical records"
+        },
+        {
+          "code": "system_admin.archive.manage",
+          "label": "Execute archival, restoration, and purge requests"
+        },
+        {
+          "code": "system_admin.audit.view",
+          "label": "View audit logs and generate reports"
+        },
+        {
+          "code": "system_admin.config.change",
+          "label": "Configure permitted system parameters"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",

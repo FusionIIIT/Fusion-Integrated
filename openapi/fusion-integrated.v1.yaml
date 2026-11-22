@@ -1674,6 +1674,762 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/system_admin/archives/:
+    get:
+      operationId: v1_system_admin_archives_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArchivedUser'
+          description: ''
+  /api/v1/system_admin/archives/dataset/:
+    post:
+      operationId: v1_system_admin_archives_dataset_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HistoricalDataset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HistoricalDataset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HistoricalDataset'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalDataset'
+          description: ''
+  /api/v1/system_admin/archives/purge-request/:
+    post:
+      operationId: v1_system_admin_archives_purge_request_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePurgeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreatePurgeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreatePurgeRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurgeRequest'
+          description: ''
+  /api/v1/system_admin/archives/purge-request/{purge_id}/authorize/:
+    post:
+      operationId: v1_system_admin_archives_purge_request_authorize_create
+      parameters:
+      - in: path
+        name: purge_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurgeAuthorize'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PurgeAuthorize'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PurgeAuthorize'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurgeRequest'
+          description: ''
+  /api/v1/system_admin/archives/user/:
+    post:
+      operationId: v1_system_admin_archives_user_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchiveUserAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArchiveUserAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArchiveUserAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchivedUser'
+          description: ''
+  /api/v1/system_admin/archives/user/{user_id}/restore/:
+    post:
+      operationId: v1_system_admin_archives_user_restore_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestoreUserAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestoreUserAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestoreUserAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/system_admin/audit/:
+    get:
+      operationId: v1_system_admin_audit_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SystemAuditLog'
+          description: ''
+  /api/v1/system_admin/audit/alias/:
+    get:
+      operationId: v1_system_admin_audit_alias_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SystemAuditLog'
+          description: ''
+  /api/v1/system_admin/audit/failed-logins/:
+    get:
+      operationId: v1_system_admin_audit_failed_logins_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FailedLoginLog'
+          description: ''
+  /api/v1/system_admin/config/:
+    get:
+      operationId: v1_system_admin_config_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemParameters'
+          description: ''
+    patch:
+      operationId: v1_system_admin_config_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSystemParameters'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSystemParameters'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSystemParameters'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemParameters'
+          description: ''
+  /api/v1/system_admin/dashboard/:
+    get:
+      operationId: v1_system_admin_dashboard_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardMetrics'
+          description: ''
+  /api/v1/system_admin/roles/:
+    get:
+      operationId: v1_system_admin_roles_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/system_admin/roles/{id}/revoke/alias/:
+    post:
+      operationId: v1_system_admin_roles_revoke_alias_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevokeRole'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RevokeRole'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RevokeRole'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/system_admin/roles/{role_id}/extend/:
+    post:
+      operationId: v1_system_admin_roles_extend_create
+      parameters:
+      - in: path
+        name: role_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtendRole'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtendRole'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtendRole'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/system_admin/roles/{role_id}/reassign/:
+    post:
+      operationId: v1_system_admin_roles_reassign_create
+      parameters:
+      - in: path
+        name: role_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReassignRole'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReassignRole'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReassignRole'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/system_admin/roles/{role_id}/revoke/:
+    post:
+      operationId: v1_system_admin_roles_revoke_create
+      parameters:
+      - in: path
+        name: role_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevokeRole'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RevokeRole'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RevokeRole'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/system_admin/roles/assign/:
+    post:
+      operationId: v1_system_admin_roles_assign_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/system_admin/roles/assign/alias/:
+    post:
+      operationId: v1_system_admin_roles_assign_alias_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/system_admin/users/:
+    get:
+      operationId: v1_system_admin_users_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserAccount'
+          description: ''
+    post:
+      operationId: v1_system_admin_users_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserAccount'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/system_admin/users/{id}/status/alias/:
+    post:
+      operationId: v1_system_admin_users_status_alias_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserStatus'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserStatus'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserStatus'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+    patch:
+      operationId: v1_system_admin_users_status_alias_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserStatus'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserStatus'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserStatus'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/system_admin/users/{user_id}/:
+    get:
+      operationId: v1_system_admin_users_retrieve
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+    patch:
+      operationId: v1_system_admin_users_partial_update
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateUser'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/system_admin/users/{user_id}/status/:
+    post:
+      operationId: v1_system_admin_users_status_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserStatus'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserStatus'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserStatus'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+    patch:
+      operationId: v1_system_admin_users_status_partial_update
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserStatus'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserStatus'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserStatus'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/system_admin/users/alias/:
+    get:
+      operationId: v1_system_admin_users_alias_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserAccount'
+          description: ''
+    post:
+      operationId: v1_system_admin_users_alias_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserAccount'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
+  /api/v1/system_admin/users/bulk-create/:
+    post:
+      operationId: v1_system_admin_users_bulk_create_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkCreateUsers'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BulkCreateUsers'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BulkCreateUsers'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkCreateResult'
+          description: ''
+  /api/v1/system_admin/users/create/:
+    post:
+      operationId: v1_system_admin_users_create_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1981,6 +2737,122 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    ArchiveUserAction:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        reason:
+          type: string
+          maxLength: 500
+        retention_option:
+          type: string
+          default: standard_7yr
+        reversible_days:
+          type: integer
+          default: 90
+      required:
+      - reason
+      - user_id
+    ArchivedUser:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        institute_id:
+          type: string
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        user_type:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        retention_option:
+          allOf:
+          - $ref: '#/components/schemas/RetentionOptionEnum'
+          readOnly: true
+        archived_by:
+          type: integer
+          readOnly: true
+        archived_at:
+          type: string
+          format: date-time
+          readOnly: true
+        reversible_until:
+          type: string
+          format: date-time
+          readOnly: true
+        is_permanent:
+          type: boolean
+          readOnly: true
+        snapshot:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - archived_at
+      - archived_by
+      - created_at
+      - email
+      - institute_id
+      - is_permanent
+      - reason
+      - retention_option
+      - reversible_until
+      - snapshot
+      - user_id
+      - user_type
+      - username
+    AssignRole:
+      type: object
+      properties:
+        role_code:
+          type: string
+          default: ''
+          maxLength: 64
+        role_name:
+          type: string
+          default: ''
+          maxLength: 120
+        user_id:
+          type: integer
+        user:
+          type: integer
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        scope:
+          type: string
+          default: ''
+          maxLength: 80
+        reason:
+          type: string
+          default: Role assignment
+          maxLength: 500
+        assigned_by:
+          type: string
+          nullable: true
+          default: '1'
+        is_singular:
+          type: boolean
+          default: false
+      required:
+      - start_date
     AudienceEnum:
       enum:
       - students
@@ -1993,6 +2865,31 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BulkCreateResult:
+      type: object
+      properties:
+        created_count:
+          type: integer
+        error_count:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - created_count
+      - error_count
+      - errors
+    BulkCreateUsers:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateUser'
+      required:
+      - users
     BulkOutcome:
       type: object
       properties:
@@ -2315,6 +3212,101 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CreatePurgeRequest:
+      type: object
+      properties:
+        dataset_identifier:
+          type: string
+          maxLength: 128
+        retention_years:
+          type: number
+          format: double
+        reason:
+          type: string
+          maxLength: 500
+      required:
+      - dataset_identifier
+      - reason
+      - retention_years
+    CreateUser:
+      type: object
+      properties:
+        institute_id:
+          type: string
+          maxLength: 32
+        username:
+          type: string
+          maxLength: 64
+        email:
+          type: string
+          format: email
+        user_type:
+          $ref: '#/components/schemas/CreateUserUserTypeEnum'
+        name:
+          type: string
+          default: ''
+          maxLength: 150
+        contact_number:
+          type: string
+          default: ''
+          maxLength: 32
+        department:
+          type: string
+          default: ''
+          maxLength: 80
+        programme:
+          type: string
+          default: ''
+          maxLength: 40
+        discipline:
+          type: string
+          default: ''
+          maxLength: 40
+        batch_year:
+          type: integer
+          nullable: true
+        user_id:
+          type: integer
+          nullable: true
+      required:
+      - email
+      - institute_id
+      - user_type
+      - username
+    CreateUserUserTypeEnum:
+      enum:
+      - student
+      - faculty
+      - staff
+      type: string
+      description: |-
+        * `student` - student
+        * `faculty` - faculty
+        * `staff` - staff
+    DashboardMetrics:
+      type: object
+      properties:
+        users:
+          type: object
+          additionalProperties: {}
+        roles:
+          type: object
+          additionalProperties: {}
+        security:
+          type: object
+          additionalProperties: {}
+        archives:
+          type: object
+          additionalProperties: {}
+        system_health:
+          type: object
+          additionalProperties: {}
+      required:
+      - archives
+      - roles
+      - security
+      - system_health
+      - users
     Detail:
       type: object
       properties:
@@ -2407,6 +3399,44 @@ components:
       - season_decision
       - semester
       - standing
+    ExtendRole:
+      type: object
+      properties:
+        new_end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+          maxLength: 500
+      required:
+      - new_end_date
+      - reason
+    FailedLoginLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        ip_address:
+          type: string
+          readOnly: true
+          nullable: true
+        attempted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+      required:
+      - attempted_at
+      - id
+      - ip_address
+      - reason
+      - username
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +3453,50 @@ components:
       - fee_reference
       - season
       - user_id
+    HistoricalDataset:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          type: string
+          maxLength: 64
+        description:
+          type: string
+        date_range_start:
+          type: string
+          format: date
+        date_range_end:
+          type: string
+          format: date
+        record_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        backup_reference:
+          type: string
+          maxLength: 255
+        archived_by:
+          type: integer
+          readOnly: true
+        is_restored:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - archived_by
+      - backup_reference
+      - category
+      - created_at
+      - date_range_end
+      - date_range_start
+      - description
+      - id
+      - is_restored
     IncidentRecorded:
       type: object
       properties:
@@ -3085,6 +4159,53 @@ components:
       properties:
         active_role:
           type: string
+    PatchedSystemParameters:
+      type: object
+      properties:
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+    PatchedUpdateUser:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+        contact_number:
+          type: string
+          maxLength: 32
+        department:
+          type: string
+          maxLength: 80
+        programme:
+          type: string
+          maxLength: 40
+        discipline:
+          type: string
+          maxLength: 40
+        batch_year:
+          type: integer
+          nullable: true
+    PatchedUserStatus:
+      type: object
+      properties:
+        action:
+          type: string
+          default: ''
+        status:
+          type: string
+          default: ''
+        reason:
+          type: string
+          default: Status update
+          maxLength: 500
+        institute_id:
+          type: string
+          nullable: true
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3201,6 +4322,98 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    PurgeAuthorize:
+      type: object
+      properties:
+        approve:
+          type: boolean
+        remarks:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - approve
+    PurgeRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        dataset_identifier:
+          type: string
+          maxLength: 128
+        requested_by:
+          type: integer
+          readOnly: true
+        requested_at:
+          type: string
+          format: date-time
+          readOnly: true
+        retention_verified:
+          type: boolean
+          readOnly: true
+        reason:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PurgeRequestStatusEnum'
+          readOnly: true
+        it_head_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        it_head_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        it_head_remarks:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - dataset_identifier
+      - id
+      - it_head_decided_at
+      - it_head_user_id
+      - reason
+      - requested_at
+      - requested_by
+      - retention_verified
+      - status
+    PurgeRequestStatusEnum:
+      enum:
+      - pending_it_head
+      - approved
+      - rejected
+      - purged
+      type: string
+      description: |-
+        * `pending_it_head` - Pending IT Head Authorization
+        * `approved` - Approved by IT Head
+        * `rejected` - Rejected by IT Head
+        * `purged` - Permanently Purged
+    ReassignRole:
+      type: object
+      properties:
+        new_user_id:
+          type: integer
+        effective_date:
+          type: string
+          format: date
+        reason:
+          type: string
+          maxLength: 500
+        transfer_pending_tasks:
+          type: boolean
+          default: true
+      required:
+      - effective_date
+      - new_user_id
+      - reason
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4679,114 @@ components:
       - message
       - reason
       - route
+    RestoreUserAction:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 500
+      required:
+      - reason
+    ResultEnum:
+      enum:
+      - success
+      - failure
+      type: string
+      description: |-
+        * `success` - Success
+        * `failure` - Failure
+    RetentionOptionEnum:
+      enum:
+      - standard_7yr
+      - permanent_audit
+      type: string
+      description: |-
+        * `standard_7yr` - Standard 7 Years
+        * `permanent_audit` - Permanent Audit Record
+    RevokeRole:
+      type: object
+      properties:
+        reason:
+          type: string
+          default: Role revoked
+          maxLength: 500
+        is_emergency:
+          type: boolean
+          default: false
+    RoleAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        role_code:
+          type: string
+          readOnly: true
+        role_name:
+          type: string
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RoleAssignmentStatusEnum'
+          readOnly: true
+        is_singular:
+          type: boolean
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        scope:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        assigned_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by
+      - created_at
+      - end_date
+      - id
+      - is_singular
+      - reason
+      - role_code
+      - role_name
+      - scope
+      - start_date
+      - status
+      - updated_at
+      - user_id
+    RoleAssignmentStatusEnum:
+      enum:
+      - scheduled
+      - active
+      - expired
+      - revoked
+      type: string
+      description: |-
+        * `scheduled` - Scheduled
+        * `active` - Active
+        * `expired` - Expired
+        * `revoked` - Revoked
     RoundOutcome:
       type: object
       properties:
@@ -3698,6 +5019,66 @@ components:
           type: integer
       required:
       - document_id
+    SystemAuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        actor_id:
+          type: integer
+          readOnly: true
+        actor_username:
+          type: string
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        target:
+          type: string
+          readOnly: true
+        target_id:
+          type: string
+          readOnly: true
+        ip_address:
+          type: string
+          readOnly: true
+          nullable: true
+        result:
+          allOf:
+          - $ref: '#/components/schemas/ResultEnum'
+          readOnly: true
+        details:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+        context:
+          readOnly: true
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_id
+      - actor_username
+      - context
+      - details
+      - id
+      - ip_address
+      - result
+      - target
+      - target_id
+      - timestamp
+    SystemParameters:
+      type: object
+      properties:
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+      - parameters
     TopicEnum:
       enum:
       - drive
@@ -3769,6 +5150,98 @@ components:
       - application_id
       - redacted
       - results
+    UserAccount:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        institute_id:
+          type: string
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        user_type:
+          allOf:
+          - $ref: '#/components/schemas/UserAccountUserTypeEnum'
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        contact_number:
+          type: string
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        programme:
+          type: string
+          readOnly: true
+        discipline:
+          type: string
+          readOnly: true
+        batch_year:
+          type: integer
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/UserAccountStatusEnum'
+          readOnly: true
+        deactivated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - batch_year
+      - contact_number
+      - created_at
+      - deactivated_at
+      - department
+      - discipline
+      - email
+      - institute_id
+      - name
+      - programme
+      - status
+      - updated_at
+      - user_id
+      - user_type
+      - username
+    UserAccountStatusEnum:
+      enum:
+      - active
+      - deactivated
+      - archived
+      type: string
+      description: |-
+        * `active` - Active
+        * `deactivated` - Deactivated
+        * `archived` - Archived
+    UserAccountUserTypeEnum:
+      enum:
+      - student
+      - faculty
+      - staff
+      type: string
+      description: |-
+        * `student` - Student
+        * `faculty` - Faculty
+        * `staff` - Staff
     UserRef:
       type: object
       properties:
@@ -3814,6 +5287,22 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    UserStatus:
+      type: object
+      properties:
+        action:
+          type: string
+          default: ''
+        status:
+          type: string
+          default: ''
+        reason:
+          type: string
+          default: Status update
+          maxLength: 500
+        institute_id:
+          type: string
+          nullable: true
     WaiveIncident:
       type: object
       properties:

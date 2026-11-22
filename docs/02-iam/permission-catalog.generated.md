@@ -38,3 +38,17 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `system_admin`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `system_admin.user.view` | View users and profiles | `Director`, `Registrar`, `System Administrator`, `faculty`, `unit_head` |
+| `system_admin.user.add` | Create basic user accounts | `Director`, `Registrar`, `System Administrator`, `faculty`, `unit_head` |
+| `system_admin.user.change` | Update profiles and activation status | `Director`, `Registrar`, `System Administrator`, `faculty`, `unit_head` |
+| `system_admin.role.view` | View role definitions and availability | `Director`, `Registrar`, `System Administrator`, `faculty`, `unit_head` |
+| `system_admin.role.manage` | Assign, reassign, revoke, and extend roles | `Director`, `Registrar`, `System Administrator`, `faculty`, `unit_head` |
+| `system_admin.archive.view` | View archived users and historical records | `Director`, `IT Head`, `Registrar`, `System Administrator`, `faculty`, `unit_head` |
+| `system_admin.archive.manage` | Execute archival, restoration, and purge requests | `Director`, `IT Head`, `Registrar`, `System Administrator`, `faculty`, `unit_head` |
+| `system_admin.audit.view` | View audit logs and generate reports | `Director`, `Registrar`, `System Administrator`, `faculty`, `unit_head` |
+| `system_admin.config.change` | Configure permitted system parameters | `Director`, `Registrar`, `System Administrator`, `faculty`, `unit_head` |
