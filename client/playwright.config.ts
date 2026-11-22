@@ -7,8 +7,6 @@ export default defineConfig({
   testDir: "./e2e",
   globalSetup: "./e2e/global-setup.ts",
   fullyParallel: true,
-  // Serial browsers avoid concurrent test-designation refreshes in synthetic IAM.
-  workers: 1,
   forbidOnly: CI,
   retries: CI ? 1 : 0,
   reporter: CI ? [["list"], ["html", { open: "never" }]] : [["list"]],

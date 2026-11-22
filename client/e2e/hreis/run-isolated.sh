@@ -66,7 +66,11 @@ as_runner .venv/bin/python manage.py seed_modules > "$output/readiness.log"
 if as_runner .venv/bin/python manage.py hreis_readiness >> "$output/readiness.log" 2>&1; then
   echo "Empty installation unexpectedly ready"; exit 3
 fi
-# Register the platform; fixture policies are loaded by Playwright after IAM IDs resolve.
+# Read IDs from the verified synthetic IAM and seed this disposable database before
+# Playwright begins. Do not alter the protected global browser setup.
+iam_ids="$(iam_command shell -c 'import json; from iam.models import IamUser; names = {"hrEmployee": "stf00001", "hrReviewer": "fac00021", "hrAuthority": "stf00003"}; print(json.dumps({key: IamUser.objects.get(username=name, is_active=True).erp_user_id for key, name in names.items()}))')"
+as_runner .venv/bin/python client/e2e/hreis/fixtures.py seed "$iam_ids" >> "$output/readiness.log"
+# Register the platform; all HR-EIS synthetic fixtures are already seeded.
 setsid bash -c 'if [[ $(id -u) == 0 ]]; then exec runuser -u "$1" -- .venv/bin/python manage.py runserver 127.0.0.1:8002 --noreload; else exec .venv/bin/python manage.py runserver 127.0.0.1:8002 --noreload; fi' bash "$runner_user" > "$output/backend.log" 2>&1 &
 backend_pid=$!
 for attempt in $(seq 1 40); do
@@ -76,7 +80,7 @@ for attempt in $(seq 1 40); do
 done
 [[ "$code" == 401 ]] || { echo "Backend unavailable; inspect $output/backend.log"; exit 4; }
 cd client
-as_runner npm run e2e -- "$@"
+as_runner npm run e2e -- --workers=1 "$@"
 cd "$repo"
 as_runner .venv/bin/python manage.py hreis_readiness
 echo "Browser evidence: $output"

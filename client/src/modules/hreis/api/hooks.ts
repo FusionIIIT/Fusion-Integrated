@@ -1,6 +1,7 @@
 /** HR-EIS calls use the platform's credentialed HTTP client. */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useAuth } from "../../../auth/AuthProvider";
 import { http } from "../../../lib/http";
 import type {
   AppraisalDecisionInput, AppraisalInput, AssignReviewersInput, ClaimInput,
@@ -13,13 +14,20 @@ import type {
 
 const key = ["hreis"] as const;
 
+// Session identity is part of every HR-EIS read cache key. A role switch (or
+// another user signing in) cannot render data loaded for a different principal.
+function useRoleQueryKey(...suffix: (string | number)[]) {
+  const { session } = useAuth();
+  return [...key, session?.user.id ?? null, session?.active_role ?? null, ...suffix];
+}
+
 function uniqueOperationKey(): string {
   return crypto.randomUUID();
 }
 
 export function useMyServiceRecord() {
   return useQuery({
-    queryKey: [...key, "my-record"],
+    queryKey: useRoleQueryKey("my-record"),
     queryFn: async () =>
       (await http.get<ServiceRecord>("/hreis/service-records/me/")).data,
     retry: false,
@@ -28,7 +36,7 @@ export function useMyServiceRecord() {
 
 export function useServiceRecords() {
   return useQuery({
-    queryKey: [...key, "records"],
+    queryKey: useRoleQueryKey("records"),
     queryFn: async () =>
       (await http.get<Page<ServiceRecord>>("/hreis/service-records/")).data,
   });
@@ -36,7 +44,7 @@ export function useServiceRecords() {
 
 export function useRequests(view: "all" | "approvals" = "all") {
   return useQuery({
-    queryKey: [...key, "requests", view],
+    queryKey: useRoleQueryKey("requests", view),
     queryFn: async () =>
       (await http.get<Page<HRRequest>>(
         view === "approvals" ? "/hreis/requests/approvals/" : "/hreis/requests/",
@@ -46,7 +54,7 @@ export function useRequests(view: "all" | "approvals" = "all") {
 
 export function useNotifications() {
   return useQuery({
-    queryKey: [...key, "notifications"],
+    queryKey: useRoleQueryKey("notifications"),
     queryFn: async () =>
       (await http.get<Page<HRNotification>>("/hreis/notifications/")).data,
   });
@@ -54,7 +62,7 @@ export function useNotifications() {
 
 export function useRequestDetails(id: number) {
   return useQuery({
-    queryKey: [...key, "request", id],
+    queryKey: useRoleQueryKey("request", id),
     queryFn: async () =>
       (await http.get<HRRequestDetail>(`/hreis/requests/${id}/`)).data,
     retry: false,
@@ -63,7 +71,7 @@ export function useRequestDetails(id: number) {
 
 export function useComplianceRequests() {
   return useQuery({
-    queryKey: [...key, "compliance-requests"],
+    queryKey: useRoleQueryKey("compliance-requests"),
     queryFn: async () =>
       (await http.get<Page<HRComplianceRequestStatus>>(
         "/hreis/compliance/requests/",
@@ -73,7 +81,7 @@ export function useComplianceRequests() {
 
 export function useAuditEvents() {
   return useQuery({
-    queryKey: [...key, "audit"],
+    queryKey: useRoleQueryKey("audit"),
     queryFn: async () =>
       (await http.get<Page<HRAudit>>("/hreis/audit/")).data,
   });
@@ -92,24 +100,24 @@ export function useCreateServiceRecord() {
 
 export function usePolicies(enabled = true) {
   return useQuery({
-    queryKey: [...key, "policies"],
+    queryKey: useRoleQueryKey("policies"),
     enabled,
     queryFn: async () => (await http.get<Page<HRPolicy>>("/hreis/policies/")).data,
   });
 }
 
 export function useOwnLeaveBalances() {
-  return useQuery({ queryKey: [...key, "balances"],
+  return useQuery({ queryKey: useRoleQueryKey("balances"),
     queryFn: async () => (await http.get<LeaveBalances>("/hreis/leave/balances/")).data });
 }
 
 export function useServiceRecord(id: number) {
-  return useQuery({ queryKey: [...key, "record", id],
+  return useQuery({ queryKey: useRoleQueryKey("record", id),
     queryFn: async () => (await http.get<ServiceRecord>(`/hreis/service-records/${id}/`)).data });
 }
 
 export function useComplianceRequest(id: number) {
-  return useQuery({ queryKey: [...key, "compliance", id],
+  return useQuery({ queryKey: useRoleQueryKey("compliance", id),
     queryFn: async () => (await http.get<HRComplianceRequestStatus>(`/hreis/compliance/requests/${id}/`)).data });
 }
 

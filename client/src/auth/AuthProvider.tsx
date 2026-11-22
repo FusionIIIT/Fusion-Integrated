@@ -53,8 +53,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!role) return;
     try {
       const { data } = await http.patch<Session>("/me", { active_role: role });
-      await qc.cancelQueries({ predicate: (query) => query.queryKey[0] !== "session" });
-      qc.removeQueries({ predicate: (query) => query.queryKey[0] !== "session" });
       qc.setQueryData(["session"], data);
       // Screens are scoped by the role that drew them, so start again at the top.
       navigate("/");

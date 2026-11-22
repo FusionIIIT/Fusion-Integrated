@@ -5,7 +5,7 @@ import ast
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 OUTPUT = ROOT / "docs/09-hreis/hreis-traceability-status.md"
 ID = re.compile(r"(?:HR-(?:CFR|AFR|UC)|BR-HR|[BC]W-HR)-\d+")
 
@@ -75,7 +75,8 @@ if __name__ == "__main__":
     if options.check:
         if OUTPUT.read_text(encoding="utf-8") != result:
             raise SystemExit(
-                "HR-EIS traceability is stale; run python ops/docs/hreis_traceability.py"
+                "HR-EIS traceability is stale; run python "
+                "docs/09-hreis/scripts/hreis_traceability.py"
             )
     else:
         OUTPUT.write_text(result, encoding="utf-8")

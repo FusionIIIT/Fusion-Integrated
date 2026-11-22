@@ -1,4 +1,4 @@
-/** Wire types derived from OpenAPI; run python ops/docs/hreis_client_types.py. */
+/** Wire types derived from OpenAPI; run python docs/09-hreis/scripts/hreis_client_types.py. */
 
 export interface AppraisalDecision {
   event: AppraisalDecisionEventEnum;

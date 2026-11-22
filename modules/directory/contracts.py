@@ -45,7 +45,8 @@ def _to_dto(r: UserRef) -> UserDTO:
 
 
 def get_users(user_ids: Sequence[int]) -> dict[int, UserDTO]:
-    """Batched. A missing id is simply absent from the mapping — a visible,."""
+    """Batched. A missing id is simply absent from the mapping — a visible,
+    testable case rather than a silent None three layers up."""
     ids = {int(i) for i in user_ids if i is not None}
     if not ids:
         return {}

@@ -96,9 +96,20 @@ Set `E2E_EVIDENCE_DIR` to retain actor observations and runserver logs. Generate
 the reviewable walkthrough with:
 
 ```bash
-.venv/bin/python ops/docs/hreis_browser_walkthrough.py "$E2E_EVIDENCE_DIR"
+.venv/bin/python docs/09-hreis/scripts/hreis_browser_walkthrough.py "$E2E_EVIDENCE_DIR"
 ```
 
 The generator refuses unsuccessful scenarios or request observations without
 matching actual method/path/status/timestamp log evidence. The committed
 `browser-walkthrough.md` is a synthetic execution record, not an external-provider certificate.
+
+## Windows Git and WSL line endings
+
+Clone the branch using Linux Git in WSL with LF working-tree files, or set
+`core.autocrlf=false` **before checkout**. Windows Git with automatic CRLF
+conversion has been observed to change the committed OpenAPI YAML and
+`client/e2e/hreis/run-isolated.sh`, causing a false schema mismatch or
+`pipefail\r` shell startup failure. An LF checkout avoids both errors.
+Verify locally with `file client/e2e/hreis/run-isolated.sh` and
+`make schema-check`. Do not alter tracked platform files to work around a
+Windows-only checkout configuration.

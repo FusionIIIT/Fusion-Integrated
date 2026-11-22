@@ -1180,3 +1180,80 @@ resolution or real external contracts. The five uncited live source IDs are
 not marked as implemented or waived. `student2-review-packet.md` is the
 handoff entry point. The rubric's fresh formal 10/10 review and Student 2's
 different-provider frozen spec suites have **not** been completed.
+
+## 29. Post-R3 protected-file scope remediation and verified execution (2026-11-22)
+
+This checkpoint supersedes section 27's **historical** R3-02 statement about
+protected shared-file modifications, for the implementation being prepared
+here. The Student 1 branch now restores the upstream versions of:
+`client/playwright.config.ts`, `client/e2e/global-setup.ts`,
+`client/e2e/auth.spec.ts`, `client/src/auth/AuthProvider.tsx`,
+`client/src/auth/AuthProvider.test.tsx`,
+`client/src/auth/RequireAuth.test.tsx`, `client/src/main.tsx`,
+`client/package.json` and `client/package-lock.json`.
+Their working-tree content was compared with `upstream/main` with an empty
+protected-file diff. A fresh official reviewer must recheck the final commit.
+
+The synthetic HR-EIS fixture and single-worker Chromium invocation are now
+confined to `client/e2e/hreis/run-isolated.sh`: the runner uses the synthetic
+IAM's `IamUser.erp_user_id` projection to seed the disposable module database
+before the shared Playwright setup, which remains unmodified. All 11 HR-EIS
+read-query hooks now key cached results by both user ID and active designation,
+instead of depending on a protected global cache-clearing modification. The
+module-owned frontend tests explicitly verify identity/role key isolation.
+Broader platform-wide cache invalidation is a separate platform-baseline task;
+server-side permissions remain the real authorization boundary.
+
+Three supplementary reference-support generators moved from the shared
+`ops/docs/` directory to `docs/09-hreis/scripts/`. Their root calculation,
+generated TypeScript file header, test verification paths and browser coverage
+instructions were updated. The one expressly permitted
+`ops/docs/hreis_reference.py` stays in its original location.
+The malformed `get_users` directory-contract docstring was restored without
+changing contract behavior. The latest generated traceability and browser
+walkthrough now reflect actual tests and the fresh server request log.
+
+**Final Student 1 technical gate evidence, same implementation:**
+
+- `make check`: **PASS**, including all backend tests, Django, migrations,
+  Ruff, five import-linter contracts, module/FK/nav/permission contracts and
+  the generated OpenAPI schema comparison.
+- `make check-client`: **PASS**, including two TypeScript configurations,
+  **78/78** Vitest tests (12 role-cache regression cases) and production
+  Vite build. The shared entry-chunk size warning is nonfatal.
+- Branch/statement coverage: `modules/hreis` **92.30%** (488 passing tests,
+  required 90%); `modules/hreis/domain` **95.79%** (488 passing tests,
+  required 95%).
+- Synthetic isolated Chromium: **58/58 PASS** in 4.9 minutes, covering 21
+  live use cases, all 12 role designations, denied deep links and shared
+  Placement/shell cases. The disposable database
+  `hreis_e2e_1795353535_331941` was dropped, synthetic IAM service token
+  `hreis-e2e-hreis_e2e_1795353535_331941` revoked, and the temporary
+  IAM/Django/Vite servers stopped. Source browser and backend logs remain
+  outside Git under
+  `D:\HR(EIS)\lab 9\evidence\scope-remediation-20261122-browser\`.
+  The regenerated `browser-walkthrough.md` matched browser responses
+  to actual logged method/path/status/timestamps.
+- Production-settings Django `check --deploy --fail-level WARNING`:
+  **PASS** with two documented silences. The allowed reference generator,
+  moved type generator and moved traceability generator all passed `--check`.
+
+**Security/dependency disposition:** Returning to upstream-pinned frontend
+packages avoids prohibited module-branch platform upgrades, but `npm ci`
+reported nine dependency advisories. A separate production-dependency audit
+reported **three** advisories (**one high, two moderate**) in the current
+baseline. No module-only dependency upgrade is presented as an authorized
+security fix. The owning platform must triage and integrate any remediation
+through its normal baseline process.
+
+**Not closed by these checks:** No dated Student 2 written blueprint or shared
+change/gap approvals have been received. The authentic authority for the
+Accountant/Accounts Admin mapping, institutional workflow parameters,
+external payroll/finance/sync/document/email endpoints and undefined LTC
+Returned transition remains absent. Exactly five of the 193 live source IDs
+still have no direct builder-test citation, and a source-backed disposition
+is required. The shared `fusion_auth` role-switch principal correction,
+directory `is_active` projection, fake IAM test extension and seed-status
+logging still require a documented permitted approval or platform-baseline
+route. The official fresh nine-dimension Step 7 review and the other
+student's frozen FR/UC/BR/WF Step 8 suites are **not** represented as complete.

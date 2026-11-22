@@ -123,3 +123,27 @@ pending. The handoff is ready for review, **not** certified for a 10/10 merge.
   blueprint/gap decisions and staged test preparation. The formal fresh
   10/10 review, protected platform-baseline resolution, real external
   provider contracts and Student 2's independent specs remain open.
+
+## Post-preflight Student 1 scope remediation (2026-11-22)
+
+The rubric-protected Playwright/auth/frontend/dependency files have been
+restored to `upstream/main`; the HR-EIS runner now owns its synthetic IAM
+fixture seed and serial browser execution. All 11 HR-EIS read hooks use
+principal-and-designation-scoped cache keys with 12 passing module-owned
+frontend regression cases. Three documentation utilities moved under
+`docs/09-hreis/scripts/`; directory's broken `get_users` docstring
+was restored. The official upstream review prompt itself was not changed.
+
+Technical checks on the updated implementation: `make check` PASS;
+`make check-client` PASS with 78/78 frontend tests and production build;
+488/488 HR-EIS backend tests at 92.30% coverage, 488/488 domain tests
+at 95.79%, and isolated synthetic Chromium 58/58 PASS. The Chromium run
+used actual server requests; the synthetic DB and token were discarded.
+Local sanitized proof is in
+`D:\HR(EIS)\lab 9\evidence\scope-remediation-20261122-browser\`.
+Only the independent preflight has happened; genuine written approvals,
+the final formal Step 7 review, source/external-policy decisions, and
+the other student's official Step 8 spec tests still remain pending.
+The upstream-pinned frontend dependencies have outstanding audit advisories
+for the platform to triage; they were not silently upgraded on this module
+branch.

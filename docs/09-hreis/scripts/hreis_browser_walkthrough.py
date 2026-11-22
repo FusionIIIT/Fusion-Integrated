@@ -6,7 +6,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 IST = timezone(timedelta(hours=5, minutes=30))
 LOG = re.compile(r'^\[(.*?)\] "(\w+) ([^ ]+) HTTP/1\.1" (\d+) \d+$')
 

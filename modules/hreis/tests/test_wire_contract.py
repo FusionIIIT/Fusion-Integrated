@@ -11,8 +11,9 @@ import yaml
 @pytest.mark.parametrize("script", ["hreis_client_types.py", "hreis_reference.py"])
 def test_types_and_enforcement_reference_are_derived_without_drift(script):
     root = Path(__file__).resolve().parents[3]
+    folder = "docs/09-hreis/scripts" if script == "hreis_client_types.py" else "ops/docs"
     result = subprocess.run(
-        [sys.executable, str(root / "ops/docs" / script), "--check"],
+        [sys.executable, str(root / folder / script), "--check"],
         cwd=root,
         capture_output=True,
         text=True,

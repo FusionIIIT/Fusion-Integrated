@@ -1,41 +1,38 @@
-# HR-EIS Assignment 9 — Student 2 approval record (pending)
+# HR-EIS Assignment 9 — pending Student 2 decisions
 
-**Module:** HR-EIS (`hreis`)
-**Student 1 checkout:** `D:\fusion\Fusion-Integrated-A9-HREIS`, branch `module/hreis`
-**Status:** **READY TO REQUEST REVIEW; NOT APPROVED IN WRITING** as of 2026-11-22. Student 1 reports Student 2's verbal agreement; no independently attributable written approval has been supplied. This form is a request for decisions, not evidence of acceptance.
+**Module:** `hreis` · **branch:** `module/hreis` on `keptbeetle/Fusion-Integrated`
 
-## Decisions to confirm in writing
+**Status, 2026-11-22:** This is an unsigned request for authentic Student 2 decisions, not an approval, waiver, review verdict or production-readiness certificate. Student 1's post-R3 protected-file remediation is local until validated and published; use `git rev-parse HEAD` and the final verified change list to check the exact version being considered. The independent Stage 0/1 investigation is preliminary evidence, not the assignment's official Step 8.
 
-- [ ] Student 2 has reviewed and approves the source-to-build blueprint at `docs/09-hreis/hreis-blueprint.md` and its known documentation gaps (193 live IDs).
-- [ ] Student 2 acknowledges the procedure deviation: Student 1 began implementation before the required written blueprint approval.
-- [ ] Student 2 approves justified cross-cutting changes needed to mount HR-EIS within Fusion, listed below, and does not treat the initial verbal agreement as a final 10/10 review.
-- [ ] Student 2 understands that the source problem statement **does not contain actual numerical institutional leave quotas, appraisal dates or a complete authority matrix**. The module refuses to assume them and requires explicit effective policy versions; any demo policies are disposable/synthetic.
-- [ ] Student 2 understands that the finance endpoint uses a **provisional** mapping of the specifications' Accountant actor to the existing IAM `Accounts Admin` designation, still requiring an institutional authority decision before real deployment. It records *externally referenced* status with immutable audit evidence but executes no bank transfer; the email backend requires real provider settings and a configured recipient directory; secure claim-file upload/storage is not part of the current read-only shared file service.
-- [ ] Student 2 will independently design, freeze and run its **own** FR/UC/BR/WF suites with a different AI provider after the approved Student 1 builder phase, not reuse Student 1's tests as the independent baseline.
+## Decisions that need a real written response
 
-## Non-HR-EIS shared files changed locally
+- [ ] **Blueprint and timing:** Review `hreis-blueprint.md` against all six original documents at `D:\HR(EIS)\specifications`. Explicitly approve, reject or request changes. Acknowledge the documented deviation that implementation began before the required written approval; do not backdate any response.
+- [ ] **Remaining shared implementation changes:** Approve or reject the exact `upstream/main...HEAD` diff for `fusion_auth/views.py`, `fusion_auth/tests/test_auth.py`, the fake IAM fixture extension in `conftest.py`, `modules/directory/contracts.py` and `modules/accesscontrol/management/commands/seed_modules.py`, unless these are first accepted through a separate authorized platform baseline. The active-role response must not be stale after a role switch.
+- [ ] **Institutional rules:** Resolve the source's `Accountant` actor versus the provisional IAM `Accounts Admin` designation. Supply authoritative leave eligibility and quotas, appraisal windows, HOD/Registrar/Director route rules and retention parameters, or leave them explicitly unconfigured. The six specs supply no numerical leave quota.
+- [ ] **External obligations:** Provide authoritative APIs, identity and status semantics for payroll/finance/real-time sync and file/email delivery, or record a clearly bounded incomplete/deferred disposition for `HR-CFR-013`, `HR-AFR-090`, `HR-AFR-091`, `HR-AFR-093`. Synthetic status recording is not a bank transfer or external-system integration.
+- [ ] **Underspecified state:** Rule on `HR-AFR-059`'s LTC `Returned` audit obligation: the supplied active LTC use case and business-rule documents do not define a Returned transition. Do not invent that transition without a source-backed decision.
+- [ ] **Final review and independent testing:** Obtain a fresh review of the final Student 1 commit using the original upstream nine-dimension review prompt and the guide's Step 7 rules. Begin official FR/UC/BR/WF spec-only test-design sessions only after the prerequisite review/decision process; Student 1 must never edit the reserved `modules/hreis/tests/spec/` and `docs/09-hreis/spec-tests/` paths.
 
-These changes are committed on the fork's `module/hreis` branch and require review. There is **no institutional pull request**. The module review rubric explicitly prohibits certain protected harness/auth-file changes **even if Student 2 approves them**; those must instead be resolved through an accepted platform baseline before a formal nine-dimension 10/10 review. Written agreement is not a waiver.
+## Shared-file change and resolution map
 
-| File | Purpose of change |
-|---|---|
-| `.importlinter` | Enforce HR-EIS package/layer boundaries |
-| `ops/docs/hreis_reference.py` | Deterministically generate implementation reference from registry and workflow source |
-| `client/e2e/accounts.ts` | Isolated test accounts for HR-EIS browser checks |
-| `client/playwright.config.ts` | **Protected by rubric:** serialized Chromium E2E to avoid a shared IAM role-refresh race; requires platform-baseline resolution |\n| `client/e2e/global-setup.ts`, `client/e2e/auth.spec.ts` | **Protected by rubric:** synthetic HR fixture installation and login-rate-limit test behavior; requires platform-baseline resolution |\n| `client/src/auth/AuthProvider.tsx` and auth tests | **Protected by rubric:** clear role-scoped query caches on IAM role switch; requires platform-baseline resolution |\n| `client/src/main.tsx`, `client/package.json`, `client/package-lock.json` | Shared router entry and frontend dependency upgrades; separately review any platform-wide compatibility impact |\n| `modules/directory/contracts.py` | Surface active-user status through the existing directory contract, used to reject inactive appraisal reviewers |\n| `ops/docs/hreis_browser_walkthrough.py`, `ops/docs/hreis_client_types.py`, `ops/docs/hreis_traceability.py` | Additional HR-EIS teaching/verification helpers outside the exact allowed reference-script path; approval/disposition needed |
-| `client/src/app/registry.ts` | Mount HR-EIS frontend routes |
-| `config/celery.py` | Register HR-EIS notification task routing / optional polling |
-| `config/settings/base.py` | Enable HR-EIS module app/settings |
-| `config/urls.py` | Mount versioned HR-EIS API |
-| `fusion_auth/tests/test_auth.py` | Validate platform auth handling relevant to integration |
-| `fusion_auth/views.py` | Refresh the principal after IAM role change so the API response reflects current role; shared platform change, not module-only |
-| `modules/accesscontrol/management/commands/seed_modules.py` | Seed HR-EIS module as planned until readiness prerequisites pass |
-| `docs/02-iam/permission-catalog.generated.md` | Regenerated permission catalog |
-| `openapi/fusion-integrated.v1.yaml` | Regenerated API schema |
-| `registry/permissions.json` | Regenerated HR-EIS role/action grants |
+| File or group | Disposition |
+| --- | --- |
+| `.importlinter`, `config/settings/base.py`, `config/urls.py`, `config/celery.py`, `client/src/app/registry.ts` | Module registration/contract enforcement allowed by the guide |
+| `client/e2e/accounts.ts` | Allowed new synthetic role-account entries only |
+| `ops/docs/hreis_reference.py` | Required reference generator, allowed outside module |
+| `docs/02-iam/permission-catalog.generated.md`, `openapi/fusion-integrated.v1.yaml`, `registry/permissions.json` | Generated manifests required by registration |
+| `client/playwright.config.ts`, `client/e2e/global-setup.ts` | **Protected**; changes removed from module branch in post-R3 remediation. HR-EIS-only fixture seed and worker count now live in `client/e2e/hreis/run-isolated.sh` |
+| `client/e2e/auth.spec.ts`, `client/src/auth/AuthProvider.tsx`, `client/src/auth/AuthProvider.test.tsx`, `client/src/auth/RequireAuth.test.tsx` | **Protected**; module-branch edits removed. HR-EIS's own API query hooks now scope reads by user ID and active role, with module-owned regression evidence. Platform-global cache clearing and login-throttle fixes are separate baseline concerns |
+| `client/src/main.tsx`, `client/package.json`, `client/package-lock.json` | Frontend version upgrades removed; module uses upstream-pinned client versions |
+| `docs/09-hreis/scripts/*.py` | HR-EIS-owned reference-support helpers moved from unapproved shared `ops/docs/hreis_*.py`; only the allowed `ops/docs/hreis_reference.py` remains there |
+| `modules/directory/contracts.py` | Active-user projection retained, missing `get_users` docstring text restored; requires true approval/platform integration |
+| `fusion_auth/views.py` and its regression test, `conftest.py` | Genuine shared active-role refresh/validation fix; needs acceptance or upstream baseline, not a fabricated waiver |
+| `modules/accesscontrol/management/commands/seed_modules.py` | One-line registered-status logging correction; requires review/approval |
 
-## What a future response must supply
+**Important:** A written approval cannot waive rubric-protected `§3.2` modifications if they remain in a submitted module branch. Check the actual final branch diff, not this description, before granting any approval.
 
-An identifiable Student 2 acknowledgment stating which of the above items are **approved**, which are **not approved**, and any requested correction. Save the actual response alongside this record without modifying its meaning.
+## Evidence and response
 
-The latest committed-clone technical review round R3 is recorded in the quality report and the local evidence bundle. It was **NOT APPROVED** due to missing signed decisions and protected shared-file differences, and must not be represented as a formal 10/10 result. Student 2's own independent model, spec-test suites and written response remain required.
+Source specification documents are local to the original PC and must be shared separately. Student 1's quality report and the independent Stage 1 preflight evidence are supporting claims; an official reviewer must run the gates itself on the final commit. The preflight report is at `D:\fusion\HR-EIS-Student2-Results\stage-1-technical-resolution.md`.
+
+The designated Student 2 should return an identifiable, dated **Approve / Request changes / Hold** response for each decision, with its exact branch commit hash and any exceptions. Preserve their original words without alteration. This document intentionally contains no impersonated approval, official review score or institutional PR link.

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 OUTPUT = ROOT / "client/src/modules/hreis/api/types.ts"
 ALIASES = {
     "ServiceRecord": "RecordRead",
@@ -102,7 +102,8 @@ def build():
                 needed.add(name)
                 pending.append(name)
     lines = [
-        "/** Wire types derived from OpenAPI; run python ops/docs/hreis_client_types.py. */",
+        ("/** Wire types derived from OpenAPI; run python "
+         "docs/09-hreis/scripts/hreis_client_types.py. */"),
         "",
     ]
     for name in sorted(needed):
@@ -159,7 +160,8 @@ if __name__ == "__main__":
     if options.check:
         if OUTPUT.read_text() != result:
             raise SystemExit(
-                "HR-EIS wire types are stale; run python ops/docs/hreis_client_types.py"
+                "HR-EIS wire types are stale; run python "
+                "docs/09-hreis/scripts/hreis_client_types.py"
             )
     else:
         OUTPUT.write_text(result)

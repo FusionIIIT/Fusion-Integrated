@@ -87,20 +87,4 @@ export default async function globalSetup(config: FullConfig): Promise<void> {
   grantRoles();
   mkdirSync(AUTH_DIR, { recursive: true });
   for (const key of Object.keys(ACCOUNTS) as AccountKey[]) await prepare(baseURL, key);
-  if (process.env.HREIS_E2E_SYNTHETIC === "1") {
-    const ids: Record<string, number> = {};
-    for (const key of ["hrEmployee", "hrReviewer", "hrAuthority"] as const) {
-      const api = await request.newContext({ baseURL, storageState: stateFile(key) });
-      try {
-        const me = await api.get("/api/v1/me");
-        if (!me.ok()) throw new Error(`Cannot resolve synthetic ${key}`);
-        ids[key] = ((await me.json()) as { user: { id: number } }).user.id;
-      } finally {
-        await api.dispose();
-      }
-    }
-    execFileSync(resolve(HERE, "../../.venv/bin/python"),
-      [resolve(HERE, "hreis/fixtures.py"), "seed", JSON.stringify(ids)],
-      { cwd: resolve(HERE, "../.."), stdio: "inherit" });
-  }
 }
