@@ -1,0 +1,344 @@
+[
+  {
+    "test_id": "BR-002-01",
+    "source_id": "BR-VH-002 stated outcome",
+    "purpose": "Verify BR-VH-002: VHMS shall restrict billing responsibility values to Visitor, Indenter, Institute, or Project..",
+    "preconditions": "A booking requisition records billing responsibility.",
+    "action_or_input": "Submit otherwise valid booking requests using Visitor, Indenter, Institute, and Project; then submit one unsupported value.",
+    "expected_result": "The four listed values are accepted; a value outside that set is refused.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-003-01",
+    "source_id": "BR-VH-003 stated outcome",
+    "purpose": "Verify BR-VH-003: VHMS shall apply the same approval routing to offline bookings as to other booking requests..",
+    "preconditions": "An offline booking is recorded.",
+    "action_or_input": "When this condition occurs: An offline booking is recorded. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Use the same approval routing as other booking requests.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-004-01",
+    "source_id": "BR-VH-004 stated outcome",
+    "purpose": "Verify BR-VH-004: VHMS shall apply the same room-availability checking to offline bookings as to other booking requests..",
+    "preconditions": "An offline booking is processed.",
+    "action_or_input": "When this condition occurs: An offline booking is processed. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Use the same room-availability checking as other booking requests.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-005-01",
+    "source_id": "BR-VH-005 stated outcome",
+    "purpose": "Verify BR-VH-005: VHMS shall clearly flag offline bookings for audit and reporting..",
+    "preconditions": "A booking is recorded from a telephonic or walk-in request.",
+    "action_or_input": "When this condition occurs: A booking is recorded from a telephonic or walk-in request. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Persist an Offline designation for audit/reporting.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-006-01",
+    "source_id": "BR-VH-006 stated outcome",
+    "purpose": "Verify BR-VH-006: VHMS shall compute cancellation charges according to the stated cancellation charge schedule..",
+    "preconditions": "A cancellation/no-show charge must be determined.",
+    "action_or_input": "Request cancellations exactly 7 days before arrival, within 7 days excluding same-day, and on the same day; inspect each charge.",
+    "expected_result": "Charges follow the complete stated schedule: 0%, 25% of one-day room rent, and 50% of one-day room rent for the respective cases.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-007-01",
+    "source_id": "BR-VH-007 stated outcome",
+    "purpose": "Verify BR-VH-007: For a cancellation occurring exactly 7 days before arrival, VHMS shall apply no cancellation charge..",
+    "preconditions": "Cancellation occurs exactly 7 days before arrival.",
+    "action_or_input": "Request cancellation exactly 7 days before arrival and inspect the charge.",
+    "expected_result": "The cancellation charge is zero.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-008-01",
+    "source_id": "BR-VH-008 stated outcome",
+    "purpose": "Verify BR-VH-008: For a cancellation within 7 days before arrival, excluding the separately stated same-day case, VHMS shall apply 25% of one-day room rent..",
+    "preconditions": "Cancellation occurs within 7 days before arrival and is not same-day.",
+    "action_or_input": "Request cancellation within 7 days, excluding same-day, and inspect the charge.",
+    "expected_result": "The charge is 25% of one-day room rent.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-009-01",
+    "source_id": "BR-VH-009 stated outcome",
+    "purpose": "Verify BR-VH-009: For a same-day cancellation or a recorded no-show, VHMS shall apply 50% of one-day room rent..",
+    "preconditions": "Same-day cancellation or recorded no-show.",
+    "action_or_input": "Request same-day cancellation and inspect the charge; separately inspect the stated no-show charge case.",
+    "expected_result": "The charge is 50% of one-day room rent for same-day cancellation/no-show.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-010-01",
+    "source_id": "BR-VH-010 stated outcome",
+    "purpose": "Verify BR-VH-010: VHMS shall adjust billing information according to the confirmed modification outcome..",
+    "preconditions": "A modification outcome has been confirmed.",
+    "action_or_input": "When this condition occurs: A modification outcome has been confirmed. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Adjust billing information according to the confirmed modification outcome.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-011-01",
+    "source_id": "BR-VH-011 stated outcome",
+    "purpose": "Verify BR-VH-011: VHMS shall adjust billing information according to the confirmed cancellation outcome and applicable cancellation charge..",
+    "preconditions": "A cancellation is confirmed.",
+    "action_or_input": "When this condition occurs: A cancellation is confirmed. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Adjust billing using the confirmed cancellation outcome and applicable charge.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-012-01",
+    "source_id": "BR-VH-012 stated outcome",
+    "purpose": "Verify BR-VH-012: VHMS shall allow rooms to be allotted only after booking approval..",
+    "preconditions": "Room allotment is attempted.",
+    "action_or_input": "Attempt allotment for a booking before approval and again after approval.",
+    "expected_result": "Allotment is refused before approval and permitted only after approval.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-013-01",
+    "source_id": "BR-VH-013 stated outcome",
+    "purpose": "Verify BR-VH-013: VHMS shall support Single occupancy records..",
+    "preconditions": "Occupancy type is recorded.",
+    "action_or_input": "When this condition occurs: Occupancy type is recorded. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Single is a supported occupancy value.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-014-01",
+    "source_id": "BR-VH-014 stated outcome",
+    "purpose": "Verify BR-VH-014: VHMS shall support Double occupancy records..",
+    "preconditions": "Occupancy type is recorded.",
+    "action_or_input": "When this condition occurs: Occupancy type is recorded. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Double is a supported occupancy value.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-015-01",
+    "source_id": "BR-VH-015 stated outcome",
+    "purpose": "Verify BR-VH-015: VHMS shall support Suite room records..",
+    "preconditions": "Room type is recorded.",
+    "action_or_input": "When this condition occurs: Room type is recorded. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Suite is a supported room-type value.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-016-01",
+    "source_id": "BR-VH-016 stated outcome",
+    "purpose": "Verify BR-VH-016: VHMS shall support Non-suite room records..",
+    "preconditions": "Room type is recorded.",
+    "action_or_input": "When this condition occurs: Room type is recorded. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Non-suite is a supported room-type value.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-017-01",
+    "source_id": "BR-VH-017 stated outcome",
+    "purpose": "Verify BR-VH-017: When an expected guest has not checked in under the recorded stay timing, VHMS shall generate a no-show alert..",
+    "preconditions": "Expected check-in has not occurred under recorded timing.",
+    "action_or_input": "Allow the specified check-in deadline to pass without a recorded check-in; inspect alert records.",
+    "expected_result": "A no-show alert is generated for the guest who did not check in.",
+    "test_type": "event"
+  },
+  {
+    "test_id": "BR-018-01",
+    "source_id": "BR-VH-018 stated outcome",
+    "purpose": "Verify BR-VH-018: When a recorded stay exceeds the approved duration, VHMS shall generate an overstay alert..",
+    "preconditions": "Recorded stay exceeds approved duration.",
+    "action_or_input": "Allow the approved stay duration to end without a recorded check-out; inspect alert records.",
+    "expected_result": "An overstay alert is generated after the approved duration.",
+    "test_type": "event"
+  },
+  {
+    "test_id": "BR-019-01",
+    "source_id": "BR-VH-019 stated outcome",
+    "purpose": "Verify BR-VH-019: Visitor category values used by VHMS shall be A, B, C, or D according to institute norms represented/configured in VHMS..",
+    "preconditions": "Visitor category is recorded/used.",
+    "action_or_input": "Classify visitors using the represented institute norms for categories A, B, C, and D.",
+    "expected_result": "Each visitor is assigned the category determined by the represented norm.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-023-01",
+    "source_id": "BR-VH-023 stated outcome",
+    "purpose": "Verify BR-VH-023: During billing, VHMS shall select the applicable tariff using the recorded visitor category, occupancy, and effective-from tariff information..",
+    "preconditions": "Bill tariff is selected.",
+    "action_or_input": "Generate bills for category/occupancy combinations with effective tariffs, including a changeover date.",
+    "expected_result": "The bill uses the applicable recorded category, occupancy, and effective-date tariff.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-024-01",
+    "source_id": "BR-VH-024 stated outcome",
+    "purpose": "Verify BR-VH-024: VHMS shall prevent tariff changes from affecting historical bills already generated or finalized in VHMS..",
+    "preconditions": "Tariff configuration changes after a bill has been generated/finalized.",
+    "action_or_input": "Generate/finalize a bill, change its tariff configuration, then retrieve the historical bill.",
+    "expected_result": "The tariff update does not change the previously generated/finalized bill.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-025-01",
+    "source_id": "BR-VH-025 stated outcome",
+    "purpose": "Verify BR-VH-025: Meal bookings shall be recorded only for guests staying in VH..",
+    "preconditions": "A meal booking is requested.",
+    "action_or_input": "Book a meal for a guest with an active VH stay and attempt the same for a guest without a VH stay.",
+    "expected_result": "Meal booking is allowed for the staying guest; it is refused for a guest without a VH stay.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-029-01",
+    "source_id": "BR-VH-029 stated outcome",
+    "purpose": "Verify BR-VH-029: VHMS shall restrict individual meal options to Breakfast, Lunch, and Dinner..",
+    "preconditions": "Individual meal option is selected.",
+    "action_or_input": "Submit meal bookings for each permitted option (Breakfast, Lunch, Dinner), then one option outside that set.",
+    "expected_result": "The permitted options are accepted and an outside option is refused: Allowed values: Breakfast, Lunch, Dinner.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-030-01",
+    "source_id": "BR-VH-030 stated outcome",
+    "purpose": "Verify BR-VH-030: VHMS shall restrict add-on options to Tea and Milk..",
+    "preconditions": "Add-on meal option is selected.",
+    "action_or_input": "Submit meal bookings for each permitted option (Tea, Milk), then one option outside that set.",
+    "expected_result": "The permitted options are accepted and an outside option is refused: Allowed values: Tea, Milk.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "BR-031-01",
+    "source_id": "BR-VH-031 stated outcome",
+    "purpose": "Verify BR-VH-031: A meal booking shall be linked to the guest's recorded stay duration..",
+    "preconditions": "Meal booking is recorded.",
+    "action_or_input": "Create a meal booking inside the stay period and another outside it; inspect stay linkage.",
+    "expected_result": "The in-period meal is linked to the stay; the out-of-period meal is not linked.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-032-01",
+    "source_id": "BR-VH-032 stated outcome",
+    "purpose": "Verify BR-VH-032: Recorded meal bookings shall be included in VHMS billing..",
+    "preconditions": "A bill is generated for a stay with meal bookings.",
+    "action_or_input": "When this condition occurs: A bill is generated for a stay with meal bookings. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Include recorded meal bookings in billing.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-033-01",
+    "source_id": "BR-VH-033 stated outcome",
+    "purpose": "Verify BR-VH-033: VHMS shall generate bills based on room rent..",
+    "preconditions": "A bill is generated.",
+    "action_or_input": "When this condition occurs: A bill is generated. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Include room-rent component.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-034-01",
+    "source_id": "BR-VH-034 stated outcome",
+    "purpose": "Verify BR-VH-034: VHMS shall generate bills based on meal consumption..",
+    "preconditions": "A bill is generated and meal consumption exists.",
+    "action_or_input": "When this condition occurs: A bill is generated and meal consumption exists. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Include meal-consumption component.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-035-01",
+    "source_id": "BR-VH-035 stated outcome",
+    "purpose": "Verify BR-VH-035: VHMS shall generate bills based on applicable cancellation charges..",
+    "preconditions": "A bill is generated and an applicable cancellation/no-show charge exists.",
+    "action_or_input": "When this condition occurs: A bill is generated and an applicable cancellation/no-show charge exists. Perform the specified VHMS action and inspect its recorded outcome.",
+    "expected_result": "Include the applicable cancellation-charge component.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-036-01",
+    "source_id": "BR-VH-036 stated outcome",
+    "purpose": "Verify BR-VH-036: VHMS shall record settlement as an offline cash settlement; online payment processing is not performed by VHMS..",
+    "preconditions": "Settlement is recorded.",
+    "action_or_input": "Record a cash settlement offline and inspect the bill record; do not initiate an online payment.",
+    "expected_result": "The settlement is recorded as offline cash; no online payment processing is performed.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-037-01",
+    "source_id": "BR-VH-037 stated outcome",
+    "purpose": "Verify BR-VH-037: VHMS shall maintain immutable billing records for audit..",
+    "preconditions": "Billing record is generated/finalized.",
+    "action_or_input": "Generate/finalize a bill, attempt to alter it, then retrieve it for audit.",
+    "expected_result": "The bill remains immutable for audit.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-041-01",
+    "source_id": "BR-VH-041 stated outcome",
+    "purpose": "Verify BR-VH-041: When current inventory quantity falls below the recorded minimum threshold, VHMS shall generate an inventory threshold alert..",
+    "preconditions": "Current inventory quantity < minimum threshold.",
+    "action_or_input": "Set inventory quantity below, equal to, and above its recorded minimum threshold; inspect alert records.",
+    "expected_result": "An alert is recorded below threshold; none is generated when quantity is equal to or above it.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-043-01",
+    "source_id": "BR-VH-043 stated outcome",
+    "purpose": "Verify BR-VH-043: An inventory threshold alert shall trigger the corresponding VHMS system-generated email notification event..",
+    "preconditions": "Inventory threshold alert occurs.",
+    "action_or_input": "Cause an inventory threshold alert and inspect the generated notification event/record.",
+    "expected_result": "VHMS triggers the system-generated email notification for the inventory threshold alert.",
+    "test_type": "event"
+  },
+  {
+    "test_id": "BR-045-01",
+    "source_id": "BR-VH-045 stated outcome",
+    "purpose": "Verify BR-VH-045: VHMS shall maintain exactly one active Caretaker at a time..",
+    "preconditions": "Caretaker role is active.",
+    "action_or_input": "Create one active Caretaker assignment, then attempt a second overlapping active assignment.",
+    "expected_result": "Exactly one active Caretaker assignment is maintained at a time.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-046-01",
+    "source_id": "BR-VH-046 stated outcome",
+    "purpose": "Verify BR-VH-046: VHMS shall maintain exactly one active VH In-Charge at a time..",
+    "preconditions": "VH In-Charge role is active.",
+    "action_or_input": "Create one active VH In-Charge assignment, then attempt a second overlapping active assignment.",
+    "expected_result": "Exactly one active VH In-Charge assignment is maintained at a time.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-047-01",
+    "source_id": "BR-VH-047 stated outcome",
+    "purpose": "Verify BR-VH-047: VHMS Caretaker and VH In-Charge role assignments shall be time-bound..",
+    "preconditions": "VHMS operational role is assigned.",
+    "action_or_input": "Create a role assignment with a start and end time; inspect assignment activity within and outside its period.",
+    "expected_result": "The VHMS role assignment is bounded by its recorded effective period.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-048-01",
+    "source_id": "BR-VH-048 stated outcome",
+    "purpose": "Verify BR-VH-048: A VHMS operational role reassignment shall take effect immediately..",
+    "preconditions": "Operational role reassignment is recorded/authorized.",
+    "action_or_input": "Reassign the VHMS role and immediately inspect access/active assignment for the new role holder.",
+    "expected_result": "The reassignment is applied immediately.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-049-01",
+    "source_id": "BR-VH-049 stated outcome",
+    "purpose": "Verify BR-VH-049: VHMS shall transfer pending records to the newly assigned role holder after role reassignment..",
+    "preconditions": "Role reassignment takes effect.",
+    "action_or_input": "Reassign the role while pending records exist; inspect assignment of those records to the new holder.",
+    "expected_result": "The pending records are transferred to the newly assigned role holder.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-050-01",
+    "source_id": "BR-VH-050 stated outcome",
+    "purpose": "Verify BR-VH-050: VHMS shall transfer ongoing records to the newly assigned role holder after role reassignment..",
+    "preconditions": "Role reassignment takes effect.",
+    "action_or_input": "Reassign the role while ongoing records exist; inspect assignment of those records to the new holder.",
+    "expected_result": "The ongoing records are transferred to the newly assigned role holder.",
+    "test_type": "lifecycle"
+  }
+]

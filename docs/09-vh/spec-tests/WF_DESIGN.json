@@ -1,0 +1,92 @@
+[
+  {
+    "test_id": "WF-CW-VH-01-ON-01",
+    "source_id": "CW-VH-01 online direct caretaker rejection; BW-VH-01 path",
+    "purpose": "Exercise the online booking decision path: direct caretaker rejection.",
+    "preconditions": "No booking record exists initially; the actors and booking data stated in this workflow are available.",
+    "action_or_input": "Indenter submits a valid online booking; state becomes Pending. Then Caretaker rejects the pending request.",
+    "expected_result": "The workflow records the decision path and ends with booking state Rejected. Offline designation is retained for offline cases.",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-CW-VH-01-ON-02",
+    "source_id": "CW-VH-01 online forwarded approval; BW-VH-02 path",
+    "purpose": "Exercise the online booking decision path: forwarded approval.",
+    "preconditions": "No booking record exists initially; the actors and booking data stated in this workflow are available.",
+    "action_or_input": "Indenter submits a valid online booking; state becomes Pending. Then Caretaker forwards the pending request; VH In-Charge approves it.",
+    "expected_result": "The workflow records the decision path and ends with booking state Approved. Offline designation is retained for offline cases.",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-CW-VH-01-ON-03",
+    "source_id": "CW-VH-01 online forwarded rejection; BW-VH-03 path",
+    "purpose": "Exercise the online booking decision path: forwarded rejection.",
+    "preconditions": "No booking record exists initially; the actors and booking data stated in this workflow are available.",
+    "action_or_input": "Indenter submits a valid online booking; state becomes Pending. Then Caretaker forwards the pending request; VH In-Charge rejects it.",
+    "expected_result": "The workflow records the decision path and ends with booking state Rejected. Offline designation is retained for offline cases.",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-CW-VH-01-OFF-04",
+    "source_id": "CW-VH-01 offline direct caretaker rejection; BW-VH-04 path",
+    "purpose": "Exercise the offline booking decision path: direct caretaker rejection.",
+    "preconditions": "No booking record exists initially; the actors and booking data stated in this workflow are available.",
+    "action_or_input": "Caretaker records a complete telephonic/walk-in booking; state becomes Pending (Offline). Then Caretaker rejects the pending request.",
+    "expected_result": "The workflow records the decision path and ends with booking state Rejected. Offline designation is retained for offline cases.",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-CW-VH-01-OFF-05",
+    "source_id": "CW-VH-01 offline forwarded approval; BW-VH-05 path",
+    "purpose": "Exercise the offline booking decision path: forwarded approval.",
+    "preconditions": "No booking record exists initially; the actors and booking data stated in this workflow are available.",
+    "action_or_input": "Caretaker records a complete telephonic/walk-in booking; state becomes Pending (Offline). Then Caretaker forwards the pending request; VH In-Charge approves it.",
+    "expected_result": "The workflow records the decision path and ends with booking state Approved. Offline designation is retained for offline cases.",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-CW-VH-01-OFF-06",
+    "source_id": "CW-VH-01 offline forwarded rejection; BW-VH-06 path",
+    "purpose": "Exercise the offline booking decision path: forwarded rejection.",
+    "preconditions": "No booking record exists initially; the actors and booking data stated in this workflow are available.",
+    "action_or_input": "Caretaker records a complete telephonic/walk-in booking; state becomes Pending (Offline). Then Caretaker forwards the pending request; VH In-Charge rejects it.",
+    "expected_result": "The workflow records the decision path and ends with booking state Rejected. Offline designation is retained for offline cases.",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-CW-VH-02-07",
+    "source_id": "CW-VH-02 exactly 7 days before arrival branch; BW-VH-07 path",
+    "purpose": "Exercise cancellation timing and confirmation path for exactly 7 days before arrival.",
+    "preconditions": "A booking exists before arrival and the recorded room-rent basis is available.",
+    "action_or_input": "The Indenter requests cancellation exactly 7 days before arrival; VHMS records charge 0%. The Caretaker reviews and confirms the cancellation.",
+    "expected_result": "The booking is cancelled, billing is adjusted, and the applicable charge is 0%.",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-CW-VH-02-08",
+    "source_id": "CW-VH-02 within 7 days before arrival, excluding same-day branch; BW-VH-08 path",
+    "purpose": "Exercise cancellation timing and confirmation path for within 7 days before arrival, excluding same-day.",
+    "preconditions": "A booking exists before arrival and the recorded room-rent basis is available.",
+    "action_or_input": "The Indenter requests cancellation within 7 days before arrival, excluding same-day; VHMS records charge 25% of one-day room rent. The Caretaker reviews and confirms the cancellation.",
+    "expected_result": "The booking is cancelled, billing is adjusted, and the applicable charge is 25% of one-day room rent.",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-CW-VH-02-09",
+    "source_id": "CW-VH-02 on the day of arrival branch; BW-VH-09 path",
+    "purpose": "Exercise cancellation timing and confirmation path for on the day of arrival.",
+    "preconditions": "A booking exists before arrival and the recorded room-rent basis is available.",
+    "action_or_input": "The Indenter requests cancellation on the day of arrival; VHMS records charge 50% of one-day room rent. The Caretaker reviews and confirms the cancellation.",
+    "expected_result": "The booking is cancelled, billing is adjusted, and the applicable charge is 50% of one-day room rent.",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-BW-VH-10",
+    "source_id": "BW-VH-10 approved stay path",
+    "purpose": "Exercise the approved stay transition through room allotment, check-in, and check-out.",
+    "preconditions": "A booking is in Approved state and ready for room allotment.",
+    "action_or_input": "Caretaker records room allotment (Approved -> Room Allotted), guest check-in (Room Allotted -> Checked In), and guest check-out (Checked In -> Checked Out).",
+    "expected_result": "The stay follows the stated progression and ends in Checked Out state.",
+    "test_type": "workflow_path"
+  }
+]
