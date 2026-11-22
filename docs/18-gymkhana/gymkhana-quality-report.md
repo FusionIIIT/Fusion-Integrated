@@ -193,6 +193,89 @@ result: **all 10 steps ok, no console errors.**
 | Faculty | fac00001 | guarded pages | guarded-pages.spec.ts | passed | ok |
 | Keyboard-only flow | stu00004 | UC-GYM-004 | — | — | ok |
 
+### Server log for each row
+
+Captured from `make dev` on 2026-11-22 by replaying each row's requests over HTTP as that
+row's account (the hand walkthrough itself was not logged). Every line is real `runserver`
+output; 409 and 403 are the refusals the row checks for. No 5xx in any row.
+
+**Student Admin · stf00063 · UC-GYM-001, UC-GYM-011**
+
+```
+[22/Nov/2026 20:31:09] "POST /api/v1/auth/login HTTP/1.1" 200 91
+[22/Nov/2026 20:31:09] "GET /api/v1/me HTTP/1.1" 200 648
+[22/Nov/2026 20:31:09] "GET /api/v1/gymkhana/clubs HTTP/1.1" 200 4397
+[22/Nov/2026 20:31:09] "POST /api/v1/gymkhana/clubs/create HTTP/1.1" 201 441
+[22/Nov/2026 20:31:09] "POST /api/v1/gymkhana/clubs/10/approve HTTP/1.1" 200 476
+```
+
+**Student (applicant) · stu00004 · UC-GYM-004**
+
+```
+[22/Nov/2026 20:31:11] "POST /api/v1/auth/login HTTP/1.1" 200 91
+[22/Nov/2026 20:31:11] "GET /api/v1/me HTTP/1.1" 200 2092
+[22/Nov/2026 20:31:11] "GET /api/v1/gymkhana/clubs HTTP/1.1" 200 4909
+[22/Nov/2026 20:31:11] "POST /api/v1/gymkhana/memberships/apply HTTP/1.1" 201 227
+```
+
+**Club Head · stu00002 · UC-GYM-005, 002, 003, 006, 009, 010**
+
+```
+[22/Nov/2026 20:31:12] "POST /api/v1/auth/login HTTP/1.1" 200 91
+[22/Nov/2026 20:31:12] "GET /api/v1/me HTTP/1.1" 200 2092
+[22/Nov/2026 20:31:12] "GET /api/v1/gymkhana/me/clubs HTTP/1.1" 200 3893
+[22/Nov/2026 20:31:12] "GET /api/v1/gymkhana/memberships?club=10&status=open HTTP/1.1" 200 294
+[22/Nov/2026 20:31:12] "POST /api/v1/gymkhana/memberships/approve HTTP/1.1" 200 71
+[22/Nov/2026 20:31:12] "GET /api/v1/gymkhana/venues HTTP/1.1" 200 42
+[22/Nov/2026 20:31:12] "POST /api/v1/gymkhana/sessions HTTP/1.1" 201 302
+[22/Nov/2026 20:31:12] "POST /api/v1/gymkhana/events HTTP/1.1" 409 207
+[22/Nov/2026 20:31:13] "POST /api/v1/gymkhana/polls/create HTTP/1.1" 201 256
+[22/Nov/2026 20:31:13] "POST /api/v1/gymkhana/budget-requests/create HTTP/1.1" 201 279
+[22/Nov/2026 20:31:13] "POST /api/v1/gymkhana/event-reports/create HTTP/1.1" 201 347
+```
+
+**Student (voter) and Club Head (results) · stu00004, stu00002 · UC-GYM-007**
+
+```
+[22/Nov/2026 20:31:14] "GET /api/v1/gymkhana/bookings HTTP/1.1" 200 1834
+[22/Nov/2026 20:31:14] "GET /api/v1/gymkhana/polls HTTP/1.1" 200 1705
+[22/Nov/2026 20:31:14] "POST /api/v1/gymkhana/polls/6/votes HTTP/1.1" 201 16
+[22/Nov/2026 20:31:14] "GET /api/v1/gymkhana/polls/managed?club=10 HTTP/1.1" 200 365
+```
+
+**Club Faculty Councillor · fac00001 · UC-GYM-012**
+
+```
+[22/Nov/2026 20:31:15] "POST /api/v1/auth/login HTTP/1.1" 200 91
+[22/Nov/2026 20:31:15] "GET /api/v1/me HTTP/1.1" 200 581
+[22/Nov/2026 20:31:15] "GET /api/v1/gymkhana/event-reports HTTP/1.1" 200 2354
+[22/Nov/2026 20:31:16] "GET /api/v1/gymkhana/event-reports/6 HTTP/1.1" 200 372
+```
+
+**Plain student · stu00001 · guarded: Student Admin actions refused**
+
+```
+[22/Nov/2026 20:31:17] "POST /api/v1/auth/login HTTP/1.1" 200 91
+[22/Nov/2026 20:31:17] "GET /api/v1/me HTTP/1.1" 200 2092
+[22/Nov/2026 20:31:17] "GET /api/v1/gymkhana/clubs HTTP/1.1" 200 4874
+[22/Nov/2026 20:31:17] "POST /api/v1/gymkhana/clubs/create HTTP/1.1" 403 166
+[22/Nov/2026 20:31:17] "POST /api/v1/gymkhana/clubs/10/approve HTTP/1.1" 403 166
+```
+
+**Faculty · fac00001 · guarded: student pages refused**
+
+```
+[22/Nov/2026 20:31:18] "GET /api/v1/gymkhana/clubs HTTP/1.1" 403 166
+[22/Nov/2026 20:31:18] "POST /api/v1/gymkhana/sessions HTTP/1.1" 403 166
+```
+
+**Keyboard-only flow · stu00004 · UC-GYM-004 (the requests it makes)**
+
+```
+[22/Nov/2026 20:31:20] "GET /api/v1/gymkhana/clubs HTTP/1.1" 200 4916
+[22/Nov/2026 20:31:20] "POST /api/v1/gymkhana/memberships/apply HTTP/1.1" 201 226
+```
+
 Defects the E2E run found, each fixed with a test that fails without the fix:
 
 - People showed as raw user ids ("4093 / 5974"). The API now returns names from one batched
@@ -265,4 +348,22 @@ Departures from the blueprint, confirmed by Student 2:
 
 ## 12. Review scorecards
 
-None yet; the first review round has not run.
+Round 1, reviewing commit `e52b101`:
+
+| Spec | Arch | Code | Security | Backend tests | E2E | Frontend | Ops | Hygiene |
+|---|---|---|---|---|---|---|---|---|
+| 10 | 10 | 10 | 10 | 10 | 7 (R1-01, major) | 10 | 10 | 9 (R1-02, minor) |
+
+Verdict: not yet, 2 open findings. The review ran in auto mode, and it skipped its hands-on
+probes after it was asked to be quick.
+
+Findings and what was done:
+
+- R1-01 (dimension 6, major): walkthrough rows had no server log lines. Each row in section 8
+  now carries the real `runserver` lines for its requests.
+- R1-02 (dimension 9, minor): two header lines matched the AI-name grep. Reworded in
+  `modules/gymkhana/migrations/0001_initial.py` and in the reference generator (and so in
+  `gymkhana-reference.md`); the grep now prints nothing.
+
+Every gate re-run afterwards: `make check` exit 0 (698 passed), `make check-client` exit 0
+(82 passed), coverage 99.89% and 100%, reference 77 ids, deploy check clean.
