@@ -1,0 +1,236 @@
+[
+  {
+    "test_id": "TC-BR-001-P",
+    "source_id": "BR-HM-001 condition-true",
+    "purpose": "Super Admin binds Warden role to specific hostel",
+    "preconditions": "Hostel exists; Super Admin authenticated",
+    "action_or_input": "POST /api/v1/hostel/role-bindings with user_id=10, role=warden, hostel_id={id}",
+    "expected_result": "Role binding active and recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-002-N",
+    "source_id": "BR-HM-002 condition-false",
+    "purpose": "Student cannot access hostel data outside allocated hostel",
+    "preconditions": "Student is allocated to Hostel 1",
+    "action_or_input": "Student attempts to access data for Hostel 2",
+    "expected_result": "UnauthorizedHostelAccessError / Access refused",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-003-P",
+    "source_id": "BR-HM-003 condition-true",
+    "purpose": "Super Admin has institution-wide access across all hostels",
+    "preconditions": "Multiple hostels exist; Super Admin authenticated",
+    "action_or_input": "GET /api/v1/hostel/hostels as Super Admin",
+    "expected_result": "HTTP 200 OK returning all hostels in institute",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-004-P",
+    "source_id": "BR-HM-004 condition-true",
+    "purpose": "Role binding records time-bound start and end dates",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "POST /api/v1/hostel/role-bindings with valid_from=2026-01-01, valid_to=2026-12-31",
+    "expected_result": "HTTP 201 Created and validity dates preserved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-005-N",
+    "source_id": "BR-HM-005 condition-false",
+    "purpose": "User without required permission is refused action",
+    "preconditions": "Student authenticated without hostel.allotment.manage permission",
+    "action_or_input": "POST /api/v1/hostel/allotments/batch",
+    "expected_result": "HTTP 403 Forbidden refusal",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-BR-006-P",
+    "source_id": "BR-HM-006 condition-true",
+    "purpose": "Newly reassigned role holder can view pending records for assigned hostel",
+    "preconditions": "Hostel has pending leave; new Caretaker role binding is assigned",
+    "action_or_input": "GET /api/v1/hostel/leaves as new Caretaker",
+    "expected_result": "HTTP 200 OK showing the pending leave request",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-008-P",
+    "source_id": "BR-HM-008 condition-true",
+    "purpose": "System records allotment decision and updates room assignment info",
+    "preconditions": "Super Admin authenticated and room has capacity",
+    "action_or_input": "POST /api/v1/hostel/allotments/batch",
+    "expected_result": "HTTP 201 Created, active allotment saved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-009-P",
+    "source_id": "BR-HM-009 condition-true",
+    "purpose": "Room assignment history is retained when room is vacated or exchanged",
+    "preconditions": "Student has active allotment; room vacation recorded",
+    "action_or_input": "POST /api/v1/hostel/allotments/{id}/vacate",
+    "expected_result": "Allotment record status changed to vacated with vacated_at timestamp retained",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-010-N",
+    "source_id": "BR-HM-010 condition-false",
+    "purpose": "System prevents room occupancy from exceeding defined room capacity",
+    "preconditions": "Room capacity is 2 and current occupancy is 2",
+    "action_or_input": "POST /api/v1/hostel/allotments/batch to add 3rd student",
+    "expected_result": "HTTP 400 Bad Request / CapacityExceededError and occupancy remains 2",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-011-P",
+    "source_id": "BR-HM-011 condition-true",
+    "purpose": "Attendance records are retained for reporting and compliance",
+    "preconditions": "Caretaker records attendance for a date",
+    "action_or_input": "GET /api/v1/hostel/attendance?date={date}",
+    "expected_result": "HTTP 200 OK returning the recorded attendance rows",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-013-P",
+    "source_id": "BR-HM-013 condition-true",
+    "purpose": "Leave history is permanently retained for review and reporting",
+    "preconditions": "Leave decision recorded as approved or rejected",
+    "action_or_input": "GET /api/v1/hostel/leaves",
+    "expected_result": "Historical decided leave requests remain queryable",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-015-N",
+    "source_id": "BR-HM-015 condition-false",
+    "purpose": "Complaint without mandatory description or category is refused",
+    "preconditions": "Student authenticated with hostel.complaint.create",
+    "action_or_input": "POST /api/v1/hostel/complaints with empty description",
+    "expected_result": "HTTP 400 Bad Request / MandatoryFieldMissingError refusal",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-016-N",
+    "source_id": "BR-HM-016 condition-false",
+    "purpose": "Complaint outside hostel-operational scope is refused",
+    "preconditions": "Student submits complaint with non-hostel category",
+    "action_or_input": "POST /api/v1/hostel/complaints with category=academic_course_curriculum",
+    "expected_result": "HTTP 400 Bad Request / ScopeBoundaryError refusal",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-017-P",
+    "source_id": "BR-HM-017 condition-true",
+    "purpose": "Caretaker can escalate unresolved supervisory complaint to Warden",
+    "preconditions": "Submitted complaint exists in assigned hostel",
+    "action_or_input": "PATCH /api/v1/hostel/complaints/{id} with status=escalated",
+    "expected_result": "HTTP 200 OK and complaint escalated_at recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-018-P",
+    "source_id": "BR-HM-018 condition-true",
+    "purpose": "Guest-room booking history is retained for audit and review",
+    "preconditions": "Guest booking request approved",
+    "action_or_input": "GET /api/v1/hostel/guest-rooms",
+    "expected_result": "Past booking history remains visible",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-020-P",
+    "source_id": "BR-HM-020 condition-true",
+    "purpose": "System records extended-stay charge amount when approved",
+    "preconditions": "Extended stay request in submitted state",
+    "action_or_input": "POST /api/v1/hostel/extended-stays/{id}/decide with charge_amount=2000.00",
+    "expected_result": "HTTP 200 OK with charge_amount=2000.00 and compliance_status=pending",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-021-P",
+    "source_id": "BR-HM-021 condition-true",
+    "purpose": "System records payment deadline and compliance status for extended stay",
+    "preconditions": "Extended stay approved with payment deadline",
+    "action_or_input": "GET /api/v1/hostel/extended-stays/{id}",
+    "expected_result": "Payment deadline and compliance status preserved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-025-N",
+    "source_id": "BR-HM-025 condition-false",
+    "purpose": "Fine record missing reason, positive amount, date, or student is refused",
+    "preconditions": "Caretaker authenticated with hostel.fine.record",
+    "action_or_input": "POST /api/v1/hostel/fines with amount=0 or empty reason",
+    "expected_result": "HTTP 400 Bad Request / MandatoryFieldMissingError refusal",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-027-P",
+    "source_id": "BR-HM-027 condition-true",
+    "purpose": "Hostel inventory items and staff duty logs are stored and audited",
+    "preconditions": "Caretaker authenticated with operations permissions",
+    "action_or_input": "POST inventory and staff duty logs",
+    "expected_result": "HTTP 201 Created with updated_by_user_id audit fields",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-028-P",
+    "source_id": "BR-HM-028 condition-true",
+    "purpose": "Security guard shift schedules are maintained in HM",
+    "preconditions": "Warden authenticated with hostel.security.manage",
+    "action_or_input": "POST /api/v1/hostel/security-shifts",
+    "expected_result": "HTTP 201 Created and shift recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-029-N",
+    "source_id": "BR-HM-029 condition-false",
+    "purpose": "Caretaker or Warden cannot publish notices for an unassigned hostel",
+    "preconditions": "Caretaker assigned only to Hostel 1",
+    "action_or_input": "POST /api/v1/hostel/notices with target hostel Hostel 2",
+    "expected_result": "HTTP 400 Bad Request / NoticePermissionError refusal",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-030-P",
+    "source_id": "BR-HM-030 condition-true",
+    "purpose": "Notice history is retained for transparency and audit",
+    "preconditions": "Notice published with is_active flag",
+    "action_or_input": "GET /api/v1/hostel/notices",
+    "expected_result": "HTTP 200 OK and notices remain in archive",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-031-P",
+    "source_id": "BR-HM-031 condition-true",
+    "purpose": "Hostel notice board displays relevant campus and assigned hostel notices",
+    "preconditions": "Campus notice and hostel-specific notice exist",
+    "action_or_input": "GET /api/v1/hostel/notices as student",
+    "expected_result": "HTTP 200 OK displaying both campus-wide and student hostel notices",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-032-P",
+    "source_id": "BR-HM-032 condition-true",
+    "purpose": "Predefined reports provide operational summaries derived from HM records",
+    "preconditions": "Hostel has rooms, leaves, complaints, and fines",
+    "action_or_input": "GET /api/v1/hostel/reports/{hostel_id}",
+    "expected_result": "HTTP 200 OK with occupancy rate and pending item counts",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-034-P",
+    "source_id": "BR-HM-034 condition-true",
+    "purpose": "System issues notifications for supported HM workflow events",
+    "preconditions": "Allotment, leave decision, or fine recorded for student",
+    "action_or_input": "GET /api/v1/hostel/notifications as student",
+    "expected_result": "HTTP 200 OK with relevant notification rows",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-035-N",
+    "source_id": "BR-HM-035 condition-false",
+    "purpose": "Caretaker operations denied outside assigned hostel context",
+    "preconditions": "Caretaker assigned only to Hostel 1",
+    "action_or_input": "Caretaker attempts to record attendance or leaves for Hostel 2",
+    "expected_result": "UnauthorizedHostelAccessError / refused",
+    "test_type": "negative"
+  }
+]
