@@ -38,3 +38,29 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `vms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `vms.visit_request.view` | View all visit requests | `Admin`, `Security Personnel`, `Super Admin` |
+| `vms.visit_request.view_self` | View visit requests for assigned host scope | `Admin`, `Super Admin`, `faculty`, `staff` |
+| `vms.visit_request.create` | Create and manage visit requests | `Admin`, `Super Admin`, `faculty`, `staff` |
+| `vms.visit_request.update` | Update or terminate visit requests | `Admin`, `Super Admin`, `faculty`, `staff` |
+| `vms.visit_request.approve` | Approve or reject visit requests | `Admin`, `Super Admin`, `faculty`, `staff` |
+| `vms.visit_request.expire` | Expire overdue requests | _service only_ |
+| `vms.visit_log.create` | Record visit entry and exit events | `Admin`, `Security Personnel`, `Super Admin`, `faculty`, `staff` |
+| `vms.gate.validate` | Validate visitor passes at gate checkpoints | `Admin`, `Security Personnel`, `Super Admin` |
+| `vms.gate.override` | Decide eligible manual gate overrides | `Admin`, `Super Admin` |
+| `vms.document.view` | View cleared visitor identity documents | `Admin`, `Security Personnel`, `Super Admin` |
+| `vms.registry.manage` | Manage blacklist and safe-list versions | `Admin`, `Super Admin` |
+| `vms.policy.manage` | Manage access policy versions | `Admin`, `Super Admin` |
+| `vms.zone.manage` | Manage zone permissions and elevations | `Admin`, `Super Admin` |
+| `vms.report.view` | View visitor reports and statistics | `Admin`, `Security Personnel`, `Super Admin` |
+| `vms.audit.view` | Review security audit events | `Admin`, `Super Admin` |
+| `vms.event.view` | View special-event handling information | `Admin`, `Security Personnel`, `Super Admin` |
+| `vms.event.manage` | Manage special visitor events | `Admin`, `Super Admin` |
+| `vms.muster.manage` | Manage emergency muster and roll call | `Admin`, `Security Personnel`, `Super Admin` |
+| `vms.integration.manage` | Manage VMS integration settings | `Admin`, `Super Admin` |
+| `vms.vip.manage` | Manage VIP permissions | `Admin`, `Super Admin` |
+| `vms.role.manage` | Assign scoped VMS roles | `Super Admin` |

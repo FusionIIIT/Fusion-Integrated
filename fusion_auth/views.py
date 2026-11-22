@@ -5,7 +5,10 @@ stores only the returned token, in an httpOnly cookie. This is the *user*
 login — one door for every module. Operators sign in at the sysadmin console's
 own URL; the two share an identity service, not a login page.
 """
+import hashlib
+
 from django.conf import settings
+from django.core.cache import cache
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -22,6 +25,14 @@ from fusion_auth.serializers import LoginSerializer, OkSerializer, RoleSerialize
 from modules.accesscontrol import contracts as accesscontrol
 
 COOKIE_MAX_AGE = 12 * 60 * 60
+ACTIVE_ROLE_CACHE_TTL = COOKIE_MAX_AGE
+
+
+def _active_role_cache_key(request):
+    """Bind the UI role preference to the opaque IAM session, never its raw token."""
+    token = request.auth or ""
+    digest = hashlib.sha256(str(token).encode()).hexdigest()
+    return f"fusion:active-role:{digest}"
 
 
 def _set_cookie(response, token):
@@ -101,6 +112,9 @@ class MeView(APIView):
 
     def get(self, request):
         p = request.principal
+        active_role = cache.get(_active_role_cache_key(request), p.active_role)
+        if active_role not in p.roles:
+            active_role = p.active_role
         return Response({
             "user": {
                 "id": p.user_id,
@@ -109,7 +123,7 @@ class MeView(APIView):
                 "kind": p.kind,
                 "email": p.email,
             },
-            "active_role": p.active_role,
+            "active_role": active_role,
             "roles": list(p.roles),
             "permissions": sorted(p.permissions),
             "modules": list(p.modules),
@@ -126,14 +140,10 @@ class MeView(APIView):
     def patch(self, request):
         """Switch which designation the sidebar and screens present them as."""
         role = (request.data.get("active_role") or "").strip()
-        try:
-            get_client().set_active_role(request.auth or "", role)
-        except ValueError as exc:
-            raise DomainError(str(exc), code="unknown_role") from exc
-        except IamUnavailable as exc:
-            return Response(
-                {"error": {"code": "iam_unavailable",
-                           "message": f"Identity service unavailable: {exc}",
-                           "details": [], "request_id": ""}},
-                status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        if not role or role not in request.principal.roles:
+            raise DomainError("Choose one of your assigned roles.", code="unknown_role")
+        # IAM versions that expose session read-only do not support PATCH /me.
+        # This preference only affects the current platform session; IAM remains
+        # authoritative for the user's roles, module grants, and permissions.
+        cache.set(_active_role_cache_key(request), role, ACTIVE_ROLE_CACHE_TTL)
         return self.get(request)
