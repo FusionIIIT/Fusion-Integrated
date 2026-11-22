@@ -13,6 +13,25 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `hreis`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `hreis.employee.view` | View employee service records in authorized scope | `faculty`, `hradmin`, `staff` |
+| `hreis.employee.manage` | Create and update official employee service records | `hradmin` |
+| `hreis.request.view` | View HR requests in authorized scope | `Accounts Admin`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_HR`, `faculty`, `hradmin`, `staff` |
+| `hreis.request.create` | Submit HR requests | `faculty`, `staff` |
+| `hreis.request.review` | Verify, route, and decide HR requests | `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_HR`, `hradmin` |
+| `hreis.request.assign` | Assign appraisal reviewers | `hradmin` |
+| `hreis.request.manage` | Manage HR workflow policy and requests | `hradmin` |
+| `hreis.claim.update` | Record approved claim financial processing | `Accounts Admin` |
+| `hreis.leave_balance.view` | View leave balances in authorized scope | `hradmin` |
+| `hreis.leave_balance.manage` | Record leave balance adjustments | `hradmin` |
+| `hreis.policy.manage` | Create effective-dated HR policy versions | `hradmin` |
+| `hreis.audit.view` | View authorized HR audit records | `hradmin` |
+| `hreis.notification.view` | View own HR notifications | `faculty`, `staff` |
+| `hreis.policy.view` | View effective HR policies | `SectionHead_HR`, `hradmin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

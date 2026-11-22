@@ -63,6 +63,277 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/hreis/audit-events:
+    get:
+      operationId: v1_hreis_audit_events_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEvent'
+          description: ''
+  /api/v1/hreis/employees:
+    get:
+      operationId: v1_hreis_employees_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmployeeServiceRecord'
+          description: ''
+  /api/v1/hreis/employees/{user_id}:
+    get:
+      operationId: v1_hreis_employees_retrieve
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeServiceRecord'
+          description: ''
+    put:
+      operationId: v1_hreis_employees_update
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeServiceRecordWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmployeeServiceRecordWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmployeeServiceRecordWrite'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeServiceRecord'
+          description: ''
+  /api/v1/hreis/leave-balances:
+    get:
+      operationId: v1_hreis_leave_balances_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveBalanceEntry'
+          description: ''
+    post:
+      operationId: v1_hreis_leave_balances_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceAdjustment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BalanceAdjustment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BalanceAdjustment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveBalanceEntry'
+          description: ''
+  /api/v1/hreis/notifications:
+    get:
+      operationId: v1_hreis_notifications_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/v1/hreis/policies:
+    get:
+      operationId: v1_hreis_policies_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Policy'
+          description: ''
+    post:
+      operationId: v1_hreis_policies_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PolicyCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PolicyCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+          description: ''
+  /api/v1/hreis/requests:
+    get:
+      operationId: hreis_request_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HRRequest'
+          description: ''
+    post:
+      operationId: v1_hreis_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HRRequest'
+          description: ''
+  /api/v1/hreis/requests/{id}:
+    get:
+      operationId: hreis_request_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HRRequest'
+          description: ''
+  /api/v1/hreis/requests/{id}/transition:
+    post:
+      operationId: hreis_request_transition
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HRRequestTransition'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HRRequestTransition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HRRequestTransition'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HRRequest'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1993,6 +2264,67 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuditEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+        actor_role:
+          type: string
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        resource_type:
+          type: string
+          readOnly: true
+        resource_id:
+          type: integer
+          readOnly: true
+        details:
+          readOnly: true
+        occurred_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_role
+      - actor_user_id
+      - details
+      - id
+      - occurred_at
+      - resource_id
+      - resource_type
+      - user_id
+    BalanceAdjustment:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        leave_type:
+          type: string
+          maxLength: 32
+        delta_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        reason:
+          type: string
+          maxLength: 300
+      required:
+      - delta_days
+      - leave_type
+      - reason
+      - user_id
     BulkOutcome:
       type: object
       properties:
@@ -2315,6 +2647,33 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CreateRequest:
+      type: object
+      properties:
+        request_type:
+          $ref: '#/components/schemas/CreateRequestRequestTypeEnum'
+        data:
+          type: object
+          additionalProperties: {}
+      required:
+      - data
+      - request_type
+    CreateRequestRequestTypeEnum:
+      enum:
+      - leave
+      - appraisal
+      - ltc_advance
+      - ltc_reimbursement
+      - cpda_advance
+      - cpda_reimbursement
+      type: string
+      description: |-
+        * `leave` - leave
+        * `appraisal` - appraisal
+        * `ltc_advance` - ltc_advance
+        * `ltc_reimbursement` - ltc_reimbursement
+        * `cpda_advance` - cpda_advance
+        * `cpda_reimbursement` - cpda_reimbursement
     Detail:
       type: object
       properties:
@@ -2407,6 +2766,107 @@ components:
       - season_decision
       - semester
       - standing
+    EmployeeServiceRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        employee_category:
+          allOf:
+          - $ref: '#/components/schemas/EmployeeServiceRecordEmployeeCategoryEnum'
+          readOnly: true
+        appointment_details:
+          readOnly: true
+        department_code:
+          type: string
+          readOnly: true
+        designation:
+          type: string
+          readOnly: true
+        service_history:
+          readOnly: true
+        retirement_status:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - appointment_details
+      - created_at
+      - department_code
+      - designation
+      - employee_category
+      - id
+      - retirement_status
+      - service_history
+      - updated_at
+      - user_id
+    EmployeeServiceRecordEmployeeCategoryEnum:
+      enum:
+      - faculty
+      - teaching_staff
+      - non_teaching_staff
+      type: string
+      description: |-
+        * `faculty` - Faculty
+        * `teaching_staff` - Teaching staff
+        * `non_teaching_staff` - Non-teaching staff
+    EmployeeServiceRecordWrite:
+      type: object
+      properties:
+        employee_category:
+          $ref: '#/components/schemas/EmployeeServiceRecordWriteEmployeeCategoryEnum'
+        appointment_details: {}
+        department_code:
+          type: string
+          maxLength: 80
+        designation:
+          type: string
+          maxLength: 120
+        service_history:
+          type: array
+          items: {}
+        retirement_status:
+          type: string
+          maxLength: 40
+    EmployeeServiceRecordWriteEmployeeCategoryEnum:
+      enum:
+      - faculty
+      - teaching_staff
+      - non_teaching_staff
+      type: string
+      description: |-
+        * `faculty` - faculty
+        * `teaching_staff` - teaching_staff
+        * `non_teaching_staff` - non_teaching_staff
+    EventEnum:
+      enum:
+      - assign_reviewers
+      - verify
+      - approve
+      - reject
+      - forward
+      - finalize
+      - process
+      type: string
+      description: |-
+        * `assign_reviewers` - assign_reviewers
+        * `verify` - verify
+        * `approve` - approve
+        * `reject` - reject
+        * `forward` - forward
+        * `finalize` - finalize
+        * `process` - process
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +2883,80 @@ components:
       - fee_reference
       - season
       - user_id
+    HRRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        owner_user_id:
+          type: integer
+          readOnly: true
+        request_type:
+          allOf:
+          - $ref: '#/components/schemas/HRRequestRequestTypeEnum'
+          readOnly: true
+        state:
+          allOf:
+          - $ref: '#/components/schemas/StateEnum'
+          readOnly: true
+        cycle_key:
+          type: string
+          readOnly: true
+        data:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestDecision'
+          readOnly: true
+      required:
+      - created_at
+      - cycle_key
+      - data
+      - decisions
+      - id
+      - owner_user_id
+      - request_type
+      - state
+      - updated_at
+    HRRequestRequestTypeEnum:
+      enum:
+      - leave
+      - appraisal
+      - ltc_advance
+      - ltc_reimbursement
+      - cpda_advance
+      - cpda_reimbursement
+      type: string
+      description: |-
+        * `leave` - Leave
+        * `appraisal` - Yearly appraisal
+        * `ltc_advance` - LTC advance
+        * `ltc_reimbursement` - LTC reimbursement
+        * `cpda_advance` - CPDA advance
+        * `cpda_reimbursement` - CPDA reimbursement
+    HRRequestTransition:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/EventEnum'
+        note:
+          type: string
+          maxLength: 500
+        details:
+          type: object
+          additionalProperties: {}
+      required:
+      - event
     IncidentRecorded:
       type: object
       properties:
@@ -2637,6 +3171,46 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveBalanceEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        leave_type:
+          type: string
+          readOnly: true
+        delta_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+        request_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_user_id
+      - created_at
+      - delta_days
+      - id
+      - leave_type
+      - reason
+      - request_id
+      - user_id
     LiftSanction:
       type: object
       properties:
@@ -2732,6 +3306,37 @@ components:
       - is_late
       - message
       - record
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        topic:
+          type: string
+          readOnly: true
+        request_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        payload:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - id
+      - payload
+      - read_at
+      - request_id
+      - topic
     OffCampusRecord:
       type: object
       properties:
@@ -3145,6 +3750,65 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    Policy:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        policy_name:
+          type: string
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+        effective_from:
+          type: string
+          format: date
+          readOnly: true
+        effective_to:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        payload:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - effective_from
+      - effective_to
+      - id
+      - payload
+      - policy_name
+      - version
+    PolicyCreate:
+      type: object
+      properties:
+        policy_name:
+          type: string
+          maxLength: 80
+        version:
+          type: integer
+          minimum: 1
+        effective_from:
+          type: string
+          format: date
+        effective_to:
+          type: string
+          format: date
+          nullable: true
+        payload:
+          type: object
+          additionalProperties: {}
+      required:
+      - effective_from
+      - payload
+      - policy_name
+      - version
     ProfileDocument:
       type: object
       description: |-
@@ -3466,6 +4130,39 @@ components:
       - message
       - reason
       - route
+    RequestDecision:
+      type: object
+      properties:
+        from_state:
+          type: string
+          readOnly: true
+        event:
+          type: string
+          readOnly: true
+        to_state:
+          type: string
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+        actor_role:
+          type: string
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_role
+      - actor_user_id
+      - created_at
+      - event
+      - from_state
+      - note
+      - to_state
     RoundOutcome:
       type: object
       properties:
@@ -3691,6 +4388,34 @@ components:
       required:
       - available
       - season
+    StateEnum:
+      enum:
+      - draft
+      - submitted
+      - awaiting_hr_verification
+      - reviewer_assigned_pending_review
+      - pending_current_authority
+      - pending_next_authority
+      - approved_leave_balance_updated
+      - approved_ltc_claim
+      - approved_cpda_claim
+      - rejected
+      - finalized_archived_closed
+      - processed_financial_status_recorded
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `submitted` - Submitted
+        * `awaiting_hr_verification` - Awaiting HR verification
+        * `reviewer_assigned_pending_review` - Reviewer assigned / pending review
+        * `pending_current_authority` - Pending current authority
+        * `pending_next_authority` - Pending next authority
+        * `approved_leave_balance_updated` - Approved; leave balance updated
+        * `approved_ltc_claim` - Approved LTC claim
+        * `approved_cpda_claim` - Approved CPDA claim
+        * `rejected` - Rejected
+        * `finalized_archived_closed` - Finalized, archived and closed
+        * `processed_financial_status_recorded` - Financial status recorded
     SubmitOfferLetter:
       type: object
       properties:
