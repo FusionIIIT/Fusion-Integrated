@@ -3,7 +3,7 @@
 Student 1 (git author name): vishnu
 Student 2 (git author name): vishnu
 Design commit (hash and subject): c2ea57f test(quiz): freeze specification test designs for FR, UC, BR, and WF
-Baseline commit (hash and subject): pending
+Baseline commit (hash and subject): 582c7eb test(quiz): baseline spec test suite execution and triage log
 Student 1's 10/10 commit the baseline ran on (hash): c66c8f447b43dd7cd1331a02a85f455d7b7a947b
 
 ## Results
