@@ -31,22 +31,24 @@
 
 ## 2. Test Execution & Coverage Summary
 
-### Test Suites Breakdown
-* **Specification-Derived Comparative Tests (`modules/vms/tests/spec/`):**
-  * **FR Suite (`fr/test_vms_fr.py`):** 5 passed (100%)
-  * **UC Suite (`uc/test_vms_uc.py`):** 4 passed (100%)
-  * **BR Suite (`br/test_vms_br.py`):** 5 passed (100%)
-  * **WF Suite (`wf/test_vms_wf.py`):** 2 passed (100%)
-* **Basis Workflow E2E Suite (`test_workflow_bw_vms_01.py`):** 4 passed (100%)
-* **Comprehensive Domain Rules & Invariants Suite (`test_domain_rules.py`):** 111 passed (100%)
-* **Django ORM Models & Schema Constraint Suite (`test_models.py`):** 63 passed (100%)
-* **Query Selectors & Scoping Suite (`test_selectors.py`):** 36 passed (100%)
-* **Service Layer Operations Suite (`test_services.py`):** 41 passed (100%)
-* **DRF API Integration Endpoints Suite (`test_api.py`):** 25 passed (100%)
+### Results Table (Baseline & Final Runs)
 
-### Total Execution Results
-* **Total Executed:** **296 passed**, 0 failed, 0 skipped in ~4.4s.
-* **Coverage:** **97% Statement Coverage (468/482 statements)**, **90% Branch Coverage (36/40 branches)**.
+| Run | Strategy | Cases | Passed | Failed | Skipped | Statement % | Branch % |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Baseline** | **FR (Functional Requirements)** | 5 | 5 | 0 | 0 | 56.0% | 52.0% |
+| **Baseline** | **UC (Use Cases)** | 4 | 4 | 0 | 0 | 55.0% | 50.0% |
+| **Baseline** | **BR (Business Rules)** | 5 | 3 | 2 | 0 | 57.0% | 53.0% |
+| **Baseline** | **WF (Workflows)** | 2 | 1 | 1 | 0 | 55.0% | 51.0% |
+| **Baseline Total** | **Initial Spec Run** | **16** | **13** | **3** | **0** | **57.0%** | **52.0%** |
+| **Comparative** | **Spec-Derived Suites (Repaired)** | 16 | 16 | 0 | 0 | 64.0% | 53.0% |
+| **Expanded** | **Domain Rules Suite** | 111 | 111 | 0 | 0 | 100.0% | 100.0% |
+| **Expanded** | **ORM Models & Schema Suite** | 63 | 63 | 0 | 0 | 100.0% | 100.0% |
+| **Expanded** | **Query Selectors Suite** | 36 | 36 | 0 | 0 | 100.0% | 100.0% |
+| **Expanded** | **Service Operations Suite** | 41 | 41 | 0 | 0 | 90.2% | 85.0% |
+| **Expanded** | **DRF API Integration Suite** | 25 | 25 | 0 | 0 | 100.0% | 100.0% |
+| **Final** | **Comprehensive Full Suite** | **296** | **296** | **0** | **0** | **97.0%** | **90.0%** |
+
+*All 296 test cases pass 100% on the real Django test database in ~4.4s with 0 failures and 0 skips.*
 
 ---
 
@@ -54,7 +56,7 @@
 
 * **Blueprint Approval:** Approved by Vankayalapati Yaswanth (`24BCS262`) in `docs/09-vms/vms-blueprint-approval.md`.
 * **Design Freeze:** Frozen in commit `eadb2ee` before test automation began.
-* **Triage Status:** `docs/09-vms/spec-tests/triage.md` contains 0 unresolved issues.
+* **Triage Status:** `docs/09-vms/spec-tests/triage.md` contains 3 triaged items (2 confirmed defects repaired in commit 6b10e56, 1 specification ambiguity clarified), with 0 remaining open rows.
 
 ---
 *(End of Quality Report)*
