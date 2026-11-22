@@ -1,0 +1,218 @@
+[
+  {
+    "test_id": "BR-TEST-001",
+    "source_id": "PHC-BR-01",
+    "purpose": "Verify doctor availability combines master schedule and current-day real-time attendance",
+    "preconditions": "Doctor schedule is published and attendance recorded for current date",
+    "action_or_input": "Query doctor availability view",
+    "expected_result": "Result contains master schedule and current-day attendance status together",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-002",
+    "source_id": "PHC-BR-02 condition-permitted",
+    "purpose": "Verify patient can access their own medical records read-only",
+    "preconditions": "Patient has recorded visits and prescriptions",
+    "action_or_input": "Patient requests own medical history",
+    "expected_result": "Patient own records returned in read-only form",
+    "test_type": "authorization_positive"
+  },
+  {
+    "test_id": "BR-TEST-003",
+    "source_id": "PHC-BR-02 condition-prohibited",
+    "purpose": "Verify patient accessing another patient medical record is strictly prohibited",
+    "preconditions": "Patient A attempts to access Patient B record",
+    "action_or_input": "Patient A requests Patient B record by ID",
+    "expected_result": "Access denied with UnauthorizedRecordAccessError or 403 Forbidden",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "BR-TEST-004",
+    "source_id": "PHC-BR-03 condition-permitted",
+    "purpose": "Verify authorized role permitted to perform assigned PHC function",
+    "preconditions": "User has PHC Staff role",
+    "action_or_input": "PHC Staff adjusts inventory stock",
+    "expected_result": "Operation authorized and succeeds",
+    "test_type": "authorization_positive"
+  },
+  {
+    "test_id": "BR-TEST-005",
+    "source_id": "PHC-BR-03 condition-prohibited",
+    "purpose": "Verify unauthorized role denied from performing restricted PHC function",
+    "preconditions": "User is authenticated as student",
+    "action_or_input": "Student attempts to post inventory stock adjustment",
+    "expected_result": "Access denied with 403 Forbidden",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "BR-TEST-006",
+    "source_id": "PHC-BR-04 outcome-permitted",
+    "purpose": "Verify employee is eligible to submit reimbursement claim",
+    "preconditions": "User has Employee (faculty or staff) role",
+    "action_or_input": "Evaluate employee claimant eligibility",
+    "expected_result": "Claimant is evaluated as eligible",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-007",
+    "source_id": "PHC-BR-04 outcome-prohibited",
+    "purpose": "Verify student is strictly prohibited from submitting reimbursement claim",
+    "preconditions": "User has Student role",
+    "action_or_input": "Student submits reimbursement claim",
+    "expected_result": "Submission rejected with IneligibleClaimantError",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "BR-TEST-008",
+    "source_id": "PHC-BR-05 outcome-permitted",
+    "purpose": "Verify reimbursement claim with valid prescription belonging to claimant is accepted",
+    "preconditions": "Valid recorded prescription exists for claimant",
+    "action_or_input": "Employee submits claim linked to their own prescription",
+    "expected_result": "Claim is accepted and enters reimbursement processing",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-009",
+    "source_id": "PHC-BR-05 outcome-prohibited",
+    "purpose": "Verify reimbursement claim missing valid claimant prescription is rejected",
+    "preconditions": "Prescription does not exist or belongs to another patient",
+    "action_or_input": "Employee submits claim with invalid prescription reference",
+    "expected_result": "Submission rejected with PrescriptionRequiredError",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "BR-TEST-010",
+    "source_id": "PHC-BR-06 threshold-within",
+    "purpose": "Verify reimbursement claim with expense date within 90-day window is accepted",
+    "preconditions": "Expense date is within 90 days of submission",
+    "action_or_input": "Employee submits claim for expense incurred 30 days ago",
+    "expected_result": "Submission window validation succeeds and claim is created",
+    "test_type": "boundary_positive"
+  },
+  {
+    "test_id": "BR-TEST-011",
+    "source_id": "PHC-BR-06 threshold-outside",
+    "purpose": "Verify reimbursement claim with expense date exceeding 90-day window is rejected",
+    "preconditions": "Expense date is 91 or more days prior to submission",
+    "action_or_input": "Employee submits claim for expense incurred 100 days ago",
+    "expected_result": "Submission rejected with SubmissionWindowExpiredError",
+    "test_type": "boundary_negative"
+  },
+  {
+    "test_id": "BR-TEST-012",
+    "source_id": "PHC-BR-07 threshold-below",
+    "purpose": "Verify low-stock warning generated when stock level falls strictly below threshold",
+    "preconditions": "Item has reorder threshold 20 and initial stock 25",
+    "action_or_input": "Stock is deducted by 10 resulting in stock 15 (< 20)",
+    "expected_result": "Low-stock alert notification created for PHC Staff",
+    "test_type": "boundary_negative"
+  },
+  {
+    "test_id": "BR-TEST-013",
+    "source_id": "PHC-BR-07 threshold-at-or-above",
+    "purpose": "Verify no low-stock alert generated when stock level remains at or above threshold",
+    "preconditions": "Item has reorder threshold 20 and initial stock 30",
+    "action_or_input": "Stock is deducted by 10 resulting in stock 20 (== 20)",
+    "expected_result": "No low-stock alert notification created",
+    "test_type": "boundary_positive"
+  },
+  {
+    "test_id": "BR-TEST-014",
+    "source_id": "PHC-BR-08 forward-progression",
+    "purpose": "Verify accepted claim follows exact forward progression across mandatory stages",
+    "preconditions": "Claim is submitted by employee",
+    "action_or_input": "Claim advances through PHC Review -> Accounts Verify -> Sanction -> Payment",
+    "expected_result": "Stages advance strictly in order: Pending PHC Review -> Pending Accounts Verification -> Pending Sanction -> Approved for Payment -> Reimbursed",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-015",
+    "source_id": "PHC-BR-08 outcome-rejected",
+    "purpose": "Verify Approving Authority rejection terminates reimbursement claim",
+    "preconditions": "Claim is Pending Sanction",
+    "action_or_input": "Approving Authority rejects claim sanction",
+    "expected_result": "Claim status becomes Rejected and progression terminates",
+    "test_type": "functional_negative"
+  },
+  {
+    "test_id": "BR-TEST-016",
+    "source_id": "PHC-BR-09 patient-record-audit",
+    "purpose": "Verify immutable audit trail recorded when patient record is created",
+    "preconditions": "User is authorized PHC Staff",
+    "action_or_input": "Staff creates patient visit and digitized prescription",
+    "expected_result": "PHCAuditTrail entries created with target_type PATIENT_RECORD",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-017",
+    "source_id": "PHC-BR-09 inventory-audit",
+    "purpose": "Verify immutable audit trail recorded when inventory stock level is adjusted",
+    "preconditions": "User is authorized PHC Staff",
+    "action_or_input": "Staff performs stock addition or deduction",
+    "expected_result": "PHCAuditTrail entry created with target_type INVENTORY_LEVEL",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-018",
+    "source_id": "PHC-BR-09 reimbursement-audit",
+    "purpose": "Verify immutable audit trail recorded when reimbursement claim status changes",
+    "preconditions": "User submits or transitions claim",
+    "action_or_input": "Claim is submitted and transitioned",
+    "expected_result": "PHCAuditTrail entry created with target_type REIMBURSEMENT_CLAIM",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-019",
+    "source_id": "PHC-BR-10 outcome-permitted",
+    "purpose": "Verify approved inventory requisition proceeds to delivery fulfillment",
+    "preconditions": "Requisition status is Approved",
+    "action_or_input": "Staff marks requisition as Fulfilled",
+    "expected_result": "Requisition status updated to Fulfilled",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-020",
+    "source_id": "PHC-BR-10 outcome-prohibited",
+    "purpose": "Verify fulfillment prohibited when requisition is not Approved",
+    "preconditions": "Requisition status is Pending Approval or Rejected",
+    "action_or_input": "Staff attempts to fulfill unapproved requisition",
+    "expected_result": "Fulfillment rejected with RequisitionNotApprovedError",
+    "test_type": "functional_negative"
+  },
+  {
+    "test_id": "BR-TEST-021",
+    "source_id": "PHC-BR-11",
+    "purpose": "Verify originator notified when inventory requisition is decided",
+    "preconditions": "Requisition submitted by PHC Staff originator",
+    "action_or_input": "Approver approves or rejects requisition",
+    "expected_result": "Decision notification created for requisition originator",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-022",
+    "source_id": "PHC-BR-12",
+    "purpose": "Verify administrative reports protect PII and anonymize patient data",
+    "preconditions": "Clinical visit and patient data exist",
+    "action_or_input": "Generate demographics report",
+    "expected_result": "Report output has anonymized=True with no individual patient identifiers",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-023",
+    "source_id": "PHC-BR-13",
+    "purpose": "Verify claimant notified on claim status changes including rejection and payment",
+    "preconditions": "Claim transitions to rejected or paid",
+    "action_or_input": "Claim status changes",
+    "expected_result": "Status notification generated for the claimant",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "BR-TEST-024",
+    "source_id": "PHC-BR-14",
+    "purpose": "Verify in-place modification or reopening of submitted or rejected claim is prohibited",
+    "preconditions": "Claim is in submitted or rejected state",
+    "action_or_input": "Attempt to edit or reopen existing claim",
+    "expected_result": "Action blocked with ClaimImmutableError; new claim required",
+    "test_type": "functional_negative"
+  }
+]

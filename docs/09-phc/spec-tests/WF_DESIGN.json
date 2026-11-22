@@ -1,0 +1,164 @@
+[
+  {
+    "test_id": "WF-TEST-001",
+    "source_id": "BW-PHC-01 Complete Success Path",
+    "purpose": "Verify complete end-to-end reimbursement approval and reimbursement lifecycle",
+    "preconditions": "Employee has valid prescription and expense date within window",
+    "action_or_input": "Submit claim -> PHC review forward -> Accounts verify -> Sanction approve -> Payment process",
+    "expected_result": "Claim traverses all 5 states ending in Reimbursed",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-TEST-002",
+    "source_id": "BW-PHC-01 Transition Draft to Pending PHC Review",
+    "purpose": "Verify transition from Draft to Pending PHC Review upon employee submission",
+    "preconditions": "Claimant is employee with recorded prescription",
+    "action_or_input": "Employee submits claim",
+    "expected_result": "Claim state set to Pending PHC Review with initial action history entry",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "WF-TEST-003",
+    "source_id": "BW-PHC-01 Transition Pending PHC Review to Pending Accounts Verification",
+    "purpose": "Verify transition from Pending PHC Review to Pending Accounts Verification",
+    "preconditions": "Claim is Pending PHC Review; user is PHC Staff",
+    "action_or_input": "PHC Staff forwards claim",
+    "expected_result": "Claim state set to Pending Accounts Verification and claimant notified",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "WF-TEST-004",
+    "source_id": "BW-PHC-01 Transition Pending Accounts Verification to Pending Sanction",
+    "purpose": "Verify transition from Pending Accounts Verification to Pending Sanction",
+    "preconditions": "Claim is Pending Accounts Verification; user is Accounts & Audit",
+    "action_or_input": "Accounts verifies financial details",
+    "expected_result": "Claim state set to Pending Sanction and claimant notified",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "WF-TEST-005",
+    "source_id": "BW-PHC-01 Transition Pending Sanction to Approved for Payment",
+    "purpose": "Verify transition from Pending Sanction to Approved for Payment on approval",
+    "preconditions": "Claim is Pending Sanction; user is Approving Authority",
+    "action_or_input": "Approving Authority approves sanction",
+    "expected_result": "Claim state set to Approved for Payment and claimant notified",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "WF-TEST-006",
+    "source_id": "BW-PHC-01 Transition Approved for Payment to Reimbursed",
+    "purpose": "Verify transition from Approved for Payment to Reimbursed upon payment completion",
+    "preconditions": "Claim is Approved for Payment; user is Accounts & Audit",
+    "action_or_input": "Accounts processes final payment",
+    "expected_result": "Claim state set to Reimbursed closing the workflow",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "WF-TEST-007",
+    "source_id": "BW-PHC-02 Complete Rejection Path",
+    "purpose": "Verify complete end-to-end reimbursement rejection lifecycle terminating at sanction",
+    "preconditions": "Employee submits claim with valid prerequisites",
+    "action_or_input": "Submit claim -> PHC review forward -> Accounts verify -> Sanction reject",
+    "expected_result": "Claim traverses to Rejected and reaches terminal state",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-TEST-008",
+    "source_id": "BW-PHC-02 Transition Pending Sanction to Rejected",
+    "purpose": "Verify transition from Pending Sanction to Rejected on sanction denial",
+    "preconditions": "Claim is Pending Sanction; user is Approving Authority",
+    "action_or_input": "Approving Authority rejects sanction",
+    "expected_result": "Claim state set to Rejected and rejection notification sent to claimant",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "WF-TEST-009",
+    "source_id": "CW-PHC-01 Out-of-Order Transition Blocked",
+    "purpose": "Verify out-of-order state transition is strictly prevented in reimbursement progression",
+    "preconditions": "Claim is in Pending PHC Review",
+    "action_or_input": "Attempt to jump directly to payment or sanction without prior stages",
+    "expected_result": "Transition blocked with InvalidStateTransitionError",
+    "test_type": "workflow_negative"
+  },
+  {
+    "test_id": "WF-TEST-010",
+    "source_id": "CW-PHC-01 Terminal State Immutable",
+    "purpose": "Verify reimbursement claim in terminal state Reimbursed or Rejected cannot transition further",
+    "preconditions": "Claim has reached Reimbursed or Rejected",
+    "action_or_input": "Attempt to execute any forward transition on terminal claim",
+    "expected_result": "Action blocked with InvalidStateTransitionError or ClaimImmutableError",
+    "test_type": "workflow_negative"
+  },
+  {
+    "test_id": "WF-TEST-011",
+    "source_id": "BW-PHC-03 Complete Success Path",
+    "purpose": "Verify complete end-to-end inventory requisition approval and fulfillment lifecycle",
+    "preconditions": "PHC Staff has required items and quantities",
+    "action_or_input": "Submit requisition -> Approving Authority approve -> Delivery fulfillment",
+    "expected_result": "Requisition traverses Draft -> Pending Approval -> Approved -> Fulfilled",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-TEST-012",
+    "source_id": "BW-PHC-03 Transition Draft to Pending Approval",
+    "purpose": "Verify transition from Draft to Pending Approval on staff submission",
+    "preconditions": "User is PHC Staff",
+    "action_or_input": "Staff submits inventory requisition",
+    "expected_result": "Requisition created in Pending Approval state",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "WF-TEST-013",
+    "source_id": "BW-PHC-03 Transition Pending Approval to Approved",
+    "purpose": "Verify transition from Pending Approval to Approved on authority approval",
+    "preconditions": "Requisition is Pending Approval; user is Approving Authority",
+    "action_or_input": "Approver approves requisition",
+    "expected_result": "Requisition state set to Approved and originator notified",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "WF-TEST-014",
+    "source_id": "BW-PHC-03 Transition Approved to Fulfilled",
+    "purpose": "Verify transition from Approved to Fulfilled after supply delivery",
+    "preconditions": "Requisition is in Approved state; user is PHC Staff",
+    "action_or_input": "Staff marks requisition as Fulfilled",
+    "expected_result": "Requisition state set to Fulfilled and fulfillment timestamp recorded",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "WF-TEST-015",
+    "source_id": "BW-PHC-04 Complete Rejection Path",
+    "purpose": "Verify complete end-to-end inventory requisition rejection lifecycle",
+    "preconditions": "PHC Staff submits requisition",
+    "action_or_input": "Submit requisition -> Approving Authority reject",
+    "expected_result": "Requisition state set to Rejected terminating the workflow",
+    "test_type": "workflow_path"
+  },
+  {
+    "test_id": "WF-TEST-016",
+    "source_id": "BW-PHC-04 Transition Pending Approval to Rejected",
+    "purpose": "Verify transition from Pending Approval to Rejected on authority rejection",
+    "preconditions": "Requisition is Pending Approval; user is Approving Authority",
+    "action_or_input": "Approver rejects requisition",
+    "expected_result": "Requisition state set to Rejected and originator notified",
+    "test_type": "workflow_transition"
+  },
+  {
+    "test_id": "WF-TEST-017",
+    "source_id": "CW-PHC-02 Fulfillment Blocked Before Approval",
+    "purpose": "Verify requisition cannot be marked Fulfilled prior to approval",
+    "preconditions": "Requisition is in Pending Approval or Rejected",
+    "action_or_input": "Attempt to mark requisition as Fulfilled",
+    "expected_result": "Fulfillment blocked with RequisitionNotApprovedError",
+    "test_type": "workflow_negative"
+  },
+  {
+    "test_id": "WF-TEST-018",
+    "source_id": "CW-PHC-02 Terminal State Immutable",
+    "purpose": "Verify requisition in terminal state Fulfilled or Rejected cannot be decided again",
+    "preconditions": "Requisition has reached Fulfilled or Rejected",
+    "action_or_input": "Attempt to approve or reject terminal requisition",
+    "expected_result": "Action blocked with InvalidStateTransitionError",
+    "test_type": "workflow_negative"
+  }
+]
