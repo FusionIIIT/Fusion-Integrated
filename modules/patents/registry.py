@@ -214,3 +214,19 @@ ROLE_GRANTS = {
     "attorney": _ATTORNEY,
     "pcc_admin": _PCC_ADMIN,
 }
+
+
+def readiness() -> list[str]:
+    """Returns unmet deployment prerequisites for the patents module (Step 7.5, ADR-0010)."""
+    unmet: list[str] = []
+    try:
+        from django.db import DatabaseError
+
+        from modules.patents.models.policy import PatentPolicy
+
+        if not PatentPolicy.objects.filter(is_active=True).exists():
+            unmet.append("Patent policy is not seeded — run 'manage.py pms_seed_policy'")
+    except DatabaseError:
+        unmet.append("Database tables are not migrated — run 'manage.py migrate'")
+    return unmet
+

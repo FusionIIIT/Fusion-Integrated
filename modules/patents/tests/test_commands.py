@@ -41,3 +41,15 @@ def test_pms_sweep_deadlines_command():
     call_command("pms_sweep_deadlines", stdout=out)
     output = out.getvalue()
     assert "PMS deadline sweep completed" in output
+
+
+def test_pms_readiness_command():
+    PatentPolicy.objects.all().delete()
+    with pytest.raises(SystemExit):
+        call_command("pms_readiness")
+
+    call_command("pms_seed_policy")
+    out = io.StringIO()
+    call_command("pms_readiness", stdout=out)
+    assert "Patents module is ready for operation" in out.getvalue()
+
