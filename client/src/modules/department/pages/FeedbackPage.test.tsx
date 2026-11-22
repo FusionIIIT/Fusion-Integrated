@@ -62,4 +62,12 @@ describe("FeedbackPage", () => {
     await waitFor(() => expect(api.post).toHaveBeenCalledWith("/department/feedback/4/review",
       { category: "", disposition: "", note: "" }));
   });
+
+  it("shows the owning office no control its permissions do not allow", async () => {
+    setup(["department.feedback.view"], { "/feedback": page([FB]) }, "dept_admin");
+    renderPage(<FeedbackPage />);
+    expect(await screen.findByText("Projector")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Review" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Submit feedback" })).toBeNull();
+  });
 });

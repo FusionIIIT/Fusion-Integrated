@@ -57,6 +57,20 @@ def assign(
         raise DomainError(
             "Only an institute employee (faculty or staff) can hold this role.", code="not_employee"
         )
+    latest_end = (
+        RoleTenure.objects.filter(department=dept, role=role, valid_to__gt=now)
+        .order_by("-valid_to")
+        .values_list("valid_to", flat=True)
+        .first()
+    )
+    if latest_end is not None and valid_from > latest_end:
+        # BR-DEPT-022: a recorded holder runs until latest_end, so a later start would leave a gap.
+        raise DomainError(
+            f"The current {rules.ROLE_LABELS[role]} tenure ends on "
+            f"{timezone.localtime(latest_end):%Y-%m-%d %H:%M}. "
+            "Start the new tenure then or earlier, so the role is never left empty.",
+            code="would_leave_gap",
+        )
     existing = list(RoleTenure.objects.filter(department=dept, role=role, valid_to__gt=valid_from))
     candidate = rules.Tenure(key=None, user_id=user_id, valid_from=valid_from, valid_to=valid_to)
     outgoing = [t for t in existing if t.valid_from < valid_from < t.valid_to]

@@ -47,8 +47,13 @@ export const useUpdateDepartment = () =>
   useWrite(async ({ code, ...body }: GeneralUpdate & { code: string }) =>
     (await http.patch<Department>(`${BASE}/departments/${code}`, body)).data);
 
-export const useOfficialChanges = (status?: string) =>
-  useList<OfficialChange>("official-changes", status ? { status } : undefined);
+export function useOfficialChanges(enabled: boolean) {
+  return useQuery({
+    queryKey: [KEY, "official-changes"],
+    queryFn: async () => (await http.get<Page<OfficialChange>>(`${BASE}/official-changes`)).data,
+    enabled,
+  });
+}
 
 export const useProposeChange = () =>
   useWrite(async (body: { field: OfficialChange["field"]; value: string }) =>

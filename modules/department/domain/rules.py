@@ -253,4 +253,5 @@ TIER_FIELDS = {
 }
 
 ASSIGNABLE_ROLES = (HOD, DEPT_ADMIN)
+ROLE_LABELS = {HOD: "HOD", DEPT_ADMIN: "Dept_Admin"}
 EMPLOYEE_KINDS = ("faculty", "staff")

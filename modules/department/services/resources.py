@@ -129,6 +129,12 @@ def create_profile(
     """AFR-DEPT-024 with Q8: a login user must belong here; an alumnus may have no login."""
     require_acting(ctx, DEPT_ADMIN)
     dept = own_department(ctx)
+    if kind == "alumni" and user_id is not None:
+        raise DomainError(
+            "An alumni profile has no login, so it cannot name a person's account. "
+            "Leave the person empty and type the name instead.",
+            code="alumni_has_no_login",
+        )
     if kind != "alumni":
         if user_id is None:
             raise DomainError("Choose the person this profile is for.", code="profile_needs_user")

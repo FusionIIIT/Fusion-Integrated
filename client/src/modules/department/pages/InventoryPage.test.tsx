@@ -75,4 +75,13 @@ describe("InventoryPage", () => {
     expect(await screen.findByRole("button", { name: "Request stock" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Approve" })).toBeNull();
   });
+
+  it("shows the owning office no control its permissions do not allow", async () => {
+    setup(["department.inventory_item.view", "department.stock_request.view"], { "/inventory-items": page([ITEM]), "/stock-requests": page([{ ...REQ, status: "approved" }]) }, "dept_admin");
+    renderPage(<InventoryPage />);
+    expect(await screen.findByText("18 board")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Add item" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Record receipt" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Issue" })).toBeNull();
+  });
 });

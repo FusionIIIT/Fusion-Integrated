@@ -8,6 +8,7 @@ from django.utils import timezone
 from modules.department.models import (
     Department,
     InventoryItem,
+    ProfileRecord,
     RoleTenure,
     StockMovement,
     StockRequest,
@@ -267,19 +268,19 @@ def test_ended_tenure_cannot_be_changed_and_extension_cannot_overlap(world, act)
         format="json",
     )
     assert r.status_code == 409
+    ece_current = RoleTenure.objects.get(user_id=uid("ece_hod"))
     nxt = c.post(
         f"{API}/role-assignments",
         {
             "department": "ECE",
             "role": "hod",
             "user_id": uid("faculty2"),
-            "valid_from": (now + timedelta(days=400)).isoformat(),
-            "valid_to": (now + timedelta(days=500)).isoformat(),
+            "valid_from": ece_current.valid_to.isoformat(),  # the successor starts as the holder ends
+            "valid_to": (ece_current.valid_to + timedelta(days=100)).isoformat(),
         },
         format="json",
     )
     assert nxt.status_code == 201
-    ece_current = RoleTenure.objects.get(user_id=uid("ece_hod"))
     r = c.patch(
         f"{API}/role-assignments/{ece_current.pk}",
         {"valid_to": (now + timedelta(days=450)).isoformat()},
@@ -474,6 +475,7 @@ def test_every_accepted_string_fits_its_column():
     from rest_framework import serializers as drf
 
     from modules.department.api import serializers as s
+    from modules.department.models import Announcement as AnnouncementModel
     from modules.department.models import (
         Department,
         FeedbackNote,
@@ -485,9 +487,15 @@ def test_every_accepted_string_fits_its_column():
         TimetableSlot,
     )
     from modules.department.models import Feedback as FeedbackModel
+    from modules.department.models import OfficialChange as OfficialChangeModel
+    from modules.department.models import RoleTenure as RoleTenureModel
 
     pairs = [
         (s.DeptGeneralUpdateSerializer, Department),
+        (s.DeptAnnouncementWriteSerializer, AnnouncementModel),
+        (s.DeptAnnouncementEditSerializer, AnnouncementModel),
+        (s.DeptOfficialChangeWriteSerializer, OfficialChangeModel),
+        (s.DeptRoleTenureWriteSerializer, RoleTenureModel),
         (s.DeptInventoryItemWriteSerializer, InventoryItem),
         (s.DeptReceiptSerializer, StockMovement),
         (s.DeptStockRequestWriteSerializer, StockRequest),
@@ -540,3 +548,103 @@ def test_an_over_long_official_name_is_refused_at_proposal(world, act):
     )
     assert done.status_code == 200
     assert Department.objects.get(code="CSE").name == "N" * 120
+
+
+def test_r3_03_a_successor_that_would_leave_a_gap_is_refused(world, act):
+    # BR-DEPT-022, AFR-DEPT-051: the role is never left empty by a recorded successor
+    current = RoleTenure.objects.get(user_id=uid("hod"))
+    body = {
+        "department": "CSE",
+        "role": "hod",
+        "user_id": uid("faculty2"),
+        "valid_from": (current.valid_to + timedelta(days=1)).isoformat(),
+        "valid_to": (current.valid_to + timedelta(days=100)).isoformat(),
+    }
+    r = act("central").post(f"{API}/role-assignments", body, format="json")
+    assert r.status_code == 422 and r.json()["error"]["code"] == "would_leave_gap"
+    assert "Start the new tenure then or earlier" in r.json()["error"]["message"]
+    ok = act("central").post(
+        f"{API}/role-assignments",
+        {**body, "valid_from": current.valid_to.isoformat()},
+        format="json",
+    )
+    assert ok.status_code == 201
+
+
+def test_r3_03_a_vacant_role_can_be_filled_from_any_start(world, act):
+    # Q1: before a role's first tenure there is nothing to leave a gap after
+    start = timezone.now() + timedelta(days=30)
+    r = act("central").post(
+        f"{API}/role-assignments",
+        {
+            "department": "ME",
+            "role": "hod",
+            "user_id": uid("faculty2"),
+            "valid_from": start.isoformat(),
+            "valid_to": (start + timedelta(days=10)).isoformat(),
+        },
+        format="json",
+    )
+    assert r.status_code == 201
+
+
+def test_r3_01_an_alumni_profile_cannot_borrow_a_login(world, act):
+    # BR-DEPT-019, Q8: an alumnus has no login, so no profile of kind alumni names an account
+    r = act("admin").post(
+        f"{API}/profiles",
+        {"kind": "alumni", "display_name": "X", "user_id": uid("ece_student")},
+        format="json",
+    )
+    assert r.status_code == 422 and r.json()["error"]["code"] == "alumni_has_no_login"
+    assert not ProfileRecord.objects.exists()
+
+
+def test_r3_01_the_database_refuses_an_alumni_row_with_a_login(world):
+    from django.db import IntegrityError, transaction
+
+    with pytest.raises(IntegrityError), transaction.atomic():
+        ProfileRecord.objects.create(
+            department=world["CSE"],
+            kind="alumni",
+            user_id=uid("student"),
+            display_name="X",
+            updated_by=1,
+        )
+
+
+def test_r3_02_a_full_length_title_publishes_and_its_notice_fits(world, act):
+    # A 200-character title fills its column; the notice subject built from it must still fit
+    from modules.department.models import DepartmentNotification
+
+    title = "T" * 200
+    r = act("faculty").post(
+        f"{API}/announcements",
+        {"title": title, "body": "b", "audience_role": "student"},
+        format="json",
+    )
+    assert r.status_code == 201
+    subjects = list(DepartmentNotification.objects.values_list("subject", flat=True))
+    assert subjects and all(len(x) <= 200 for x in subjects)
+    assert subjects[0].startswith("[CSE] TTT") and subjects[0].endswith("…")
+    over = act("faculty").post(
+        f"{API}/announcements",
+        {"title": "T" * 201, "body": "b", "audience_role": "all"},
+        format="json",
+    )
+    assert over.status_code == 400
+
+
+def test_r3_02_every_notice_subject_fits_for_the_longest_department_code(world):
+    # The subject is built from user text; the longest prefix is "[Design] "
+    from modules.department.models import DepartmentNotification
+    from modules.department.services import notifications
+
+    notifications.enqueue(
+        topic="announcement.published",
+        recipients=[1],
+        key="long",
+        subject="[Design] " + "T" * 200,
+        body="b",
+    )
+    subject = DepartmentNotification.objects.get(dedupe_key="announcement.published:long:1").subject
+    assert len(subject) == 200 and subject.startswith("[Design] TTT")

@@ -27,7 +27,7 @@ export default function OverviewPage() {
   const list = useDepartments();
   const code = list.data?.[0]?.code;
   const detail = useDepartment(code);
-  const changes = useOfficialChanges();
+  const changes = useOfficialChanges(can("department.official_change.view"));
   const update = useUpdateDepartment();
   const propose = useProposeChange();
   const decide = useDecideChange();

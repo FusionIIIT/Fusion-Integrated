@@ -380,7 +380,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='profilerecord',
-            constraint=models.CheckConstraint(condition=models.Q(('kind', 'alumni'), ('user_id__isnull', False), _connector='OR'), name='dept_profile_login_unless_alumni'),
+            constraint=models.CheckConstraint(condition=models.Q(models.Q(('kind', 'alumni'), ('user_id__isnull', True)), models.Q(models.Q(('kind', 'alumni'), _negated=True), ('user_id__isnull', False)), _connector='OR'), name='dept_profile_login_iff_not_alumni'),
         ),
         migrations.AddConstraint(
             model_name='profilerecord',

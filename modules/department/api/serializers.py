@@ -125,20 +125,20 @@ class DeptAnnouncementSerializer(serializers.ModelSerializer):
 
 
 class DeptAnnouncementWriteSerializer(serializers.Serializer):
-    title = serializers.CharField(allow_blank=True, max_length=400)
+    title = serializers.CharField(allow_blank=True, max_length=200)
     body = serializers.CharField(allow_blank=True, max_length=10000)
-    audience_role = serializers.CharField(max_length=20)
-    programme = serializers.CharField(required=False, allow_blank=True, max_length=80, default="")
+    audience_role = serializers.CharField(max_length=10)
+    programme = serializers.CharField(required=False, allow_blank=True, max_length=40, default="")
     batch_year = serializers.IntegerField(
         required=False, allow_null=True, default=None, min_value=2000, max_value=2100
     )
 
 
 class DeptAnnouncementEditSerializer(serializers.Serializer):
-    title = serializers.CharField(required=False, allow_blank=True, max_length=400)
+    title = serializers.CharField(required=False, allow_blank=True, max_length=200)
     body = serializers.CharField(required=False, allow_blank=True, max_length=10000)
-    audience_role = serializers.CharField(required=False, max_length=20)
-    programme = serializers.CharField(required=False, allow_blank=True, max_length=80)
+    audience_role = serializers.CharField(required=False, max_length=10)
+    programme = serializers.CharField(required=False, allow_blank=True, max_length=40)
     batch_year = serializers.IntegerField(
         required=False, allow_null=True, min_value=2000, max_value=2100
     )

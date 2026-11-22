@@ -75,4 +75,14 @@ describe("AnnouncementsPage", () => {
     expect(screen.queryByRole("button", { name: "Hide" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
   });
+
+  it("shows the owning office no control its permissions do not allow", async () => {
+    setup(["department.announcement.view"], { "/announcements": page([ANN]) }, "hod");
+    renderPage(<AnnouncementsPage />);
+    expect(await screen.findByText("Lab closed")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Publish announcement" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Edit" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Hide" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
+  });
 });

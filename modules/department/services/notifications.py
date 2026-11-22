@@ -42,11 +42,14 @@ _DISCIPLINE = {
 }
 
 CLAIM_TIMEOUT = timedelta(minutes=10)
+SUBJECT_MAX = DepartmentNotification._meta.get_field("subject").max_length
 
 
 def enqueue(*, topic: str, recipients, key: str, subject: str, body: str) -> int:
     if topic not in TOPICS:
         raise ValueError(f"Unknown notification topic {topic!r}.")
+    # The subject is built from user text (a title, an item name) and must fit its column.
+    subject = subject if len(subject) <= SUBJECT_MAX else subject[: SUBJECT_MAX - 1] + "…"
     rows = [
         DepartmentNotification(
             topic=topic,

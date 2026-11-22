@@ -233,3 +233,12 @@ def test_a_method_without_a_named_permission_is_refused(world, act):
     r = act("hod").put(f"{API}/announcements/1", {}, format="json")
     assert r.status_code in (403, 405)
     assert act("hod").post(f"{API}/departments", {}, format="json").status_code in (403, 405)
+
+
+@pytest.mark.parametrize(("method", "path", "code"), ENDPOINTS)
+def test_each_view_asks_for_exactly_the_permission_its_endpoint_needs(method, path, code):
+    # R3-04: a view whose permission is weakened (say update -> view) fails here, whatever else it checks
+    from django.urls import resolve
+
+    view = resolve(f"{API}/{path}").func.view_class
+    assert view.perms.get(method.upper()) == code, (path, method, view.perms)

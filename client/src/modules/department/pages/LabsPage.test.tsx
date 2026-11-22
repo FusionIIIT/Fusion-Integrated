@@ -49,4 +49,12 @@ describe("LabsPage", () => {
     await waitFor(() => expect(api.post).toHaveBeenCalledWith("/department/lab-resources",
       expect.objectContaining({ name: "", status: "available" })));
   });
+
+  it("shows the owning office no control its permissions do not allow", async () => {
+    setup(["department.lab_resource.view"], { "/lab-resources": page([LAB]) }, "dept_admin");
+    renderPage(<LabsPage />);
+    expect(await screen.findByText("IoT Lab")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Add lab" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Edit" })).toBeNull();
+  });
 });

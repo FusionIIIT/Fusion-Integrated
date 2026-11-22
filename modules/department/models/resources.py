@@ -86,8 +86,9 @@ class ProfileRecord(TimeStampedModel):
                 name="dept_profile_one_per_user",
             ),
             models.CheckConstraint(
-                condition=Q(kind="alumni") | Q(user_id__isnull=False),
-                name="dept_profile_login_unless_alumni",
+                condition=Q(kind="alumni", user_id__isnull=True)
+                | (~Q(kind="alumni") & Q(user_id__isnull=False)),
+                name="dept_profile_login_iff_not_alumni",
             ),
             models.CheckConstraint(condition=~Q(display_name=""), name="dept_profile_has_name"),
         ]

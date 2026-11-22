@@ -51,4 +51,13 @@ describe("TimetablePage", () => {
     await waitFor(() => expect(api.post).toHaveBeenCalledWith("/department/timetable-slots",
       { slots: [expect.objectContaining({ course_code: "CS201", day_of_week: 0 })] }));
   });
+
+  it("shows the owning office no control its permissions do not allow", async () => {
+    setup(["department.timetable.view"], { "/timetable-slots": [SLOT] }, "dept_admin");
+    renderPage(<TimetablePage />);
+    expect(await screen.findByText("CS201")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Add slot" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Edit" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Remove" })).toBeNull();
+  });
 });

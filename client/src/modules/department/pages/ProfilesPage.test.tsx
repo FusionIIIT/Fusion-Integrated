@@ -49,4 +49,12 @@ describe("ProfilesPage", () => {
     await waitFor(() => expect(api.post).toHaveBeenCalledWith("/department/profiles",
       expect.objectContaining({ kind: "faculty", user_id: null })));
   });
+
+  it("shows the owning office no control its permissions do not allow", async () => {
+    setup(["department.profile.view"], { "/profiles": page([{ ...BASIC, tier: "full", is_active: true }]) }, "dept_admin");
+    renderPage(<ProfilesPage />);
+    expect(await screen.findByText("A. Rao")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Add profile" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Deactivate" })).toBeNull();
+  });
 });

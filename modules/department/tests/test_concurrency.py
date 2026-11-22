@@ -116,7 +116,7 @@ def test_two_overlapping_tenures_recorded_at_once_leave_one(cse, stub_iam):
             for u in (3101, 3102)
         },
     )
-    start = timezone.now() + timedelta(days=40)
+    start = timezone.now() + timedelta(days=20)  # inside the current tenure, so no gap
 
     def assign(i):
         return roles.assign(

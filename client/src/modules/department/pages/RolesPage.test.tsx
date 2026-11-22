@@ -60,4 +60,12 @@ describe("RolesPage", () => {
     await waitFor(() => expect(api.patch).toHaveBeenCalledWith("/department/role-assignments/1",
       { valid_to: new Date("2027-01-01T10:00").toISOString() }));
   });
+
+  it("shows the owning office no control its permissions do not allow", async () => {
+    setup(["department.role_assignment.view"], { "/role-assignments": page([TENURE]), "/departments": [] }, "central");
+    renderPage(<RolesPage />);
+    expect(await screen.findByText("in effect")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Record tenure" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Change end" })).toBeNull();
+  });
 });

@@ -64,4 +64,19 @@ describe("OverviewPage", () => {
     await waitFor(() => expect(api.post).toHaveBeenCalledWith("/department/official-changes/3/decide",
       { approve: true }));
   });
+
+  it("shows the owning office no control its permissions do not allow", async () => {
+    setup(["department.department.view"], { "/departments": [DEPT], "/departments/CSE": DEPT }, "dept_admin");
+    renderPage(<OverviewPage />);
+    expect(await screen.findByText("Dr. Head")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Edit details" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Propose official change" })).toBeNull();
+  });
+
+  it("does not ask for official changes when the role cannot see them", async () => {
+    setup(["department.department.view"], { "/departments": [DEPT], "/departments/CSE": DEPT }, "student");
+    renderPage(<OverviewPage />);
+    expect(await screen.findByText("Dr. Head")).toBeInTheDocument();
+    expect(api.get.mock.calls.some(([url]) => String(url).endsWith("/official-changes"))).toBe(false);
+  });
 });
