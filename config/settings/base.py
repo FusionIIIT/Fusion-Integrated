@@ -85,6 +85,7 @@ LOCAL_APPS = [
 PLATFORM_MODULES = [
     "modules.directory",         # who people are, projected from IAM
     "modules.accesscontrol",     # which modules a role may enter
+    "modules.systemadmin",       # system administration control plane
 ]
 
 # See docs/03-platform/module-authoring-guide.md to add one.
