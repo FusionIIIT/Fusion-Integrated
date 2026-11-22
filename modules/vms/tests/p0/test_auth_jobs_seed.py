@@ -144,10 +144,10 @@ def test_tasks_module_imports():
 
 # --- contracts -----------------------------------------------------------------------
 
-def test_get_visit_status_is_plural_and_a_stub():
+def test_get_visit_status_is_plural_by_signature():
     import inspect
     assert "Sequence" in str(inspect.signature(contracts.get_visit_status))
-    assert contracts.get_visit_status([1, 2]) == {}
+    assert contracts.get_visit_status([]) == {}          # no ids, no database access
 
 
 # --- seed_vms ------------------------------------------------------------------------
