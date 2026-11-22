@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="17" tests="28" time="10.779" timestamp="2026-11-09T18:35:48.730484+05:30" hostname="hp"><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_001" time="0.005"><skipped type="pytest.skip" message="NOT_AUTOMATED: Internal-issue lifecycle states (Stock Reserved, Internal Issue Approved, Dispatched / Ready for Receipt, GRN Accepted, Stock Posted) and receipt-confirmation/stock-posting services are not in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:60: NOT_AUTOMATED: Internal-issue lifecycle states (Stock Reserved, Internal Issue Approved, Dispatched / Ready for Receipt, GRN Accepted, Stock Posted) and receipt-confirmation/stock-posting services are not in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_002" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: Internal-issue lifecycle states (Stock Reserved, Internal Issue Approved, Dispatched / Ready for Receipt, GRN Accepted, Stock Posted) and receipt-confirmation/stock-posting services are not in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:65: NOT_AUTOMATED: Internal-issue lifecycle states (Stock Reserved, Internal Issue Approved, Dispatched / Ready for Receipt, GRN Accepted, Stock Posted) and receipt-confirmation/stock-posting services are not in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_003" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: No Employee receipt-confirmation or stock-posting service exists to attempt Confirm Delivery Receipt.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:70: NOT_AUTOMATED: No Employee receipt-confirmation or stock-posting service exists to attempt Confirm Delivery Receipt.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_004" time="1.743"><failure message="core.api.exceptions.BadRequestError: Invalid state transition from 'HEAD_RECOMMENDED' to 'APPROVED'.">make_indent = &lt;function make_indent.&lt;locals&gt;._make at 0x000002158E527EC0&gt;
+principal = namespace(id=1001, pk=1001, user_id=1001)
+
+    def test_tc_004(make_indent, principal):
+        """TC-004 | BW-PSM-02 rows 1-5 standard external authorization path
+    
+        Final authority review not required: HEAD_RECOMMENDED must advance to
+        authorized (APPROVED) without entering AWAITING_FINAL_APPROVAL.
+        Not observable: PS Admin method selection (no interface), audit."""
+        indent = make_indent()
+&gt;       visited = _advance(principal, indent,
+                           ["STOCK_CHECKED", "DEPT_REVIEWED", "HEAD_RECOMMENDED", "APPROVED"])
+
+tests\a8\wf\test_psm_wf_automated.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\a8\wf\test_psm_wf_automated.py:45: in _advance
+    transition_indent(principal=principal, indent_id=indent.id, target_state=t)
+C:\Python313\Lib\contextlib.py:85: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+principal = namespace(id=1001, pk=1001, user_id=1001), indent_id = 1
+target_state = 'APPROVED', justification = ''
+
+    @transaction.atomic
+    def transition_indent(
+        *,
+        principal: Any,
+        indent_id: Any,
+        target_state: str,
+        justification: str = "",
+    ) -&gt; Indent:
+        """Transition an indent to a new workflow status.
+    
+        Validates transition rules and rejection justification requirements.
+        """
+        indent = get_indent_by_id(principal, indent_id)
+        if indent is None:
+            raise NotFoundError("Indent not found or access denied.")
+    
+        target_norm = str(target_state).strip().upper()
+    
+        if not can_transition(indent.status, target_norm):
+&gt;           raise ValidationError(
+                f"Invalid state transition from '{indent.status}' to '{target_norm}'."
+            )
+E           core.api.exceptions.BadRequestError: Invalid state transition from 'HEAD_RECOMMENDED' to 'APPROVED'.
+
+modules\psm\services\indents.py:194: BadRequestError</failure></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_005" time="0.046" /><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_006" time="0.031"><failure message="Failed: DID NOT RAISE BadRequestError">make_indent = &lt;function make_indent.&lt;locals&gt;._make at 0x000002158E79AAC0&gt;
+make_vendor = &lt;function make_vendor.&lt;locals&gt;._make at 0x000002158E79ACA0&gt;
+
+    def test_tc_006(make_indent, make_vendor):
+        """TC-006 | BW-PSM-03 row 5/6 final authority gating"""
+        indent = make_indent()
+        Indent.objects.filter(pk=indent.pk).update(status="AWAITING_FINAL_APPROVAL")
+        vendor = make_vendor(verified=True)
+&gt;       with pytest.raises(BadRequestError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE BadRequestError
+
+tests\a8\wf\test_psm_wf_automated.py:107: Failed</failure></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_007" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: No invoice-verification state, payment-processing service, or Invoice Verified / Paid / Partially Paid states in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:117: NOT_AUTOMATED: No invoice-verification state, payment-processing service, or Invoice Verified / Paid / Partially Paid states in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_008" time="0.023" /><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_009" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: No invoice-verification state, payment-processing service, or Invoice Verified / Paid / Partially Paid states in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:136: NOT_AUTOMATED: No invoice-verification state, payment-processing service, or Invoice Verified / Paid / Partially Paid states in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_010" time="0.024" /><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_011" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: No tender/bid/committee interface in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:157: NOT_AUTOMATED: No tender/bid/committee interface in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_012" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No tender/bid/committee interface in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:162: NOT_AUTOMATED: No tender/bid/committee interface in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_013" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No discrepancy-case / return / replacement interface in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:168: NOT_AUTOMATED: No discrepancy-case / return / replacement interface in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_014" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: No discrepancy-case / return / replacement interface in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:173: NOT_AUTOMATED: No discrepancy-case / return / replacement interface in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_015" time="0.014"><failure message="core.api.exceptions.BadRequestError: Invalid state transition from 'SUBMITTED' to 'DEPT_REVIEWED'.">make_indent = &lt;function make_indent.&lt;locals&gt;._make at 0x000002158E7E4AE0&gt;
+principal = namespace(id=1001, pk=1001, user_id=1001)
+
+    def test_tc_015(make_indent, principal):
+        """TC-015 | BW-PSM-07 rows 1-3 modify pending indent and re-review
+    
+        Expected: modified indent awaits re-review (SUBMITTED; no distinct 'Modified' state exists),
+        then DEPT_REVIEWED, then HEAD_RECOMMENDED, with the modification kept as a distinct version.
+        Not observable: audit log entry."""
+        indent = make_indent(justification="original reason")
+        modify_indent(principal=principal, indent_id=indent.id, justification="revised reason")
+        indent.refresh_from_db()
+        assert indent.status == "SUBMITTED"
+        assert indent.current_version == 2
+        assert IndentVersion.objects.filter(indent=indent).count() &gt;= 2  # distinct versions retained
+&gt;       transition_indent(principal=principal, indent_id=indent.id, target_state="DEPT_REVIEWED")
+
+tests\a8\wf\test_psm_wf_automated.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python313\Lib\contextlib.py:85: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+principal = namespace(id=1001, pk=1001, user_id=1001), indent_id = 1
+target_state = 'DEPT_REVIEWED', justification = ''
+
+    @transaction.atomic
+    def transition_indent(
+        *,
+        principal: Any,
+        indent_id: Any,
+        target_state: str,
+        justification: str = "",
+    ) -&gt; Indent:
+        """Transition an indent to a new workflow status.
+    
+        Validates transition rules and rejection justification requirements.
+        """
+        indent = get_indent_by_id(principal, indent_id)
+        if indent is None:
+            raise NotFoundError("Indent not found or access denied.")
+    
+        target_norm = str(target_state).strip().upper()
+    
+        if not can_transition(indent.status, target_norm):
+&gt;           raise ValidationError(
+                f"Invalid state transition from '{indent.status}' to '{target_norm}'."
+            )
+E           core.api.exceptions.BadRequestError: Invalid state transition from 'SUBMITTED' to 'DEPT_REVIEWED'.
+
+modules\psm\services\indents.py:194: BadRequestError</failure></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_016" time="0.017" /><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_017" time="0.014" /><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_018" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: Only initiate_stock_transfer exists; no dispatch or destination-confirmation (completion/ledger update) service.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:223: NOT_AUTOMATED: Only initiate_stock_transfer exists; no dispatch or destination-confirmation (completion/ledger update) service.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_019" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: No transfer dispatch service exists to attempt Process and Dispatch Stock Transfer.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:228: NOT_AUTOMATED: No transfer dispatch service exists to attempt Process and Dispatch Stock Transfer.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_020" time="0.021" /><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_021" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: No cost/priority approval-routing or configured-policy interface in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:254: NOT_AUTOMATED: No cost/priority approval-routing or configured-policy interface in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_022" time="0.022" /><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_023" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: No tender/bid/committee interface in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:273: NOT_AUTOMATED: No tender/bid/committee interface in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_024" time="0.000"><skipped type="pytest.skip" message="NOT_AUTOMATED: issue_internal_stock sets status APPROVED; the Dispatched / Ready for Receipt state and its dispatch step do not exist.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:278: NOT_AUTOMATED: issue_internal_stock sets status APPROVED; the Dispatched / Ready for Receipt state and its dispatch step do not exist.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_025" time="0.027" /><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_026" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: No discrepancy-case / return / replacement interface in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:298: NOT_AUTOMATED: No discrepancy-case / return / replacement interface in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_027" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: No discrepancy-case / return / replacement interface in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:303: NOT_AUTOMATED: No discrepancy-case / return / replacement interface in the supplied implementation.</skipped></testcase><testcase classname="tests.a8.wf.test_psm_wf_automated" name="test_tc_028" time="0.001"><skipped type="pytest.skip" message="NOT_AUTOMATED: No invoice-verification state, payment-processing service, or Invoice Verified / Paid / Partially Paid states in the supplied implementation.">C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\tests\a8\wf\test_psm_wf_automated.py:308: NOT_AUTOMATED: No invoice-verification state, payment-processing service, or Invoice Verified / Paid / Partially Paid states in the supplied implementation.</skipped></testcase></testsuite></testsuites>

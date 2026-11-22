@@ -1,0 +1,106 @@
+Failed to find real location of C:\Python313\python.exe
+.........sssss..ssss....ss...s.sss..s...sssss.F.ssssss..sssssFs.sssssss. [ 90%]
+sssss.ss                                                                 [100%]
+================================== FAILURES ===================================
+_______________________________ test_tc_br_047 ________________________________
+
+make_indent = <function make_indent.<locals>._make at 0x000001E5779420C0>
+principal = namespace(id=1001, pk=1001, user_id=1001)
+
+    def test_tc_br_047(make_indent, principal):
+        """TC-BR-047 | BR-PSM-015 modified-indent-trigger"""
+        make_indent(item_details="Laptop 16GB", estimated_cost="50000.00")
+        other = make_indent(item_details="Wireless Mouse", estimated_cost="500.00")
+        assert other.is_duplicate is False
+        modify_indent(principal=principal, indent_id=other.id,
+                      item_details="Laptop 16GB", estimated_cost="50000.00")
+        other.refresh_from_db()
+>       assert other.is_duplicate is True
+E       assert False is True
+E        +  where False = <Indent: IND-2026-8A932C>.is_duplicate
+
+tests\a8\br\test_psm_br_automated.py:380: AssertionError
+_______________________________ test_tc_br_062 ________________________________
+
+make_indent = <function make_indent.<locals>._make at 0x000001E577981EE0>
+principal = namespace(id=1001, pk=1001, user_id=1001)
+
+    def test_tc_br_062(make_indent, principal):
+        """TC-BR-062 | BR-PSM-021 indent-version-history
+    
+        Not observable: audit entries (no interface)."""
+        indent = make_indent(justification="v1 text")
+        modify_indent(principal=principal, indent_id=indent.id, justification="v2 text")
+        modify_indent(principal=principal, indent_id=indent.id, justification="v3 text")
+        versions = {v.version_number: v.justification
+                    for v in IndentVersion.objects.filter(indent=indent)}
+>       assert set(versions) == {1, 2, 3}
+E       assert {1, 2} == {1, 2, 3}
+E         
+E         Extra items in the right set:
+E         3
+E         Use -v to get more diff
+
+tests\a8\br\test_psm_br_automated.py:478: AssertionError
+============================== warnings summary ===============================
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_PORT setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST_USER setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST_PASSWORD setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_USE_TLS setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_BACKEND setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.7-final-0 _______________
+
+Name                                                                                                 Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------------------------------------------------------------
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\__init__.py                          0      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\apps.py                              5      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\contracts.py                        20     20      6      0     0%   6-59
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\__init__.py                   4      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\duplicate_check.py            6      6      4      0     0%   1-12
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\indent_state.py              27      2      4      2    87%   62, 64
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\rules.py                     71     15     36      9    78%   17, 31, 37-39, 45-47, 63-64, 78, 86-87, 91, 92->74, 94->74, 106
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\three_way_match.py           19      2      8      2    85%   40, 56
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\migrations\0001_initial.py           6      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\migrations\__init__.py               0      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\models.py                           76      6      0      0    92%   17, 30, 78, 103, 116, 136
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\registry.py                          9      9      0      0     0%   6-90
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\__init__.py                5      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\indents.py                22     11      6      1    43%   13-16, 26-28, 33-36
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\scoping.py                37     14     24      9    52%   15, 18-22, 28, 30, 43, 47, 50-51, 63, 67
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\stock.py                  19      8      4      1    52%   17, 20-21, 26, 31-34
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\vendors.py                13      8      2      0    33%   12-15, 20-23
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\__init__.py                 4      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\indents.py                 82      9     28      7    84%   47, 82, 86, 128, 149, 155-157, 189
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\procurement.py             64     11     26     11    76%   28, 30, 33, 52, 77, 87, 91, 95, 123, 128, 130
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\stock.py                   55     25     24      6    48%   22, 26, 45-70, 83, 86, 90, 94
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\tests\__init__.py                    0      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\tests\test_domain.py               108    108      4      0     0%   6-237
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\tests\test_services_and_api.py     104    104      0      0     0%   5-299
+------------------------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                                                  756    358    176     48    52%
+Coverage XML written to file a8_results/br/coverage.xml
+=========================== short test summary info ===========================
+FAILED tests/a8/br/test_psm_br_automated.py::test_tc_br_047 - assert False is...
+FAILED tests/a8/br/test_psm_br_automated.py::test_tc_br_062 - assert {1, 2} =...
+2 failed, 31 passed, 47 skipped, 6 warnings in 11.19s

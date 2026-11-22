@@ -1,0 +1,187 @@
+Failed to find real location of C:\Python313\python.exe
+sssF.Fs.s.ssssF..ss.s.ss.sss                                             [100%]
+================================== FAILURES ===================================
+_________________________________ test_tc_004 _________________________________
+
+make_indent = <function make_indent.<locals>._make at 0x000002158E527EC0>
+principal = namespace(id=1001, pk=1001, user_id=1001)
+
+    def test_tc_004(make_indent, principal):
+        """TC-004 | BW-PSM-02 rows 1-5 standard external authorization path
+    
+        Final authority review not required: HEAD_RECOMMENDED must advance to
+        authorized (APPROVED) without entering AWAITING_FINAL_APPROVAL.
+        Not observable: PS Admin method selection (no interface), audit."""
+        indent = make_indent()
+>       visited = _advance(principal, indent,
+                           ["STOCK_CHECKED", "DEPT_REVIEWED", "HEAD_RECOMMENDED", "APPROVED"])
+
+tests\a8\wf\test_psm_wf_automated.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\a8\wf\test_psm_wf_automated.py:45: in _advance
+    transition_indent(principal=principal, indent_id=indent.id, target_state=t)
+C:\Python313\Lib\contextlib.py:85: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+principal = namespace(id=1001, pk=1001, user_id=1001), indent_id = 1
+target_state = 'APPROVED', justification = ''
+
+    @transaction.atomic
+    def transition_indent(
+        *,
+        principal: Any,
+        indent_id: Any,
+        target_state: str,
+        justification: str = "",
+    ) -> Indent:
+        """Transition an indent to a new workflow status.
+    
+        Validates transition rules and rejection justification requirements.
+        """
+        indent = get_indent_by_id(principal, indent_id)
+        if indent is None:
+            raise NotFoundError("Indent not found or access denied.")
+    
+        target_norm = str(target_state).strip().upper()
+    
+        if not can_transition(indent.status, target_norm):
+>           raise ValidationError(
+                f"Invalid state transition from '{indent.status}' to '{target_norm}'."
+            )
+E           core.api.exceptions.BadRequestError: Invalid state transition from 'HEAD_RECOMMENDED' to 'APPROVED'.
+
+modules\psm\services\indents.py:194: BadRequestError
+_________________________________ test_tc_006 _________________________________
+
+make_indent = <function make_indent.<locals>._make at 0x000002158E79AAC0>
+make_vendor = <function make_vendor.<locals>._make at 0x000002158E79ACA0>
+
+    def test_tc_006(make_indent, make_vendor):
+        """TC-006 | BW-PSM-03 row 5/6 final authority gating"""
+        indent = make_indent()
+        Indent.objects.filter(pk=indent.pk).update(status="AWAITING_FINAL_APPROVAL")
+        vendor = make_vendor(verified=True)
+>       with pytest.raises(BadRequestError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE BadRequestError
+
+tests\a8\wf\test_psm_wf_automated.py:107: Failed
+_________________________________ test_tc_015 _________________________________
+
+make_indent = <function make_indent.<locals>._make at 0x000002158E7E4AE0>
+principal = namespace(id=1001, pk=1001, user_id=1001)
+
+    def test_tc_015(make_indent, principal):
+        """TC-015 | BW-PSM-07 rows 1-3 modify pending indent and re-review
+    
+        Expected: modified indent awaits re-review (SUBMITTED; no distinct 'Modified' state exists),
+        then DEPT_REVIEWED, then HEAD_RECOMMENDED, with the modification kept as a distinct version.
+        Not observable: audit log entry."""
+        indent = make_indent(justification="original reason")
+        modify_indent(principal=principal, indent_id=indent.id, justification="revised reason")
+        indent.refresh_from_db()
+        assert indent.status == "SUBMITTED"
+        assert indent.current_version == 2
+        assert IndentVersion.objects.filter(indent=indent).count() >= 2  # distinct versions retained
+>       transition_indent(principal=principal, indent_id=indent.id, target_state="DEPT_REVIEWED")
+
+tests\a8\wf\test_psm_wf_automated.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python313\Lib\contextlib.py:85: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+principal = namespace(id=1001, pk=1001, user_id=1001), indent_id = 1
+target_state = 'DEPT_REVIEWED', justification = ''
+
+    @transaction.atomic
+    def transition_indent(
+        *,
+        principal: Any,
+        indent_id: Any,
+        target_state: str,
+        justification: str = "",
+    ) -> Indent:
+        """Transition an indent to a new workflow status.
+    
+        Validates transition rules and rejection justification requirements.
+        """
+        indent = get_indent_by_id(principal, indent_id)
+        if indent is None:
+            raise NotFoundError("Indent not found or access denied.")
+    
+        target_norm = str(target_state).strip().upper()
+    
+        if not can_transition(indent.status, target_norm):
+>           raise ValidationError(
+                f"Invalid state transition from '{indent.status}' to '{target_norm}'."
+            )
+E           core.api.exceptions.BadRequestError: Invalid state transition from 'SUBMITTED' to 'DEPT_REVIEWED'.
+
+modules\psm\services\indents.py:194: BadRequestError
+============================== warnings summary ===============================
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_BACKEND setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST_USER setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST_PASSWORD setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_PORT setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_USE_TLS setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+venv\Lib\site-packages\pytest_django\plugin.py:394
+  C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\venv\Lib\site-packages\pytest_django\plugin.py:394: RemovedInDjango70Warning: The EMAIL_HOST setting is deprecated. Migrate to MAILERS before Django 7.0.
+    dj_settings.DATABASES  # noqa: B018
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.7-final-0 _______________
+
+Name                                                                                                 Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------------------------------------------------------------------------
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\__init__.py                          0      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\apps.py                              5      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\contracts.py                        20     20      6      0     0%   6-59
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\__init__.py                   4      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\duplicate_check.py            6      6      4      0     0%   1-12
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\indent_state.py              27      2      4      2    87%   62, 64
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\rules.py                     71     23     36     11    64%   17, 22, 27, 37-39, 45-47, 63-64, 78, 86-87, 91, 92->74, 94->74, 106, 120-124, 131-132
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\domain\three_way_match.py           19      2      8      4    78%   40, 43->49, 49->55, 56
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\migrations\0001_initial.py           6      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\migrations\__init__.py               0      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\models.py                           76      7      0      0    91%   17, 30, 66, 78, 103, 116, 136
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\registry.py                          9      9      0      0     0%   6-90
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\__init__.py                5      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\indents.py                22     11      6      1    43%   13-16, 26-28, 33-36
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\scoping.py                37     14     24      9    52%   15, 18-22, 28, 30, 43, 47, 50-51, 63, 67
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\stock.py                  19      8      4      1    52%   17, 20-21, 26, 31-34
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\selectors\vendors.py                13      8      2      0    33%   12-15, 20-23
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\__init__.py                 4      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\indents.py                 82     17     28     11    73%   47, 58-59, 82, 86, 128, 147, 149, 151, 152->154, 155-157, 189, 200-201, 205, 218
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\procurement.py             64     11     26     11    76%   28, 30, 33, 52, 77, 87, 91, 95, 123, 128, 130
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\services\stock.py                   55     35     24      3    29%   22, 26, 30, 45-70, 82-108
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\tests\__init__.py                    0      0      0      0   100%
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\tests\test_domain.py               108    108      4      0     0%   6-237
+C:\Users\samee\Downloads\fusion_leave\Fusion-Integrated\modules\psm\tests\test_services_and_api.py     104    104      0      0     0%   5-299
+------------------------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                                                  756    385    176     53    47%
+Coverage XML written to file a8_results/wf/coverage.xml
+=========================== short test summary info ===========================
+FAILED tests/a8/wf/test_psm_wf_automated.py::test_tc_004 - core.api.exception...
+FAILED tests/a8/wf/test_psm_wf_automated.py::test_tc_006 - Failed: DID NOT RA...
+FAILED tests/a8/wf/test_psm_wf_automated.py::test_tc_015 - core.api.exception...
+3 failed, 8 passed, 17 skipped, 6 warnings in 10.97s
