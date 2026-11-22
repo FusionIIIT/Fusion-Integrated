@@ -22,4 +22,9 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
     basePath: "/leave",
     load: () => import("../modules/employee_leave/routes"),
   },
+  quiz: {
+    code: "quiz",
+    basePath: "/quiz",
+    load: () => import("../modules/quiz/routes"),
+  },
 };

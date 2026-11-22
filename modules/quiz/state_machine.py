@@ -38,5 +38,7 @@ def apply_transition(machine, state, action, actor_role, ctx):
         raise IllegalTransition(state, action, actor_role)
     row = matches[0]
     if row.guard:
-        row.guard(ctx)
+        res = row.guard(ctx)
+        if res is False:
+            raise GuardFailed(f"Guard condition returned False for transition '{action}'")
     return row.to_state(ctx) if callable(row.to_state) else row.to_state
