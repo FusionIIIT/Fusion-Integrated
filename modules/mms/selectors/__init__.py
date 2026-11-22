@@ -15,17 +15,17 @@ from modules.mms.selectors.mms import (
 )
 
 __all__ = [
-    "get_active_role_assignment",
     "get_active_mess_roles",
-    "get_open_registration_windows",
-    "get_feedbacks",
-    "list_role_assignments",
+    "get_active_role_assignment",
     "get_current_registration_window",
-    "list_registration_windows",
+    "get_feedbacks",
+    "get_open_registration_windows",
     "get_student_registration",
-    "list_registrations",
     "get_weekly_menu",
-    "list_rebate_requests",
-    "list_feedbacks",
     "list_action_logs",
+    "list_feedbacks",
+    "list_rebate_requests",
+    "list_registration_windows",
+    "list_registrations",
+    "list_role_assignments",
 ]

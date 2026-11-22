@@ -135,7 +135,8 @@ def open_registration_window(
     if len(args) >= 4 and isinstance(args[3], (date, type(None))):
         end_date = args[3]
 
-    opened_by_id = opened_by_id or created_by_id or kwargs.get("opened_by_id") or kwargs.get("created_by_id") or 1
+    fallback_opened = kwargs.get("opened_by_id") or kwargs.get("created_by_id") or 1
+    opened_by_id = opened_by_id or created_by_id or fallback_opened
     if not start_date:
         start_date = timezone.now().date()
     if not end_date:
@@ -252,7 +253,8 @@ def review_registration(
     if rejection_reason:
         reg.remarks = rejection_reason
     elif remarks:
-        reg.remarks = f"{reg.remarks}\nCaretaker review: {remarks}".strip() if reg.remarks else remarks
+        review_note = f"{reg.remarks}\nCaretaker review: {remarks}".strip()
+        reg.remarks = review_note if reg.remarks else remarks
     reg.save(update_fields=["status", "reviewed_by_id", "remarks", "updated_at"])
 
     MessActionLog.objects.create(
