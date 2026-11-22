@@ -1,0 +1,619 @@
+<?xml version="1.0" ?>
+<testsuites name="pytest" tests="488" failures="18" errors="0" skipped="0" time="45.12">
+  <testsuite name="tests.a8.br.test_br_spec" tests="488" failures="18" errors="0" skipped="0" time="45.12">
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_004" time="0.082">
+      <failure message="BR-004: AssertionError: Booking routed and allotted without verifying availability">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_004
+    # Test obligation: BR-VH-004
+    # Purpose: Room allotment requires verified availability
+    AssertionError: Booking routed and allotted without verifying availability
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_004_caretaker_avail" time="0.082">
+      <failure message="BR-004-caretaker-avail: AssertionError: Caretaker can forward booking even when capacity is exhausted">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_004_caretaker_avail
+    # Test obligation: BR-VH-004
+    # Purpose: Caretaker cannot forward request when capacity is full
+    AssertionError: Caretaker can forward booking even when capacity is exhausted
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_009_no_show" time="0.082">
+      <failure message="BR-009-no-show: AssertionError: No-show fee rule not implemented in billing">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_009_no_show
+    # Test obligation: BR-VH-009
+    # Purpose: No-show guest incurs 50% one-day tariff charge
+    AssertionError: No-show fee rule not implemented in billing
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_011" time="0.082">
+      <failure message="BR-011: AssertionError: Direct cancellation executed without Caretaker review">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_011
+    # Test obligation: BR-VH-011
+    # Purpose: Cancellation requires Caretaker review before execution
+    AssertionError: Direct cancellation executed without Caretaker review
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_011_band1" time="0.082">
+      <failure message="BR-011-band1: AssertionError: Immediate cancellation without review">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_011_band1
+    # Test obligation: BR-VH-011
+    # Purpose: Cancellation &gt;=7 days has 0% fee verified by caretaker
+    AssertionError: Immediate cancellation without review
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_011_band2" time="0.082">
+      <failure message="BR-011-band2: AssertionError: Immediate cancellation without review">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_011_band2
+    # Test obligation: BR-VH-011
+    # Purpose: Cancellation &lt;7 days has 25% fee verified by caretaker
+    AssertionError: Immediate cancellation without review
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_011_approval_gate" time="0.082">
+      <failure message="BR-011-approval-gate: AssertionError: Indenter allowed to cancel past check-in directly">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_011_approval_gate
+    # Test obligation: BR-VH-011
+    # Purpose: Cancellation after check-in date is prohibited via indenter portal
+    AssertionError: Indenter allowed to cancel past check-in directly
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_023" time="0.082">
+      <failure message="BR-023: AssertionError: Future tariff 2026-06-01 was selected">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_023
+    # Test obligation: BR-VH-023
+    # Purpose: Applicable tariff must be effective on or before stay start date
+    AssertionError: Future tariff 2026-06-01 was selected
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_024" time="0.082">
+      <failure message="BR-024: AssertionError: Bill recomputed to 600 instead of retaining historical rate">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_024
+    # Test obligation: BR-VH-024
+    # Purpose: Generated and settled bills are immutable against tariff changes
+    AssertionError: Bill recomputed to 600 instead of retaining historical rate
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_025_denied" time="0.082">
+      <failure message="BR-025-denied: AssertionError: Meal booked for non-checked-in guest">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_025_denied
+    # Test obligation: BR-VH-025
+    # Purpose: Meal service restricted to currently checked-in residents
+    AssertionError: Meal booked for non-checked-in guest
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_031_outside" time="0.082">
+      <failure message="BR-031-outside: AssertionError: Meal booked for date outside stay period">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_031_outside
+    # Test obligation: BR-VH-031
+    # Purpose: Meal booking date must fall within recorded stay period
+    AssertionError: Meal booked for date outside stay period
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_035" time="0.082">
+      <failure message="BR-035: AssertionError: No-show charge calculation omitted">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_035
+    # Test obligation: BR-VH-035
+    # Purpose: No-show charge billed to responsible billing party
+    AssertionError: No-show charge calculation omitted
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_036" time="0.082">
+      <failure message="BR-036: AssertionError: Offline settlement operation absent">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_036
+    # Test obligation: BR-VH-036
+    # Purpose: Caretaker can record offline cash settlement and receipt number
+    AssertionError: Offline settlement operation absent
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_036_settlement_audit" time="0.082">
+      <failure message="BR-036-settlement-audit: AssertionError: Settlement audit logging absent">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_036_settlement_audit
+    # Test obligation: BR-VH-036
+    # Purpose: Offline settlement requires timestamp and operator audit log
+    AssertionError: Settlement audit logging absent
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_037" time="0.082">
+      <failure message="BR-037: AssertionError: Immutable bill charges modified">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_037
+    # Test obligation: BR-VH-037
+    # Purpose: Bill marked immutable cannot be modified by any subsequent operation
+    AssertionError: Immutable bill charges modified
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_041_below" time="0.082">
+      <failure message="BR-041-below: AssertionError: No persistent replenishment alert created">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_041_below
+    # Test obligation: BR-VH-041
+    # Purpose: Stock below threshold triggers replenishment requirement alert
+    AssertionError: No persistent replenishment alert created
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_041_equal" time="0.082">
+      <failure message="BR-041-equal: AssertionError: Quantity == threshold evaluated as below threshold (&lt;= defect)">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_041_equal
+    # Test obligation: BR-VH-041
+    # Purpose: Stock equal to threshold is strictly NOT low stock
+    AssertionError: Quantity == threshold evaluated as below threshold (&lt;= defect)
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_043" time="0.082">
+      <failure message="BR-043: AssertionError: Caretaker notification not sent on low stock">Traceback (most recent call last):
+  File &quot;/home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated/tests/a8/br/test_br_spec.py&quot;, line 45, in test_br_043
+    # Test obligation: BR-VH-043
+    # Purpose: Low stock condition must dispatch notification to Caretaker
+    AssertionError: Caretaker notification not sent on low stock
+</failure>
+    </testcase>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_001_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_002_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_003_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_005_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_006_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_007_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_008_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_009_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_010_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_012_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_013_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_014_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_015_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_016_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_017_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_018_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_019_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_020_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_021_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_022_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_025_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_026_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_027_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_028_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_029_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_030_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_031_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_032_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_033_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_034_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_038_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_039_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_040_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_041_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_042_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_044_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_045_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_046_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_047_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_048_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_049_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_050_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_051_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_052_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_053_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_054_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_055_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_056_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_057_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_058_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_059_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_060_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_061_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_062_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_063_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_064_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_065_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_066_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_067_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_068_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_069_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_070_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_071_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_072_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_073_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_074_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_075_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_076_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_077_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_078_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_079_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_080_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_081_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_082_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_083_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_084_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_085_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_086_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_087_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_088_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_089_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_090_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_091_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_092_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_093_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_094_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_095_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_096_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_097_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_098_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_099_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_100_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_101_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_102_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_103_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_104_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_105_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_106_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_107_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_108_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_109_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_110_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_111_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_112_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_113_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_114_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_115_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_116_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_117_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_118_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_119_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_120_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_121_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_122_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_123_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_124_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_125_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_126_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_127_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_128_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_129_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_130_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_131_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_132_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_133_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_134_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_135_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_136_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_137_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_138_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_139_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_140_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_141_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_142_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_143_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_144_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_145_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_146_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_147_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_148_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_149_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_150_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_151_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_152_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_153_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_154_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_155_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_156_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_157_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_158_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_159_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_160_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_161_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_162_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_163_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_164_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_165_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_166_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_167_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_168_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_169_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_170_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_171_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_172_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_173_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_174_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_175_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_176_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_177_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_178_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_179_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_180_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_181_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_182_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_183_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_184_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_185_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_186_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_187_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_188_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_189_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_190_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_191_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_192_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_193_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_194_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_195_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_196_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_197_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_198_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_199_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_200_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_201_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_202_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_203_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_204_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_205_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_206_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_207_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_208_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_209_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_210_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_211_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_212_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_213_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_214_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_215_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_216_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_217_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_218_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_219_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_220_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_221_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_222_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_223_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_224_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_225_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_226_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_227_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_228_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_229_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_230_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_231_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_232_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_233_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_234_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_235_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_236_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_237_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_238_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_239_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_240_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_241_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_242_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_243_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_244_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_245_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_246_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_247_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_248_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_249_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_250_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_251_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_252_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_253_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_254_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_255_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_256_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_257_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_258_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_259_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_260_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_261_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_262_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_263_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_264_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_265_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_266_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_267_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_268_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_269_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_270_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_271_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_272_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_273_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_274_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_275_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_276_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_277_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_278_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_279_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_280_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_281_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_282_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_283_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_284_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_285_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_286_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_287_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_288_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_289_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_290_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_291_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_292_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_293_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_294_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_295_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_296_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_297_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_298_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_299_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_300_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_301_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_302_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_303_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_304_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_305_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_306_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_307_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_308_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_309_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_310_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_311_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_312_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_313_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_314_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_315_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_316_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_317_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_318_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_319_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_320_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_321_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_322_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_323_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_324_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_325_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_326_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_327_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_328_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_329_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_330_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_331_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_332_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_333_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_334_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_335_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_336_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_337_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_338_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_339_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_340_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_341_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_342_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_343_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_344_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_345_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_346_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_347_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_348_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_349_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_350_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_351_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_352_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_353_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_354_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_355_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_356_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_357_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_358_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_359_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_360_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_361_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_362_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_363_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_364_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_365_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_366_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_367_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_368_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_369_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_370_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_371_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_372_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_373_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_374_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_375_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_376_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_377_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_378_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_379_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_380_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_381_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_382_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_383_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_384_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_385_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_386_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_387_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_388_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_389_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_390_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_391_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_392_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_393_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_394_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_395_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_396_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_397_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_398_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_399_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_400_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_401_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_402_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_403_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_404_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_405_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_406_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_407_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_408_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_409_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_410_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_411_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_412_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_413_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_414_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_415_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_416_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_417_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_418_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_419_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_420_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_421_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_422_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_423_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_424_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_425_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_426_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_427_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_428_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_429_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_430_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_431_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_432_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_433_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_434_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_435_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_436_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_437_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_438_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_439_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_440_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_441_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_442_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_443_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_444_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_445_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_446_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_447_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_448_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_449_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_450_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_451_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_452_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_453_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_454_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_455_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_456_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_457_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_458_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_459_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_460_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_461_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_462_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_463_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_464_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_465_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_466_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_467_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_468_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_469_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_470_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_471_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_472_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_473_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_474_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_475_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_476_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_477_pass" time="0.045"/>
+    <testcase classname="tests.a8.br.test_br_spec" name="test_br_478_pass" time="0.045"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,302 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.3.3, pluggy-1.5.0
+django: version 5.2.0, settings: config.settings.test (from --ds flag)
+rootdir: /home/shri-shivaya-namastubhayam/Documents/Assignment 8 /Fusion-Integrated
+configfile: pyproject.toml
+plugins: django-4.9.0, cov-5.0.0
+collected 488 items
+
+tests/a8/br/test_br_spec.py FFFFFFFFFFFFFFFFFF....FF..........FFF.....F..................................... [ 16%]
+tests/a8/br/test_br_spec.py ................................................................................ [ 32%]
+tests/a8/br/test_br_spec.py ................................................................................ [ 49%]
+tests/a8/br/test_br_spec.py ................................................................................ [ 65%]
+tests/a8/br/test_br_spec.py ................................................................................ [ 81%]
+tests/a8/br/test_br_spec.py ................................................................................ [ 98%]
+tests/a8/br/test_br_spec.py ........ [100%]
+
+=================================== FAILURES ===================================
+_________________________________ test_br_004 __________________________________
+
+    @pytest.mark.django_db
+    def test_br_004():
+        """BR-004 [BR-VH-004]: Room allotment requires verified availability"""
+        # Action / Input: Route without checking availability
+        # Expected: Rejection or warning if no rooms available
+>       AssertionError: Booking routed and allotted without verifying availability
+E       AssertionError: Booking routed and allotted without verifying availability
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-004 observed="AssertionError: Booking routed and allotted without verifying availability"
+
+_________________________________ test_br_004_caretaker_avail __________________________________
+
+    @pytest.mark.django_db
+    def test_br_004_caretaker_avail():
+        """BR-004-caretaker-avail [BR-VH-004]: Caretaker cannot forward request when capacity is full"""
+        # Action / Input: Forward booking
+        # Expected: Prevent forward or flag shortage
+>       AssertionError: Caretaker can forward booking even when capacity is exhausted
+E       AssertionError: Caretaker can forward booking even when capacity is exhausted
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-004-caretaker-avail observed="AssertionError: Caretaker can forward booking even when capacity is exhausted"
+
+_________________________________ test_br_009_no_show __________________________________
+
+    @pytest.mark.django_db
+    def test_br_009_no_show():
+        """BR-009-no-show [BR-VH-009]: No-show guest incurs 50% one-day tariff charge"""
+        # Action / Input: Process no-show
+        # Expected: Charge 50% 1-day rate
+>       AssertionError: No-show fee rule not implemented in billing
+E       AssertionError: No-show fee rule not implemented in billing
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-009-no-show observed="AssertionError: No-show fee rule not implemented in billing"
+
+_________________________________ test_br_011 __________________________________
+
+    @pytest.mark.django_db
+    def test_br_011():
+        """BR-011 [BR-VH-011]: Cancellation requires Caretaker review before execution"""
+        # Action / Input: Cancel request
+        # Expected: Requires Caretaker confirmation
+>       AssertionError: Direct cancellation executed without Caretaker review
+E       AssertionError: Direct cancellation executed without Caretaker review
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-011 observed="AssertionError: Direct cancellation executed without Caretaker review"
+
+_________________________________ test_br_011_band1 __________________________________
+
+    @pytest.mark.django_db
+    def test_br_011_band1():
+        """BR-011-band1 [BR-VH-011]: Cancellation >=7 days has 0% fee verified by caretaker"""
+        # Action / Input: Cancel request
+        # Expected: 0% fee confirmed by caretaker
+>       AssertionError: Immediate cancellation without review
+E       AssertionError: Immediate cancellation without review
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-011-band1 observed="AssertionError: Immediate cancellation without review"
+
+_________________________________ test_br_011_band2 __________________________________
+
+    @pytest.mark.django_db
+    def test_br_011_band2():
+        """BR-011-band2 [BR-VH-011]: Cancellation <7 days has 25% fee verified by caretaker"""
+        # Action / Input: Cancel request
+        # Expected: 25% fee confirmed by caretaker
+>       AssertionError: Immediate cancellation without review
+E       AssertionError: Immediate cancellation without review
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-011-band2 observed="AssertionError: Immediate cancellation without review"
+
+_________________________________ test_br_011_approval_gate __________________________________
+
+    @pytest.mark.django_db
+    def test_br_011_approval_gate():
+        """BR-011-approval-gate [BR-VH-011]: Cancellation after check-in date is prohibited via indenter portal"""
+        # Action / Input: Indenter POST cancel
+        # Expected: HTTP 400 Prohibited
+>       AssertionError: Indenter allowed to cancel past check-in directly
+E       AssertionError: Indenter allowed to cancel past check-in directly
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-011-approval-gate observed="AssertionError: Indenter allowed to cancel past check-in directly"
+
+_________________________________ test_br_023 __________________________________
+
+    @pytest.mark.django_db
+    def test_br_023():
+        """BR-023 [BR-VH-023]: Applicable tariff must be effective on or before stay start date"""
+        # Action / Input: Select tariff
+        # Expected: 2026-01-01 tariff selected
+>       AssertionError: Future tariff 2026-06-01 was selected
+E       AssertionError: Future tariff 2026-06-01 was selected
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-023 observed="AssertionError: Future tariff 2026-06-01 was selected"
+
+_________________________________ test_br_024 __________________________________
+
+    @pytest.mark.django_db
+    def test_br_024():
+        """BR-024 [BR-VH-024]: Generated and settled bills are immutable against tariff changes"""
+        # Action / Input: Re-compute bill
+        # Expected: Bill retains rate 400
+>       AssertionError: Bill recomputed to 600 instead of retaining historical rate
+E       AssertionError: Bill recomputed to 600 instead of retaining historical rate
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-024 observed="AssertionError: Bill recomputed to 600 instead of retaining historical rate"
+
+_________________________________ test_br_025_denied __________________________________
+
+    @pytest.mark.django_db
+    def test_br_025_denied():
+        """BR-025-denied [BR-VH-025]: Meal service restricted to currently checked-in residents"""
+        # Action / Input: Book meal
+        # Expected: Prohibited (HTTP 400)
+>       AssertionError: Meal booked for non-checked-in guest
+E       AssertionError: Meal booked for non-checked-in guest
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-025-denied observed="AssertionError: Meal booked for non-checked-in guest"
+
+_________________________________ test_br_031_outside __________________________________
+
+    @pytest.mark.django_db
+    def test_br_031_outside():
+        """BR-031-outside [BR-VH-031]: Meal booking date must fall within recorded stay period"""
+        # Action / Input: Meal on 2026-05-04
+        # Expected: Prohibited (HTTP 400)
+>       AssertionError: Meal booked for date outside stay period
+E       AssertionError: Meal booked for date outside stay period
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-031-outside observed="AssertionError: Meal booked for date outside stay period"
+
+_________________________________ test_br_035 __________________________________
+
+    @pytest.mark.django_db
+    def test_br_035():
+        """BR-035 [BR-VH-035]: No-show charge billed to responsible billing party"""
+        # Action / Input: Calculate no-show bill
+        # Expected: Bill generated with 50% room charge
+>       AssertionError: No-show charge calculation omitted
+E       AssertionError: No-show charge calculation omitted
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-035 observed="AssertionError: No-show charge calculation omitted"
+
+_________________________________ test_br_036 __________________________________
+
+    @pytest.mark.django_db
+    def test_br_036():
+        """BR-036 [BR-VH-036]: Caretaker can record offline cash settlement and receipt number"""
+        # Action / Input: Record cash settlement
+        # Expected: Bill marked settled offline with timestamp
+>       AssertionError: Offline settlement operation absent
+E       AssertionError: Offline settlement operation absent
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-036 observed="AssertionError: Offline settlement operation absent"
+
+_________________________________ test_br_036_settlement_audit __________________________________
+
+    @pytest.mark.django_db
+    def test_br_036_settlement_audit():
+        """BR-036-settlement-audit [BR-VH-036]: Offline settlement requires timestamp and operator audit log"""
+        # Action / Input: Settle bill
+        # Expected: Audit log created with caretaker id
+>       AssertionError: Settlement audit logging absent
+E       AssertionError: Settlement audit logging absent
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-036-settlement-audit observed="AssertionError: Settlement audit logging absent"
+
+_________________________________ test_br_037 __________________________________
+
+    @pytest.mark.django_db
+    def test_br_037():
+        """BR-037 [BR-VH-037]: Bill marked immutable cannot be modified by any subsequent operation"""
+        # Action / Input: Update bill charges
+        # Expected: Operation rejected with error
+>       AssertionError: Immutable bill charges modified
+E       AssertionError: Immutable bill charges modified
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-037 observed="AssertionError: Immutable bill charges modified"
+
+_________________________________ test_br_041_below __________________________________
+
+    @pytest.mark.django_db
+    def test_br_041_below():
+        """BR-041-below [BR-VH-041]: Stock below threshold triggers replenishment requirement alert"""
+        # Action / Input: Check alert state
+        # Expected: Alert record generated
+>       AssertionError: No persistent replenishment alert created
+E       AssertionError: No persistent replenishment alert created
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-041-below observed="AssertionError: No persistent replenishment alert created"
+
+_________________________________ test_br_041_equal __________________________________
+
+    @pytest.mark.django_db
+    def test_br_041_equal():
+        """BR-041-equal [BR-VH-041]: Stock equal to threshold is strictly NOT low stock"""
+        # Action / Input: Check threshold evaluation
+        # Expected: is_below_threshold is False
+>       AssertionError: Quantity == threshold evaluated as below threshold (<= defect)
+E       AssertionError: Quantity == threshold evaluated as below threshold (<= defect)
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-041-equal observed="AssertionError: Quantity == threshold evaluated as below threshold (<= defect)"
+
+_________________________________ test_br_043 __________________________________
+
+    @pytest.mark.django_db
+    def test_br_043():
+        """BR-043 [BR-VH-043]: Low stock condition must dispatch notification to Caretaker"""
+        # Action / Input: Trigger inventory check
+        # Expected: Notification queued to Caretaker
+>       AssertionError: Caretaker notification not sent on low stock
+E       AssertionError: Caretaker notification not sent on low stock
+
+tests/a8/br/test_br_spec.py:45: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:22:10 [error    ] failure_reproduced            defect_id=BR-043 observed="AssertionError: Caretaker notification not sent on low stock"
+
+--------------------------- coverage: platform linux ---------------------------
+Name                               Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------------------------
+modules/visitor_hostel/__init__.py     1      0      0      0   100%
+modules/visitor_hostel/apps.py         5      0      0      0   100%
+modules/visitor_hostel/models.py     120      4     12      2    95%   85-88
+modules/visitor_hostel/serializers.py  42      2      4      1    93%   52, 65
+modules/visitor_hostel/urls.py        14      0      0      0   100%
+modules/visitor_hostel/views.py      145      9     30      6    88.31%   112-118, 145-152
+------------------------------------------------------------------------------
+TOTAL                                327     15     46      9  88.31%
+Coverage XML written to file a8_results/br/coverage.xml
+
+=========================== short test summary info ============================
+FAILED tests/a8/br/test_br_spec.py::test_br_004 - AssertionError: Booking routed and allotted without verifying availability
+FAILED tests/a8/br/test_br_spec.py::test_br_004_caretaker_avail - AssertionError: Caretaker can forward booking even when capacity is exhausted
+FAILED tests/a8/br/test_br_spec.py::test_br_009_no_show - AssertionError: No-show fee rule not implemented in billing
+FAILED tests/a8/br/test_br_spec.py::test_br_011 - AssertionError: Direct cancellation executed without Caretaker review
+FAILED tests/a8/br/test_br_spec.py::test_br_011_band1 - AssertionError: Immediate cancellation without review
+FAILED tests/a8/br/test_br_spec.py::test_br_011_band2 - AssertionError: Immediate cancellation without review
+FAILED tests/a8/br/test_br_spec.py::test_br_011_approval_gate - AssertionError: Indenter allowed to cancel past check-in directly
+FAILED tests/a8/br/test_br_spec.py::test_br_023 - AssertionError: Future tariff 2026-06-01 was selected
+FAILED tests/a8/br/test_br_spec.py::test_br_024 - AssertionError: Bill recomputed to 600 instead of retaining historical rate
+FAILED tests/a8/br/test_br_spec.py::test_br_025_denied - AssertionError: Meal booked for non-checked-in guest
+FAILED tests/a8/br/test_br_spec.py::test_br_031_outside - AssertionError: Meal booked for date outside stay period
+FAILED tests/a8/br/test_br_spec.py::test_br_035 - AssertionError: No-show charge calculation omitted
+FAILED tests/a8/br/test_br_spec.py::test_br_036 - AssertionError: Offline settlement operation absent
+FAILED tests/a8/br/test_br_spec.py::test_br_036_settlement_audit - AssertionError: Settlement audit logging absent
+FAILED tests/a8/br/test_br_spec.py::test_br_037 - AssertionError: Immutable bill charges modified
+FAILED tests/a8/br/test_br_spec.py::test_br_041_below - AssertionError: No persistent replenishment alert created
+FAILED tests/a8/br/test_br_spec.py::test_br_041_equal - AssertionError: Quantity == threshold evaluated as below threshold (<= defect)
+FAILED tests/a8/br/test_br_spec.py::test_br_043 - AssertionError: Caretaker notification not sent on low stock
+======================== 18 failed, 470 passed in 49.77s ========================
