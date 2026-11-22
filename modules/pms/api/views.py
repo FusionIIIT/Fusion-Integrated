@@ -145,7 +145,25 @@ class PatentApplicationDetailView(PmsAPIView):
         app = _visible_application(request, pk)
         return Response(s.PatentApplicationReadSerializer(app).data)
 
+class PatentAppealListView(PmsAPIView):
+    """List appeals visible to the Director (UC-PMS-023, CFR-PMS-020)."""
 
+    permission_classes = [p.MODULE, HasPermission(p.P_REVIEW_APPEAL)]
+
+    @extend_schema(responses=s.PatentAppealSerializer(many=True))
+    def get(self, request):
+        visible_ids = visible_applications(
+            request.principal
+        ).values_list("id", flat=True)
+
+        appeals = (
+            PatentAppeal.objects
+            .filter(application_id__in=visible_ids)
+            .select_related("application")
+            .order_by("-created_at", "-id")
+        )
+
+        return Response(s.PatentAppealSerializer(appeals[:100], many=True).data)
 class PatentApplicationReviseView(PmsWriteAPIView):
     """Revise and resubmit an application (UC-PMS-005, CFR-PMS-008)."""
 

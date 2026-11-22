@@ -133,11 +133,14 @@ export interface PatentAppeal {
   grounds: string;
   justification: string;
   status: string;
-  outcome: string;
+  outcome: string | null;
   director_user_id: number | null;
-  outcome_justification: string;
+  outcome_justification: string | null;
   decided_at: string | null;
   created_at: string;
+  application_id: number;
+  application_no: string;
+  application_title: string;
 }
 
 export interface LicensingRequest {

@@ -42,6 +42,11 @@ urlpatterns = [
         name="pms-application-appeal",
     ),
     path(
+        "appeals/",
+        views.PatentAppealListView.as_view(),
+        name="pms-appeal-list",
+    ),
+    path(
         "appeals/<int:appeal_id>/review/",
         views.PatentAppealReviewView.as_view(),
         name="pms-appeal-review",

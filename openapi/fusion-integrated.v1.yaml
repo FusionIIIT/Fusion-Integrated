@@ -1674,6 +1674,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/pms/appeals/:
+    get:
+      operationId: v1_pms_appeals_list
+      description: List appeals visible to the Director (UC-PMS-023, CFR-PMS-020).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatentAppeal'
+          description: ''
   /api/v1/pms/appeals/{appeal_id}/review/:
     post:
       operationId: v1_pms_appeals_review_create
@@ -5197,7 +5214,19 @@ components:
           nullable: true
         justification:
           type: string
+        application_id:
+          type: integer
+          readOnly: true
+        application_no:
+          type: string
+          readOnly: true
+        application_title:
+          type: string
+          readOnly: true
       required:
+      - application_id
+      - application_no
+      - application_title
       - id
     PatentBudgetStatusEnum:
       enum:

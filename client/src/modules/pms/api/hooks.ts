@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { http } from "../../../lib/http";
 import type {
   AttorneyPanelEntry, LicensingRequest, OfficeAction, PatentApplication,
-  PmsAuditEntry, PmsConfiguration, PmsReport, WorkflowOversight,
+  PmsAuditEntry, PmsConfiguration, PmsReport, WorkflowOversight, PatentAppeal,
 } from "./types";
 
 const ROOT = "/pms";
@@ -20,6 +20,7 @@ export const pmsKeys = {
   audit: (filters?: unknown) => [KEY, "audit", filters] as const,
   panel: () => [KEY, "panel"] as const,
   configuration: () => [KEY, "configuration"] as const,
+  appeals: () => [KEY, "appeals"] as const,
 };
 
 export function usePmsApplications() {
@@ -27,6 +28,15 @@ export function usePmsApplications() {
     queryKey: pmsKeys.applications(),
     queryFn: async () =>
       (await http.get<PatentApplication[]>(`${ROOT}/applications/`)).data,
+    staleTime: 15_000,
+  });
+}
+
+export function usePmsAppeals() {
+  return useQuery({
+    queryKey: pmsKeys.appeals(),
+    queryFn: async () =>
+      (await http.get<PatentAppeal[]>(`${ROOT}/appeals/`)).data,
     staleTime: 15_000,
   });
 }

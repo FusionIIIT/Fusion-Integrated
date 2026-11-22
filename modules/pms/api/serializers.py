@@ -73,6 +73,13 @@ class DirectorReviewSerializer(serializers.ModelSerializer):
 
 
 class PatentBudgetSerializer(serializers.ModelSerializer):
+    application_id = serializers.IntegerField(read_only=True)
+    application_no = serializers.CharField(
+    source="application.application_no", read_only=True
+)
+    application_title = serializers.CharField(
+    source="application.title", read_only=True
+)
     class Meta:
         model = PatentBudget
         fields = [
@@ -86,6 +93,9 @@ class PatentBudgetSerializer(serializers.ModelSerializer):
             "decided_by_user_id",
             "decided_at",
             "justification",
+            "application_id",
+            "application_no",
+            "application_title",
         ]
 
 

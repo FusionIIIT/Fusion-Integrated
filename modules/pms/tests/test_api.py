@@ -940,3 +940,53 @@ def test_api_maintenance_request_requires_manage_permission(stub_iam):
         permissions=("pms.maintenance.manage", "pms.application.view"),
     )
     assert c_atty.post(f"/api/v1/pms/maintenance/{maint.id}/request-renewal/").status_code == 200
+
+
+def test_appeal_list_endpoint_requires_review_permission(stub_iam):
+    client = _client(
+        stub_iam,
+        user_id=1001,
+        roles=("applicant",),
+        permissions=("pms.application.view",),
+    )
+
+    response = client.get("/api/v1/pms/appeals/")
+
+    assert response.status_code in (403, 404)
+
+def test_director_can_list_visible_appeals(stub_iam):
+    from modules.pms.models import PatentAppeal
+
+    app = submit_application(
+        applicant_user_id=1001,
+        title="Appeal listing test",
+        abstract="A",
+        detailed_description="D",
+        claims="C",
+        domain="Tech",
+    )
+    app.assigned_director_user_id = 2001
+    app.save()
+
+    appeal = PatentAppeal.objects.create(
+        application=app,
+        applicant_user_id=1001,
+        grounds="Procedural error",
+        justification="The decision should be reconsidered.",
+    )
+
+    client = _client(
+        stub_iam,
+        user_id=2001,
+        roles=("director",),
+        permissions=(
+            "pms.application.review_appeal",
+            "pms.application.view",
+        ),
+    )
+
+    response = client.get("/api/v1/pms/appeals/")
+
+    assert response.status_code == 200
+    results = response.json()
+    assert any(item["id"] == appeal.id for item in results)
