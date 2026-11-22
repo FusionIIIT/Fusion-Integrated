@@ -36,3 +36,22 @@ System Admin must configure financial-year dates, budgets, TA policy, document r
 - PostgreSQL, live IAM, storage and notification delivery require integration verification.
 
 IAA Process/Record is internal governance only; it does not initiate bank transfers or payments.
+
+
+## IAM ownership boundary and role notifications
+
+IAA does not own user identities or role membership. Fusion IAM remains authoritative for
+both designations and the active session role; IAA reads the current principal and uses
+the existing IAM active-role switch operation. Legacy role-assignment mirror tables are
+retained in the initial schema for upgrade compatibility but are not used to grant roles.
+The current Fusion IAM service client exposes session resolution and active-role switching,
+but no service-authenticated role-grant mutation API. Effective designation grants must
+therefore use the separate Fusion IAM administrator workflow.
+
+Role-targeted notifications are stored in a role inbox and are visible only while the
+matching IAM role is active. Per-user receipt rows keep read state private to each holder.
+Personal notifications remain scoped to their individual recipient. Audit-observation
+QuerySet deletion is prohibited in addition to instance deletion.
+
+Supporting-document references are validated and canonicalised with Fusion's existing
+Google Drive link validator; arbitrary URLs and non-Drive references are rejected.
