@@ -102,9 +102,12 @@ def test_br_br_qz_006_source_br_qz_006_availability_window_boundaries():
             SYSTEM,
             {"now": now, "start_at": start_at},
         )
-    assert apply_transition(
-        M1, scheduled, "boundary_start", SYSTEM, {"now": start_at, "start_at": start_at}
-    ) == "AVAILABLE"
+    assert (
+        apply_transition(
+            M1, scheduled, "boundary_start", SYSTEM, {"now": start_at, "start_at": start_at}
+        )
+        == "AVAILABLE"
+    )
     close_at = start_at + timedelta(minutes=30)
     with pytest.raises(GuardFailed):
         apply_transition(
@@ -114,9 +117,12 @@ def test_br_br_qz_006_source_br_qz_006_availability_window_boundaries():
             SYSTEM,
             {"now": start_at, "close_at": close_at},
         )
-    assert apply_transition(
-        M1, "AVAILABLE", "boundary_close", SYSTEM, {"now": close_at, "close_at": close_at}
-    ) == "CLOSED"
+    assert (
+        apply_transition(
+            M1, "AVAILABLE", "boundary_close", SYSTEM, {"now": close_at, "close_at": close_at}
+        )
+        == "CLOSED"
+    )
 
 
 def test_br_br_qz_008_source_br_qz_008_permitted_attempt_limit():
@@ -141,12 +147,11 @@ def test_br_br_qz_012_source_br_qz_012_unanswered_submission_guard():
     now = datetime.now(UTC)
     common = {"confirm": True, "now": now, "deadline_at": now, "unanswered": 1}
     with pytest.raises(GuardFailed, match="UNANSWERED_NOT_ALLOWED"):
-        apply_transition(
-            M2, "STARTED", "submit", STUDENT, {**common, "allow_unanswered": False}
-        )
-    assert apply_transition(
-        M2, "STARTED", "submit", STUDENT, {**common, "allow_unanswered": True}
-    ) == "SUBMITTED"
+        apply_transition(M2, "STARTED", "submit", STUDENT, {**common, "allow_unanswered": False})
+    assert (
+        apply_transition(M2, "STARTED", "submit", STUDENT, {**common, "allow_unanswered": True})
+        == "SUBMITTED"
+    )
 
 
 def test_br_br_qz_018_source_br_qz_018_objective_evaluation_domain():
@@ -167,119 +172,21 @@ def test_br_br_qz_021_source_br_qz_021_release_and_permitted_visibility():
             STUDENT,
             {"visibility_permits": True},
         )
-    released = apply_transition(
-        M3, "EVALUATED", "release", PROFESSOR, {"owns_course": True}
-    )
+    released = apply_transition(M3, "EVALUATED", "release", PROFESSOR, {"owns_course": True})
     assert released == "RELEASED"
-    assert apply_transition(
-        M3, released, "view_result", STUDENT, {"visibility_permits": True}
-    ) == "RELEASED"
+    assert (
+        apply_transition(M3, released, "view_result", STUDENT, {"visibility_permits": True})
+        == "RELEASED"
+    )
     with pytest.raises(GuardFailed):
-        apply_transition(
-            M3, released, "view_result", STUDENT, {"visibility_permits": False}
-        )
+        apply_transition(M3, released, "view_result", STUDENT, {"visibility_permits": False})
 
 
 def test_br_br_qz_023_source_br_qz_023_archive_permission():
     """Design test_id=BR-BR-QZ-023; source_id=BR-QZ-023: checks permitted M1 archive; denial is a candidate failure, delete/policy remain unspecified."""
     with pytest.raises(GuardFailed):
         apply_transition(M1, "CLOSED", "archive", PROFESSOR, {"archive_permitted": False})
-    assert apply_transition(
-        M1, "CLOSED", "archive", PROFESSOR, {"archive_permitted": True}
-    ) == "ARCHIVED"
-
-
-def test_br_br_qz_001_source_br_qz_001_role_separation_not_automated():
-    """test_id=BR-BR-QZ-001; source_id=BR-QZ-001."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-001 (source_id=BR-QZ-001): the Professor-only "
-        "quiz authorization API/service for protected operations is absent."
-    )
-
-
-def test_br_br_qz_004_source_br_qz_004_student_data_visibility_not_automated():
-    """test_id=BR-BR-QZ-004; source_id=BR-QZ-004."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-004 (source_id=BR-QZ-004): a student-scoped "
-        "result/report/history API or query service enforcing role and configured visibility is absent."
-    )
-
-
-def test_br_br_qz_005_source_br_qz_005_pre_activation_edit_boundary_not_automated():
-    """test_id=BR-BR-QZ-005; source_id=BR-QZ-005."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-005 (source_id=BR-QZ-005): a Quiz/Question "
-        "mutation service with persistence enforcing edits against current quiz state is absent."
-    )
-
-
-def test_br_br_qz_007_source_br_qz_007_time_limit_not_automated():
-    """test_id=BR-BR-QZ-007; source_id=BR-QZ-007."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-007 (source_id=BR-QZ-007): an attempt timer "
-        "service deriving deadlines from Quiz.duration_minutes and exposing the running timer is absent."
-    )
-
-
-def test_br_br_qz_009_source_br_qz_009_question_option_order_not_automated():
-    """test_id=BR-BR-QZ-009; source_id=BR-QZ-009."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-009 (source_id=BR-QZ-009): a question "
-        "selection/rendering service applying configured question and option ordering is absent."
-    )
-
-
-def test_br_br_qz_010_source_br_qz_010_navigation_display_mode_not_automated():
-    """test_id=BR-BR-QZ-010; source_id=BR-QZ-010."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-010 (source_id=BR-QZ-010): an attempt UI "
-        "or navigation handler enforcing back-navigation and one-question display settings is absent."
-    )
-
-
-def test_br_br_qz_013_source_br_qz_013_tab_block_rule_not_automated():
-    """test_id=BR-BR-QZ-013; source_id=BR-QZ-013."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-013 (source_id=BR-QZ-013): browser attempt "
-        "UI and tab-event enforcement for the configured policy are absent; platform semantics remain unresolved."
-    )
-
-
-def test_br_br_qz_014_source_br_qz_014_background_application_check_not_automated():
-    """test_id=BR-BR-QZ-014; source_id=BR-QZ-014."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-014 (source_id=BR-QZ-014): OS background-"
-        "process detection and the close-option UI integration are absent; platform and permission semantics remain unresolved."
-    )
-
-
-def test_br_br_qz_015_source_br_qz_015_active_response_persistence_not_automated():
-    """test_id=BR-BR-QZ-015; source_id=BR-QZ-015."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-015 (source_id=BR-QZ-015): an answer-save "
-        "application service/API persisting AttemptResponse during an active attempt is absent."
-    )
-
-
-def test_br_br_qz_019_source_br_qz_019_professor_subjective_evaluation_not_automated():
-    """test_id=BR-BR-QZ-019; source_id=BR-QZ-019."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-019 (source_id=BR-QZ-019): a subjective-"
-        "evaluation service integrating AI suggestions, Professor confirmation, and final-mark persistence is absent."
-    )
-
-
-def test_br_br_qz_022_source_br_qz_022_audit_trail_not_automated():
-    """test_id=BR-BR-QZ-022; source_id=BR-QZ-022."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-022 (source_id=BR-QZ-022): an audit event-"
-        "producing service connecting state changes to AuditLogEntry persistence is absent."
-    )
-
-
-def test_br_br_qz_024_source_br_qz_024_notification_events_not_automated():
-    """test_id=BR-BR-QZ-024; source_id=BR-QZ-024."""
-    pytest.skip(
-        "NOT_AUTOMATED: BR-BR-QZ-024 (source_id=BR-QZ-024): a notification "
-        "event-generation and recipient-delivery service is absent."
+    assert (
+        apply_transition(M1, "CLOSED", "archive", PROFESSOR, {"archive_permitted": True})
+        == "ARCHIVED"
     )

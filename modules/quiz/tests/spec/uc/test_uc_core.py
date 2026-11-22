@@ -25,14 +25,26 @@ def test_uc_uc_qz_005_publish_quiz_immediately_or_on_schedule():
         "now": now,
     }
 
-    assert apply_transition(
-        M1, "READY_TO_PUBLISH", "publish", PROFESSOR,
-        {**common, "start_at": now + timedelta(minutes=1)},
-    ) == "SCHEDULED"
-    assert apply_transition(
-        M1, "READY_TO_PUBLISH", "publish", PROFESSOR,
-        {**common, "start_at": now},
-    ) == "AVAILABLE"
+    assert (
+        apply_transition(
+            M1,
+            "READY_TO_PUBLISH",
+            "publish",
+            PROFESSOR,
+            {**common, "start_at": now + timedelta(minutes=1)},
+        )
+        == "SCHEDULED"
+    )
+    assert (
+        apply_transition(
+            M1,
+            "READY_TO_PUBLISH",
+            "publish",
+            PROFESSOR,
+            {**common, "start_at": now},
+        )
+        == "AVAILABLE"
+    )
 
     for context, reason in (
         ({**common, "owns_course": False}, "NOT_COURSE_OWNER"),
@@ -41,7 +53,10 @@ def test_uc_uc_qz_005_publish_quiz_immediately_or_on_schedule():
     ):
         with pytest.raises(GuardFailed, match=reason):
             apply_transition(
-                M1, "READY_TO_PUBLISH", "publish", PROFESSOR,
+                M1,
+                "READY_TO_PUBLISH",
+                "publish",
+                PROFESSOR,
                 {**context, "start_at": now},
             )
 
@@ -51,9 +66,10 @@ def test_uc_uc_qz_006_archive_quiz_domain_transition():
 
     A8_BASE has no quiz deletion service; this does not verify deletion or persistence.
     """
-    assert apply_transition(
-        M1, "CLOSED", "archive", PROFESSOR, {"archive_permitted": True}
-    ) == "ARCHIVED"
+    assert (
+        apply_transition(M1, "CLOSED", "archive", PROFESSOR, {"archive_permitted": True})
+        == "ARCHIVED"
+    )
 
 
 def test_uc_uc_qz_008_start_attempt():
@@ -102,20 +118,29 @@ def test_uc_uc_qz_010_manual_submit():
     not submission persistence or evaluation.
     """
     now = datetime.now(UTC)
-    assert apply_transition(
-        M2, "STARTED", "submit", STUDENT,
-        {
-            "confirm": True,
-            "now": now,
-            "deadline_at": now + timedelta(minutes=5),
-            "allow_unanswered": True,
-            "unanswered": 0,
-        },
-    ) == "SUBMITTED"
+    assert (
+        apply_transition(
+            M2,
+            "STARTED",
+            "submit",
+            STUDENT,
+            {
+                "confirm": True,
+                "now": now,
+                "deadline_at": now + timedelta(minutes=5),
+                "allow_unanswered": True,
+                "unanswered": 0,
+            },
+        )
+        == "SUBMITTED"
+    )
 
     with pytest.raises(GuardFailed, match="CONFIRM_REQUIRED"):
         apply_transition(
-            M2, "STARTED", "submit", STUDENT,
+            M2,
+            "STARTED",
+            "submit",
+            STUDENT,
             {
                 "confirm": False,
                 "now": now,
@@ -133,13 +158,22 @@ def test_uc_uc_qz_011_auto_submit_at_deadline():
     not response/timestamp persistence.
     """
     now = datetime.now(UTC)
-    assert apply_transition(
-        M2, "STARTED", "auto_submit", SYSTEM,
-        {"now": now, "deadline_at": now},
-    ) == "SUBMITTED"
+    assert (
+        apply_transition(
+            M2,
+            "STARTED",
+            "auto_submit",
+            SYSTEM,
+            {"now": now, "deadline_at": now},
+        )
+        == "SUBMITTED"
+    )
     with pytest.raises(IllegalTransition):
         apply_transition(
-            M2, "SUBMITTED", "auto_submit", SYSTEM,
+            M2,
+            "SUBMITTED",
+            "auto_submit",
+            SYSTEM,
             {"now": now, "deadline_at": now},
         )
 
@@ -155,13 +189,16 @@ def test_uc_uc_qz_012_objective_scoring_and_evaluation_domain():
         negative_marking_enabled=False,
     )
     assert score == 2
-    assert apply_transition(
-        M3,
-        "NOT_EVALUATED",
-        "auto_evaluate",
-        SYSTEM,
-        {"responses": [{"kind": "objective"}]},
-    ) == "EVALUATED"
+    assert (
+        apply_transition(
+            M3,
+            "NOT_EVALUATED",
+            "auto_evaluate",
+            SYSTEM,
+            {"responses": [{"kind": "objective"}]},
+        )
+        == "EVALUATED"
+    )
 
 
 def test_uc_uc_qz_014_release_result_domain_transition():
@@ -169,9 +206,9 @@ def test_uc_uc_qz_014_release_result_domain_transition():
 
     Does not verify release authorization, visibility rules, persistence, or result delivery.
     """
-    assert apply_transition(
-        M3, "EVALUATED", "release", PROFESSOR, {"owns_course": True}
-    ) == "RELEASED"
+    assert (
+        apply_transition(M3, "EVALUATED", "release", PROFESSOR, {"owns_course": True}) == "RELEASED"
+    )
 
 
 def test_uc_uc_qz_018_process_quiz_availability_boundaries():
@@ -180,105 +217,22 @@ def test_uc_uc_qz_018_process_quiz_availability_boundaries():
     """
     now = datetime.now(UTC)
     available = apply_transition(
-        M1, "SCHEDULED", "boundary_start", SYSTEM,
+        M1,
+        "SCHEDULED",
+        "boundary_start",
+        SYSTEM,
         {"now": now, "start_at": now},
     )
     assert available == "AVAILABLE"
-    assert apply_transition(
-        M1, available, "boundary_close", SYSTEM,
-        {"now": now, "close_at": now},
-    ) == "CLOSED"
+    assert (
+        apply_transition(
+            M1,
+            available,
+            "boundary_close",
+            SYSTEM,
+            {"now": now, "close_at": now},
+        )
+        == "CLOSED"
+    )
     with pytest.raises(IllegalTransition):
         apply_transition(M1, "DRAFT", "boundary_start", SYSTEM, {"now": now, "start_at": now})
-
-
-def test_uc_uc_qz_001_not_automated_quiz_create_edit():
-    """Test ID UC-UC-QZ-001; source_id UC-QZ-001."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-001; source_id=UC-QZ-001]: No quiz create/edit service or "
-        "API exists; the Quiz model alone cannot exercise authorization, validation, and "
-        "persisted-edit behavior."
-    )
-
-
-def test_uc_uc_qz_002_not_automated_manage_questions():
-    """Test ID UC-UC-QZ-002; source_id UC-QZ-002."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-002; source_id=UC-QZ-002]: No quiz question-management "
-        "service or API exists to validate and persist a complete question-set edit."
-    )
-
-
-def test_uc_uc_qz_003_not_automated_question_bank():
-    """Test ID UC-UC-QZ-003; source_id UC-QZ-003."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-003; source_id=UC-QZ-003]: No Question Bank search/filter/"
-        "reuse service or API exists; the QuestionBankItem model alone does not implement "
-        "these flows."
-    )
-
-
-def test_uc_uc_qz_004_not_automated_configure_quiz():
-    """Test ID UC-UC-QZ-004; source_id UC-QZ-004."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-004; source_id=UC-QZ-004]: No quiz configuration/scheduling "
-        "service or API exists to validate and persist the configured quiz window and settings."
-    )
-
-
-def test_uc_uc_qz_007_not_automated_view_eligible_quizzes():
-    """Test ID UC-UC-QZ-007; source_id UC-QZ-007."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-007; source_id=UC-QZ-007]: No eligible-quiz listing service/"
-        "API or dashboard UI exists to return assigned quizzes and instructions to a student."
-    )
-
-
-def test_uc_uc_qz_009_not_automated_save_responses():
-    """Test ID UC-UC-QZ-009; source_id UC-QZ-009."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-009; source_id=UC-QZ-009]: No active-attempt response-save "
-        "service or API exists to validate, persist, and read back the latest responses."
-    )
-
-
-def test_uc_uc_qz_013_not_automated_evaluate_subjective_responses():
-    """Test ID UC-UC-QZ-013; source_id UC-QZ-013."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-013; source_id=UC-QZ-013]: No subjective grading service/UI "
-        "exists to enter or revise marks and feedback and persist professor-finalized evaluations."
-    )
-
-
-def test_uc_uc_qz_015_not_automated_view_released_result():
-    """Test ID UC-UC-QZ-015; source_id UC-QZ-015."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-015; source_id=UC-QZ-015]: No authorized result-retrieval "
-        "API or UI exists to return and render permitted released-result details; M3 only "
-        "models a visibility transition."
-    )
-
-
-def test_uc_uc_qz_016_not_automated_view_submissions_reports():
-    """Test ID UC-UC-QZ-016; source_id UC-QZ-016."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-016; source_id=UC-QZ-016]: No submissions/report query "
-        "service/API or reporting UI exists to retrieve quiz and student performance summaries."
-    )
-
-
-def test_uc_uc_qz_017_not_automated_view_performance_history():
-    """Test ID UC-UC-QZ-017; source_id UC-QZ-017."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-017; source_id=UC-QZ-017]: No student performance-history "
-        "query service/API or history UI exists to retrieve and display prior quiz results."
-    )
-
-
-def test_uc_uc_qz_019_not_automated_event_notification():
-    """Test ID UC-UC-QZ-019; source_id UC-QZ-019."""
-    pytest.skip(
-        "NOT_AUTOMATED [UC-UC-QZ-019; source_id=UC-QZ-019]: No quiz event-notification "
-        "generation/delivery service exists; the Notification model alone does not trigger "
-        "or deliver event notifications."
-    )
