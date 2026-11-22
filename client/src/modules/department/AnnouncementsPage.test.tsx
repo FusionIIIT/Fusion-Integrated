@@ -8,7 +8,7 @@ import { http } from "../../lib/http";
 import AnnouncementsPage from "./AnnouncementsPage";
 
 vi.mock("../../auth/AuthProvider", () => ({
-  useAuth: () => ({ session: { user: { id: 10 }, active_role: "student" } }),
+  useAuth: () => ({ session: { user: { id: 10 }, active_role: "student" }, can: () => false }),
 }));
 vi.mock("../../lib/http", () => ({ http: { get: vi.fn() } }));
 

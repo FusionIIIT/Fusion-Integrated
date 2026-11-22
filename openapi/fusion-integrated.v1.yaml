@@ -73,6 +73,333 @@ paths:
               schema:
                 $ref: '#/components/schemas/PaginatedDepartmentAnnouncementList'
           description: ''
+    post:
+      operationId: v1_department_announcements_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentAnnouncementWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DepartmentAnnouncementWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepartmentAnnouncementWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentAnnouncement'
+          description: ''
+  /api/v1/department/announcements/{id}/action:
+    post:
+      operationId: v1_department_announcements_action_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnnouncementMaintenance'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AnnouncementMaintenance'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AnnouncementMaintenance'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/department/announcements/managed:
+    get:
+      operationId: v1_department_announcements_managed_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedManagedAnnouncementList'
+          description: ''
+  /api/v1/department/feedback:
+    get:
+      operationId: v1_department_feedback_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFeedbackList'
+          description: ''
+    post:
+      operationId: v1_department_feedback_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackSubmission'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeedbackSubmission'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeedbackSubmission'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedbackReceipt'
+          description: ''
+  /api/v1/department/feedback/{id}/action:
+    post:
+      operationId: v1_department_feedback_action_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeedbackAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeedbackAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+  /api/v1/department/inventory:
+    get:
+      operationId: v1_department_inventory_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInventoryList'
+          description: ''
+    post:
+      operationId: v1_department_inventory_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockInsertion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockInsertion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockInsertion'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inventory'
+          description: ''
+  /api/v1/department/notices:
+    get:
+      operationId: v1_department_notices_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNoticeList'
+          description: ''
+  /api/v1/department/stock-requests:
+    get:
+      operationId: v1_department_stock_requests_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStockRequestList'
+          description: ''
+    post:
+      operationId: v1_department_stock_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockRequestWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockRequestWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockRequestWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockRequest'
+          description: ''
+  /api/v1/department/stock-requests/{id}/action:
+    post:
+      operationId: v1_department_stock_requests_action_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockRequest'
+          description: ''
   /api/v1/directory/users:
     get:
       operationId: v1_directory_users_retrieve
@@ -1854,6 +2181,25 @@ components:
       - title
       - topic
       - withdrawn_reason
+    AnnouncementMaintenance:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/AnnouncementMaintenanceActionEnum'
+        announcement:
+          $ref: '#/components/schemas/DepartmentAnnouncementWrite'
+      required:
+      - action
+    AnnouncementMaintenanceActionEnum:
+      enum:
+      - edit
+      - hide
+      - delete
+      type: string
+      description: |-
+        * `edit` - edit
+        * `hide` - hide
+        * `delete` - delete
     Application:
       type: object
       properties:
@@ -2358,6 +2704,35 @@ components:
       - content
       - id
       - published_at
+    DepartmentAnnouncementWrite:
+      type: object
+      properties:
+        content:
+          type: string
+          maxLength: 8000
+        target_roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/TargetRolesEnum'
+          maxItems: 20
+        target_programmes:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          maxItems: 20
+        target_batch_years:
+          type: array
+          items:
+            type: integer
+            maximum: 2200
+            minimum: 1900
+          maxItems: 20
+      required:
+      - content
+      - target_batch_years
+      - target_programmes
+      - target_roles
     Detail:
       type: object
       properties:
@@ -2466,6 +2841,80 @@ components:
       - fee_reference
       - season
       - user_id
+    Feedback:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+        category:
+          type: string
+          maxLength: 100
+        status:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        disposed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - content
+      - created_at
+      - id
+      - status
+    FeedbackAction:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/FeedbackActionActionEnum'
+        category:
+          type: string
+          maxLength: 100
+        close_simple:
+          type: boolean
+          default: false
+      required:
+      - action
+    FeedbackActionActionEnum:
+      enum:
+      - review
+      - close
+      - resolve
+      type: string
+      description: |-
+        * `review` - review
+        * `close` - close
+        * `resolve` - resolve
+    FeedbackReceipt:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - status
+    FeedbackSubmission:
+      type: object
+      properties:
+        content:
+          type: string
+          maxLength: 8000
+      required:
+      - content
     IncidentRecorded:
       type: object
       properties:
@@ -2551,6 +3000,24 @@ components:
         * `tech` - Technical interview
         * `hr` - HR interview
         * `other` - Other
+    Inventory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 160
+        quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - id
+      - name
+      - quantity
     JobPosting:
       type: object
       properties:
@@ -2706,6 +3173,38 @@ components:
       required:
       - password
       - username
+    ManagedAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+        target_roles:
+          type: array
+          items:
+            type: string
+            maxLength: 80
+        target_programmes:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+        target_batch_years:
+          type: array
+          items:
+            type: integer
+            maximum: 32767
+            minimum: 0
+      required:
+      - content
+      - id
+      - published_at
     ModeEnum:
       enum:
       - online
@@ -2775,6 +3274,23 @@ components:
       - is_late
       - message
       - record
+    Notice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        message:
+          type: string
+          maxLength: 200
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - message
     OffCampusRecord:
       type: object
       properties:
@@ -3005,6 +3521,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DepartmentAnnouncement'
+    PaginatedFeedbackList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feedback'
     PaginatedInterviewRoundList:
       type: object
       required:
@@ -3024,6 +3559,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InterviewRound'
+    PaginatedInventoryList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Inventory'
     PaginatedJobPostingList:
       type: object
       required:
@@ -3043,6 +3597,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedManagedAnnouncementList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagedAnnouncement'
+    PaginatedNoticeList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notice'
     PaginatedOfferList:
       type: object
       required:
@@ -3062,6 +3654,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedStockRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockRequest'
     PatchedJobPosting:
       type: object
       properties:
@@ -3753,6 +4364,74 @@ components:
       required:
       - available
       - season
+    StockAction:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/StockActionActionEnum'
+      required:
+      - action
+    StockActionActionEnum:
+      enum:
+      - approve
+      - reject
+      - issue
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+        * `issue` - issue
+    StockInsertion:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 160
+        quantity:
+          type: integer
+          maximum: 1000000
+          minimum: 1
+      required:
+      - name
+      - quantity
+    StockRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        status:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - item_name
+      - quantity
+      - status
+    StockRequestWrite:
+      type: object
+      properties:
+        item_id:
+          type: integer
+          minimum: 1
+        quantity:
+          type: integer
+          maximum: 1000000
+          minimum: 1
+      required:
+      - item_id
+      - quantity
     SubmitOfferLetter:
       type: object
       properties:
@@ -3760,6 +4439,36 @@ components:
           type: integer
       required:
       - document_id
+    TargetRolesEnum:
+      enum:
+      - student
+      - faculty
+      - HOD (CSE)
+      - HOD (Design)
+      - HOD (ECE)
+      - HOD (ME)
+      - HOD (NS)
+      - deptadmin_cse
+      - deptadmin_design
+      - deptadmin_ece
+      - deptadmin_me
+      - deptadmin_ns
+      - deptadmin_sm
+      type: string
+      description: |-
+        * `student` - student
+        * `faculty` - faculty
+        * `HOD (CSE)` - HOD (CSE)
+        * `HOD (Design)` - HOD (Design)
+        * `HOD (ECE)` - HOD (ECE)
+        * `HOD (ME)` - HOD (ME)
+        * `HOD (NS)` - HOD (NS)
+        * `deptadmin_cse` - deptadmin_cse
+        * `deptadmin_design` - deptadmin_design
+        * `deptadmin_ece` - deptadmin_ece
+        * `deptadmin_me` - deptadmin_me
+        * `deptadmin_ns` - deptadmin_ns
+        * `deptadmin_sm` - deptadmin_sm
     TopicEnum:
       enum:
       - drive

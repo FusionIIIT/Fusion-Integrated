@@ -11,7 +11,20 @@ For the intended taxonomy of modules not yet built, see
 
 | Code | What it allows | Held by |
 |---|---|---|
-| `department.announcement.view` | View relevant Department announcements | `faculty`, `student` |
+| `department.announcement.view` | View relevant Department announcements | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty`, `student` |
+| `department.announcement.publish` | Publish Department announcements | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty` |
+| `department.announcement.manage` | Edit, hide or delete active Department announcements | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)` |
+| `department.stock.view` | View Department stock | `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty` |
+| `department.stock.create` | Insert Department stock | `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm` |
+| `department.stock_request.create` | Request Department stock | `faculty` |
+| `department.stock_request.approve` | Decide pending stock requests | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)` |
+| `department.stock_request.update` | Issue approved stock requests | `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm` |
+| `department.stock_request.view` | View permitted stock requests | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty` |
+| `department.feedback.create` | Submit confidential feedback | `faculty`, `student` |
+| `department.feedback.view` | View Department feedback | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm` |
+| `department.feedback.review` | Perform the initial feedback review | `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm` |
+| `department.feedback.update` | Resolve or close reviewed feedback | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm` |
+| `department.notice.view` | View Department notifications | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (ME)`, `HOD (NS)`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty`, `student` |
 
 ## `directory`
 

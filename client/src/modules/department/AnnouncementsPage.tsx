@@ -5,6 +5,7 @@ import { useAuth } from "../../auth/AuthProvider";
 import { http } from "../../lib/http";
 import { ErrorState } from "../../ui/components/ErrorState";
 import { PageHeader } from "../../ui/components/PageHeader";
+import { ManageAnnouncements, PublishAnnouncement } from "./AnnouncementEditor";
 
 interface Announcement {
   id: number;
@@ -20,7 +21,7 @@ interface AnnouncementPage {
 const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 
 export default function AnnouncementsPage() {
-  const { session } = useAuth();
+  const { session, can } = useAuth();
   const query = useInfiniteQuery({
     queryKey: ["department", "announcements", session?.user.id, session?.active_role],
     initialPageParam: null as string | null,
@@ -39,6 +40,9 @@ export default function AnnouncementsPage() {
   return (
     <Container size="md" py="lg">
       <PageHeader title="Department announcements" />
+      {can("department.announcement.publish") && (
+        <Stack mb="lg"><PublishAnnouncement /></Stack>
+      )}
       {query.isPending && <Loader aria-label="Loading announcements" />}
       {query.isError && <ErrorState error={query.error} />}
       {query.isSuccess && announcements.length === 0 && (
@@ -63,6 +67,9 @@ export default function AnnouncementsPage() {
           onClick={() => void query.fetchNextPage()}>
           Load more announcements
         </Button>
+      )}
+      {can("department.announcement.manage") && (
+        <Stack mt="lg"><ManageAnnouncements /></Stack>
       )}
     </Container>
   );
