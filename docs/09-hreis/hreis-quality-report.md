@@ -1257,3 +1257,91 @@ directory `is_active` projection, fake IAM test extension and seed-status
 logging still require a documented permitted approval or platform-baseline
 route. The official fresh nine-dimension Step 7 review and the other
 student's frozen FR/UC/BR/WF Step 8 suites are **not** represented as complete.
+
+## 30. Student 2 written decisions received — limited scope (2026-11-22)
+
+**Status precedence:** This dated section supersedes the earlier checkpoint statements in sections 27–29 that Student 2 had not yet responded. It does **not** supersede formal Step 7/8 gates or real external-owner requirements.
+
+**Current human response (not a formal review verdict).** The person identified as
+Student 2, **Namala Venkata Siva Ramakrishna (24BCS163)**, responded in a
+dated email screenshot supplied to Student 1. The response identifies commit
+**12e1ddfe964873dbcd2080f4a74b0a41b5b82d94** and states:
+**"My decisions for D01–D22 are recorded in the attached Excel workbook
+(Student2_HREIS_Written_Approval_Decision_Register_24BCS163.xlsx) and are
+confirmed by me."** Overall disposition: **"Approve specified items only."**
+The email states **2026-11-22 20:05 IST (UTC+05:30)** as its decision time;
+the Gmail screenshot shows the message at approximately **8:11 PM** that day.
+The screenshots show a sender address and Excel attachment, but full raw
+email headers and the original message ID have not yet been archived on
+this PC.
+
+The returned workbook contains **22/22 filled decisions**:
+**6 Approve** (D01, D03–D07), **11 Approve with limitations** (D08–D18)
+and **5 Acknowledged** (D02, D19–D22). No selections are empty, and
+none say Request Changes, Hold or Escalate. This does **not** mean the
+external service-owner or institutional-policy conditions are met.
+
+Each following line is the exact decision-condition text returned in
+the completed Excel register and confirmed by the attributed email.
+The full working transcription is held outside Git in
+`D:\HR(EIS)\lab 9\evidence\student2-approvals\student2-decisions-20261122-transcribed-from-email-and-returned-workbook.md`.
+Preserve the original received .eml, full headers and original .xlsx
+attachment separately; screenshots and transcription are not substitutes
+for transport-level proof or a message permalink.
+
+| Decision ID | Written selection | Verbatim written condition |
+|---|---|---|
+| D01 | Approve | Approved 193-live-ID blueprint (BR-HR-032, HR-UC-020 retired) against all six original specifications (01-06) at commit 12e1ddf, subject to the explicit module-only boundaries in D08-D18. |
+| D02 | Acknowledged | Acknowledged that implementation started before formal written blueprint approval as disclosed in docs/09-hreis/procedure-deviation.md; not backdated; timing deviation accepted transparently. |
+| D03 | Approve | Approved MeView.patch RoleSerializer validation and _principal_after_switch refresh in fusion_auth/views.py so PATCH /api/v1/me returns the newly active role; recommend upstream PR. |
+| D04 | Approve | Approved shared auth regression tests in fusion_auth/tests/test_auth.py verifying active-role refresh and 400 rejection of malformed payloads alongside D03. |
+| D05 | Approve | Approved FakeIam.set_active_role fixture method in conftest.py (exempted from §3.2 protected Blocker list) supporting D03-D04. |
+| D06 | Approve | Approved UserDTO.is_active projection in modules/directory/contracts.py (get_users docstring restored) used to exclude inactive appraisal reviewers and notification recipients (HR-AFR-098). |
+| D07 | Approve | Approved one-line fix in modules/accesscontrol/management/commands/seed_modules.py printing actual module.status instead of spec['status'] when readiness marks a module planned. |
+| D08 | Approve with limitations | Approved provisional Accountant -> IAM Accounts Admin mapping for Assignment 9 module-only scope only; production deployment requires institutional IAM authority confirmation. |
+| D09 | Approve with limitations | Approved leaving numeric leave quotas/eligibility unconfigured in code (requiring explicit effective-dated HRPolicyVersion) since specs 01-06 supply no numeric quotas; production needs institute policy. |
+| D10 | Approve with limitations | Approved leaving appraisal submission windows unconfigured in code (requiring explicit effective-dated HRPolicyVersion) since specs 01-06 supply no fixed calendar window; production needs institute policy. |
+| D11 | Approve with limitations | Approved policy-driven HOD/Registrar/Director routing without hardcoded department assumptions for Assignment 9 module-only scope; production requires an institutional routing matrix. |
+| D12 | Approve with limitations | Accepted HR-CFR-013 as a bounded module-only gap: read-only contracts and externally attested status recording are approved without modifying payroll rules; live payroll/finance/real-time sync needs external contract. |
+| D13 | Approve with limitations | Accepted HR-AFR-090 as a bounded module-only gap: Accountant-attested source_system='payroll' disbursement status history and read-only contract projection approved; live payroll connector needs external contract. |
+| D14 | Approve with limitations | Accepted HR-AFR-091 as a bounded module-only gap: Accountant-attested source_system='finance' accounting status history and read-only contract projection approved; live finance connector needs external contract. |
+| D15 | Approve with limitations | Accepted HR-AFR-093 as a bounded module-only gap: automatic real-time sync applies 'where configured' and fails closed with no fake sync while no external broker/target contract is supplied. |
+| D16 | Approve with limitations | Approved Student 1's strict adherence to UC spec p476 and BR spec p461: no undocumented LTC 'Returned' transition is invented; HR-AFR-059 remains a documented spec-silence limitation pending spec-owner ruling. |
+| D17 | Approve with limitations | Approved HR-AFR-092 / BR-HR-028 public directory-contract IAM identity/grant refresh coverage as partial for module-only scope; broader multi-module sync beyond directory awaits external module contracts. |
+| D18 | Approve with limitations | Approved durable dashboard notifications, outbox pattern, and claim document-reference tracking for Assignment 9 scope; real claim-file storage provider and certified SMTP delivery remain external prerequisites. |
+| D19 | Acknowledged | Acknowledged 9 inherited upstream npm advisories (3 production: follow-redirects, react-router, react-router-dom) from upstream/main; none introduced by HR-EIS; remediation belongs in an upstream platform PR. |
+| D20 | Acknowledged | Acknowledged all 11 HR-EIS read hooks scope cache keys by (user.id, active_role) and logout clears cache; in-session prior-role memory retention until gcTime is a separate upstream AuthProvider concern. |
+| D21 | Acknowledged | Acknowledged independent verification that all §3.2 protected frontend/harness files have 0 bytes diff vs upstream/main at 12e1ddf (no waiver claimed). |
+| D22 | Acknowledged | Acknowledged that this written decision record and prior preflight are not a formal Step 7 10/10 verdict; a fresh Step 7 review on committed code is required before starting official frozen Step 8. |
+
+**Interpretation and retained limitations:** D01 approves the 193-live-ID
+blueprint subject to explicit D08–D18 restrictions. D03–D07 approve
+the five retained non-protected shared-code files, not any protected change.
+D02 acknowledges that blueprint approval was obtained only *after* the
+initial implementation: it does not retroactively satisfy the pre-code
+approval sequence. The documented procedure deviation must remain.
+
+D08–D11 do not supply institutional leave quotas, appraisal schedules,
+the HOD/Registrar/Director routing matrix or production role authority.
+D12–D18 accept bounded module-only limitations, NOT a genuine
+payroll/finance connector, real-time sync guarantee, real claim-file
+storage, certified email delivery, or invented LTC Returned transition.
+Accordingly HR-CFR-013, HR-AFR-059, HR-AFR-090, HR-AFR-091 and HR-AFR-093
+remain **uncited as implemented** in Student 1's 188/193 mapping.
+HR-AFR-092 remains partially supported through the directory contract.
+Production and specification-owner rulings remain open.
+
+D19 records inherited npm advisories, not platform remediation. D20
+acknowledges residual prior-role cache entries in JS heap, not a broad
+platform security clearance. D21 confirms the protected-file diff was
+zero at the reviewed commit, with no claimed waiver. D22 expressly states
+that **this approval is not a formal Step 7 10/10 verdict** and that
+official frozen Step 8 does **not** start before a fresh valid Step 7
+outcome.
+
+**Next gate:** The revised quality report must be committed under the
+Student 1 branch before a new clean-clone formal Step 7 review. Save every
+raw review round and tie the verdict to that exact commit. Step 8 remains
+on hold until the guide's review criterion or valid post-round-7
+pair-decision process is satisfied. This decision record is not an
+institutional production approval or a signed review scorecard.
