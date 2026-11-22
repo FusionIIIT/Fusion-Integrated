@@ -1,8 +1,4 @@
-"""The client guards each office page with its nav item's own permission.
-
-routes.tsx and registry.py name the same permission twice; a typo would lock the
-office out of its own page, or let the wrong role in, with every test still green.
-"""
+"""The client guards each office page with its nav item's own permission."""
 import re
 from pathlib import Path
 

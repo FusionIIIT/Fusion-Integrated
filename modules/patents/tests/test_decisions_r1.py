@@ -1,8 +1,4 @@
-"""Tests for the R1-08 design and the two review decisions.
-
-Covers the append-only budget ledger, effective-dated policy, the missed-renewal alert,
-and one-time consent tokens for external co-inventors.
-"""
+"""Tests for the R1-08 design and the two review decisions."""
 from __future__ import annotations
 
 import re

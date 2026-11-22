@@ -123,28 +123,45 @@ Contract and layer linting verified using `import-linter`:
 
 ## 7. Fresh Installation & Startup Proof
 
-Verification on a pristine scratch database:
+Canonical sequence on a pristine database `fusion_integrated_fresh`. The output below is pasted from the run.
 
 ```bash
-# 1. Drop and recreate scratch database
-dropdb --if-exists fusion_scratch
-createdb fusion_scratch
-
-# 2. Apply migrations
-DATABASE_URL="postgres://localhost/fusion_scratch" .venv/bin/python manage.py migrate
-
-# 3. Seed patent policies
-DATABASE_URL="postgres://localhost/fusion_scratch" .venv/bin/python manage.py pms_seed_policy --threshold=100000 --max-workload=5
-
-# 4. Verify readiness
-DATABASE_URL="postgres://localhost/fusion_scratch" .venv/bin/python manage.py pms_readiness
-# Output: [OK] Patent module tables present and initialized.
-# Output: [OK] Active PatentPolicy configured.
-
-# 5. Perform initial applicant submission
-# POST /api/v1/patents/applications/ with title, abstract, domain, and co-inventors
-# Result: 201 Created, application ID generated in status DRAFT.
+docker compose exec -T db psql -U fusion_admin -d postgres -c "CREATE DATABASE fusion_integrated_fresh OWNER fusion_admin;"
+DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py migrate
+DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py seed_modules
+DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py pms_readiness
+DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py pms_seed_policy
+DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py seed_modules
+DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py pms_readiness
 ```
+
+Output of `seed_modules` before the policy is seeded:
+
+```text
+  Patent policy is not seeded — run 'manage.py pms_seed_policy'
+  registered patents (active)
+2 module(s) registered
+```
+
+Output of `pms_readiness` before the policy is seeded (exit status 1):
+
+```text
+Patents module is NOT ready:
+  - Patent policy is not seeded — run 'manage.py pms_seed_policy'
+```
+
+Output of `pms_seed_policy` and `pms_readiness` after the policy is seeded (exit status 0):
+
+```text
+Created active PatentPolicy (id=1).
+  registered patents (active)
+2 module(s) registered
+Patents module is ready for operation.
+```
+
+The policy is seeded without a cost threshold or a workload cap, because neither has a value in the spec. Set them with `--threshold` and `--max-workload` when the institute decides.
+
+Server probe on the fresh database: login returns 200 with a session, reading applications returns 200, and a write without a CSRF token returns 403.
 
 ---
 

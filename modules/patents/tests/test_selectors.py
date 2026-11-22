@@ -1,7 +1,4 @@
-"""Tests for patents selectors and scoping (Step 4.3).
-
-Verifies ownership isolation, role scoping, and 404 behavior across all PMS entities.
-"""
+"""Tests for patents selectors and scoping (Step 4.3)."""
 from __future__ import annotations
 
 import pytest
