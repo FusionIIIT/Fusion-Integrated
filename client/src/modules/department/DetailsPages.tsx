@@ -1,4 +1,4 @@
-import { Button, Container, Group, Paper, Select, Stack, Text, Textarea, TextInput } from "@mantine/core";
+import { Button, Container, Group, Loader, Paper, Select, Stack, Text, Textarea, TextInput } from "@mantine/core";
 import { useState } from "react";
 
 import { ErrorState } from "../../ui/components/ErrorState";
@@ -9,7 +9,7 @@ import { FeedState } from "./FeedState";
 
 interface Lab { id: number; name: string; details: string }
 interface Details { department: string; official_name: string; general_information: string; core_policies: string }
-interface Proposal { id: number; field: string; value: string; status: string }
+interface Proposal { id: number; field: "official_name" | "core_policies"; value: string; status: string; decided_at: string | null }
 
 export function LabsPage() {
   const can = useDepartmentCan();
@@ -86,6 +86,7 @@ export function DepartmentDetailsPage() {
     <Container size="md" py="lg">
       <PageHeader title="Department details" />
       <Stack>
+        {details.isPending && <Loader aria-label="Loading Department details" />}
         {details.isError && <ErrorState error={details.error} />}
         {details.data && (
           <Paper withBorder p="md">

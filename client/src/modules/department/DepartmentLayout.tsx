@@ -4,6 +4,7 @@ import { createContext, type ReactNode, useContext, useEffect, useRef } from "re
 import { Outlet } from "react-router-dom";
 
 import { useAuth } from "../../auth/AuthProvider";
+import { errorStatus } from "../../lib/http";
 import { ErrorState } from "../../ui/components/ErrorState";
 import { NotPermitted } from "../../ui/components/NotPermitted";
 import { useDepartmentFeed, useDepartmentRecord } from "./api";
@@ -43,7 +44,11 @@ export function DepartmentLayout() {
   const { session } = useAuth();
   const access = useDepartmentRecord<{ permissions: string[] }>("access");
   if (access.isPending) return <Container size="md" py="lg"><Loader aria-label="Loading Department access" /></Container>;
-  if (access.isError) return <Container size="md" py="lg"><ErrorState error={access.error} /></Container>;
+  if (access.isError) return (
+    <Container size="md" py="lg">
+      {errorStatus(access.error) === 403 ? <NotPermitted /> : <ErrorState error={access.error} />}
+    </Container>
+  );
   return (
     <DepartmentPermissions.Provider value={access.data.permissions}>
       {access.data.permissions.includes("department.notice.view") && (

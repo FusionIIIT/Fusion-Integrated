@@ -135,7 +135,7 @@ The enforcement points below describe the module. The generated reference links 
 - **Announcement.** Department key from the IAM department projection, authored content, publication timestamp, active/hidden status, and applicable role, programme and cohort-year lists. Target axes combine with AND and values within one axis with OR. An empty axis means explicitly unrestricted within the department. Filter on the current identity and active role, before pagination.
 - **Inventory and requests.** Inventory has a department, item identity and nonnegative quantity. Requests reference an item within the module and an integer IAM requester ID, with a strictly positive requested quantity. One atomic transaction locks the item and request during issuance and records an append-only movement and notification event. Constrain the quantity in the database. Request submission checks availability without reserving stock.
 - **Feedback.** Department, integer submitter ID, confidential content, categorization, review and disposition timestamps. Initial review and a simple closure may be recorded in one transaction, in that order. Staff queries start with department scoping and per-stage permissions.
-- **Timetable and lab.** Department timetable slots use half-open intervals for the applicable term and day. A room, instructor or cohort conflict prevents saving. Lab resource and inventory records are separate.
+- **Timetable and lab.** Department timetable slots use half-open intervals for the applicable term and day. PostgreSQL exclusion constraints prevent any overlapping room, instructor or cohort slot within a department and term. Lab resource and inventory records are separate.
 - **Department details.** Store published details separately from proposed official changes. Name and Core Policies are candidates for the HOD approval allowlist. Headship is a read-only IAM projection once the authoritative contract exists.
 
 Person references use integer IAM IDs. Cross-module foreign keys are excluded. Profile field allowlists and teaching/enrollment scope require authoritative inputs before exposure.
@@ -169,7 +169,7 @@ The platform shell currently receives union navigation from IAM. Department's ac
 | `feedback`, `feedback/{id}/action` | Confidential feedback submit, view, review or disposition permissions | Submit a new record, review it, or close or resolve it. |
 | `labs`, `timetable`, `timetable/{id}`, `academic-context` | Lab or timetable view and update permissions | Faculty resource profiles, Dept_Admin slot upload and replacement, and the student's verified programme, batch and applicable timetable. |
 | `details`, `proposals`, `proposals/{id}/action` | Details view or update, official-change proposal or HOD decision permissions | Immediate general update and pending official proposal with approval or rejection. |
-| `notices`, `access` | Department grant, plus the notice-view permission on `notices` | Role-scoped in-app notifications and current module action permissions. |
+| `notices`, `access` | Department grant plus notice-view or announcement-view permission, respectively | Role-scoped in-app notifications and current module action permissions. |
 
 The `/department` index redirects to `/department/announcements`. Each page uses its permission from the Department access response. For the external Fusion shell, add a sidebar entry with id `department`, label `Department`, icon `Buildings`, destination `/department`, and section `Department`.
 

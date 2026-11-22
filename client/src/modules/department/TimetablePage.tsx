@@ -107,6 +107,10 @@ export default function TimetablePage() {
     <Container size="md" py="lg">
       <PageHeader title="Academic timetable" />
       <Stack>
+        {!editable && context.isError && <ErrorState error={context.error} />}
+        {!editable && context.isSuccess && !context.data.programme && (
+          <Text c="dimmed">No academic programme information is available for your account.</Text>
+        )}
         {!editable && context.data?.programme && (
           <Text fw={600}>{context.data.programme}{context.data.batch_year && ` · Batch ${context.data.batch_year}`}</Text>
         )}
