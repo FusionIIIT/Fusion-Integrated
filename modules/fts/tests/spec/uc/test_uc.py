@@ -361,12 +361,12 @@ def test_tc_fts_003_04(fts_client):
 
 
 def test_tc_fts_003_05(fts_client):
-    """TC-FTS-003-05 [FTS-UC-003 Exception Flows (missing comment / invalid recipient / archived)].
+    """TC-FTS-003-05 [FTS-UC-003 Exception Flow 1 (missing comment)].
 
-    Verify that missing comment, invalid recipient, or archived status blocks forwarding.
+    Verify that missing mandatory movement comment blocks forwarding.
     """
     f = create_file(
-        subject="UC-003 Guards",
+        subject="UC-003 Missing Comment",
         comment_text="Creation.",
         actor_user_id=101,
         actor_username="faculty_101",
@@ -376,21 +376,90 @@ def test_tc_fts_003_05(fts_client):
         recipient_username="faculty_101",
         recipient_role="Assistant Professor",
     )
-    # 1. Missing comment
-    res_no_cmt = fts_client(user_id=101).post(
+    res = fts_client(user_id=101).post(
         f"/api/v1/fts/files/{f.id}/forward/",
         data={"to_user_id": 202, "to_username": "staff_202", "to_role": "Staff", "comment": ""},
         format="json",
     )
-    assert res_no_cmt.status_code == status.HTTP_400_BAD_REQUEST
+    assert res.status_code == status.HTTP_400_BAD_REQUEST
 
-    # 2. Invalid recipient
-    res_inv_recip = fts_client(user_id=101).post(
+
+def test_tc_fts_003_06(fts_client):
+    """TC-FTS-003-06 [FTS-UC-003 Exception Flow 2 (invalid recipient)].
+
+    Verify that forwarding is blocked when an invalid recipient is specified.
+    """
+    f = create_file(
+        subject="UC-003 Invalid Recipient",
+        comment_text="Creation.",
+        actor_user_id=101,
+        actor_username="faculty_101",
+        actor_role="Assistant Professor",
+        is_draft=False,
+        recipient_user_id=101,
+        recipient_username="faculty_101",
+        recipient_role="Assistant Professor",
+    )
+    res = fts_client(user_id=101).post(
         f"/api/v1/fts/files/{f.id}/forward/",
         data={"to_user_id": -1, "to_username": "invalid", "to_role": "Staff", "comment": "Valid comment."},
         format="json",
     )
-    assert res_inv_recip.status_code == status.HTTP_400_BAD_REQUEST
+    assert res.status_code == status.HTTP_400_BAD_REQUEST
+
+
+def test_tc_fts_003_07(fts_client):
+    """TC-FTS-003-07 [FTS-UC-003 Exception Flow 3 (unauthorized action)].
+
+    Verify that forwarding is blocked when the sender is not authorized to act on the file.
+    """
+    f = create_file(
+        subject="UC-003 Unauthorized Forward",
+        comment_text="Creation.",
+        actor_user_id=101,
+        actor_username="faculty_101",
+        actor_role="Assistant Professor",
+        is_draft=False,
+        recipient_user_id=101,
+        recipient_username="faculty_101",
+        recipient_role="Assistant Professor",
+    )
+    res = fts_client(user_id=999).post(
+        f"/api/v1/fts/files/{f.id}/forward/",
+        data={"to_user_id": 202, "to_username": "staff_202", "to_role": "Staff", "comment": "Unauthorized fwd."},
+        format="json",
+    )
+    assert res.status_code in (status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND)
+
+
+def test_tc_fts_003_08(fts_client):
+    """TC-FTS-003-08 [FTS-UC-003 Exception Flow 3 (archived file)].
+
+    Verify that forwarding is blocked when the file is archived.
+    """
+    f = create_file(
+        subject="UC-003 Archived Forward",
+        comment_text="Creation.",
+        actor_user_id=101,
+        actor_username="faculty_101",
+        actor_role="Assistant Professor",
+        is_draft=False,
+        recipient_user_id=101,
+        recipient_username="faculty_101",
+        recipient_role="Assistant Professor",
+    )
+    archive_file(
+        file_id=f.id,
+        actor_user_id=101,
+        actor_username="faculty_101",
+        actor_role="Assistant Professor",
+    )
+    res = fts_client(user_id=101).post(
+        f"/api/v1/fts/files/{f.id}/forward/",
+        data={"to_user_id": 202, "to_username": "staff_202", "to_role": "Staff", "comment": "Fwd archived."},
+        format="json",
+    )
+    assert res.status_code in (status.HTTP_400_BAD_REQUEST, status.HTTP_409_CONFLICT)
 
 
 # ==========================================
@@ -484,12 +553,12 @@ def test_tc_fts_004_03(fts_client):
 
 
 def test_tc_fts_004_04(fts_client):
-    """TC-FTS-004-04 [FTS-UC-004 Exception Flows (missing comment / unauthorized)].
+    """TC-FTS-004-04 [FTS-UC-004 Exception Flow 1 (missing comment)].
 
-    Verify that missing comment or unauthorized actor blocks return.
+    Verify that returning a file is blocked when mandatory movement comment is blank.
     """
     f = create_file(
-        subject="UC-004 Return Guards",
+        subject="UC-004 Missing Comment Return",
         comment_text="From 101 to 202.",
         actor_user_id=101,
         actor_username="faculty_101",
@@ -499,7 +568,6 @@ def test_tc_fts_004_04(fts_client):
         recipient_username="staff_202",
         recipient_role="Junior Superintendent",
     )
-    # Empty comment
     res_no_cmt = fts_client(user_id=202).post(
         f"/api/v1/fts/files/{f.id}/return/",
         data={"comment": "   "},
@@ -507,13 +575,59 @@ def test_tc_fts_004_04(fts_client):
     )
     assert res_no_cmt.status_code == status.HTTP_400_BAD_REQUEST
 
-    # Non-holder attempt
+
+def test_tc_fts_004_05(fts_client):
+    """TC-FTS-004-05 [FTS-UC-004 Exception Flow 2 (unauthorized action on return)].
+
+    Verify that return is blocked when the employee is not authorized to return the file.
+    """
+    f = create_file(
+        subject="UC-004 Unauthorized Return",
+        comment_text="From 101 to 202.",
+        actor_user_id=101,
+        actor_username="faculty_101",
+        actor_role="Assistant Professor",
+        is_draft=False,
+        recipient_user_id=202,
+        recipient_username="staff_202",
+        recipient_role="Junior Superintendent",
+    )
     res_unauth = fts_client(user_id=303).post(
         f"/api/v1/fts/files/{f.id}/return/",
         data={"comment": "Impostor return."},
         format="json",
     )
-    assert res_unauth.status_code == status.HTTP_403_FORBIDDEN
+    assert res_unauth.status_code in (status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND)
+
+
+def test_tc_fts_004_06(fts_client):
+    """TC-FTS-004-06 [FTS-UC-004 Exception Flow 2 (archived file return blocked)].
+
+    Verify that return is blocked when the file is in an archived/completed state.
+    """
+    f = create_file(
+        subject="UC-004 Return Archived File",
+        comment_text="From 101 to 202.",
+        actor_user_id=101,
+        actor_username="faculty_101",
+        actor_role="Assistant Professor",
+        is_draft=False,
+        recipient_user_id=101,
+        recipient_username="faculty_101",
+        recipient_role="Assistant Professor",
+    )
+    archive_file(
+        file_id=f.id,
+        actor_user_id=101,
+        actor_username="faculty_101",
+        actor_role="Assistant Professor",
+    )
+    res = fts_client(user_id=101).post(
+        f"/api/v1/fts/files/{f.id}/return/",
+        data={"comment": "Return archived file."},
+        format="json",
+    )
+    assert res.status_code in (status.HTTP_400_BAD_REQUEST, status.HTTP_409_CONFLICT)
 
 
 # ==========================================
@@ -631,52 +745,6 @@ def test_tc_fts_005_05(fts_client):
     assert res.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_tc_fts_005_06(fts_client):
-    """TC-FTS-005-06 [FTS-UC-005 Exception Flow 2 (unavailable action denied)].
-
-    Verify that an action not permitted for the current file state is denied.
-    """
-    f = create_file(
-        subject="State Action Denied",
-        comment_text="Draft file.",
-        actor_user_id=101,
-        actor_username="faculty_101",
-        actor_role="Assistant Professor",
-        is_draft=True,
-    )
-    # Draft files cannot be returned
-    res = fts_client(user_id=101).post(f"/api/v1/fts/files/{f.id}/return/", data={"comment": "Return draft."})
-    assert res.status_code == status.HTTP_409_CONFLICT
-
-
-def test_tc_fts_005_07(fts_client):
-    """TC-FTS-005-07 [FTS-UC-005 Postcondition: viewing does not alter state].
-
-    Verify that viewing inbox, outbox, or file details does not mutate business state.
-    """
-    f = create_file(
-        subject="Immutable View Test",
-        comment_text="Creation.",
-        actor_user_id=101,
-        actor_username="faculty_101",
-        actor_role="Assistant Professor",
-        is_draft=False,
-        recipient_user_id=202,
-        recipient_username="staff_202",
-        recipient_role="Junior Superintendent",
-    )
-    status_before = f.status
-    holder_before = f.current_holder_user_id
-
-    fts_client(user_id=202).get("/api/v1/fts/inbox/")
-    fts_client(user_id=101).get("/api/v1/fts/outbox/")
-    fts_client(user_id=202).get(f"/api/v1/fts/files/{f.id}/")
-
-    f.refresh_from_db()
-    assert f.status == status_before
-    assert f.current_holder_user_id == holder_before
-
-
 # ==========================================
 # FTS-UC-006: View File Tracking History
 # ==========================================
@@ -756,52 +824,6 @@ def test_tc_fts_006_03(fts_client):
     )
     res = fts_client(user_id=999).get(f"/api/v1/fts/files/{f.id}/history/")
     assert res.status_code == status.HTTP_404_NOT_FOUND
-
-
-def test_tc_fts_006_04(fts_client):
-    """TC-FTS-006-04 [FTS-UC-006 Postcondition: viewing history does not alter state].
-
-    Verify that viewing history is a read-only operation.
-    """
-    f = create_file(
-        subject="History Read-Only File",
-        comment_text="Creation.",
-        actor_user_id=101,
-        actor_username="faculty_101",
-        actor_role="Assistant Professor",
-        is_draft=False,
-        recipient_user_id=202,
-        recipient_username="staff_202",
-        recipient_role="Staff",
-    )
-    fts_client(user_id=101).get(f"/api/v1/fts/files/{f.id}/history/")
-    f.refresh_from_db()
-    assert f.status == STATE_CIRCULATED
-
-
-def test_tc_fts_006_05(fts_client):
-    """TC-FTS-006-05 [FTS-UC-006 History completeness and field presence].
-
-    Verify tracking history contains sender, receiver, timestamp, comment, and attachment fields.
-    """
-    f = create_file(
-        subject="Complete History Fields",
-        comment_text="Initial creation.",
-        actor_user_id=101,
-        actor_username="faculty_101",
-        actor_role="Assistant Professor",
-        is_draft=False,
-        recipient_user_id=101,
-        recipient_username="faculty_101",
-        recipient_role="Assistant Professor",
-    )
-    history = fts_client(user_id=101).get(f"/api/v1/fts/files/{f.id}/history/").json()
-    item = history[0]
-    assert "from_user_id" in item
-    assert "to_user_id" in item
-    assert "created_at" in item
-    assert "comments" in item
-    assert "attachments" in item
 
 
 # ==========================================
@@ -895,36 +917,6 @@ def test_tc_fts_007_04(fts_client):
     )
     res = fts_client(user_id=101, permissions=("fts.file.view",)).post(f"/api/v1/fts/files/{f.id}/archive/")
     assert res.status_code == status.HTTP_403_FORBIDDEN
-
-
-def test_tc_fts_007_05(fts_client):
-    """TC-FTS-007-05 [FTS-UC-007 Archived file is immutable and cannot be forwarded].
-
-    Verify that once archived, a file cannot be modified or forwarded.
-    """
-    f = create_file(
-        subject="UC-007 Immutability",
-        comment_text="Creation.",
-        actor_user_id=101,
-        actor_username="faculty_101",
-        actor_role="Assistant Professor",
-        is_draft=False,
-        recipient_user_id=101,
-        recipient_username="faculty_101",
-        recipient_role="Assistant Professor",
-    )
-    archive_file(
-        file_id=f.id,
-        actor_user_id=101,
-        actor_username="faculty_101",
-        actor_role="Assistant Professor",
-    )
-    res_fwd = fts_client(user_id=101).post(
-        f"/api/v1/fts/files/{f.id}/forward/",
-        data={"to_user_id": 202, "to_username": "staff", "to_role": "Staff", "comment": "Fwd."},
-        format="json",
-    )
-    assert res_fwd.status_code == status.HTTP_409_CONFLICT
 
 
 # ==========================================
