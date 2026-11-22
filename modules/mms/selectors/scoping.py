@@ -1,23 +1,29 @@
 """Data scoping selectors for MMS queries."""
 from __future__ import annotations
-from django.db.models import QuerySet
+
+from typing import TYPE_CHECKING
 
 from modules.mms.models import (
-    MessRegistration,
+    MessAnnouncement,
+    MessBill,
     MessDeregistration,
+    MessFeedback,
     MessMenu,
     MessRebate,
+    MessRegistration,
     SpecialFoodRequest,
-    MessBill,
-    MessAnnouncement,
-    MessFeedback,
     VacationFoodResponse,
 )
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 
 def visible_registrations(actor) -> QuerySet[MessRegistration]:
     """Scoping for mess registrations. Admin is restricted (BR-MMS-005)."""
-    if actor.has_permission("mms.registration.review") or actor.has_permission("mms.registration.view_oversight"):
+    can_review = actor.has_permission("mms.registration.review")
+    can_oversight = actor.has_permission("mms.registration.view_oversight")
+    if can_review or can_oversight:
         return MessRegistration.objects.all()
     if actor.has_permission("mms.registration.self"):
         return MessRegistration.objects.filter(user_id=actor.user_id)
@@ -26,7 +32,9 @@ def visible_registrations(actor) -> QuerySet[MessRegistration]:
 
 def visible_deregistrations(actor) -> QuerySet[MessDeregistration]:
     """Scoping for mess deregistrations."""
-    if actor.has_permission("mms.deregistration.review") or actor.has_permission("mms.registration.view_oversight"):
+    can_review = actor.has_permission("mms.deregistration.review")
+    can_oversight = actor.has_permission("mms.registration.view_oversight")
+    if can_review or can_oversight:
         return MessDeregistration.objects.all()
     if actor.has_permission("mms.deregistration.self"):
         return MessDeregistration.objects.filter(user_id=actor.user_id)
@@ -44,7 +52,9 @@ def visible_rebates(actor) -> QuerySet[MessRebate]:
 
 def visible_special_food_requests(actor) -> QuerySet[SpecialFoodRequest]:
     """Scoping for special food requests."""
-    if actor.has_permission("mms.special_food.review") or actor.has_permission("mms.special_food.fulfill"):
+    can_review = actor.has_permission("mms.special_food.review")
+    can_fulfill = actor.has_permission("mms.special_food.fulfill")
+    if can_review or can_fulfill:
         return SpecialFoodRequest.objects.all()
     if actor.has_permission("mms.special_food.self"):
         return SpecialFoodRequest.objects.filter(user_id=actor.user_id)
@@ -86,7 +96,9 @@ def visible_announcements(actor) -> QuerySet[MessAnnouncement]:
 def visible_vacation_responses(actor, survey_id: int) -> QuerySet[VacationFoodResponse]:
     """Vacation survey responses visible to staff or student's own."""
     qs = VacationFoodResponse.objects.filter(survey_id=survey_id)
-    if actor.has_permission("mms.vacation.manage") or actor.has_permission("mms.report.supervisory"):
+    can_manage = actor.has_permission("mms.vacation.manage")
+    can_supervise = actor.has_permission("mms.report.supervisory")
+    if can_manage or can_supervise:
         return qs
     if actor.has_permission("mms.vacation.respond"):
         return qs.filter(user_id=actor.user_id)

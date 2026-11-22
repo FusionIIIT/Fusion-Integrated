@@ -2,14 +2,14 @@
 from django.urls import path
 
 from modules.mms.api.views import (
-    MenuListView,
     AnnouncementListView,
-    RegistrationListView,
-    DeregistrationListView,
-    RebateListView,
-    SpecialFoodListView,
     BillListView,
+    DeregistrationListView,
     FeedbackListView,
+    MenuListView,
+    RebateListView,
+    RegistrationListView,
+    SpecialFoodListView,
 )
 
 urlpatterns = [

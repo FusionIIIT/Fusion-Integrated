@@ -99,20 +99,20 @@ def validate_rebate_duration(start_date: date, end_date: date) -> int:
 
 
 def validate_rebate_lead_time(start_date: date, submission_date: date) -> None:
-    """BR-MMS-022: Rebate request must be submitted at least one calendar day before start date."""
+    """BR-MMS-022: Rebate request must be submitted at least 1 day before start date."""
     if (start_date - submission_date).days < 1:
         raise RuleViolation(
             "BR-MMS-022",
-            "Rebate request must be submitted at least one calendar day before the rebate start date.",
+            "Rebate request must be submitted at least one calendar day before start date.",
         )
 
 
 def validate_special_food_lead_time(requested_date: date, submission_date: date) -> None:
-    """BR-MMS-028: Special food request must be submitted at least one calendar day before requested date."""
+    """BR-MMS-028: Special food request must be submitted at least 1 day before date."""
     if (requested_date - submission_date).days < 1:
         raise RuleViolation(
             "BR-MMS-028",
-            "Special food request must be submitted at least one calendar day before requested date.",
+            "Special food request must be submitted at least one calendar day before date.",
         )
 
 
@@ -137,10 +137,14 @@ def validate_special_food_transition(current_status: str, new_status: str) -> st
     requested -> approved | rejected
     approved -> served | cancelled
     """
-    if current_status == SPECIAL_FOOD_REQUESTED:
-        if new_status in {SPECIAL_FOOD_APPROVED, SPECIAL_FOOD_REJECTED}:
-            return new_status
-    elif current_status == SPECIAL_FOOD_APPROVED:
-        if new_status in {SPECIAL_FOOD_SERVED, SPECIAL_FOOD_CANCELLED}:
-            return new_status
+    if current_status == SPECIAL_FOOD_REQUESTED and new_status in {
+        SPECIAL_FOOD_APPROVED,
+        SPECIAL_FOOD_REJECTED,
+    }:
+        return new_status
+    if current_status == SPECIAL_FOOD_APPROVED and new_status in {
+        SPECIAL_FOOD_SERVED,
+        SPECIAL_FOOD_CANCELLED,
+    }:
+        return new_status
     raise InvalidTransition(current_status, new_status)

@@ -3,30 +3,32 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta
 from decimal import Decimal
+
 from django.db import transaction
-from django.db.models import Q
 from django.utils import timezone
 
 from core.api.exceptions import BadRequestError, ConflictError, PermissionDeniedError
 from modules.mms.domain import state_machine as sm
 from modules.mms.models import (
-    MessRoleAssignment,
-    MessRegistrationWindow,
-    MessRegistration,
+    MessAnnouncement,
+    MessBill,
     MessDeregistration,
+    MessFeedback,
     MessMenu,
     MessRebate,
-    VacationFoodSurvey,
-    VacationFoodResponse,
-    SpecialFoodRequest,
-    MessBill,
-    MessAnnouncement,
-    MessFeedback,
+    MessRegistration,
+    MessRegistrationWindow,
+    MessRoleAssignment,
     MmsNotification,
+    SpecialFoodRequest,
+    VacationFoodResponse,
+    VacationFoodSurvey,
 )
 
 
-def _send_notification(recipient_user_id: int, event_type: str, title: str, message: str) -> MmsNotification:
+def _send_notification(
+    recipient_user_id: int, event_type: str, title: str, message: str
+) -> MmsNotification:
     """Helper to trigger system-generated notification (BR-MMS-035)."""
     return MmsNotification.objects.create(
         recipient_user_id=recipient_user_id,
@@ -55,12 +57,14 @@ def assign_mess_role(
         raise PermissionDeniedError("Only Mess Admin can assign or reassign operational roles.")
 
     if role_name not in sm.ALLOWED_OPERATIONAL_ROLES:
-        raise BadRequestError(f"Invalid role {role_name!r}. Allowed: {sm.ALLOWED_OPERATIONAL_ROLES}.")
+        raise BadRequestError(
+            f"Invalid role {role_name!r}. Allowed: {sm.ALLOWED_OPERATIONAL_ROLES}."
+        )
 
     if end_date < start_date:
         raise BadRequestError("Role assignment end date cannot precede start date.")
 
-    # BR-MMS-006: Mid-cycle reassignment immediately deactivates any existing active role for this role_name
+    # BR-MMS-006: Mid-cycle reassignment immediately deactivates previous active assignment
     MessRoleAssignment.objects.filter(role_name=role_name, is_active=True).update(is_active=False)
 
     assignment = MessRoleAssignment.objects.create(
@@ -80,7 +84,7 @@ def assign_mess_role(
     return assignment
 
 
-# --- Registration Management Services (CFR-MMS-004, BR-MMS-008..011, MMS-UC-002..004, BW-MMS-01..02) ---
+# --- Registration Services (CFR-MMS-004, BR-MMS-008..011, MMS-UC-002..004, BW-MMS-01..02) ---
 
 @transaction.atomic
 def open_registration_window(
@@ -101,7 +105,7 @@ def open_registration_window(
     # Close any currently open windows
     MessRegistrationWindow.objects.filter(status=sm.WINDOW_OPEN).update(status=sm.WINDOW_CLOSED)
 
-    window = MessRegistrationWindow.objects.create(
+    return MessRegistrationWindow.objects.create(
         academic_year=academic_year,
         semester=semester,
         start_date=start_date,
@@ -109,7 +113,6 @@ def open_registration_window(
         status=sm.WINDOW_OPEN,
         opened_by_user_id=actor.user_id,
     )
-    return window
 
 
 @transaction.atomic
@@ -128,7 +131,7 @@ def submit_registration_request(
         try:
             window = MessRegistrationWindow.objects.get(pk=window_id, status=sm.WINDOW_OPEN)
         except MessRegistrationWindow.DoesNotExist:
-            raise ConflictError("Specified registration window is not open.")
+            raise ConflictError("Specified registration window is not open.") from None
     else:
         window = MessRegistrationWindow.objects.filter(status=sm.WINDOW_OPEN).first()
         if not window:
@@ -194,7 +197,7 @@ def review_registration_request(
     return reg
 
 
-# --- Deregistration Management Services (CFR-MMS-005, BR-MMS-010, 012, 013, MMS-UC-005..006, 027, BW-MMS-03..04) ---
+# --- Deregistration Services (CFR-MMS-005, BR-MMS-010..013, MMS-UC-005..006) ---
 
 @transaction.atomic
 def submit_deregistration_request(
@@ -248,7 +251,7 @@ def review_deregistration_request(
     Approved deregistration takes effect from the next calendar day after decision.
     """
     if not actor.has_permission("mms.deregistration.review"):
-        raise PermissionDeniedError("Only active Mess Caretaker can decide deregistration requests.")
+        raise PermissionDeniedError("Only active Caretaker can decide deregistration requests.")
 
     dereg = MessDeregistration.objects.select_for_update().get(pk=request_id)
     if dereg.status != sm.DEREG_SUBMITTED:
@@ -302,9 +305,9 @@ def publish_or_update_menu(
     meal_type: str,
     items: list[str],
 ) -> MessMenu:
-    """BR-MMS-014, BR-MMS-039: Caretaker maintains weekly mess menu in day-wise and meal-wise format."""
+    """BR-MMS-014, BR-MMS-039: Caretaker maintains weekly menu day-wise and meal-wise."""
     if not actor.has_permission("mms.menu.manage"):
-        raise PermissionDeniedError("Only active Mess Caretaker can publish or update the mess menu.")
+        raise PermissionDeniedError("Only active Caretaker can publish or update the mess menu.")
 
     day_of_week = day_of_week.lower()
     meal_type = meal_type.lower()
@@ -325,7 +328,7 @@ def publish_or_update_menu(
     return menu
 
 
-# --- Rebate Management Services (CFR-MMS-011, BR-MMS-021..025, MMS-UC-014..015, BW-MMS-05..07, CW-MMS-03) ---
+# --- Rebate Services (CFR-MMS-011, BR-MMS-021..025, MMS-UC-014..015, BW-MMS-05..07) ---
 
 @transaction.atomic
 def submit_rebate_request(
@@ -354,7 +357,9 @@ def submit_rebate_request(
         end_date__gte=start_date,
     ).exists()
     if overlapping:
-        raise sm.RuleViolation("BR-MMS-023", "Rebate request dates overlap with an existing rebate.")
+        raise sm.RuleViolation(
+            "BR-MMS-023", "Rebate request dates overlap with an existing rebate."
+        )
 
     rebate = MessRebate.objects.create(
         user_id=actor.user_id,
@@ -423,7 +428,7 @@ def review_rebate_request(
     return rebate
 
 
-# --- Vacation Food Continuity Services (CFR-MMS-012, BR-MMS-026, 027, 041, MMS-UC-016..018, 028, 031, BW-MMS-08..10) ---
+# --- Vacation Continuity Services (CFR-MMS-012, BR-MMS-026, 027, 041, MMS-UC-016..018) ---
 
 @transaction.atomic
 def create_vacation_survey(
@@ -438,7 +443,7 @@ def create_vacation_survey(
     if not actor.has_permission("mms.vacation.manage"):
         raise PermissionDeniedError("Only active Mess Caretaker can create vacation surveys.")
 
-    survey = VacationFoodSurvey.objects.create(
+    return VacationFoodSurvey.objects.create(
         title=title,
         vacation_start_date=vacation_start_date,
         vacation_end_date=vacation_end_date,
@@ -446,7 +451,6 @@ def create_vacation_survey(
         status=sm.SURVEY_OPEN,
         created_by_user_id=actor.user_id,
     )
-    return survey
 
 
 @transaction.atomic
@@ -458,7 +462,7 @@ def respond_to_vacation_survey(
 ) -> VacationFoodResponse:
     """BR-MMS-026, BR-MMS-041, BW-MMS-08..09: Registered student responds Yes or No to survey."""
     if not actor.has_permission("mms.vacation.respond"):
-        raise PermissionDeniedError("Only students can respond to vacation food continuity surveys.")
+        raise PermissionDeniedError("Only students can respond to vacation food surveys.")
 
     survey = VacationFoodSurvey.objects.get(pk=survey_id)
     if survey.status != sm.SURVEY_OPEN:
@@ -470,7 +474,9 @@ def respond_to_vacation_survey(
         status=sm.REG_APPROVED,
     ).exists()
     if not is_registered:
-        raise sm.RuleViolation("BR-MMS-026", "Only currently registered students can respond to vacation survey.")
+        raise sm.RuleViolation(
+            "BR-MMS-026", "Only currently registered students can respond to vacation survey."
+        )
 
     response, _ = VacationFoodResponse.objects.update_or_create(
         survey=survey,
@@ -486,7 +492,7 @@ def respond_to_vacation_survey(
 
 @transaction.atomic
 def apply_default_vacation_responses(*, survey_id: int) -> int:
-    """MMS-UC-028, BR-MMS-027, BW-MMS-10: Default No applied to registered students who did not respond by deadline."""
+    """MMS-UC-028, BR-MMS-027, BW-MMS-10: Default No applied to non-responding students."""
     survey = VacationFoodSurvey.objects.select_for_update().get(pk=survey_id)
     registered_student_ids = MessRegistration.objects.filter(
         status=sm.REG_APPROVED,
@@ -510,7 +516,7 @@ def apply_default_vacation_responses(*, survey_id: int) -> int:
     return created_count
 
 
-# --- Special Food Arrangement Services (CFR-MMS-013, BR-MMS-028..031, MMS-UC-019..021, 029, BW-MMS-11..15) ---
+# --- Special Food Services (CFR-MMS-013, BR-MMS-028..031, MMS-UC-019..021, BW-MMS-11..15) ---
 
 @transaction.atomic
 def submit_special_food_request(
@@ -558,7 +564,7 @@ def review_special_food_request(
 ) -> SpecialFoodRequest:
     """BR-MMS-031, BW-MMS-11, 13: Caretaker approves or rejects special food request."""
     if not actor.has_permission("mms.special_food.review"):
-        raise PermissionDeniedError("Only active Mess Caretaker can decide special food requests.")
+        raise PermissionDeniedError("Only active Caretaker can decide special food requests.")
 
     req = SpecialFoodRequest.objects.select_for_update().get(pk=request_id)
     if req.status != sm.SPECIAL_FOOD_REQUESTED:
@@ -594,7 +600,7 @@ def update_special_food_fulfillment(
 ) -> SpecialFoodRequest:
     """BR-MMS-031, BW-MMS-14, 15: Transition approved special food to Served or Cancelled."""
     if not actor.has_permission("mms.special_food.fulfill"):
-        raise PermissionDeniedError("Only active Mess Caretaker can update fulfillment status.")
+        raise PermissionDeniedError("Only active Caretaker can update fulfillment status.")
 
     req = SpecialFoodRequest.objects.select_for_update().get(pk=request_id)
     new_status = sm.validate_special_food_transition(req.status, status)
@@ -609,7 +615,7 @@ def update_special_food_fulfillment(
 
 @transaction.atomic
 def default_reject_special_food_request(*, request_id: int) -> SpecialFoodRequest:
-    """MMS-UC-029, BR-MMS-029, BW-MMS-12: Event-triggered default rejection of undecided special food."""
+    """MMS-UC-029, BR-MMS-029, BW-MMS-12: Default rejection of undecided special food."""
     req = SpecialFoodRequest.objects.select_for_update().get(pk=request_id)
     if req.status == sm.SPECIAL_FOOD_REQUESTED:
         req.status = sm.SPECIAL_FOOD_REJECTED
@@ -620,12 +626,12 @@ def default_reject_special_food_request(*, request_id: int) -> SpecialFoodReques
             recipient_user_id=req.user_id,
             event_type="special_food_default_rejected",
             title="Special Food Request Rejected (Timeout)",
-            message="Your special food request was rejected because it was not decided within the required period.",
+            message="Your special food request was rejected because it timed out without decision.",
         )
     return req
 
 
-# --- Monthly Billing Services (CFR-MMS-009, BR-MMS-016..019, 040, MMS-UC-010, 030, BW-MMS-16) ---
+# --- Billing Services (CFR-MMS-009, BR-MMS-016..019, 040, MMS-UC-010, 030, BW-MMS-16) ---
 
 @transaction.atomic
 def generate_monthly_bills(
@@ -690,7 +696,7 @@ def generate_monthly_bills(
 def finalize_and_publish_bill(*, actor, bill_id: int) -> MessBill:
     """BR-MMS-018, MMS-UC-010, BW-MMS-16: Caretaker finalizes and publishes monthly mess bill."""
     if not actor.has_permission("mms.bill.manage"):
-        raise PermissionDeniedError("Only active Mess Caretaker can finalize and publish mess bills.")
+        raise PermissionDeniedError("Only active Caretaker can finalize and publish mess bills.")
 
     bill = MessBill.objects.select_for_update().get(pk=bill_id)
     bill.status = sm.BILL_PUBLISHED
@@ -698,16 +704,17 @@ def finalize_and_publish_bill(*, actor, bill_id: int) -> MessBill:
     bill.published_by_user_id = actor.user_id
     bill.save()
 
+    month_str = bill.billing_month.strftime("%B %Y")
     _send_notification(
         recipient_user_id=bill.user_id,
         event_type="bill_published",
         title="Mess Bill Published",
-        message=f"Your mess bill for {bill.billing_month.strftime('%B %Y')} has been published. Amount: {bill.total_amount}",
+        message=f"Your bill for {month_str} has been published. Amount: {bill.total_amount}",
     )
     return bill
 
 
-# --- Announcements & Feedback Services (CFR-MMS-010, BR-MMS-020, 032..033, MMS-UC-012, 022) ---
+# --- Announcements & Feedback (CFR-MMS-010, BR-MMS-020, 032..033, MMS-UC-012, 022) ---
 
 @transaction.atomic
 def publish_announcement(
@@ -720,14 +727,13 @@ def publish_announcement(
     if not actor.has_permission("mms.announcement.publish"):
         raise PermissionDeniedError("Only Mess Caretaker or Warden can publish announcements.")
 
-    announcement = MessAnnouncement.objects.create(
+    return MessAnnouncement.objects.create(
         title=title,
         content=content,
         published_by_user_id=actor.user_id,
         published_by_role=actor.active_role or "mess_staff",
         is_active=True,
     )
-    return announcement
 
 
 @transaction.atomic
@@ -741,15 +747,14 @@ def submit_feedback(
     if not actor.has_permission("mms.feedback.submit"):
         raise PermissionDeniedError("Only students can submit mess feedback.")
 
-    feedback = MessFeedback.objects.create(
+    return MessFeedback.objects.create(
         user_id=actor.user_id,
         description=description,
         category=category,
     )
-    return feedback
 
 
-# --- Query & Report Services (MMS-UC-007, 009, 011, 013, 023..025, BR-MMS-011, 020, 033..034, 038, 040) ---
+# --- Query & Report Services (MMS-UC-007, 009, 011, 013, 023..025, BR-MMS-011, 020) ---
 
 def view_registration_oversight(*, actor):
     """MMS-UC-007, BR-MMS-011: Mess Warden views operational student requests for oversight."""
@@ -781,9 +786,11 @@ def view_feedback_entries(*, actor):
 
 def view_monthly_bills(*, actor):
     """MMS-UC-011, BR-MMS-040: Student views personal bills and outstanding balances."""
-    if not actor.has_permission("mms.bill.view_self") and not actor.has_permission("mms.bill.manage"):
+    can_self = actor.has_permission("mms.bill.view_self")
+    can_manage = actor.has_permission("mms.bill.manage")
+    if not can_self and not can_manage:
         raise PermissionDeniedError("Bill view permission required.")
-    if actor.has_permission("mms.bill.manage"):
+    if can_manage:
         return list(MessBill.objects.all())
     return list(MessBill.objects.filter(user_id=actor.user_id))
 
@@ -800,4 +807,3 @@ def generate_supervisory_reports(*, actor, report_type: str = "registered_studen
     if not actor.has_permission("mms.report.supervisory"):
         raise PermissionDeniedError("Only Mess Warden can view supervisory reports.")
     return {"report_type": report_type, "status": "generated", "generated_by": actor.user_id}
-

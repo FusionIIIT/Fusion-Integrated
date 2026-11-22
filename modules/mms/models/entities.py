@@ -1,5 +1,6 @@
 """Database models for MMS module."""
 from django.db import models
+
 from core.db.mixins import TimeStampedModel, UserScopedModel
 
 
@@ -65,7 +66,7 @@ class MessRegistration(TimeStampedModel, UserScopedModel):
 
 
 class MessDeregistration(TimeStampedModel, UserScopedModel):
-    """Student deregistration request with next-day effective date (CFR-MMS-005, BR-MMS-012, 013)."""
+    """Student deregistration with next-day effective date (CFR-MMS-005, BR-MMS-012, 013)."""
     STATUS_CHOICES = [
         ("submitted", "Submitted"),
         ("approved", "Approved"),
@@ -165,7 +166,9 @@ class VacationFoodSurvey(TimeStampedModel):
 
 class VacationFoodResponse(TimeStampedModel, UserScopedModel):
     """Student response to vacation survey (BR-MMS-027, 041)."""
-    survey = models.ForeignKey(VacationFoodSurvey, on_delete=models.CASCADE, related_name="responses")
+    survey = models.ForeignKey(
+        VacationFoodSurvey, on_delete=models.CASCADE, related_name="responses"
+    )
     requires_food = models.BooleanField(default=False)
     is_default = models.BooleanField(default=False)
     responded_at = models.DateTimeField(null=True, blank=True)

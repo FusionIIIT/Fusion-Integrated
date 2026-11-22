@@ -1,4 +1,4 @@
-import React, { lazy } from "react";
+import { lazy } from "react";
 import { Navigate, type RouteObject } from "react-router-dom";
 
 const MmsPlaceholderPage = lazy(() => import("./pages/MmsPlaceholderPage"));

@@ -5,8 +5,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
-from modules.mms.models import MessRegistration, MessBill
 from modules.mms.domain import state_machine as sm
+from modules.mms.models import MessBill, MessRegistration
 
 
 @dataclass(frozen=True)

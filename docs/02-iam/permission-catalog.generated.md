@@ -21,7 +21,7 @@ For the intended taxonomy of modules not yet built, see
 | `mms.window.manage` | Open and close mess registration windows | `mess_caretaker` |
 | `mms.registration.self` | Submit mess registration requests | `student` |
 | `mms.registration.review` | Review and approve/reject registration requests | `mess_caretaker` |
-| `mms.registration.view_oversight` | View registration and deregistration requests for oversight | `mess_warden` |
+| `mms.registration.view_oversight` | View registration/deregistration for oversight | `mess_warden` |
 | `mms.deregistration.self` | Submit mess deregistration requests | `student` |
 | `mms.deregistration.review` | Review and approve/reject deregistration requests | `mess_caretaker` |
 | `mms.menu.view` | View weekly mess menu | `mess_admin`, `mess_caretaker`, `mess_warden`, `student` |

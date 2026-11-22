@@ -141,7 +141,7 @@ PERMISSIONS = [
     ("mms.window.manage", "Open and close mess registration windows"),
     ("mms.registration.self", "Submit mess registration requests"),
     ("mms.registration.review", "Review and approve/reject registration requests"),
-    ("mms.registration.view_oversight", "View registration and deregistration requests for oversight"),
+    ("mms.registration.view_oversight", "View registration/deregistration for oversight"),
     # Deregistration
     ("mms.deregistration.self", "Submit mess deregistration requests"),
     ("mms.deregistration.review", "Review and approve/reject deregistration requests"),
