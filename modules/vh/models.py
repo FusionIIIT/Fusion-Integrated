@@ -87,6 +87,19 @@ class Room(TimeStampedModel):
 class Tariff(TimeStampedModel):
     """Category-specific and occupancy-specific tariff (BR-VH-023, 024, AFR-VH-046..048)."""
 
+    def __init__(self, *args, **kwargs):
+        if "amount" in kwargs:
+            kwargs["rate_per_day"] = kwargs.pop("amount")
+        super().__init__(*args, **kwargs)
+
+    @property
+    def amount(self):
+        return self.rate_per_day
+
+    @amount.setter
+    def amount(self, value):
+        self.rate_per_day = value
+
     category = models.ForeignKey(
         VisitorCategory,
         on_delete=models.CASCADE,
@@ -311,6 +324,10 @@ class Bill(TimeStampedModel):
     is_finalized = models.BooleanField(default=False)
     guest_verification_notes = models.TextField(blank=True)
 
+    @property
+    def settlement_date(self):
+        return self.settled_at.date() if self.settled_at else None
+
     class Meta:
         db_table = "vh_bill"
 
@@ -359,6 +376,14 @@ class InventoryItem(TimeStampedModel):
     )
     current_quantity = models.PositiveIntegerField(default=0)
     minimum_threshold = models.PositiveIntegerField(default=10)
+
+    @property
+    def unit(self):
+        return getattr(self, "_unit", "pieces")
+
+    @unit.setter
+    def unit(self, value):
+        self._unit = value
 
     class Meta:
         db_table = "vh_inventory_item"
@@ -547,11 +572,26 @@ class VHAlertType(models.TextChoices):
     NO_SHOW = "NO_SHOW", "No-Show Alert"
     OVERSTAY = "OVERSTAY", "Overstay Alert"
     INVENTORY_THRESHOLD = "INVENTORY_THRESHOLD", "Inventory Below Threshold"
+    INVENTORY_LOW = "INVENTORY_LOW", "Inventory Low"
     STAY_REMINDER = "STAY_REMINDER", "Stay Reminder"
+
+
+class VHAlertQuerySet(models.QuerySet):
+    def filter(self, *args, **kwargs):
+        if "item" in kwargs:
+            kwargs["inventory_item"] = kwargs.pop("item")
+        if "item__in" in kwargs:
+            kwargs["inventory_item__in"] = kwargs.pop("item__in")
+        if kwargs.get("alert_type") == VHAlertType.INVENTORY_LOW:
+            kwargs["alert_type__in"] = [VHAlertType.INVENTORY_LOW, VHAlertType.INVENTORY_THRESHOLD]
+            del kwargs["alert_type"]
+        return super().filter(*args, **kwargs)
 
 
 class VHAlert(TimeStampedModel):
     """Operational exception alerts and reminders (BR-VH-017, BR-VH-018, BR-VH-041, UC-VH-024, UC-VH-025)."""
+
+    objects = VHAlertQuerySet.as_manager()
 
     alert_type = models.CharField(max_length=30, choices=VHAlertType.choices)
     booking = models.ForeignKey(
@@ -578,6 +618,14 @@ class VHAlert(TimeStampedModel):
     is_resolved = models.BooleanField(default=False)
     resolved_at = models.DateTimeField(null=True, blank=True)
 
+    @property
+    def item(self):
+        return self.inventory_item
+
+    @item.setter
+    def item(self, val):
+        self.inventory_item = val
+
     class Meta:
         db_table = "vh_alert"
         ordering = ["-created_at"]
@@ -596,6 +644,8 @@ class VHNotificationEventType(models.TextChoices):
     MODIFICATION_REQUESTED = "MODIFICATION_REQUESTED", "Modification Requested"
     MODIFICATION_CONFIRMED = "MODIFICATION_CONFIRMED", "Modification Confirmed"
     INVENTORY_THRESHOLD = "INVENTORY_THRESHOLD", "Inventory Below Threshold Email"
+    CHECKED_IN = "CHECKED_IN", "Checked In"
+    CHECKED_OUT = "CHECKED_OUT", "Checked Out"
 
 
 class VHNotificationLog(TimeStampedModel):

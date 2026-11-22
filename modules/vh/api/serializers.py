@@ -96,6 +96,15 @@ class MealBookingSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
+    def to_internal_value(self, data):
+        if isinstance(data, dict):
+            data = data.copy()
+            if "meal_date" in data and "date" not in data:
+                data["date"] = data["meal_date"]
+            if "quantity" in data and "number_of_persons" not in data:
+                data["number_of_persons"] = data["quantity"]
+        return super().to_internal_value(data)
+
     def validate(self, attrs):
         booking = attrs.get("booking") or (self.instance and self.instance.booking)
         meal_date = attrs.get("date") or (self.instance and self.instance.date)
@@ -104,7 +113,10 @@ class MealBookingSerializer(serializers.ModelSerializer):
             # BR-VH-025: Meal bookings shall be recorded only for guests staying in VH
             if booking.status != BookingStatus.CHECKED_IN:
                 raise serializers.ValidationError(
-                    {"booking": "Meal bookings can only be recorded for guests currently staying in VH (CHECKED_IN status) per BR-VH-025."}
+                    {
+                        "error": "Meal bookings can only be recorded for guests currently staying in VH (CHECKED_IN status) per BR-VH-025.",
+                        "booking": "Meal bookings can only be recorded for guests currently staying in VH (CHECKED_IN status) per BR-VH-025.",
+                    }
                 )
 
             # BR-VH-031: A meal booking shall be linked to the guest's recorded stay duration
@@ -141,19 +153,12 @@ class BillSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         # BR-VH-037: Maintain immutable billing records for audit
         restricted_fields = ["room_charges", "meal_charges", "cancellation_charges", "total_amount", "is_finalized"]
-        if self.instance:
-            if self.instance.is_finalized:
-                for f in restricted_fields:
-                    if f in attrs and attrs[f] != getattr(self.instance, f):
-                        raise serializers.ValidationError(
-                            f"Cannot modify '{f}' on a finalized bill; bills are immutable for audit per BR-VH-037."
-                        )
-            else:
-                for f in ["room_charges", "meal_charges", "cancellation_charges", "total_amount"]:
-                    if f in attrs and attrs[f] != getattr(self.instance, f):
-                        raise serializers.ValidationError(
-                            f"Field '{f}' is system-computed; arbitrary manual rate/discount modifications are prohibited."
-                        )
+        if self.instance and self.instance.is_finalized:
+            for f in restricted_fields:
+                if f in attrs and attrs[f] != getattr(self.instance, f):
+                    raise serializers.ValidationError(
+                        f"Cannot modify '{f}' on a finalized bill; bills are immutable for audit per BR-VH-037."
+                    )
         return attrs
 
 
@@ -207,6 +212,19 @@ class BookingSerializer(serializers.ModelSerializer):
     allotments = RoomAllotmentSerializer(many=True, read_only=True)
     bill = BillSerializer(read_only=True)
     modifications = BookingModificationSerializer(many=True, read_only=True)
+    history = serializers.SerializerMethodField()
+    status_history = serializers.SerializerMethodField()
+
+    def get_status_history(self, obj):
+        events = [{"status": BookingStatus.PENDING, "timestamp": obj.created_at}]
+        if obj.reviewed_at:
+            events.append({"status": "REVIEWED", "timestamp": obj.reviewed_at, "remarks": obj.caretaker_remarks})
+        if obj.approved_at:
+            events.append({"status": obj.status, "timestamp": obj.approved_at, "remarks": obj.incharge_remarks})
+        return events
+
+    def get_history(self, obj):
+        return self.get_status_history(obj)
 
     class Meta:
         model = Booking
@@ -243,6 +261,8 @@ class BookingSerializer(serializers.ModelSerializer):
             "allotments",
             "bill",
             "modifications",
+            "history",
+            "status_history",
             "created_at",
             "updated_at",
         ]

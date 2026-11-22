@@ -3,6 +3,7 @@
 Implements UC-VH-023, UC-VH-024, UC-VH-025, CFR-VH-014, BR-VH-017, BR-VH-018, BR-VH-041, BR-VH-043.
 """
 import logging
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
@@ -11,13 +12,12 @@ from modules.vh.models import (
     Booking,
     BookingStatus,
     InventoryItem,
-    RoomAllotment,
     VHAlert,
     VHAlertType,
-    VHNotificationEventType,
-    VHNotificationLog,
     VHMSUserRole,
     VHMSUserRoleType,
+    VHNotificationEventType,
+    VHNotificationLog,
 )
 
 logger = logging.getLogger("fusion.vh.notifications")
@@ -76,7 +76,6 @@ def check_stay_exception_alerts() -> dict[str, int]:
     Returns summary counts of created alerts: {'no_shows': N, 'overstays': M}.
     """
     today = timezone.localdate()
-    now = timezone.now()
     active_caretaker = VHMSUserRole.get_active_caretaker()
     caretaker_user_id = active_caretaker.user_id if active_caretaker else None
 
@@ -84,22 +83,24 @@ def check_stay_exception_alerts() -> dict[str, int]:
     overstays_count = 0
 
     # 1. No-Show: Approved & Allotted bookings where check_in_date is today or in past, but check_in_time is null
-    pending_checkins = RoomAllotment.objects.filter(
-        booking__status=BookingStatus.ROOM_ALLOTTED,
-        booking__check_in_date__lte=today,
-        check_in_time__isnull=True,
-        is_no_show=False,
-    ).select_related("booking", "room")
+    no_show_bookings = (
+        Booking.objects.filter(
+            status=BookingStatus.ROOM_ALLOTTED,
+            check_in_date__lte=today,
+        )
+        .exclude(alerts__alert_type=VHAlertType.NO_SHOW)
+        .exclude(allotments__check_in_time__isnull=False)
+        .distinct()
+    )
 
-    for allotment in pending_checkins:
-        allotment.is_no_show = True
-        allotment.save(update_fields=["is_no_show"])
+    for b in no_show_bookings:
+        b.allotments.filter(check_in_time__isnull=True).update(is_no_show=True)
         VHAlert.objects.create(
             alert_type=VHAlertType.NO_SHOW,
-            booking=allotment.booking,
+            booking=b,
             message=(
-                f"Guest {allotment.booking.visitor_name} has not checked in for booking "
-                f"{allotment.booking.booking_reference} (expected: {allotment.booking.check_in_date})."
+                f"Guest {b.visitor_name} has not checked in for booking "
+                f"{b.booking_reference} (expected: {b.check_in_date})."
             ),
             recipient_role=VHMSUserRoleType.CARETAKER,
             recipient_user_id=caretaker_user_id,
@@ -107,29 +108,37 @@ def check_stay_exception_alerts() -> dict[str, int]:
         no_shows_count += 1
 
     # 2. Overstay: Bookings with CHECKED_IN status where check_out_date < today and check_out_time is null
-    active_stays = RoomAllotment.objects.filter(
-        booking__status=BookingStatus.CHECKED_IN,
-        booking__check_out_date__lt=today,
-        check_out_time__isnull=True,
-        is_overstay=False,
-    ).select_related("booking", "room")
+    overstay_candidates = (
+        Booking.objects.filter(
+            status=BookingStatus.CHECKED_IN,
+            check_out_date__lt=today,
+        )
+        .exclude(alerts__alert_type=VHAlertType.OVERSTAY)
+        .distinct()
+    )
 
-    for allotment in active_stays:
-        allotment.is_overstay = True
-        allotment.save(update_fields=["is_overstay"])
+    for b in overstay_candidates:
+        if b.allotments.exists() and not b.allotments.filter(check_out_time__isnull=True).exists():
+            continue
+        b.allotments.filter(check_out_time__isnull=True).update(is_overstay=True)
         VHAlert.objects.create(
             alert_type=VHAlertType.OVERSTAY,
-            booking=allotment.booking,
+            booking=b,
             message=(
-                f"Guest {allotment.booking.visitor_name} (Booking {allotment.booking.booking_reference}) "
-                f"has exceeded the approved duration (scheduled checkout: {allotment.booking.check_out_date})."
+                f"Guest {b.visitor_name} (Booking {b.booking_reference}) "
+                f"has exceeded the approved duration (scheduled checkout: {b.check_out_date})."
             ),
             recipient_role=VHMSUserRoleType.CARETAKER,
             recipient_user_id=caretaker_user_id,
         )
         overstays_count += 1
 
-    return {"no_shows": no_shows_count, "overstays": overstays_count}
+    return {
+        "no_shows": no_shows_count,
+        "overstays": overstays_count,
+        "no_shows_detected": no_shows_count,
+        "overstays_detected": overstays_count,
+    }
 
 
 def check_inventory_threshold_alert(item: InventoryItem) -> VHAlert | None:
