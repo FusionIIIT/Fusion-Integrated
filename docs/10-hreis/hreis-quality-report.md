@@ -36,7 +36,7 @@ This report documents the verification, test coverage, static analysis, performa
 | **Route Guard & N+1 Verification** | `test_client_route_guards.py` & `test_query_budgets.py` | Zero regressions | All 6 office pages guarded; query budget kept | **PASS** |
 | **Spec Test Verification** | `pytest modules/hreis/tests/spec/` | 266/266 passed (0 skipped) | 266 passed in 8.6s | **PASS** |
 | **Test Coverage (Module)** | `pytest --cov=modules/hreis --cov-branch` | > 90% | 93.4% branch coverage | **PASS** |
-| **Test Coverage (Domain)** | `pytest --cov=modules/hreis/domain` | > 95% | 96.8% coverage | **PASS** |
+| **Test Coverage (Domain)** | `pytest --cov=modules/hreis/domain` | > 95% | 98.1% coverage | **PASS** |
 
 ---
 
