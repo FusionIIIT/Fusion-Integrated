@@ -34,6 +34,224 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "leave": {
+      "grants": {
+        "dean": [
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.substitute.respond"
+        ],
+        "deputy_registrar_establishment": [
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.substitute.respond"
+        ],
+        "director": [
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.substitute.respond"
+        ],
+        "employee": [
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view_self"
+        ],
+        "faculty": [
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view_self"
+        ],
+        "leave_administrator": [
+          "leave.balance.update",
+          "leave.record.maintain",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.type.manage"
+        ],
+        "registrar": [
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.substitute.respond"
+        ],
+        "staff": [
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view_self"
+        ],
+        "substitute": [
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view_self",
+          "leave.substitute.respond"
+        ],
+        "unit_head": [
+          "leave.request.approve",
+          "leave.request.create",
+          "leave.request.delete",
+          "leave.request.view",
+          "leave.request.view_self",
+          "leave.substitute.respond"
+        ]
+      },
+      "module_grants": [
+        "dean",
+        "deputy_registrar_establishment",
+        "director",
+        "employee",
+        "faculty",
+        "leave_administrator",
+        "registrar",
+        "staff",
+        "substitute",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "CalendarCheck",
+        "items": [
+          {
+            "code": "leave.apply",
+            "icon": "CalendarPlus",
+            "label": "Apply for Leave",
+            "required_permission": "leave.request.create",
+            "sort_order": 5,
+            "to": "/leave/apply"
+          },
+          {
+            "code": "leave.mine",
+            "icon": "ClipboardList",
+            "label": "My Requests",
+            "required_permission": "leave.request.view_self",
+            "sort_order": 10,
+            "to": "/leave/requests"
+          },
+          {
+            "code": "leave.balances",
+            "icon": "Scale",
+            "label": "My Balances",
+            "required_permission": "leave.request.view_self",
+            "sort_order": 15,
+            "to": "/leave/balances"
+          },
+          {
+            "code": "leave.substitutions",
+            "icon": "UserRoundCheck",
+            "label": "Substitute Requests",
+            "required_permission": "leave.substitute.respond",
+            "sort_order": 20,
+            "to": "/leave/substitutions"
+          },
+          {
+            "code": "leave.approvals",
+            "icon": "Gavel",
+            "label": "Approvals",
+            "required_permission": "leave.request.approve",
+            "sort_order": 40,
+            "to": "/leave/approvals"
+          },
+          {
+            "code": "leave.exceptions",
+            "icon": "TriangleAlert",
+            "label": "Leave Exceptions",
+            "required_permission": "leave.record.maintain",
+            "sort_order": 50,
+            "to": "/leave/exceptions"
+          },
+          {
+            "code": "leave.admin",
+            "icon": "Settings2",
+            "label": "Leave Administration",
+            "required_permission": "leave.record.maintain",
+            "sort_order": 60,
+            "to": "/leave/admin"
+          },
+          {
+            "code": "leave.accounts",
+            "icon": "BookOpen",
+            "label": "Leave Accounts",
+            "required_permission": "leave.balance.update",
+            "sort_order": 70,
+            "to": "/leave/accounts"
+          },
+          {
+            "code": "leave.calendar",
+            "icon": "CalendarDays",
+            "label": "Holiday Calendar",
+            "required_permission": "leave.record.maintain",
+            "sort_order": 80,
+            "to": "/leave/admin/calendar"
+          },
+          {
+            "code": "leave.year_end",
+            "icon": "CalendarSync",
+            "label": "Year-End Close",
+            "required_permission": "leave.record.maintain",
+            "sort_order": 90,
+            "to": "/leave/admin/year-end"
+          }
+        ],
+        "label": "Employee Leave Management",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "leave.request.view_self",
+          "label": "See one's own leave requests"
+        },
+        {
+          "code": "leave.request.create",
+          "label": "Apply for leave, and withdraw one's own request"
+        },
+        {
+          "code": "leave.request.delete",
+          "label": "Delete a draft leave request"
+        },
+        {
+          "code": "leave.request.view",
+          "label": "See leave requests within scope"
+        },
+        {
+          "code": "leave.request.approve",
+          "label": "Decide a leave request one has been asked to decide"
+        },
+        {
+          "code": "leave.balance.update",
+          "label": "Adjust a leave account"
+        },
+        {
+          "code": "leave.type.manage",
+          "label": "Manage leave types and entitlements"
+        },
+        {
+          "code": "leave.substitute.respond",
+          "label": "Answer a substitute nomination"
+        },
+        {
+          "code": "leave.record.maintain",
+          "label": "Maintain leave records, hierarchy, calendar and thresholds"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "leave.sla.escalate",
+        "leave.sla.remind",
+        "leave.year_end.process"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

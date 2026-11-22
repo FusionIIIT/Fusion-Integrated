@@ -13,6 +13,20 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.request.view_self` | See one's own leave requests | `dean`, `deputy_registrar_establishment`, `director`, `employee`, `faculty`, `leave_administrator`, `registrar`, `staff`, `substitute`, `unit_head` |
+| `leave.request.create` | Apply for leave, and withdraw one's own request | `dean`, `deputy_registrar_establishment`, `director`, `employee`, `faculty`, `registrar`, `staff`, `substitute`, `unit_head` |
+| `leave.request.delete` | Delete a draft leave request | `dean`, `deputy_registrar_establishment`, `director`, `employee`, `faculty`, `registrar`, `staff`, `substitute`, `unit_head` |
+| `leave.request.view` | See leave requests within scope | `dean`, `deputy_registrar_establishment`, `director`, `leave_administrator`, `registrar`, `unit_head` |
+| `leave.request.approve` | Decide a leave request one has been asked to decide | `dean`, `deputy_registrar_establishment`, `director`, `registrar`, `unit_head` |
+| `leave.balance.update` | Adjust a leave account | `leave_administrator` |
+| `leave.type.manage` | Manage leave types and entitlements | `leave_administrator` |
+| `leave.substitute.respond` | Answer a substitute nomination | `dean`, `deputy_registrar_establishment`, `director`, `registrar`, `substitute`, `unit_head` |
+| `leave.record.maintain` | Maintain leave records, hierarchy, calendar and thresholds | `leave_administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

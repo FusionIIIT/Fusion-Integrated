@@ -1,0 +1,1 @@
+"""Framework-free rules for the leave module. Imports no Django, no DRF, no Celery."""
