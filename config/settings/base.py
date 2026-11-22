@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.badms",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -135,6 +136,30 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 #: How long a cached directory row may be trusted before it is refetched.
 DIRECTORY_MAX_AGE_SECONDS = env_int("DIRECTORY_MAX_AGE_SECONDS", 6 * 60 * 60)
+
+# BADMS storage is disabled until a private S3 bucket and KMS key are supplied.
+BADMS_S3_BUCKET = env("BADMS_S3_BUCKET", "")
+BADMS_KMS_KEY_ID = env("BADMS_KMS_KEY_ID", "")
+BADMS_AWS_REGION = env("BADMS_AWS_REGION", env("AWS_REGION", ""))
+BADMS_ATTACHMENT_MAX_BYTES = env_int("BADMS_ATTACHMENT_MAX_BYTES", 50 * 1024 * 1024)
+BADMS_USER_QUOTA_BYTES = env_int("BADMS_USER_QUOTA_BYTES", 10 * 1024 * 1024 * 1024)
+BADMS_STORAGE_THRESHOLD_PERCENT = env_int("BADMS_STORAGE_THRESHOLD_PERCENT", 80)
+BADMS_AVAILABLE_CAPACITY_BYTES = env_int("BADMS_AVAILABLE_CAPACITY_BYTES")
+BADMS_DATASETS = {"fusion_integrated": "default"}
+BADMS_SYSADMIN_EMAILS = env_list("BADMS_SYSADMIN_EMAILS")
+BADMS_IT_SECURITY_EMAILS = env_list("BADMS_IT_SECURITY_EMAILS")
+BADMS_IT_DIRECTOR_EMAILS = env_list("BADMS_IT_DIRECTOR_EMAILS")
+
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend",
+)
+EMAIL_HOST = env("EMAIL_HOST", "")
+EMAIL_PORT = env_int("EMAIL_PORT", 587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
+EMAIL_TIMEOUT = env_int("EMAIL_TIMEOUT", 10)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "badms@localhost")
 
 # The IAM. This service is a client of it and caches nothing it cannot rebuild.
 IAM_BASE_URL = env("IAM_BASE_URL", "http://127.0.0.1:8001")
