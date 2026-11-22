@@ -9,3 +9,8 @@ FEEDBACK_TRANSITIONS = {
     ("reviewed", "close"): "closed",
     ("reviewed", "resolve"): "resolved",
 }
+
+OFFICIAL_TRANSITIONS = {
+    ("pending", "approve"): "approved",
+    ("pending", "reject"): "rejected",
+}

@@ -130,3 +130,77 @@ class Notice(models.Model):
 
     def __str__(self):
         return f"Department notice {self.pk}"
+
+
+class DepartmentDetails(models.Model):
+    department = models.CharField(max_length=200, unique=True)
+    official_name = models.CharField(max_length=200, blank=True)
+    core_policies = models.TextField(blank=True)
+    general_information = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.department
+
+
+class DepartmentProposal(models.Model):
+    class Field(models.TextChoices):
+        NAME = "official_name", "Official name"
+        POLICIES = "core_policies", "Core policies"
+
+    department = models.ForeignKey(DepartmentDetails, on_delete=models.PROTECT)
+    field = models.CharField(max_length=20, choices=Field)
+    value = models.TextField()
+    status = models.CharField(max_length=10, default="pending")
+    proposed_by_id = models.PositiveIntegerField()
+    decided_by_id = models.PositiveIntegerField(null=True)
+    decided_at = models.DateTimeField(null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["department", "field"],
+                                    condition=models.Q(status="pending"),
+                                    name="dept_one_pending_field"),
+        ]
+
+    def __str__(self):
+        return f"Department proposal {self.pk}"
+
+
+class LabResource(models.Model):
+    department = models.CharField(max_length=200)
+    name = models.CharField(max_length=160)
+    details = models.TextField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["department", "name"], name="dept_unique_lab_name"),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class TimetableSlot(models.Model):
+    department = models.CharField(max_length=200)
+    term = models.CharField(max_length=40)
+    day = models.PositiveSmallIntegerField()
+    starts_at = models.TimeField()
+    ends_at = models.TimeField()
+    programme = models.CharField(max_length=100)
+    batch_year = models.PositiveSmallIntegerField()
+    room = models.CharField(max_length=100)
+    instructor_id = models.PositiveIntegerField()
+    title = models.CharField(max_length=160)
+    kind = models.CharField(max_length=8, choices=[("class", "Class"), ("lab", "Lab")])
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(condition=models.Q(day__lte=6), name="dept_timetable_weekday"),
+            models.CheckConstraint(condition=models.Q(ends_at__gt=models.F("starts_at")),
+                                   name="dept_timetable_positive_duration"),
+        ]
+        indexes = [models.Index(fields=["department", "term", "day"],
+                                name="dept_timetable_slots_idx")]
+
+    def __str__(self):
+        return self.title

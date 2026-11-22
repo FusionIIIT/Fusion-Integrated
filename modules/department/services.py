@@ -13,13 +13,13 @@ from modules.department.models import (
     StockMovement,
     StockRequest,
 )
-from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS
+from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS, STUDENT_ROLES, acting_role
 from modules.department.selectors import department_for, live_identity
 
 
 def _department(actor, permission, roles):
     if (not actor.has_module("department") or not actor.has_permission(permission)
-            or (actor.active_role or actor.kind) not in roles):
+            or acting_role(actor) not in roles):
         raise PermissionDeniedError()
     department = department_for(actor, live_identity(actor))
     if not department:
@@ -130,7 +130,7 @@ def advance_stock_request(*, actor, request_id, action):
 
 @transaction.atomic
 def submit_feedback(*, actor, content):
-    department = _department(actor, p.SUBMIT_FEEDBACK, {"student", "faculty"})
+    department = _department(actor, p.SUBMIT_FEEDBACK, {*STUDENT_ROLES, "faculty"})
     feedback = Feedback.objects.create(
         department=department, user_id=actor.user_id, content=content,
     )

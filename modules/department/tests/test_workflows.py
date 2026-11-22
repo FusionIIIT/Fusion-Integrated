@@ -4,7 +4,14 @@ from rest_framework.test import APIClient
 
 from conftest import make_session
 from fusion_auth.client import UserRef
-from modules.department.models import Announcement, Feedback, Notice, StockItem, StockMovement
+from modules.department.models import (
+    Announcement,
+    Feedback,
+    Notice,
+    StockItem,
+    StockMovement,
+    TimetableSlot,
+)
 from modules.department.registry import ROLE_GRANTS
 
 pytestmark = pytest.mark.django_db
@@ -13,8 +20,9 @@ BASE = "/api/v1/department"
 
 @pytest.fixture
 def role_client(stub_iam):
-    def as_role(role, user_id=10, department="CSE", kind="faculty"):
-        identity = UserRef(user_id, f"u{user_id}", "Test user", kind, department=department)
+    def as_role(role, user_id=10, department="CSE", kind="faculty", **attributes):
+        identity = UserRef(user_id, f"u{user_id}", "Test user", kind,
+                           department=department, **attributes)
         stub_iam(session=make_session(user_id=user_id, roles=[role], active_role=role, kind=kind,
                                       modules=["department"], permissions=ROLE_GRANTS[role]),
                  users={user_id: identity})
@@ -99,3 +107,125 @@ def test_feedback_is_reviewed_before_hod_disposition(role_client):
     assert row.reviewed_by_id == 22
     assert row.disposed_by_id == 21
     assert Notice.objects.filter(user_id=20).exists()
+
+
+def test_timetable_batches_are_atomic_and_student_reads_match_cohort(role_client):
+    """UC-DEPT-009/018; BR-DEPT-010; AFR-DEPT-029-031/036/037."""
+    admin = role_client("deptadmin_cse", kind="staff")
+    slot = {"title": "Programming", "kind": "class", "term": "2026 autumn", "day": 0,
+            "starts_at": "10:00", "ends_at": "11:00", "room": "R1", "instructor_id": 11,
+            "programme": "BTech", "batch_year": 2024}
+    overlapping = {**slot, "title": "Networks", "starts_at": "10:30", "ends_at": "11:30"}
+    assert post(admin, "timetable", {"slots": [slot, overlapping]}).status_code == 409
+    assert not TimetableSlot.objects.exists()
+
+    next_slot = {**slot, "title": "Networks", "starts_at": "11:00", "ends_at": "12:00",
+                 "batch_year": 2025}
+    response = post(admin, "timetable", {"slots": [slot, next_slot]})
+    assert response.status_code == 201
+    first_id = response.json()[0]["id"]
+    edit = admin.put(f"{BASE}/timetable/{first_id}", {**slot, "title": "Data structures"}, format="json")
+    assert edit.status_code == 200
+    student = role_client("student", user_id=12, kind="student", programme="BTech", batch_year=2024)
+    assert student.get(f"{BASE}/academic-context").json() == {"programme": "BTech", "batch_year": 2024}
+    assert [row["title"] for row in student.get(f"{BASE}/timetable").json()["results"]] == ["Data structures"]
+
+
+def test_faculty_lab_resources_use_department_scope(role_client):
+    """UC-DEPT-011/017; BR-DEPT-012; AFR-DEPT-034/035."""
+    admin = role_client("deptadmin_cse", kind="staff")
+    assert post(admin, "labs", {"name": "Networks", "details": "Ten workstations"}).status_code == 200
+    assert post(admin, "labs", {"name": "Networks", "details": "Twelve workstations"}).status_code == 200
+    faculty = role_client("faculty")
+    assert [row["details"] for row in faculty.get(f"{BASE}/labs").json()["results"]] == ["Twelve workstations"]
+    other = role_client("faculty", department="Design")
+    assert other.get(f"{BASE}/labs").json()["results"] == []
+
+
+def test_department_general_save_and_official_decision(role_client):
+    """UC-DEPT-010/012; BR-DEPT-011/013; BW-DEPT-05/06; AFR-DEPT-038-040."""
+    admin = role_client("deptadmin_cse", kind="staff")
+    assert post(admin, "details", {"general_information": "Office hours 9 to 5"}).status_code == 200
+    accepted = post(admin, "proposals", {"field": "official_name", "value": "Computer Science"})
+    rejected = post(admin, "proposals", {"field": "core_policies", "value": "Proposed policy"})
+    assert accepted.status_code == rejected.status_code == 201
+    assert admin.get(f"{BASE}/details").json()["official_name"] == ""
+    hod = role_client("HOD (CSE)", user_id=11)
+    path = f"proposals/{accepted.json()['id']}/action"
+    assert post(hod, path, {"action": "approve"}).status_code == 200
+    path = f"proposals/{rejected.json()['id']}/action"
+    assert post(hod, path, {"action": "reject"}).status_code == 200
+    assert hod.get(f"{BASE}/details").json() == {
+        "department": "CSE", "official_name": "Computer Science", "core_policies": "",
+        "general_information": "Office hours 9 to 5",
+    }
+
+
+def test_stock_shortage_after_approval_preserves_existing_movements(role_client):
+    """BR-DEPT-007/015/016 and the approved concurrent-shortage interpretation."""
+    admin = role_client("deptadmin_cse", kind="staff")
+    item = post(admin, "inventory", {"name": "Scope probe", "quantity": 4}).json()["id"]
+    assert post(admin, "inventory", {"name": "Scope probe", "quantity": 1}).json()["quantity"] == 5
+    faculty = role_client("faculty")
+    assert post(faculty, "stock-requests", {"item_id": item, "quantity": 6}).status_code == 409
+    ids = [post(faculty, "stock-requests", {"item_id": item, "quantity": 4}).json()["id"]
+           for _ in range(2)]
+    admin = role_client("deptadmin_cse", kind="staff")
+    assert post(admin, f"stock-requests/{ids[0]}/action", {"action": "issue"}).status_code == 409
+    hod = role_client("HOD (CSE)")
+    assert len(hod.get(f"{BASE}/stock-requests").json()["results"]) == 2
+    for request_id in ids:
+        assert post(hod, f"stock-requests/{request_id}/action", {"action": "approve"}).status_code == 200
+    admin = role_client("deptadmin_cse", kind="staff")
+    assert len(admin.get(f"{BASE}/stock-requests").json()["results"]) == 2
+    assert len(admin.get(f"{BASE}/notices").json()["results"]) == 2
+    assert post(admin, f"stock-requests/{ids[0]}/action", {"action": "issue"}).status_code == 200
+    assert post(admin, f"stock-requests/{ids[1]}/action", {"action": "issue"}).status_code == 409
+    assert StockItem.objects.get(pk=item).quantity == 1
+    assert StockMovement.objects.filter(delta__lt=0).count() == 1
+    assert admin.get(f"{BASE}/stock-requests").json()["results"][0]["id"] == ids[1]
+
+
+def test_announcement_edit_and_delete_are_department_hod_actions(role_client):
+    """UC-DEPT-003; BR-DEPT-003/004; AFR-DEPT-004/006."""
+    author = role_client("faculty")
+    payload = {"content": "Notice", "target_roles": [],
+               "target_programmes": [], "target_batch_years": []}
+    pk = post(author, "announcements", payload).json()["id"]
+    url = f"announcements/{pk}/action"
+    other_hod = role_client("HOD (Design)", department="Design")
+    assert post(other_hod, url, {"action": "hide"}).status_code == 404
+    hod = role_client("HOD (CSE)")
+    assert post(hod, url, {"action": "edit"}).status_code == 400
+    assert post(hod, url, {"action": "edit", "announcement": {**payload, "content": "Revised"}}).status_code == 204
+    assert Announcement.objects.get(pk=pk).content == "Revised"
+    assert post(hod, url, {"action": "delete"}).status_code == 204
+    assert not Announcement.objects.filter(pk=pk).exists()
+    assert not Notice.objects.exists()
+
+
+def test_simple_feedback_records_initial_review_before_closing(role_client):
+    """UC-DEPT-008; BW-DEPT-03; AFR-DEPT-019-022/045."""
+    student = role_client("student", kind="student", user_id=10)
+    pk = post(student, "feedback", {"content": "Please replace the broken sign."}).json()["id"]
+    admin = role_client("deptadmin_cse", kind="staff", user_id=11)
+    assert len(admin.get(f"{BASE}/feedback").json()["results"]) == 1
+    path = f"feedback/{pk}/action"
+    assert post(admin, path, {"action": "review", "close_simple": True}).status_code == 409
+    review = post(admin, path, {"action": "review", "category": "Signage", "close_simple": True})
+    assert review.json()["status"] == "closed"
+    row = Feedback.objects.get(pk=pk)
+    assert row.reviewed_at <= row.disposed_at
+    assert row.reviewed_by_id == row.disposed_by_id == 11
+    student = role_client("student", kind="student", user_id=10)
+    messages = student.get(f"{BASE}/notices").json()["results"]
+    assert [message["message"] for message in messages] == [f"Feedback #{pk} was closed."]
+
+
+def test_department_declines_write_when_faculty_department_is_unknown(role_client):
+    faculty = role_client("faculty", department="")
+    assert faculty.get(f"{BASE}/inventory").json()["results"] == []
+    assert faculty.get(f"{BASE}/stock-requests").json()["results"] == []
+    assert faculty.get(f"{BASE}/notices").json()["results"] == []
+    assert post(faculty, "feedback", {"content": "Unknown department"}).status_code == 403
+    assert not Feedback.objects.exists()

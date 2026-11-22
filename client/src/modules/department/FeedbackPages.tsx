@@ -1,10 +1,10 @@
 import { Button, Checkbox, Container, Group, Paper, Stack, Text, Textarea, TextInput } from "@mantine/core";
 import { useState } from "react";
 
-import { useAuth } from "../../auth/AuthProvider";
 import { ErrorState } from "../../ui/components/ErrorState";
 import { PageHeader } from "../../ui/components/PageHeader";
 import { useDepartmentAction, useDepartmentFeed } from "./api";
+import { useDepartmentCan } from "./DepartmentLayout";
 import { FeedState } from "./FeedState";
 
 interface Feedback { id: number; content: string; category: string; status: string }
@@ -55,7 +55,7 @@ function InitialReview({ id }: { id: number }) {
 }
 
 export function FeedbackInboxPage() {
-  const { can } = useAuth();
+  const can = useDepartmentCan();
   const feed = useDepartmentFeed<Feedback>("feedback");
   const action = useDepartmentAction();
   const dispose = (id: number, decision: string) => action.mutate({

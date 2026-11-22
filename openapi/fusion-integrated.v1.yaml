@@ -46,6 +46,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ok'
           description: ''
+  /api/v1/department/academic-context:
+    get:
+      operationId: v1_department_academic_context_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicContext'
+          description: ''
+  /api/v1/department/access:
+    get:
+      operationId: v1_department_access_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentAccess'
+          description: ''
   /api/v1/department/announcements:
     get:
       operationId: v1_department_announcements_list
@@ -152,6 +180,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedManagedAnnouncementList'
+          description: ''
+  /api/v1/department/details:
+    get:
+      operationId: v1_department_details_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDetails'
+          description: ''
+    post:
+      operationId: v1_department_details_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeneralDetails'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GeneralDetails'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GeneralDetails'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentDetails'
           description: ''
   /api/v1/department/feedback:
     get:
@@ -289,6 +356,58 @@ paths:
               schema:
                 $ref: '#/components/schemas/Inventory'
           description: ''
+  /api/v1/department/labs:
+    get:
+      operationId: v1_department_labs_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLabResourceList'
+          description: ''
+    post:
+      operationId: v1_department_labs_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabResource'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LabResource'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LabResource'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabResource'
+          description: ''
   /api/v1/department/notices:
     get:
       operationId: v1_department_notices_list
@@ -315,6 +434,90 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedNoticeList'
+          description: ''
+  /api/v1/department/proposals:
+    get:
+      operationId: v1_department_proposals_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDepartmentProposalList'
+          description: ''
+    post:
+      operationId: v1_department_proposals_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentProposalWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DepartmentProposalWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepartmentProposalWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentProposal'
+          description: ''
+  /api/v1/department/proposals/{id}/action:
+    post:
+      operationId: v1_department_proposals_action_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProposalDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProposalDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentProposal'
           description: ''
   /api/v1/department/stock-requests:
     get:
@@ -399,6 +602,103 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockRequest'
+          description: ''
+  /api/v1/department/timetable:
+    get:
+      operationId: v1_department_timetable_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDepartmentTimetableList'
+          description: ''
+    post:
+      operationId: v1_department_timetable_create
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimetableUpload'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TimetableUpload'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TimetableUpload'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDepartmentTimetableList'
+          description: ''
+  /api/v1/department/timetable/{id}:
+    put:
+      operationId: v1_department_timetable_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentTimetable'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DepartmentTimetable'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepartmentTimetable'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentTimetable'
           description: ''
   /api/v1/directory/users:
     get:
@@ -2030,6 +2330,17 @@ paths:
           description: ''
 components:
   schemas:
+    AcademicContext:
+      type: object
+      properties:
+        programme:
+          type: string
+        batch_year:
+          type: integer
+          nullable: true
+      required:
+      - batch_year
+      - programme
     AcademicDirectory:
       type: object
       properties:
@@ -2688,6 +2999,15 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DepartmentAccess:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+      required:
+      - permissions
     DepartmentAnnouncement:
       type: object
       properties:
@@ -2733,6 +3053,111 @@ components:
       - target_batch_years
       - target_programmes
       - target_roles
+    DepartmentDetails:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 200
+        official_name:
+          type: string
+          maxLength: 200
+        core_policies:
+          type: string
+        general_information:
+          type: string
+      required:
+      - department
+    DepartmentProposal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        field:
+          $ref: '#/components/schemas/FieldEnum'
+        value:
+          type: string
+        status:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - field
+      - id
+      - status
+      - value
+    DepartmentProposalWrite:
+      type: object
+      properties:
+        field:
+          $ref: '#/components/schemas/FieldEnum'
+        value:
+          type: string
+          maxLength: 8000
+      required:
+      - field
+      - value
+    DepartmentTimetable:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        term:
+          type: string
+          maxLength: 40
+        day:
+          type: integer
+          maximum: 6
+          minimum: 0
+        starts_at:
+          type: string
+          format: time
+        ends_at:
+          type: string
+          format: time
+        programme:
+          type: string
+          maxLength: 100
+        batch_year:
+          type: integer
+          maximum: 2200
+          minimum: 1900
+        room:
+          type: string
+          maxLength: 100
+        instructor_id:
+          type: integer
+          minimum: 1
+        title:
+          type: string
+          maxLength: 160
+        kind:
+          $ref: '#/components/schemas/DepartmentTimetableKindEnum'
+      required:
+      - batch_year
+      - day
+      - ends_at
+      - id
+      - instructor_id
+      - kind
+      - programme
+      - room
+      - starts_at
+      - term
+      - title
+    DepartmentTimetableKindEnum:
+      enum:
+      - class
+      - lab
+      type: string
+      description: |-
+        * `class` - Class
+        * `lab` - Lab
     Detail:
       type: object
       properties:
@@ -2915,6 +3340,22 @@ components:
           maxLength: 8000
       required:
       - content
+    FieldEnum:
+      enum:
+      - official_name
+      - core_policies
+      type: string
+      description: |-
+        * `official_name` - Official name
+        * `core_policies` - Core policies
+    GeneralDetails:
+      type: object
+      properties:
+        general_information:
+          type: string
+          maxLength: 8000
+      required:
+      - general_information
     IncidentRecorded:
       type: object
       properties:
@@ -3147,6 +3588,22 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LabResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 160
+        details:
+          type: string
+          maxLength: 8000
+      required:
+      - details
+      - id
+      - name
     LiftSanction:
       type: object
       properties:
@@ -3521,6 +3978,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DepartmentAnnouncement'
+    PaginatedDepartmentProposalList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepartmentProposal'
+    PaginatedDepartmentTimetableList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepartmentTimetable'
     PaginatedFeedbackList:
       type: object
       required:
@@ -3597,6 +4092,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLabResourceList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LabResource'
     PaginatedManagedAnnouncementList:
       type: object
       required:
@@ -3874,6 +4388,21 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    ProposalDecision:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ProposalDecisionActionEnum'
+      required:
+      - action
+    ProposalDecisionActionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
     Recommendation:
       type: object
       description: |-
@@ -4469,6 +4998,15 @@ components:
         * `deptadmin_me` - deptadmin_me
         * `deptadmin_ns` - deptadmin_ns
         * `deptadmin_sm` - deptadmin_sm
+    TimetableUpload:
+      type: object
+      properties:
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/DepartmentTimetable'
+      required:
+      - slots
     TopicEnum:
       enum:
       - drive

@@ -4,7 +4,7 @@ Module code `department`. Documentation `docs/09-department/`. Environment `modu
 
 ## Traceability
 
-The enforcement points below describe the planned module. The first increment implements the announcement read contract. The external dependencies listed below remain open.
+The enforcement points below describe the module. The generated reference links implemented obligations to their primary source. External dependencies are tracked below.
 
 | ID | Obligation | Layer | Enforcement point |
 | --- | --- | --- | --- |
@@ -155,32 +155,37 @@ The issuance operation aborts if stock has been consumed since approval. It leav
 
 ## Permissions and navigation
 
-The first increment uses a Department module grant and `department.announcement.view`. Only the existing basic `student` and `faculty` roles receive that permission in this increment. The navigation item is `department.announcements`, labelled Announcements, icon `Megaphone`, path `/department/announcements`. The module uses the `Buildings` icon, `/department` base path and Department section. It declares no system or scope permissions in this increment.
+The module requires a Department grant and the permission for the requested action. The acting designation limits which of the session's permissions this module accepts. Verified degree designations share the basic student permissions. Office grants map to the explicit department key for each verified HOD and Dept_Admin designation. `registry.py` is the source for the exact grants and navigation.
 
-Later actions require distinct IAM permissions and local data-scope checks. Key HOD and Dept_Admin grants by the actual verified designations and bind them to their authorised department. Keep the external assignment authority with IAM. Use separate permissions for announcement publication and HOD maintenance, stock request/review/issuance, feedback review and final disposition, timetable and lab editing, and official-detail approval.
+The platform shell currently receives union navigation from IAM. Department's active-role access endpoint is authoritative for page and action guards. Office assignments with no verified department-key mapping are withheld. IAM remains the owner of designation changes.
 
 ## Endpoints
 
 | Method and path | Gates | Response and trace |
 | --- | --- | --- |
 | `GET /api/v1/department/announcements` | Department module grant and `department.announcement.view` | Cursor-paginated active posts visible within the caller's department and target scope. `UC-DEPT-001`, `BR-DEPT-002`, `AFR-DEPT-002` and `AFR-DEPT-003`. |
+| `POST /api/v1/department/announcements` and `announcements/{id}/action` | Publication or HOD maintenance permissions | Publish a scoped announcement or edit, hide or delete an active one. |
+| `inventory`, `stock-requests`, `stock-requests/{id}/action` | Stock view, insertion, request, review or issue permissions | Current inventory, role-specific request queue, Faculty issued history and transitions. |
+| `feedback`, `feedback/{id}/action` | Confidential feedback submit, view, review or disposition permissions | Submit a new record, review it, or close or resolve it. |
+| `labs`, `timetable`, `timetable/{id}`, `academic-context` | Lab or timetable view and update permissions | Faculty resource profiles, Dept_Admin slot upload and replacement, and the student's verified programme, batch and applicable timetable. |
+| `details`, `proposals`, `proposals/{id}/action` | Details view or update, official-change proposal or HOD decision permissions | Immediate general update and pending official proposal with approval or rejection. |
+| `notices`, `access` | Department grant, plus the notice-view permission on `notices` | Role-scoped in-app notifications and current module action permissions. |
 
-The `/department/announcements` route uses `RequirePermission` with the same grant. The `/department` index redirects to it. For the external Fusion shell, add the sidebar entry with id `department`, label `Department`, icon `Buildings`, destination `/department`, and section `Department`.
+The `/department` index redirects to `/department/announcements`. Each page uses its permission from the Department access response. For the external Fusion shell, add a sidebar entry with id `department`, label `Department`, icon `Buildings`, destination `/department`, and section `Department`.
 
 ## Contracts
 
-Use IAM's batched `get_users` lookup for active membership, department, programme and batch year. Announcement visibility checks these fields live because the local display cache can retain an old department during an identity change or outage. Unknown and inactive identities produce an empty list. IAM outages return a service-unavailable response. The directory's discipline field is distinct from department. The first increment exports no contracts to other modules.
+Use IAM's batched `get_users` lookup for active membership, department, programme and batch year. Business scopes use live fields because the local display cache can retain an old department during an identity change or outage. Unknown and inactive identities produce an empty list on scoped collections. IAM outages return a service-unavailable response. The directory's discipline field is distinct from department. Department exports no contracts to other modules.
 
 The planned profile and Headship workflows need IAM contracts for instructor-to-enrollment scope and effective role assignments. Authoritative identity and role data live in IAM. Department owns its business records only.
 
 ## Scheduled work
 
-The first increment has no timed transition. Later notification delivery belongs to the action that records the corresponding event. Role tenure and effective handoffs belong to the external IAM contract.
+Department writes in-app notices in the source transaction. The portal refreshes notices while the module is open. No Celery schedule is required for these notices. Role tenure and effective handoffs belong to the external IAM contract.
 
 ## Decisions and open work
 
 - The current IAM cannot guarantee scoped, time-bounded HOD and Dept_Admin handoffs or derive authoritative Headship. Track `CFR-DEPT-016`, `AFR-DEPT-047`–`053`, `BR-DEPT-021`–`024`, `UC-DEPT-020`/`022`, `BW-DEPT-07`/`08` and `CW-DEPT-04` as open contract dependencies. Initial role bootstrap still needs an explicit rule.
 - `BR-DEPT-019` explicitly depends on external privacy policy. Hold detailed profiles and profile writes until the whitelist, course roster and intended lifecycle operations are available.
 - For Faculty, limit issued-stock history to their own issued requests. Staff operations remain subject to verified departmental designation scope.
-- Announcement publishing, notifications and maintenance are separate future increments. The announcement-read increment alone leaves `AFR-DEPT-046`, mutation and HOD/Dept_Admin scope unimplemented.
-- Confirm the concurrency interpretation, official versus general field classification, and timetable scope before implementing those increments.
+- The approved local implementation uses the stock shortage interpretation above, the Name and Core Policies allowlist, and half-open timetable slots. Programme information is limited to the verified programme and batch returned by IAM.

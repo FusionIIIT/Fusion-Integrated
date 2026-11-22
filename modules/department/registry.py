@@ -1,5 +1,5 @@
 from modules.department import permissions as p
-from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS
+from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS, STUDENT_ROLES
 
 MODULE = {
     "code": "department", "label": "Department", "icon": "Buildings",
@@ -22,6 +22,12 @@ NAV_ITEMS = [
      "to": "/department/feedback-inbox", "required_permission": p.VIEW_FEEDBACK, "sort_order": 40},
     {"code": "department.notices", "label": "Notifications", "icon": "Megaphone",
      "to": "/department/notices", "required_permission": p.VIEW_NOTICE, "sort_order": 50},
+    {"code": "department.labs", "label": "Lab resources", "icon": "Buildings",
+     "to": "/department/labs", "required_permission": p.VIEW_LABS, "sort_order": 55},
+    {"code": "department.timetable", "label": "Academic timetable", "icon": "CalendarBlank",
+     "to": "/department/timetable", "required_permission": p.VIEW_TIMETABLE, "sort_order": 60},
+    {"code": "department.details", "label": "Department details", "icon": "Buildings",
+     "to": "/department/details", "required_permission": p.VIEW_DETAILS, "sort_order": 65},
 ]
 
 PERMISSIONS = [
@@ -39,19 +45,29 @@ PERMISSIONS = [
     (p.REVIEW_FEEDBACK, "Perform the initial feedback review"),
     (p.DISPOSE_FEEDBACK, "Resolve or close reviewed feedback"),
     (p.VIEW_NOTICE, "View Department notifications"),
+    (p.VIEW_LABS, "View Department lab resources"),
+    (p.UPDATE_LABS, "Update Department lab resources"),
+    (p.VIEW_TIMETABLE, "View applicable Department timetable slots"),
+    (p.UPDATE_TIMETABLE, "Upload and update Department timetables"),
+    (p.VIEW_DETAILS, "View Department details and official proposals"),
+    (p.UPDATE_DETAILS, "Update general Department information"),
+    (p.PROPOSE_DETAILS, "Propose official Department changes"),
+    (p.APPROVE_DETAILS, "Decide official Department changes"),
 ]
 SYSTEM_PERMISSIONS = []
 SCOPE_PERMISSIONS = []
 
 _COMMON = [p.VIEW_ANNOUNCEMENT, p.VIEW_NOTICE]
 _STOCK = [p.VIEW_STOCK, p.VIEW_STOCK_REQUEST]
-_STAFF = [*_COMMON, p.PUBLISH_ANNOUNCEMENT, p.VIEW_FEEDBACK, p.DISPOSE_FEEDBACK]
+_STAFF = [*_COMMON, p.PUBLISH_ANNOUNCEMENT, p.VIEW_FEEDBACK, p.DISPOSE_FEEDBACK, p.VIEW_DETAILS]
+_HOD = (*_STAFF, p.VIEW_STOCK_REQUEST, p.MANAGE_ANNOUNCEMENT, p.REVIEW_STOCK, p.APPROVE_DETAILS)
+_ADMIN = (*_STAFF, *_STOCK, p.INSERT_STOCK, p.ISSUE_STOCK, p.REVIEW_FEEDBACK, p.VIEW_LABS,
+          p.UPDATE_LABS, p.VIEW_TIMETABLE, p.UPDATE_TIMETABLE, p.UPDATE_DETAILS, p.PROPOSE_DETAILS)
 
 ROLE_GRANTS = {
-    "faculty": [*_COMMON, *_STOCK, p.PUBLISH_ANNOUNCEMENT, p.REQUEST_STOCK, p.SUBMIT_FEEDBACK],
-    "student": [*_COMMON, p.SUBMIT_FEEDBACK],
-    **{role: [*_STAFF, p.VIEW_STOCK_REQUEST, p.MANAGE_ANNOUNCEMENT, p.REVIEW_STOCK]
-       for role in HOD_DEPARTMENTS},
-    **{role: [*_STAFF, *_STOCK, p.INSERT_STOCK, p.ISSUE_STOCK, p.REVIEW_FEEDBACK]
-       for role in ADMIN_DEPARTMENTS},
+    "faculty": [*_COMMON, *_STOCK, p.PUBLISH_ANNOUNCEMENT, p.REQUEST_STOCK, p.SUBMIT_FEEDBACK,
+                p.VIEW_LABS],
+    **dict.fromkeys(sorted(STUDENT_ROLES), (*_COMMON, p.SUBMIT_FEEDBACK, p.VIEW_TIMETABLE)),
+    **dict.fromkeys(HOD_DEPARTMENTS, _HOD),
+    **dict.fromkeys(ADMIN_DEPARTMENTS, _ADMIN),
 }

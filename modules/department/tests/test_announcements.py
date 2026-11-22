@@ -74,3 +74,16 @@ def test_announcement_list_handles_identity_outage(reader, monkeypatch):
 
     monkeypatch.setattr(fake, "get_users", unavailable)
     assert client.get(URL).status_code == 503
+
+
+def test_only_acting_role_controls_department_access(reader):
+    client, fake = reader
+    fake.session = make_session(modules=["department"], permissions=[VIEW_ANNOUNCEMENT],
+                                roles=["student", "staff"], active_role="staff")
+    assert client.get(URL).status_code == 403
+    assert client.get("/api/v1/department/access").json() == {"permissions": []}
+
+    fake.session = make_session(modules=["department"], permissions=[VIEW_ANNOUNCEMENT],
+                                roles=["student", "ug_student"], active_role="ug_student")
+    assert client.get("/api/v1/department/access").json() == {"permissions": [VIEW_ANNOUNCEMENT]}
+    assert client.get(URL).status_code == 200

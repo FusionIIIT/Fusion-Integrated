@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "../../auth/AuthProvider";
 import { http } from "../../lib/http";
@@ -28,8 +28,18 @@ export function useDepartmentFeed<T>(resource: string, refresh?: number) {
 export function useDepartmentAction() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ path, data }: { path: string; data: unknown }) =>
-      http.post(`/department/${path}`, data),
+    mutationFn: ({ path, data, method = "post" }: { path: string; data: unknown; method?: "post" | "put" }) =>
+      http[method](`/department/${path}`, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["department"] }),
+  });
+}
+
+export function useDepartmentRecord<T>(resource: string, enabled = true) {
+  const { session } = useAuth();
+  return useQuery({
+    queryKey: ["department", resource, session?.user.id, session?.active_role],
+    queryFn: async ({ signal }) => (await http.get<T>(`/department/${resource}`, { signal })).data,
+    enabled,
+    gcTime: 0,
   });
 }

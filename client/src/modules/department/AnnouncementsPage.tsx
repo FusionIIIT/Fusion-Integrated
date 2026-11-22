@@ -6,6 +6,7 @@ import { http } from "../../lib/http";
 import { ErrorState } from "../../ui/components/ErrorState";
 import { PageHeader } from "../../ui/components/PageHeader";
 import { ManageAnnouncements, PublishAnnouncement } from "./AnnouncementEditor";
+import { useDepartmentCan } from "./DepartmentLayout";
 
 interface Announcement {
   id: number;
@@ -21,7 +22,8 @@ interface AnnouncementPage {
 const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 
 export default function AnnouncementsPage() {
-  const { session, can } = useAuth();
+  const { session } = useAuth();
+  const can = useDepartmentCan();
   const query = useInfiniteQuery({
     queryKey: ["department", "announcements", session?.user.id, session?.active_role],
     initialPageParam: null as string | null,

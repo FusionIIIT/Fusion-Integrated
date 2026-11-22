@@ -1,17 +1,17 @@
 import { Button, Container, Group, NumberInput, Paper, Stack, Text, TextInput } from "@mantine/core";
 import { useState } from "react";
 
-import { useAuth } from "../../auth/AuthProvider";
 import { ErrorState } from "../../ui/components/ErrorState";
 import { PageHeader } from "../../ui/components/PageHeader";
 import { useDepartmentAction, useDepartmentFeed } from "./api";
+import { useDepartmentCan } from "./DepartmentLayout";
 import { FeedState } from "./FeedState";
 
 interface Item { id: number; name: string; quantity: number }
 interface StockRequest { id: number; item_name: string; quantity: number; status: string }
 
 export function InventoryPage() {
-  const { can } = useAuth();
+  const can = useDepartmentCan();
   const feed = useDepartmentFeed<Item>("inventory");
   const action = useDepartmentAction();
   const [name, setName] = useState("");
@@ -77,7 +77,7 @@ export function InventoryPage() {
 }
 
 export function StockRequestsPage() {
-  const { can } = useAuth();
+  const can = useDepartmentCan();
   const feed = useDepartmentFeed<StockRequest>("stock-requests");
   const action = useDepartmentAction();
   const canReview = can("department.stock_request.approve");

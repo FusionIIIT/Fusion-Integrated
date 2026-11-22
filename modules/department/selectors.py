@@ -1,8 +1,18 @@
 from django.db.models import Q
 
 from fusion_auth.client import get_client
-from modules.department.models import Announcement, Feedback, Notice, StockItem, StockRequest
-from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS
+from modules.department.models import (
+    Announcement,
+    DepartmentDetails,
+    DepartmentProposal,
+    Feedback,
+    LabResource,
+    Notice,
+    StockItem,
+    StockRequest,
+    TimetableSlot,
+)
+from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS, audience_role
 
 
 def live_identity(principal):
@@ -42,7 +52,7 @@ def _relevant_announcements(principal, viewer, department):
     if not department:
         return Announcement.objects.none()
     return Announcement.objects.filter(
-        _matches_target("target_roles", principal.active_role or principal.kind),
+        _matches_target("target_roles", audience_role(principal)),
         _matches_target("target_programmes", viewer.programme),
         _matches_target("target_batch_years", viewer.batch_year),
         department=department,
@@ -94,3 +104,40 @@ def notices_for(principal):
     if principal.kind in ("student", "faculty"):
         audience |= Q(announcement__in=_relevant_announcements(principal, viewer, department))
     return Notice.objects.filter(audience, department=department)
+
+
+def labs_for(principal):
+    department = department_for(principal, live_identity(principal))
+    if not department:
+        return LabResource.objects.none()
+    return LabResource.objects.filter(department=department)
+
+
+def timetable_for(principal):
+    viewer = live_identity(principal)
+    department = department_for(principal, viewer)
+    if not department:
+        return TimetableSlot.objects.none()
+    timetable = TimetableSlot.objects.filter(department=department)
+    if principal.active_role in ADMIN_DEPARTMENTS:
+        return timetable
+    student = audience_role(principal) == "student"
+    if student and viewer.programme and viewer.batch_year:
+        return timetable.filter(programme=viewer.programme, batch_year=viewer.batch_year)
+    return timetable.none()
+
+
+def details_for(principal):
+    department = department_for(principal, live_identity(principal))
+    if not department:
+        return None
+    return DepartmentDetails.objects.filter(department=department).first() or DepartmentDetails(
+        department=department,
+    )
+
+
+def proposals_for(principal):
+    department = department_for(principal, live_identity(principal))
+    if not department:
+        return DepartmentProposal.objects.none()
+    return DepartmentProposal.objects.filter(department__department=department)

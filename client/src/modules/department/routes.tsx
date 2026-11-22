@@ -1,7 +1,7 @@
 import { lazy } from "react";
 import { Navigate, type RouteObject } from "react-router-dom";
 
-import { RequirePermission } from "../../auth/RequirePermission";
+import { DepartmentLayout, RequireDepartmentPermission } from "./DepartmentLayout";
 
 const AnnouncementsPage = lazy(() => import("./AnnouncementsPage"));
 const InventoryPage = lazy(() => import("./StockPages").then((module) => ({ default: module.InventoryPage })));
@@ -9,27 +9,41 @@ const StockRequestsPage = lazy(() => import("./StockPages").then((module) => ({ 
 const SubmitFeedbackPage = lazy(() => import("./FeedbackPages").then((module) => ({ default: module.SubmitFeedbackPage })));
 const FeedbackInboxPage = lazy(() => import("./FeedbackPages").then((module) => ({ default: module.FeedbackInboxPage })));
 const NoticesPage = lazy(() => import("./NoticesPage"));
+const LabsPage = lazy(() => import("./DetailsPages").then((module) => ({ default: module.LabsPage })));
+const DepartmentDetailsPage = lazy(() => import("./DetailsPages").then((module) => ({ default: module.DepartmentDetailsPage })));
+const TimetablePage = lazy(() => import("./TimetablePage"));
 
-export const routes: RouteObject[] = [
+const pages: RouteObject[] = [
   { index: true, element: <Navigate to="announcements" replace /> },
   { path: "announcements", element: (
-    <RequirePermission permission="department.announcement.view">
+    <RequireDepartmentPermission permission="department.announcement.view">
       <AnnouncementsPage />
-    </RequirePermission>
+    </RequireDepartmentPermission>
   ) },
   { path: "inventory", element: (
-    <RequirePermission permission="department.stock.view"><InventoryPage /></RequirePermission>
+    <RequireDepartmentPermission permission="department.stock.view"><InventoryPage /></RequireDepartmentPermission>
   ) },
   { path: "stock-requests", element: (
-    <RequirePermission permission="department.stock_request.view"><StockRequestsPage /></RequirePermission>
+    <RequireDepartmentPermission permission="department.stock_request.view"><StockRequestsPage /></RequireDepartmentPermission>
   ) },
   { path: "feedback", element: (
-    <RequirePermission permission="department.feedback.create"><SubmitFeedbackPage /></RequirePermission>
+    <RequireDepartmentPermission permission="department.feedback.create"><SubmitFeedbackPage /></RequireDepartmentPermission>
   ) },
   { path: "feedback-inbox", element: (
-    <RequirePermission permission="department.feedback.view"><FeedbackInboxPage /></RequirePermission>
+    <RequireDepartmentPermission permission="department.feedback.view"><FeedbackInboxPage /></RequireDepartmentPermission>
   ) },
   { path: "notices", element: (
-    <RequirePermission permission="department.notice.view"><NoticesPage /></RequirePermission>
+    <RequireDepartmentPermission permission="department.notice.view"><NoticesPage /></RequireDepartmentPermission>
+  ) },
+  { path: "labs", element: (
+    <RequireDepartmentPermission permission="department.lab.view"><LabsPage /></RequireDepartmentPermission>
+  ) },
+  { path: "timetable", element: (
+    <RequireDepartmentPermission permission="department.timetable.view"><TimetablePage /></RequireDepartmentPermission>
+  ) },
+  { path: "details", element: (
+    <RequireDepartmentPermission permission="department.details.view"><DepartmentDetailsPage /></RequireDepartmentPermission>
   ) },
 ];
+
+export const routes: RouteObject[] = [{ element: <DepartmentLayout />, children: pages }];
