@@ -81,7 +81,7 @@ def test_wf_001_full_lifecycle_path():
 
     transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_OUT, actor_id=1)
     visit.refresh_from_db()
-    assert visit.status == "checked_out"
+    assert visit.status == "completed"
 
 
 @pytest.mark.django_db
@@ -163,7 +163,7 @@ def test_wf_005_early_termination_path():
     transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_IN, actor_id=1)
     transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_OUT, actor_id=1)
     visit.refresh_from_db()
-    assert visit.status == "checked_out"
+    assert visit.status == "completed"
 
 
 @pytest.mark.django_db

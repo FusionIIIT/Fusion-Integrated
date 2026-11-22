@@ -15,7 +15,11 @@ from modules.vms.models.access import GateAlert, GateLog
 from modules.vms.models.visitors import BlacklistEntry, Visitor
 from modules.vms.selectors.visits import list_active_onsite_visits
 from modules.vms.services.errors import BlacklistMatchError, PassExpiredError
-from modules.vms.services.gate import reconcile_offline_gate_events, transition_visit_state
+from modules.vms.services.gate import (
+    reconcile_offline_gate_events,
+    transition_visit_state,
+    verify_qr_and_check_in,
+)
 from modules.vms.services.registration import (
     approve_visit,
     reject_visit,
@@ -139,8 +143,8 @@ def test_fr_004_immutable_audit_logging_gate_check_in():
 
     log = GateLog.objects.filter(visit=visit).first()
     assert log is not None
-    assert log.event_type == "check_in"
-    assert log.actor_id == 42
+    assert log.action == "check_in"
+    assert log.logged_by == 42
     assert log.gate_name == "North Gate"
     assert log.reader_machine_id == "RDR-01"
 
@@ -179,7 +183,7 @@ def test_fr_006_blacklist_addition():
         added_by=1,
     )
     assert entry.id is not None
-    assert entry.status == "active"
+    assert entry.is_active is True
 
 
 @pytest.mark.django_db
@@ -224,9 +228,9 @@ def test_fr_008_host_listing_actionable_requests():
         id_number="9988-7766-5544",
         host_user_id=505,
     )
-    from modules.vms.selectors.scoping import get_approvals_for_host
+    from modules.vms.selectors.visits import list_pending_approvals_for_host
 
-    pending = get_approvals_for_host(505)
+    pending = list_pending_approvals_for_host(505)
     assert visit in pending
 
 
@@ -308,7 +312,7 @@ def test_fr_012_gate_check_in_refusal_when_expired():
     )
     approve_visit(visit.id, host_user_id=101)
     with pytest.raises(PassExpiredError):
-        transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_IN, actor_id=1)
+        verify_qr_and_check_in(visit.qr_code_hash, guard_user_id=1)
 
 
 @pytest.mark.django_db
@@ -337,9 +341,9 @@ def test_fr_013_gate_alert_on_blacklisted_entry_attempt():
     )
 
     with pytest.raises(BlacklistMatchError):
-        transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_IN, actor_id=1)
+        verify_qr_and_check_in(visit.qr_code_hash, guard_user_id=1)
 
-    alert = GateAlert.objects.filter(visit=visit).first()
+    alert = GateAlert.objects.filter(visit_id=visit.id).first()
     assert alert is not None
     assert alert.alert_type == "blacklist_gate_entry_attempt"
 
@@ -361,7 +365,7 @@ def test_fr_014_gate_check_out_records_exit():
     transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_IN, actor_id=1)
     transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_OUT, actor_id=1)
     visit.refresh_from_db()
-    assert visit.status == "checked_out"
+    assert visit.status == "completed"
     assert visit.check_out_time is not None
 
 

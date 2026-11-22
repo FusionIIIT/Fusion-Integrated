@@ -12,7 +12,10 @@ from modules.vms.domain.rules import validate_zone_access
 from modules.vms.domain.state_machine import TransitionTrigger
 from modules.vms.models.visitors import BlacklistEntry
 from modules.vms.services.errors import BlacklistMatchError, PassExpiredError
-from modules.vms.services.gate import transition_visit_state
+from modules.vms.services.gate import (
+    transition_visit_state,
+    verify_qr_and_check_in,
+)
 from modules.vms.services.registration import (
     approve_visit,
     reject_visit,
@@ -136,9 +139,9 @@ def test_uc_004_request_visit_via_host_routing():
         id_number="NHWBS1234N",
         host_user_id=303,
     )
-    from modules.vms.selectors.scoping import get_approvals_for_host
+    from modules.vms.selectors.visits import list_pending_approvals_for_host
 
-    approvals = get_approvals_for_host(303)
+    approvals = list_pending_approvals_for_host(303)
     assert visit in approvals
 
 
@@ -243,7 +246,7 @@ def test_uc_009_gate_validation_failure_expired():
     )
     approve_visit(visit.id, host_user_id=101)
     with pytest.raises(PassExpiredError):
-        transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_IN, actor_id=1)
+        verify_qr_and_check_in(visit.qr_code_hash, guard_user_id=1)
 
 
 @pytest.mark.django_db
@@ -263,7 +266,7 @@ def test_uc_010_checkout_visitor_at_gate():
     transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_IN, actor_id=1)
     transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_OUT, actor_id=1)
     visit.refresh_from_db()
-    assert visit.status == "checked_out"
+    assert visit.status == "completed"
     assert visit.check_out_time is not None
 
 
@@ -326,7 +329,7 @@ def test_uc_015_emergency_roll_call_resolution():
     muster = trigger_emergency_muster(admin_user_id=1)
     resolved = resolve_emergency_muster(muster.id, admin_user_id=1)
     assert resolved.status == "resolved"
-    assert resolved.resolved_at is not None
+    assert resolved.ended_at is not None
 
 
 @pytest.mark.django_db
@@ -346,4 +349,4 @@ def test_uc_016_terminate_visit_early():
     transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_IN, actor_id=1)
     transition_visit_state(visit.id, trigger=TransitionTrigger.GATE_CHECK_OUT, actor_id=1)
     visit.refresh_from_db()
-    assert visit.status == "checked_out"
+    assert visit.status == "completed"
