@@ -1,0 +1,596 @@
+[
+  {
+    "test_id": "BR_001_A",
+    "source_id": "BR-SA-001 Permitted",
+    "purpose": "Verify unique institute ID is accepted during user creation",
+    "preconditions": "Super Admin authenticated; institute ID does not exist",
+    "action_or_input": "POST /api/super-admin/users with unique institute_id 'BR001_U1'",
+    "expected_result": "HTTP 201 Created; user account created",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_001_B",
+    "source_id": "BR-SA-001 Prohibited",
+    "purpose": "Verify duplicate institute ID is rejected during user creation",
+    "preconditions": "User with institute_id 'BR001_DUP' already exists",
+    "action_or_input": "POST /api/super-admin/users with institute_id 'BR001_DUP'",
+    "expected_result": "HTTP 400 Bad Request; rejection with validation error",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_001_C",
+    "source_id": "BR-SA-001 Boundary/Constraint",
+    "purpose": "Verify existing institute ID is immutable and cannot be altered",
+    "preconditions": "User exists with institute_id 'BR001_IMM'",
+    "action_or_input": "PATCH/PUT attempting to modify institute_id to 'BR001_NEW'",
+    "expected_result": "Institute ID remains unchanged ('BR001_IMM')",
+    "test_type": "Constraint Enforcement"
+  },
+  {
+    "test_id": "BR_002_A",
+    "source_id": "BR-SA-002 Permitted",
+    "purpose": "Verify user creation with valid institute email domain",
+    "preconditions": "Super Admin authenticated; unique institute email provided",
+    "action_or_input": "POST /api/super-admin/users with email 'br002@fusion.edu'",
+    "expected_result": "HTTP 201 Created; email saved",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_002_B",
+    "source_id": "BR-SA-002 Prohibited",
+    "purpose": "Verify user creation with invalid non-institute email domain is rejected",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "POST /api/super-admin/users with email 'br002@external-gmail.com'",
+    "expected_result": "HTTP 400 Bad Request; non-institute email rejected",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_002_C",
+    "source_id": "BR-SA-002 Boundary",
+    "purpose": "Verify malformed email string without domain is rejected",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "POST /api/super-admin/users with email 'notanemail'",
+    "expected_result": "HTTP 400 Bad Request; invalid email format rejected",
+    "test_type": "Boundary Condition"
+  },
+  {
+    "test_id": "BR_003_A",
+    "source_id": "BR-SA-003 Permitted",
+    "purpose": "Verify creation with all mandatory user-type fields present",
+    "preconditions": "Super Admin authenticated; complete student payload",
+    "action_or_input": "POST /api/super-admin/users with first_name, last_name, email, institute_id, user_type='student'",
+    "expected_result": "HTTP 201 Created; complete user record persisted",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_003_B",
+    "source_id": "BR-SA-003 Prohibited",
+    "purpose": "Verify creation missing mandatory fields is rejected",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "POST /api/super-admin/users with missing user_type or missing name",
+    "expected_result": "HTTP 400 Bad Request; missing mandatory fields error",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_003_C",
+    "source_id": "BR-SA-003 Boundary",
+    "purpose": "Verify creation with invalid user_type outside allowed choices is rejected",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "POST /api/super-admin/users with user_type='invalid_alien'",
+    "expected_result": "HTTP 400 Bad Request; invalid user_type rejected",
+    "test_type": "Boundary Condition"
+  },
+  {
+    "test_id": "BR_004_A",
+    "source_id": "BR-SA-004 Permitted",
+    "purpose": "Verify deactivated user who meets archival criteria is successfully archived",
+    "preconditions": "User is in 'deactivated' state",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='archived'",
+    "expected_result": "HTTP 200 OK; status updated to 'archived'",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_004_B",
+    "source_id": "BR-SA-004 Prohibited",
+    "purpose": "Verify active user cannot be directly archived without prior deactivation",
+    "preconditions": "User is currently 'active'",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='archived' directly from active",
+    "expected_result": "HTTP 400 Bad Request; direct archival of active user prohibited",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_005_A",
+    "source_id": "BR-SA-005 Permitted",
+    "purpose": "Verify restoration of archived user within reversible window",
+    "preconditions": "User archived within allowed window (< 30 days)",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='deactivated'",
+    "expected_result": "HTTP 200 OK; user restored from archive",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_005_B",
+    "source_id": "BR-SA-005 Boundary/Prohibited",
+    "purpose": "Verify restoration is blocked after reversibility window expires",
+    "preconditions": "User archived beyond reversible window (> 30 days) marked non-restorable",
+    "action_or_input": "Restoration request for expired archived user",
+    "expected_result": "Restoration prohibited; permanent archive status preserved",
+    "test_type": "Boundary Condition"
+  },
+  {
+    "test_id": "BR_006_A",
+    "source_id": "BR-SA-006 Permitted",
+    "purpose": "Verify user can hold multiple compatible concurrent roles",
+    "preconditions": "User has active role 'tutor'",
+    "action_or_input": "POST /api/super-admin/roles/assign with role_name='event_coordinator'",
+    "expected_result": "HTTP 201 Created; user holds both active roles concurrently",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_006_B",
+    "source_id": "BR-SA-006 Prohibited",
+    "purpose": "Verify concurrent assignment of mutually conflicting roles is rejected",
+    "preconditions": "User holds 'internal_auditor' role",
+    "action_or_input": "POST /api/super-admin/roles/assign with role_name='finance_officer'",
+    "expected_result": "HTTP 400 Bad Request; conflict error rejected",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_007_A",
+    "source_id": "BR-SA-007 Permitted",
+    "purpose": "Verify singular role assignment when role is currently vacant",
+    "preconditions": "Singular role 'dean_academics' has no active holder",
+    "action_or_input": "POST /api/super-admin/roles/assign with role_name='dean_academics'",
+    "expected_result": "HTTP 201 Created; role successfully assigned",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_007_B",
+    "source_id": "BR-SA-007 Prohibited",
+    "purpose": "Verify assigning occupied singular role to a second holder is rejected",
+    "preconditions": "Singular role 'dean_academics' already actively held by User A",
+    "action_or_input": "POST /api/super-admin/roles/assign with role_name='dean_academics' to User B",
+    "expected_result": "HTTP 400 Bad Request; singular role duplicate occupancy rejected",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_008_A",
+    "source_id": "BR-SA-008 Permitted",
+    "purpose": "Verify role assignment with valid start_date and future end_date",
+    "preconditions": "Super Admin authenticated; eligible user",
+    "action_or_input": "POST /api/super-admin/roles/assign with start_date='2026-01-01', end_date='2026-12-31'",
+    "expected_result": "HTTP 201 Created; assignment created with valid dates",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_008_B",
+    "source_id": "BR-SA-008 Prohibited",
+    "purpose": "Verify role assignment with inverted dates (start_date > end_date) is rejected",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "POST /api/super-admin/roles/assign with start_date='2026-12-31', end_date='2026-01-01'",
+    "expected_result": "HTTP 400 Bad Request; inverted dates rejected",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_008_C",
+    "source_id": "BR-SA-008 Boundary/Exception",
+    "purpose": "Verify permanent role may omit end_date",
+    "preconditions": "Super Admin authenticated; permanent role assignment",
+    "action_or_input": "POST /api/super-admin/roles/assign with start_date='2026-01-01' and null end_date",
+    "expected_result": "HTTP 201 Created; permanent assignment created",
+    "test_type": "Stated Exception"
+  },
+  {
+    "test_id": "BR_009_A",
+    "source_id": "BR-SA-009 Permitted",
+    "purpose": "Verify role past its end date is considered expired and inactive",
+    "preconditions": "Role assignment exists with past end_date ('2025-01-01')",
+    "action_or_input": "Check role effective activity status",
+    "expected_result": "Role is marked inactive / expired; access revoked",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_009_B",
+    "source_id": "BR-SA-009 Boundary",
+    "purpose": "Verify future-dated role with start_date in future is not yet active",
+    "preconditions": "Role assignment exists with future start_date ('2027-01-01')",
+    "action_or_input": "Check role effective activity status prior to start date",
+    "expected_result": "Role remains scheduled and not currently active",
+    "test_type": "Boundary Condition"
+  },
+  {
+    "test_id": "BR_010_A",
+    "source_id": "BR-SA-010 Permitted",
+    "purpose": "Verify assigning faculty role to faculty user is permitted",
+    "preconditions": "User has user_type='faculty'",
+    "action_or_input": "POST /api/super-admin/roles/assign with role_name='dean_academics'",
+    "expected_result": "HTTP 201 Created; faculty role assigned to faculty",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_010_B",
+    "source_id": "BR-SA-010 Prohibited",
+    "purpose": "Verify assigning administrative/faculty role to student is prohibited",
+    "preconditions": "User has user_type='student'",
+    "action_or_input": "POST /api/super-admin/roles/assign with role_name='dean_academics'",
+    "expected_result": "HTTP 400 Bad Request; ineligible user_type rejected",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_011_A",
+    "source_id": "BR-SA-011 Permitted",
+    "purpose": "Verify non-conflicting role assignments are permitted simultaneously",
+    "preconditions": "User has active role 'course_instructor'",
+    "action_or_input": "POST /api/super-admin/roles/assign with role_name='lab_incharge'",
+    "expected_result": "HTTP 201 Created; non-conflicting roles coexist",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_011_B",
+    "source_id": "BR-SA-011 Prohibited",
+    "purpose": "Verify conflicting role assignment is rejected with conflict details",
+    "preconditions": "User has active role 'procurement_officer'",
+    "action_or_input": "POST /api/super-admin/roles/assign with role_name='vendor_manager'",
+    "expected_result": "HTTP 400 Bad Request; conflict validation prevents assignment",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_012_A",
+    "source_id": "BR-SA-012 Permitted",
+    "purpose": "Verify role reassignment transfers active tenure from old holder to new holder",
+    "preconditions": "User A holds role 'dean_students'",
+    "action_or_input": "Reassign role 'dean_students' to User B",
+    "expected_result": "Old holder's assignment closed; new holder granted active assignment",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_013_A",
+    "source_id": "BR-SA-013 Permitted",
+    "purpose": "Verify previous role holder retains read-only access to their past actions",
+    "preconditions": "User was previously 'dean_academics'; tenure ended",
+    "action_or_input": "User accesses audit logs for actions taken during their tenure",
+    "expected_result": "Read-only access granted; operational edit access revoked",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_014_A",
+    "source_id": "BR-SA-014 Permitted",
+    "purpose": "Verify standard role revocation sets is_active=False",
+    "preconditions": "User has an active role assignment",
+    "action_or_input": "POST /api/super-admin/roles/<id>/revoke",
+    "expected_result": "HTTP 200 OK; role assignment marked is_active=False",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_014_B",
+    "source_id": "BR-SA-014 Prohibited",
+    "purpose": "Verify revoking an already revoked/inactive role assignment is rejected",
+    "preconditions": "Role assignment already revoked (is_active=False)",
+    "action_or_input": "POST /api/super-admin/roles/<id>/revoke",
+    "expected_result": "HTTP 400 Bad Request; already inactive role cannot be revoked",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_015_A",
+    "source_id": "BR-SA-015 Permitted",
+    "purpose": "Verify deactivation of user account revokes all active role assignments",
+    "preconditions": "User has active account and 2 active role assignments",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='deactivated'",
+    "expected_result": "User account deactivated; effective role access terminated",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_016_A",
+    "source_id": "BR-SA-016 Permitted",
+    "purpose": "Verify valid extension of active role end date",
+    "preconditions": "Active role assignment with end_date '2026-06-30'",
+    "action_or_input": "Update assignment end_date to '2026-12-31'",
+    "expected_result": "End date updated to '2026-12-31'; validity extended",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_016_B",
+    "source_id": "BR-SA-016 Prohibited",
+    "purpose": "Verify extending role with invalid end date prior to start date is rejected",
+    "preconditions": "Active role assignment with start_date '2026-01-01'",
+    "action_or_input": "Attempt to extend with new end_date '2025-12-31'",
+    "expected_result": "Rejection; extension date cannot precede start date",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_017_A",
+    "source_id": "BR-SA-017 Permitted",
+    "purpose": "Verify eligible historical operational records can be archived",
+    "preconditions": "Historical academic batch records closed and inactive",
+    "action_or_input": "Archival request for closed historical batch",
+    "expected_result": "Archival permitted; records moved to archive storage",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_017_B",
+    "source_id": "BR-SA-017 Prohibited",
+    "purpose": "Verify audit logs are strictly excluded from archival",
+    "preconditions": "System audit log records exist",
+    "action_or_input": "Attempt to archive system audit logs",
+    "expected_result": "Operation rejected; audit logs immutable and non-archivable",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_018_A",
+    "source_id": "BR-SA-018 Permitted",
+    "purpose": "Verify archival proceeds when pre-archival backup succeeds",
+    "preconditions": "Pre-archival backup completes verified checksum",
+    "action_or_input": "Initiate data archival",
+    "expected_result": "Archival proceeds and commits successfully",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_018_B",
+    "source_id": "BR-SA-018 Prohibited",
+    "purpose": "Verify archival aborts if pre-archival backup fails",
+    "preconditions": "Pre-archival backup simulation returns failure",
+    "action_or_input": "Initiate data archival",
+    "expected_result": "Archival aborted; active data untouched",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_019_A",
+    "source_id": "BR-SA-019 Prohibited",
+    "purpose": "Verify purge is prevented before archive retention period has elapsed",
+    "preconditions": "Archived records with retention period ending 2030",
+    "action_or_input": "Purge request in 2026",
+    "expected_result": "Purge request rejected; retention period enforced",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_020_A",
+    "source_id": "BR-SA-020 Permitted",
+    "purpose": "Verify archived data permits read-only search and retrieval",
+    "preconditions": "Archived records exist in repository",
+    "action_or_input": "Search and view query on archived records",
+    "expected_result": "Read-only result returned successfully",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_020_B",
+    "source_id": "BR-SA-020 Prohibited",
+    "purpose": "Verify direct write or modification of archived records is prohibited",
+    "preconditions": "Archived user record exists",
+    "action_or_input": "Direct update/edit to archived record content",
+    "expected_result": "Operation prohibited; archived state is immutable",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_021_A",
+    "source_id": "BR-SA-021 Permitted",
+    "purpose": "Verify purge request is accepted for retention-expired archived data",
+    "preconditions": "Archived dataset whose retention policy has expired",
+    "action_or_input": "Submit purge request for expired dataset",
+    "expected_result": "Purge request accepted and queued for dual authorization",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_021_B",
+    "source_id": "BR-SA-021 Prohibited",
+    "purpose": "Verify purge request for unexpired archived data is rejected",
+    "preconditions": "Archived dataset still within active retention period",
+    "action_or_input": "Submit purge request for unexpired dataset",
+    "expected_result": "Purge request rejected; retention constraint error",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_022_A",
+    "source_id": "BR-SA-022 Permitted",
+    "purpose": "Verify permanent purge executes only when both Super Admin and IT Head approve",
+    "preconditions": "Purge request initiated by Super Admin; IT Head supplies second signature",
+    "action_or_input": "Authorize purge with dual credentials",
+    "expected_result": "Dual authorization verified; permanent purge executed",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_022_B",
+    "source_id": "BR-SA-022 Prohibited",
+    "purpose": "Verify purge execution is blocked with only single authorization",
+    "preconditions": "Purge request has only Super Admin initiation; no IT Head approval",
+    "action_or_input": "Attempt to commit permanent purge",
+    "expected_result": "Purge execution blocked; missing second authorization",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_023_A",
+    "source_id": "BR-SA-023 Permitted",
+    "purpose": "Verify role assignment queues notification within specified time window",
+    "preconditions": "Super Admin assigns role to user",
+    "action_or_input": "POST /api/super-admin/roles/assign",
+    "expected_result": "Role assigned; notification event created for delivery",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_024_A",
+    "source_id": "BR-SA-024 Permitted",
+    "purpose": "Verify security alert is triggered when consecutive failed logins reach 5",
+    "preconditions": "User account experiences 5 consecutive failed logins",
+    "action_or_input": "Process 5th failed login attempt",
+    "expected_result": "Security alert generated and dispatched to configured channels",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_024_B",
+    "source_id": "BR-SA-024 Boundary",
+    "purpose": "Verify security alert is not triggered when failed logins are below threshold (4)",
+    "preconditions": "User account experiences 4 consecutive failed logins",
+    "action_or_input": "Process 4th failed login attempt",
+    "expected_result": "Failed attempt logged; threshold alert not yet triggered",
+    "test_type": "Boundary Condition"
+  },
+  {
+    "test_id": "BR_025_A",
+    "source_id": "BR-SA-025 Permitted",
+    "purpose": "Verify system audit log is created upon Super Admin actions",
+    "preconditions": "Super Admin creates a user account",
+    "action_or_input": "POST /api/super-admin/users",
+    "expected_result": "SystemAuditLog record exists with action, actor, timestamp",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_025_B",
+    "source_id": "BR-SA-025 Prohibited",
+    "purpose": "Verify direct deletion or alteration of audit log entries is blocked",
+    "preconditions": "Audit log entry exists in database",
+    "action_or_input": "DELETE /api/super-admin/audit-logs/<id> or audit log modification",
+    "expected_result": "Operation prohibited; audit logs are strictly append-only",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_026_A",
+    "source_id": "BR-SA-026 Permitted",
+    "purpose": "Verify Super Admin can access module control-plane and metadata",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "GET /api/super-admin/users and GET /api/super-admin/audit-logs",
+    "expected_result": "HTTP 200 OK; administrative control-plane data returned",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_026_B",
+    "source_id": "BR-SA-026 Prohibited",
+    "purpose": "Verify Super Admin cannot access operational student grading data",
+    "preconditions": "Super Admin authenticated in SA scope",
+    "action_or_input": "Direct access attempt to student module gradebook contents",
+    "expected_result": "Access denied; control plane isolated from academic operational content",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_027_A",
+    "source_id": "BR-SA-027 Permitted",
+    "purpose": "Verify valid Super Admin credentials establish an authenticated session",
+    "preconditions": "Valid credentials and active super admin account",
+    "action_or_input": "Authenticate Super Admin",
+    "expected_result": "Session established; access to SA endpoints allowed",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_027_B",
+    "source_id": "BR-SA-027 Prohibited",
+    "purpose": "Verify unauthenticated requests to Super Admin endpoints are denied",
+    "preconditions": "Unauthenticated client (no credentials/session)",
+    "action_or_input": "POST /api/super-admin/users without authentication",
+    "expected_result": "HTTP 401 Unauthorized / 403 Forbidden; access denied",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_028_A",
+    "source_id": "BR-SA-028 Prohibited",
+    "purpose": "Verify Super Admin cannot alter or revoke their own Super Admin status via module",
+    "preconditions": "Super Admin authenticated as User SA1",
+    "action_or_input": "POST /api/super-admin/roles/<id>/revoke targeting self Super Admin role",
+    "expected_result": "Rejection; self-modification of Super Admin status is prohibited",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_029_A",
+    "source_id": "BR-SA-029 Permitted",
+    "purpose": "Verify critical operation executes when accompanied by valid confirmation/reauth",
+    "preconditions": "Super Admin session active; confirmation token provided",
+    "action_or_input": "Execute critical operation (e.g. permanent purge request) with valid confirmation",
+    "expected_result": "Operation succeeds and audit logged",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_029_B",
+    "source_id": "BR-SA-029 Prohibited",
+    "purpose": "Verify critical operation is rejected without valid confirmation/reauthentication",
+    "preconditions": "Super Admin session active; confirmation omitted or invalid",
+    "action_or_input": "Execute critical operation without confirmation",
+    "expected_result": "Operation rejected; critical confirmation required",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_030_A",
+    "source_id": "BR-SA-030 Permitted",
+    "purpose": "Verify bulk operation within upper limit (<= 1000 records) is accepted",
+    "preconditions": "Super Admin uploads batch with 500 records",
+    "action_or_input": "Process bulk operation with 500 records",
+    "expected_result": "Batch validated and processed successfully",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_030_B",
+    "source_id": "BR-SA-030 Boundary/Prohibited",
+    "purpose": "Verify bulk operation exceeding 1000 records is rejected",
+    "preconditions": "Batch containing 1001 records submitted",
+    "action_or_input": "Process bulk operation with 1001 records",
+    "expected_result": "Operation rejected; batch size exceeds 1000 limit",
+    "test_type": "Boundary Condition"
+  },
+  {
+    "test_id": "BR_031_A",
+    "source_id": "BR-SA-031 Permitted",
+    "purpose": "Verify password change according to configured rotation policy",
+    "preconditions": "Super Admin account due for rotation",
+    "action_or_input": "Submit new compliant password",
+    "expected_result": "Password updated; rotation timestamp refreshed",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_031_B",
+    "source_id": "BR-SA-031 Prohibited",
+    "purpose": "Verify login is restricted if password has expired beyond rotation grace period",
+    "preconditions": "Account password expired beyond rotation limit",
+    "action_or_input": "Attempt regular administrative action",
+    "expected_result": "Access blocked; password change required",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_032_A",
+    "source_id": "BR-SA-032 Permitted",
+    "purpose": "Verify notification dispatch routes via configured institutional channels",
+    "preconditions": "Event triggering notification occurs (user creation/role change)",
+    "action_or_input": "Trigger notification event",
+    "expected_result": "Notification queued for institutional email channel",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_033_A",
+    "source_id": "BR-SA-033 Permitted",
+    "purpose": "Verify audit log entries contain all mandatory schema fields",
+    "preconditions": "Audit log entry generated",
+    "action_or_input": "GET /api/super-admin/audit-logs",
+    "expected_result": "Each audit entry contains actor, action, timestamp, and details",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_034_A",
+    "source_id": "BR-SA-034 Permitted",
+    "purpose": "Verify user with active role can access authorized resources",
+    "preconditions": "User has valid active role assignment",
+    "action_or_input": "User accesses resource permitted by the active role",
+    "expected_result": "Access granted; role permissions enforced",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_034_B",
+    "source_id": "BR-SA-034 Prohibited",
+    "purpose": "Verify user cannot access resources of an inactive or revoked role",
+    "preconditions": "User role assignment has is_active=False",
+    "action_or_input": "User attempts to access resource of revoked role",
+    "expected_result": "Access denied; inactive role permissions not recognized",
+    "test_type": "Prohibited Outcome"
+  },
+  {
+    "test_id": "BR_035_A",
+    "source_id": "BR-SA-035 Permitted",
+    "purpose": "Verify updating system parameters within permitted whitelist",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "Configure permitted parameters (e.g. session timeout = 30 mins)",
+    "expected_result": "Configuration saved successfully",
+    "test_type": "Permitted Outcome"
+  },
+  {
+    "test_id": "BR_035_B",
+    "source_id": "BR-SA-035 Prohibited",
+    "purpose": "Verify attempting to update parameters outside permitted boundary is rejected",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "Attempt to configure academic calendar or unauthorized module parameters",
+    "expected_result": "Rejected; modification outside permitted boundary prohibited",
+    "test_type": "Prohibited Outcome"
+  }
+]

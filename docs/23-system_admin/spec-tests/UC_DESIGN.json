@@ -1,0 +1,1019 @@
+[
+  {
+    "test_id": "UC_001_M",
+    "source_id": "UC-SA-001 Main Flow",
+    "purpose": "Create basic user successfully with valid data",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "POST /api/super-admin/users with valid student",
+    "expected_result": "HTTP 201 Created; user account created",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_001_A1",
+    "source_id": "UC-SA-001 Alternative Flow A1",
+    "purpose": "Super Admin cancels before submission; no account created",
+    "preconditions": "Super Admin on creation form",
+    "action_or_input": "Form cancelled without submission",
+    "expected_result": "No account created in database",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_001_A2",
+    "source_id": "UC-SA-001 Alternative Flow A2",
+    "purpose": "Correctable validation errors returned to caller",
+    "preconditions": "Super Admin enters invalid payload",
+    "action_or_input": "POST /api/super-admin/users with missing fields",
+    "expected_result": "HTTP 400 Bad Request with field errors",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_001_E1",
+    "source_id": "UC-SA-001 Exception Flow E1",
+    "purpose": "Duplicate Institute ID or identity rejected",
+    "preconditions": "User with same institute_id already exists",
+    "action_or_input": "POST /api/super-admin/users with existing institute_id",
+    "expected_result": "HTTP 400 Bad Request; duplicate rejected",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_001_E2",
+    "source_id": "UC-SA-001 Exception Flow E2",
+    "purpose": "Notification failure logged but account creation preserved",
+    "preconditions": "Notification service unavailable",
+    "action_or_input": "POST /api/super-admin/users with valid data",
+    "expected_result": "Account created; notification failure handled gracefully",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_002_M",
+    "source_id": "UC-SA-002 Main Flow",
+    "purpose": "Retrieve permitted user profile data",
+    "preconditions": "User exists in database",
+    "action_or_input": "GET /api/super-admin/users",
+    "expected_result": "HTTP 200 OK; user list and profile metadata returned",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_002_A1",
+    "source_id": "UC-SA-002 Alternative Flow A1",
+    "purpose": "Archived user retrieved in user query",
+    "preconditions": "User exists in archived state",
+    "action_or_input": "GET /api/super-admin/users filter by archived",
+    "expected_result": "Archived user record retrieved with immutable fields",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_002_E1",
+    "source_id": "UC-SA-002 Exception Flow E1",
+    "purpose": "User not found returns appropriate response",
+    "preconditions": "Target user ID does not exist",
+    "action_or_input": "GET /api/super-admin/users/99999",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_003_M",
+    "source_id": "UC-SA-003 Main Flow",
+    "purpose": "Update user status and profile fields",
+    "preconditions": "User exists",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='deactivated'",
+    "expected_result": "HTTP 200 OK; status updated",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_003_A1",
+    "source_id": "UC-SA-003 Alternative Flow A1",
+    "purpose": "Super admin cancels profile update; no change saved",
+    "preconditions": "User exists",
+    "action_or_input": "Cancel edit request",
+    "expected_result": "Record unchanged in database",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_003_E1",
+    "source_id": "UC-SA-003 Exception Flow E1",
+    "purpose": "Attempt to change immutable Institute ID rejected",
+    "preconditions": "User exists",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with institute_id change",
+    "expected_result": "Institute ID remains unchanged",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_003_E2",
+    "source_id": "UC-SA-003 Exception Flow E2",
+    "purpose": "Invalid status update rejected",
+    "preconditions": "User exists",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='invalid_status'",
+    "expected_result": "HTTP 400 Bad Request",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_004_M",
+    "source_id": "UC-SA-004 Main Flow",
+    "purpose": "Deactivate an active user account",
+    "preconditions": "User is active",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='deactivated'",
+    "expected_result": "HTTP 200 OK; status becomes deactivated",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_004_A1",
+    "source_id": "UC-SA-004 Alternative Flow A1",
+    "purpose": "Super Admin suspends user account under policy",
+    "preconditions": "User is active",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='suspended'",
+    "expected_result": "HTTP 200 OK; status updated to suspended",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_004_E1",
+    "source_id": "UC-SA-004 Exception Flow E1",
+    "purpose": "Target not in valid state for transition rejected",
+    "preconditions": "User does not exist",
+    "action_or_input": "PATCH /api/super-admin/users/99999/status",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_005_M",
+    "source_id": "UC-SA-005 Main Flow",
+    "purpose": "Reactivate a deactivated user account",
+    "preconditions": "User is deactivated",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='active'",
+    "expected_result": "HTTP 200 OK; status becomes active",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_005_A1",
+    "source_id": "UC-SA-005 Alternative Flow A1",
+    "purpose": "Reactivation with updated reason/context",
+    "preconditions": "User is deactivated",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='active' and reason",
+    "expected_result": "HTTP 200 OK; status active and reason logged",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_005_E1",
+    "source_id": "UC-SA-005 Exception Flow E1",
+    "purpose": "Reactivation of permanently archived non-restorable user rejected",
+    "preconditions": "User is archived beyond reversibility window",
+    "action_or_input": "Reactivation request for non-restorable user",
+    "expected_result": "Operation rejected; non-restorable status preserved",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_006_M",
+    "source_id": "UC-SA-006 Main Flow",
+    "purpose": "Upload valid CSV batch to create users",
+    "preconditions": "Super Admin authenticated; valid CSV format",
+    "action_or_input": "Submit bulk creation batch",
+    "expected_result": "Batch validated; user records created",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_006_A1",
+    "source_id": "UC-SA-006 Alternative Flow A1",
+    "purpose": "Partial record validation errors in batch reported",
+    "preconditions": "Batch contains 1 valid and 1 invalid row",
+    "action_or_input": "Submit batch with partial errors",
+    "expected_result": "Invalid rows reported with line numbers",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_006_E1",
+    "source_id": "UC-SA-006 Exception Flow E1",
+    "purpose": "Invalid file format rejected",
+    "preconditions": "Corrupted non-CSV file",
+    "action_or_input": "Upload invalid binary payload",
+    "expected_result": "Operation rejected; format error",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_006_E2",
+    "source_id": "UC-SA-006 Exception Flow E2",
+    "purpose": "Batch size exceeding 1000 limit rejected",
+    "preconditions": "Batch with 1001 records",
+    "action_or_input": "Submit batch > 1000 records",
+    "expected_result": "Operation rejected; limit exceeded",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_007_M",
+    "source_id": "UC-SA-007 Main Flow",
+    "purpose": "Execute bulk status update for target users",
+    "preconditions": "Eligible target users exist",
+    "action_or_input": "Submit bulk status update (deactivate)",
+    "expected_result": "Target users updated to deactivated",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_007_A1",
+    "source_id": "UC-SA-007 Alternative Flow A1",
+    "purpose": "Some targets ineligible in bulk update identified",
+    "preconditions": "Mixed eligible and ineligible targets",
+    "action_or_input": "Submit bulk status update",
+    "expected_result": "Ineligible targets excluded; eligible processed",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_007_E1",
+    "source_id": "UC-SA-007 Exception Flow E1",
+    "purpose": "Unsupported bulk status action rejected",
+    "preconditions": "Unsupported bulk status submitted",
+    "action_or_input": "Submit unsupported bulk operation",
+    "expected_result": "Operation rejected",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_008_M",
+    "source_id": "UC-SA-008 Main Flow",
+    "purpose": "Assign additional role with valid dates to basic user",
+    "preconditions": "Target user exists and eligible",
+    "action_or_input": "POST /api/super-admin/roles/assign with role_name='mentor', start_date='2026-01-01', end_date='2026-12-31'",
+    "expected_result": "HTTP 201 Created; role assignment active",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_008_A1",
+    "source_id": "UC-SA-008 Alternative Flow A1",
+    "purpose": "Future-dated role assignment recorded as scheduled",
+    "preconditions": "Target user exists",
+    "action_or_input": "POST /api/super-admin/roles/assign with future start_date",
+    "expected_result": "HTTP 201 Created; assignment created for future date",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_008_A2",
+    "source_id": "UC-SA-008 Alternative Flow A2",
+    "purpose": "Permanent role assignment without end_date",
+    "preconditions": "Target user exists",
+    "action_or_input": "POST /api/super-admin/roles/assign without end_date",
+    "expected_result": "HTTP 201 Created; permanent role created",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_008_E1",
+    "source_id": "UC-SA-008 Exception Flow E1",
+    "purpose": "Inverted dates rejected on role assignment",
+    "preconditions": "Target user exists",
+    "action_or_input": "POST /api/super-admin/roles/assign with start_date > end_date",
+    "expected_result": "HTTP 400 Bad Request; inverted dates rejected",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_009_M",
+    "source_id": "UC-SA-009 Main Flow",
+    "purpose": "Reassign role transferring tenure from old to new holder",
+    "preconditions": "Role held by User A",
+    "action_or_input": "Revoke User A assignment and assign to User B",
+    "expected_result": "User A role revoked; User B role active",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_009_A1",
+    "source_id": "UC-SA-009 Alternative Flow A1",
+    "purpose": "Future-dated reassignment handover",
+    "preconditions": "Role held by User A",
+    "action_or_input": "Schedule reassignment for future handover date",
+    "expected_result": "Scheduled handover recorded",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_009_E1",
+    "source_id": "UC-SA-009 Exception Flow E1",
+    "purpose": "Reassignment to ineligible new holder rejected",
+    "preconditions": "New holder is student ineligible for faculty role",
+    "action_or_input": "POST /api/super-admin/roles/assign to ineligible user",
+    "expected_result": "HTTP 400 Bad Request; ineligible holder rejected",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_010_M",
+    "source_id": "UC-SA-010 Main Flow",
+    "purpose": "Revoke an active role assignment immediately",
+    "preconditions": "Active role assignment exists",
+    "action_or_input": "POST /api/super-admin/roles/<id>/revoke",
+    "expected_result": "HTTP 200 OK; role status set to revoked",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_010_A1",
+    "source_id": "UC-SA-010 Alternative Flow A1",
+    "purpose": "Emergency revocation with immediate effect",
+    "preconditions": "Active role assignment exists",
+    "action_or_input": "POST /api/super-admin/roles/<id>/revoke with emergency flag",
+    "expected_result": "HTTP 200 OK; role revoked immediately",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_010_E1",
+    "source_id": "UC-SA-010 Exception Flow E1",
+    "purpose": "Revoking non-existent role assignment returns 404",
+    "preconditions": "Role ID 99999 does not exist",
+    "action_or_input": "POST /api/super-admin/roles/99999/revoke",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_011_M",
+    "source_id": "UC-SA-011 Main Flow",
+    "purpose": "Extend end date of an active time-bound role",
+    "preconditions": "Active role assignment with end date",
+    "action_or_input": "Update assignment end_date to new later date",
+    "expected_result": "End date updated; active validity extended",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_011_A1",
+    "source_id": "UC-SA-011 Alternative Flow A1",
+    "purpose": "No extension chosen; role expires naturally",
+    "preconditions": "Active role reaches end date without extension",
+    "action_or_input": "System evaluates expired role",
+    "expected_result": "Role status set to expired",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_011_E1",
+    "source_id": "UC-SA-011 Exception Flow E1",
+    "purpose": "Extension with end date prior to start date rejected",
+    "preconditions": "Role has start date 2026-01-01",
+    "action_or_input": "Attempt extension with end date 2025-12-31",
+    "expected_result": "Extension rejected; invalid date",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_012_M",
+    "source_id": "UC-SA-012 Main Flow",
+    "purpose": "View role definitions, current holders, and availability",
+    "preconditions": "Role assignments exist in database",
+    "action_or_input": "Query role assignments and active occupancy",
+    "expected_result": "Role metadata and occupancy list returned",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_012_A1",
+    "source_id": "UC-SA-012 Alternative Flow A1",
+    "purpose": "View occupancy for specific role filter",
+    "preconditions": "Roles assigned across users",
+    "action_or_input": "Query assignments filtered by role_name",
+    "expected_result": "Filtered assignments returned",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_012_E1",
+    "source_id": "UC-SA-012 Exception Flow E1",
+    "purpose": "Role query with empty result returns empty list",
+    "preconditions": "No assignments exist for specified role",
+    "action_or_input": "Query assignments for unassigned role",
+    "expected_result": "Empty results returned; no error",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_013_M",
+    "source_id": "UC-SA-013 Main Flow",
+    "purpose": "User with multiple roles selects new active role context",
+    "preconditions": "User has multiple active roles",
+    "action_or_input": "Switch session role context to second role",
+    "expected_result": "Active role context updated",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_013_A1",
+    "source_id": "UC-SA-013 Alternative Flow A1",
+    "purpose": "User selects already active role; no change required",
+    "preconditions": "User has active role selected",
+    "action_or_input": "Select current active role again",
+    "expected_result": "Context preserved without error",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_013_E1",
+    "source_id": "UC-SA-013 Exception Flow E1",
+    "purpose": "Switch to expired or revoked role denied",
+    "preconditions": "User has revoked role",
+    "action_or_input": "Attempt to switch context to revoked role",
+    "expected_result": "Switch denied; invalid role context",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_014_M",
+    "source_id": "UC-SA-014 Main Flow",
+    "purpose": "Authorize access to module resources based on active role",
+    "preconditions": "User authenticated with permitted active role",
+    "action_or_input": "Access authorized module endpoint",
+    "expected_result": "Access granted",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_014_A1",
+    "source_id": "UC-SA-014 Alternative Flow A1",
+    "purpose": "Access permitted across multiple granted modules",
+    "preconditions": "User role grants access to multiple modules",
+    "action_or_input": "Access secondary authorized resource",
+    "expected_result": "Access granted",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_014_E1",
+    "source_id": "UC-SA-014 Exception Flow E1",
+    "purpose": "Access denied when active role lacks permission",
+    "preconditions": "User active role lacks administrative permission",
+    "action_or_input": "Access super admin endpoint",
+    "expected_result": "HTTP 403 Forbidden; access denied",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_015_M",
+    "source_id": "UC-SA-015 Main Flow",
+    "purpose": "Archive an eligible deactivated user",
+    "preconditions": "User is deactivated and eligible",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='archived'",
+    "expected_result": "HTTP 200 OK; status updated to archived",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_015_A1",
+    "source_id": "UC-SA-015 Alternative Flow A1",
+    "purpose": "Multiple eligible deactivated users archived sequentially",
+    "preconditions": "Two deactivated users exist",
+    "action_or_input": "Archive both users sequentially",
+    "expected_result": "Both users updated to archived",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_015_E1",
+    "source_id": "UC-SA-015 Exception Flow E1",
+    "purpose": "Archiving active user directly without deactivation rejected",
+    "preconditions": "User is currently active",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='archived'",
+    "expected_result": "HTTP 400 Bad Request; direct archival rejected",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_015_E2",
+    "source_id": "UC-SA-015 Exception Flow E2",
+    "purpose": "Archiving user with active pending transactions blocked",
+    "preconditions": "User has pending academic/financial clearance holds",
+    "action_or_input": "Attempt user archival",
+    "expected_result": "Archival blocked; pending clearance holds exist",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_016_M",
+    "source_id": "UC-SA-016 Main Flow",
+    "purpose": "Archive eligible closed historical operational data",
+    "preconditions": "Closed academic session data eligible",
+    "action_or_input": "Initiate historical data archive",
+    "expected_result": "Data transitioned to archive storage",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_016_A1",
+    "source_id": "UC-SA-016 Alternative Flow A1",
+    "purpose": "Ineligible records excluded during archive batch",
+    "preconditions": "Batch contains eligible and active records",
+    "action_or_input": "Initiate archive run",
+    "expected_result": "Ineligible records preserved in active storage",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_016_E1",
+    "source_id": "UC-SA-016 Exception Flow E1",
+    "purpose": "Attempting to archive immutable audit logs is rejected",
+    "preconditions": "Audit logs selected for archival",
+    "action_or_input": "Initiate archival on audit logs",
+    "expected_result": "Archival rejected; audit logs non-archivable",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_016_E2",
+    "source_id": "UC-SA-016 Exception Flow E2",
+    "purpose": "Archival aborted if pre-archival backup fails",
+    "preconditions": "Pre-archival backup failure simulated",
+    "action_or_input": "Initiate archival run",
+    "expected_result": "Archival aborted; active data untouched",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_017_M",
+    "source_id": "UC-SA-017 Main Flow",
+    "purpose": "Read-only search and view of archived user records",
+    "preconditions": "Archived user records exist",
+    "action_or_input": "GET /api/super-admin/users filter by status=archived",
+    "expected_result": "HTTP 200 OK; read-only archived records returned",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_017_A1",
+    "source_id": "UC-SA-017 Alternative Flow A1",
+    "purpose": "Search archived records with specific filter criteria",
+    "preconditions": "Archived records exist",
+    "action_or_input": "Filter archived query by user_type",
+    "expected_result": "Filtered archived records returned",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_017_E1",
+    "source_id": "UC-SA-017 Exception Flow E1",
+    "purpose": "Attempting edit or write to archived record rejected",
+    "preconditions": "Archived user record exists",
+    "action_or_input": "Attempt direct modification of archived record",
+    "expected_result": "Modification rejected; archived records are read-only",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_018_M",
+    "source_id": "UC-SA-018 Main Flow",
+    "purpose": "Restore archived user within reversible window",
+    "preconditions": "User is archived within window",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='deactivated'",
+    "expected_result": "HTTP 200 OK; status restored to deactivated",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_018_A1",
+    "source_id": "UC-SA-018 Alternative Flow A1",
+    "purpose": "Restoration with immediate policy reactivation",
+    "preconditions": "User restored within window",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='active'",
+    "expected_result": "HTTP 200 OK; status restored to active",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_018_E1",
+    "source_id": "UC-SA-018 Exception Flow E1",
+    "purpose": "Restoration attempt after window expiry rejected",
+    "preconditions": "User archived beyond reversible window",
+    "action_or_input": "Restore request after window expiry",
+    "expected_result": "Restoration rejected; user is permanently archived",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_018_E2",
+    "source_id": "UC-SA-018 Exception Flow E2",
+    "purpose": "Restoration blocked if identity conflict exists in active system",
+    "preconditions": "Another user created with conflicting identity",
+    "action_or_input": "Restore archived user with conflicting identity",
+    "expected_result": "Restoration blocked; conflict error reported",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_019_M",
+    "source_id": "UC-SA-019 Main Flow",
+    "purpose": "Restore archived historical data upon required authorization",
+    "preconditions": "Archived data exists; restoration approved",
+    "action_or_input": "Execute historical data restoration",
+    "expected_result": "Data restored to active repository",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_019_A1",
+    "source_id": "UC-SA-019 Alternative Flow A1",
+    "purpose": "Partial historical batch restoration",
+    "preconditions": "Sub-batch approved for restoration",
+    "action_or_input": "Execute restoration for target sub-batch",
+    "expected_result": "Sub-batch restored",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_019_E1",
+    "source_id": "UC-SA-019 Exception Flow E1",
+    "purpose": "Restoration rejected without required authorization",
+    "preconditions": "Restoration requested without authorization token",
+    "action_or_input": "Execute restoration without approval",
+    "expected_result": "Restoration rejected; unauthorized",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_020_M",
+    "source_id": "UC-SA-020 Main Flow",
+    "purpose": "Generate archive status and volume report",
+    "preconditions": "Archived data exists",
+    "action_or_input": "Request archive metadata summary report",
+    "expected_result": "Summary report generated with volume metrics",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_020_A1",
+    "source_id": "UC-SA-020 Alternative Flow A1",
+    "purpose": "Report pagination for large result sets",
+    "preconditions": "Large archive volume",
+    "action_or_input": "Request paginated archive report",
+    "expected_result": "Paginated report pages returned",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_020_E1",
+    "source_id": "UC-SA-020 Exception Flow E1",
+    "purpose": "Restricted operational content excluded from report",
+    "preconditions": "Report request includes restricted operational fields",
+    "action_or_input": "Generate archive report",
+    "expected_result": "Restricted fields omitted; policy compliance maintained",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_021_M",
+    "source_id": "UC-SA-021 Main Flow",
+    "purpose": "Export archived dataset package for external storage",
+    "preconditions": "Archived package prepared and authorized",
+    "action_or_input": "Initiate archive export package",
+    "expected_result": "Export bundle created and verified",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_021_A1",
+    "source_id": "UC-SA-021 Alternative Flow A1",
+    "purpose": "Metadata-only export where operational data is restricted",
+    "preconditions": "Operational data restricted from external bundle",
+    "action_or_input": "Export metadata summary",
+    "expected_result": "Metadata manifest generated",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_021_E1",
+    "source_id": "UC-SA-021 Exception Flow E1",
+    "purpose": "Export rejected if policy validation fails",
+    "preconditions": "Export request lacks export clearance",
+    "action_or_input": "Initiate export",
+    "expected_result": "Export rejected; policy clearance required",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_022_M",
+    "source_id": "UC-SA-022 Main Flow",
+    "purpose": "Submit permanent purge request for retention-expired data",
+    "preconditions": "Archived dataset retention period expired",
+    "action_or_input": "Submit purge request",
+    "expected_result": "Purge request recorded pending IT Head approval",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_022_A1",
+    "source_id": "UC-SA-022 Alternative Flow A1",
+    "purpose": "Super Admin cancels purge request before submission",
+    "preconditions": "Super Admin on purge request form",
+    "action_or_input": "Cancel request",
+    "expected_result": "No purge request created",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_022_E1",
+    "source_id": "UC-SA-022 Exception Flow E1",
+    "purpose": "Purge request for unexpired data rejected",
+    "preconditions": "Archived dataset within active retention period",
+    "action_or_input": "Submit purge request for unexpired data",
+    "expected_result": "Purge request rejected; retention period active",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_023_M",
+    "source_id": "UC-SA-023 Main Flow",
+    "purpose": "IT Head authorizes valid purge request; purge executes",
+    "preconditions": "Valid purge request pending; IT Head approves",
+    "action_or_input": "Submit IT Head authorization",
+    "expected_result": "Dual authorization verified; dataset permanently purged",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_023_A1",
+    "source_id": "UC-SA-023 Alternative Flow A1",
+    "purpose": "IT Head defers decision; request remains pending",
+    "preconditions": "Purge request pending",
+    "action_or_input": "Exit review without decision",
+    "expected_result": "Request remains in pending state",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_023_E1",
+    "source_id": "UC-SA-023 Exception Flow E1",
+    "purpose": "IT Head rejects purge request; data remains retained",
+    "preconditions": "Purge request pending",
+    "action_or_input": "Submit IT Head rejection",
+    "expected_result": "Purge request rejected; archived data preserved",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_024_M",
+    "source_id": "UC-SA-024 Main Flow",
+    "purpose": "Super Admin retrieves system audit logs",
+    "preconditions": "Audit log entries exist",
+    "action_or_input": "GET /api/super-admin/audit-logs",
+    "expected_result": "HTTP 200 OK; audit entries returned",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_024_A1",
+    "source_id": "UC-SA-024 Alternative Flow A1",
+    "purpose": "Audit query with no matches returns empty list",
+    "preconditions": "No matching audit entries for filter",
+    "action_or_input": "GET /api/super-admin/audit-logs with non-matching filter",
+    "expected_result": "HTTP 200 OK; empty results list",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_024_E1",
+    "source_id": "UC-SA-024 Exception Flow E1",
+    "purpose": "Audit log deletion or modification blocked",
+    "preconditions": "Audit entry exists",
+    "action_or_input": "DELETE /api/super-admin/audit-logs/<id>",
+    "expected_result": "HTTP 405 Method Not Allowed / 403 Forbidden",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_025_M",
+    "source_id": "UC-SA-025 Main Flow",
+    "purpose": "Generate structured audit trail report",
+    "preconditions": "Audit entries recorded",
+    "action_or_input": "Request audit summary report",
+    "expected_result": "Report returned with action counts and timestamps",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_025_A1",
+    "source_id": "UC-SA-025 Alternative Flow A1",
+    "purpose": "Audit report for zero-activity window",
+    "preconditions": "Zero operations recorded in specified window",
+    "action_or_input": "Request audit report for future date range",
+    "expected_result": "Report generated indicating no records found",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_025_E1",
+    "source_id": "UC-SA-025 Exception Flow E1",
+    "purpose": "Restricted operational content excluded from audit report",
+    "preconditions": "Audit report requested",
+    "action_or_input": "Generate audit report",
+    "expected_result": "Operational payloads excluded; control metadata preserved",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_026_M",
+    "source_id": "UC-SA-026 Main Flow",
+    "purpose": "Load Super Admin dashboard aggregating core metrics",
+    "preconditions": "Users and role assignments exist",
+    "action_or_input": "Request administrative dashboard metrics",
+    "expected_result": "Aggregated user, role, and audit counts returned",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_026_A1",
+    "source_id": "UC-SA-026 Alternative Flow A1",
+    "purpose": "Dashboard handles sub-service latency gracefully",
+    "preconditions": "External reporting subsystem delayed",
+    "action_or_input": "Load dashboard",
+    "expected_result": "Core metrics displayed with cached/partial indicators",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_026_E1",
+    "source_id": "UC-SA-026 Exception Flow E1",
+    "purpose": "Unauthenticated user denied dashboard access",
+    "preconditions": "Unauthenticated client",
+    "action_or_input": "Request administrative dashboard",
+    "expected_result": "HTTP 401 Unauthorized / 403 Forbidden",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_027_M",
+    "source_id": "UC-SA-027 Main Flow",
+    "purpose": "Update system parameters within permitted boundary",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "Configure permitted setting (session timeout = 30m)",
+    "expected_result": "Setting saved and audit logged",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_027_A1",
+    "source_id": "UC-SA-027 Alternative Flow A1",
+    "purpose": "Super Admin cancels parameter update; no change saved",
+    "preconditions": "Super Admin on config form",
+    "action_or_input": "Cancel configuration change",
+    "expected_result": "Parameters remain at prior values",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_027_E1",
+    "source_id": "UC-SA-027 Exception Flow E1",
+    "purpose": "Attempting to modify unauthorized parameter rejected",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "Attempt to configure academic calendar parameter",
+    "expected_result": "Operation rejected; out of permitted boundary",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_027_E2",
+    "source_id": "UC-SA-027 Exception Flow E2",
+    "purpose": "Invalid parameter value rejected",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "Configure session timeout = -5 minutes",
+    "expected_result": "Operation rejected; invalid range",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_028_M",
+    "source_id": "UC-SA-028 Main Flow",
+    "purpose": "Scheduled role assignment activates automatically when start date reached",
+    "preconditions": "Role assignment scheduled for today",
+    "action_or_input": "Evaluate scheduled role activation event",
+    "expected_result": "Role assignment status updated to active",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_028_A1",
+    "source_id": "UC-SA-028 Alternative Flow A1",
+    "purpose": "Scheduled assignment superseded before start date",
+    "preconditions": "Scheduled assignment cancelled prior to start date",
+    "action_or_input": "Start date reached for cancelled assignment",
+    "expected_result": "No activation occurs; cancelled state remains",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_028_E1",
+    "source_id": "UC-SA-028 Exception Flow E1",
+    "purpose": "Activation blocked if user deactivated before start date",
+    "preconditions": "User account deactivated while assignment scheduled",
+    "action_or_input": "Start date reached",
+    "expected_result": "Activation blocked; user is not active",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_029_M",
+    "source_id": "UC-SA-029 Main Flow",
+    "purpose": "Time-bound role expires automatically when end date reached",
+    "preconditions": "Active role with end date reached",
+    "action_or_input": "Process role expiry event",
+    "expected_result": "Role status updated to expired",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_029_A1",
+    "source_id": "UC-SA-029 Alternative Flow A1",
+    "purpose": "Role validly extended before end date does not expire",
+    "preconditions": "Role end date extended prior to original date",
+    "action_or_input": "Original end date reached",
+    "expected_result": "Role remains active with new end date",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_029_E1",
+    "source_id": "UC-SA-029 Exception Flow E1",
+    "purpose": "Expiry failure logged without corrupting role status",
+    "preconditions": "Database lock during expiry execution",
+    "action_or_input": "Process role expiry",
+    "expected_result": "Failure recorded for retry; no silent corruption",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_030_M",
+    "source_id": "UC-SA-030 Main Flow",
+    "purpose": "Send expiry reminder notice to holder before role expiry",
+    "preconditions": "Active role within reminder window",
+    "action_or_input": "Process reminder event",
+    "expected_result": "Reminder notification queued for holder",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_030_A1",
+    "source_id": "UC-SA-030 Alternative Flow A1",
+    "purpose": "Reminder suppressed if role already extended",
+    "preconditions": "Role extended beyond reminder threshold",
+    "action_or_input": "Evaluate reminder criteria",
+    "expected_result": "No reminder sent",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_030_E1",
+    "source_id": "UC-SA-030 Exception Flow E1",
+    "purpose": "Delivery channel failure logged for retry",
+    "preconditions": "Notification delivery service error",
+    "action_or_input": "Send reminder notice",
+    "expected_result": "Failure logged; role status remains active",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_031_M",
+    "source_id": "UC-SA-031 Main Flow",
+    "purpose": "Finalize archived user as non-restorable upon reversibility window expiry",
+    "preconditions": "User archived beyond reversible window",
+    "action_or_input": "Process window expiry event",
+    "expected_result": "User finalized as permanently non-restorable",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_031_A1",
+    "source_id": "UC-SA-031 Alternative Flow A1",
+    "purpose": "User restored before window expiry is not finalized",
+    "preconditions": "User restored within window",
+    "action_or_input": "Window expiry date reached",
+    "expected_result": "No finalization; active/deactivated state preserved",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_031_E1",
+    "source_id": "UC-SA-031 Exception Flow E1",
+    "purpose": "Commit error during finalization preserves state safely",
+    "preconditions": "Commit error simulated during finalization",
+    "action_or_input": "Process finalization",
+    "expected_result": "Failure logged; existing archived status preserved",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_032_M",
+    "source_id": "UC-SA-032 Main Flow",
+    "purpose": "Trigger security alert when consecutive failed logins reach 5",
+    "preconditions": "Account reaches 5 consecutive failed logins",
+    "action_or_input": "Process 5th failed login attempt",
+    "expected_result": "Security alert generated and dispatched",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_032_A1",
+    "source_id": "UC-SA-032 Alternative Flow A1",
+    "purpose": "Consecutive failures below 5 logged without threshold alert",
+    "preconditions": "Account experiences 3 failed logins",
+    "action_or_input": "Process 3rd failed login",
+    "expected_result": "Attempt logged; no security alert triggered",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_032_E1",
+    "source_id": "UC-SA-032 Exception Flow E1",
+    "purpose": "Alert notification delivery failure logged safely",
+    "preconditions": "Delivery gateway offline",
+    "action_or_input": "Process 5th failed login",
+    "expected_result": "Alert record persisted; delivery failure logged for retry",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_033_M",
+    "source_id": "UC-SA-033 Main Flow",
+    "purpose": "Authenticate Super Admin with valid credentials",
+    "preconditions": "Active Super Admin account",
+    "action_or_input": "Authenticate with valid credentials",
+    "expected_result": "Authenticated session established",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_033_A1",
+    "source_id": "UC-SA-033 Alternative Flow A1",
+    "purpose": "Password rotation due prompts required change",
+    "preconditions": "Password rotation interval elapsed",
+    "action_or_input": "Submit login credentials",
+    "expected_result": "Password change required before session establishment",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_033_A2",
+    "source_id": "UC-SA-033 Alternative Flow A2",
+    "purpose": "2FA challenge step during authentication",
+    "preconditions": "2FA configured for Super Admin",
+    "action_or_input": "Submit password then valid 2FA token",
+    "expected_result": "2FA verified; session established",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_033_E1",
+    "source_id": "UC-SA-033 Exception Flow E1",
+    "purpose": "Invalid credentials rejected; no session established",
+    "preconditions": "Invalid credentials provided",
+    "action_or_input": "Submit invalid password",
+    "expected_result": "Authentication rejected; failed attempt logged",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_033_E2",
+    "source_id": "UC-SA-033 Exception Flow E2",
+    "purpose": "Non-whitelisted IP denied access",
+    "preconditions": "IP whitelist enabled; request from unlisted IP",
+    "action_or_input": "Submit credentials from unlisted IP",
+    "expected_result": "Access denied; IP rejection logged",
+    "test_type": "Exception Flow"
+  },
+  {
+    "test_id": "UC_034_M",
+    "source_id": "UC-SA-034 Main Flow",
+    "purpose": "Terminate session upon reaching inactivity timeout",
+    "preconditions": "Active session with no activity past timeout limit",
+    "action_or_input": "Process session inactivity timeout",
+    "expected_result": "Session invalidated; re-authentication required",
+    "test_type": "Main Flow"
+  },
+  {
+    "test_id": "UC_034_A1",
+    "source_id": "UC-SA-034 Alternative Flow A1",
+    "purpose": "Valid user activity before timeout resets idle timer",
+    "preconditions": "Session idle for half of timeout limit",
+    "action_or_input": "User performs valid authenticated action",
+    "expected_result": "Idle timer reset; session remains active",
+    "test_type": "Alternative Flow"
+  },
+  {
+    "test_id": "UC_034_E1",
+    "source_id": "UC-SA-034 Exception Flow E1",
+    "purpose": "Session cleanup failure logged without silent bypass",
+    "preconditions": "Session store cleanup error",
+    "action_or_input": "Process inactivity timeout",
+    "expected_result": "Session invalidated securely; error logged",
+    "test_type": "Exception Flow"
+  }
+]

@@ -1,0 +1,317 @@
+[
+  {
+    "test_id": "TEST-WF-01",
+    "source_id": "BW-SA-01 Approved Path",
+    "purpose": "Verify permanent data purge approved workflow with dual authorization",
+    "preconditions": "Archived dataset exceeds retention period; Super Admin requests purge",
+    "action_or_input": "Super Admin submits purge request; IT Head provides second authorization",
+    "expected_result": "Purge executed; dataset permanently removed; audit evidence preserved",
+    "test_type": "Workflow Path"
+  },
+  {
+    "test_id": "TEST-WF-02",
+    "source_id": "BW-SA-02 Rejected Path",
+    "purpose": "Verify permanent data purge rejected workflow when second authorization denied",
+    "preconditions": "Retention-expired dataset; Super Admin submits purge request",
+    "action_or_input": "IT Head reviews and formally rejects purge request",
+    "expected_result": "Purge rejected; dataset retained in archived status; rejection audit logged",
+    "test_type": "Workflow Path"
+  },
+  {
+    "test_id": "TEST-WF-03",
+    "source_id": "BW-SA-02 Premature Purge Decision",
+    "purpose": "Verify purge request for data still within retention period is rejected at entry",
+    "preconditions": "Dataset currently within active retention period",
+    "action_or_input": "Submit purge request for unexpired dataset",
+    "expected_result": "Purge request rejected; retention constraint error",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-04",
+    "source_id": "CW-SA-01 Purge Lifecycle Query",
+    "purpose": "Verify purge request lifecycle state progression from requested to decided",
+    "preconditions": "Purge request submitted by Super Admin",
+    "action_or_input": "Query purge request status during review lifecycle",
+    "expected_result": "Request displayed in pending status with audit details",
+    "test_type": "Composite Workflow"
+  },
+  {
+    "test_id": "TEST-WF-05",
+    "source_id": "CW-SA-01 Redundant Decision Branch",
+    "purpose": "Verify decision submitted for already decided purge request is rejected",
+    "preconditions": "Purge request already decided (approved or rejected)",
+    "action_or_input": "Submit second decision on terminal purge request",
+    "expected_result": "Operation rejected; request already finalized",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-06",
+    "source_id": "BW-SA-03 Immediate Assignment Path",
+    "purpose": "Verify immediate time-bound role assignment activates and reaches expiry state",
+    "preconditions": "Target user exists; Super Admin authenticated",
+    "action_or_input": "POST /api/super-admin/roles/assign with start_date=today, end_date=future",
+    "expected_result": "HTTP 201 Created; role assignment is active",
+    "test_type": "Workflow Path"
+  },
+  {
+    "test_id": "TEST-WF-07",
+    "source_id": "BW-SA-03 Missing Date Decision",
+    "purpose": "Verify role assignment missing required start date is rejected",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "POST /api/super-admin/roles/assign omitting start_date",
+    "expected_result": "HTTP 400 Bad Request; required date missing",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-08",
+    "source_id": "BW-SA-04 Scheduled Assignment Path",
+    "purpose": "Verify future-dated role assignment activates when effective start date is reached",
+    "preconditions": "Target user exists; Super Admin authenticated",
+    "action_or_input": "POST /api/super-admin/roles/assign with start_date in future",
+    "expected_result": "HTTP 201 Created; role assignment created",
+    "test_type": "Workflow Path"
+  },
+  {
+    "test_id": "TEST-WF-09",
+    "source_id": "BW-SA-04 Scheduled User Inactive Decision",
+    "purpose": "Verify scheduled assignment does not activate if user account is deactivated before start date",
+    "preconditions": "Role scheduled for future date; user deactivated prior to start date",
+    "action_or_input": "Start date reached for deactivated user",
+    "expected_result": "Role activation blocked; access not granted",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-10",
+    "source_id": "BW-SA-05 Extension Traversal",
+    "purpose": "Verify role validity extension traversal updating end date before expiry",
+    "preconditions": "Active role assignment exists with current end_date",
+    "action_or_input": "Super Admin updates end_date to new later date",
+    "expected_result": "End date updated; active validity extended",
+    "test_type": "Workflow Path"
+  },
+  {
+    "test_id": "TEST-WF-11",
+    "source_id": "BW-SA-05 Post-Expiry Extension Decision",
+    "purpose": "Verify extension attempt on already expired role is rejected",
+    "preconditions": "Role assignment status is expired",
+    "action_or_input": "Attempt to extend validity of expired role",
+    "expected_result": "Extension rejected; new assignment required for expired role",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-12",
+    "source_id": "CW-SA-02 Early Revocation Path",
+    "purpose": "Verify early role revocation state transition from active to revoked",
+    "preconditions": "Active role assignment exists",
+    "action_or_input": "POST /api/super-admin/roles/<id>/revoke",
+    "expected_result": "HTTP 200 OK; role status set to revoked",
+    "test_type": "State Transition"
+  },
+  {
+    "test_id": "TEST-WF-13",
+    "source_id": "CW-SA-02 Redundant Revocation Decision",
+    "purpose": "Verify revoking an already revoked role assignment is rejected",
+    "preconditions": "Role assignment already revoked",
+    "action_or_input": "POST /api/super-admin/roles/<id>/revoke",
+    "expected_result": "HTTP 400 Bad Request; already inactive role cannot be revoked",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-14",
+    "source_id": "CW-SA-02 Handover Reassignment Path",
+    "purpose": "Verify role reassignment workflow transitioning prior holder to revoked and new holder to active",
+    "preconditions": "User A holds active role",
+    "action_or_input": "Revoke User A assignment and assign role to User B",
+    "expected_result": "User A role revoked; User B role active",
+    "test_type": "State Transition"
+  },
+  {
+    "test_id": "TEST-WF-15",
+    "source_id": "CW-SA-02 Inverted Dating Decision",
+    "purpose": "Verify role assignment rejection path when end_date < start_date",
+    "preconditions": "Super Admin authenticated",
+    "action_or_input": "POST /api/super-admin/roles/assign with start_date='2026-12-31', end_date='2026-01-01'",
+    "expected_result": "HTTP 400 Bad Request; inverted dates rejected",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-16",
+    "source_id": "CW-SA-02 Singular Role Duplicate Decision",
+    "purpose": "Verify singular role assignment rejection path when role is already actively occupied",
+    "preconditions": "Singular role actively held by User A",
+    "action_or_input": "POST /api/super-admin/roles/assign with singular role to User B",
+    "expected_result": "HTTP 400 Bad Request; duplicate singular role occupancy rejected",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-17",
+    "source_id": "CW-SA-02 User-Type Eligibility Decision",
+    "purpose": "Verify role assignment rejection path when user type is ineligible",
+    "preconditions": "Target user has user_type='student'",
+    "action_or_input": "POST /api/super-admin/roles/assign with faculty role to student",
+    "expected_result": "HTTP 400 Bad Request; ineligible user_type rejected",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-18",
+    "source_id": "CW-SA-02 Cascade Revocation Path",
+    "purpose": "Verify deactivation of user account triggers revocation/inactivation of assigned roles",
+    "preconditions": "User has active account and active role",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='deactivated'",
+    "expected_result": "User account deactivated; effective role access terminated",
+    "test_type": "State Transition"
+  },
+  {
+    "test_id": "TEST-WF-19",
+    "source_id": "BW-SA-06 Deactivation Transition",
+    "purpose": "Verify user account deactivation transition from active to deactivated",
+    "preconditions": "User is active",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='deactivated'",
+    "expected_result": "HTTP 200 OK; status updated to deactivated",
+    "test_type": "State Transition"
+  },
+  {
+    "test_id": "TEST-WF-20",
+    "source_id": "BW-SA-06 Reactivation Transition",
+    "purpose": "Verify user account reactivation transition from deactivated to active",
+    "preconditions": "User is deactivated",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='active'",
+    "expected_result": "HTTP 200 OK; status updated to active",
+    "test_type": "State Transition"
+  },
+  {
+    "test_id": "TEST-WF-21",
+    "source_id": "BW-SA-07 Restoration Path",
+    "purpose": "Verify restoration workflow of archived account within reversible retention window",
+    "preconditions": "User is archived within reversible window",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='deactivated'",
+    "expected_result": "HTTP 200 OK; user restored from archived to deactivated",
+    "test_type": "Workflow Path"
+  },
+  {
+    "test_id": "TEST-WF-22",
+    "source_id": "BW-SA-07 Immediate Active Restoration Path",
+    "purpose": "Verify restoration workflow directly restoring archived account to active status",
+    "preconditions": "User archived within reversible window",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='active'",
+    "expected_result": "HTTP 200 OK; user restored directly to active",
+    "test_type": "Workflow Path"
+  },
+  {
+    "test_id": "TEST-WF-23",
+    "source_id": "BW-SA-08 Finalization Path",
+    "purpose": "Verify transition from archived to permanently non-restorable upon window expiry",
+    "preconditions": "User archived beyond reversible window",
+    "action_or_input": "Evaluate window expiry event",
+    "expected_result": "User finalized as permanently non-restorable",
+    "test_type": "State Transition"
+  },
+  {
+    "test_id": "TEST-WF-24",
+    "source_id": "BW-SA-08 Post-Window Restoration Decision",
+    "purpose": "Verify restoration attempt after window expiry is rejected",
+    "preconditions": "User finalized as permanently non-restorable",
+    "action_or_input": "Attempt restoration of permanently non-restorable user",
+    "expected_result": "Restoration rejected; permanent archive status preserved",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-25",
+    "source_id": "CW-SA-03 Direct Archival Decision",
+    "purpose": "Verify direct archival of active user without prior deactivation is rejected",
+    "preconditions": "User is currently active",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='archived' directly from active",
+    "expected_result": "HTTP 400 Bad Request; direct archival prohibited",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-26",
+    "source_id": "CW-SA-03 Suspension Transition",
+    "purpose": "Verify user status transition from active to suspended",
+    "preconditions": "User is currently active",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='suspended'",
+    "expected_result": "HTTP 200 OK; user status updated to suspended",
+    "test_type": "State Transition"
+  },
+  {
+    "test_id": "TEST-WF-27",
+    "source_id": "CW-SA-03 Suspended Reactivation Transition",
+    "purpose": "Verify user status transition from suspended back to active",
+    "preconditions": "User is suspended",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='active'",
+    "expected_result": "HTTP 200 OK; user status updated to active",
+    "test_type": "State Transition"
+  },
+  {
+    "test_id": "TEST-WF-28",
+    "source_id": "CW-SA-03 Archival Transition",
+    "purpose": "Verify transition of eligible deactivated user to archived state",
+    "preconditions": "User is deactivated",
+    "action_or_input": "PATCH /api/super-admin/users/<id>/status with status='archived'",
+    "expected_result": "HTTP 200 OK; user status updated to archived",
+    "test_type": "State Transition"
+  },
+  {
+    "test_id": "TEST-WF-29",
+    "source_id": "BW-SA-09 Archive Path",
+    "purpose": "Verify historical data archival workflow moving inactive records to archive",
+    "preconditions": "Closed academic data eligible for archival; backup succeeds",
+    "action_or_input": "Initiate historical data archive workflow",
+    "expected_result": "Dataset moved to archive; active storage cleared; backup verified",
+    "test_type": "Workflow Path"
+  },
+  {
+    "test_id": "TEST-WF-30",
+    "source_id": "BW-SA-09 Backup Failure Decision",
+    "purpose": "Verify historical archival aborts when pre-archival backup fails",
+    "preconditions": "Pre-archival backup fails verification",
+    "action_or_input": "Initiate historical data archive workflow",
+    "expected_result": "Archival aborted; active data untouched",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-31",
+    "source_id": "BW-SA-09 Restore Path",
+    "purpose": "Verify historical data restore workflow upon approved authorization",
+    "preconditions": "Archived dataset exists; restoration approved",
+    "action_or_input": "Execute historical restore workflow",
+    "expected_result": "Data restored to active database",
+    "test_type": "Workflow Path"
+  },
+  {
+    "test_id": "TEST-WF-32",
+    "source_id": "BW-SA-09 Unauthorized Restore Decision",
+    "purpose": "Verify historical data restore rejected without authorization",
+    "preconditions": "Archived dataset exists; authorization missing",
+    "action_or_input": "Execute historical restore workflow without approval",
+    "expected_result": "Restoration rejected; approval required",
+    "test_type": "Decision Branch"
+  },
+  {
+    "test_id": "TEST-WF-33",
+    "source_id": "WF Security (Unauthenticated Initiation)",
+    "purpose": "Verify workflow entry point rejects unauthenticated requests",
+    "preconditions": "Unauthenticated client (no credentials)",
+    "action_or_input": "POST /api/super-admin/users without authentication",
+    "expected_result": "HTTP 401 Unauthorized / 403 Forbidden; access denied",
+    "test_type": "Security Boundary"
+  },
+  {
+    "test_id": "TEST-WF-34",
+    "source_id": "WF Security (CSRF Missing on Transition)",
+    "purpose": "Verify workflow state transition write rejects missing CSRF token",
+    "preconditions": "Authenticated session without CSRF token",
+    "action_or_input": "POST /api/super-admin/roles/assign without CSRF token header",
+    "expected_result": "HTTP 403 Forbidden; CSRF validation failed",
+    "test_type": "Security Boundary"
+  },
+  {
+    "test_id": "TEST-WF-35",
+    "source_id": "WF Audit (Non-Repudiation Logging)",
+    "purpose": "Verify every workflow transition generates an immutable audit log record",
+    "preconditions": "Super Admin executes user and role lifecycle workflows",
+    "action_or_input": "GET /api/super-admin/audit-logs after operations",
+    "expected_result": "Audit entries recorded with actor, action, timestamp, details",
+    "test_type": "Audit Trail"
+  }
+]
