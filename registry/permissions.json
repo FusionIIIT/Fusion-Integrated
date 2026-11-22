@@ -278,6 +278,132 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "quiz": {
+      "grants": {
+        "Associate Professor": [
+          "quiz.evaluation.manage",
+          "quiz.quiz.manage",
+          "quiz.quiz.publish",
+          "quiz.quiz.view",
+          "quiz.report.view"
+        ],
+        "Dean Academic": [
+          "quiz.evaluation.manage",
+          "quiz.quiz.manage",
+          "quiz.quiz.publish",
+          "quiz.quiz.view",
+          "quiz.report.view"
+        ],
+        "Professor": [
+          "quiz.evaluation.manage",
+          "quiz.quiz.manage",
+          "quiz.quiz.publish",
+          "quiz.quiz.view",
+          "quiz.report.view"
+        ],
+        "faculty": [
+          "quiz.evaluation.manage",
+          "quiz.quiz.manage",
+          "quiz.quiz.publish",
+          "quiz.quiz.view",
+          "quiz.report.view"
+        ],
+        "student": [
+          "quiz.attempt.start",
+          "quiz.attempt.view_own",
+          "quiz.quiz.view"
+        ]
+      },
+      "module_grants": [
+        "Associate Professor",
+        "Dean Academic",
+        "Professor",
+        "faculty",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/quiz",
+        "icon": "FaQuestionCircle",
+        "items": [
+          {
+            "code": "quiz.my_quizzes",
+            "icon": "FaListAlt",
+            "label": "My Quizzes",
+            "required_permission": "quiz.quiz.view",
+            "sort_order": 10,
+            "to": "/quiz/my-quizzes"
+          },
+          {
+            "code": "quiz.results",
+            "icon": "FaChartBar",
+            "label": "My Results",
+            "required_permission": "quiz.attempt.view_own",
+            "sort_order": 20,
+            "to": "/quiz/results"
+          },
+          {
+            "code": "quiz.manage",
+            "icon": "FaClipboardList",
+            "label": "Manage Quizzes",
+            "required_permission": "quiz.quiz.manage",
+            "sort_order": 30,
+            "to": "/quiz/manage"
+          },
+          {
+            "code": "quiz.evaluate",
+            "icon": "FaEdit",
+            "label": "Evaluate",
+            "required_permission": "quiz.evaluation.manage",
+            "sort_order": 40,
+            "to": "/quiz/evaluate"
+          },
+          {
+            "code": "quiz.reports",
+            "icon": "FaChartPie",
+            "label": "Reports",
+            "required_permission": "quiz.report.view",
+            "sort_order": 50,
+            "to": "/quiz/reports"
+          }
+        ],
+        "label": "Quiz",
+        "nav_section": "Academic",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "quiz.quiz.view",
+          "label": "View available quizzes"
+        },
+        {
+          "code": "quiz.quiz.manage",
+          "label": "Create and manage quizzes"
+        },
+        {
+          "code": "quiz.quiz.publish",
+          "label": "Publish and schedule quizzes"
+        },
+        {
+          "code": "quiz.attempt.start",
+          "label": "Start a quiz attempt"
+        },
+        {
+          "code": "quiz.attempt.view_own",
+          "label": "View own attempts and results"
+        },
+        {
+          "code": "quiz.evaluation.manage",
+          "label": "Evaluate and release quiz results"
+        },
+        {
+          "code": "quiz.report.view",
+          "label": "View quiz performance reports"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",

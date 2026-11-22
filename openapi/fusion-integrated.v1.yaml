@@ -1674,6 +1674,632 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/quiz/attempts/{id}/:
+    get:
+      operationId: quiz_attempt_retrieve
+      summary: Get active attempt with questions
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttemptDetail'
+          description: ''
+  /api/v1/quiz/attempts/{id}/evaluate/:
+    get:
+      operationId: quiz_attempt_eval_retrieve
+      summary: Get attempt for evaluation
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttemptDetail'
+          description: ''
+    post:
+      operationId: quiz_attempt_eval_submit
+      summary: Evaluate subjective responses
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluateAttempt'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EvaluateAttempt'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EvaluateAttempt'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttemptDetail'
+          description: ''
+  /api/v1/quiz/attempts/{id}/release/:
+    post:
+      operationId: quiz_attempt_release
+      summary: Release result for a single attempt
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttempt'
+          description: ''
+  /api/v1/quiz/attempts/{id}/respond/:
+    post:
+      operationId: quiz_save_response
+      summary: Save a response during active attempt
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SaveResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SaveResponse'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaveResponseResult'
+          description: ''
+  /api/v1/quiz/attempts/{id}/submit/:
+    post:
+      operationId: quiz_submit_attempt
+      summary: Manually submit a quiz attempt
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttempt'
+          description: ''
+  /api/v1/quiz/bank/:
+    get:
+      operationId: quiz_bank_list
+      summary: List question bank (reusable questions)
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+          description: ''
+  /api/v1/quiz/bank/{id}/add-to-quiz/:
+    post:
+      operationId: quiz_bank_add_to_quiz
+      summary: Add a bank question to a quiz
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddBankQuestion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddBankQuestion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddBankQuestion'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+          description: ''
+  /api/v1/quiz/eligible/:
+    get:
+      operationId: quiz_eligible_list
+      summary: List eligible quizzes for student
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizList'
+          description: ''
+  /api/v1/quiz/eligible/{id}/:
+    get:
+      operationId: quiz_eligible_detail
+      summary: Eligible quiz detail + instructions
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizDetail'
+          description: ''
+  /api/v1/quiz/eligible/{id}/start/:
+    post:
+      operationId: quiz_start_attempt
+      summary: Start a quiz attempt
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttemptDetail'
+          description: ''
+  /api/v1/quiz/my-results/:
+    get:
+      operationId: quiz_my_results_list
+      summary: List student's released results
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttempt'
+          description: ''
+  /api/v1/quiz/my-results/{id}/:
+    get:
+      operationId: quiz_my_result_detail
+      summary: Single released result with responses
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttemptDetail'
+          description: ''
+  /api/v1/quiz/questions/{id}/:
+    patch:
+      operationId: quiz_question_update
+      summary: Update a question
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedQuestionWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedQuestionWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedQuestionWrite'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+          description: ''
+    delete:
+      operationId: quiz_question_delete
+      summary: Delete a question
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/quiz/quizzes/:
+    get:
+      operationId: quiz_quizzes_list
+      summary: List professor's quizzes
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizList'
+          description: ''
+    post:
+      operationId: quiz_quizzes_create
+      summary: Create a new quiz
+      tags:
+      - quiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuizWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/QuizWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/QuizWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizDetail'
+          description: ''
+  /api/v1/quiz/quizzes/{id}/:
+    get:
+      operationId: quiz_quiz_retrieve
+      summary: Retrieve a quiz
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizDetail'
+          description: ''
+    patch:
+      operationId: quiz_quiz_update
+      summary: Update a quiz (Draft only)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedQuizWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedQuizWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedQuizWrite'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizDetail'
+          description: ''
+    delete:
+      operationId: quiz_quiz_delete
+      summary: Delete a quiz (Draft only)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/quiz/quizzes/{id}/archive/:
+    post:
+      operationId: quiz_archive
+      summary: Archive a closed quiz
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizDetail'
+          description: ''
+  /api/v1/quiz/quizzes/{id}/close/:
+    post:
+      operationId: quiz_close
+      summary: Close an active quiz
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizDetail'
+          description: ''
+  /api/v1/quiz/quizzes/{id}/publish/:
+    post:
+      operationId: quiz_publish
+      summary: Publish or schedule a quiz
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizDetail'
+          description: ''
+  /api/v1/quiz/quizzes/{quiz_pk}/questions/:
+    get:
+      operationId: quiz_questions_list
+      summary: List questions for a quiz
+      parameters:
+      - in: path
+        name: quiz_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+          description: ''
+    post:
+      operationId: quiz_questions_create
+      summary: Add a question to a quiz
+      parameters:
+      - in: path
+        name: quiz_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/QuestionWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/QuestionWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+          description: ''
+  /api/v1/quiz/quizzes/{quiz_pk}/release-all/:
+    post:
+      operationId: quiz_release_all
+      summary: Release all evaluated results for a quiz
+      parameters:
+      - in: path
+        name: quiz_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReleaseAllResult'
+          description: ''
+  /api/v1/quiz/quizzes/{quiz_pk}/report/:
+    get:
+      operationId: quiz_report
+      summary: Quiz performance report
+      parameters:
+      - in: path
+        name: quiz_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizReport'
+          description: ''
+  /api/v1/quiz/quizzes/{quiz_pk}/submissions/:
+    get:
+      operationId: quiz_submissions_list
+      summary: List all submissions for a quiz
+      parameters:
+      - in: path
+        name: quiz_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - quiz
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttempt'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1763,6 +2389,13 @@ components:
       - semester
       - semester_type
       - user_id
+    AddBankQuestion:
+      type: object
+      properties:
+        quiz_id:
+          type: integer
+      required:
+      - quiz_id
     AddCandidates:
       type: object
       properties:
@@ -1981,6 +2614,195 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    AttemptDetail:
+      type: object
+      description: Full attempt with questions and responses for the quiz-taking UI.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        quiz:
+          type: integer
+          readOnly: true
+        quiz_title:
+          type: string
+          readOnly: true
+        quiz_course:
+          type: string
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/QuizAttemptStatusEnum'
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        attempt_number:
+          type: integer
+          readOnly: true
+          default: 1
+        score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        passed:
+          type: boolean
+          readOnly: true
+          nullable: true
+        time_taken_seconds:
+          type: integer
+          readOnly: true
+          nullable: true
+        tab_violations:
+          type: integer
+          readOnly: true
+        time_remaining_seconds:
+          type: integer
+          nullable: true
+          readOnly: true
+        duration_minutes:
+          type: integer
+          readOnly: true
+        allow_back_navigation:
+          type: boolean
+          readOnly: true
+        one_question_at_a_time:
+          type: boolean
+          readOnly: true
+        randomize_questions:
+          type: boolean
+          readOnly: true
+        allow_unanswered:
+          type: boolean
+          readOnly: true
+        tab_block:
+          type: boolean
+          readOnly: true
+        instructions:
+          type: string
+          readOnly: true
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+          readOnly: true
+        responses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttemptResponse'
+          readOnly: true
+      required:
+      - allow_back_navigation
+      - allow_unanswered
+      - attempt_number
+      - duration_minutes
+      - id
+      - instructions
+      - one_question_at_a_time
+      - passed
+      - percentage
+      - questions
+      - quiz
+      - quiz_course
+      - quiz_title
+      - randomize_questions
+      - responses
+      - score
+      - started_at
+      - status
+      - submitted_at
+      - tab_block
+      - tab_violations
+      - time_remaining_seconds
+      - time_taken_seconds
+      - user_id
+    AttemptResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        question:
+          type: integer
+          readOnly: true
+        question_text:
+          type: string
+          readOnly: true
+        question_type:
+          type: string
+          readOnly: true
+        marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        options:
+          readOnly: true
+        correct_answer:
+          readOnly: true
+        response:
+          readOnly: true
+          nullable: true
+          description: Student's answer (option id, list, text).
+        is_correct:
+          type: boolean
+          readOnly: true
+          nullable: true
+        marks_obtained:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        ai_suggested_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        ai_reasoning:
+          type: string
+          readOnly: true
+        professor_feedback:
+          type: string
+          readOnly: true
+        evaluated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - ai_reasoning
+      - ai_suggested_marks
+      - correct_answer
+      - evaluated_at
+      - id
+      - is_correct
+      - marks
+      - marks_obtained
+      - options
+      - professor_feedback
+      - question
+      - question_text
+      - question_type
+      - response
     AudienceEnum:
       enum:
       - students
@@ -1993,6 +2815,9 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BlankEnum:
+      enum:
+      - ''
     BulkOutcome:
       type: object
       properties:
@@ -2407,6 +3232,15 @@ components:
       - season_decision
       - semester
       - standing
+    EvaluateAttempt:
+      type: object
+      properties:
+        responses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseEvaluation'
+      required:
+      - responses
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -3080,6 +3914,117 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedQuestionWrite:
+      type: object
+      properties:
+        question_type:
+          $ref: '#/components/schemas/QuestionWriteQuestionTypeEnum'
+        text:
+          type: string
+        image_url:
+          nullable: true
+          oneOf:
+          - type: string
+            format: uri
+          - type: string
+            maxLength: 0
+        marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        negative_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          default: '0.00'
+        topic:
+          type: string
+          default: ''
+        difficulty:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/QuestionWriteDifficultyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        order:
+          type: integer
+          default: 0
+        is_bank_question:
+          type: boolean
+          default: false
+        options:
+          nullable: true
+        correct_answer:
+          nullable: true
+        reference_answer:
+          type: string
+          default: ''
+        evaluation_criteria:
+          type: string
+          default: ''
+    PatchedQuizWrite:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 300
+        description:
+          type: string
+          default: ''
+        course:
+          type: string
+          maxLength: 200
+        instructions:
+          type: string
+          default: ''
+        duration_minutes:
+          type: integer
+          minimum: 1
+        max_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        passing_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        max_attempts:
+          type: integer
+          minimum: 1
+          default: 1
+        start_at:
+          type: string
+          format: date-time
+          nullable: true
+        close_at:
+          type: string
+          format: date-time
+          nullable: true
+        allow_back_navigation:
+          type: boolean
+          default: true
+        one_question_at_a_time:
+          type: boolean
+          default: false
+        randomize_questions:
+          type: boolean
+          default: false
+        randomize_options:
+          type: boolean
+          default: false
+        allow_unanswered:
+          type: boolean
+          default: true
+        tab_block:
+          type: boolean
+          default: false
+        negative_marking:
+          type: boolean
+          default: false
+        result_visibility:
+          allOf:
+          - $ref: '#/components/schemas/QuizResultVisibilityEnum'
+          default: after_release
     PatchedRole:
       type: object
       properties:
@@ -3201,6 +4146,594 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        quiz:
+          type: integer
+          readOnly: true
+        question_type:
+          $ref: '#/components/schemas/QuestionQuestionTypeEnum'
+        text:
+          type: string
+        image_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 500
+          - type: string
+            maxLength: 0
+        marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        negative_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        topic:
+          type: string
+          maxLength: 200
+        difficulty:
+          oneOf:
+          - $ref: '#/components/schemas/QuestionDifficultyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_bank_question:
+          type: boolean
+        options:
+          nullable: true
+          description: 'For MCQ/MSQ/TF: list of {id: str, text: str} dicts.'
+        correct_answer:
+          nullable: true
+          description: Correct option id (MCQ/TF), list of ids (MSQ), or string (FITB).
+        reference_answer:
+          type: string
+          description: Reference answer for AI evaluation.
+        evaluation_criteria:
+          type: string
+      required:
+      - id
+      - marks
+      - question_type
+      - quiz
+      - text
+    QuestionDifficultyEnum:
+      enum:
+      - easy
+      - medium
+      - hard
+      type: string
+      description: |-
+        * `easy` - Easy
+        * `medium` - Medium
+        * `hard` - Hard
+    QuestionQuestionTypeEnum:
+      enum:
+      - mcq
+      - msq
+      - tf
+      - fitb
+      - short
+      type: string
+      description: |-
+        * `mcq` - Multiple Choice (single answer)
+        * `msq` - Multiple Select (multiple answers)
+        * `tf` - True / False
+        * `fitb` - Fill in the Blank
+        * `short` - Short Answer (subjective)
+    QuestionWrite:
+      type: object
+      properties:
+        question_type:
+          $ref: '#/components/schemas/QuestionWriteQuestionTypeEnum'
+        text:
+          type: string
+        image_url:
+          nullable: true
+          oneOf:
+          - type: string
+            format: uri
+          - type: string
+            maxLength: 0
+        marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+        negative_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          default: '0.00'
+        topic:
+          type: string
+          default: ''
+        difficulty:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/QuestionWriteDifficultyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        order:
+          type: integer
+          default: 0
+        is_bank_question:
+          type: boolean
+          default: false
+        options:
+          nullable: true
+        correct_answer:
+          nullable: true
+        reference_answer:
+          type: string
+          default: ''
+        evaluation_criteria:
+          type: string
+          default: ''
+      required:
+      - marks
+      - question_type
+      - text
+    QuestionWriteDifficultyEnum:
+      enum:
+      - easy
+      - medium
+      - hard
+      type: string
+      description: "* `easy` - easy\n* `medium` - medium\n* `hard` - hard\n* `` - "
+    QuestionWriteQuestionTypeEnum:
+      enum:
+      - mcq
+      - msq
+      - tf
+      - fitb
+      - short
+      type: string
+      description: |-
+        * `mcq` - mcq
+        * `msq` - msq
+        * `tf` - tf
+        * `fitb` - fitb
+        * `short` - short
+    QuizAttempt:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        quiz:
+          type: integer
+          readOnly: true
+        quiz_title:
+          type: string
+          readOnly: true
+        quiz_course:
+          type: string
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/QuizAttemptStatusEnum'
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        attempt_number:
+          type: integer
+          readOnly: true
+          default: 1
+        score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        passed:
+          type: boolean
+          readOnly: true
+          nullable: true
+        time_taken_seconds:
+          type: integer
+          readOnly: true
+          nullable: true
+        tab_violations:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - attempt_number
+      - created_at
+      - id
+      - passed
+      - percentage
+      - quiz
+      - quiz_course
+      - quiz_title
+      - score
+      - started_at
+      - status
+      - submitted_at
+      - tab_violations
+      - time_taken_seconds
+      - user_id
+    QuizAttemptStatusEnum:
+      enum:
+      - in_progress
+      - submitted
+      - partially_evaluated
+      - evaluated
+      - released
+      type: string
+      description: |-
+        * `in_progress` - In progress
+        * `submitted` - Submitted
+        * `partially_evaluated` - Partially evaluated
+        * `evaluated` - Evaluated
+        * `released` - Released
+    QuizDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        course:
+          type: string
+          readOnly: true
+        instructions:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/QuizStatusEnum'
+          readOnly: true
+        duration_minutes:
+          type: integer
+          readOnly: true
+        max_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+        passing_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        max_attempts:
+          type: integer
+          readOnly: true
+        start_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        close_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        allow_back_navigation:
+          type: boolean
+          readOnly: true
+        one_question_at_a_time:
+          type: boolean
+          readOnly: true
+        randomize_questions:
+          type: boolean
+          readOnly: true
+        randomize_options:
+          type: boolean
+          readOnly: true
+        allow_unanswered:
+          type: boolean
+          readOnly: true
+        tab_block:
+          type: boolean
+          readOnly: true
+        negative_marking:
+          type: boolean
+          readOnly: true
+        result_visibility:
+          allOf:
+          - $ref: '#/components/schemas/QuizResultVisibilityEnum'
+          readOnly: true
+        question_count:
+          type: integer
+          readOnly: true
+          default: 0
+        attempt_count:
+          type: integer
+          readOnly: true
+          default: 0
+        created_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - allow_back_navigation
+      - allow_unanswered
+      - attempt_count
+      - close_at
+      - course
+      - created_at
+      - created_by_user_id
+      - description
+      - duration_minutes
+      - id
+      - instructions
+      - max_attempts
+      - max_marks
+      - negative_marking
+      - one_question_at_a_time
+      - passing_marks
+      - question_count
+      - randomize_options
+      - randomize_questions
+      - result_visibility
+      - start_at
+      - status
+      - tab_block
+      - title
+      - updated_at
+    QuizList:
+      type: object
+      description: Compact representation for list views.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        course:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/QuizStatusEnum'
+          readOnly: true
+        duration_minutes:
+          type: integer
+          readOnly: true
+        max_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+        passing_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        max_attempts:
+          type: integer
+          readOnly: true
+        start_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        close_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        result_visibility:
+          allOf:
+          - $ref: '#/components/schemas/QuizResultVisibilityEnum'
+          readOnly: true
+        question_count:
+          type: integer
+          readOnly: true
+          default: 0
+        attempt_count:
+          type: integer
+          readOnly: true
+          default: 0
+        created_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - attempt_count
+      - close_at
+      - course
+      - created_at
+      - created_by_user_id
+      - description
+      - duration_minutes
+      - id
+      - max_attempts
+      - max_marks
+      - passing_marks
+      - question_count
+      - result_visibility
+      - start_at
+      - status
+      - title
+      - updated_at
+    QuizReport:
+      type: object
+      properties:
+        quiz_id:
+          type: integer
+        quiz_title:
+          type: string
+        total_submissions:
+          type: integer
+        average_score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        highest_score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        lowest_score:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        pass_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          nullable: true
+        submissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizAttempt'
+      required:
+      - average_score
+      - highest_score
+      - lowest_score
+      - pass_percentage
+      - quiz_id
+      - quiz_title
+      - submissions
+      - total_submissions
+    QuizResultVisibilityEnum:
+      enum:
+      - immediate
+      - after_release
+      - never
+      type: string
+      description: |-
+        * `immediate` - Immediate — shown as soon as evaluated
+        * `after_release` - After Release — professor releases explicitly
+        * `never` - Never — professor-only
+    QuizStatusEnum:
+      enum:
+      - draft
+      - scheduled
+      - available
+      - closed
+      - archived
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `scheduled` - Scheduled
+        * `available` - Available
+        * `closed` - Closed
+        * `archived` - Archived
+    QuizWrite:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 300
+        description:
+          type: string
+          default: ''
+        course:
+          type: string
+          maxLength: 200
+        instructions:
+          type: string
+          default: ''
+        duration_minutes:
+          type: integer
+          minimum: 1
+        max_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        passing_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        max_attempts:
+          type: integer
+          minimum: 1
+          default: 1
+        start_at:
+          type: string
+          format: date-time
+          nullable: true
+        close_at:
+          type: string
+          format: date-time
+          nullable: true
+        allow_back_navigation:
+          type: boolean
+          default: true
+        one_question_at_a_time:
+          type: boolean
+          default: false
+        randomize_questions:
+          type: boolean
+          default: false
+        randomize_options:
+          type: boolean
+          default: false
+        allow_unanswered:
+          type: boolean
+          default: true
+        tab_block:
+          type: boolean
+          default: false
+        negative_marking:
+          type: boolean
+          default: false
+        result_visibility:
+          allOf:
+          - $ref: '#/components/schemas/QuizResultVisibilityEnum'
+          default: after_release
+      required:
+      - course
+      - duration_minutes
+      - max_marks
+      - title
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4999,34 @@ components:
       - message
       - reason
       - route
+    ReleaseAllResult:
+      type: object
+      properties:
+        released:
+          type: integer
+      required:
+      - released
+    ResponseEvaluation:
+      type: object
+      properties:
+        response_id:
+          type: integer
+        marks_obtained:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          nullable: true
+        professor_feedback:
+          type: string
+          default: ''
+        ai_suggested_marks:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          nullable: true
+      required:
+      - marks_obtained
+      - response_id
     RoundOutcome:
       type: object
       properties:
@@ -3551,6 +5112,23 @@ components:
         * `deregister` - deregister
         * `bar_season` - bar_season
         * `bar_permanent` - bar_permanent
+    SaveResponse:
+      type: object
+      properties:
+        question_id:
+          type: integer
+        response:
+          nullable: true
+      required:
+      - question_id
+      - response
+    SaveResponseResult:
+      type: object
+      properties:
+        saved:
+          type: boolean
+      required:
+      - saved
     ScheduledCount:
       type: object
       properties:
