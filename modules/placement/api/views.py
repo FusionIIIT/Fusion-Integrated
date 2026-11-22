@@ -30,6 +30,7 @@ from modules.placement.authentication import (
     RecruiterAuthentication,
 )
 from modules.placement.models import (
+    InterviewRound,
     PlacementPolicy,
     RecruiterAccount,
 )
@@ -470,12 +471,13 @@ class RoundOutcomeView(_Scoped, APIView):
         return Response(s.RoundParticipationSerializer(participation).data)
 
 
-@extend_schema(responses=s.InterviewProgressRoundSerializer(many=True))
+@extend_schema(responses=s.InterviewProgressListSerializer)
 class InterviewProgressView(_Scoped, APIView):
     """PC-AFR-029: TPO-scoped view for tracking interview progress and status."""
 
     permission_classes = [
         MODULE, HasPermission(P_VIEW_REPORTS, "placement_cell.interview.schedule")]
+    queryset = InterviewRound.objects.none()
 
     def get(self, request):
         actor = _actor(request)
@@ -627,11 +629,12 @@ class ReportSuccessRateView(_Scoped, APIView):
         return Response(stats_service.placement_success_rate(season=season))
 
 
-@extend_schema(responses=s.CompanyTrendReportSerializer(many=True))
+@extend_schema(responses=s.CompanyTrendListSerializer)
 class ReportParticipationTrendsView(_Scoped, APIView):
     """PC-AFR-034: TPO report for company participation trends across seasons."""
 
     permission_classes = [MODULE, HasPermission(P_VIEW_REPORTS)]
+    queryset = PlacementPolicy.objects.none()
 
     def get(self, request):
         return Response({"results": stats_service.company_participation_trends()})
@@ -648,11 +651,12 @@ class ReportSalaryDistributionView(_Scoped, APIView):
         return Response(stats_service.salary_distribution(season=season))
 
 
-@extend_schema(responses=s.EmploymentTrendReportSerializer(many=True))
+@extend_schema(responses=s.EmploymentTrendListSerializer)
 class ReportEmploymentTrendsView(_Scoped, APIView):
     """PC-AFR-036: TPO report for employment trends across seasons."""
 
     permission_classes = [MODULE, HasPermission(P_VIEW_REPORTS)]
+    queryset = PlacementPolicy.objects.none()
 
     def get(self, request):
         return Response({"results": stats_service.employment_trends()})

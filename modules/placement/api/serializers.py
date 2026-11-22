@@ -744,6 +744,10 @@ class InterviewProgressRoundSerializer(serializers.Serializer):
     candidates = serializers.ListField(child=serializers.DictField())
 
 
+class InterviewProgressListSerializer(serializers.Serializer):
+    results = InterviewProgressRoundSerializer(many=True)
+
+
 class PlacementOutcomesSerializer(serializers.Serializer):
     season = serializers.CharField()
     total_records = serializers.IntegerField()
@@ -779,6 +783,10 @@ class CompanyTrendReportSerializer(serializers.Serializer):
     postings_count = serializers.IntegerField()
 
 
+class CompanyTrendListSerializer(serializers.Serializer):
+    results = CompanyTrendReportSerializer(many=True)
+
+
 class SalaryDistributionReportSerializer(serializers.Serializer):
     season = serializers.CharField()
     available = serializers.BooleanField()
@@ -803,3 +811,7 @@ class EmploymentTrendReportSerializer(serializers.Serializer):
     median_ctc = serializers.CharField(allow_null=True)
     mean_ctc = serializers.CharField(allow_null=True)
     max_ctc = serializers.CharField(allow_null=True)
+
+
+class EmploymentTrendListSerializer(serializers.Serializer):
+    results = EmploymentTrendReportSerializer(many=True)
