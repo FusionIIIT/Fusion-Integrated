@@ -46,6 +46,75 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ok'
           description: ''
+  /api/v1/courses/workspaces:
+    get:
+      operationId: v1_courses_workspaces_list
+      description: List course workspaces visible to the requesting actor (AFR-LMS-001.1).
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkspaceSummary'
+          description: ''
+  /api/v1/courses/workspaces/{id}:
+    get:
+      operationId: v1_courses_workspaces_retrieve
+      description: Retrieve or update course workspace details.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceDetail'
+          description: ''
+    patch:
+      operationId: v1_courses_workspaces_partial_update
+      description: Retrieve or update course workspace details.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkspaceUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkspaceUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWorkspaceUpdate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceDetail'
+          description: ''
   /api/v1/directory/users:
     get:
       operationId: v1_directory_users_retrieve
@@ -2315,6 +2384,26 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CoursePerson:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        name:
+          type: string
+        email:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        department:
+          type: string
+      required:
+      - department
+      - email
+      - name
+      - user_id
     Detail:
       type: object
       properties:
@@ -3085,6 +3174,22 @@ components:
       properties:
         active_role:
           type: string
+    PatchedWorkspaceUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        syllabus:
+          type: string
+        schedule:
+          type: string
+        is_published:
+          type: boolean
+        allow_ta_announcements:
+          type: boolean
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3830,6 +3935,95 @@ components:
           maxLength: 300
       required:
       - reason
+    WorkspaceDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 32
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        semester:
+          type: string
+          maxLength: 32
+        academic_year:
+          type: string
+          maxLength: 16
+        credits:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        syllabus:
+          type: string
+        schedule:
+          type: string
+        is_published:
+          type: boolean
+        allow_ta_announcements:
+          type: boolean
+        instructors:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoursePerson'
+          readOnly: true
+        tas:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoursePerson'
+          readOnly: true
+        viewer_role:
+          type: string
+          nullable: true
+          readOnly: true
+        can_manage:
+          type: boolean
+          readOnly: true
+      required:
+      - academic_year
+      - can_manage
+      - code
+      - id
+      - instructors
+      - semester
+      - tas
+      - title
+      - viewer_role
+    WorkspaceSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 32
+        title:
+          type: string
+          maxLength: 200
+        semester:
+          type: string
+          maxLength: 32
+        academic_year:
+          type: string
+          maxLength: 16
+        credits:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        is_published:
+          type: boolean
+      required:
+      - academic_year
+      - code
+      - id
+      - semester
+      - title
   securitySchemes:
     iamSession:
       type: apiKey

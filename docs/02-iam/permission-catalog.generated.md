@@ -7,6 +7,13 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `courses`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `courses.workspace.view` | View enrolled or assigned course workspaces | `Dean Academic`, `faculty`, `observer`, `student`, `ta` |
+| `courses.workspace.manage` | Configure and update course workspace details | `Dean Academic`, `faculty` |
+
 ## `directory`
 
 | Code | What it allows | Held by |
