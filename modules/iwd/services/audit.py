@@ -1,4 +1,4 @@
-from typing import Optional
+
 from modules.iwd.models.audit import DecisionAuditTrail
 from modules.iwd.models.complaint import Complaint
 from modules.iwd.models.estimate import RepairEstimate
@@ -12,7 +12,7 @@ def record_audit_trail(
     from_state: str,
     to_state: str,
     decision_reason: str = "",
-    estimate: Optional[RepairEstimate] = None,
+    estimate: RepairEstimate | None = None,
 ) -> DecisionAuditTrail:
     """Records an immutable audit entry (BR-IWD-013)."""
     return DecisionAuditTrail.objects.create(

@@ -1,8 +1,8 @@
 """Specification tests for Functional Requirements (FR)."""
 from decimal import Decimal
-import pytest
-from modules.iwd.domain.routing import classify_cost_band
+
 from modules.iwd.domain.assignment import EngineerCandidate, select_best_engineer
+from modules.iwd.domain.routing import classify_cost_band
 
 
 class TestFunctionalRequirements:

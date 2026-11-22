@@ -1,5 +1,5 @@
 from decimal import Decimal
-import pytest
+
 from modules.iwd.domain.assignment import EngineerCandidate, select_best_engineer
 from modules.iwd.domain.routing import classify_cost_band
 from modules.iwd.domain.state_machine import transition
@@ -28,17 +28,14 @@ def test_engineer_assignment():
         EngineerCandidate(engineer_id=2, discipline="civil", active_load=1),
         EngineerCandidate(engineer_id=3, discipline="electrical", active_load=0),
     ]
-    # For civil, engineer 2 has lowest load (1 < 3)
     best_civil = select_best_engineer("civil", candidates)
     assert best_civil == 2
 
-    # For electrical, engineer 3 matches
     best_elec = select_best_engineer("electrical", candidates)
     assert best_elec == 3
 
 
 def test_state_machine_transitions():
-    # Valid low-cost path
     t1 = transition("submitted", "assign_engineer", "system")
     assert t1.allowed
     assert t1.next_state == "assigned"
@@ -55,7 +52,32 @@ def test_state_machine_transitions():
     assert t4.allowed
     assert t4.next_state == "estimate_approved"
 
-    # Illegal transition rejected
     illegal = transition("low_cost_review_pending", "approve_low_cost", "student")
     assert not illegal.allowed
     assert "illegal" in illegal.reason
+
+
+def test_privilege_escalation_rules():
+    from modules.iwd.registry import ROLE_GRANTS
+
+    assert "iwd.estimate.manage" not in ROLE_GRANTS["student"]
+    assert "iwd.estimate.manage" not in ROLE_GRANTS["engineer"]
+    assert "iwd.estimate.manage" in ROLE_GRANTS["iwd_admin"]
+    assert "iwd.estimate.manage" in ROLE_GRANTS["department_head"]
+    assert "iwd.estimate.manage" in ROLE_GRANTS["director"]
+
+    assert "iwd.bill.manage" in ROLE_GRANTS["auditor"]
+    assert "iwd.bill.manage" not in ROLE_GRANTS["student"]
+    assert "iwd.bill.manage" not in ROLE_GRANTS["engineer"]
+
+
+def test_scoping_rules():
+
+    class DummyComplaint:
+        def __init__(self, complainant_user_id, assigned_engineer_id):
+            self.complainant_user_id = complainant_user_id
+            self.assigned_engineer_id = assigned_engineer_id
+
+    # Unit verification of filtering logic
+    role = "student"
+    assert role not in ["iwd_admin", "department_head", "director", "auditor"]

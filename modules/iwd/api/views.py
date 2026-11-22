@@ -1,13 +1,13 @@
 from decimal import Decimal
+
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 
 from modules.iwd.api.serializers import (
     ComplaintFeedbackSerializer,
     ComplaintSerializer,
-    DecisionAuditTrailSerializer,
     FinalBillSerializer,
     InventoryItemSerializer,
     MaterialIssueLedgerSerializer,
@@ -161,7 +161,10 @@ class EstimateCommitteeReviewView(APIView):
             is_necessary=request.data.get("is_necessary", True),
             remarks=request.data.get("remarks", ""),
         )
-        return Response(ReviewCommitteeOutcomeSerializer(review).data, status=status.HTTP_201_CREATED)
+        return Response(
+            ReviewCommitteeOutcomeSerializer(review).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class EstimateReviewMidView(APIView):
@@ -311,9 +314,11 @@ class ComplaintFeedbackView(APIView):
     def get(self, request, pk):
         role = request.headers.get("X-Active-Role", "employee")
         complaint = get_scoped_complaint(pk, request.user.id, role)
+        from modules.iwd.models.completion import ComplaintFeedback
+
         try:
             return Response(ComplaintFeedbackSerializer(complaint.feedback).data)
-        except Exception:
+        except ComplaintFeedback.DoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, pk):

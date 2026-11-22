@@ -1,5 +1,6 @@
 import uuid
-from typing import Sequence
+from collections.abc import Sequence
+
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
@@ -18,7 +19,6 @@ def create_complaint(
     remarks: str = "",
     available_engineers: Sequence[EngineerCandidate] = (),
 ) -> Complaint:
-    """Creates a maintenance complaint and assigns engineer automatically (BR-IWD-001, BR-IWD-002)."""
     with transaction.atomic():
         cid = f"CMP-{timezone.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
         assigned_id = None
@@ -60,7 +60,6 @@ def record_assessment(
     assessment_details: str,
     is_site_visit_complete: bool = True,
 ) -> RepairAssessment:
-    """Records engineer repair assessment."""
     if complaint.assigned_engineer_id != engineer_id:
         raise ValidationError("Only the assigned engineer can assess this complaint.")
 
@@ -100,14 +99,20 @@ def flag_urgent(
     engineer_id: int,
     escalated_to: str,
 ) -> Complaint:
-    """Flags urgent repair for fast-track attention (BR-IWD-012)."""
     if complaint.assigned_engineer_id != engineer_id:
         raise ValidationError("Only the assigned engineer can flag urgent escalation.")
 
     complaint.is_urgent_escalated = True
     complaint.urgent_escalated_at = timezone.now()
     complaint.urgent_escalated_to = escalated_to
-    complaint.save(update_fields=["is_urgent_escalated", "urgent_escalated_at", "urgent_escalated_to", "updated_at"])
+    complaint.save(
+        update_fields=[
+            "is_urgent_escalated",
+            "urgent_escalated_at",
+            "urgent_escalated_to",
+            "updated_at",
+        ]
+    )
 
     record_audit_trail(
         complaint=complaint,

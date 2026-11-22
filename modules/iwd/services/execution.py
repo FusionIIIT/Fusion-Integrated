@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
@@ -17,7 +18,6 @@ def complete_repair_work(
     complaint: Complaint,
     engineer_id: int,
 ) -> Complaint:
-    """Engineer marks repair work complete."""
     if complaint.assigned_engineer_id != engineer_id:
         raise ValidationError("Only assigned engineer can mark work complete.")
 
@@ -50,7 +50,6 @@ def record_physical_verification(
     remarks: str,
     rework_notes: str = "",
 ) -> PhysicalVerification:
-    """Department Head verifies work before resolution (BR-IWD-014)."""
     event = "verify_approved" if approve else "verify_rework"
 
     with transaction.atomic():
@@ -91,7 +90,6 @@ def submit_final_bill(
     invoice_number: str,
     claimed_amount: Decimal,
 ) -> FinalBill:
-    """Submits final bill after physical verification resolution."""
     if complaint.assigned_engineer_id != engineer_id:
         raise ValidationError("Only assigned engineer can submit final bill.")
 
@@ -129,7 +127,6 @@ def audit_final_bill(
     auditor_user_id: int,
     remarks: str,
 ) -> FinalBill:
-    """Auditor validates final bill against estimate (BR-IWD-015)."""
     complaint = bill.complaint
 
     with transaction.atomic():
@@ -141,7 +138,14 @@ def audit_final_bill(
         bill.auditor_user_id = auditor_user_id
         bill.audit_remarks = remarks
         bill.audit_timestamp = timezone.now()
-        bill.save(update_fields=["is_audited", "auditor_user_id", "audit_remarks", "audit_timestamp"])
+        bill.save(
+            update_fields=[
+                "is_audited",
+                "auditor_user_id",
+                "audit_remarks",
+                "audit_timestamp",
+            ]
+        )
 
         old_state = complaint.status
         complaint.status = outcome.next_state
@@ -163,10 +167,9 @@ def audit_final_bill(
 def settle_payment(
     bill: FinalBill,
     user_id: int,
-    role: str,  # 'director' or 'accounts'
+    role: str,
     accounts_ref: str = "",
 ) -> FinalBill:
-    """Director payment approval and Accounts settlement sequence (BR-IWD-016)."""
     complaint = bill.complaint
 
     with transaction.atomic():
@@ -178,7 +181,13 @@ def settle_payment(
             bill.director_approved = True
             bill.director_user_id = user_id
             bill.director_approved_at = timezone.now()
-            bill.save(update_fields=["director_approved", "director_user_id", "director_approved_at"])
+            bill.save(
+                update_fields=[
+                    "director_approved",
+                    "director_user_id",
+                    "director_approved_at",
+                ]
+            )
 
             action_name = "director_approved_payment"
         else:
@@ -189,7 +198,13 @@ def settle_payment(
             bill.settlement_status = "settled"
             bill.accounts_reference = accounts_ref
             bill.settled_at = timezone.now()
-            bill.save(update_fields=["settlement_status", "accounts_reference", "settled_at"])
+            bill.save(
+                update_fields=[
+                    "settlement_status",
+                    "accounts_reference",
+                    "settled_at",
+                ]
+            )
 
             action_name = "accounts_settled_payment"
 
@@ -217,10 +232,16 @@ def submit_feedback(
     feedback_text: str = "",
     post_repair_issue: str = "",
 ) -> ComplaintFeedback:
-    """Submits rating and post-repair feedback after resolution (BR-IWD-017)."""
     if complaint.complainant_user_id != user_id:
         raise ValidationError("Only the original complainant can submit feedback.")
-    if complaint.status not in ["resolved", "audit_pending", "director_payment_approval_pending", "accounts_settlement_pending", "settled"]:
+    valid_states = [
+        "resolved",
+        "audit_pending",
+        "director_payment_approval_pending",
+        "accounts_settlement_pending",
+        "settled",
+    ]
+    if complaint.status not in valid_states:
         raise ValidationError("Feedback can only be submitted after complaint resolution.")
 
     feedback, _ = ComplaintFeedback.objects.update_or_create(

@@ -1,5 +1,4 @@
 """Specification tests for Use Cases (UC)."""
-import pytest
 from modules.iwd.domain.state_machine import transition
 
 

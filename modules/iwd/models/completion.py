@@ -1,12 +1,9 @@
 from django.db import models
-from django.db.models import Q
 
 from modules.iwd.models.complaint import Complaint
 
 
 class PhysicalVerification(models.Model):
-    """Department Head physical verification of completed work."""
-
     complaint = models.OneToOneField(
         Complaint, on_delete=models.CASCADE, related_name="physical_verification"
     )
@@ -19,10 +16,11 @@ class PhysicalVerification(models.Model):
     class Meta:
         db_table = "iwd_physical_verification"
 
+    def __str__(self):
+        return f"Verification for {self.complaint_id} (Approved: {self.is_approved})"
+
 
 class FinalBill(models.Model):
-    """Final bill submitted by engineer."""
-
     complaint = models.OneToOneField(
         Complaint, on_delete=models.CASCADE, related_name="final_bill"
     )
@@ -45,10 +43,11 @@ class FinalBill(models.Model):
     class Meta:
         db_table = "iwd_final_bill"
 
+    def __str__(self):
+        return f"FinalBill {self.invoice_number} ({self.settlement_status})"
+
 
 class ComplaintFeedback(models.Model):
-    """Feedback and rating from employee after resolution."""
-
     complaint = models.OneToOneField(
         Complaint, on_delete=models.CASCADE, related_name="feedback"
     )
@@ -62,7 +61,10 @@ class ComplaintFeedback(models.Model):
         db_table = "iwd_complaint_feedback"
         constraints = [
             models.CheckConstraint(
-                check=Q(rating__gte=1) & Q(rating__lte=5),
+                condition=models.Q(rating__gte=1) & models.Q(rating__lte=5),
                 name="iwd_valid_feedback_rating_1_to_5",
             ),
         ]
+
+    def __str__(self):
+        return f"Feedback {self.rating}/5 for {self.complaint_id}"

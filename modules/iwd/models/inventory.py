@@ -1,13 +1,10 @@
 from django.db import models
-from django.db.models import Q
 
 from modules.iwd.models.complaint import Complaint
 from modules.iwd.models.estimate import RepairEstimate
 
 
 class InventoryItem(models.Model):
-    """Inventory item tracked by IWD."""
-
     item_code = models.CharField(max_length=50, unique=True, db_index=True)
     name = models.CharField(max_length=255)
     category = models.CharField(max_length=50)
@@ -18,15 +15,16 @@ class InventoryItem(models.Model):
         db_table = "iwd_inventory_item"
         constraints = [
             models.CheckConstraint(
-                check=Q(current_stock__gte=0),
+                condition=models.Q(current_stock__gte=0),
                 name="iwd_non_negative_inventory_stock",
             ),
         ]
 
+    def __str__(self):
+        return f"{self.item_code} - {self.name}"
+
 
 class MaterialIssueLedger(models.Model):
-    """Append-only ledger of material issues."""
-
     complaint = models.ForeignKey(
         Complaint, on_delete=models.CASCADE, related_name="material_issues"
     )
@@ -38,10 +36,11 @@ class MaterialIssueLedger(models.Model):
     class Meta:
         db_table = "iwd_material_issue_ledger"
 
+    def __str__(self):
+        return f"Issue {self.quantity} of {self.item_id} to complaint {self.complaint_id}"
+
 
 class ProcurementOrder(models.Model):
-    """Procurement or bidding action."""
-
     TYPE_CHOICES = [
         ("internal_quotation", "Internal Quotation"),
         ("external_bidding", "External Bidding"),
@@ -59,3 +58,6 @@ class ProcurementOrder(models.Model):
 
     class Meta:
         db_table = "iwd_procurement_order"
+
+    def __str__(self):
+        return f"Procurement {self.vendor_name} ({self.procurement_type})"

@@ -1,11 +1,11 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Mapping, Tuple
 
 State = str
 Event = str
 Role = str
 
-TransitionKey = Tuple[State, Event, Role]
+TransitionKey = tuple[State, Event, Role]
 
 
 @dataclass(frozen=True)
@@ -31,9 +31,17 @@ TRANSITIONS: Mapping[TransitionKey, str] = {
     ("low_cost_review_pending", "reject_low_cost", "iwd_admin"): "rejected_low_cost",
 
     # 4. Mid-Range Approval (BR-IWD-005, BR-IWD-006)
-    ("mid_range_committee_pending", "record_committee_review", "review_committee"): "dept_head_review_pending",
+    (
+        "mid_range_committee_pending",
+        "record_committee_review",
+        "review_committee",
+    ): "dept_head_review_pending",
     ("dept_head_review_pending", "approve_dept_head", "department_head"): "estimate_approved",
-    ("dept_head_review_pending", "forward_to_director", "department_head"): "director_review_mid_pending",
+    (
+        "dept_head_review_pending",
+        "forward_to_director",
+        "department_head",
+    ): "director_review_mid_pending",
     ("dept_head_review_pending", "reject_dept_head", "department_head"): "rejected_mid_range",
     ("director_review_mid_pending", "approve_director_mid", "director"): "estimate_approved",
     ("director_review_mid_pending", "reject_director_mid", "director"): "rejected_director_route",
@@ -61,7 +69,11 @@ TRANSITIONS: Mapping[TransitionKey, str] = {
     # 8. Billing, Audit, Settlement (BR-IWD-015, BR-IWD-016)
     ("resolved", "submit_final_bill", "engineer"): "audit_pending",
     ("audit_pending", "audit_validated", "auditor"): "director_payment_approval_pending",
-    ("director_payment_approval_pending", "approve_payment", "director"): "accounts_settlement_pending",
+    (
+        "director_payment_approval_pending",
+        "approve_payment",
+        "director",
+    ): "accounts_settlement_pending",
     ("accounts_settlement_pending", "record_settlement", "accounts"): "settled",
 
     # 9. Rejections and Resubmissions (BR-IWD-009)

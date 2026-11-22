@@ -1,10 +1,7 @@
 from django.db import models
-from django.db.models import Q
 
 
 class Complaint(models.Model):
-    """Primary IWD maintenance complaint record."""
-
     CATEGORY_CHOICES = [
         ("civil", "Civil Maintenance"),
         ("electrical", "Electrical Maintenance"),
@@ -27,7 +24,7 @@ class Complaint(models.Model):
 
     is_urgent_escalated = models.BooleanField(default=False)
     urgent_escalated_at = models.DateTimeField(null=True, blank=True)
-    urgent_escalated_to = models.CharField(max_length=50, null=True, blank=True)
+    urgent_escalated_to = models.CharField(max_length=50, blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -37,11 +34,11 @@ class Complaint(models.Model):
         ordering = ["-created_at"]
         constraints = [
             models.CheckConstraint(
-                check=Q(category__in=["civil", "electrical"]),
+                condition=models.Q(category__in=["civil", "electrical"]),
                 name="iwd_valid_complaint_category",
             ),
             models.CheckConstraint(
-                check=Q(urgency__in=["low", "medium", "high", "emergency"]),
+                condition=models.Q(urgency__in=["low", "medium", "high", "emergency"]),
                 name="iwd_valid_complaint_urgency",
             ),
         ]
@@ -51,8 +48,6 @@ class Complaint(models.Model):
 
 
 class RepairAssessment(models.Model):
-    """Technical repair assessment completed by assigned engineer."""
-
     complaint = models.OneToOneField(
         Complaint, on_delete=models.CASCADE, related_name="assessment"
     )
@@ -64,3 +59,6 @@ class RepairAssessment(models.Model):
 
     class Meta:
         db_table = "iwd_repair_assessment"
+
+    def __str__(self):
+        return f"Assessment for {self.complaint_id}"

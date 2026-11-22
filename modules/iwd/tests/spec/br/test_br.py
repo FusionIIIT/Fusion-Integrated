@@ -1,6 +1,6 @@
 """Specification tests for Business Rules (BR)."""
 from decimal import Decimal
-import pytest
+
 from modules.iwd.domain.routing import classify_cost_band
 from modules.iwd.domain.state_machine import transition
 

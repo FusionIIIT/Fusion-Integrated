@@ -61,7 +61,11 @@ export const ComplaintsPage: React.FC = () => {
               <select
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
                 value={urgency}
-                onChange={(e) => setUrgency(e.target.value as any)}
+                onChange={(e) =>
+                  setUrgency(
+                    e.target.value as "low" | "medium" | "high" | "emergency",
+                  )
+                }
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>

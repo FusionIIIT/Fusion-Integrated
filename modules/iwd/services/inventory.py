@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
@@ -18,11 +19,11 @@ def issue_materials(
     item_id: int,
     quantity: int,
 ) -> MaterialIssueLedger:
-    """Checks stock and issues available material (BR-IWD-010, BR-IWD-011)."""
     with transaction.atomic():
         item = InventoryItem.objects.select_for_update().get(id=item_id)
         if item.current_stock < quantity:
-            raise ValidationError(f"Insufficient stock for {item.name}. Available: {item.current_stock}")
+            msg = f"Insufficient stock for {item.name}. Available: {item.current_stock}"
+            raise ValidationError(msg)
 
         item.current_stock -= quantity
         item.save(update_fields=["current_stock"])
@@ -34,7 +35,11 @@ def issue_materials(
             issued_by_user_id=admin_user_id,
         )
 
-        event = "issue_materials" if complaint.status == "materials_available" else "issue_materials_direct"
+        event = (
+            "issue_materials"
+            if complaint.status == "materials_available"
+            else "issue_materials_direct"
+        )
         outcome = transition(complaint.status, event, "iwd_admin")
         if outcome.allowed:
             old_state = complaint.status
@@ -57,12 +62,11 @@ def issue_materials(
 def conduct_procurement_or_bidding(
     complaint: Complaint,
     admin_user_id: int,
-    procurement_type: str,  # 'internal_quotation' or 'external_bidding'
+    procurement_type: str,
     vendor_name: str,
     quoted_amount: Decimal,
     vendor_details: str = "",
 ) -> ProcurementOrder:
-    """Coordinates internal procurement or external bidding (BR-IWD-004, BR-IWD-007, BR-IWD-008)."""
     estimate = complaint.estimates.order_by("-version").first()
     if not estimate:
         raise ValidationError("Cannot procure without an estimate.")

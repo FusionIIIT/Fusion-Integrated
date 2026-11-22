@@ -5,8 +5,6 @@ from modules.iwd.models.estimate import RepairEstimate
 
 
 class DecisionAuditTrail(models.Model):
-    """Immutable audit log of all approvals, rejections, and transitions."""
-
     complaint = models.ForeignKey(
         Complaint, on_delete=models.CASCADE, related_name="audit_trails"
     )
@@ -24,3 +22,6 @@ class DecisionAuditTrail(models.Model):
     class Meta:
         db_table = "iwd_decision_audit_trail"
         ordering = ["timestamp"]
+
+    def __str__(self):
+        return f"{self.action} on {self.complaint_id} by user {self.actor_user_id}"

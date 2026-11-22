@@ -1,4 +1,3 @@
-from typing import Optional
 from django.db.models import QuerySet
 from rest_framework.exceptions import NotFound
 
@@ -11,13 +10,11 @@ def scope_complaints_for_actor(
     user_id: int,
     acting_role: str,
 ) -> QuerySet[Complaint]:
-    """Applies role-appropriate scoping to complaints (yields 404 on unowned)."""
     role = acting_role.lower()
     if role in ["iwd_admin", "department_head", "director", "auditor", "accounts", "dean"]:
         return Complaint.objects.all()
     if role == "engineer":
         return Complaint.objects.filter(assigned_engineer_id=user_id)
-    # Default: Institute Employee sees only their own
     return Complaint.objects.filter(complainant_user_id=user_id)
 
 
@@ -26,12 +23,11 @@ def get_scoped_complaint(
     user_id: int,
     acting_role: str,
 ) -> Complaint:
-    """Retrieves complaint within actor scope or raises NotFound (404, never 403)."""
     qs = scope_complaints_for_actor(user_id, acting_role)
     try:
         return qs.get(id=complaint_id)
-    except Complaint.DoesNotExist:
-        raise NotFound("Complaint not found.")
+    except Complaint.DoesNotExist as err:
+        raise NotFound("Complaint not found.") from err
 
 
 def scope_estimates_for_complaint(

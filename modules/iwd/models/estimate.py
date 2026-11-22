@@ -1,13 +1,11 @@
 from decimal import Decimal
+
 from django.db import models
-from django.db.models import Q
 
 from modules.iwd.models.complaint import Complaint
 
 
 class RepairEstimate(models.Model):
-    """Repair estimate submitted by engineer."""
-
     COST_BAND_CHOICES = [
         ("low", "Low-Cost (< Rs. 25,000)"),
         ("mid", "Mid-Range (Rs. 25,000 to Rs. 2.5 Lakh)"),
@@ -38,19 +36,20 @@ class RepairEstimate(models.Model):
                 name="iwd_unique_complaint_estimate_version",
             ),
             models.CheckConstraint(
-                check=Q(total_cost__gte=0),
+                condition=models.Q(total_cost__gte=0),
                 name="iwd_non_negative_estimate_total",
             ),
             models.CheckConstraint(
-                check=Q(time_estimate_days__gt=0),
+                condition=models.Q(time_estimate_days__gt=0),
                 name="iwd_positive_estimate_days",
             ),
         ]
 
+    def __str__(self):
+        return f"Estimate v{self.version} for {self.complaint_id}"
+
 
 class ReviewCommitteeOutcome(models.Model):
-    """Committee necessity and feasibility review outcome."""
-
     estimate = models.OneToOneField(
         RepairEstimate, on_delete=models.CASCADE, related_name="committee_review"
     )
@@ -62,3 +61,6 @@ class ReviewCommitteeOutcome(models.Model):
 
     class Meta:
         db_table = "iwd_committee_outcome"
+
+    def __str__(self):
+        return f"Committee review for estimate {self.estimate_id}"

@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
@@ -17,7 +18,6 @@ def create_estimate(
     labor_cost: Decimal,
     other_cost: Decimal = Decimal("0.00"),
 ) -> RepairEstimate:
-    """Prepares and submits repair estimate according to cost-band routing (BR-IWD-003)."""
     if complaint.assigned_engineer_id != engineer_id:
         raise ValidationError("Only the assigned engineer can prepare an estimate.")
 
@@ -64,7 +64,7 @@ def create_estimate(
             action="submit_estimate",
             from_state=old_state,
             to_state=complaint.status,
-            decision_reason=f"Submitted estimate v{next_ver} for total {total_cost} ({band_info.band})",
+            decision_reason=f"Submitted estimate v{next_ver} for {total_cost} ({band_info.band})",
         )
 
         return estimate
@@ -76,7 +76,6 @@ def review_low_cost(
     approve: bool,
     rejection_reason: str = "",
 ) -> RepairEstimate:
-    """IWD Admin approves or rejects low-cost estimate (BR-IWD-004, BR-IWD-009)."""
     complaint = estimate.complaint
     event = "approve_low_cost" if approve else "reject_low_cost"
 
@@ -115,11 +114,12 @@ def record_committee_review(
     is_necessary: bool,
     remarks: str,
 ) -> ReviewCommitteeOutcome:
-    """Records committee necessity and feasibility review (BR-IWD-005)."""
     complaint = estimate.complaint
 
     with transaction.atomic():
-        outcome = transition(complaint.status, "record_committee_review", "review_committee")
+        outcome = transition(
+            complaint.status, "record_committee_review", "review_committee"
+        )
         if not outcome.allowed:
             raise ValidationError(outcome.reason)
 
@@ -155,10 +155,9 @@ def record_committee_review(
 def review_mid_range(
     estimate: RepairEstimate,
     dept_head_user_id: int,
-    action: str,  # 'approve', 'reject', 'forward'
+    action: str,
     reason: str = "",
 ) -> RepairEstimate:
-    """Department Head reviews committee-reviewed mid-range estimate (BR-IWD-006)."""
     complaint = estimate.complaint
     event_map = {
         "approve": "approve_dept_head",
@@ -200,10 +199,9 @@ def review_mid_range(
 def review_director(
     estimate: RepairEstimate,
     director_user_id: int,
-    action: str,  # 'approve_high', 'approve_mid', 'reject'
+    action: str,
     reason: str = "",
 ) -> RepairEstimate:
-    """Director review for high-cost bidding authorization or forwarded mid-range work (BR-IWD-007)."""
     complaint = estimate.complaint
     event_map = {
         "approve_high": "authorize_bidding",
