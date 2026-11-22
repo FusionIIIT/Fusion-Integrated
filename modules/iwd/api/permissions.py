@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+
 class HasRolePermission(permissions.BasePermission):
     """
     Checks role against HTTP header 'X-Role' or request.user.role.

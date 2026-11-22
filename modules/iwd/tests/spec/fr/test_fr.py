@@ -1,7 +1,7 @@
 import pytest
 from rest_framework import status
 from rest_framework.test import APIClient
-from modules.iwd.models import Complaint
+
 
 @pytest.mark.django_db
 def test_fr_01_submit_valid_complaint():

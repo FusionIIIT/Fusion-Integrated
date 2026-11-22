@@ -1,9 +1,12 @@
-import pytest
 from decimal import Decimal
+
+import pytest
 from rest_framework import status
 from rest_framework.test import APIClient
+
+from modules.iwd.domain.models import CostBand, determine_cost_band
 from modules.iwd.models import Complaint, Estimate, FinalBill
-from modules.iwd.domain.models import determine_cost_band, CostBand
+
 
 @pytest.mark.django_db
 def test_br_001_active_role_authorization():

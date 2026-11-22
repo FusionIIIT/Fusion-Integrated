@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Optional
+
 from modules.iwd.models import Complaint, Estimate
 
 
@@ -39,12 +39,12 @@ def get_complaint_summaries(
 
 def get_complaint_estimates(
     complaint_ids: Sequence[int]
-) -> dict[int, Optional[float]]:
+) -> dict[int, float | None]:
     ids = {int(i) for i in complaint_ids if i is not None}
     if not ids:
         return {}
     rows = Estimate.objects.filter(complaint_id__in=ids)
-    res = {cid: None for cid in ids}
+    res = dict.fromkeys(ids)
     for e in rows:
         res[e.complaint_id] = float(e.total_cost)
     return res

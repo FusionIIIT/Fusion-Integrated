@@ -1,5 +1,7 @@
-from django.db import models
 from decimal import Decimal
+
+from django.db import models
+
 
 class Complaint(models.Model):
     CATEGORY_CHOICES = [

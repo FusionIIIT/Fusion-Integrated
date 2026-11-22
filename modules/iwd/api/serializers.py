@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from ..models import Complaint, Estimate, InventoryItem, FinalBill, Feedback, PhysicalVerification
+
+from ..models import Complaint, Estimate, Feedback, FinalBill
+
 
 class ComplaintSerializer(serializers.ModelSerializer):
     class Meta:

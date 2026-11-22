@@ -1,6 +1,6 @@
 """Domain models and permission definitions for IWD."""
-from enum import Enum
 from decimal import Decimal
+from enum import Enum
 
 # Permission codes enforced across IWD endpoints and services
 PERM_VIEW = "iwd.complaint.view"
@@ -31,7 +31,6 @@ HIGH_THRESHOLD = Decimal("250000.00")
 def determine_cost_band(total: Decimal) -> CostBand:
     if total < LOW_THRESHOLD:
         return CostBand.LOW
-    elif total <= HIGH_THRESHOLD:
+    if total <= HIGH_THRESHOLD:
         return CostBand.MID
-    else:
-        return CostBand.HIGH
+    return CostBand.HIGH
