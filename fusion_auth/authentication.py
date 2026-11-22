@@ -5,7 +5,11 @@ Accepts either the httpOnly cookie the SPA carries, or an
 resolved by asking IAM who the holder is — this service never checks a
 password and never reads a user table.
 """
+import hashlib
+from dataclasses import replace
+
 from django.conf import settings
+from django.core.cache import cache
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -41,6 +45,10 @@ class IamSessionAuthentication(BaseAuthentication):
             csrf.require(request, token)
 
         principal = Principal.from_session(session)
+        active_role = cache.get(
+            f"fusion:active-role:{hashlib.sha256(str(token).encode()).hexdigest()}")
+        if active_role in principal.roles:
+            principal = replace(principal, active_role=active_role)
         request.principal = principal
         return (principal, token)
 

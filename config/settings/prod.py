@@ -9,6 +9,9 @@ DATABASES["default"]["PASSWORD"] = DB_PASSWORD
 IAM_SERVICE_TOKEN = os.environ["IAM_SERVICE_TOKEN"]
 # Required, no fallback: a home-directory default is wrong on a server.
 PLACEMENT_UPLOAD_ROOT = os.environ["PLACEMENT_UPLOAD_ROOT"]
+VMS_ID_FINGERPRINT_KEY = os.environ["VMS_ID_FINGERPRINT_KEY"]
+VMS_ID_UPLOAD_ROOT = os.environ["VMS_ID_UPLOAD_ROOT"]
+VMS_CLAMD_SOCKET = os.environ.get("VMS_CLAMD_SOCKET", "/run/clamav/clamd.ctl")
 
 # Required because their absence is silent and severe: LocMem makes every
 # throttle per-worker, and memory:// means no task ever runs — so no

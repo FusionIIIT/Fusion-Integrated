@@ -7,6 +7,8 @@ over HTTP — see fusion_auth/.
 import os
 from pathlib import Path
 
+from corsheaders.defaults import default_headers
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
@@ -59,6 +61,16 @@ def env_list(name, default=None):
 
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", "django-insecure-dev-only-change-me")
+VMS_ID_FINGERPRINT_KEY = env("VMS_ID_FINGERPRINT_KEY")
+VMS_PUBLIC_BASE_URL = env("VMS_PUBLIC_BASE_URL", "http://localhost:5173")
+VMS_ID_UPLOAD_ROOT = env("VMS_ID_UPLOAD_ROOT", str(Path.home() / ".local" / "share" /
+    "fusion-integrated" / "vms-identity"))
+VMS_CLAMD_SOCKET = env("VMS_CLAMD_SOCKET", "/run/clamav/clamd.ctl")
+# A synthetic host can be exposed to the public registration form in local
+# development when the institutional directory is unavailable. The API only
+# uses these values when DEBUG is enabled; production hosts always come from IAM.
+VMS_DEMO_HOST_USER_ID = int(env("VMS_DEMO_HOST_USER_ID", "2147483647"))
+VMS_DEMO_HOST_DISPLAY_NAME = env("VMS_DEMO_HOST_DISPLAY_NAME", "VMS Demo Host")
 DEBUG = False
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
 
@@ -90,6 +102,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.vms",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -99,6 +112,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "core.observability.middleware.RequestIDMiddleware",
+    "modules.vms.middleware.RequestBodyLimitMiddleware",
     "django.middleware.common.CommonMiddleware",
     # X_FRAME_OPTIONS is inert without this; only this middleware emits it.
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -188,8 +202,9 @@ PLACEMENT_UPLOAD_ROOT = env(
 #: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
 PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
 
-# No multipart endpoints remain, so this only caps the JSON body.
-DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
+# Multipart requests are streamed to disk; nginx and VMS enforce the 5 MB file limit.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -216,6 +231,9 @@ REST_FRAMEWORK = {
         "export": "5/hour",
         "upload": "20/hour",
         "directory_search": "120/hour",
+        "vms_registration": "60/hour",
+        "vms_visitor_access": "60/hour",
+        "vms_gate": "120/min",
     },
 }
 
@@ -235,6 +253,7 @@ SPECTACULAR_SETTINGS = {
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = env_list("DJANGO_CORS_ALLOWED_ORIGINS", ["http://localhost:5173"])
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = (*default_headers, "x-visitor-token")
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Kolkata"

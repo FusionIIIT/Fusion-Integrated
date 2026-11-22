@@ -21,6 +21,10 @@ const RecruiterApplicants = lazy(
   () => import("../recruiter/pages/RecruiterApplicantsPage"));
 const RecruiterInterviews = lazy(
   () => import("../recruiter/pages/RecruiterInterviewsPage"));
+const VmsVisitorRegistration = lazy(() => import("../modules/vms/VisitorPortal")
+  .then((m) => ({ default: m.VisitorRegistrationPage })));
+const VmsVisitorAccess = lazy(() => import("../modules/vms/VisitorPortal")
+  .then((m) => ({ default: m.VisitorAccessPage })));
 
 const loading = <Center h="60vh"><Loader /></Center>;
 
@@ -116,6 +120,8 @@ export function AppRoutes() {
 
   return useRoutes([
     { path: "/login", element: <LoginPage /> },
+    { path: "/vms/register", element: <Suspense fallback={loading}><VmsVisitorRegistration /></Suspense> },
+    { path: "/vms/access", element: <Suspense fallback={loading}><VmsVisitorAccess /></Suspense> },
     // Matched before "/" so the institute RequireAuth never sees a recruiter.
     recruiterRoutes,
     {

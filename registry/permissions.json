@@ -278,6 +278,223 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "vms": {
+      "grants": {
+        "Admin": [
+          "vms.audit.view",
+          "vms.document.view",
+          "vms.event.manage",
+          "vms.event.view",
+          "vms.gate.override",
+          "vms.gate.validate",
+          "vms.integration.manage",
+          "vms.muster.manage",
+          "vms.policy.manage",
+          "vms.registry.manage",
+          "vms.report.view",
+          "vms.vip.manage",
+          "vms.visit_log.create",
+          "vms.visit_request.approve",
+          "vms.visit_request.create",
+          "vms.visit_request.update",
+          "vms.visit_request.view",
+          "vms.visit_request.view_self",
+          "vms.zone.manage"
+        ],
+        "Security Personnel": [
+          "vms.document.view",
+          "vms.event.view",
+          "vms.gate.validate",
+          "vms.muster.manage",
+          "vms.report.view",
+          "vms.visit_log.create",
+          "vms.visit_request.view"
+        ],
+        "Super Admin": [
+          "vms.audit.view",
+          "vms.document.view",
+          "vms.event.manage",
+          "vms.event.view",
+          "vms.gate.override",
+          "vms.gate.validate",
+          "vms.integration.manage",
+          "vms.muster.manage",
+          "vms.policy.manage",
+          "vms.registry.manage",
+          "vms.report.view",
+          "vms.role.manage",
+          "vms.vip.manage",
+          "vms.visit_log.create",
+          "vms.visit_request.approve",
+          "vms.visit_request.create",
+          "vms.visit_request.update",
+          "vms.visit_request.view",
+          "vms.visit_request.view_self",
+          "vms.zone.manage"
+        ],
+        "faculty": [
+          "vms.visit_log.create",
+          "vms.visit_request.approve",
+          "vms.visit_request.create",
+          "vms.visit_request.update",
+          "vms.visit_request.view_self"
+        ],
+        "staff": [
+          "vms.visit_log.create",
+          "vms.visit_request.approve",
+          "vms.visit_request.create",
+          "vms.visit_request.update",
+          "vms.visit_request.view_self"
+        ]
+      },
+      "module_grants": [
+        "Admin",
+        "Security Personnel",
+        "Super Admin",
+        "faculty",
+        "staff"
+      ],
+      "nav": {
+        "base_path": "/vms",
+        "icon": "FaIdCard",
+        "items": [
+          {
+            "code": "vms.visits",
+            "icon": "FaUsers",
+            "label": "Visitor requests",
+            "required_permission": "vms.visit_request.view",
+            "sort_order": 10,
+            "to": "/vms/visits"
+          },
+          {
+            "code": "vms.inbox",
+            "icon": "FaCheckDouble",
+            "label": "Host approvals",
+            "required_permission": "vms.visit_request.approve",
+            "sort_order": 20,
+            "to": "/vms/inbox"
+          },
+          {
+            "code": "vms.admin_review",
+            "icon": "FaClipboardCheck",
+            "label": "Urgent and contingency review",
+            "required_permission": "vms.visit_request.approve",
+            "sort_order": 25,
+            "to": "/vms/admin-review"
+          },
+          {
+            "code": "vms.events",
+            "icon": "FaCalendarAlt",
+            "label": "Special events",
+            "required_permission": "vms.event.manage",
+            "sort_order": 30,
+            "to": "/vms/admin/events"
+          },
+          {
+            "code": "vms.security_events",
+            "icon": "FaCalendarAlt",
+            "label": "Event operations",
+            "required_permission": "vms.event.view",
+            "sort_order": 35,
+            "to": "/vms/security/events"
+          }
+        ],
+        "label": "Visitor Management",
+        "nav_section": "Visitor Management",
+        "sort_order": 30,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "vms.visit_request.view",
+          "label": "View all visit requests"
+        },
+        {
+          "code": "vms.visit_request.view_self",
+          "label": "View visit requests for assigned host scope"
+        },
+        {
+          "code": "vms.visit_request.create",
+          "label": "Create and manage visit requests"
+        },
+        {
+          "code": "vms.visit_request.update",
+          "label": "Update or terminate visit requests"
+        },
+        {
+          "code": "vms.visit_request.approve",
+          "label": "Approve or reject visit requests"
+        },
+        {
+          "code": "vms.visit_request.expire",
+          "label": "Expire overdue requests"
+        },
+        {
+          "code": "vms.visit_log.create",
+          "label": "Record visit entry and exit events"
+        },
+        {
+          "code": "vms.gate.validate",
+          "label": "Validate visitor passes at gate checkpoints"
+        },
+        {
+          "code": "vms.gate.override",
+          "label": "Decide eligible manual gate overrides"
+        },
+        {
+          "code": "vms.document.view",
+          "label": "View cleared visitor identity documents"
+        },
+        {
+          "code": "vms.registry.manage",
+          "label": "Manage blacklist and safe-list versions"
+        },
+        {
+          "code": "vms.policy.manage",
+          "label": "Manage access policy versions"
+        },
+        {
+          "code": "vms.zone.manage",
+          "label": "Manage zone permissions and elevations"
+        },
+        {
+          "code": "vms.report.view",
+          "label": "View visitor reports and statistics"
+        },
+        {
+          "code": "vms.audit.view",
+          "label": "Review security audit events"
+        },
+        {
+          "code": "vms.event.view",
+          "label": "View special-event handling information"
+        },
+        {
+          "code": "vms.event.manage",
+          "label": "Manage special visitor events"
+        },
+        {
+          "code": "vms.muster.manage",
+          "label": "Manage emergency muster and roll call"
+        },
+        {
+          "code": "vms.integration.manage",
+          "label": "Manage VMS integration settings"
+        },
+        {
+          "code": "vms.vip.manage",
+          "label": "Manage VIP permissions"
+        },
+        {
+          "code": "vms.role.manage",
+          "label": "Assign scoped VMS roles"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "vms.visit_request.expire"
+      ]
     }
   },
   "publisher": "integrated",
