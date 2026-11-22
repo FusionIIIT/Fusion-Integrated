@@ -34,6 +34,149 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "iwd": {
+      "grants": {
+        "iwd_director": [
+          "iwd.budget.manage",
+          "iwd.budget.view",
+          "iwd.contractor.manage",
+          "iwd.inventory.manage",
+          "iwd.report.view",
+          "iwd.work_request.approve",
+          "iwd.work_request.assign",
+          "iwd.work_request.close",
+          "iwd.work_request.create",
+          "iwd.work_request.view"
+        ],
+        "iwd_engineer": [
+          "iwd.inventory.manage",
+          "iwd.work_request.create",
+          "iwd.work_request.view"
+        ],
+        "iwd_requester": [
+          "iwd.work_request.create",
+          "iwd.work_request.view"
+        ],
+        "iwd_supervisor": [
+          "iwd.budget.view",
+          "iwd.contractor.manage",
+          "iwd.inventory.manage",
+          "iwd.report.view",
+          "iwd.work_request.approve",
+          "iwd.work_request.assign",
+          "iwd.work_request.create",
+          "iwd.work_request.view"
+        ]
+      },
+      "module_grants": [
+        "iwd_director",
+        "iwd_engineer",
+        "iwd_requester",
+        "iwd_supervisor"
+      ],
+      "nav": {
+        "base_path": "/iwd",
+        "icon": "Wrench",
+        "items": [
+          {
+            "code": "iwd.requests",
+            "icon": "ClipboardText",
+            "label": "Work Requests",
+            "required_permission": "iwd.work_request.view",
+            "sort_order": 10,
+            "to": "/iwd/requests"
+          },
+          {
+            "code": "iwd.new_request",
+            "icon": "PlusCircle",
+            "label": "Submit Request",
+            "required_permission": "iwd.work_request.create",
+            "sort_order": 20,
+            "to": "/iwd/new-request"
+          },
+          {
+            "code": "iwd.approvals",
+            "icon": "CheckSquare",
+            "label": "Approvals",
+            "required_permission": "iwd.work_request.approve",
+            "sort_order": 30,
+            "to": "/iwd/approvals"
+          },
+          {
+            "code": "iwd.contractors",
+            "icon": "Buildings",
+            "label": "Contractors",
+            "required_permission": "iwd.contractor.manage",
+            "sort_order": 40,
+            "to": "/iwd/contractors"
+          },
+          {
+            "code": "iwd.inventory",
+            "icon": "Package",
+            "label": "Inventory",
+            "required_permission": "iwd.inventory.manage",
+            "sort_order": 50,
+            "to": "/iwd/inventory"
+          },
+          {
+            "code": "iwd.reports",
+            "icon": "ChartBar",
+            "label": "Reports",
+            "required_permission": "iwd.report.view",
+            "sort_order": 60,
+            "to": "/iwd/reports"
+          }
+        ],
+        "label": "Institute Works Department",
+        "nav_section": "Administration",
+        "sort_order": 30,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "iwd.work_request.view",
+          "label": "View work requests"
+        },
+        {
+          "code": "iwd.work_request.create",
+          "label": "Submit a new work request"
+        },
+        {
+          "code": "iwd.work_request.approve",
+          "label": "Approve or reject work requests"
+        },
+        {
+          "code": "iwd.work_request.assign",
+          "label": "Assign work requests to engineers"
+        },
+        {
+          "code": "iwd.work_request.close",
+          "label": "Close and complete work requests"
+        },
+        {
+          "code": "iwd.contractor.manage",
+          "label": "Manage contractor records"
+        },
+        {
+          "code": "iwd.inventory.manage",
+          "label": "Manage materials and inventory"
+        },
+        {
+          "code": "iwd.budget.view",
+          "label": "View budget allocations"
+        },
+        {
+          "code": "iwd.budget.manage",
+          "label": "Manage and update budgets"
+        },
+        {
+          "code": "iwd.report.view",
+          "label": "View IWD operational reports"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

@@ -1,0 +1,542 @@
+[
+  {
+    "test_id": "TC_FR_001",
+    "source_id": "CFR-IWD-01 (AFR-IWD-001)",
+    "purpose": "Verify compliance with AFR-IWD-001: Allow authenticated Institute Employee to submit complaint.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-001 under CFR-IWD-01.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-001 behavior.",
+    "test_type": "Happy Path Submit"
+  },
+  {
+    "test_id": "TC_FR_002",
+    "source_id": "CFR-IWD-01 (AFR-IWD-002)",
+    "purpose": "Verify compliance with AFR-IWD-002: Capture category/nature (civil, electrical, plumbing, carpentry, repair, new_construction).",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-002 under CFR-IWD-01.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-002 behavior.",
+    "test_type": "Category Validation"
+  },
+  {
+    "test_id": "TC_FR_003",
+    "source_id": "CFR-IWD-01 (AFR-IWD-003)",
+    "purpose": "Verify compliance with AFR-IWD-003: Capture complaint location.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-003 under CFR-IWD-01.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-003 behavior.",
+    "test_type": "Location Validation"
+  },
+  {
+    "test_id": "TC_FR_004",
+    "source_id": "CFR-IWD-01 (AFR-IWD-004)",
+    "purpose": "Verify compliance with AFR-IWD-004: Capture complaint urgency/priority level (low, medium, high, urgent).",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-004 under CFR-IWD-01.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-004 behavior.",
+    "test_type": "Priority Validation"
+  },
+  {
+    "test_id": "TC_FR_005",
+    "source_id": "CFR-IWD-01 (AFR-IWD-005)",
+    "purpose": "Verify compliance with AFR-IWD-005: Capture complaint remarks.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-005 under CFR-IWD-01.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-005 behavior.",
+    "test_type": "Remarks Storage"
+  },
+  {
+    "test_id": "TC_FR_006",
+    "source_id": "CFR-IWD-01 (AFR-IWD-006)",
+    "purpose": "Verify compliance with AFR-IWD-006: Create and persist complaint record in draft status upon submission.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-006 under CFR-IWD-01.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-006 behavior.",
+    "test_type": "Persistence in Draft"
+  },
+  {
+    "test_id": "TC_FR_007",
+    "source_id": "CFR-IWD-02 (AFR-IWD-007)",
+    "purpose": "Verify compliance with AFR-IWD-007: Automatically assign submitted complaint to an engineer based on category/workload.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-007 under CFR-IWD-02.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-007 behavior.",
+    "test_type": "Engineer Assignment"
+  },
+  {
+    "test_id": "TC_FR_008",
+    "source_id": "CFR-IWD-02 (AFR-IWD-008)",
+    "purpose": "Verify compliance with AFR-IWD-008: Allow employee to track current status of submitted complaint.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-008 under CFR-IWD-02.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-008 behavior.",
+    "test_type": "Status Tracking"
+  },
+  {
+    "test_id": "TC_FR_009",
+    "source_id": "CFR-IWD-02 (AFR-IWD-009)",
+    "purpose": "Verify compliance with AFR-IWD-009: Allow assigned engineer to view complaints assigned to them.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-009 under CFR-IWD-02.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-009 behavior.",
+    "test_type": "Assigned Worklist"
+  },
+  {
+    "test_id": "TC_FR_010",
+    "source_id": "CFR-IWD-03 (AFR-IWD-010)",
+    "purpose": "Verify compliance with AFR-IWD-010: Allow engineer to record assessment of assigned complaint.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-010 under CFR-IWD-03.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-010 behavior.",
+    "test_type": "Assessment Recording"
+  },
+  {
+    "test_id": "TC_FR_011",
+    "source_id": "CFR-IWD-03 (AFR-IWD-011)",
+    "purpose": "Verify compliance with AFR-IWD-011: Allow engineer to record estimated repair time.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-011 under CFR-IWD-03.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-011 behavior.",
+    "test_type": "Estimated Duration"
+  },
+  {
+    "test_id": "TC_FR_012",
+    "source_id": "CFR-IWD-03 (AFR-IWD-012)",
+    "purpose": "Verify compliance with AFR-IWD-012: Allow engineer to record required materials and quantities.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-012 under CFR-IWD-03.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-012 behavior.",
+    "test_type": "Material Requirements"
+  },
+  {
+    "test_id": "TC_FR_013",
+    "source_id": "CFR-IWD-03 (AFR-IWD-013)",
+    "purpose": "Verify compliance with AFR-IWD-013: Allow engineer to record estimated cost and submit estimate.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-013 under CFR-IWD-03.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-013 behavior.",
+    "test_type": "Estimate Submission"
+  },
+  {
+    "test_id": "TC_FR_014",
+    "source_id": "CFR-IWD-04 (AFR-IWD-014)",
+    "purpose": "Verify compliance with AFR-IWD-014: Classify and route submitted estimate according to cost band.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-014 under CFR-IWD-04.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-014 behavior.",
+    "test_type": "Cost Band Classification"
+  },
+  {
+    "test_id": "TC_FR_015",
+    "source_id": "CFR-IWD-04 (AFR-IWD-015)",
+    "purpose": "Verify compliance with AFR-IWD-015: Route estimate below Rs. 25,000 to IWD Admin for low-cost approval.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-015 under CFR-IWD-04.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-015 behavior.",
+    "test_type": "Low-Cost Band Routing"
+  },
+  {
+    "test_id": "TC_FR_016",
+    "source_id": "CFR-IWD-05 (AFR-IWD-016)",
+    "purpose": "Verify compliance with AFR-IWD-016: Allow IWD Admin to approve or reject low-cost estimate.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-016 under CFR-IWD-05.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-016 behavior.",
+    "test_type": "Low-Cost Approval Decision"
+  },
+  {
+    "test_id": "TC_FR_017",
+    "source_id": "CFR-IWD-05 (AFR-IWD-017)",
+    "purpose": "Verify compliance with AFR-IWD-017: Support internal quotation route for low-cost procurement.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-017 under CFR-IWD-05.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-017 behavior.",
+    "test_type": "Internal Procurement Path"
+  },
+  {
+    "test_id": "TC_FR_018",
+    "source_id": "CFR-IWD-04 (AFR-IWD-018)",
+    "purpose": "Verify compliance with AFR-IWD-018: Route estimate from Rs. 25,000 through Rs. 2,50,000 for mid-range review.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-018 under CFR-IWD-04.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-018 behavior.",
+    "test_type": "Mid-Range Band Routing"
+  },
+  {
+    "test_id": "TC_FR_019",
+    "source_id": "CFR-IWD-06 (AFR-IWD-019)",
+    "purpose": "Verify compliance with AFR-IWD-019: Capture committee necessity/feasibility outcome for mid-range estimate.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-019 under CFR-IWD-06.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-019 behavior.",
+    "test_type": "Committee Review Outcome"
+  },
+  {
+    "test_id": "TC_FR_020",
+    "source_id": "CFR-IWD-06 (AFR-IWD-020)",
+    "purpose": "Verify compliance with AFR-IWD-020: Allow Department Head to approve, reject, or forward mid-range estimate.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-020 under CFR-IWD-06.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-020 behavior.",
+    "test_type": "HOD Decision Action"
+  },
+  {
+    "test_id": "TC_FR_021",
+    "source_id": "CFR-IWD-04 (AFR-IWD-021)",
+    "purpose": "Verify compliance with AFR-IWD-021: Route estimate above Rs. 2,50,000 (and >1,00,000) to Director for approval.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-021 under CFR-IWD-04.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-021 behavior.",
+    "test_type": "High-Cost Director Routing"
+  },
+  {
+    "test_id": "TC_FR_022",
+    "source_id": "CFR-IWD-07 (AFR-IWD-022)",
+    "purpose": "Verify compliance with AFR-IWD-022: Support initiation of external competitive bidding after high-cost approval.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-022 under CFR-IWD-07.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-022 behavior.",
+    "test_type": "Competitive Bidding Initiation"
+  },
+  {
+    "test_id": "TC_FR_023",
+    "source_id": "CFR-IWD-07 (AFR-IWD-023)",
+    "purpose": "Verify compliance with AFR-IWD-023: Support vendor selection from approved contractor list.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-023 under CFR-IWD-07.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-023 behavior.",
+    "test_type": "Vendor Selection"
+  },
+  {
+    "test_id": "TC_FR_024",
+    "source_id": "CFR-IWD-08 (AFR-IWD-024)",
+    "purpose": "Verify compliance with AFR-IWD-024: Record mandatory rejection reason when approval-stage request is rejected.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-024 under CFR-IWD-08.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-024 behavior.",
+    "test_type": "Mandatory Rejection Reason"
+  },
+  {
+    "test_id": "TC_FR_025",
+    "source_id": "CFR-IWD-08 (AFR-IWD-025)",
+    "purpose": "Verify compliance with AFR-IWD-025: Allow responsible actor to modify rejected complaint when resubmission permitted.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-025 under CFR-IWD-08.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-025 behavior.",
+    "test_type": "Rejected Ticket Modification"
+  },
+  {
+    "test_id": "TC_FR_026",
+    "source_id": "CFR-IWD-08 (AFR-IWD-026)",
+    "purpose": "Verify compliance with AFR-IWD-026: Allow modified rejected request to be resubmitted to approval route.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-026 under CFR-IWD-08.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-026 behavior.",
+    "test_type": "Resubmission Workflow"
+  },
+  {
+    "test_id": "TC_FR_027",
+    "source_id": "CFR-IWD-09 (AFR-IWD-027)",
+    "purpose": "Verify compliance with AFR-IWD-027: Allow IWD Admin to view and monitor inventory stock levels.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-027 under CFR-IWD-09.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-027 behavior.",
+    "test_type": "Inventory Stock Monitoring"
+  },
+  {
+    "test_id": "TC_FR_028",
+    "source_id": "CFR-IWD-09 (AFR-IWD-028)",
+    "purpose": "Verify compliance with AFR-IWD-028: Check stock availability before initiating procurement.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-028 under CFR-IWD-09.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-028 behavior.",
+    "test_type": "Pre-Procurement Stock Check"
+  },
+  {
+    "test_id": "TC_FR_029",
+    "source_id": "CFR-IWD-09 (AFR-IWD-029)",
+    "purpose": "Verify compliance with AFR-IWD-029: Record material usage against relevant maintenance work request.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-029 under CFR-IWD-09.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-029 behavior.",
+    "test_type": "Material Usage Tracking"
+  },
+  {
+    "test_id": "TC_FR_030",
+    "source_id": "CFR-IWD-09 (AFR-IWD-030)",
+    "purpose": "Verify compliance with AFR-IWD-030: Maintain audit trail of inventory movements associated with maintenance.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-030 under CFR-IWD-09.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-030 behavior.",
+    "test_type": "Inventory Audit Trail"
+  },
+  {
+    "test_id": "TC_FR_031",
+    "source_id": "CFR-IWD-09 (AFR-IWD-031)",
+    "purpose": "Verify compliance with AFR-IWD-031: Allow IWD Admin to coordinate procurement action when required stock unavailable.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-031 under CFR-IWD-09.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-031 behavior.",
+    "test_type": "Stock Shortage Procurement"
+  },
+  {
+    "test_id": "TC_FR_032",
+    "source_id": "CFR-IWD-10 (AFR-IWD-032)",
+    "purpose": "Verify compliance with AFR-IWD-032: Allow engineer to record work execution progress and mark repair complete.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-032 under CFR-IWD-10.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-032 behavior.",
+    "test_type": "Work Completion Recording"
+  },
+  {
+    "test_id": "TC_FR_033",
+    "source_id": "CFR-IWD-10 (AFR-IWD-033)",
+    "purpose": "Verify compliance with AFR-IWD-033: Allow engineer to flag repair as urgent for fast-track attention.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-033 under CFR-IWD-10.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-033 behavior.",
+    "test_type": "Urgent Priority Flagging"
+  },
+  {
+    "test_id": "TC_FR_034",
+    "source_id": "CFR-IWD-10 (AFR-IWD-034)",
+    "purpose": "Verify compliance with AFR-IWD-034: Route urgent flag for fast-track review without bypassing cost-based controls.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-034 under CFR-IWD-10.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-034 behavior.",
+    "test_type": "Urgent Escalation Review"
+  },
+  {
+    "test_id": "TC_FR_035",
+    "source_id": "CFR-IWD-11 (AFR-IWD-035)",
+    "purpose": "Verify compliance with AFR-IWD-035: Log approval actions performed in IWD workflow.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-035 under CFR-IWD-11.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-035 behavior.",
+    "test_type": "Approval Event Logging"
+  },
+  {
+    "test_id": "TC_FR_036",
+    "source_id": "CFR-IWD-11 (AFR-IWD-036)",
+    "purpose": "Verify compliance with AFR-IWD-036: Log modifications to approval-stage IWD requests.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-036 under CFR-IWD-11.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-036 behavior.",
+    "test_type": "Modification Audit Logging"
+  },
+  {
+    "test_id": "TC_FR_037",
+    "source_id": "CFR-IWD-11 (AFR-IWD-037)",
+    "purpose": "Verify compliance with AFR-IWD-037: Log rejection actions and recorded reasons into audit trail.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-037 under CFR-IWD-11.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-037 behavior.",
+    "test_type": "Rejection Audit Logging"
+  },
+  {
+    "test_id": "TC_FR_038",
+    "source_id": "CFR-IWD-12 (AFR-IWD-038)",
+    "purpose": "Verify compliance with AFR-IWD-038: Prevent complaint from being marked resolved until physical verification passes.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-038 under CFR-IWD-12.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-038 behavior.",
+    "test_type": "Pre-Resolution Verification Guard"
+  },
+  {
+    "test_id": "TC_FR_039",
+    "source_id": "CFR-IWD-12 (AFR-IWD-039)",
+    "purpose": "Verify compliance with AFR-IWD-039: Allow Department Head / Supervisor to record quality verification outcome.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-039 under CFR-IWD-12.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-039 behavior.",
+    "test_type": "Quality Verification Recording"
+  },
+  {
+    "test_id": "TC_FR_040",
+    "source_id": "CFR-IWD-13 (AFR-IWD-040)",
+    "purpose": "Verify compliance with AFR-IWD-040: Allow engineer to submit final bill with actual cost and resolution remarks.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-040 under CFR-IWD-13.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-040 behavior.",
+    "test_type": "Final Bill Submission"
+  },
+  {
+    "test_id": "TC_FR_041",
+    "source_id": "CFR-IWD-13 (AFR-IWD-041)",
+    "purpose": "Verify compliance with AFR-IWD-041: Allow auditor to validate invoices against approved estimate.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-041 under CFR-IWD-13.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-041 behavior.",
+    "test_type": "Invoice Validation"
+  },
+  {
+    "test_id": "TC_FR_042",
+    "source_id": "CFR-IWD-13 (AFR-IWD-042)",
+    "purpose": "Verify compliance with AFR-IWD-042: Cross-check completed-work reports and supporting evidence during validation.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-042 under CFR-IWD-13.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-042 behavior.",
+    "test_type": "Bill Cross-Check Validation"
+  },
+  {
+    "test_id": "TC_FR_043",
+    "source_id": "CFR-IWD-13 (AFR-IWD-043)",
+    "purpose": "Verify compliance with AFR-IWD-043: Allow auditor to forward validated bill to Director for final approval.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-043 under CFR-IWD-13.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-043 behavior.",
+    "test_type": "Auditor Bill Forwarding"
+  },
+  {
+    "test_id": "TC_FR_044",
+    "source_id": "CFR-IWD-13 (AFR-IWD-044)",
+    "purpose": "Verify compliance with AFR-IWD-044: Allow Director to grant or withhold final approval for payment settlement.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-044 under CFR-IWD-13.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-044 behavior.",
+    "test_type": "Settlement Approval Decision"
+  },
+  {
+    "test_id": "TC_FR_045",
+    "source_id": "CFR-IWD-13 (AFR-IWD-045)",
+    "purpose": "Verify compliance with AFR-IWD-045: Route payment for Accounts settlement and record resulting settlement status.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-045 under CFR-IWD-13.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-045 behavior.",
+    "test_type": "Accounts Payment Settlement"
+  },
+  {
+    "test_id": "TC_FR_046",
+    "source_id": "CFR-IWD-14 (AFR-IWD-046)",
+    "purpose": "Verify compliance with AFR-IWD-046: Allow employee to submit post-resolution feedback and rating.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-046 under CFR-IWD-14.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-046 behavior.",
+    "test_type": "Post-Resolution Feedback"
+  },
+  {
+    "test_id": "TC_FR_047",
+    "source_id": "CFR-IWD-14 (AFR-IWD-047)",
+    "purpose": "Verify compliance with AFR-IWD-047: Allow employee to report post-repair issue through feedback channel.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-047 under CFR-IWD-14.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-047 behavior.",
+    "test_type": "Post-Repair Issue Reporting"
+  },
+  {
+    "test_id": "TC_FR_048",
+    "source_id": "CFR-IWD-14 (AFR-IWD-048)",
+    "purpose": "Verify compliance with AFR-IWD-048: Allow authorized stakeholders to view recorded feedback for quality monitoring.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-048 under CFR-IWD-14.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-048 behavior.",
+    "test_type": "Feedback Monitoring Access"
+  },
+  {
+    "test_id": "TC_FR_049",
+    "source_id": "CFR-IWD-15 (AFR-IWD-049)",
+    "purpose": "Verify compliance with AFR-IWD-049: Notify relevant stakeholders when complaint is submitted and assigned.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-049 under CFR-IWD-15.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-049 behavior.",
+    "test_type": "Submission Notification"
+  },
+  {
+    "test_id": "TC_FR_050",
+    "source_id": "CFR-IWD-15 (AFR-IWD-050)",
+    "purpose": "Verify compliance with AFR-IWD-050: Notify relevant stakeholders when work request status changes.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-050 under CFR-IWD-15.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-050 behavior.",
+    "test_type": "Status Change Notification"
+  },
+  {
+    "test_id": "TC_FR_051",
+    "source_id": "CFR-IWD-15 (AFR-IWD-051)",
+    "purpose": "Verify compliance with AFR-IWD-051: Notify relevant stakeholders of estimate/budget approval decisions.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-051 under CFR-IWD-15.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-051 behavior.",
+    "test_type": "Approval Decision Notification"
+  },
+  {
+    "test_id": "TC_FR_052",
+    "source_id": "CFR-IWD-15 (AFR-IWD-052)",
+    "purpose": "Verify compliance with AFR-IWD-052: Issue alerts when urgent repair is escalated for fast-track review.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-052 under CFR-IWD-15.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-052 behavior.",
+    "test_type": "Urgent Escalation Alert"
+  },
+  {
+    "test_id": "TC_FR_053",
+    "source_id": "CFR-IWD-15 (AFR-IWD-053)",
+    "purpose": "Verify compliance with AFR-IWD-053: Issue notifications for submission deadlines and policy updates.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-053 under CFR-IWD-15.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-053 behavior.",
+    "test_type": "Deadline Policy Notification"
+  },
+  {
+    "test_id": "TC_FR_054",
+    "source_id": "CFR-IWD-16 (AFR-IWD-054)",
+    "purpose": "Verify compliance with AFR-IWD-054: Enforce role-based access control according to active authorized role.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-054 under CFR-IWD-16.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-054 behavior.",
+    "test_type": "RBAC Access Enforcement"
+  },
+  {
+    "test_id": "TC_FR_055",
+    "source_id": "CFR-IWD-16 (AFR-IWD-055)",
+    "purpose": "Verify compliance with AFR-IWD-055: Restrict access to sensitive financial information according to role.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-055 under CFR-IWD-16.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-055 behavior.",
+    "test_type": "Financial Info Restriction"
+  },
+  {
+    "test_id": "TC_FR_056",
+    "source_id": "CFR-IWD-16 (AFR-IWD-056)",
+    "purpose": "Verify compliance with AFR-IWD-056: Restrict approval actions to users authorized for corresponding approval role.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-056 under CFR-IWD-16.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-056 behavior.",
+    "test_type": "Approval Authorization Guard"
+  },
+  {
+    "test_id": "TC_FR_057",
+    "source_id": "CFR-IWD-16 (AFR-IWD-057)",
+    "purpose": "Verify compliance with AFR-IWD-057: Allow user with multiple assigned IWD roles to switch active authorized role.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-057 under CFR-IWD-16.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-057 behavior.",
+    "test_type": "Active Role Switching"
+  },
+  {
+    "test_id": "TC_FR_058",
+    "source_id": "CFR-IWD-17 (AFR-IWD-058)",
+    "purpose": "Verify compliance with AFR-IWD-058: Use shared Fusion ERP data/services to maintain cross-module consistency.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-058 under CFR-IWD-17.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-058 behavior.",
+    "test_type": "Cross-Module Parity"
+  },
+  {
+    "test_id": "TC_FR_059",
+    "source_id": "CFR-IWD-16 (AFR-IWD-059)",
+    "purpose": "Verify compliance with AFR-IWD-059: Prevent invalid status transition from draft directly to complete.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-059 under CFR-IWD-16.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-059 behavior.",
+    "test_type": "State Transition Guard"
+  },
+  {
+    "test_id": "TC_FR_060",
+    "source_id": "CFR-IWD-16 (AFR-IWD-060)",
+    "purpose": "Verify compliance with AFR-IWD-060: Represent Department Head and Dean as distinct IWD approval roles.",
+    "preconditions": "IWD test environment initialized with Django test database.",
+    "action_or_input": "Execute test covering requirement AFR-IWD-060 under CFR-IWD-16.",
+    "expected_result": "System strictly complies with requirement AFR-IWD-060 behavior.",
+    "test_type": "Role Separation Invariant"
+  }
+]
