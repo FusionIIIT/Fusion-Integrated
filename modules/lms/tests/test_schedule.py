@@ -19,6 +19,10 @@ pytestmark = pytest.mark.django_db
 
 
 def test_process_scheduled_content_release():
+    """UC-LMS-015, BR-LMS-006, BW-LMS-03: Process scheduled content release.
+    Scheduled release transitions materials and assignments from SCHEDULED to PUBLISHED
+    once the release timestamp arrives.
+    """
     now = timezone.now()
 
     # Past scheduled material -> should be published

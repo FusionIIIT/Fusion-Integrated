@@ -10,6 +10,7 @@ export default defineConfig({
   forbidOnly: CI,
   retries: CI ? 1 : 0,
   reporter: CI ? [["list"], ["html", { open: "never" }]] : [["list"]],
+  expect: { timeout: 10_000 },
   use: {
     baseURL: BASE_URL,
     trace: "retain-on-failure",

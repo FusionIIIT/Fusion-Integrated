@@ -9,6 +9,7 @@ from modules.lms.domain import calculations, rules, validators
 from modules.lms.domain import state_machine as sm
 from modules.lms.domain.constants import (
     AssignmentStatus,
+    CourseRole,
     GradeStatus,
     MaterialStatus,
     MaterialType,
@@ -413,4 +414,53 @@ def test_validator_instructions_and_type_failures():
             submission_type="UNKNOWN_TYPE",
             due_date=now + timedelta(days=5),
             release_date=None,
+        )
+
+
+def test_ta_authoring_restrictions_br_lms_004():
+    """BR-LMS-004: TA authoring restriction.
+    TAs are strictly barred from creating or modifying assignments, materials, or course details.
+    """
+    assert rules.can_author_assignment(CourseRole.INSTRUCTOR) is True
+    assert rules.can_author_assignment(CourseRole.TA) is False
+    assert rules.can_author_material(CourseRole.INSTRUCTOR) is True
+    assert rules.can_author_material(CourseRole.TA) is False
+    assert rules.can_manage_workspace(CourseRole.INSTRUCTOR) is True
+    assert rules.can_manage_workspace(CourseRole.TA) is False
+
+
+def test_announcement_posting_authority_br_lms_007():
+    """BR-LMS-007: Announcement posting authority.
+    Faculty always permitted; TA requires course-level can_post_announcement toggle.
+    """
+    assert rules.can_post_announcement(CourseRole.INSTRUCTOR, can_post_flag=False) is True
+    assert rules.can_post_announcement(CourseRole.TA, can_post_flag=True) is True
+    assert rules.can_post_announcement(CourseRole.TA, can_post_flag=False) is False
+    assert rules.can_post_announcement(CourseRole.STUDENT, can_post_flag=True) is False
+    assert rules.can_post_announcement(CourseRole.OBSERVER, can_post_flag=True) is False
+
+
+def test_assignment_required_configuration_br_lms_009():
+    """BR-LMS-009: Assignment required configuration.
+    Validates due date, instructions, points possible, and submission type.
+    """
+    now = datetime.now(UTC)
+    # Valid configuration passes
+    validators.validate_assignment_config(
+        title="Midterm Project",
+        instructions="Complete the project specification",
+        points_possible=Decimal("100.00"),
+        submission_type=SubmissionType.TEXT,
+        due_date=now + timedelta(days=7),
+        release_date=now,
+    )
+    # Empty title fails
+    with pytest.raises(validators.DomainValidationError, match="title cannot be empty"):
+        validators.validate_assignment_config(
+            title="",
+            instructions="Instructions",
+            points_possible=100,
+            submission_type=SubmissionType.TEXT,
+            due_date=now + timedelta(days=7),
+            release_date=now,
         )

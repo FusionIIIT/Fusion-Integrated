@@ -208,6 +208,14 @@ def test_student_and_ta_grading_journey(stub_iam, lms_course_setup):
     )
     client_stu = _make_client(stub_iam, 3001, "student", student_perms)
 
+    # Student views published materials (UC-LMS-004)
+    res_mat = client_stu.get(f"/api/v1/lms/materials/?course_id={course_id}")
+    assert res_mat.status_code == 200
+
+    # Student views course announcements (UC-LMS-006)
+    res_ann = client_stu.get(f"/api/v1/lms/announcements/?course_id={course_id}")
+    assert res_ann.status_code == 200
+
     # Student retrieves assignment details (UC-LMS-009, AFR-LMS-007.4)
     res = client_stu.get(f"/api/v1/lms/assignments/{asg.id}/")
     assert res.status_code == 200

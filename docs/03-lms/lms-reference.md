@@ -21,7 +21,7 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 | `CFR-LMS-012` | Student access to released grade and feedback | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
 | `CFR-LMS-013` | Audit logging of post-release grade changes | `services` | [services/grading.py:71](../../modules/lms/services/grading.py#L71) | `VERIFIED` |
 | `CFR-LMS-014` | Teaching Assistant authority boundaries | `domain` | [domain/rules.py:58](../../modules/lms/domain/rules.py#L58) | `VERIFIED` |
-| `CFR-LMS-015` | Observer read-only isolation and student-data privacy | `selectors` | [selectors/scoping.py:69](../../modules/lms/selectors/scoping.py#L69) | `VERIFIED` |
+| `CFR-LMS-015` | Observer read-only isolation and student-data privacy | `selectors` | [selectors/scoping.py:67](../../modules/lms/selectors/scoping.py#L67) | `VERIFIED` |
 
 ### Atomic Functional Requirements (AFRs)
 
@@ -44,14 +44,14 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 | `AFR-LMS-005.3` | Automatically timestamp posted announcements | `models` | [models/announcements.py:14](../../modules/lms/models/announcements.py#L14) | `VERIFIED` |
 | `AFR-LMS-005.4` | Make announcements visible course-wide to enrolled/linked users | `selectors` | [selectors/announcements.py:11](../../modules/lms/selectors/announcements.py#L11) | `VERIFIED` |
 | `AFR-LMS-006.1` | Faculty create assignments for assigned courses | `services` | [services/assignments.py:20](../../modules/lms/services/assignments.py#L20) | `VERIFIED` |
-| `AFR-LMS-006.2` | Capture required assignment configuration (due date, instructions, points, type) | `domain` | [domain/validators.py:34](../../modules/lms/domain/validators.py#L34) | `VERIFIED` |
+| `AFR-LMS-006.2` | Capture required assignment configuration (due date, instructions, points, type) | `domain` | [domain/validators.py:43](../../modules/lms/domain/validators.py#L43) | `VERIFIED` |
 | `AFR-LMS-006.3` | Allow Faculty to edit assignment details | `services` | [services/assignments.py:61](../../modules/lms/services/assignments.py#L61) | `VERIFIED` |
 | `AFR-LMS-006.4` | Maintain assignment in Draft state before explicit publication | `domain` | [domain/state_machine.py:86](../../modules/lms/domain/state_machine.py#L86) | `VERIFIED` |
 | `AFR-LMS-007.1` | Faculty publish draft assignments | `services` | [services/assignments.py:101](../../modules/lms/services/assignments.py#L101) | `VERIFIED` |
 | `AFR-LMS-007.2` | Apply release-date visibility control | `selectors` | [selectors/assignments.py:19](../../modules/lms/selectors/assignments.py#L19) | `VERIFIED` |
 | `AFR-LMS-007.3` | Release scheduled assignment when release time is reached | `tasks` | [tasks.py:23](../../modules/lms/tasks.py#L23) | `VERIFIED` |
 | `AFR-LMS-007.4` | Students view and download assignment instructions once released | `selectors` | [selectors/assignments.py:36](../../modules/lms/selectors/assignments.py#L36) | `VERIFIED` |
-| `AFR-LMS-008.1` | Submit work conforming to configured submission type (file/text/link) | `domain` | [domain/validators.py:58](../../modules/lms/domain/validators.py#L58) | `VERIFIED` |
+| `AFR-LMS-008.1` | Submit work conforming to configured submission type (file/text/link) | `domain` | [domain/validators.py:79](../../modules/lms/domain/validators.py#L79) | `VERIFIED` |
 | `AFR-LMS-008.2` | Record and timestamp baseline on-time submission | `domain` | [domain/rules.py:10](../../modules/lms/domain/rules.py#L10) | `VERIFIED` |
 | `AFR-LMS-009.1` | Student views own submission history | `selectors` | [selectors/submissions.py:16](../../modules/lms/selectors/submissions.py#L16) | `VERIFIED` |
 | `AFR-LMS-009.2` | Student views own submission status (submitted, late, missing) | `domain` | [domain/calculations.py:8](../../modules/lms/domain/calculations.py#L8) | `VERIFIED` |
@@ -62,10 +62,10 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 | `AFR-LMS-011.2` | Prevent students from viewing unreleased draft grades | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
 | `AFR-LMS-011.3` | Allow Faculty to release grades and feedback to students | `services` | [services/grading.py:126](../../modules/lms/services/grading.py#L126) | `VERIFIED` |
 | `AFR-LMS-012.1` | Student views own released grade and feedback | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
-| `AFR-LMS-012.2` | Released grade is strictly read-only to Student | `api` | [api/views.py:612](../../modules/lms/api/views.py#L612) | `VERIFIED` |
+| `AFR-LMS-012.2` | Released grade is strictly read-only to Student | `api` | [api/views.py:630](../../modules/lms/api/views.py#L630) | `VERIFIED` |
 | `AFR-LMS-013.1` | Record actor identity on post-release grade modification | `models` | [models/grading.py:56](../../modules/lms/models/grading.py#L56) | `VERIFIED` |
 | `AFR-LMS-013.2` | Record exact timestamp of post-release grade modification | `models` | [models/grading.py:57](../../modules/lms/models/grading.py#L57) | `VERIFIED` |
-| `AFR-LMS-014.1` | TA views course details, materials, and announcements | `selectors` | [selectors/scoping.py:37](../../modules/lms/selectors/scoping.py#L37) | `VERIFIED` |
+| `AFR-LMS-014.1` | TA views course details, materials, and announcements | `selectors` | [selectors/scoping.py:35](../../modules/lms/selectors/scoping.py#L35) | `VERIFIED` |
 | `AFR-LMS-014.2` | TA views student submissions for assigned course | `selectors` | [selectors/submissions.py:16](../../modules/lms/selectors/submissions.py#L16) | `VERIFIED` |
 | `AFR-LMS-014.3` | TA cannot create, edit, or publish assignments | `domain` | [domain/rules.py:43](../../modules/lms/domain/rules.py#L43) | `VERIFIED` |
 | `AFR-LMS-014.4` | TA cannot create or edit course materials | `domain` | [domain/rules.py:48](../../modules/lms/domain/rules.py#L48) | `VERIFIED` |
@@ -99,24 +99,24 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 
 | ID | Description | Layer | Source File & Line | Status |
 |:---|:---|:---|:---|:---|
-| `BR-LMS-001` | Course-specific access control | `selectors` | [selectors/scoping.py:37](../../modules/lms/selectors/scoping.py#L37) | `VERIFIED` |
-| `BR-LMS-002` | Student registration data governs Student course access | `selectors` | [selectors/scoping.py:81](../../modules/lms/selectors/scoping.py#L81) | `VERIFIED` |
-| `BR-LMS-003` | Observer read-only and student-data restriction | `selectors` | [selectors/scoping.py:69](../../modules/lms/selectors/scoping.py#L69) | `VERIFIED` |
+| `BR-LMS-001` | Course-specific access control | `selectors` | [selectors/scoping.py:35](../../modules/lms/selectors/scoping.py#L35) | `VERIFIED` |
+| `BR-LMS-002` | Student registration data governs Student course access | `selectors` | [selectors/scoping.py:79](../../modules/lms/selectors/scoping.py#L79) | `VERIFIED` |
+| `BR-LMS-003` | Observer read-only and student-data restriction | `selectors` | [selectors/scoping.py:67](../../modules/lms/selectors/scoping.py#L67) | `VERIFIED` |
 | `BR-LMS-004` | TA authoring restriction | `domain` | [domain/rules.py:43](../../modules/lms/domain/rules.py#L43) | `VERIFIED` |
 | `BR-LMS-005` | Published material visibility | `selectors` | [selectors/materials.py:19](../../modules/lms/selectors/materials.py#L19) | `VERIFIED` |
 | `BR-LMS-006` | Scheduled material release | `tasks` | [tasks.py:14](../../modules/lms/tasks.py#L14) | `VERIFIED` |
 | `BR-LMS-007` | Announcement posting authority | `domain` | [domain/rules.py:34](../../modules/lms/domain/rules.py#L34) | `VERIFIED` |
 | `BR-LMS-008` | Announcement timestamp and audience | `models` | [models/announcements.py:8](../../modules/lms/models/announcements.py#L8) | `VERIFIED` |
-| `BR-LMS-009` | Assignment required configuration | `domain` | [domain/validators.py:34](../../modules/lms/domain/validators.py#L34) | `VERIFIED` |
+| `BR-LMS-009` | Assignment required configuration | `domain` | [domain/validators.py:43](../../modules/lms/domain/validators.py#L43) | `VERIFIED` |
 | `BR-LMS-010` | Assignment draft-before-publication | `domain` | [domain/state_machine.py:86](../../modules/lms/domain/state_machine.py#L86) | `VERIFIED` |
 | `BR-LMS-011` | Assignment release-date visibility | `selectors` | [selectors/assignments.py:19](../../modules/lms/selectors/assignments.py#L19) | `VERIFIED` |
-| `BR-LMS-012` | Submission-type conformity | `domain` | [domain/validators.py:58](../../modules/lms/domain/validators.py#L58) | `VERIFIED` |
+| `BR-LMS-012` | Submission-type conformity | `domain` | [domain/validators.py:79](../../modules/lms/domain/validators.py#L79) | `VERIFIED` |
 | `BR-LMS-013` | Baseline on-time submission | `domain` | [domain/rules.py:10](../../modules/lms/domain/rules.py#L10) | `VERIFIED` |
 | `BR-LMS-014` | Submission ownership and privacy | `selectors` | [selectors/submissions.py:16](../../modules/lms/selectors/submissions.py#L16) | `VERIFIED` |
 | `BR-LMS-015` | Grading authority and attribution | `models` | [models/grading.py:22](../../modules/lms/models/grading.py#L22) | `VERIFIED` |
 | `BR-LMS-016` | Draft grade visibility | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
 | `BR-LMS-017` | Grade release authority | `domain` | [domain/rules.py:67](../../modules/lms/domain/rules.py#L67) | `VERIFIED` |
-| `BR-LMS-018` | Released grade read-only to Student | `api` | [api/views.py:612](../../modules/lms/api/views.py#L612) | `VERIFIED` |
+| `BR-LMS-018` | Released grade read-only to Student | `api` | [api/views.py:630](../../modules/lms/api/views.py#L630) | `VERIFIED` |
 | `BR-LMS-019` | Post-release grade-change audit | `services` | [services/grading.py:71](../../modules/lms/services/grading.py#L71) | `VERIFIED` |
 
 ### Workflows (BWs & CWs)

@@ -45,6 +45,12 @@ class CourseWorkspaceListView(APIView):
 
 class CourseWorkspaceDetailView(APIView):
     serializer_class = CourseWorkspaceDetailSerializer
+    throttle_scope = "lms_workspace"
+
+    def get_throttles(self):
+        if self.request.method in ("PATCH", "PUT"):
+            return super().get_throttles()
+        return []
 
     def get_permissions(self):
         if self.request.method in ("PATCH", "PUT"):
@@ -213,6 +219,12 @@ class CourseMaterialDownloadView(APIView):
 
 class CourseAnnouncementListCreateView(APIView):
     serializer_class = CourseAnnouncementSerializer
+    throttle_scope = "lms_announcement"
+
+    def get_throttles(self):
+        if self.request.method == "POST":
+            return super().get_throttles()
+        return []
 
     def get_permissions(self):
         if self.request.method == "POST":
@@ -294,6 +306,12 @@ class CourseAnnouncementDetailView(APIView):
 
 class AssignmentListCreateView(APIView):
     serializer_class = AssignmentSerializer
+    throttle_scope = "lms_assignment"
+
+    def get_throttles(self):
+        if self.request.method == "POST":
+            return super().get_throttles()
+        return []
 
     def get_permissions(self):
         if self.request.method == "POST":

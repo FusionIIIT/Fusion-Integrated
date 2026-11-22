@@ -217,6 +217,9 @@ REST_FRAMEWORK = {
         "directory_search": "120/hour",
         "lms_submission": "60/hour",
         "lms_grade": "120/hour",
+        "lms_workspace": "60/hour",
+        "lms_announcement": "60/hour",
+        "lms_assignment": "60/hour",
     },
 }
 

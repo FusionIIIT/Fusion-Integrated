@@ -88,6 +88,9 @@ def test_course_material_model():
 
 
 def test_course_announcement_model():
+    """BR-LMS-008: Announcement timestamp and audience.
+    Announcements are automatically timestamped upon creation and scoped to course audience.
+    """
     ann = CourseAnnouncement.objects.create(
         course_id=101,
         title="Welcome to CS301",
@@ -96,6 +99,8 @@ def test_course_announcement_model():
         author_role=CourseRole.INSTRUCTOR,
     )
     assert str(ann) == "Welcome to CS301 (Course 101)"
+    assert ann.created_at is not None
+    assert ann.course_id == 101
 
 
 def test_assignment_points_positive_constraint():

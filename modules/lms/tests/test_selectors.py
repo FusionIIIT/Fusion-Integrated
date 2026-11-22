@@ -180,7 +180,10 @@ def workspace_setup():
     }
 
 
-def test_get_user_courses_queryset(workspace_setup):
+def test_get_user_courses_queryset_br_lms_001(workspace_setup):
+    """BR-LMS-001: Course-specific access control.
+    Principal must be actively registered, assigned, or linked to access the course.
+    """
     p_student = make_principal(user_id=1001)
     p_unrelated = make_principal(user_id=9999)
 
@@ -191,7 +194,19 @@ def test_get_user_courses_queryset(workspace_setup):
     assert not qs_unrelated.filter(course_id=201).exists()
 
 
-def test_list_published_materials_visibility(workspace_setup):
+def test_student_enrollment_governs_access_br_lms_002(workspace_setup):
+    """BR-LMS-002: Student registration data governs Student course access."""
+    p_student = make_principal(user_id=1001)
+    p_unrelated = make_principal(user_id=9999)
+
+    assert selectors.is_student_enrolled(201, p_student) is True
+    assert selectors.is_student_enrolled(201, p_unrelated) is False
+
+
+def test_list_published_materials_visibility_br_lms_005(workspace_setup):
+    """BR-LMS-005: Published material visibility.
+    Materials are hidden from students until published and release date reached.
+    """
     p_student = make_principal(user_id=1001)
     p_instructor = make_principal(user_id=2001, kind="faculty", active_role="faculty")
 
@@ -225,7 +240,10 @@ def test_get_material_detail_failsafe(workspace_setup, monkeypatch):
     assert selectors.get_material_detail(mat_draft_id, p_instructor) is not None
 
 
-def test_assignment_scoping(workspace_setup):
+def test_assignment_scoping_br_lms_011(workspace_setup):
+    """BR-LMS-011: Assignment release-date visibility.
+    Assignments are hidden from students prior to release date and while unpublished.
+    """
     p_student = make_principal(user_id=1001)
     p_instructor = make_principal(user_id=2001, kind="faculty", active_role="faculty")
 

@@ -18,6 +18,7 @@ from modules.lms.selectors.scoping import (
     is_course_instructor,
     is_course_observer,
     is_course_ta,
+    is_student_enrolled,
 )
 from modules.lms.selectors.submissions import (
     get_student_submission,
@@ -40,6 +41,7 @@ __all__ = [
     "is_course_instructor",
     "is_course_observer",
     "is_course_ta",
+    "is_student_enrolled",
     "list_announcements",
     "list_assignments",
     "list_course_grades",

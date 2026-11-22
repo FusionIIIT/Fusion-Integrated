@@ -11,9 +11,7 @@ from modules.lms.models import CourseMembership, CourseWorkspace
 
 
 def get_user_courses_queryset(principal: Any) -> QuerySet[CourseWorkspace]:
-    """Returns workspaces for courses the principal is actively enrolled in,
-    assigned to, or linked.
-    """
+    """Returns courses the principal is actively enrolled in, assigned to, or linked."""
     user_id = getattr(principal, "user_id", None) or getattr(principal, "erp_user_id", None)
     if user_id is None:
         return CourseWorkspace.objects.none()

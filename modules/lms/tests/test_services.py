@@ -282,6 +282,7 @@ def test_assignments_and_submissions_workflow(base_course):
 
 
 def test_grading_audit_and_release_workflow(base_course):
+    """Grading workflow, audit trail, and release verification (BR-LMS-015, BR-LMS-017, BR-LMS-019)."""
     _, now = base_course
     p_inst = make_principal(user_id=4001, kind="faculty", active_role="faculty")
     p_ta_grader = make_principal(user_id=4002)
@@ -313,7 +314,7 @@ def test_grading_audit_and_release_workflow(base_course):
             principal=p_ta_no_grade,
         )
 
-    # 2. Authorized TA grades submission -> saved as DRAFT
+    # 2. Authorized TA grades submission -> saved as DRAFT (BR-LMS-015: attribution recorded)
     grade = services.grade_submission(
         submission_id=sub.id,
         points_awarded=88.5,
@@ -322,6 +323,7 @@ def test_grading_audit_and_release_workflow(base_course):
     )
     assert grade.status == GradeStatus.DRAFT
     assert grade.points_awarded == Decimal("88.5")
+    assert grade.graded_by == 4002
 
     # 3. TA updates draft grade before release -> NO audit record generated
     services.update_grade(

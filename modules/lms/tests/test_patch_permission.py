@@ -20,16 +20,16 @@ def test_patch_course_without_workspace_update_permission_returns_403(stub_iam):
     )
     CourseMembership.objects.create(
         course_id=course_id,
-        user_id=5001,
-        role=CourseRole.STUDENT,
+        user_id=4002,
+        role=CourseRole.INSTRUCTOR,
         status=MembershipStatus.ACTIVE,
     )
 
-    # Student has lms.workspace.view but lacks lms.workspace.update
+    # Assigned instructor has lms.workspace.view but lacks lms.workspace.update
     stub_iam(
         make_session(
-            user_id=5001,
-            kind="student",
+            user_id=4002,
+            kind="faculty",
             permissions=("lms.workspace.view",),
             modules=("lms",),
         )
@@ -40,7 +40,7 @@ def test_patch_course_without_workspace_update_permission_returns_403(stub_iam):
 
     res = client.patch(
         f"/api/v1/lms/courses/{course_id}/",
-        data={"syllabus": "Modified by student"},
+        data={"syllabus": "Modified by instructor without permission"},
         format="json",
     )
     assert res.status_code == 403

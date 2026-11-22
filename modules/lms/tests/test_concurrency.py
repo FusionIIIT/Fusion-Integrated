@@ -5,10 +5,11 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
-from django.db import connections
+from django.db import DatabaseError, IntegrityError, connections
 from django.utils import timezone
 
 from conftest import make_principal
+from core.api.exceptions import DomainError
 from modules.lms import services
 from modules.lms.domain.constants import (
     AssignmentStatus,
@@ -66,7 +67,7 @@ def test_concurrent_submissions_are_safely_serialized():
                 principal=p_student,
             )
             results.append(sub)
-        except Exception as exc:  # noqa: BLE001
+        except (DomainError, IntegrityError, DatabaseError) as exc:
             errors.append(exc)
         finally:
             for conn in connections.all():
