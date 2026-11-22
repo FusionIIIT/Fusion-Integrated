@@ -38,3 +38,34 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `visitor_hostel`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `visitor_hostel.booking.create` | Submit a booking request for a visitor | `faculty`, `staff`, `student` |
+| `visitor_hostel.booking.view_self` | See one's own bookings | `faculty`, `staff`, `student` |
+| `visitor_hostel.modification.create` | Request a booking modification | `faculty`, `staff`, `student` |
+| `visitor_hostel.cancellation.create` | Request a booking cancellation | `faculty`, `staff`, `student` |
+| `visitor_hostel.booking.view` | See every booking, online and offline | `VhCaretaker`, `VhIncharge` |
+| `visitor_hostel.booking.review` | Review, forward or reject a booking | `VhCaretaker` |
+| `visitor_hostel.offline_booking.create` | Record a telephonic or walk-in booking | `VhCaretaker` |
+| `visitor_hostel.cancellation.approve` | Confirm a cancellation request | `VhCaretaker` |
+| `visitor_hostel.room.manage` | Maintain rooms and allot them | `VhCaretaker` |
+| `visitor_hostel.stay.update` | Record check-in and check-out | `VhCaretaker` |
+| `visitor_hostel.meal.manage` | Record meal bookings for guests | `VhCaretaker` |
+| `visitor_hostel.bill.manage` | Generate bills and record settlement | `VhCaretaker` |
+| `visitor_hostel.inventory.manage` | Maintain VH inventory | `VhCaretaker` |
+| `visitor_hostel.replenishment.create` | Record a replenishment requirement | `VhCaretaker` |
+| `visitor_hostel.operations_report.view` | See the Caretaker's daily reports | `VhCaretaker` |
+| `visitor_hostel.alert.view` | See no-show and overstay alerts | `VhCaretaker` |
+| `visitor_hostel.booking.approve` | Approve or reject a forwarded booking | `VhIncharge` |
+| `visitor_hostel.bill.view` | Review finalized bills and meal records | `VhIncharge` |
+| `visitor_hostel.inventory.view` | Review VH inventory | `VhIncharge` |
+| `visitor_hostel.replenishment.approve` | Approve a replenishment requirement | `VhIncharge` |
+| `visitor_hostel.report.view` | See the VH In-Charge's reports | `VhIncharge` |
+| `visitor_hostel.tariff.view` | See visitor categories and tariffs | `VhCaretaker`, `VhIncharge` |
+| `visitor_hostel.duty.view` | See who is on duty | `VhCaretaker`, `VhIncharge` |
+| `visitor_hostel.tariff.manage` | Record a new tariff version | _service only_ |
+| `visitor_hostel.duty.manage` | Reassign the Caretaker or VH In-Charge | _service only_ |
+| `visitor_hostel.modification.approve` | Confirm a booking modification | _service only_ |
