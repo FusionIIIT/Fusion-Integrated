@@ -1,0 +1,335 @@
+[
+  {
+    "test_id": "TC-001",
+    "source_id": "UC-GYM-001 Main Flow (BW-GYM-03, Club Not Created → Club Open)",
+    "purpose": "Verify a Student Admin can create a club with required data and valid assignments.",
+    "preconditions": "A Student Admin is authenticated. The coordinator and co-coordinator are valid students, the Club Faculty Councillor is valid faculty, and the category is Technical.",
+    "action_or_input": "Submit a new club with all required data and the specified valid assignments.",
+    "expected_result": "The club is created in the Club Open state.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-002",
+    "source_id": "UC-GYM-001 Main Flow; Problem Statement §6 Business Constraints — required club data",
+    "purpose": "Verify club creation requires the required data.",
+    "preconditions": "A Student Admin is authenticated. All assignments and the category are valid.",
+    "action_or_input": "Submit a new club with a required data item omitted.",
+    "expected_result": "The club is not created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-003",
+    "source_id": "Problem Statement §6 Business Constraints — coordinator assignments must refer to valid students",
+    "purpose": "Verify an invalid coordinator assignment prevents club creation.",
+    "preconditions": "A Student Admin is authenticated. All required data, other assignments, and the category are valid; the proposed coordinator is not a valid student.",
+    "action_or_input": "Submit the new club.",
+    "expected_result": "The club is not created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-004",
+    "source_id": "Problem Statement §6 Business Constraints — co-coordinator assignments must refer to valid students",
+    "purpose": "Verify an invalid co-coordinator assignment prevents club creation.",
+    "preconditions": "A Student Admin is authenticated. All required data, other assignments, and the category are valid; the proposed co-coordinator is not a valid student.",
+    "action_or_input": "Submit the new club.",
+    "expected_result": "The club is not created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-005",
+    "source_id": "Problem Statement §6 Business Constraints — Club Faculty Councillor must be a valid faculty member",
+    "purpose": "Verify an invalid faculty assignment prevents club creation.",
+    "preconditions": "A Student Admin is authenticated. All required data, other assignments, and the category are valid; the proposed Club Faculty Councillor is not valid faculty.",
+    "action_or_input": "Submit the new club.",
+    "expected_result": "The club is not created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-006",
+    "source_id": "Problem Statement §6 Business Constraints — club category is restricted to Technical, Sports, or Cultural",
+    "purpose": "Verify a category outside the allowed set prevents club creation.",
+    "preconditions": "A Student Admin is authenticated. All required data and assignments are valid.",
+    "action_or_input": "Submit the new club with a category other than Technical, Sports, or Cultural.",
+    "expected_result": "The club is not created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-007",
+    "source_id": "UC-GYM-011 Main Flow (BW-GYM-03, Club Open → Club Confirmed)",
+    "purpose": "Verify Student Admin approval confirms an open club.",
+    "preconditions": "A club exists in the Club Open state. A Student Admin is authenticated.",
+    "action_or_input": "Approve the club.",
+    "expected_result": "The club transitions to Club Confirmed.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-008",
+    "source_id": "Problem Statement §3.1 Club Governance; §4.1 In Scope — club activation under Student Admin control",
+    "purpose": "Verify an actor other than Student Admin cannot confirm a club.",
+    "preconditions": "A club exists in the Club Open state. A non-Student-Admin actor is authenticated.",
+    "action_or_input": "Attempt to approve the club.",
+    "expected_result": "The club remains open and is not confirmed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-009",
+    "source_id": "Problem Statement §2 Problem Domain; §4.1 In Scope — club leadership changes and current leadership assignment",
+    "purpose": "Verify a club leadership change updates the current coordinator and co-coordinator assignments.",
+    "preconditions": "A club exists. A Club Head is authenticated. The proposed coordinator and co-coordinator are valid students.",
+    "action_or_input": "Change the club leadership to the proposed students.",
+    "expected_result": "The club's current leadership assignment reflects the proposed coordinator and co-coordinator.",
+    "test_type": "business-rule"
+  },
+  {
+    "test_id": "TC-010",
+    "source_id": "Problem Statement §6 Business Constraints — coordinator and co-coordinator assignments must refer to valid students",
+    "purpose": "Verify a leadership change cannot assign an invalid student.",
+    "preconditions": "A club exists with a current leadership assignment. A Club Head is authenticated. A proposed replacement is not a valid student.",
+    "action_or_input": "Attempt to change a coordinator or co-coordinator assignment to the invalid student.",
+    "expected_result": "The invalid assignment is not applied; the current leadership assignment remains unchanged.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-011",
+    "source_id": "UC-GYM-004 Main Flow (BW-GYM-01, No Membership Application → Membership Application Open)",
+    "purpose": "Verify a student can apply to a confirmed club.",
+    "preconditions": "A club is confirmed. A student has no application to that club.",
+    "action_or_input": "Submit a membership application to the confirmed club.",
+    "expected_result": "A membership application is created in the Membership Application Open state.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-012",
+    "source_id": "Problem Statement §6 Business Constraints — membership applications are allowed only for confirmed clubs",
+    "purpose": "Verify an application cannot be submitted to an unconfirmed club.",
+    "preconditions": "A club is open but not confirmed. A student has no application to that club.",
+    "action_or_input": "Attempt to apply for membership in the club.",
+    "expected_result": "No membership application is created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-013",
+    "source_id": "Problem Statement §6 Business Constraints — duplicate applications to the same club must be prevented",
+    "purpose": "Verify a student cannot submit a duplicate application to the same club.",
+    "preconditions": "A club is confirmed. The student already has an open membership application to that club.",
+    "action_or_input": "Submit another membership application to the same club.",
+    "expected_result": "No duplicate application is created; the existing application remains open.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-014",
+    "source_id": "Problem Statement §3.3 Membership Management; §6 Business Constraints — applications to different clubs remain allowed",
+    "purpose": "Verify a student can apply to multiple different clubs.",
+    "preconditions": "Two clubs are confirmed. The student has no application to either club.",
+    "action_or_input": "Submit a membership application to each club.",
+    "expected_result": "An open membership application exists for each club.",
+    "test_type": "business-rule"
+  },
+  {
+    "test_id": "TC-015",
+    "source_id": "UC-GYM-005 Main Flow (BW-GYM-01, Membership Application Open → Membership Confirmed)",
+    "purpose": "Verify the applicable Club Head can approve an open membership application.",
+    "preconditions": "A membership application is open. The applicable Club Head for that club is authenticated.",
+    "action_or_input": "Approve the application.",
+    "expected_result": "The membership transitions to Membership Confirmed.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-016",
+    "source_id": "Problem Statement §6 Business Constraints — only the applicable Club Head may approve pending membership applications",
+    "purpose": "Verify another club's head cannot approve the application.",
+    "preconditions": "A membership application is open. A Club Head who is not applicable to that club is authenticated.",
+    "action_or_input": "Attempt to approve the application.",
+    "expected_result": "The application remains open and is not confirmed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-017",
+    "source_id": "UC-GYM-006 Main Flow (BW-GYM-02, Poll Not Available → Poll Open / Target Audience Defined); Problem Statement §3.6 Student Polling",
+    "purpose": "Verify a Club Head can create a poll with valid choices and target groups and notify its intended audience.",
+    "preconditions": "The applicable Club Head is authenticated. Valid target groups are available. The shared notification mechanism is operational.",
+    "action_or_input": "Create a poll with at least two choices and select valid target groups.",
+    "expected_result": "The poll is created open with its target audience defined; intended audience members are notified.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-018",
+    "source_id": "UC-GYM-006 Main Flow (BW-GYM-02, actor is applicable Club Head)",
+    "purpose": "Verify a non-applicable Club Head cannot create the poll for the club.",
+    "preconditions": "A Club Head who is not applicable to the club is authenticated. Valid target groups are available.",
+    "action_or_input": "Attempt to create a poll for that club with at least two choices.",
+    "expected_result": "The poll is not created.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-019",
+    "source_id": "Problem Statement §6 Business Constraints — a voting poll must contain at least two choices",
+    "purpose": "Verify poll creation rejects fewer than two choices.",
+    "preconditions": "The applicable Club Head is authenticated. Valid target groups are available.",
+    "action_or_input": "Attempt to create a poll with one choice.",
+    "expected_result": "The poll is not created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-020",
+    "source_id": "UC-GYM-006 Main Flow (BW-GYM-02, valid target groups)",
+    "purpose": "Verify poll creation rejects invalid target groups.",
+    "preconditions": "The applicable Club Head is authenticated.",
+    "action_or_input": "Attempt to create a poll with at least two choices and a target group that is not valid.",
+    "expected_result": "The poll is not created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-021",
+    "source_id": "UC-GYM-007 Main Flow (BW-GYM-02, Poll Open / Target Audience Defined / Student Not Yet Voted → Student Vote Recorded)",
+    "purpose": "Verify an eligible student can record one vote in an active, unexpired poll.",
+    "preconditions": "A poll is active and unexpired. The student belongs to its target audience and has not voted in it.",
+    "action_or_input": "Submit a vote in the poll.",
+    "expected_result": "The student's vote is recorded; the poll remains open and its target audience remains defined.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-022",
+    "source_id": "UC-GYM-007 Main Flow (BW-GYM-02, poll active guard)",
+    "purpose": "Verify voting is not accepted when the poll is inactive.",
+    "preconditions": "A poll is inactive. The student belongs to its target audience and has not voted.",
+    "action_or_input": "Attempt to submit a vote.",
+    "expected_result": "The vote is not recorded.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-023",
+    "source_id": "UC-GYM-007 Main Flow (BW-GYM-02, poll unexpired guard)",
+    "purpose": "Verify voting is not accepted after a poll expires.",
+    "preconditions": "A poll has expired. The student belongs to its target audience and has not voted.",
+    "action_or_input": "Attempt to submit a vote.",
+    "expected_result": "The vote is not recorded.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-024",
+    "source_id": "UC-GYM-007 Main Flow (BW-GYM-02, student belongs to target audience guard)",
+    "purpose": "Verify a student outside the target audience cannot vote.",
+    "preconditions": "A poll is active and unexpired. The student is not in its target audience and has not voted.",
+    "action_or_input": "Attempt to submit a vote.",
+    "expected_result": "The vote is not recorded.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-025",
+    "source_id": "Problem Statement §3.6 Student Polling; §6 Business Constraints — at most one vote per student per poll",
+    "purpose": "Verify a student cannot vote twice in the same poll.",
+    "preconditions": "A poll is active and unexpired. The student belongs to its target audience and already has a recorded vote.",
+    "action_or_input": "Attempt to submit another vote in the same poll.",
+    "expected_result": "No additional vote is recorded; the student's existing vote remains recorded.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-026",
+    "source_id": "Problem Statement §4.1 In Scope — session booking and notifications for newly booked sessions",
+    "purpose": "Verify a session can be booked at a configured venue and its notification is delivered.",
+    "preconditions": "A configured venue is available. The booking time range is valid. The shared notification mechanism is operational.",
+    "action_or_input": "Book a session at the configured venue on a date and time with no conflicting booking.",
+    "expected_result": "The session is booked and a notification is delivered to its intended recipients.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-027",
+    "source_id": "Problem Statement §4.1 In Scope — event booking and notifications for newly booked events",
+    "purpose": "Verify an event can be booked at a configured venue and its notification is delivered.",
+    "preconditions": "A configured venue is available. The booking time range is valid. The shared notification mechanism is operational.",
+    "action_or_input": "Book an event at the configured venue on a date and time with no conflicting booking.",
+    "expected_result": "The event is booked and a notification is delivered to its intended recipients.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-028",
+    "source_id": "Problem Statement §6 Business Constraints — a booking start time must precede its end time",
+    "purpose": "Verify a booking with a non-increasing time range is rejected.",
+    "preconditions": "A configured venue is available and no other booking conflicts.",
+    "action_or_input": "Attempt to book a session with a start time equal to its end time.",
+    "expected_result": "The booking is not created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-029",
+    "source_id": "Problem Statement §6 Business Constraints; §8 Success Criteria — prevent session-session overlap in the same venue on the same date",
+    "purpose": "Verify a session cannot overlap another session at the same venue and date.",
+    "preconditions": "A session already exists at a venue on a date. The proposed session uses the same venue and date and has an overlapping time range.",
+    "action_or_input": "Attempt to book the proposed session.",
+    "expected_result": "The new session is not created; the existing session remains unchanged.",
+    "test_type": "business-rule"
+  },
+  {
+    "test_id": "TC-030",
+    "source_id": "Problem Statement §6 Business Constraints; §8 Success Criteria — prevent event-event overlap in the same venue on the same date",
+    "purpose": "Verify an event cannot overlap another event at the same venue and date.",
+    "preconditions": "An event already exists at a venue on a date. The proposed event uses the same venue and date and has an overlapping time range.",
+    "action_or_input": "Attempt to book the proposed event.",
+    "expected_result": "The new event is not created; the existing event remains unchanged.",
+    "test_type": "business-rule"
+  },
+  {
+    "test_id": "TC-031",
+    "source_id": "Problem Statement §3.2 Venue Scheduling; §8 Success Criteria — prevent session-event overlap in the same venue on the same date",
+    "purpose": "Verify a session cannot overlap an event at the same venue and date.",
+    "preconditions": "An event already exists at a venue on a date. The proposed session uses the same venue and date and has an overlapping time range.",
+    "action_or_input": "Attempt to book the proposed session.",
+    "expected_result": "The new session is not created; the existing event remains unchanged.",
+    "test_type": "business-rule"
+  },
+  {
+    "test_id": "TC-032",
+    "source_id": "Problem Statement §4.1 In Scope; §6 Business Constraints — club budget-request submission, non-negative amount, and required supporting file",
+    "purpose": "Verify a club budget request with a non-negative amount and supporting file is retained for tracking.",
+    "preconditions": "A Club Head is authenticated for the club. File-upload storage is available.",
+    "action_or_input": "Submit a budget request with amount zero and the required supporting file.",
+    "expected_result": "The request and supporting file are stored and the request can be tracked.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-033",
+    "source_id": "Problem Statement §6 Business Constraints — club budget amounts must be non-negative",
+    "purpose": "Verify a negative budget amount is rejected.",
+    "preconditions": "A Club Head is authenticated for the club. File-upload storage is available.",
+    "action_or_input": "Submit a budget request with a negative amount and the required supporting file.",
+    "expected_result": "The budget request is not created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-034",
+    "source_id": "Problem Statement §6 Business Constraints — budget requests must include the required supporting file",
+    "purpose": "Verify a budget request without its required supporting file is rejected.",
+    "preconditions": "A Club Head is authenticated for the club. File-upload storage is available.",
+    "action_or_input": "Submit a budget request with a non-negative amount and no supporting file.",
+    "expected_result": "The budget request is not created.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-035",
+    "source_id": "Problem Statement §4.1 In Scope; §6 Business Constraints — club event-report submission and required report/details file",
+    "purpose": "Verify a Club Head can submit an event report with its required file.",
+    "preconditions": "A Club Head is authenticated for the club. File-upload storage is available.",
+    "action_or_input": "Submit an event report with the required report/details file.",
+    "expected_result": "The event report and file are stored in the centralized repository.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-036",
+    "source_id": "Problem Statement §6 Business Constraints — club event reports must include the required report/details file",
+    "purpose": "Verify an event report without its required file is rejected.",
+    "preconditions": "A Club Head is authenticated for the club. File-upload storage is available.",
+    "action_or_input": "Submit an event report without the required report/details file.",
+    "expected_result": "The event report is not submitted.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-037",
+    "source_id": "Problem Statement §3.5 Event Reporting; §8 Success Criteria — assigned Club Faculty Councillor can access and review reports for the assigned club",
+    "purpose": "Verify the assigned Club Faculty Councillor can access and review the club's submitted report.",
+    "preconditions": "A report has been submitted for a club. A Club Faculty Councillor is assigned to that club.",
+    "action_or_input": "Access and review the submitted report as the assigned Club Faculty Councillor.",
+    "expected_result": "The assigned Club Faculty Councillor can access and review the report.",
+    "test_type": "access"
+  }
+]
