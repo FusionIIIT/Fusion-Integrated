@@ -1,5 +1,7 @@
 import random
 from datetime import datetime, time, timedelta
+from datetime import timezone as dt_tz
+from zoneinfo import ZoneInfo
 
 from modules.vms.domain import policy_eval as pe
 
@@ -46,3 +48,24 @@ def test_advance_ok_boundary():
 def test_is_same_day():
     assert pe.is_same_day(D, D.replace(hour=23))
     assert not pe.is_same_day(D, D + timedelta(days=1))
+
+
+IST = ZoneInfo("Asia/Kolkata")
+
+
+def test_is_same_day_uses_campus_day_not_utc_day_after_local_midnight():
+    """BR-203: 01:00 IST on the 23rd is still the 22nd in UTC, but the visit is the same day."""
+    now = datetime(2026, 11, 22, 19, 30, tzinfo=dt_tz.utc)          # 01:00 IST, 23 Nov
+    start = datetime(2026, 11, 23, 10, 0, tzinfo=IST)
+    assert pe.is_same_day(now, start, IST)
+
+
+def test_is_same_day_next_campus_day_is_not_same_day_even_if_same_utc_day():
+    """BR-203: 23:30 IST and 00:30 IST next day share a UTC date but not a campus day."""
+    now = datetime(2026, 11, 23, 18, 0, tzinfo=dt_tz.utc)           # 23:30 IST, 23 Nov
+    start = datetime(2026, 11, 23, 19, 0, tzinfo=dt_tz.utc)         # 00:30 IST, 24 Nov
+    assert not pe.is_same_day(now, start, IST)
+
+
+def test_is_same_day_naive_values_are_taken_as_local():
+    assert pe.is_same_day(D, D.replace(hour=23), IST)

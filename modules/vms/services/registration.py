@@ -259,7 +259,8 @@ def submit(*, session_visitor, data: dict) -> VisitRequest:
 
         urgent = False
         if not bypass and not policy_eval.advance_ok(now, start, pol.advance_registration_hours):
-            if pol.allow_same_day_urgent and policy_eval.is_same_day(now, start):
+            if pol.allow_same_day_urgent and policy_eval.is_same_day(
+                    now, start, timezone.get_current_timezone()):
                 urgent = True        # BR-203
             else:
                 _fail(f"Register at least {pol.advance_registration_hours} hours ahead.",
