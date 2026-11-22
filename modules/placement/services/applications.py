@@ -16,6 +16,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
+from decimal import Decimal
 
 from django.db import transaction
 from django.utils import timezone
@@ -37,6 +38,17 @@ from modules.placement.services import facts as facts_service
 from modules.placement.services import notifications
 
 log = logging.getLogger("fusion.placement.applications")
+
+
+def _json_safe(value):
+    """Recursively convert Decimal instances to JSON-safe numbers (int or float)."""
+    if isinstance(value, Decimal):
+        return int(value) if value % 1 == 0 else float(value)
+    if isinstance(value, dict):
+        return {k: _json_safe(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(v) for v in value]
+    return value
 
 
 def actor_kind(actor, application=None) -> str:
@@ -237,7 +249,7 @@ def apply_to(*, posting_id: int, actor, cover_note: str = "",
         raise ConflictError("You have already applied to this posting.",
                             code="already_applied")
 
-    snapshot = evaluate_for(posting=posting, user_id=actor.user_id, policy=policy)
+    snapshot = _json_safe(evaluate_for(posting=posting, user_id=actor.user_id, policy=policy))
 
     app = Application.objects.create(
         posting=posting, user_id=actor.user_id, status=sm.DRAFT,
@@ -281,7 +293,7 @@ def evaluate_for(*, posting: JobPosting, user_id: int,
             sector=posting.company.sector_kind))
 
     standing = f.get("_standing") or {}
-    return {
+    return _json_safe({
         "is_eligible": outcome.is_eligible and season.allowed,
         "failed": elig.failure_reasons(outcome),
         "error": outcome.error,
@@ -292,7 +304,7 @@ def evaluate_for(*, posting: JobPosting, user_id: int,
         "declared_seq": standing.get("declared_seq"),
         "standing": standing,
         "evaluated_at": timezone.now().isoformat(),
-    }
+    })
 
 
 #: A convenience, not a migration tool, and N queries per item.

@@ -15,9 +15,11 @@ import pytest
 from django.utils import timezone
 
 from conftest import make_principal, make_session
+from core.api.exceptions import ConflictError
 from fusion_auth.client import UserRef
 from modules.placement.domain import offer_policy as pol
 from modules.placement.models import (
+    Application,
     Company,
     NotificationOutbox,
     PlacementPolicy,
@@ -275,3 +277,80 @@ def test_cw_pc_04_end_to_end_application_lifecycle(env):
     reg = PlacementRegistration.objects.get(policy=policy, user_id=STUDENT_ID)
     assert reg.offer_count == 1
     assert reg.best_accepted_ctc_lpa == Decimal("14.50")
+
+
+def test_apply_to_ineligible_with_decimal_cpi_snapshot_regression(env):
+    """Regression test for PCMS-TC-010 / PCMS-AFR-008:
+    When an ineligible student applies, the eligibility snapshot containing
+    Decimal values (such as required threshold or actual CPI) must serialize cleanly
+    to JSONField without raising TypeError: Object of type Decimal is not JSON serializable,
+    and must raise ConflictError('not_eligible') leaving no Application created.
+    """
+    _policy, company, tpo, student = env
+
+    posting = posting_service.create(
+        actor=tpo,
+        company_id=company.pk,
+        title="High Bar Engineer",
+        placement_year=SEASON,
+        description="High requirement",
+        ctc_lpa=Decimal("20.00"),
+        closes_at=timezone.now() + timedelta(days=7),
+        eligibility_rule={"gte": ["cpi", 9.0]},
+    )
+    posting_service.publish(posting_id=posting.pk, actor=tpo)
+
+    # Student has CPI 8.50, which is below required 9.00.
+    # Attempting to apply should report not eligible and create no application.
+    with pytest.raises(ConflictError) as exc_info:
+        app_service.apply_to(posting_id=posting.pk, actor=student)
+
+    assert exc_info.value.code == "not_eligible"
+    assert "not eligible" in str(exc_info.value)
+    # Ensure no application row was persisted
+    assert not Application.objects.filter(posting=posting, user_id=STUDENT_ID).exists()
+
+
+def test_eligibility_snapshot_serialization_with_decimals(env):
+    """Ensure Application row with nested Decimal values in eligibility_snapshot
+    converts and saves cleanly to JSONField."""
+    _policy, company, tpo, _student = env
+    posting = posting_service.create(
+        actor=tpo,
+        company_id=company.pk,
+        title="Sample Engineer",
+        placement_year=SEASON,
+        description="Engineering role",
+        ctc_lpa=Decimal("15.00"),
+        closes_at=timezone.now() + timedelta(days=7),
+        eligibility_rule={"gte": ["cpi", 7.0]},
+    )
+    raw_snapshot = {
+        "is_eligible": False,
+        "failed": [
+            {
+                "field": "cpi",
+                "reason": "less_than",
+                "required": Decimal("8.50"),
+                "actual": Decimal("7.25"),
+                "message": "CPI below required minimum.",
+            }
+        ],
+        "standing": {
+            "cpi": Decimal("7.25"),
+            "earned_credits": Decimal("120.00"),
+        },
+    }
+    safe_snapshot = app_service._json_safe(raw_snapshot)
+    app = Application.objects.create(
+        posting=posting,
+        user_id=STUDENT_ID,
+        status="draft",
+        eligibility_snapshot=safe_snapshot,
+    )
+    app.refresh_from_db()
+    assert app.eligibility_snapshot["failed"][0]["actual"] == 7.25
+    assert app.eligibility_snapshot["failed"][0]["required"] == 8.5
+    assert app.eligibility_snapshot["standing"]["cpi"] == 7.25
+    assert app.eligibility_snapshot["standing"]["earned_credits"] == 120
+
