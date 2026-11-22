@@ -46,6 +46,553 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ok'
           description: ''
+  /api/v1/badms/archive_requests:
+    get:
+      operationId: badms_archive_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchivePage'
+          description: ''
+    post:
+      operationId: badms_archive_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchiveCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArchiveCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArchiveCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveRead'
+          description: ''
+  /api/v1/badms/archive_requests/{id}:
+    get:
+      operationId: badms_archive_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveRead'
+          description: ''
+  /api/v1/badms/archive_requests/{id}/classification:
+    post:
+      operationId: v1_badms_archive_requests_classification_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Classification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Classification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Classification'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveRead'
+          description: ''
+  /api/v1/badms/archive_requests/{id}/decision:
+    post:
+      operationId: v1_badms_archive_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchiveDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArchiveDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArchiveDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveRead'
+          description: ''
+  /api/v1/badms/archive_requests/{id}/encryption:
+    post:
+      operationId: v1_badms_archive_requests_encryption_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArchiveRead'
+          description: ''
+  /api/v1/badms/audit_events:
+    get:
+      operationId: v1_badms_audit_events_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditPage'
+          description: ''
+  /api/v1/badms/backup_runs:
+    get:
+      operationId: v1_badms_backup_runs_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupRunPage'
+          description: ''
+    post:
+      operationId: v1_badms_backup_runs_create
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupRun'
+          description: ''
+  /api/v1/badms/reports/department:
+    get:
+      operationId: v1_badms_reports_department_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/badms/reports/security:
+    get:
+      operationId: v1_badms_reports_security_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/badms/restoration_requests:
+    get:
+      operationId: v1_badms_restoration_requests_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestorePage'
+          description: ''
+    post:
+      operationId: v1_badms_restoration_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestoreCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RestoreCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RestoreCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestoreRead'
+          description: ''
+  /api/v1/badms/restoration_requests/{id}/decision:
+    post:
+      operationId: v1_badms_restoration_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchiveDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArchiveDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArchiveDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestoreRead'
+          description: ''
+  /api/v1/badms/restoration_requests/{id}/download:
+    get:
+      operationId: v1_badms_restoration_requests_download_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/badms/restoration_requests/{id}/execution:
+    post:
+      operationId: v1_badms_restoration_requests_execution_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestoreRead'
+          description: ''
+  /api/v1/badms/schedules:
+    get:
+      operationId: v1_badms_schedules_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupScheduleList'
+          description: ''
+    post:
+      operationId: v1_badms_schedules_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackupSchedule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BackupSchedule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BackupSchedule'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupSchedule'
+          description: ''
+  /api/v1/badms/schedules/{id}:
+    patch:
+      operationId: v1_badms_schedules_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBackupSchedule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBackupSchedule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBackupSchedule'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupSchedule'
+          description: ''
+  /api/v1/badms/security_policies:
+    get:
+      operationId: v1_badms_security_policies_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    put:
+      operationId: v1_badms_security_policies_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityPolicy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SecurityPolicy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SecurityPolicy'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/badms/special_archives:
+    post:
+      operationId: v1_badms_special_archives_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialArchive'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpecialArchive'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpecialArchive'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialArchiveRead'
+          description: ''
+  /api/v1/badms/storage_extension_requests:
+    get:
+      operationId: v1_badms_storage_extension_requests_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageExtensionPage'
+          description: ''
+    post:
+      operationId: v1_badms_storage_extension_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageExtensionCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StorageExtensionCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StorageExtensionCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageExtensionRead'
+          description: ''
+  /api/v1/badms/storage_extension_requests/{id}/decision:
+    post:
+      operationId: v1_badms_storage_extension_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageExtensionDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StorageExtensionDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StorageExtensionDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageExtensionRead'
+          description: ''
+  /api/v1/badms/storage_thresholds/me:
+    get:
+      operationId: v1_badms_storage_thresholds_me_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyStorageThreshold'
+          description: ''
   /api/v1/directory/users:
     get:
       operationId: v1_directory_users_retrieve
@@ -1981,6 +2528,151 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    ArchiveCreate:
+      type: object
+      properties:
+        file_name:
+          type: string
+          maxLength: 255
+        file_date:
+          type: string
+          format: date
+        owners: {}
+        file_type:
+          type: string
+          maxLength: 80
+        reason:
+          type: string
+          maxLength: 4000
+        initial_classification:
+          allOf:
+          - $ref: '#/components/schemas/BADMSClassification'
+          default: Routine
+        attachment:
+          type: string
+          format: uri
+      required:
+      - attachment
+      - file_date
+      - file_name
+      - file_type
+      - owners
+      - reason
+    ArchiveDecision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        note:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - decision
+    ArchivePage:
+      type: object
+      properties:
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArchiveRead'
+      required:
+      - next
+      - previous
+      - results
+    ArchiveRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        file_name:
+          type: string
+          readOnly: true
+        file_date:
+          type: string
+          format: date
+          readOnly: true
+        owners:
+          readOnly: true
+        file_type:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        initial_classification:
+          allOf:
+          - $ref: '#/components/schemas/BADMSClassification'
+          readOnly: true
+        classification:
+          allOf:
+          - $ref: '#/components/schemas/BADMSClassification'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ArchiveReadStatusEnum'
+          readOnly: true
+        decision_note:
+          type: string
+          readOnly: true
+        checksum_sha256:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - checksum_sha256
+      - classification
+      - created_at
+      - decision_note
+      - department
+      - file_date
+      - file_name
+      - file_type
+      - id
+      - initial_classification
+      - owners
+      - reason
+      - status
+      - updated_at
+      - user_id
+    ArchiveReadStatusEnum:
+      enum:
+      - Submitted
+      - Rejected
+      - HoD Approved
+      - Classified Non-Sensitive / Policy Applied
+      - Classified Sensitive / Routed to IT Security
+      - Sensitive Archive Encrypted
+      type: string
+      description: |-
+        * `Submitted` - Submitted
+        * `Rejected` - Rejected
+        * `HoD Approved` - HoD Approved
+        * `Classified Non-Sensitive / Policy Applied` - Classified Non-Sensitive / Policy Applied
+        * `Classified Sensitive / Routed to IT Security` - Classified Sensitive / Routed to IT Security
+        * `Sensitive Archive Encrypted` - Sensitive Archive Encrypted
     AudienceEnum:
       enum:
       - students
@@ -1993,6 +2685,195 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuditEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        department:
+          type: string
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        object_type:
+          type: string
+          readOnly: true
+        object_id:
+          type: string
+          readOnly: true
+        outcome:
+          type: string
+          readOnly: true
+        details:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_user_id
+      - created_at
+      - department
+      - details
+      - id
+      - object_id
+      - object_type
+      - outcome
+    AuditPage:
+      type: object
+      properties:
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEvent'
+      required:
+      - next
+      - previous
+      - results
+    BADMSClassification:
+      enum:
+      - Critical
+      - Sensitive
+      - Routine
+      - Archival
+      type: string
+      description: |-
+        * `Critical` - Critical
+        * `Sensitive` - Sensitive
+        * `Routine` - Routine
+        * `Archival` - Archival
+    BackupRun:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        trigger:
+          allOf:
+          - $ref: '#/components/schemas/TriggerEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BackupRunStatusEnum'
+          readOnly: true
+        dataset:
+          type: string
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        checksum_sha256:
+          type: string
+          readOnly: true
+        integrity_verified:
+          type: boolean
+          readOnly: true
+        outcome:
+          type: string
+          readOnly: true
+      required:
+      - checksum_sha256
+      - completed_at
+      - dataset
+      - id
+      - integrity_verified
+      - outcome
+      - started_at
+      - status
+      - trigger
+    BackupRunPage:
+      type: object
+      properties:
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BackupRun'
+      required:
+      - next
+      - previous
+      - results
+    BackupRunStatusEnum:
+      enum:
+      - running
+      - success
+      - failure
+      type: string
+      description: |-
+        * `running` - Running
+        * `success` - Success
+        * `failure` - Failure
+    BackupSchedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        scope:
+          $ref: '#/components/schemas/ScopeEnum'
+        dataset:
+          type: string
+          maxLength: 120
+        frequency:
+          $ref: '#/components/schemas/FrequencyEnum'
+        scheduled_time:
+          type: string
+          format: time
+        timezone:
+          type: string
+          maxLength: 64
+        classifications: {}
+        enabled:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - dataset
+      - frequency
+      - id
+      - scheduled_time
+      - scope
+      - timezone
+      - updated_at
+    BackupScheduleList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BackupSchedule'
+      required:
+      - results
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +2963,13 @@ components:
       - resume_link
       - roll_no
       - user_id
+    Classification:
+      type: object
+      properties:
+        classification:
+          $ref: '#/components/schemas/BADMSClassification'
+      required:
+      - classification
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3203,14 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
     Detail:
       type: object
       properties:
@@ -2423,6 +3319,14 @@ components:
       - fee_reference
       - season
       - user_id
+    FrequencyEnum:
+      enum:
+      - daily
+      - weekly
+      type: string
+      description: |-
+        * `daily` - daily
+        * `weekly` - weekly
     IncidentRecorded:
       type: object
       properties:
@@ -2671,6 +3575,27 @@ components:
       description: |-
         * `online` - Online
         * `offline` - Offline
+    MyStorageThreshold:
+      type: object
+      properties:
+        usage_bytes:
+          type: integer
+          minimum: 0
+        quota_bytes:
+          type: integer
+          minimum: 0
+          nullable: true
+        is_full:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - is_full
+      - quota_bytes
+      - updated_at
+      - usage_bytes
     NavGroup:
       type: object
       description: |-
@@ -3000,6 +3925,32 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedBackupSchedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        scope:
+          $ref: '#/components/schemas/ScopeEnum'
+        dataset:
+          type: string
+          maxLength: 120
+        frequency:
+          $ref: '#/components/schemas/FrequencyEnum'
+        scheduled_time:
+          type: string
+          format: time
+        timezone:
+          type: string
+          maxLength: 64
+        classifications: {}
+        enabled:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedJobPosting:
       type: object
       properties:
@@ -3466,6 +4417,83 @@ components:
       - message
       - reason
       - route
+    RestoreCreate:
+      type: object
+      properties:
+        archive_request_id:
+          type: integer
+          minimum: 1
+      required:
+      - archive_request_id
+    RestorePage:
+      type: object
+      properties:
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RestoreRead'
+      required:
+      - next
+      - previous
+      - results
+    RestoreRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        archive_request_id:
+          type: integer
+          readOnly: true
+        classification:
+          allOf:
+          - $ref: '#/components/schemas/BADMSClassification'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RestoreReadStatusEnum'
+          readOnly: true
+        outcome:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - archive_request_id
+      - classification
+      - created_at
+      - id
+      - outcome
+      - status
+      - updated_at
+    RestoreReadStatusEnum:
+      enum:
+      - Restoration Requested / Standard Path
+      - Sensitive Restoration Pending Approval
+      - Rejected
+      - Approved for Restoration
+      - Restored
+      type: string
+      description: |-
+        * `Restoration Requested / Standard Path` - Restoration Requested / Standard Path
+        * `Sensitive Restoration Pending Approval` - Sensitive Restoration Pending Approval
+        * `Rejected` - Rejected
+        * `Approved for Restoration` - Approved for Restoration
+        * `Restored` - Restored
     RoundOutcome:
       type: object
       properties:
@@ -3558,6 +4586,14 @@ components:
           type: integer
       required:
       - scheduled
+    ScopeEnum:
+      enum:
+      - local
+      - global
+      type: string
+      description: |-
+        * `local` - Local
+        * `global` - Global
     Season:
       type: object
       description: Just enough to populate a season picker.
@@ -3598,6 +4634,21 @@ components:
         * `it` - IT / software
         * `core` - Core engineering
         * `other` - Other
+    SecurityPolicy:
+      type: object
+      properties:
+        retention_days: {}
+        updated_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - updated_at
+      - updated_by
     Session:
       type: object
       properties:
@@ -3663,6 +4714,51 @@ components:
       description: |-
         * `campus` - Through the Placement Cell
         * `off_campus` - Off campus (rules 5 and 24)
+    SpecialArchive:
+      type: object
+      properties:
+        offline_request_reference:
+          type: string
+          maxLength: 160
+        research_description:
+          type: string
+          maxLength: 4000
+        attachment:
+          type: string
+          format: uri
+      required:
+      - attachment
+      - offline_request_reference
+      - research_description
+    SpecialArchiveRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        offline_request_reference:
+          type: string
+          readOnly: true
+        research_description:
+          type: string
+          readOnly: true
+        checksum_sha256:
+          type: string
+          readOnly: true
+        outcome:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - checksum_sha256
+      - created_at
+      - id
+      - offline_request_reference
+      - outcome
+      - research_description
     StaffStats:
       type: object
       description: PC-UC-011/012. Operational figures, staff only.
@@ -3691,6 +4787,113 @@ components:
       required:
       - available
       - season
+    StorageExtensionCreate:
+      type: object
+      properties:
+        requested_bytes:
+          type: integer
+          minimum: 1
+        justification:
+          type: string
+          maxLength: 4000
+        attachment:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - justification
+      - requested_bytes
+    StorageExtensionDecision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        note:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - decision
+    StorageExtensionPage:
+      type: object
+      properties:
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageExtensionRead'
+      required:
+      - next
+      - previous
+      - results
+    StorageExtensionRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        requested_bytes:
+          type: integer
+          readOnly: true
+        usage_bytes:
+          type: integer
+          readOnly: true
+        available_bytes:
+          type: integer
+          readOnly: true
+        justification:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StorageExtensionReadStatusEnum'
+          readOnly: true
+        decision_note:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - available_bytes
+      - created_at
+      - decision_note
+      - department
+      - id
+      - justification
+      - requested_bytes
+      - status
+      - updated_at
+      - usage_bytes
+      - user_id
+    StorageExtensionReadStatusEnum:
+      enum:
+      - Submitted
+      - Rejected
+      - Approved
+      type: string
+      description: |-
+        * `Submitted` - Submitted
+        * `Rejected` - Rejected
+        * `Approved` - Approved
     SubmitOfferLetter:
       type: object
       properties:
@@ -3769,6 +4972,14 @@ components:
       - application_id
       - redacted
       - results
+    TriggerEnum:
+      enum:
+      - manual
+      - scheduled
+      type: string
+      description: |-
+        * `manual` - Manual
+        * `scheduled` - Scheduled
     UserRef:
       type: object
       properties:

@@ -1,5 +1,270 @@
 {
   "modules": {
+    "badms": {
+      "grants": {
+        "Department Head (HoD)": [
+          "badms.archive.review_department",
+          "badms.reports.department",
+          "badms.storage_extension.review_department"
+        ],
+        "IT Security Team": [
+          "badms.archive.encrypt",
+          "badms.security.audit",
+          "badms.security_policy.manage"
+        ],
+        "Super Admin": [
+          "badms.archive.special",
+          "badms.backup.run_manual",
+          "badms.backup.view",
+          "badms.schedule_global.manage"
+        ],
+        "System Administrator (SysAdmin)": [
+          "badms.archive.classify",
+          "badms.audit.view",
+          "badms.backup.run_manual",
+          "badms.backup.view",
+          "badms.restore.approve",
+          "badms.restore.execute",
+          "badms.schedule_local.manage"
+        ],
+        "faculty": [
+          "badms.archive.create",
+          "badms.archive.view_self",
+          "badms.backup.view",
+          "badms.restore.create",
+          "badms.restore.view_self",
+          "badms.storage_extension.create"
+        ],
+        "staff": [
+          "badms.archive.create",
+          "badms.archive.view_self",
+          "badms.backup.view",
+          "badms.restore.create",
+          "badms.restore.view_self",
+          "badms.storage_extension.create"
+        ],
+        "student": [
+          "badms.archive.create",
+          "badms.archive.view_self",
+          "badms.backup.view",
+          "badms.restore.create",
+          "badms.restore.view_self",
+          "badms.storage_extension.create"
+        ]
+      },
+      "module_grants": [
+        "Department Head (HoD)",
+        "IT Security Team",
+        "Super Admin",
+        "System Administrator (SysAdmin)",
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/badms",
+        "icon": "Database",
+        "items": [
+          {
+            "code": "badms.home",
+            "icon": "Database",
+            "label": "Overview",
+            "required_permission": "badms.backup.view",
+            "sort_order": 10,
+            "to": "/badms"
+          },
+          {
+            "code": "badms.archives",
+            "icon": "ArchiveBox",
+            "label": "Archives",
+            "required_permission": "badms.archive.view_self",
+            "sort_order": 20,
+            "to": "/badms/archives"
+          },
+          {
+            "code": "badms.archive.review",
+            "icon": "ShieldCheck",
+            "label": "Review Archives",
+            "required_permission": "badms.archive.review_department",
+            "sort_order": 30,
+            "to": "/badms/archives"
+          },
+          {
+            "code": "badms.operations",
+            "icon": "Database",
+            "label": "Recovery & Reports",
+            "required_permission": "badms.restore.view_self",
+            "sort_order": 40,
+            "to": "/badms/operations"
+          },
+          {
+            "code": "badms.schedule.manage",
+            "icon": "Database",
+            "label": "Backup Schedules",
+            "required_permission": "badms.schedule_local.manage",
+            "sort_order": 50,
+            "to": "/badms/operations"
+          },
+          {
+            "code": "badms.schedule.global",
+            "icon": "Database",
+            "label": "Global Backup Schedules",
+            "required_permission": "badms.schedule_global.manage",
+            "sort_order": 55,
+            "to": "/badms/operations"
+          },
+          {
+            "code": "badms.security.audit",
+            "icon": "ShieldCheck",
+            "label": "Security Audit",
+            "required_permission": "badms.security.audit",
+            "sort_order": 60,
+            "to": "/badms/operations"
+          },
+          {
+            "code": "badms.department.report",
+            "icon": "Database",
+            "label": "Department Reports",
+            "required_permission": "badms.reports.department",
+            "sort_order": 70,
+            "to": "/badms/operations"
+          },
+          {
+            "code": "badms.special.archive",
+            "icon": "ArchiveBox",
+            "label": "Special Archive",
+            "required_permission": "badms.archive.special",
+            "sort_order": 80,
+            "to": "/badms/operations"
+          },
+          {
+            "code": "badms.audit",
+            "icon": "ShieldCheck",
+            "label": "Audit History",
+            "required_permission": "badms.audit.view",
+            "sort_order": 90,
+            "to": "/badms/operations"
+          },
+          {
+            "code": "badms.storage.review",
+            "icon": "Database",
+            "label": "Review Storage Requests",
+            "required_permission": "badms.storage_extension.review_department",
+            "sort_order": 100,
+            "to": "/badms/operations"
+          }
+        ],
+        "label": "Backup and Archive Management",
+        "nav_section": "Operations",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "badms.backup.run_manual",
+          "label": "Trigger a manual backup"
+        },
+        {
+          "code": "badms.backup.view",
+          "label": "View authorized backup status and history"
+        },
+        {
+          "code": "badms.backup.execute_scheduled",
+          "label": "Execute scheduled backups"
+        },
+        {
+          "code": "badms.notifications.deliver",
+          "label": "Deliver BADMS notifications"
+        },
+        {
+          "code": "badms.storage.monitor",
+          "label": "Monitor storage thresholds"
+        },
+        {
+          "code": "badms.retention.enforce",
+          "label": "Enforce configured retention policy"
+        },
+        {
+          "code": "badms.schedule_local.manage",
+          "label": "Manage local backup schedules"
+        },
+        {
+          "code": "badms.schedule_global.manage",
+          "label": "Manage global backup schedules and defaults"
+        },
+        {
+          "code": "badms.archive.create",
+          "label": "Submit archival requests"
+        },
+        {
+          "code": "badms.archive.view_self",
+          "label": "View own archival requests"
+        },
+        {
+          "code": "badms.archive.review_department",
+          "label": "Review department archival requests"
+        },
+        {
+          "code": "badms.archive.classify",
+          "label": "Assign authoritative archival classification"
+        },
+        {
+          "code": "badms.archive.encrypt",
+          "label": "Configure Sensitive archive encryption"
+        },
+        {
+          "code": "badms.archive.special",
+          "label": "Perform special archival operations"
+        },
+        {
+          "code": "badms.restore.create",
+          "label": "Request data restoration"
+        },
+        {
+          "code": "badms.restore.view_self",
+          "label": "View own restoration requests"
+        },
+        {
+          "code": "badms.restore.approve",
+          "label": "Approve Sensitive restoration"
+        },
+        {
+          "code": "badms.restore.execute",
+          "label": "Execute approved restoration"
+        },
+        {
+          "code": "badms.storage_extension.create",
+          "label": "Request storage extension"
+        },
+        {
+          "code": "badms.storage_extension.review_department",
+          "label": "Review department storage requests"
+        },
+        {
+          "code": "badms.audit.view",
+          "label": "View authorized audit history"
+        },
+        {
+          "code": "badms.security.audit",
+          "label": "Review security audit reports"
+        },
+        {
+          "code": "badms.security_policy.manage",
+          "label": "Manage BADMS security and retention policy"
+        },
+        {
+          "code": "badms.reports.department",
+          "label": "View department reports"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "badms.backup.execute_scheduled",
+        "badms.notifications.deliver",
+        "badms.retention.enforce",
+        "badms.storage.monitor"
+      ]
+    },
     "directory": {
       "grants": {
         "Dean Academic": [
