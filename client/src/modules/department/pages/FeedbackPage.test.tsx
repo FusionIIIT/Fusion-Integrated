@@ -41,7 +41,7 @@ describe("FeedbackPage", () => {
   });
 
   it("submits feedback and shows a refusal", async () => {
-    setup(STUDENT, { "/feedback": page([]) });
+    setup(STUDENT, { "/feedback": page([]) }, "student");
     api.post.mockRejectedValueOnce(serverError("Give your feedback a subject and some text.", 422));
     renderPage(<FeedbackPage />);
     fireEvent.click(await screen.findByRole("button", { name: "Submit feedback" }));
@@ -53,7 +53,7 @@ describe("FeedbackPage", () => {
   });
 
   it("lets Dept_Admin review new feedback", async () => {
-    setup(["department.feedback.view", "department.feedback.review"], { "/feedback": page([FB]) });
+    setup(["department.feedback.view", "department.feedback.review"], { "/feedback": page([FB]) }, "dept_admin");
     api.post.mockResolvedValue({ data: { ...FB, status: "under_review" } });
     renderPage(<FeedbackPage />);
     fireEvent.click(await screen.findByRole("button", { name: "Review" }));

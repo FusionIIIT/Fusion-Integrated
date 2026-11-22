@@ -9,11 +9,11 @@ from django.utils import timezone
 
 from core.api.exceptions import ConflictError, DomainError, NotFoundError
 from modules.department.domain import rules
-from modules.department.domain.roles import ActorContext
+from modules.department.domain.roles import CENTRAL, ActorContext
 from modules.department.models import Department, RoleTenure
 from modules.department.selectors import scoping
 from modules.department.services import notifications
-from modules.department.services.common import get_scoped, translated
+from modules.department.services.common import get_scoped, require_acting, translated
 from modules.directory import contracts as directory
 
 #: How far in the past a tenure may start, so a clock skew is not a refusal but a back-date is.
@@ -36,6 +36,7 @@ def assign(
     now=None,
 ) -> RoleTenure:
     """BR-DEPT-021 by permission, BR-DEPT-022/023 dates, AFR-DEPT-047 employees only."""
+    require_acting(ctx, CENTRAL)
     now = now or timezone.now()
     if role not in rules.ASSIGNABLE_ROLES:
         raise DomainError("Choose the role hod or dept_admin and try again.", code="invalid_role")
@@ -81,6 +82,7 @@ def assign(
 @transaction.atomic
 def change(ctx: ActorContext, tenure_id: int, *, valid_to, now=None) -> RoleTenure:
     """UC-DEPT-020 "change": move the end date, never opening a gap or an overlap."""
+    require_acting(ctx, CENTRAL)
     now = now or timezone.now()
     tenure = get_scoped(scoping.tenures_for(ctx), tenure_id, lock=True, what="tenure")
     Department.objects.select_for_update().get(pk=tenure.department_id)

@@ -16,6 +16,7 @@ pytestmark = pytest.mark.django_db
 API = "/api/v1/department"
 
 ENDPOINTS = [
+    ("get", "context", "department.department.view"),
     ("get", "departments", "department.department.view"),
     ("get", "departments/CSE", "department.department.view"),
     ("patch", "departments/CSE", "department.department.update"),

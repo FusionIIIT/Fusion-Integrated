@@ -44,7 +44,7 @@ describe("OverviewPage", () => {
 
   it("lets Dept_Admin propose an official change and shows a refusal", async () => {
     setup(["department.department.view", "department.official_change.create", "department.official_change.view"],
-      { "/departments": [DEPT], "/departments/CSE": DEPT, "/official-changes": page([]) });
+      { "/departments": [DEPT], "/departments/CSE": DEPT, "/official-changes": page([]) }, "dept_admin");
     api.post.mockRejectedValueOnce(serverError("A change to name is already waiting for the HOD.", 409));
     renderPage(<OverviewPage />);
     fireEvent.click(await screen.findByRole("button", { name: "Propose official change" }));
@@ -57,7 +57,7 @@ describe("OverviewPage", () => {
 
   it("lets the HOD approve a pending change", async () => {
     setup(["department.department.view", "department.official_change.view", "department.official_change.approve"],
-      { "/departments": [DEPT], "/departments/CSE": DEPT, "/official-changes": page([CHANGE]) });
+      { "/departments": [DEPT], "/departments/CSE": DEPT, "/official-changes": page([CHANGE]) }, "hod");
     api.post.mockResolvedValue({ data: { ...CHANGE, status: "approved" } });
     renderPage(<OverviewPage />);
     fireEvent.click(await screen.findByRole("button", { name: "Approve" }));

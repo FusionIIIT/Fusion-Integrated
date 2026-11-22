@@ -1,6 +1,5 @@
 import { Badge, Button, Card, Group, Select, Stack, Table, Text, TextInput, Textarea, Title } from "@mantine/core";
 
-import { useAuth } from "../../../auth/AuthProvider";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { StatusBadge } from "../../../ui/components/StatusBadge";
@@ -9,6 +8,7 @@ import {
 } from "../api/hooks";
 import type { GeneralUpdate, OfficialChange } from "../api/types";
 import { ActionError, PageBody, useDialog } from "../components/PageBody";
+import { useCanAct } from "../components/acting";
 
 type Dialog =
   | { kind: "general"; values: GeneralUpdate }
@@ -23,7 +23,7 @@ const GENERAL: { key: keyof GeneralUpdate; label: string }[] = [
 ];
 
 export default function OverviewPage() {
-  const { can } = useAuth();
+  const can = useCanAct();
   const list = useDepartments();
   const code = list.data?.[0]?.code;
   const detail = useDepartment(code);

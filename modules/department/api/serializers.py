@@ -36,7 +36,9 @@ def _one_of(values, **kwargs):
                 f"Choose one of: {', '.join(v or '(empty)' for v in values)}."
             )
 
-    return serializers.CharField(max_length=20, validators=[check], **kwargs)
+    return serializers.CharField(
+        max_length=max(len(v) for v in values), validators=[check], **kwargs
+    )
 
 
 class DeptHeadshipSerializer(serializers.Serializer):
@@ -62,10 +64,10 @@ class DeptDepartmentSerializer(serializers.ModelSerializer):
 
 class DeptGeneralUpdateSerializer(serializers.Serializer):
     description = serializers.CharField(required=False, allow_blank=True, max_length=5000)
-    contact_email = serializers.EmailField(required=False, allow_blank=True)
+    contact_email = serializers.EmailField(required=False, allow_blank=True, max_length=254)
     contact_phone = serializers.CharField(required=False, allow_blank=True, max_length=30)
     office_location = serializers.CharField(required=False, allow_blank=True, max_length=120)
-    website = serializers.URLField(required=False, allow_blank=True)
+    website = serializers.URLField(required=False, allow_blank=True, max_length=200)
     name = serializers.CharField(required=False, max_length=120)
     core_policies = serializers.CharField(required=False, allow_blank=True)
 
@@ -331,25 +333,25 @@ class DeptLabResourceEditSerializer(serializers.Serializer):
 
 
 class DeptProfileViewSerializer(serializers.Serializer):
-    """Fields beyond the viewer's tier are absent, not null (BR-DEPT-019)."""
+    """Output only. Fields beyond the viewer's tier are absent, not null (BR-DEPT-019)."""
 
-    tier = serializers.CharField(read_only=True)
-    id = serializers.IntegerField(read_only=True)
-    kind = serializers.CharField(read_only=True)
-    display_name = serializers.CharField(read_only=True)
-    programme = serializers.CharField(read_only=True)
-    department = serializers.CharField(read_only=True)
-    email = serializers.CharField(read_only=True, required=False)
-    office = serializers.CharField(read_only=True, required=False)
-    research_interests = serializers.CharField(read_only=True, required=False)
-    current_position = serializers.CharField(read_only=True, required=False)
-    user_id = serializers.IntegerField(read_only=True, required=False)
-    username = serializers.CharField(read_only=True, required=False)
-    discipline = serializers.CharField(read_only=True, required=False)
-    batch_year = serializers.IntegerField(read_only=True, required=False)
-    bio = serializers.CharField(read_only=True, required=False)
-    graduation_year = serializers.IntegerField(read_only=True, required=False)
-    is_active = serializers.BooleanField(read_only=True, required=False)
+    tier = serializers.CharField()
+    id = serializers.IntegerField()
+    kind = serializers.CharField()
+    display_name = serializers.CharField()
+    programme = serializers.CharField()
+    department = serializers.CharField()
+    email = serializers.CharField(required=False)
+    office = serializers.CharField(required=False)
+    research_interests = serializers.CharField(required=False)
+    current_position = serializers.CharField(required=False)
+    user_id = serializers.IntegerField(required=False, allow_null=True)
+    username = serializers.CharField(required=False)
+    discipline = serializers.CharField(required=False)
+    batch_year = serializers.IntegerField(required=False, allow_null=True)
+    bio = serializers.CharField(required=False)
+    graduation_year = serializers.IntegerField(required=False, allow_null=True)
+    is_active = serializers.BooleanField(required=False)
 
     def to_representation(self, instance):
         return dict(instance)
@@ -429,3 +431,8 @@ class DeptRoleWarningSerializer(serializers.Serializer):
     role = serializers.CharField(read_only=True)
     problem = serializers.CharField(read_only=True)
     message = serializers.CharField(read_only=True)
+
+
+class DeptActingSerializer(serializers.Serializer):
+    role = serializers.CharField(read_only=True, allow_null=True)
+    department = serializers.CharField(read_only=True, allow_null=True)

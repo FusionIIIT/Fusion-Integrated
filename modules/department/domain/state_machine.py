@@ -21,6 +21,11 @@ FEEDBACK_UNDER_REVIEW = "under_review"
 FEEDBACK_RESOLVED = "resolved"
 FEEDBACK_CLOSED = "closed"
 
+# -- announcement (UC-DEPT-002, UC-DEPT-003) -------------------------------------
+ANN_ACTIVE = "active"
+ANN_HIDDEN = "hidden"
+ANN_DELETED = "deleted"
+
 # -- official department change (BW-DEPT-05, BW-DEPT-06, CW-DEPT-03) -------------
 CHANGE_PENDING = "pending"
 CHANGE_APPROVED = "approved"
@@ -73,7 +78,17 @@ OFFICIAL_CHANGE_TRANSITIONS: tuple[Transition, ...] = (
     ),
 )
 
+ANNOUNCEMENT_TRANSITIONS: tuple[Transition, ...] = (
+    Transition(
+        NONE, ANN_ACTIVE, "department.announcement.create", frozenset({FACULTY, DEPT_ADMIN, HOD})
+    ),
+    Transition(ANN_ACTIVE, ANN_ACTIVE, "department.announcement.update", frozenset({HOD})),
+    Transition(ANN_ACTIVE, ANN_HIDDEN, "department.announcement.update", frozenset({HOD})),
+    Transition(ANN_ACTIVE, ANN_DELETED, "department.announcement.delete", frozenset({HOD})),
+)
+
 MACHINES = {
+    "announcement": ANNOUNCEMENT_TRANSITIONS,
     "stock request": STOCK_TRANSITIONS,
     "feedback": FEEDBACK_TRANSITIONS,
     "official change": OFFICIAL_CHANGE_TRANSITIONS,

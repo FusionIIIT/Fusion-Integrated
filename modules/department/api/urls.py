@@ -18,6 +18,7 @@ class RowId:
 register_converter(RowId, "rowid")
 
 urlpatterns = [
+    path("context", v.ActingContextView.as_view(), name="department-context"),
     path("departments", v.DepartmentListView.as_view(), name="department-departments"),
     path("departments/<str:code>", v.DepartmentDetailView.as_view(), name="department-detail"),
     path(

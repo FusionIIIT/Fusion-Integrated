@@ -8,15 +8,21 @@ from django.utils import timezone
 from core.api.exceptions import ConflictError, NotFoundError
 from modules.department.domain import rules
 from modules.department.domain import state_machine as sm
-from modules.department.domain.roles import ActorContext
+from modules.department.domain.roles import DEPT_ADMIN, ActorContext
 from modules.department.models import Department, OfficialChange
 from modules.department.selectors import scoping
-from modules.department.services.common import get_scoped, own_department, translated
+from modules.department.services.common import (
+    get_scoped,
+    own_department,
+    require_acting,
+    translated,
+)
 
 
 @transaction.atomic
 def update_general(ctx: ActorContext, code: str, **fields) -> Department:
     """AFR-DEPT-038: general fields only; an official field is refused, never silently saved."""
+    require_acting(ctx, DEPT_ADMIN)
     dept = scoping.departments_for(ctx).select_for_update().filter(code=code).first()
     if dept is None:
         raise NotFoundError("That department does not exist or is not yours.")
@@ -31,9 +37,10 @@ def update_general(ctx: ActorContext, code: str, **fields) -> Department:
 @transaction.atomic
 def propose(ctx: ActorContext, *, field: str, value: str) -> OfficialChange:
     """UC-DEPT-010 official branch: pending, not published (BR-DEPT-011, AFR-DEPT-039)."""
-    dept = own_department(ctx, lock=True)
     with translated():
         sm.resolve("official change", sm.NONE, sm.CHANGE_PENDING, ctx.role)
+    dept = own_department(ctx, lock=True)
+    with translated():
         rules.validate_official_change(field, value)
     try:
         with transaction.atomic():

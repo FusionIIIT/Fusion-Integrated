@@ -166,7 +166,7 @@ def test_hidden_or_deleted_announcement_cannot_be_changed(world, act):
     )
     act("hod").post(f"{API}/announcements/{aid}/hide")
     r = act("hod").patch(f"{API}/announcements/{aid}", {"title": "x"}, format="json")
-    assert r.status_code == 409 and r.json()["error"]["code"] == "announcement_not_active"
+    assert r.status_code == 409 and r.json()["error"]["code"] == "invalid_transition"
     assert act("hod").delete(f"{API}/announcements/{aid}").status_code == 409
 
 
@@ -467,3 +467,76 @@ def test_huge_receipt_and_huge_row_id_are_not_500(world, act):
         act("admin").patch(f"{API}/profiles/{HUGE}", {"office": "x"}, format="json").status_code
         == 404
     )
+
+
+def test_every_accepted_string_fits_its_column():
+    # R2-04: a value the API accepts must never be too long for the column it is saved in
+    from rest_framework import serializers as drf
+
+    from modules.department.api import serializers as s
+    from modules.department.models import (
+        Department,
+        FeedbackNote,
+        InventoryItem,
+        LabResource,
+        ProfileRecord,
+        StockMovement,
+        StockRequest,
+        TimetableSlot,
+    )
+    from modules.department.models import Feedback as FeedbackModel
+
+    pairs = [
+        (s.DeptGeneralUpdateSerializer, Department),
+        (s.DeptInventoryItemWriteSerializer, InventoryItem),
+        (s.DeptReceiptSerializer, StockMovement),
+        (s.DeptStockRequestWriteSerializer, StockRequest),
+        (s.DeptDecisionSerializer, StockRequest),
+        (s.DeptFeedbackWriteSerializer, FeedbackModel),
+        (s.DeptFeedbackNoteWriteSerializer, FeedbackNote),
+        (s.DeptTimetableSlotWriteSerializer, TimetableSlot),
+        (s.DeptTimetableSlotEditSerializer, TimetableSlot),
+        (s.DeptLabResourceEditSerializer, LabResource),
+        (s.DeptProfileWriteSerializer, ProfileRecord),
+        (s.DeptProfileEditSerializer, ProfileRecord),
+    ]
+    too_long = []
+    for ser, model in pairs:
+        columns = {
+            f.name: f.max_length for f in model._meta.get_fields() if getattr(f, "max_length", None)
+        }
+        strings = {n: f for n, f in ser().fields.items() if isinstance(f, drf.CharField)}
+        for name, field in strings.items():
+            fits = field.max_length is not None and field.max_length <= columns.get(name, 0)
+            if name in columns and not fits:
+                too_long.append(f"{ser.__name__}.{name}: {field.max_length} > {columns[name]}")
+    assert not too_long
+
+
+@pytest.mark.parametrize(
+    ("body", "field"),
+    [
+        ({"website": "https://example.com/" + "a" * 300}, "website"),
+        ({"contact_email": "a" * 300 + "@example.com"}, "contact_email"),
+    ],
+)
+def test_over_long_department_details_are_400(world, act, body, field):
+    r = act("admin").patch(f"{API}/departments/CSE", body, format="json")
+    assert r.status_code == 400 and r.json()["error"]["details"][0]["field"] == field
+
+
+def test_an_over_long_official_name_is_refused_at_proposal(world, act):
+    # R2-03: refused before it can reach the HOD, so approval can never fail on length
+    r = act("admin").post(
+        f"{API}/official-changes", {"field": "name", "value": "N" * 130}, format="json"
+    )
+    assert r.status_code == 422 and r.json()["error"]["code"] == "invalid_value"
+    ok = act("admin").post(
+        f"{API}/official-changes", {"field": "name", "value": "N" * 120}, format="json"
+    )
+    assert ok.status_code == 201
+    done = act("hod").post(
+        f"{API}/official-changes/{ok.json()['id']}/decide", {"approve": True}, format="json"
+    )
+    assert done.status_code == 200
+    assert Department.objects.get(code="CSE").name == "N" * 120

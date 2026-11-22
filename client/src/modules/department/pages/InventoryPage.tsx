@@ -1,6 +1,5 @@
 import { Button, Group, NumberInput, Select, Stack, Table, Text, TextInput, Title } from "@mantine/core";
 
-import { useAuth } from "../../../auth/AuthProvider";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { StatusBadge } from "../../../ui/components/StatusBadge";
@@ -10,6 +9,7 @@ import {
 } from "../api/hooks";
 import type { InventoryItem } from "../api/types";
 import { ActionError, PageBody, useDialog } from "../components/PageBody";
+import { useCanAct } from "../components/acting";
 
 type Dialog =
   | { kind: "add"; name: string; unit: string; quantity: number }
@@ -17,7 +17,7 @@ type Dialog =
   | { kind: "request"; item: string | null; quantity: number; purpose: string };
 
 export default function InventoryPage() {
-  const { can } = useAuth();
+  const can = useCanAct();
   const items = useInventoryItems();
   const requests = useStockRequests();
   const movements = useStockMovements(can("department.stock_movement.view"));

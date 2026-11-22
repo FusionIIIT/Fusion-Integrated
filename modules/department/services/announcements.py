@@ -5,8 +5,8 @@ from __future__ import annotations
 from django.db import transaction
 from django.utils import timezone
 
-from core.api.exceptions import ConflictError
 from modules.department.domain import rules
+from modules.department.domain import state_machine as sm
 from modules.department.domain.roles import ActorContext
 from modules.department.models import Announcement
 from modules.department.selectors import scoping
@@ -24,7 +24,9 @@ def publish(
     programme: str = "",
     batch_year: int | None = None,
 ) -> Announcement:
-    """BR-DEPT-001 by permission, BR-DEPT-003 here, AFR-DEPT-046 in the same transaction."""
+    """BR-DEPT-001 by the table, BR-DEPT-003 here, AFR-DEPT-046 in the same transaction."""
+    with translated():
+        sm.resolve("announcement", sm.NONE, sm.ANN_ACTIVE, ctx.role)
     dept = own_department(ctx)
     with translated():
         rules.validate_announcement(
@@ -60,21 +62,18 @@ def publish(
     return ann
 
 
-def _active(ctx: ActorContext, pk: int) -> Announcement:
+def _move(ctx: ActorContext, pk: int, target: str) -> Announcement:
+    """BR-DEPT-004: every change goes through the table, which also checks the acting role."""
     ann = get_scoped(scoping.announcements_for(ctx), pk, lock=True, what="announcement")
-    if ann.status != Announcement.ACTIVE:
-        raise ConflictError(
-            "This announcement is hidden or deleted, so it cannot be changed. "
-            "Publish a new one instead.",
-            code="announcement_not_active",
-        )
+    with translated():
+        sm.resolve("announcement", ann.status, target, ctx.role)
     return ann
 
 
 @transaction.atomic
 def edit(ctx: ActorContext, pk: int, **changes) -> Announcement:
     """AFR-DEPT-004, re-validated under BR-DEPT-003."""
-    ann = _active(ctx, pk)
+    ann = _move(ctx, pk, sm.ANN_ACTIVE)
     merged = {
         f: changes.get(f, getattr(ann, f))
         for f in ("title", "body", "audience_role", "programme", "batch_year")
@@ -91,7 +90,7 @@ def edit(ctx: ActorContext, pk: int, **changes) -> Announcement:
 @transaction.atomic
 def hide(ctx: ActorContext, pk: int) -> Announcement:
     """AFR-DEPT-005."""
-    ann = _active(ctx, pk)
+    ann = _move(ctx, pk, sm.ANN_HIDDEN)
     ann.status, ann.edited_by, ann.edited_at = Announcement.HIDDEN, ctx.user_id, timezone.now()
     ann.save(update_fields=["status", "edited_by", "edited_at", "updated_at"])
     return ann
@@ -100,6 +99,6 @@ def hide(ctx: ActorContext, pk: int) -> Announcement:
 @transaction.atomic
 def delete(ctx: ActorContext, pk: int) -> None:
     """AFR-DEPT-006 with Q7: soft delete, kept for audit, gone from every view."""
-    ann = _active(ctx, pk)
+    ann = _move(ctx, pk, sm.ANN_DELETED)
     ann.status, ann.edited_by, ann.edited_at = Announcement.DELETED, ctx.user_id, timezone.now()
     ann.save(update_fields=["status", "edited_by", "edited_at", "updated_at"])

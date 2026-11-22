@@ -39,7 +39,7 @@ describe("LabsPage", () => {
   });
 
   it("lets Dept_Admin add a lab and shows a refusal", async () => {
-    setup(["department.lab_resource.view", "department.lab_resource.update"], { "/lab-resources": page([]) });
+    setup(["department.lab_resource.view", "department.lab_resource.update"], { "/lab-resources": page([]) }, "dept_admin");
     api.post.mockRejectedValueOnce(serverError("Give the lab or resource a name.", 422));
     renderPage(<LabsPage />);
     fireEvent.click(await screen.findByRole("button", { name: "Add lab" }));

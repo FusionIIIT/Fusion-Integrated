@@ -206,6 +206,27 @@ paths:
                     audience_role: student
                     status: hidden
           description: ''
+  /api/v1/department/context:
+    get:
+      operationId: v1_department_context_retrieve
+      description: The acting role and department, so the client shows only that role's
+        controls.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptActing'
+              examples:
+                HOD:
+                  value:
+                    role: hod
+                    department: CSE
+          description: ''
   /api/v1/department/departments:
     get:
       operationId: v1_department_departments_list
@@ -688,7 +709,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeptLabResource'
+              $ref: '#/components/schemas/DeptLabResourceEdit'
             examples:
               Add:
                 value:
@@ -696,11 +717,10 @@ paths:
                   capacity: 30
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/DeptLabResource'
+              $ref: '#/components/schemas/DeptLabResourceEdit'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/DeptLabResource'
-        required: true
+              $ref: '#/components/schemas/DeptLabResourceEdit'
       security:
       - iamSession: []
       responses:
@@ -3783,6 +3803,20 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DeptActing:
+      type: object
+      properties:
+        role:
+          type: string
+          readOnly: true
+          nullable: true
+        department:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - department
+      - role
     DeptAnnouncement:
       type: object
       properties:
@@ -4003,7 +4037,7 @@ components:
       properties:
         outcome:
           type: string
-          maxLength: 20
+          maxLength: 8
         note:
           type: string
           default: ''
@@ -4050,7 +4084,7 @@ components:
         disposition:
           type: string
           default: ''
-          maxLength: 20
+          maxLength: 8
         note:
           type: string
           default: ''
@@ -4166,6 +4200,25 @@ components:
       - id
       - name
       - updated_at
+    DeptLabResourceEdit:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        location:
+          type: string
+          maxLength: 120
+        equipment:
+          type: string
+          maxLength: 5000
+        capacity:
+          type: integer
+          maximum: 100000
+          minimum: 0
+          nullable: true
+        status:
+          $ref: '#/components/schemas/DeptLabResourceEditStatusEnum'
     DeptLabResourceEditStatusEnum:
       enum:
       - available
@@ -4263,83 +4316,59 @@ components:
       - value
     DeptProfileView:
       type: object
-      description: Fields beyond the viewer's tier are absent, not null (BR-DEPT-019).
+      description: Output only. Fields beyond the viewer's tier are absent, not null
+        (BR-DEPT-019).
       properties:
         tier:
           type: string
-          readOnly: true
         id:
           type: integer
-          readOnly: true
         kind:
           type: string
-          readOnly: true
         display_name:
           type: string
-          readOnly: true
         programme:
           type: string
-          readOnly: true
         department:
           type: string
-          readOnly: true
         email:
           type: string
-          readOnly: true
         office:
           type: string
-          readOnly: true
         research_interests:
           type: string
-          readOnly: true
         current_position:
           type: string
-          readOnly: true
         user_id:
           type: integer
-          readOnly: true
+          nullable: true
         username:
           type: string
-          readOnly: true
         discipline:
           type: string
-          readOnly: true
         batch_year:
           type: integer
-          readOnly: true
+          nullable: true
         bio:
           type: string
-          readOnly: true
         graduation_year:
           type: integer
-          readOnly: true
+          nullable: true
         is_active:
           type: boolean
-          readOnly: true
       required:
-      - batch_year
-      - bio
-      - current_position
       - department
-      - discipline
       - display_name
-      - email
-      - graduation_year
       - id
-      - is_active
       - kind
-      - office
       - programme
-      - research_interests
       - tier
-      - user_id
-      - username
     DeptProfileWrite:
       type: object
       properties:
         kind:
           type: string
-          maxLength: 20
+          maxLength: 7
         user_id:
           type: integer
           maximum: 2147483647
@@ -4680,7 +4709,7 @@ components:
       properties:
         kind:
           type: string
-          maxLength: 20
+          maxLength: 5
         programme:
           type: string
           default: ''
@@ -5445,6 +5474,7 @@ components:
           oneOf:
           - type: string
             format: email
+            maxLength: 254
           - type: string
             maxLength: 0
         contact_phone:
@@ -5457,6 +5487,7 @@ components:
           oneOf:
           - type: string
             format: uri
+            maxLength: 200
           - type: string
             maxLength: 0
         name:
@@ -5519,7 +5550,7 @@ components:
       properties:
         kind:
           type: string
-          maxLength: 20
+          maxLength: 5
         programme:
           type: string
           maxLength: 40

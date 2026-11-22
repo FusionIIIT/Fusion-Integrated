@@ -6,10 +6,15 @@ from django.db import IntegrityError, transaction
 
 from core.api.exceptions import ConflictError, DomainError
 from modules.department.domain import rules
-from modules.department.domain.roles import ActorContext, normalise_department
+from modules.department.domain.roles import DEPT_ADMIN, ActorContext, normalise_department
 from modules.department.models import LabResource, ProfileRecord, TimetableSlot
 from modules.department.selectors import scoping
-from modules.department.services.common import get_scoped, own_department, translated
+from modules.department.services.common import (
+    get_scoped,
+    own_department,
+    require_acting,
+    translated,
+)
 from modules.directory import contracts as directory
 
 SLOT_FIELDS = (
@@ -60,6 +65,7 @@ def _check(candidates: list[rules.Slot], saved: list[rules.Slot]) -> None:
 @transaction.atomic
 def upload(ctx: ActorContext, slots: list[dict]) -> list[TimetableSlot]:
     """AFR-DEPT-029: the whole batch is saved, or none of it."""
+    require_acting(ctx, DEPT_ADMIN)
     dept = own_department(ctx, lock=True)
     _check([_as_slot(f"new:{i}", s) for i, s in enumerate(slots)], _saved(dept))
     return [
@@ -75,6 +81,7 @@ def upload(ctx: ActorContext, slots: list[dict]) -> list[TimetableSlot]:
 @transaction.atomic
 def modify(ctx: ActorContext, slot_id: int, **changes) -> TimetableSlot:
     """AFR-DEPT-030."""
+    require_acting(ctx, DEPT_ADMIN)
     own_department(ctx, lock=True)
     slot = get_scoped(scoping.timetable_for(ctx), slot_id, lock=True, what="timetable slot")
     merged = {f: changes.get(f, getattr(slot, f)) for f in SLOT_FIELDS}
@@ -88,12 +95,14 @@ def modify(ctx: ActorContext, slot_id: int, **changes) -> TimetableSlot:
 
 @transaction.atomic
 def remove(ctx: ActorContext, slot_id: int) -> None:
+    require_acting(ctx, DEPT_ADMIN)
     get_scoped(scoping.timetable_for(ctx), slot_id, lock=True, what="timetable slot").delete()
 
 
 @transaction.atomic
 def save_lab(ctx: ActorContext, lab_id: int | None = None, **fields) -> LabResource:
     """AFR-DEPT-034."""
+    require_acting(ctx, DEPT_ADMIN)
     if lab_id is None:
         lab = LabResource(department=own_department(ctx))
     else:
@@ -118,6 +127,7 @@ def create_profile(
     ctx: ActorContext, *, kind: str, user_id: int | None = None, display_name: str = "", **fields
 ) -> ProfileRecord:
     """AFR-DEPT-024 with Q8: a login user must belong here; an alumnus may have no login."""
+    require_acting(ctx, DEPT_ADMIN)
     dept = own_department(ctx)
     if kind != "alumni":
         if user_id is None:
@@ -154,6 +164,7 @@ def create_profile(
 
 @transaction.atomic
 def update_profile(ctx: ActorContext, profile_id: int, **fields) -> ProfileRecord:
+    require_acting(ctx, DEPT_ADMIN)
     record = get_scoped(scoping.profiles_for(ctx), profile_id, lock=True, what="profile")
     if "display_name" in fields and not (fields["display_name"] or "").strip():
         raise DomainError("A profile needs a name.", code="profile_incomplete")

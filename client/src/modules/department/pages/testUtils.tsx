@@ -17,12 +17,14 @@ export const httpMock = async (importOriginal: () => Promise<Record<string, unkn
   http: api,
 });
 
-export function setup(perms: string[], routes: Record<string, unknown>) {
+// `role` is the acting role GET /department/context reports; null for a non-department role.
+export function setup(perms: string[], routes: Record<string, unknown>, role: string | null = null) {
   granted.clear();
   perms.forEach((p) => granted.add(p));
+  const all: Record<string, unknown> = { "/department/context": { role, department: role ? "CSE" : null }, ...routes };
   api.get.mockImplementation((url: string) => {
-    const key = Object.keys(routes).find((k) => url.endsWith(k));
-    const value = key ? routes[key] : { results: [] };
+    const key = Object.keys(all).find((k) => url.endsWith(k));
+    const value = key ? all[key] : { results: [] };
     if (value === "pending") return new Promise(() => undefined);
     if (value instanceof Error) return Promise.reject(value);
     return Promise.resolve({ data: value });

@@ -41,7 +41,7 @@ describe("AnnouncementsPage", () => {
   });
 
   it("publishes, and shows the server's refusal as sent", async () => {
-    setup(["department.announcement.view", "department.announcement.create"], { "/announcements": page([]) });
+    setup(["department.announcement.view", "department.announcement.create"], { "/announcements": page([]) }, "faculty");
     api.post.mockRejectedValueOnce(serverError("Give the announcement a title.", 422));
     renderPage(<AnnouncementsPage />);
     fireEvent.click(await screen.findByRole("button", { name: /publish announcement/i }));
@@ -58,11 +58,21 @@ describe("AnnouncementsPage", () => {
 
   it("gives the HOD edit, hide and delete", async () => {
     setup(["department.announcement.view", "department.announcement.update", "department.announcement.delete"],
-      { "/announcements": page([ANN]) });
+      { "/announcements": page([ANN]) }, "hod");
     api.post.mockResolvedValue({ data: { ...ANN, status: "hidden" } });
     renderPage(<AnnouncementsPage />);
     fireEvent.click(await screen.findByRole("button", { name: "Hide" }));
     await waitFor(() => expect(api.post).toHaveBeenCalledWith("/department/announcements/1/hide"));
     expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+  });
+
+  it("shows an HOD acting as faculty no HOD controls, though the session holds the permissions", async () => {
+    setup(["department.announcement.view", "department.announcement.update", "department.announcement.delete",
+      "department.announcement.create"], { "/announcements": page([ANN]) }, "faculty");
+    renderPage(<AnnouncementsPage />);
+    await screen.findByText("Lab closed");
+    expect(await screen.findByRole("button", { name: /publish announcement/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Hide" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
   });
 });

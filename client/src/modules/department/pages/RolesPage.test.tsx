@@ -49,7 +49,7 @@ describe("RolesPage", () => {
 
   it("lets the central authority change an end date and shows a refusal", async () => {
     setup(["department.role_assignment.view", "department.role_assignment.assign"],
-      { "/role-assignments": page([TENURE]), "/departments": [] });
+      { "/role-assignments": page([TENURE]), "/departments": [] }, "central");
     api.patch.mockRejectedValueOnce(serverError("Record the successor first.", 422));
     renderPage(<RolesPage />);
     fireEvent.click(await screen.findByRole("button", { name: "Change end" }));

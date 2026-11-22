@@ -1,12 +1,12 @@
 import { Button, NumberInput, Select, Stack, Table, TextInput, Textarea } from "@mantine/core";
 
-import { useAuth } from "../../../auth/AuthProvider";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { StatusBadge } from "../../../ui/components/StatusBadge";
 import { useLabs, useSaveLab } from "../api/hooks";
 import type { LabInput } from "../api/types";
 import { PageBody, useDialog } from "../components/PageBody";
+import { useCanAct } from "../components/acting";
 
 const STATUSES = [
   { value: "available", label: "Available" },
@@ -15,7 +15,7 @@ const STATUSES = [
 ];
 
 export default function LabsPage() {
-  const { can } = useAuth();
+  const can = useCanAct();
   const { data, isPending, error } = useLabs();
   const save = useSaveLab();
   const { dialog: form, setDialog: setForm, opened } = useDialog<LabInput & { id?: number }>();

@@ -40,7 +40,7 @@ describe("TimetablePage", () => {
   });
 
   it("adds a slot and shows the conflict refusal", async () => {
-    setup(["department.timetable.view", "department.timetable.create"], { "/timetable-slots": [] });
+    setup(["department.timetable.view", "department.timetable.create"], { "/timetable-slots": [] }, "dept_admin");
     api.post.mockRejectedValueOnce(serverError("These slots overlap; move them and save again.", 422));
     renderPage(<TimetablePage />);
     fireEvent.click(await screen.findByRole("button", { name: "Add slot" }));

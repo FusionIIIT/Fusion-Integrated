@@ -39,7 +39,7 @@ describe("ProfilesPage", () => {
   });
 
   it("lets Dept_Admin add an alumni profile and shows a refusal", async () => {
-    setup(["department.profile.view", "department.profile.update"], { "/profiles": page([]) });
+    setup(["department.profile.view", "department.profile.update"], { "/profiles": page([]) }, "dept_admin");
     api.post.mockRejectedValueOnce(serverError("Give the profile a name.", 422));
     renderPage(<ProfilesPage />);
     fireEvent.click(await screen.findByRole("button", { name: "Add profile" }));

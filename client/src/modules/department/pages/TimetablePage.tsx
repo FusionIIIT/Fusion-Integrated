@@ -1,11 +1,11 @@
 import { Button, Group, NumberInput, Select, SimpleGrid, Table, TextInput } from "@mantine/core";
 
-import { useAuth } from "../../../auth/AuthProvider";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { useDeleteSlot, useEditSlot, useTimetable, useUploadSlots } from "../api/hooks";
 import type { TimetableSlotInput } from "../api/types";
 import { ActionError, PageBody, useDialog } from "../components/PageBody";
+import { useCanAct } from "../components/acting";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const BLANK: TimetableSlotInput = {
@@ -14,7 +14,7 @@ const BLANK: TimetableSlotInput = {
 };
 
 export default function TimetablePage() {
-  const { can } = useAuth();
+  const can = useCanAct();
   const { data, isPending, error } = useTimetable();
   const upload = useUploadSlots();
   const edit = useEditSlot();

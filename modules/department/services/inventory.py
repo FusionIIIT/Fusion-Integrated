@@ -13,7 +13,12 @@ from modules.department.models import InventoryItem, StockMovement, StockRequest
 from modules.department.selectors import scoping
 from modules.department.selectors.actors import current_holders
 from modules.department.services import notifications
-from modules.department.services.common import get_scoped, own_department, translated
+from modules.department.services.common import (
+    get_scoped,
+    own_department,
+    require_acting,
+    translated,
+)
 
 
 @transaction.atomic
@@ -21,6 +26,7 @@ def add_item(
     ctx: ActorContext, *, name: str, unit: str, quantity: int, note: str = ""
 ) -> InventoryItem:
     """AFR-DEPT-007, AFR-DEPT-014: a new item arrives with its first receipt."""
+    require_acting(ctx, DEPT_ADMIN)
     dept = own_department(ctx)
     with translated():
         rules.check_receipt(quantity)
@@ -40,6 +46,7 @@ def add_item(
 @transaction.atomic
 def receive(ctx: ActorContext, item_id: int, *, quantity: int, note: str = "") -> InventoryItem:
     """AFR-DEPT-008, AFR-DEPT-014: a receipt is a movement plus the running total."""
+    require_acting(ctx, DEPT_ADMIN)
     item = get_scoped(scoping.inventory_items_for(ctx), item_id, lock=True, what="inventory item")
     with translated():
         rules.check_receipt(quantity)
@@ -60,9 +67,9 @@ def request_stock(
     ctx: ActorContext, *, item_id: int, quantity: int, purpose: str = ""
 ) -> StockRequest:
     """UC-DEPT-004: BR-DEPT-005 by permission and table, BR-DEPT-015 against the locked item."""
-    dept = own_department(ctx)
     with translated():
         sm.resolve("stock request", sm.NONE, sm.STOCK_PENDING, ctx.role)
+    dept = own_department(ctx)
     item = (
         scoping.inventory_items_for(ctx).select_for_update(of=("self",)).filter(pk=item_id).first()
     )

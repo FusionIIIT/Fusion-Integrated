@@ -44,7 +44,7 @@ describe("InventoryPage", () => {
   });
 
   it("lets faculty request stock and shows a refusal", async () => {
-    setup(FACULTY, { "/inventory-items": page([ITEM]), "/stock-requests": page([]) });
+    setup(FACULTY, { "/inventory-items": page([ITEM]), "/stock-requests": page([]) }, "faculty");
     api.post.mockRejectedValueOnce(serverError("Only 18 in stock.", 422));
     renderPage(<InventoryPage />);
     fireEvent.click(await screen.findByRole("button", { name: "Request stock" }));
@@ -58,12 +58,21 @@ describe("InventoryPage", () => {
   it("lets the HOD approve a pending request", async () => {
     setup(["department.inventory_item.view", "department.stock_request.view", "department.stock_request.approve",
       "department.stock_movement.view"], { "/inventory-items": page([ITEM]), "/stock-requests": page([REQ]),
-      "/stock-movements": page([]) });
+      "/stock-movements": page([]) }, "hod");
     api.post.mockResolvedValue({ data: { ...REQ, status: "approved" } });
     renderPage(<InventoryPage />);
     fireEvent.click(await screen.findByRole("button", { name: "Approve" }));
     await waitFor(() => expect(api.post).toHaveBeenCalledWith("/department/stock-requests/11/decide",
       { approve: true }));
     expect(screen.getByText("No movements yet.")).toBeInTheDocument();
+  });
+
+  it("shows an HOD acting as faculty no approve control", async () => {
+    setup(["department.inventory_item.view", "department.stock_request.view", "department.stock_request.approve",
+      "department.stock_request.create"], { "/inventory-items": page([ITEM]), "/stock-requests": page([REQ]) },
+      "faculty");
+    renderPage(<InventoryPage />);
+    expect(await screen.findByRole("button", { name: "Request stock" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Approve" })).toBeNull();
   });
 });

@@ -8,12 +8,17 @@ from django.utils import timezone
 from core.api.exceptions import ConflictError
 from modules.department.domain import rules
 from modules.department.domain import state_machine as sm
-from modules.department.domain.roles import DEPT_ADMIN, ActorContext
+from modules.department.domain.roles import DEPT_ADMIN, HOD, ActorContext
 from modules.department.models import Feedback, FeedbackNote
 from modules.department.selectors import scoping
 from modules.department.selectors.actors import current_holders
 from modules.department.services import notifications
-from modules.department.services.common import get_scoped, own_department, translated
+from modules.department.services.common import (
+    get_scoped,
+    own_department,
+    require_acting,
+    translated,
+)
 
 TERMINAL = (sm.FEEDBACK_RESOLVED, sm.FEEDBACK_CLOSED)
 
@@ -21,9 +26,10 @@ TERMINAL = (sm.FEEDBACK_RESOLVED, sm.FEEDBACK_CLOSED)
 @transaction.atomic
 def submit(ctx: ActorContext, *, subject: str, body: str) -> Feedback:
     """UC-DEPT-007: BR-DEPT-008, BR-DEPT-017, AFR-DEPT-044."""
-    dept = own_department(ctx)
     with translated():
         sm.resolve("feedback", sm.NONE, sm.FEEDBACK_NEW, ctx.role)
+    dept = own_department(ctx)
+    with translated():
         if not (subject or "").strip() or not (body or "").strip():
             raise rules.RuleViolation(
                 "feedback_incomplete", "Give your feedback a subject and some text."
@@ -101,6 +107,7 @@ def dispose(ctx: ActorContext, feedback_id: int, *, outcome: str, note: str = ""
 @transaction.atomic
 def add_note(ctx: ActorContext, feedback_id: int, *, body: str) -> FeedbackNote:
     """UC-DEPT-014: oversight without changing the status."""
+    require_acting(ctx, HOD, DEPT_ADMIN)
     fb = get_scoped(scoping.feedback_for(ctx), feedback_id, lock=True, what="feedback")
     if fb.status == sm.FEEDBACK_NEW:
         raise ConflictError(

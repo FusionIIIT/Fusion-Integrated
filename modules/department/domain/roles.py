@@ -9,7 +9,6 @@ FACULTY = "faculty"
 HOD = "hod"
 DEPT_ADMIN = "dept_admin"
 CENTRAL = "central"
-SYSTEM = "system"
 
 DEPARTMENT_CODES = ("CSE", "ECE", "ME", "Design", "NS", "SM", "LA")
 

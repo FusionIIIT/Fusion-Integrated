@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 from core.api.exceptions import ConflictError, DomainError, NotFoundError, PermissionDeniedError
 from modules.department.domain.errors import ActorNotAllowed, InvalidTransition, RuleViolation
-from modules.department.domain.roles import ActorContext
+from modules.department.domain.roles import CENTRAL, DEPT_ADMIN, FACULTY, HOD, STUDENT, ActorContext
 from modules.department.models import Department
 
 
@@ -46,3 +46,22 @@ def get_scoped(queryset, pk, *, lock: bool = False, what: str = "record"):
     if row is None:
         raise NotFoundError(f"That {what} does not exist or is not visible to you.")
     return row
+
+
+_ROLE_NAMES = {
+    STUDENT: "Student",
+    FACULTY: "Faculty",
+    HOD: "HOD",
+    DEPT_ADMIN: "Dept_Admin",
+    CENTRAL: "Institute Admin",
+}
+
+
+def require_acting(ctx: ActorContext, *roles: str) -> None:
+    """The IAM sends every held role's permissions, so the acting role is checked here too."""
+    if ctx.role not in roles:
+        names = " or ".join(_ROLE_NAMES[r] for r in roles)
+        raise PermissionDeniedError(
+            f"Only someone acting as {names} can do this. Switch your role and try again.",
+            code="wrong_acting_role",
+        )

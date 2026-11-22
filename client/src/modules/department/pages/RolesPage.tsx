@@ -1,18 +1,18 @@
 import { Alert, Badge, Button, List, NumberInput, Select, Stack, Table, TextInput } from "@mantine/core";
 
-import { useAuth } from "../../../auth/AuthProvider";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { useAssignTenure, useChangeTenure, useDepartments, useRoleWarnings, useTenures } from "../api/hooks";
 import type { Tenure, TenureInput } from "../api/types";
 import { PageBody, useDialog } from "../components/PageBody";
+import { useCanAct } from "../components/acting";
 
 type Dialog = { kind: "assign"; input: TenureInput } | { kind: "change"; tenure: Tenure; valid_to: string };
 
 const iso = (local: string) => (local ? new Date(local).toISOString() : "");
 
 export default function RolesPage() {
-  const { can } = useAuth();
+  const can = useCanAct();
   const { data, isPending, error } = useTenures();
   const departments = useDepartments();
   const warnings = useRoleWarnings();

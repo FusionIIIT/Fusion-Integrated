@@ -540,7 +540,7 @@ class TimetableListView(DepartmentView):
     )
     def get(self, request):
         qs = scoping.timetable_for(self.ctx).order_by("day_of_week", "starts_at", "id")
-        return Response(s.DeptTimetableSlotSerializer(qs[:500], many=True).data)
+        return Response(s.DeptTimetableSlotSerializer(qs, many=True).data)
 
     @extend_schema(
         request=s.DeptTimetableUploadSerializer,
@@ -602,7 +602,7 @@ class LabListView(DepartmentView):
         return self.paginated(scoping.lab_resources_for(self.ctx), s.DeptLabResourceSerializer)
 
     @extend_schema(
-        request=s.DeptLabResourceSerializer,
+        request=s.DeptLabResourceEditSerializer,
         responses={201: s.DeptLabResourceSerializer},
         examples=[
             _ex("Add", {"name": "IoT Lab", "capacity": 30}, request=True),
@@ -808,3 +808,18 @@ class RoleVacancyView(DepartmentView):
     def get(self, request):
         depts = list(scoping.departments_for(self.ctx))
         return Response(s.DeptRoleWarningSerializer(role_warnings(depts), many=True).data)
+
+
+class ActingContextView(DepartmentView):
+    """The acting role and department, so the client shows only that role's controls."""
+
+    perms = {"GET": "department.department.view"}
+
+    @extend_schema(
+        responses=s.DeptActingSerializer,
+        examples=[_ex("HOD", {"role": "hod", "department": "CSE"})],
+    )
+    def get(self, request):
+        return Response(
+            s.DeptActingSerializer({"role": self.ctx.role, "department": self.ctx.department}).data
+        )

@@ -8,12 +8,10 @@ from datetime import datetime, time
 
 from modules.department.domain.errors import RuleViolation
 from modules.department.domain.roles import (
-    CENTRAL,
     DEPT_ADMIN,
     FACULTY,
     HOD,
     STUDENT,
-    ActorContext,
 )
 
 # -- announcements (BR-DEPT-002, BR-DEPT-003) ------------------------------------
@@ -61,20 +59,6 @@ def validate_announcement(
             "The announcement cannot be published until these are fixed.",
             problems,
         )
-
-
-def announcement_reaches(
-    *, audience_role: str, programme: str, batch_year: int | None, viewer: ActorContext
-) -> bool:
-    """BR-DEPT-002 with Q5: a blank programme or empty batch year means any."""
-    if audience_role != "all" and audience_role != viewer.role:
-        return False
-    if viewer.role in (STUDENT,):
-        if programme and programme != viewer.programme:
-            return False
-        if batch_year is not None and batch_year != viewer.batch_year:
-            return False
-    return True
 
 
 # -- stock (BR-DEPT-015, AFR-DEPT-013) -------------------------------------------
@@ -141,6 +125,7 @@ def find_overlaps(candidates: Sequence[Slot], existing: Iterable[Slot]) -> list[
 
 # -- official department details (BR-DEPT-011, AFR-DEPT-053) ---------------------
 OFFICIAL_FIELDS = ("name", "core_policies")
+NAME_MAX = 120  # the Department.name column
 GENERAL_FIELDS = ("description", "contact_email", "contact_phone", "office_location", "website")
 
 
@@ -153,6 +138,10 @@ def validate_official_change(field: str, value: str) -> None:
         )
     if field == "name" and not (value or "").strip():
         raise RuleViolation("invalid_value", "A department needs a name.")
+    if field == "name" and len(value) > NAME_MAX:
+        raise RuleViolation(
+            "invalid_value", f"Keep the department name under {NAME_MAX} characters."
+        )
 
 
 def check_general_update(fields: Iterable[str]) -> None:
@@ -183,10 +172,6 @@ class Tenure:
     user_id: int
     valid_from: datetime
     valid_to: datetime
-
-
-def in_effect(t: Tenure, now: datetime) -> bool:
-    return t.valid_from <= now < t.valid_to
 
 
 def validate_interval(valid_from: datetime, valid_to: datetime) -> None:
@@ -269,4 +254,3 @@ TIER_FIELDS = {
 
 ASSIGNABLE_ROLES = (HOD, DEPT_ADMIN)
 EMPLOYEE_KINDS = ("faculty", "staff")
-ROLE_MAINTAINERS = (CENTRAL,)

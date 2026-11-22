@@ -421,6 +421,7 @@ rule refusal gives 422 (`api-conventions.md`).
 
 | Method | Path under `/api/v1/department/` | Permission | Returns | Rules |
 |---|---|---|---|---|
+| GET | `context` | `department.view` | the acting role and department, so the client shows only that role's controls | Step 3.4 "only the acting role counts" |
 | GET | `departments` | `department.view` | departments in scope, with headship | AFR-053 |
 | GET | `departments/{code}` | `department.view` | details, headship, programmes | UC-010/018 |
 | PATCH | `departments/{code}` | `department.update` | updated (general fields only; official field → 422 `official_field`) | AFR-038 |
@@ -445,7 +446,7 @@ rule refusal gives 422 (`api-conventions.md`).
 | POST | `feedback/{id}/review` | `feedback.review` | under_review (or closed) | BR-018, AFR-021 |
 | POST | `feedback/{id}/dispose` | `feedback_resolution.create` | resolved/closed | BR-009 |
 | POST | `feedback/{id}/notes` | `feedback_resolution.create` | 201 note | UC-014 |
-| GET | `timetable-slots` | `timetable.view` | applicable slots | AFR-037 |
+| GET | `timetable-slots` | `timetable.view` | the applicable week's slots, whole and unpaginated (the one exception to cursor pagination: a week is one screen, sorted by day and time) | AFR-037 |
 | POST | `timetable-slots` | `timetable.create` | 201 batch; 422 `timetable_conflict` with clashes | BR-010 |
 | PATCH | `timetable-slots/{id}` | `timetable.update` | updated / 422 | BR-010 |
 | DELETE | `timetable-slots/{id}` | `timetable.update` | 204 | AFR-030 |
@@ -663,3 +664,18 @@ These implement what was approved; none changes a ruling.
   overlapping tenure or a clashing slot, under a per-department advisory lock. No extension or
   dependency is added.
 - The Overview route is `/department/overview`.
+
+## Changes after approval (review round 2)
+
+These enforce what was approved; none changes a ruling.
+
+- **Only the acting role counts, on every write.** The IAM sends the union of every held role's
+  permissions, so each write also checks the acting role. Announcements (create, edit, hide,
+  delete) are now a declarative table in `domain/state_machine.py`, like the other three
+  lifecycles. Every other office write calls `require_acting`. An HOD or Dept_Admin acting in a
+  plain role, or whose tenure has ended (BR-DEPT-024), is refused every office write.
+- `GET context` reports the acting role, and the client shows an office control only to the
+  role that owns it.
+- A department name proposal is limited to the 120 characters its column holds. `website` and
+  `contact_email` are limited to their columns.
+- The timetable list is returned whole (see the endpoint table).

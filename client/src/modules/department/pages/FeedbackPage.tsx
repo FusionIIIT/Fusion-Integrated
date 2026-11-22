@@ -1,6 +1,5 @@
 import { Badge, Button, Card, Group, Select, Stack, Text, TextInput, Textarea } from "@mantine/core";
 
-import { useAuth } from "../../../auth/AuthProvider";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { StatusBadge } from "../../../ui/components/StatusBadge";
@@ -9,6 +8,7 @@ import {
 } from "../api/hooks";
 import { FEEDBACK_CATEGORIES, type Feedback } from "../api/types";
 import { PageBody, useDialog } from "../components/PageBody";
+import { useCanAct } from "../components/acting";
 
 type Dialog =
   | { kind: "submit"; subject: string; body: string }
@@ -19,7 +19,7 @@ type Dialog =
 const TITLES = { submit: "Submit feedback", review: "Initial review", dispose: "Resolve or close", note: "Add oversight note" };
 
 export default function FeedbackPage() {
-  const { can } = useAuth();
+  const can = useCanAct();
   const { data, isPending, error } = useFeedback();
   const submitFb = useSubmitFeedback();
   const review = useReviewFeedback();

@@ -17,7 +17,6 @@ ALL_ACTORS = (
     roles.HOD,
     roles.DEPT_ADMIN,
     roles.CENTRAL,
-    roles.SYSTEM,
     None,
 )
 
@@ -95,29 +94,6 @@ def test_br_dept_003_missing_or_invalid_field_is_named(kw, field):
         r.validate_announcement(**{**base, **kw})
     assert exc.value.code == "announcement_incomplete"
     assert [d["field"] for d in exc.value.details] == [field]
-
-
-STUDENT_24 = ActorContext(1, roles.STUDENT, "CSE", "B.Tech", 2024)
-
-
-@pytest.mark.parametrize(
-    ("aud", "prog", "year", "viewer", "seen"),
-    [
-        ("all", "", None, STUDENT_24, True),
-        ("student", "", None, STUDENT_24, True),
-        ("student", "B.Tech", 2024, STUDENT_24, True),
-        ("student", "M.Tech", None, STUDENT_24, False),
-        ("student", "", 2023, STUDENT_24, False),
-        ("faculty", "", None, STUDENT_24, False),
-        ("faculty", "M.Tech", 2020, ActorContext(2, roles.FACULTY, "CSE"), True),
-        ("hod", "", None, ActorContext(3, roles.DEPT_ADMIN, "CSE"), False),
-    ],
-)
-def test_br_dept_002_relevance(aud, prog, year, viewer, seen):
-    assert (
-        r.announcement_reaches(audience_role=aud, programme=prog, batch_year=year, viewer=viewer)
-        is seen
-    )
 
 
 # -- stock (BR-DEPT-015) -------------------------------------------------------------
@@ -213,11 +189,6 @@ def test_br_dept_023_interval_must_be_positive():
     r.validate_interval(T0, T0 + timedelta(seconds=1))
     with pytest.raises(RuleViolation):
         r.validate_interval(T0, T0)
-
-
-def test_in_effect_is_half_open():
-    t = _t(1, 0, 10)
-    assert r.in_effect(t, T0) and not r.in_effect(t, T0 + timedelta(days=10))
 
 
 @pytest.mark.parametrize(

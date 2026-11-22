@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Badge, Button, Card, Group, NumberInput, Select, Stack, Text, TextInput, Textarea } from "@mantine/core";
 
-import { useAuth } from "../../../auth/AuthProvider";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import {
@@ -10,6 +9,7 @@ import {
 } from "../api/hooks";
 import type { Announcement, AnnouncementInput, AudienceRole } from "../api/types";
 import { ActionError, PageBody, useDialog } from "../components/PageBody";
+import { useCanAct } from "../components/acting";
 
 const AUDIENCES = [
   { value: "all", label: "Everyone" },
@@ -23,7 +23,7 @@ const BLANK: AnnouncementInput = { title: "", body: "", audience_role: "all", pr
 
 export default function AnnouncementsPage() {
   const { data, isPending, error } = useAnnouncements();
-  const { can } = useAuth();
+  const can = useCanAct();
   const publish = usePublishAnnouncement();
   const edit = useEditAnnouncement();
   const hide = useHideAnnouncement();

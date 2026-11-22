@@ -1,11 +1,11 @@
 import { Badge, Button, NumberInput, Select, Stack, Table, TextInput } from "@mantine/core";
 
-import { useAuth } from "../../../auth/AuthProvider";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { useCreateProfile, useProfiles, useUpdateProfile } from "../api/hooks";
 import type { ProfileInput } from "../api/types";
 import { ActionError, PageBody, useDialog } from "../components/PageBody";
+import { useCanAct } from "../components/acting";
 
 const BLANK: ProfileInput = {
   kind: "faculty", user_id: null, display_name: "", office: "", research_interests: "",
@@ -13,7 +13,7 @@ const BLANK: ProfileInput = {
 };
 
 export default function ProfilesPage() {
-  const { can } = useAuth();
+  const can = useCanAct();
   const { data, isPending, error } = useProfiles();
   const create = useCreateProfile();
   const update = useUpdateProfile();

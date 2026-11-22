@@ -29,7 +29,7 @@ export async function openDept(page: Page, key: AccountKey, link: string, headin
   await expect(page.getByRole("heading", { name: heading, level: 2 })).toBeVisible();
 }
 
-function local(date: Date): string {
+export function local(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
     + `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
