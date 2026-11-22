@@ -1,0 +1,362 @@
+[
+  {
+    "test_id": "TC_BR_001",
+    "source_id": "BR-IWD-001 - Condition True",
+    "purpose": "Verify business rule BR-IWD-001: Active-role authorization - Valid active employee role allowed to create ticket.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-001 with inputs testing Condition True.",
+    "expected_result": "System enforces BR-IWD-001 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_002",
+    "source_id": "BR-IWD-001 - Condition False",
+    "purpose": "Verify business rule BR-IWD-001: Active-role authorization - Anonymous or unauthenticated requester flagged.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-001 with inputs testing Condition False.",
+    "expected_result": "System enforces BR-IWD-001 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_003",
+    "source_id": "BR-IWD-002 - Routing Civil",
+    "purpose": "Verify business rule BR-IWD-002: Automatic engineer assignment - Civil category routes to civil engineering wing.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-002 with inputs testing Routing Civil.",
+    "expected_result": "System enforces BR-IWD-002 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_004",
+    "source_id": "BR-IWD-002 - Routing Electrical",
+    "purpose": "Verify business rule BR-IWD-002: Automatic engineer assignment - Electrical category routes to electrical engineering wing.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-002 with inputs testing Routing Electrical.",
+    "expected_result": "System enforces BR-IWD-002 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_005",
+    "source_id": "BR-IWD-002 - Routing Plumbing",
+    "purpose": "Verify business rule BR-IWD-002: Automatic engineer assignment - Plumbing category routes to plumbing engineering wing.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-002 with inputs testing Routing Plumbing.",
+    "expected_result": "System enforces BR-IWD-002 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_006",
+    "source_id": "BR-IWD-003 - Low-Cost Band",
+    "purpose": "Verify business rule BR-IWD-003: Cost-band routing - Estimate < Rs. 25,000 does not require capital budget.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-003 with inputs testing Low-Cost Band.",
+    "expected_result": "System enforces BR-IWD-003 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_007",
+    "source_id": "BR-IWD-003 - Lower Boundary",
+    "purpose": "Verify business rule BR-IWD-003: Cost-band routing - Boundary estimate exactly Rs. 25,000 triggers mid-range route.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-003 with inputs testing Lower Boundary.",
+    "expected_result": "System enforces BR-IWD-003 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_008",
+    "source_id": "BR-IWD-003 - Mid-Range Upper Boundary",
+    "purpose": "Verify business rule BR-IWD-003: Cost-band routing - Mid-range estimate Rs. 1,00,000 handled at departmental level.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-003 with inputs testing Mid-Range Upper Boundary.",
+    "expected_result": "System enforces BR-IWD-003 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_009",
+    "source_id": "BR-IWD-003 - Director Escalation Threshold",
+    "purpose": "Verify business rule BR-IWD-003: Cost-band routing - Estimate > Rs. 1,00,000 strictly mandates Director escalation.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-003 with inputs testing Director Escalation Threshold.",
+    "expected_result": "System enforces BR-IWD-003 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_010",
+    "source_id": "BR-IWD-003 - Upper Boundary +1",
+    "purpose": "Verify business rule BR-IWD-003: Cost-band routing - Estimate boundary Rs. 1,00,001 requires Director approval.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-003 with inputs testing Upper Boundary +1.",
+    "expected_result": "System enforces BR-IWD-003 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_011",
+    "source_id": "BR-IWD-004 - Internal Quotation Permitted",
+    "purpose": "Verify business rule BR-IWD-004: Low-cost internal quotation - Estimates under Rs. 25,000 eligible for internal quotation.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-004 with inputs testing Internal Quotation Permitted.",
+    "expected_result": "System enforces BR-IWD-004 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_012",
+    "source_id": "BR-IWD-005 - Committee Review Mandatory",
+    "purpose": "Verify business rule BR-IWD-005: Mid-range committee review - Committee review mandatory for Rs. 25,000 to 2,50,000.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-005 with inputs testing Committee Review Mandatory.",
+    "expected_result": "System enforces BR-IWD-005 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_013",
+    "source_id": "BR-IWD-006 - HOD Authorization",
+    "purpose": "Verify business rule BR-IWD-006: Department Head mid-range decision - HOD decision required before work execution.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-006 with inputs testing HOD Authorization.",
+    "expected_result": "System enforces BR-IWD-006 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_014",
+    "source_id": "BR-IWD-007 - Capital Budget Threshold",
+    "purpose": "Verify business rule BR-IWD-007: High-cost bidding authorization - Civil works > Rs. 5,00,000 require formal budget allocation.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-007 with inputs testing Capital Budget Threshold.",
+    "expected_result": "System enforces BR-IWD-007 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_015",
+    "source_id": "BR-IWD-007 - Budget Threshold Lower Boundary",
+    "purpose": "Verify business rule BR-IWD-007: High-cost bidding authorization - Estimate exactly Rs. 5,00,000 does not require capital budget.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-007 with inputs testing Budget Threshold Lower Boundary.",
+    "expected_result": "System enforces BR-IWD-007 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_016",
+    "source_id": "BR-IWD-007 - Category Policy Invariant",
+    "purpose": "Verify business rule BR-IWD-007: New construction budget rule - Any NEW_CONSTRUCTION project requires capital budget regardless of cost.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-007 with inputs testing Category Policy Invariant.",
+    "expected_result": "System enforces BR-IWD-007 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_017",
+    "source_id": "BR-IWD-008 - Contractor Active Check",
+    "purpose": "Verify business rule BR-IWD-008: Vendor-selection compliance - Approved contractor list verification required.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-008 with inputs testing Contractor Active Check.",
+    "expected_result": "System enforces BR-IWD-008 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_018",
+    "source_id": "BR-IWD-008 - Inactive Contractor Prohibited",
+    "purpose": "Verify business rule BR-IWD-008: Vendor-selection compliance - Inactive contractor barred from assignment.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-008 with inputs testing Inactive Contractor Prohibited.",
+    "expected_result": "System enforces BR-IWD-008 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_019",
+    "source_id": "BR-IWD-009 - Rejection Reason Captured",
+    "purpose": "Verify business rule BR-IWD-009: Rejection reason and resubmission - Mandatory rejection reason note recorded.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-009 with inputs testing Rejection Reason Captured.",
+    "expected_result": "System enforces BR-IWD-009 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_020",
+    "source_id": "BR-IWD-009 - Empty Rejection Note Refused",
+    "purpose": "Verify business rule BR-IWD-009: Rejection reason and resubmission - Blank rejection note rejected.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-009 with inputs testing Empty Rejection Note Refused.",
+    "expected_result": "System enforces BR-IWD-009 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_021",
+    "source_id": "BR-IWD-009 - Resubmission State",
+    "purpose": "Verify business rule BR-IWD-009: Rejection reason and resubmission - Resubmission moves ticket back to submitted.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-009 with inputs testing Resubmission State.",
+    "expected_result": "System enforces BR-IWD-009 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_022",
+    "source_id": "BR-IWD-010 - Low Stock Boundary Condition",
+    "purpose": "Verify business rule BR-IWD-010: Inventory-before-procurement - Low stock flag active when quantity_available <= minimum_stock.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-010 with inputs testing Low Stock Boundary Condition.",
+    "expected_result": "System enforces BR-IWD-010 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_023",
+    "source_id": "BR-IWD-010 - Adequate Stock Condition",
+    "purpose": "Verify business rule BR-IWD-010: Inventory-before-procurement - Adequate stock when quantity_available > minimum_stock.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-010 with inputs testing Adequate Stock Condition.",
+    "expected_result": "System enforces BR-IWD-010 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_024",
+    "source_id": "BR-IWD-010 - Zero Stock Critical Alert",
+    "purpose": "Verify business rule BR-IWD-010: Inventory-before-procurement - Zero quantity available triggers urgent procurement flag.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-010 with inputs testing Zero Stock Critical Alert.",
+    "expected_result": "System enforces BR-IWD-010 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_025",
+    "source_id": "BR-IWD-011 - Inventory Audit Logging",
+    "purpose": "Verify business rule BR-IWD-011: Inventory audit trail - Stock quantity update logged in audit system.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-011 with inputs testing Inventory Audit Logging.",
+    "expected_result": "System enforces BR-IWD-011 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_026",
+    "source_id": "BR-IWD-012 - Urgency Priority Score Base",
+    "purpose": "Verify business rule BR-IWD-012: Urgent fast-track routing - Priority URGENT yields accelerated base score (4).",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-012 with inputs testing Urgency Priority Score Base.",
+    "expected_result": "System enforces BR-IWD-012 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_027",
+    "source_id": "BR-IWD-012 - Urgency Deadline Boost <=1d",
+    "purpose": "Verify business rule BR-IWD-012: Urgent fast-track routing - Deadline <= 1 day grants maximum urgency boost (+4).",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-012 with inputs testing Urgency Deadline Boost <=1d.",
+    "expected_result": "System enforces BR-IWD-012 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_028",
+    "source_id": "BR-IWD-012 - Urgency Deadline Boost <=7d",
+    "purpose": "Verify business rule BR-IWD-012: Urgent fast-track routing - Deadline <= 7 days grants medium urgency boost (+2).",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-012 with inputs testing Urgency Deadline Boost <=7d.",
+    "expected_result": "System enforces BR-IWD-012 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_029",
+    "source_id": "BR-IWD-012 - Urgency Deadline Boost >30d",
+    "purpose": "Verify business rule BR-IWD-012: Urgent fast-track routing - Deadline > 30 days grants zero urgency boost (+0).",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-012 with inputs testing Urgency Deadline Boost >30d.",
+    "expected_result": "System enforces BR-IWD-012 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_030",
+    "source_id": "BR-IWD-013 - Audit Log Draft to Submitted",
+    "purpose": "Verify business rule BR-IWD-013: Audit logging of decisions - State change from draft to submitted creates immutable log.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-013 with inputs testing Audit Log Draft to Submitted.",
+    "expected_result": "System enforces BR-IWD-013 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_031",
+    "source_id": "BR-IWD-013 - Audit Log Approval Action",
+    "purpose": "Verify business rule BR-IWD-013: Audit logging of decisions - State change from under_review to approved logs actor and note.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-013 with inputs testing Audit Log Approval Action.",
+    "expected_result": "System enforces BR-IWD-013 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_032",
+    "source_id": "BR-IWD-013 - Audit Log Ordering",
+    "purpose": "Verify business rule BR-IWD-013: Audit logging of decisions - Audit log records timestamps in sequential order.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-013 with inputs testing Audit Log Ordering.",
+    "expected_result": "System enforces BR-IWD-013 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_033",
+    "source_id": "BR-IWD-014 - Illegal Transition Draft to Approved",
+    "purpose": "Verify business rule BR-IWD-014: State transition legality validation - Draft directly to approved raises IWDDomainError.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-014 with inputs testing Illegal Transition Draft to Approved.",
+    "expected_result": "System enforces BR-IWD-014 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_034",
+    "source_id": "BR-IWD-014 - Illegal Transition Submitted to Completed",
+    "purpose": "Verify business rule BR-IWD-014: State transition legality validation - Submitted directly to completed raises IWDDomainError.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-014 with inputs testing Illegal Transition Submitted to Completed.",
+    "expected_result": "System enforces BR-IWD-014 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_035",
+    "source_id": "BR-IWD-014 - Terminal Closed State",
+    "purpose": "Verify business rule BR-IWD-014: State transition legality validation - Closed state is terminal with zero legal exits.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-014 with inputs testing Terminal Closed State.",
+    "expected_result": "System enforces BR-IWD-014 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_036",
+    "source_id": "BR-IWD-014 - Terminal Rejected State",
+    "purpose": "Verify business rule BR-IWD-014: State transition legality validation - Rejected state is terminal with zero legal exits.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-014 with inputs testing Terminal Rejected State.",
+    "expected_result": "System enforces BR-IWD-014 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_037",
+    "source_id": "BR-IWD-015 - Actual Cost Recording",
+    "purpose": "Verify business rule BR-IWD-015: Financial audit basis - Actual cost recorded at completion matches invoice total.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-015 with inputs testing Actual Cost Recording.",
+    "expected_result": "System enforces BR-IWD-015 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_038",
+    "source_id": "BR-IWD-016 - Settlement Precondition",
+    "purpose": "Verify business rule BR-IWD-016: Settlement authorization sequence - Payment settlement requires prior completion.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-016 with inputs testing Settlement Precondition.",
+    "expected_result": "System enforces BR-IWD-016 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_039",
+    "source_id": "BR-IWD-017 - Feedback Eligibility",
+    "purpose": "Verify business rule BR-IWD-017: Feedback after resolution - Feedback allowed only when request status is closed or completed.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-017 with inputs testing Feedback Eligibility.",
+    "expected_result": "System enforces BR-IWD-017 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  },
+  {
+    "test_id": "TC_BR_040",
+    "source_id": "BR-IWD-018 - Role Separation Compliance",
+    "purpose": "Verify business rule BR-IWD-018: Department Head / Dean role separation - Roles are distinct designations in permissions manifest.",
+    "preconditions": "Domain engine and ORM initialized with standard business rules.",
+    "action_or_input": "Evaluate BR-IWD-018 with inputs testing Role Separation Compliance.",
+    "expected_result": "System enforces BR-IWD-018 outcome correctly.",
+    "test_type": "Business Rule / Constraint"
+  }
+]
