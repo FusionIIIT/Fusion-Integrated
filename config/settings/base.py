@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.badms",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -216,6 +217,7 @@ REST_FRAMEWORK = {
         "export": "5/hour",
         "upload": "20/hour",
         "directory_search": "120/hour",
+        "badms_write": "60/hour",
     },
 }
 
@@ -230,6 +232,11 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "DataClassificationEnum": (
+            "modules.badms.models.archival.ArchivalRequest.CLASSIFICATION_CHOICES"
+        ),
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False
