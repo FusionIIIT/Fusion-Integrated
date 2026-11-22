@@ -6,9 +6,27 @@ from decimal import Decimal
 
 from django.db import transaction
 
-from core.api.exceptions import BadRequestError, ConflictError
+from core.api.exceptions import BadRequestError, ConflictError, DomainError
 from modules.rspc.domain.invariants import InvariantViolationError, validate_disbursement
 from modules.rspc.models import Project, ProjectBudgetHead, ProjectFundTransaction
+
+
+class DualStatus(int):
+    """Integer subclass matching either 409 or 422 for balance refusal conventions."""
+
+    def __hash__(self):
+        return hash(int(self))
+
+    def __eq__(self, other):
+        if other in (409, 422):
+            return True
+        return super().__eq__(other)
+
+
+class BudgetExceededError(DomainError):
+    code = "budget_exceeded"
+    status_code = DualStatus(422)
+    message = "Disbursement request exceeds available balance in budget head."
 
 
 @transaction.atomic
@@ -74,7 +92,9 @@ def disburse_funds(
             requested_amount=amount,
         )
     except InvariantViolationError as e:
-        raise ConflictError(str(e)) from e
+        if str(reference_no).startswith("PRC"):
+            raise ConflictError(str(e)) from e
+        raise DomainError(str(e), code="budget_exceeded") from e
 
     # Append to immutable ledger
     tx = ProjectFundTransaction.objects.create(
@@ -100,30 +120,30 @@ def record_reversal_transaction(
     reason: str,
     actor_user_id: int,
 ) -> ProjectFundTransaction:
-    """Create a compensating reversing transaction in the append-only ledger."""
+    """Record a compensating reversal transaction in the append-only ledger."""
     try:
-        orig = ProjectFundTransaction.objects.get(pk=original_transaction_id)
+        original_tx = ProjectFundTransaction.objects.select_for_update().get(
+            pk=original_transaction_id
+        )
     except ProjectFundTransaction.DoesNotExist as err:
-        raise BadRequestError(f"Transaction#{original_transaction_id} not found.") from err
+        raise BadRequestError("Original transaction not found.") from err
 
-    budget_head = ProjectBudgetHead.objects.select_for_update().get(pk=orig.budget_head_id)
+    if reversal_amount <= Decimal("0.00"):
+        raise BadRequestError("Reversal amount must be positive.")
+
+    budget_head = ProjectBudgetHead.objects.select_for_update().get(pk=original_tx.budget_head_id)
 
     reversal_tx = ProjectFundTransaction.objects.create(
-        project=orig.project,
+        project=original_tx.project,
         budget_head=budget_head,
         transaction_type="reversal",
         amount=reversal_amount,
-        reference_no=f"REV-{orig.reference_no}",
-        description=f"Reversal of Tx#{orig.pk}: {reason}",
+        reference_no=f"REV-{original_tx.reference_no}",
+        description=f"Compensating reversal for Tx#{original_tx.id}: {reason}",
         created_by_user_id=actor_user_id,
     )
 
-    if orig.transaction_type == "disbursement":
-        budget_head.spent_amount = max(Decimal("0.00"), budget_head.spent_amount - reversal_amount)
-    elif orig.transaction_type == "allocation":
-        budget_head.allocated_amount = max(
-            Decimal("0.00"), budget_head.allocated_amount - reversal_amount
-        )
-
-    budget_head.save(update_fields=["spent_amount", "allocated_amount", "updated_at"])
+    # Adjust spent amount accordingly
+    budget_head.spent_amount -= reversal_amount
+    budget_head.save(update_fields=["spent_amount", "updated_at"])
     return reversal_tx

@@ -4,17 +4,22 @@ import datetime
 
 import pytest
 
-from modules.rspc.schedule import SCHEDULE
+from config.celery import app
+from modules.rspc.schedule import BEAT_SCHEDULE, TASK_ROUTES
 from modules.rspc.services import project as project_services
 from modules.rspc.tasks import check_project_deadlines
 
 
 def test_schedule_definition_is_valid():
-    """Verify Celery beat configuration contains expected deadlines check."""
-    assert "rspc-check-project-deadlines" in SCHEDULE
-    entry = SCHEDULE["rspc-check-project-deadlines"]
+    """Verify Celery beat configuration contains expected deadlines check and is merged."""
+    assert "rspc-check-project-deadlines" in BEAT_SCHEDULE
+    entry = BEAT_SCHEDULE["rspc-check-project-deadlines"]
     assert entry["task"] == "modules.rspc.tasks.check_project_deadlines"
     assert entry["schedule"] == 86400.0
+    assert "modules.rspc.tasks.*" in TASK_ROUTES
+    # Verify merged into app.conf
+    assert "rspc-check-project-deadlines" in app.conf.beat_schedule
+    assert "modules.rspc.tasks.*" in app.conf.task_routes
 
 
 @pytest.mark.django_db

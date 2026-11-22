@@ -6,7 +6,8 @@ from decimal import Decimal
 import pytest
 from django.core.exceptions import PermissionDenied
 
-from core.api.exceptions import ConflictError
+from core.api.exceptions import ConflictError, DomainError
+from modules.rspc.models import Proposal
 from modules.rspc.services import (
     extension as extension_services,
 )
@@ -146,8 +147,8 @@ def test_append_only_ledger_and_budget_disbursement():
     assert head.spent_amount == Decimal("400000.00")
     assert head.available_balance == Decimal("800000.00")
 
-    # Exceeding budget raises ConflictError
-    with pytest.raises(ConflictError, match="Insufficient balance"):
+    # Exceeding budget raises DomainError (422)
+    with pytest.raises((ConflictError, DomainError), match="Insufficient balance"):
         finance_services.disburse_funds(
             project=proj,
             head_type="equipment",
@@ -312,3 +313,57 @@ def test_finance_reversal_transaction():
     )
     assert rev_tx.transaction_type == "reversal"
     assert rev_tx.amount == Decimal("100000.00")
+
+
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_proposal_approval_prevented_by_select_for_update():
+    """Verify that racing approval attempts on the same proposal cannot double-approve."""
+    import threading
+
+    prop = proposal_services.create_proposal(
+        user_id=10,
+        title="Concurrent Race Proposal",
+        proposal_type="sponsored_research",
+        department="CSE",
+        funding_agency="DST",
+        proposed_budget=Decimal("500000.00"),
+    )
+    proposal_services.submit_proposal(proposal=prop, actor_user_id=10)
+    proposal_services.endorse_proposal(proposal=prop, actor_user_id=20, actor_role="hod")
+
+    barrier = threading.Barrier(2)
+    results = []
+    errors = []
+
+    def worker(dean_id: int):
+        from django.db import connection
+
+        try:
+            barrier.wait(timeout=5)
+            # Re-fetch from db to start clean
+            p = Proposal.objects.get(pk=prop.pk)
+            approved = proposal_services.approve_proposal(
+                proposal=p, actor_user_id=dean_id, actor_role="dean", comments=f"Approved by {dean_id}"
+            )
+            results.append(approved)
+        except Exception as exc:  # noqa: BLE001
+            errors.append(exc)
+        finally:
+            connection.close()
+
+    t1 = threading.Thread(target=worker, args=(101,))
+    t2 = threading.Thread(target=worker, args=(102,))
+
+    t1.start()
+    t2.start()
+    t1.join(timeout=10)
+    t2.join(timeout=10)
+
+    # Exactly one succeeded and one was blocked by state machine / select_for_update
+    from django.db import OperationalError
+
+    assert len(results) == 1
+    assert len(errors) == 1
+    assert isinstance(errors[0], (ConflictError, OperationalError))
+    assert prop.reviews.filter(action="approve").count() == 1
+

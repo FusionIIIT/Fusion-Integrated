@@ -217,6 +217,7 @@ REST_FRAMEWORK = {
         "export": "5/hour",
         "upload": "20/hour",
         "directory_search": "120/hour",
+        "rspc.write": "60/min",
     },
 }
 

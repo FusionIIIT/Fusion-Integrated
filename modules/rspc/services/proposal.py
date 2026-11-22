@@ -7,7 +7,7 @@ from decimal import Decimal
 
 from django.db import transaction
 
-from core.api.exceptions import BadRequestError, ConflictError
+from core.api.exceptions import BadRequestError, ConflictError, DomainError
 from modules.rspc.domain.state_machine import DomainTransitionError, ProposalStateMachine
 from modules.rspc.models import Proposal, ProposalReview
 
@@ -25,7 +25,16 @@ def create_proposal(
     summary: str = "",
 ) -> Proposal:
     if proposed_budget <= Decimal("0.00"):
-        raise BadRequestError("Proposed budget must be strictly positive.")
+        raise DomainError(
+            "Proposed budget must be strictly positive.",
+            code="validation_error",
+            details=[
+                {
+                    "field": "proposed_budget",
+                    "message": "Proposed budget must be strictly positive.",
+                }
+            ],
+        )
 
     return Proposal.objects.create(
         user_id=user_id,
@@ -43,8 +52,28 @@ def create_proposal(
 
 @transaction.atomic
 def submit_proposal(*, proposal: Proposal, actor_user_id: int) -> Proposal:
+    proposal = Proposal.objects.select_for_update().get(pk=proposal.pk)
+
     if proposal.user_id != actor_user_id:
         raise BadRequestError("Only the Principal Investigator can submit their proposal.")
+
+    # BR-RSPC-013: Mandatory field validation
+    missing = []
+    if not str(proposal.title).strip():
+        missing.append({"field": "title", "message": "Title is required."})
+    if not str(proposal.department).strip():
+        missing.append({"field": "department", "message": "Department is required."})
+    if not str(proposal.funding_agency).strip():
+        missing.append({"field": "funding_agency", "message": "Funding agency is required."})
+    if not proposal.proposed_budget or proposal.proposed_budget <= Decimal("0.00"):
+        missing.append({"field": "proposed_budget", "message": "Proposed budget must be positive."})
+
+    if missing:
+        raise DomainError(
+            "Proposal cannot be submitted with missing mandatory fields.",
+            code="validation_error",
+            details=missing,
+        )
 
     try:
         new_status = ProposalStateMachine.transition(
@@ -63,12 +92,16 @@ def submit_proposal(*, proposal: Proposal, actor_user_id: int) -> Proposal:
 
 
 @transaction.atomic
-def endorse_proposal(*, proposal: Proposal, actor_user_id: int, comments: str = "") -> Proposal:
+def endorse_proposal(
+    *, proposal: Proposal, actor_user_id: int, actor_role: str = "hod", comments: str = ""
+) -> Proposal:
+    proposal = Proposal.objects.select_for_update().get(pk=proposal.pk)
+
     try:
         new_status = ProposalStateMachine.transition(
             current_status=proposal.status,
             event="endorse",
-            actor_role="hod",
+            actor_role=actor_role,
             pi_user_id=proposal.user_id,
             actor_user_id=actor_user_id,
         )
@@ -89,12 +122,16 @@ def endorse_proposal(*, proposal: Proposal, actor_user_id: int, comments: str = 
 
 
 @transaction.atomic
-def approve_proposal(*, proposal: Proposal, actor_user_id: int, comments: str = "") -> Proposal:
+def approve_proposal(
+    *, proposal: Proposal, actor_user_id: int, actor_role: str = "dean", comments: str = ""
+) -> Proposal:
+    proposal = Proposal.objects.select_for_update().get(pk=proposal.pk)
+
     try:
         new_status = ProposalStateMachine.transition(
             current_status=proposal.status,
             event="approve",
-            actor_role="dean",
+            actor_role=actor_role,
             pi_user_id=proposal.user_id,
             actor_user_id=actor_user_id,
         )
@@ -118,6 +155,8 @@ def approve_proposal(*, proposal: Proposal, actor_user_id: int, comments: str = 
 def reject_proposal(
     *, proposal: Proposal, actor_user_id: int, actor_role: str, comments: str = ""
 ) -> Proposal:
+    proposal = Proposal.objects.select_for_update().get(pk=proposal.pk)
+
     try:
         new_status = ProposalStateMachine.transition(
             current_status=proposal.status,

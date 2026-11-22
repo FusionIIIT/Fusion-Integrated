@@ -37,6 +37,17 @@ def get_user_id(request) -> int:
     return int(p.user_id)
 
 
+def get_department(request) -> str:
+    """Extract authenticated principal's department."""
+    p = get_principal(request)
+    if not p:
+        return ""
+    dept = getattr(p, "department", "") or ""
+    if not dept and hasattr(p, "directory_user") and p.directory_user:
+        dept = getattr(p.directory_user, "department", "") or ""
+    return str(dept).strip()
+
+
 def is_hod(request) -> bool:
     """Check if the acting user holds a Head of Department role."""
     p = get_principal(request)
@@ -55,6 +66,12 @@ def scope_proposals(request) -> QuerySet[Proposal]:
         return qs
     user_id = get_user_id(request)
     if is_hod(request):
+        dept = get_department(request)
+        if dept:
+            return qs.filter(
+                Q(user_id=user_id)
+                | (Q(department=dept) & Q(status__in=["submitted_hod", "endorsed_hod"]))
+            )
         return qs.filter(Q(user_id=user_id) | Q(status__in=["submitted_hod", "endorsed_hod"]))
     return qs.filter(user_id=user_id)
 
@@ -66,6 +83,13 @@ def scope_projects(request) -> QuerySet[Project]:
         return qs
     user_id = get_user_id(request)
     if is_hod(request):
+        dept = get_department(request)
+        if dept:
+            return qs.filter(
+                Q(user_id=user_id)
+                | Q(co_pis__user_id=user_id)
+                | (Q(department=dept) & Q(status__in=["sanctioned", "active"]))
+            ).distinct()
         return qs.filter(
             Q(user_id=user_id) | Q(co_pis__user_id=user_id) | Q(status__in=["sanctioned", "active"])
         ).distinct()

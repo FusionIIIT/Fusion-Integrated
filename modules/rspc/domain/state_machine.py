@@ -24,9 +24,9 @@ class ProposalStateMachine:
             "hod",
         ): ProposalStatus.REVISION_REQUESTED,
         (ProposalStatus.REVISION_REQUESTED, "resubmit", "faculty"): ProposalStatus.SUBMITTED_HOD,
-        (ProposalStatus.SUBMITTED_HOD, "reject", "hod"): ProposalStatus.REJECTED,
+        (ProposalStatus.SUBMITTED_HOD, "reject", "hod"): ProposalStatus.DEPT_NOT_RECOMMENDED,
         (ProposalStatus.ENDORSED_HOD, "approve", "dean"): ProposalStatus.APPROVED_DEAN,
-        (ProposalStatus.ENDORSED_HOD, "reject", "dean"): ProposalStatus.REJECTED,
+        (ProposalStatus.ENDORSED_HOD, "reject", "dean"): ProposalStatus.DEAN_NOT_APPROVED,
     }
 
     @classmethod

@@ -45,6 +45,9 @@ def review_project_extension(
     actor_role: str,
     comments: str = "",
 ) -> ProjectExtensionRequest:
+    if extension_request.status != "submitted":
+        raise ConflictError("Extension request has already been reviewed.")
+
     project = extension_request.project
     cumulative = sum(
         r.months_requested

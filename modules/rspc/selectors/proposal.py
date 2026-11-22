@@ -9,7 +9,7 @@ from modules.rspc.selectors.scoping import scope_proposals
 
 
 def list_proposals(request, status: str | None = None) -> QuerySet[Proposal]:
-    qs = scope_proposals(request).order_by("-created_at")
+    qs = scope_proposals(request).prefetch_related("reviews").order_by("-created_at")
     if status:
         qs = qs.filter(status=status)
     return qs

@@ -1,4 +1,4 @@
-from config.settings.test import *
+from config.settings.test import *  # noqa: F403
 
 DATABASES = {
     "default": {

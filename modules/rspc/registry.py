@@ -108,3 +108,37 @@ ROLE_GRANTS = {
         "rspc.report.view",
     ],
 }
+
+
+def readiness() -> list[str]:
+    """Check whether the RSPC module's prerequisites are met.
+
+    Returns a list of unmet prerequisite descriptions. An empty list means ready.
+    """
+    unmet: list[str] = []
+    try:
+        from django.db import connection
+
+        tables = connection.introspection.table_names()
+        required_tables = [
+            "rspc_proposal",
+            "rspc_project",
+            "rspc_project_budget_head",
+            "rspc_fund_transaction",
+        ]
+        missing = [t for t in required_tables if t not in tables]
+        if missing:
+            unmet.append(f"Database tables missing (run migrations): {', '.join(missing)}")
+    except Exception as exc:  # noqa: BLE001
+        unmet.append(f"Database connectivity check failed: {exc}")
+
+    try:
+        from config.celery import app
+
+        if "rspc-check-project-deadlines" not in getattr(app.conf, "beat_schedule", {}):
+            unmet.append("Celery beat schedule missing 'rspc-check-project-deadlines'")
+    except Exception as exc:  # noqa: BLE001
+        unmet.append(f"Celery configuration check failed: {exc}")
+
+    return unmet
+
