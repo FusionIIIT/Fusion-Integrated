@@ -13,6 +13,35 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `hr_eis`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `hr_eis.service_record.view_self` | View own employee service record | `accountant`, `director`, `faculty`, `hod`, `hr_admin`, `registrar`, `staff` |
+| `hr_eis.service_record.manage` | Create and update employee service records | `hr_admin` |
+| `hr_eis.service_record.view_all` | View all employee service records | `hr_admin` |
+| `hr_eis.leave.apply` | Submit leave requests | `director`, `faculty`, `hod`, `registrar`, `staff` |
+| `hr_eis.leave.view_self` | View own leave requests | `director`, `faculty`, `hod`, `registrar`, `staff` |
+| `hr_eis.leave.review` | Review, approve, reject, or forward leave requests | `director`, `hod`, `registrar` |
+| `hr_eis.appraisal.submit` | Submit annual appraisal form | `director`, `faculty`, `hod`, `registrar`, `staff` |
+| `hr_eis.appraisal.view_self` | View own appraisal submissions | `director`, `faculty`, `hod`, `registrar`, `staff` |
+| `hr_eis.appraisal.assign_reviewer` | Assign reviewers to annual appraisals | `hr_admin` |
+| `hr_eis.appraisal.review` | Review and score assigned annual appraisals | `director`, `hod`, `registrar` |
+| `hr_eis.appraisal.finalize` | Finalize and close annual appraisals | `director`, `registrar` |
+| `hr_eis.ltc.apply` | Submit LTC advance or reimbursement requests | `director`, `faculty`, `hod`, `registrar`, `staff` |
+| `hr_eis.ltc.view_self` | View own LTC requests | `director`, `faculty`, `hod`, `registrar`, `staff` |
+| `hr_eis.ltc.verify` | Verify LTC claim eligibility and documents | `hr_admin` |
+| `hr_eis.ltc.approve` | Approve, reject, or forward LTC requests | `director`, `hod`, `registrar` |
+| `hr_eis.ltc.settle` | Record financial settlement for approved LTC claims | `accountant` |
+| `hr_eis.cpda.apply` | Submit CPDA advance or reimbursement requests | `director`, `faculty`, `hod`, `registrar`, `staff` |
+| `hr_eis.cpda.view_self` | View own CPDA requests | `director`, `faculty`, `hod`, `registrar`, `staff` |
+| `hr_eis.cpda.verify` | Verify CPDA claim eligibility and documents | `hr_admin` |
+| `hr_eis.cpda.approve` | Approve, reject, or forward CPDA requests | `director`, `hod`, `registrar` |
+| `hr_eis.cpda.settle` | Record financial disbursement for approved CPDA claims | `accountant` |
+| `hr_eis.workflow.configure` | Configure HR-EIS workflow policies and submission windows | `hr_admin` |
+| `hr_eis.audit.view` | View immutable audit logs and compliance records | `hr_admin` |
+| `hr_eis.notification.view_self` | Receive and view HR-EIS notifications | `accountant`, `director`, `faculty`, `hod`, `hr_admin`, `registrar`, `staff` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
