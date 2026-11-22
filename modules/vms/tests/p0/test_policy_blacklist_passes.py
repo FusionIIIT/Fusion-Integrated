@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import pytest
 from django.utils import timezone
+from freezegun import freeze_time
 
 from core.api.exceptions import ConflictError
 from modules.vms.models import AuditLog, VisitPass
@@ -129,6 +130,19 @@ def test_inactive_and_expired_entries_are_ignored(live_version):
     assert blacklist.check(checkpoint="gate", id_doc_number="I1") is None
     assert blacklist.check(checkpoint="gate", id_doc_number="E1") is None
     assert blacklist.check(checkpoint="gate", id_doc_number="F1")
+
+
+@pytest.mark.parametrize("frozen", ["2026-11-22 20:18:00", "2026-11-23 10:00:00"],
+                         ids=["01:48-IST-utc-still-yesterday", "15:30-IST-afternoon"])
+def test_br_112_entry_expired_yesterday_is_ignored_at_any_hour(live_version, frozen):
+    """AFR-111/120: expiry is a campus-calendar date; 22 Nov UTC 20:18 is already 23 Nov IST."""
+    with freeze_time(frozen, tz_offset=0):
+        yesterday = timezone.localdate() - timedelta(days=1)
+        f.make_blacklist_entry(version=live_version, id_doc_number="EY1", expiry_date=yesterday)
+        f.make_blacklist_entry(version=live_version, id_doc_number="ET1",
+                               expiry_date=timezone.localdate())
+        assert blacklist.check(checkpoint="gate", id_doc_number="EY1") is None
+        assert blacklist.check(checkpoint="gate", id_doc_number="ET1")
 
 
 def test_worst_severity_wins(live_version):

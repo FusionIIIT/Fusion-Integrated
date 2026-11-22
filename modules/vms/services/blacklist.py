@@ -62,7 +62,7 @@ def check(*, checkpoint: str, name="", id_doc_number="", phone="", email="",
             or blacklist_match.norm_email(email)):
         return None
     hits = []
-    entries = version.entries.filter(is_active=True).exclude(expiry_date__lt=at.date())
+    entries = version.entries.filter(is_active=True).exclude(expiry_date__lt=timezone.localdate(at))
     for entry in entries:
         fields = blacklist_match.matched_fields(entry, probe)
         if fields:
