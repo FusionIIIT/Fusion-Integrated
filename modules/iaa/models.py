@@ -59,6 +59,11 @@ class ActiveRoleSelection(TimeStampedModel):
     user_id=models.IntegerField(unique=True); role=models.CharField(max_length=80)
     class Meta: db_table="iaa_active_role_selection"
 
+class AuditObservationQuerySet(models.QuerySet):
+    def delete(self):
+        raise ValueError("IAA audit observations are retained; deletion is prohibited.")
+
+
 class AuditObservation(TimeStampedModel):
     OPEN="open"; RESPONDED="responded"; CLOSED="closed"
     STATUSES=[(OPEN,"Open"),(RESPONDED,"Responded"),(CLOSED,"Closed")]
@@ -68,8 +73,12 @@ class AuditObservation(TimeStampedModel):
     status=models.CharField(max_length=16,choices=STATUSES,default=OPEN,db_index=True)
     verified_by_id=models.IntegerField(null=True,blank=True); verified_at=models.DateTimeField(null=True,blank=True)
     verification_remarks=models.TextField(blank=True); closed_at=models.DateTimeField(null=True,blank=True)
+    objects = AuditObservationQuerySet.as_manager()
+
     class Meta: db_table="iaa_audit_observation"; ordering=["-created_at"]
-    def delete(self,*args,**kwargs): raise ValueError("IAA audit observations are retained; deletion is prohibited.")
+
+    def delete(self,*args,**kwargs):
+        raise ValueError("IAA audit observations are retained; deletion is prohibited.")
 
 class AuditLogQuerySet(models.QuerySet):
     def update(self,**kwargs): raise ValueError("IAA audit logs are append-only.")
@@ -134,7 +143,7 @@ class ObservationResponse(TimeStampedModel):
     class Meta: db_table="iaa_observation_response"; ordering=["created_at"]
 
 class DashboardNotification(models.Model):
-    recipient_user_id=models.IntegerField(db_index=True); recipient_role=models.CharField(max_length=80,blank=True)
+    recipient_user_id=models.IntegerField(null=True,blank=True,db_index=True); recipient_role=models.CharField(max_length=80,blank=True)
     event_type=models.CharField(max_length=80,db_index=True); title=models.CharField(max_length=180)
     message=models.TextField(blank=True); resource_type=models.CharField(max_length=60,blank=True)
     resource_id=models.IntegerField(null=True,blank=True); read_at=models.DateTimeField(null=True,blank=True)
@@ -142,4 +151,21 @@ class DashboardNotification(models.Model):
     class Meta: db_table="iaa_dashboard_notification"; ordering=["-created_at"]
 
     def __str__(self):
-        return f"{self.title} for user {self.recipient_user_id}"
+        recipient = f"user {self.recipient_user_id}" if self.recipient_user_id else f"role {self.recipient_role}"
+        return f"{self.title} for {recipient}"
+
+
+class NotificationReceipt(models.Model):
+    """Per-user read state for a notification addressed to an IAM role."""
+    notification = models.ForeignKey(
+        DashboardNotification, on_delete=models.CASCADE, related_name="receipts")
+    recipient_user_id = models.IntegerField(db_index=True)
+    read_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "iaa_notification_receipt"
+        constraints = [models.UniqueConstraint(
+            fields=("notification", "recipient_user_id"),
+            name="iaa_notification_receipt_user_uniq")]
+
