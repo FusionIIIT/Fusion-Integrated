@@ -139,14 +139,6 @@ def test_tc_fr_001(stub_iam):
     assert other.id not in ids
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC exposes no project history or project approval-history view (only proposal reviews and the fund ledger exist)')
-def test_tc_fr_002():
-    """TC-FR-002 | source RSPC-FR-005 | Faculty can view approval history of own project
-
-    Action: F1 opens the approval history of an own project
-    Expected: the approval decisions recorded for that project are displayed
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -188,24 +180,8 @@ def test_tc_fr_004(stub_iam):
         assert resp.data["status"] == stored == project.status
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC exposes no project history or project approval-history view (only proposal reviews and the fund ledger exist)')
-def test_tc_fr_005():
-    """TC-FR-005 | source RSPC-FR-108 | Faculty can view history of own project
-
-    Action: F1 opens the history view of an own project
-    Expected: the recorded history of the project is displayed
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC exposes no audit-trail/audit-log record or retrieval interface (no model, service or endpoint)')
-def test_tc_fr_006():
-    """TC-FR-006 | source RSPC-FR-109 | Faculty can view audit trail of own project
-
-    Action: F1 opens the audit trail of an own project
-    Expected: the audit-trail entries recorded for that project are displayed
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -229,34 +205,10 @@ def test_tc_fr_007(stub_iam):
         assert resp.status_code == 404, suffix
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC exposes no audit-trail/audit-log record or retrieval interface (no model, service or endpoint)')
-def test_tc_fr_008():
-    """TC-FR-008 | source RSPC-FR-007 (parent RSPC-CFR-002) | RSPC Admin can maintain structured audit/compliance records
-
-    Action: RSPC Admin creates or updates a structured audit/compliance record for that RSPC record
-    Expected: The record is persisted with its content and is retrievable afterwards
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC exposes no audit-trail/audit-log record or retrieval interface (no model, service or endpoint)')
-def test_tc_fr_009():
-    """TC-FR-009 | source RSPC-FR-088 | RSPC maintains logs for audit, transparency and regulatory compliance
-
-    Action: Perform the event, then an authorized user retrieves the RSPC logs
-    Expected: A log entry for the event is persisted and retrievable by the authorized user; BR-RSPC-050 log content is present
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC exposes no audit-trail/audit-log record or retrieval interface (no model, service or endpoint)')
-def test_tc_fr_010():
-    """TC-FR-010 | source RSPC-CFR-002 roll-up | Audit logs are retrievable by authorized users and not by unauthorized roles
-
-    Action: Both users request the audit logs
-    Expected: Authorized user receives the entries; the unauthorized user is denied
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -303,24 +255,8 @@ def test_tc_fr_012(stub_iam):
         assert review["reviewer_user_id"] == HOD
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no feasibility-evaluation record or interface (no model, service or endpoint)')
-def test_tc_fr_013():
-    """TC-FR-013 | source RSPC-FR-118 | HoD can evaluate departmental feasibility
-
-    Action: HoD records a feasibility evaluation for an assigned request
-    Expected: The feasibility evaluation is persisted against the request
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no alignment-evaluation record or interface (no model, service or endpoint)')
-def test_tc_fr_014():
-    """TC-FR-014 | source RSPC-FR-119 | HoD can evaluate departmental alignment
-
-    Action: HoD records an alignment evaluation for an assigned request
-    Expected: The alignment evaluation is persisted against the request
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -384,54 +320,14 @@ def test_tc_fr_017(stub_iam):
     assert review.comments == "Sanctioned"
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no Director stage in any workflow (proposal states stop at Dean approval; Director holds only view/closure grants); no Dean forward-to-Director action exists')
-def test_tc_fr_018():
-    """TC-FR-018 | source RSPC-FR-012 | Dean-RSPC can forward high-value or strategic requests to Director (BR-RSPC-004)
-
-    Action: Dean-RSPC forwards the request to the Director
-    Expected: The request is routed to the Director stage and the forwarding is recorded
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_019():
-    """TC-FR-019 | source RSPC-FR-120 | Dean-RSPC can review routed staff-appointment requests
-
-    Action: Dean-RSPC opens the routed item
-    Expected: The item is displayed for review
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no budget-allocation request routed to a Dean stage (budget heads are allocated directly by project managers)')
-def test_tc_fr_020():
-    """TC-FR-020 | source RSPC-FR-121 | Dean-RSPC can review routed budget allocations
-
-    Action: Dean-RSPC opens the routed item
-    Expected: The item is displayed for review
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no financial-request verification/escalation workflow; the disbursement-approve endpoint is a stub that records nothing')
-def test_tc_fr_021():
-    """TC-FR-021 | source RSPC-FR-122 | Dean-RSPC can review routed financial requests
-
-    Action: Dean-RSPC opens the routed item
-    Expected: The item is displayed for review
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no procurement-request workflow, status or approval hierarchy (no model, service or endpoint)')
-def test_tc_fr_022():
-    """TC-FR-022 | source RSPC-FR-123 | Dean-RSPC can review routed procurement requests
-
-    Action: Dean-RSPC opens the routed item
-    Expected: The item is displayed for review
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -452,81 +348,17 @@ def test_tc_fr_023(stub_iam):
     assert resp.data["status"] == "closure_pending"
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no policy-compliance view for routed requests (no model, service or endpoint)')
-def test_tc_fr_024():
-    """TC-FR-024 | source RSPC-FR-125 | Dean-RSPC can review policy compliance (BR-RSPC-070)
-
-    Action: Dean-RSPC opens the compliance view of the request
-    Expected: The represented policy compliance information is displayed for the request
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC defines no Dean-RSPC value limit and no limit-based approval rule; the limit value is left open by the specification')
-def test_tc_fr_025():
-    """TC-FR-025 | source RSPC-FR-126 within limits | Dean-RSPC can approve eligible requests within delegated or defined limits (BR-RSPC-068)
-
-    Action: Dean-RSPC approves the request
-    Expected: Approval is accepted and recorded
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC defines no Dean-RSPC value limit and no limit-based approval rule; the limit value is left open by the specification')
-def test_tc_fr_026():
-    """TC-FR-026 | source RSPC-FR-126 beyond limits | Dean-RSPC cannot approve requests beyond delegated or defined limits
-
-    Action: Dean-RSPC attempts to approve the request
-    Expected: Approval is rejected and the request is not finally approved at the Dean-RSPC stage
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no Director stage in any workflow (proposal states stop at Dean approval; Director holds only view/closure grants)')
-def test_tc_fr_027():
-    """TC-FR-027 | source RSPC-FR-013 (parent RSPC-CFR-005) | Director can approve large funding requests (BR-RSPC-005)
-
-    Action: Director approves the request
-    Expected: The approval is recorded and the request state is updated
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no Director stage in any workflow (proposal states stop at Dean approval; Director holds only view/closure grants)')
-def test_tc_fr_028():
-    """TC-FR-028 | source RSPC-FR-014 | Director can authorize high-value expenditures (BR-RSPC-006)
-
-    Action: Director authorizes the expenditure
-    Expected: The authorization is recorded against the request
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no Director stage in any workflow (proposal states stop at Dean approval; Director holds only view/closure grants)')
-def test_tc_fr_029():
-    """TC-FR-029 | source RSPC-FR-127 | Director can review significant, high-value, strategic or escalated requests (BR-RSPC-069)
-
-    Action: Director opens the request
-    Expected: The request is displayed for review
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no Director stage in any workflow (proposal states stop at Dean approval; Director holds only view/closure grants); no regulation-adherence view exists')
-def test_tc_fr_030():
-    """TC-FR-030 | source RSPC-FR-128 | Director can review adherence to institutional and external funding regulations (BR-RSPC-070)
-
-    Action: Director opens the regulation adherence view
-    Expected: The represented regulation adherence information is displayed
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no Director stage in any workflow (proposal states stop at Dean approval; Director holds only view/closure grants)')
-def test_tc_fr_031():
-    """TC-FR-031 | source RSPC-CFR-005 authorization recorded | Director-stage authorization decision is recorded with the request
-
-    Action: Director records authorization
-    Expected: Authorization outcome is persisted with the Director's identity and the request state is updated
-    """
-    raise NotImplementedError

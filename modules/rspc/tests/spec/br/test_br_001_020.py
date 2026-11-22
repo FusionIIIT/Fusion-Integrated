@@ -57,9 +57,6 @@ def _url(prop, action):
     return f"/api/v1/rspc/proposals/{prop.id}/{action}/"
 
 
-@pytest.mark.skip(reason=NO_DIRECTOR_STAGE)
-def test_tc_br_001_dean_forwards_to_director_when_required():
-    """TC-BR-001 / BR-RSPC-004 condition-true (Director required)."""
 
 
 @pytest.mark.django_db
@@ -78,37 +75,16 @@ def test_tc_br_002_dean_handles_request_without_director_stage(stub_iam):
     assert all("director" not in s.lower() for s, _ in Proposal.STATUS_CHOICES)
 
 
-@pytest.mark.skip(reason=NO_DIRECTOR_STAGE)
-def test_tc_br_003_director_records_approval():
-    """TC-BR-003 / BR-RSPC-005 Director records approval."""
 
 
-@pytest.mark.skip(reason=NO_DIRECTOR_STAGE)
-def test_tc_br_004_non_director_cannot_record_director_approval():
-    """TC-BR-004 / BR-RSPC-005 non-Director actor prohibited."""
 
 
-@pytest.mark.skip(reason=NO_DIRECTOR_STAGE)
-def test_tc_br_005_director_records_authorization():
-    """TC-BR-005 / BR-RSPC-006 Director records authorization."""
 
 
-@pytest.mark.skip(reason=NO_DIRECTOR_STAGE)
-def test_tc_br_006_non_director_cannot_record_authorization():
-    """TC-BR-006 / BR-RSPC-006 non-Director actor prohibited."""
 
 
-@pytest.mark.skip(reason=NO_DIRECTOR_STAGE)
-def test_tc_br_007_main_route_with_director_applicable():
-    """TC-BR-007 / BR-RSPC-012 Main route with Director applicable."""
 
 
-@pytest.mark.skip(reason=NO_DIRECTOR_STAGE)
-def test_tc_br_008_main_route_director_not_applicable():
-    """TC-BR-008 / BR-RSPC-012 Director stage not applicable.
-
-    The route includes an RSPC Admin stage that the implementation does not have.
-    """
 
 
 @pytest.mark.django_db
@@ -254,9 +230,6 @@ def test_tc_br_016_decision_remarks_recorded(stub_iam):
     assert review.comments == remarks
 
 
-@pytest.mark.skip(reason=NO_APPOINTMENT)
-def test_tc_br_017_consultancy_routes_through_hod_and_director():
-    """TC-BR-017 / BR-RSPC-022 applicable stages only (HoD/Director applicable)."""
 
 
 @pytest.mark.django_db
@@ -278,11 +251,5 @@ def test_tc_br_018_consultancy_enters_only_applicable_stages(stub_iam):
     assert roles == ["Head of Department", "Dean (RSPC)"]
 
 
-@pytest.mark.skip(reason=NO_APPOINTMENT)
-def test_tc_br_019_appointment_routed_to_dean_then_director():
-    """TC-BR-019 / BR-RSPC-026 Director applicable."""
 
 
-@pytest.mark.skip(reason=NO_APPOINTMENT)
-def test_tc_br_020_appointment_routed_to_dean_only():
-    """TC-BR-020 / BR-RSPC-026 Director not applicable."""

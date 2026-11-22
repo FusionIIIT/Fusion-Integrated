@@ -148,24 +148,8 @@ def test_tc_fr_032(stub_iam):
     assert detail.data["title"] == "Quantum Sensing Testbed"
 
 
-@pytest.mark.skip(reason="NOT_AUTOMATED: Proposal has no objectives field (only 'summary'); mapping it would reinterpret the case")
-def test_tc_fr_033():
-    """TC-FR-033 | source RSPC-FR-016 | Proposal objectives is captured at submission
-
-    Action: Faculty enters objectives text and submits the proposal
-    Expected: The entered objectives is persisted on the submitted proposal record
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: Proposal has no start/end date fields (only an optional submission_deadline)')
-def test_tc_fr_034():
-    """TC-FR-034 | source RSPC-FR-017 | Proposal timeline is captured at submission
-
-    Action: Faculty enters start and end dates and submits the proposal
-    Expected: The entered timeline is persisted on the submitted proposal record
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -207,24 +191,8 @@ def test_tc_fr_036(stub_iam):
     assert client.get(f"{URL}/proposals/{pid}/").data["funding_agency"] == "ISRO"
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: Proposal has no resource-requirements field')
-def test_tc_fr_037():
-    """TC-FR-037 | source RSPC-FR-020 | Proposal resource requirements is captured at submission
-
-    Action: Faculty enters resource requirements and submits the proposal
-    Expected: The entered resource requirements is persisted on the submitted proposal record
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no Director stage in any workflow (proposal states stop at Dean approval; Director holds only view/closure grants); no RSPC Admin stage in the proposal state machine (draft, submitted_hod, endorsed_hod, approved_dean)')
-def test_tc_fr_038():
-    """TC-FR-038 | source RSPC-FR-021 (parent RSPC-CFR-007) | Proposal is routed Faculty-HoD-RSPC Admin-Dean-RSPC-Director (BR-RSPC-012)
-
-    Action: Each actor in turn approves/forwards the proposal
-    Expected: The proposal moves in order Faculty, HoD, RSPC Admin, Dean-RSPC, Director and each hand-off state is recorded
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -265,14 +233,6 @@ def test_tc_fr_040(stub_iam):
     assert Proposal.objects.count() == 0
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no configurable system-validation policy mechanism for proposals')
-def test_tc_fr_041():
-    """TC-FR-041 | source RSPC-FR-023 policy represented | Policy validation enforced when represented as system validation (BR-RSPC-014)
-
-    Action: Submit a proposal that violates the policy
-    Expected: Submission is rejected/blocked according to the validation and the proposal does not advance
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -291,14 +251,6 @@ def test_tc_fr_042(stub_iam):
     assert resp.data["status"] == "submitted_hod"
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no Director stage in any workflow (proposal states stop at Dean approval; Director holds only view/closure grants); no RSPC Admin review stage, so decisions of all four reviewers cannot be recorded')
-def test_tc_fr_043():
-    """TC-FR-043 | source RSPC-FR-024 (parent RSPC-CFR-008) | Proposal approval decisions recorded with timestamps (BR-RSPC-015)
-
-    Action: Each reviewer records a decision
-    Expected: Each decision is stored with a timestamp and is retrievable
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -343,54 +295,14 @@ def test_tc_fr_045(stub_iam):
     assert detail.data["status"] == "submitted_hod"
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: Consultancy registration (a Proposal of type consultancy) has no client-details field')
-def test_tc_fr_046():
-    """TC-FR-046 | source RSPC-FR-028 | Consultancy client details captured at registration
-
-    Action: Faculty enters client details and registers
-    Expected: The entered client details is persisted on the consultancy record
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: Consultancy registration has no scope field')
-def test_tc_fr_047():
-    """TC-FR-047 | source RSPC-FR-029 | Consultancy scope captured at registration
-
-    Action: Faculty enters scope and registers
-    Expected: The entered scope is persisted on the consultancy record
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: Consultancy registration has no deliverables field')
-def test_tc_fr_048():
-    """TC-FR-048 | source RSPC-FR-030 | Consultancy deliverables captured at registration
-
-    Action: Faculty enters deliverables and registers
-    Expected: The entered deliverables is persisted on the consultancy record
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: Consultancy registration has no timeline fields')
-def test_tc_fr_049():
-    """TC-FR-049 | source RSPC-FR-031 | Consultancy timeline captured at registration
-
-    Action: Faculty enters timeline and registers
-    Expected: The entered timeline is persisted on the consultancy record
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: Consultancy registration has no financial-terms field distinct from proposed_budget; mapping would reinterpret the case')
-def test_tc_fr_050():
-    """TC-FR-050 | source RSPC-FR-032 | Consultancy financial terms captured at registration
-
-    Action: Faculty enters financial terms and registers
-    Expected: The entered financial terms is persisted on the consultancy record
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -433,34 +345,10 @@ def test_tc_fr_052(stub_iam):
     assert prop.reviews.count() == 0
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no consultancy-payment record or view (the ledger models project fund allocation/disbursement/reversal only)')
-def test_tc_fr_053():
-    """TC-FR-053 | source RSPC-FR-034 (parent RSPC-CFR-011) | RSPC tracks consultancy payments
-
-    Action: Record and then view consultancy payments
-    Expected: Consultancy payments are stored as project records and displayed
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no consultancy-deliverable record or view')
-def test_tc_fr_054():
-    """TC-FR-054 | source RSPC-FR-035 | RSPC tracks consultancy deliverables
-
-    Action: Record and then view consultancy deliverables
-    Expected: Consultancy deliverables are stored as project records and displayed
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no consultancy-settlement record or view')
-def test_tc_fr_055():
-    """TC-FR-055 | source RSPC-FR-036 | RSPC tracks consultancy settlements
-
-    Action: Record and then view consultancy settlements
-    Expected: Consultancy settlements are stored as project records and displayed
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -492,14 +380,6 @@ def test_tc_fr_056(stub_iam):
     }
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC exposes no project history or project approval-history view (only proposal reviews and the fund ledger exist)')
-def test_tc_fr_057():
-    """TC-FR-057 | source RSPC-FR-038 | Consultancy approval history maintained for authorized users
-
-    Action: Authorized user opens the approval history
-    Expected: Complete approval history is displayed
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db

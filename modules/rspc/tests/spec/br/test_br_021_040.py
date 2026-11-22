@@ -90,34 +90,16 @@ def _disburse(client, project, amount):
     )
 
 
-@pytest.mark.skip(reason=NO_DELEGATION)
-def test_tc_br_021_dean_approves_within_delegated_powers():
-    """TC-BR-021 / BR-RSPC-032 within delegated powers."""
 
 
-@pytest.mark.skip(reason=NO_DELEGATION)
-def test_tc_br_022_dean_blocked_beyond_delegated_powers():
-    """TC-BR-022 / BR-RSPC-032 beyond delegated powers."""
 
 
-@pytest.mark.skip(reason=NO_DELEGATION)
-def test_tc_br_023_delegated_limit_boundary():
-    """TC-BR-023 / BR-RSPC-032 delegated limit boundary."""
 
 
-@pytest.mark.skip(reason=NO_DELEGATION)
-def test_tc_br_024_escalation_condition_met_routes_to_director():
-    """TC-BR-024 / BR-RSPC-033 escalation condition met."""
 
 
-@pytest.mark.skip(reason=NO_DELEGATION)
-def test_tc_br_025_escalation_condition_not_met_not_routed():
-    """TC-BR-025 / BR-RSPC-033 condition not met."""
 
 
-@pytest.mark.skip(reason=NO_AUDIT)
-def test_tc_br_026_lifecycle_events_logged():
-    """TC-BR-026 / BR-RSPC-034 lifecycle events logged."""
 
 
 @pytest.mark.django_db
@@ -164,54 +146,24 @@ def test_tc_br_029_request_equal_to_remaining_budget_accepted(stub_iam):
     assert head.available_balance == Decimal("0.00")
 
 
-@pytest.mark.skip(reason=NO_PROCUREMENT)
-def test_tc_br_030_budget_not_represented_no_budget_rejection():
-    """TC-BR-030 / BR-RSPC-035 budget not represented."""
 
 
-@pytest.mark.skip(reason=NO_PROCUREMENT)
-def test_tc_br_031_procurement_routed_through_applicable_hierarchy():
-    """TC-BR-031 / BR-RSPC-036 applicable hierarchy."""
 
 
-@pytest.mark.skip(reason=NO_PROCUREMENT)
-def test_tc_br_032_approval_by_stage_not_in_hierarchy_rejected():
-    """TC-BR-032 / BR-RSPC-036 stage not in hierarchy."""
 
 
-@pytest.mark.skip(reason=NO_REPORTS)
-def test_tc_br_033_reporting_schedule_pending_and_reminder():
-    """TC-BR-033 / BR-RSPC-037 schedule represented."""
 
 
-@pytest.mark.skip(reason=NO_REPORTS)
-def test_tc_br_034_report_submitted_before_due_not_pending():
-    """TC-BR-034 / BR-RSPC-037 report submitted before due."""
 
 
-@pytest.mark.skip(reason=NO_REPORTS)
-def test_tc_br_035_no_schedule_no_pending_status():
-    """TC-BR-035 / BR-RSPC-037 no schedule represented."""
 
 
-@pytest.mark.skip(reason=NO_REPORTS)
-def test_tc_br_036_progress_report_history_shown_to_authorized_actor():
-    """TC-BR-036 / BR-RSPC-038 authorized actor."""
 
 
-@pytest.mark.skip(reason=NO_REPORTS)
-def test_tc_br_037_progress_report_history_denied_to_unauthorized_actor():
-    """TC-BR-037 / BR-RSPC-038 unauthorized actor."""
 
 
-@pytest.mark.skip(reason=NO_REPORTS)
-def test_tc_br_038_utilization_history_shown_to_authorized_actor():
-    """TC-BR-038 / BR-RSPC-039 authorized actor."""
 
 
-@pytest.mark.skip(reason=NO_REPORTS)
-def test_tc_br_039_utilization_history_denied_to_unauthorized_actor():
-    """TC-BR-039 / BR-RSPC-039 unauthorized actor."""
 
 
 @pytest.mark.django_db

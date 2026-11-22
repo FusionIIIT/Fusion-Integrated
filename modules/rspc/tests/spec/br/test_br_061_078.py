@@ -63,14 +63,8 @@ def _proposal(status="draft", user_id=10):
     )
 
 
-@pytest.mark.skip(reason=NO_NOTIFICATION)
-def test_tc_br_061_email_delivery_failure_leaves_event_intact():
-    """TC-BR-061 / BR-RSPC-061 delivery failure."""
 
 
-@pytest.mark.skip(reason=NO_AGENCY)
-def test_tc_br_062_external_agency_information_stored_not_executed():
-    """TC-BR-062 / BR-RSPC-062 external agency info."""
 
 
 @pytest.mark.django_db
@@ -127,24 +121,12 @@ def test_tc_br_065_restrictions_applied_per_supplied_role(stub_iam):
     assert prop.status == "endorsed_hod"
 
 
-@pytest.mark.skip(reason=NO_UPDATE)
-def test_tc_br_066_update_permitted_by_lifecycle_state():
-    """TC-BR-066 / BR-RSPC-065 update permitted by lifecycle."""
 
 
-@pytest.mark.skip(reason=NO_UPDATE)
-def test_tc_br_067_update_not_permitted_for_closed_project():
-    """TC-BR-067 / BR-RSPC-065 update not permitted."""
 
 
-@pytest.mark.skip(reason=NO_ADMIN_STAGE)
-def test_tc_br_068_rspc_admin_forwards_eligible_outcome():
-    """TC-BR-068 / BR-RSPC-066 eligible outcome."""
 
 
-@pytest.mark.skip(reason=NO_ADMIN_STAGE)
-def test_tc_br_069_rspc_admin_cannot_forward_ineligible_outcome():
-    """TC-BR-069 / BR-RSPC-066 ineligible outcome."""
 
 
 @pytest.mark.django_db
@@ -197,9 +179,6 @@ def test_tc_br_072_dean_approves_request_within_authority(stub_iam):
     assert ProposalReview.objects.filter(proposal=prop, action="approve").count() == 1
 
 
-@pytest.mark.skip(reason=NO_DIRECTOR_STAGE)
-def test_tc_br_073_dean_approval_outside_authority_not_recorded():
-    """TC-BR-073 / BR-RSPC-068 outside authority."""
 
 
 @pytest.mark.django_db
@@ -220,21 +199,9 @@ def test_tc_br_074_dean_approval_of_ineligible_request_not_recorded(stub_iam):
     assert prop.reviews.count() == 0
 
 
-@pytest.mark.skip(reason=NO_DIRECTOR_STAGE)
-def test_tc_br_075_director_routing_condition_met_enters_director_stage():
-    """TC-BR-075 / BR-RSPC-069 condition met."""
 
 
-@pytest.mark.skip(reason=NO_DIRECTOR_STAGE)
-def test_tc_br_076_director_routing_condition_not_met_no_director_stage():
-    """TC-BR-076 / BR-RSPC-069 condition not met."""
 
 
-@pytest.mark.skip(reason=NO_POLICY_CONFIG)
-def test_tc_br_077_represented_policy_applied():
-    """TC-BR-077 / BR-RSPC-070 represented policy applied."""
 
 
-@pytest.mark.skip(reason=NO_POLICY_CONFIG)
-def test_tc_br_078_unrepresented_policy_not_applied():
-    """TC-BR-078 / BR-RSPC-070 unrepresented policy."""

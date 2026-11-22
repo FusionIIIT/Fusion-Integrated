@@ -93,14 +93,6 @@ def test_tc_uc_032(stub_iam):
     assert Proposal.objects.get(pk=pid).status == "submitted_hod"
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: no configurable HoD-stage routing for consultancy; only "
-            "one fixed path exists"
-    )
-)
-def test_tc_uc_033():
-    """TC-UC-033 / RSPC-UC-007 Alternative Flow A1."""
 
 
 @pytest.mark.django_db
@@ -132,15 +124,6 @@ def test_tc_uc_035(stub_iam):
     assert Proposal.objects.count() == 0
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no consultancy "
-            "payment/deliverable/settlement tracking interface (not implemented in "
-            "this baseline)"
-    )
-)
-def test_tc_uc_036():
-    """TC-UC-036 / RSPC-UC-008 Main Success Scenario."""
 
 
 @pytest.mark.django_db
@@ -169,96 +152,22 @@ def test_tc_uc_038(stub_iam):
     assert client.get(f"/api/v1/rspc/projects/{project.id}/ledger/").status_code == 404
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no consultancy "
-            "payment/settlement tracking interface (not implemented in this "
-            "baseline)"
-    )
-)
-def test_tc_uc_039():
-    """TC-UC-039 / RSPC-UC-008 Exception Flow E2."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no staff appointment request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_040():
-    """TC-UC-040 / RSPC-UC-009 Main Success Scenario."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no staff appointment request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_041():
-    """TC-UC-041 / RSPC-UC-009 Exception Flow E1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no staff appointment request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_042():
-    """TC-UC-042 / RSPC-UC-009 Exception Flow E2."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no staff appointment request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_043():
-    """TC-UC-043 / RSPC-UC-010 Main Success Scenario."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no staff appointment request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_044():
-    """TC-UC-044 / RSPC-UC-010 Alternative Flow A1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no staff appointment request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_045():
-    """TC-UC-045 / RSPC-UC-010 Exception Flow E1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no staff appointment request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_046():
-    """TC-UC-046 / RSPC-UC-010 Exception Flow E2."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: financial requests are executed directly by the "
-            "disburse endpoint; no submitted/verification routing to RSPC Admin "
-            "exists"
-    )
-)
-def test_tc_uc_047():
-    """TC-UC-047 / RSPC-UC-011 Main Success Scenario."""
 
 
 @pytest.mark.django_db
@@ -277,124 +186,28 @@ def test_tc_uc_048(stub_iam):
     assert _snapshot() == before
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the only submission interface (disburse) itself writes "
-            "ledger entries, so absence of ledger operation cannot be tested"
-    )
-)
-def test_tc_uc_049():
-    """TC-UC-049 / RSPC-UC-011 Exception Flow E2."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no financial request "
-            "verification interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_050():
-    """TC-UC-050 / RSPC-UC-012 Main Success Scenario."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no financial request "
-            "verification interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_051():
-    """TC-UC-051 / RSPC-UC-012 Exception Flow E1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no financial request "
-            "verification interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_052():
-    """TC-UC-052 / RSPC-UC-012 Exception Flow E2."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no procurement request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_053():
-    """TC-UC-053 / RSPC-UC-013 Main Success Scenario."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no procurement request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_054():
-    """TC-UC-054 / RSPC-UC-013 Alternative Flow A1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no procurement request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_055():
-    """TC-UC-055 / RSPC-UC-013 Exception Flow E1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no procurement request "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_056():
-    """TC-UC-056 / RSPC-UC-013 Exception Flow E2."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no periodic progress report "
-            "submission or reminder interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_057():
-    """TC-UC-057 / RSPC-UC-014 Main Success Scenario."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no periodic progress report "
-            "submission or reminder interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_058():
-    """TC-UC-058 / RSPC-UC-014 Alternative Flow A1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no periodic progress report "
-            "submission or reminder interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_059():
-    """TC-UC-059 / RSPC-UC-014 Exception Flow E1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no periodic progress report "
-            "submission or reminder interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_060():
-    """TC-UC-060 / RSPC-UC-014 Exception Flow E2."""
 
 
 @pytest.mark.django_db
@@ -425,31 +238,7 @@ def test_tc_uc_062(stub_iam):
     assert project.status == "active"
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no accounting settlement or "
-            "inventory interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_063():
-    """TC-UC-063 / RSPC-UC-015 Exception Flow E2."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no notification/dashboard/email "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_064():
-    """TC-UC-064 / RSPC-UC-016 Main Success Scenario."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no notification/dashboard/email "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_065():
-    """TC-UC-065 / RSPC-UC-016 Alternative Flow A1."""

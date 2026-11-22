@@ -162,24 +162,8 @@ def test_tc_uc_005(stub_iam):
     assert pid in [r["id"] for r in listed.data]
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: no endpoint or service exists to edit a saved draft "
-            "proposal"
-    )
-)
-def test_tc_uc_006():
-    """TC-UC-006 / RSPC-UC-002 Alternative Flow A1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: no configurable submission policy validation exists in "
-            "RSPC"
-    )
-)
-def test_tc_uc_007():
-    """TC-UC-007 / RSPC-UC-002 Alternative Flow A2."""
 
 
 @pytest.mark.django_db
@@ -195,14 +179,6 @@ def test_tc_uc_008(stub_iam):
     assert proposal.title == "Proposal"
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: no configurable submission policy validation exists in "
-            "RSPC"
-    )
-)
-def test_tc_uc_009():
-    """TC-UC-009 / RSPC-UC-002 Exception Flow E1 policy validation failure."""
 
 
 @pytest.mark.django_db
@@ -254,14 +230,6 @@ def test_tc_uc_012(stub_iam):
     assert review.comments == "Not recommended: budget unjustified"
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: no configurable HoD-stage routing for consultancy; only "
-            "one fixed path exists"
-    )
-)
-def test_tc_uc_013():
-    """TC-UC-013 / RSPC-UC-003 Alternative Flow A1."""
 
 
 @pytest.mark.django_db
@@ -290,44 +258,12 @@ def test_tc_uc_015(stub_iam):
     assert ProposalReview.objects.count() == 0
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no RSPC Admin "
-            "verification/forwarding interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_016():
-    """TC-UC-016 / RSPC-UC-004 Main Success Scenario."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no RSPC Admin "
-            "verification/forwarding interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_017():
-    """TC-UC-017 / RSPC-UC-004 Alternative Flow A1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no RSPC Admin "
-            "verification/forwarding interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_018():
-    """TC-UC-018 / RSPC-UC-004 Exception Flow E1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no RSPC Admin "
-            "verification/forwarding interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_019():
-    """TC-UC-019 / RSPC-UC-004 Exception Flow E2."""
 
 
 @pytest.mark.django_db
@@ -345,14 +281,6 @@ def test_tc_uc_020(stub_iam):
     assert (review.action, review.reviewer_user_id) == ("approve", 100)
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no Dean-to-Director forwarding "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_021():
-    """TC-UC-021 / RSPC-UC-005 Main Success Scenario forward to Director."""
 
 
 @pytest.mark.django_db
@@ -369,13 +297,6 @@ def test_tc_uc_022(stub_iam):
     assert (review.action, review.comments) == ("reject", "Not approved")
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: no routing threshold configuration exists in RSPC"
-    )
-)
-def test_tc_uc_023():
-    """TC-UC-023 / RSPC-UC-005 Alternative Flow A1."""
 
 
 @pytest.mark.django_db
@@ -404,61 +325,13 @@ def test_tc_uc_025(stub_iam):
     assert ProposalReview.objects.count() == 0
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no Director decision stage "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_026():
-    """TC-UC-026 / RSPC-UC-006 Main Success Scenario decision recorded."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no Director decision stage "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_027():
-    """TC-UC-027 / RSPC-UC-006 Main Success Scenario rejection."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no Director decision stage "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_028():
-    """TC-UC-028 / RSPC-UC-006 Main Success Scenario high-value requirement."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no Director decision stage "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_029():
-    """TC-UC-029 / RSPC-UC-006 Alternative Flow A1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no Director decision stage "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_030():
-    """TC-UC-030 / RSPC-UC-006 Exception Flow E1."""
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: the RSPC module exposes no Director decision stage "
-            "interface (not implemented in this baseline)"
-    )
-)
-def test_tc_uc_031():
-    """TC-UC-031 / RSPC-UC-006 Exception Flow E2."""

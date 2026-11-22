@@ -129,14 +129,8 @@ def test_tc_br_042_closure_performs_only_rspc_archival(stub_iam):
     )
 
 
-@pytest.mark.skip(reason=NO_INTEGRATION)
-def test_tc_br_043_configured_integration_information_processed():
-    """TC-BR-043 / BR-RSPC-045 configured integration."""
 
 
-@pytest.mark.skip(reason=NO_INTEGRATION)
-def test_tc_br_044_unconfigured_integration_information_not_processed():
-    """TC-BR-044 / BR-RSPC-045 unconfigured integration."""
 
 
 @pytest.mark.django_db
@@ -207,9 +201,6 @@ def test_tc_br_049_auditable_event_logged(stub_iam):
     assert review.created_at is not None
 
 
-@pytest.mark.skip(reason=NO_INTEGRATION)
-def test_tc_br_050_non_rspc_event_creates_no_audit_entry():
-    """TC-BR-050 / BR-RSPC-050 non-RSPC info excluded."""
 
 
 @pytest.mark.django_db
@@ -325,21 +316,9 @@ def test_tc_br_056_reassignment_effective_immediately(stub_iam):
     assert role_b.status_code == 200
 
 
-@pytest.mark.skip(reason=NO_EXTERNAL_EXEC)
-def test_tc_br_057_no_hr_payroll_execution():
-    """TC-BR-057 / BR-RSPC-058 no HR/payroll execution."""
 
 
-@pytest.mark.skip(reason=NO_EXTERNAL_EXEC)
-def test_tc_br_058_no_accounting_bank_execution():
-    """TC-BR-058 / BR-RSPC-059 no accounting/bank execution."""
 
 
-@pytest.mark.skip(reason=NO_EXTERNAL_EXEC)
-def test_tc_br_059_no_procurement_inventory_execution():
-    """TC-BR-059 / BR-RSPC-060 no procurement/inventory execution."""
 
 
-@pytest.mark.skip(reason=NO_EXTERNAL_EXEC)
-def test_tc_br_060_notification_triggered_on_rspc_event():
-    """TC-BR-060 / BR-RSPC-061 notification triggered."""

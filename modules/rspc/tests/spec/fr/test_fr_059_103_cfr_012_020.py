@@ -123,134 +123,30 @@ def _head(project, head_type, amount):
     )
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_059():
-    """TC-FR-059 | source RSPC-FR-039 (parent RSPC-CFR-012) | Faculty can request a project-based staff appointment
-
-    Action: Faculty submits an appointment request
-    Expected: The request is created (CW-RSPC-03 T1) and retrievable
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_060():
-    """TC-FR-060 | source RSPC-FR-040 | RSPC Admin can manage advertisement records
-
-    Action: RSPC Admin creates and then updates a advertisement record
-    Expected: The advertisement record is persisted and the update is reflected
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_061():
-    """TC-FR-061 | source RSPC-FR-041 | RSPC Admin can manage application records
-
-    Action: RSPC Admin creates and then updates a application record
-    Expected: The application record is persisted and the update is reflected
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_062():
-    """TC-FR-062 | source RSPC-FR-042 | RSPC Admin can manage stipend structure records
-
-    Action: RSPC Admin creates and then updates a stipend structure record
-    Expected: The stipend structure record is persisted and the update is reflected
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_063():
-    """TC-FR-063 | source RSPC-FR-129 | RSPC Admin can manage staff-selection records
-
-    Action: RSPC Admin creates and then updates a staff-selection record
-    Expected: The staff-selection record is persisted and the update is reflected
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_064():
-    """TC-FR-064 | source RSPC-FR-131 | RSPC Admin can manage stipend-workflow records
-
-    Action: RSPC Admin creates and then updates a stipend-workflow record
-    Expected: The stipend-workflow record is persisted and the update is reflected
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_065():
-    """TC-FR-065 | source RSPC-FR-046 | RSPC maintains appointment duration records for staff appointments
-
-    Action: Record appointment duration information for the appointment and retrieve it
-    Expected: The appointment duration record is persisted and retrievable
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_066():
-    """TC-FR-066 | source RSPC-FR-047 | RSPC maintains payment records for staff appointments
-
-    Action: Record payment information for the appointment and retrieve it
-    Expected: The payment record is persisted and retrievable
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_067():
-    """TC-FR-067 | source RSPC-FR-048 | RSPC maintains compliance records for staff appointments
-
-    Action: Record compliance information for the appointment and retrieve it
-    Expected: The compliance record is persisted and retrievable
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_068():
-    """TC-FR-068 | source RSPC-FR-043 (parent RSPC-CFR-013) | Faculty can record participation in selection
-
-    Action: Faculty records participation in the selection process
-    Expected: Participation is persisted
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_069():
-    """TC-FR-069 | source RSPC-FR-044 | Faculty can submit staff selection recommendation
-
-    Action: Faculty submits a recommendation
-    Expected: Recommendation is persisted against the appointment
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_070():
-    """TC-FR-070 | source RSPC-FR-045 (parent RSPC-CFR-014) | Staff appointment approvals routed via Dean-RSPC and Director as applicable (BR-RSPC-026)
-
-    Action: Dean-RSPC approves and forwards, Director acts
-    Expected: Approvals follow Dean-RSPC then Director and are recorded (CW-RSPC-03 T5-T9)
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no staff-appointment request/records interface (no model, service or endpoint)')
-def test_tc_fr_071():
-    """TC-FR-071 | source RSPC-FR-045 Director not applicable | Director stage skipped where not applicable
-
-    Action: Dean-RSPC approves
-    Expected: No Director stage is created
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -301,74 +197,18 @@ def test_tc_fr_073(stub_iam):
     ).exists()
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no financial-request verification/escalation workflow; the disbursement-approve endpoint is a stub that records nothing')
-def test_tc_fr_074():
-    """TC-FR-074 | source RSPC-FR-051 | RSPC Admin performs initial financial verification of fund requests
-
-    Action: Verify the request
-    Expected: Verification outcome recorded and request progresses (CW-RSPC-04 T2-T3)
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no financial-request verification/escalation workflow; the disbursement-approve endpoint is a stub that records nothing')
-def test_tc_fr_075():
-    """TC-FR-075 | source RSPC-FR-052 | RSPC Admin performs initial financial verification of expenditure requests
-
-    Action: Verify the request
-    Expected: Verification outcome recorded and request progresses
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no financial-request verification/escalation workflow; the disbursement-approve endpoint is a stub that records nothing')
-def test_tc_fr_076():
-    """TC-FR-076 | source RSPC-FR-053 (parent RSPC-CFR-016) | Dean-RSPC approves financial requests within delegated powers (BR-RSPC-032)
-
-    Action: Dean-RSPC approves
-    Expected: Approval recorded
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no financial-request verification/escalation workflow; the disbursement-approve endpoint is a stub that records nothing')
-def test_tc_fr_077():
-    """TC-FR-077 | source RSPC-FR-053 beyond delegated powers | Dean-RSPC cannot approve beyond delegated powers
-
-    Action: Dean-RSPC attempts approval
-    Expected: Approval is not granted at Dean-RSPC stage
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no financial-request verification/escalation workflow; the disbursement-approve endpoint is a stub that records nothing')
-def test_tc_fr_078():
-    """TC-FR-078 | source RSPC-FR-054 | High-value financial requests escalated to Director (BR-RSPC-033)
-
-    Action: Dean-RSPC stage processes the request
-    Expected: Request is escalated to the Director and escalation recorded
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no financial-request verification/escalation workflow; the disbursement-approve endpoint is a stub that records nothing')
-def test_tc_fr_079():
-    """TC-FR-079 | source RSPC-FR-054 not high-value | Non-high-value request not escalated
-
-    Action: Dean-RSPC approves
-    Expected: No escalation to Director occurs
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no financial-request verification/escalation workflow; the disbursement-approve endpoint is a stub that records nothing; no audit log exists')
-def test_tc_fr_080():
-    """TC-FR-080 | source RSPC-FR-055 | Financial request lifecycle logged (BR-RSPC-034)
-
-    Action: Retrieve the audit log of the request
-    Expected: Request, verification, approval, escalation and transaction-record entries are all present
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -486,104 +326,24 @@ def test_tc_fr_085(stub_iam):
     assert head.available_balance == Decimal("0.00")
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no procurement-request workflow, status or approval hierarchy (no model, service or endpoint)')
-def test_tc_fr_086():
-    """TC-FR-086 | source RSPC-FR-059 | Procurement approval hierarchy enforced (BR-RSPC-036)
-
-    Action: Approvers act in the represented order
-    Expected: Request advances only along the hierarchy
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no procurement-request workflow, status or approval hierarchy (no model, service or endpoint)')
-def test_tc_fr_087():
-    """TC-FR-087 | source RSPC-FR-059 bypass | Procurement hierarchy cannot be bypassed
-
-    Action: Actor at a later stage attempts approval
-    Expected: Action rejected
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no procurement-request workflow, status or approval hierarchy (no model, service or endpoint)')
-def test_tc_fr_088():
-    """TC-FR-088 | source RSPC-FR-060 | Faculty can track procurement request status
-
-    Action: Open the request status
-    Expected: Current status displayed and updates after each stage
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no progress/utilization report submission, schedule or history interface (only a summary count report exists)')
-def test_tc_fr_089():
-    """TC-FR-089 | source RSPC-FR-061 (parent RSPC-CFR-018) | Faculty can submit periodic progress report
-
-    Action: Submit progress report
-    Expected: Report stored
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no progress/utilization report submission, schedule or history interface (only a summary count report exists)')
-def test_tc_fr_090():
-    """TC-FR-090 | source RSPC-FR-062 | Faculty can submit periodic utilization report
-
-    Action: Submit utilization report
-    Expected: Report stored
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no progress/utilization report submission, schedule or history interface (only a summary count report exists)')
-def test_tc_fr_091():
-    """TC-FR-091 | source RSPC-FR-063 in schedule | Reporting schedule enforced (BR-RSPC-037)
-
-    Action: Submit a report within the scheduled period
-    Expected: Accepted
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no progress/utilization report submission, schedule or history interface (only a summary count report exists)')
-def test_tc_fr_092():
-    """TC-FR-092 | source RSPC-FR-063 outside schedule | Report outside represented schedule not accepted as scheduled
-
-    Action: Submit a report outside the represented schedule
-    Expected: Submission is handled per the schedule rule (rejected or flagged) and not accepted as on schedule
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no progress/utilization report submission, schedule or history interface (only a summary count report exists)')
-def test_tc_fr_093():
-    """TC-FR-093 | source RSPC-FR-066 (parent RSPC-CFR-019) | Authorized stakeholders access historical progress reports (BR-RSPC-038)
-
-    Action: Authorized stakeholder opens history
-    Expected: Historical progress reports listed
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no progress/utilization report submission, schedule or history interface (only a summary count report exists)')
-def test_tc_fr_094():
-    """TC-FR-094 | source RSPC-FR-067 | Authorized stakeholders access historical utilization reports (BR-RSPC-039)
-
-    Action: Authorized stakeholder opens history
-    Expected: Historical utilization reports listed
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no progress/utilization report submission, schedule or history interface (only a summary count report exists)')
-def test_tc_fr_095():
-    """TC-FR-095 | source RSPC-CFR-019 unauthorized | Unauthorized users cannot access historical reports
-
-    Action: User without authorization requests reports
-    Expected: Access denied
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -609,34 +369,10 @@ def test_tc_fr_096(stub_iam):
     assert project.status == "closure_pending"
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no interface to submit a completion report (the closure record has a completion_report_submitted flag that no endpoint sets)')
-def test_tc_fr_097():
-    """TC-FR-097 | source RSPC-FR-069 | Faculty can submit completion report
-
-    Action: Submit completion report
-    Expected: Stored
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no settlement-record verification step in the closure workflow')
-def test_tc_fr_098():
-    """TC-FR-098 | source RSPC-FR-070 | Financial settlement verified during closure
-
-    Action: Verify settlement records
-    Expected: Verification outcome recorded (CW-RSPC-06 T2-T3)
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no asset-declaration record or verification step in the closure workflow')
-def test_tc_fr_099():
-    """TC-FR-099 | source RSPC-FR-071 | Asset declarations verified during closure
-
-    Action: Verify asset declaration records
-    Expected: Verification outcome recorded
-    """
-    raise NotImplementedError
 
 
 @pytest.mark.django_db
@@ -659,31 +395,7 @@ def test_tc_fr_100(stub_iam):
     assert closure.closed_at is not None
 
 
-@pytest.mark.skip(reason="NOT_AUTOMATED: RSPC closure ends at status 'closed' with no archive state and no project audit trail to retrieve")
-def test_tc_fr_101():
-    """TC-FR-101 | source RSPC-FR-073 | Closed projects archived with complete audit trails (BR-RSPC-043)
-
-    Action: Closure completes
-    Expected: Project archived and its complete audit trail is retrievable
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC has no reviewer-remarks interface for closure (remarks are only supplied by the requester at submission)')
-def test_tc_fr_102():
-    """TC-FR-102 | source RSPC-FR-130 | Closure-related remarks recorded
-
-    Action: Reviewer enters remarks
-    Expected: Remarks persisted
-    """
-    raise NotImplementedError
 
 
-@pytest.mark.skip(reason='NOT_AUTOMATED: RSPC closure has no Verified or Archived step (pending, approved, rejected only)')
-def test_tc_fr_103():
-    """TC-FR-103 | source RSPC-CFR-020 full path | Closure path from submission to archival
-
-    Action: Verify, approve and archive in order
-    Expected: Project goes Submitted, Verified, Approved, Archived with each step recorded
-    """
-    raise NotImplementedError
