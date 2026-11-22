@@ -38,3 +38,24 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `psm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `psm.indent.create` | Raise new purchase indents | `faculty`, `staff` |
+| `psm.indent.view` | View indents within user or departmental scope | `dept_admin`, `director`, `faculty`, `head_of_department`, `purchase_officer`, `staff` |
+| `psm.indent.approve_dept` | Department-level indent verification and HOD approval | `dept_admin`, `head_of_department` |
+| `psm.indent.approve_ps` | Procurement & Stores admin indent evaluation and routing | `purchase_officer` |
+| `psm.indent.approve_director` | Director / Registrar high-value indent approval | `director` |
+| `psm.stock.view` | View store inventory and ledger entries | `dept_admin`, `head_of_department`, `store_keeper` |
+| `psm.stock.manage` | Issue departmental stock and manage adjustments | `dept_admin`, `store_keeper` |
+| `psm.vendor.view` | View vendor master records | `purchase_officer` |
+| `psm.vendor.manage` | Onboard, vet, verify and update vendor master data | `purchase_officer` |
+| `psm.po.create` | Generate and issue Purchase Orders | `purchase_officer` |
+| `psm.po.view` | Inspect Purchase Orders and delivery status | `accounts_admin`, `director`, `purchase_officer`, `store_keeper` |
+| `psm.grn.create` | Log Goods Receipt Notes upon delivery | `store_keeper` |
+| `psm.grn.view` | View Goods Receipt Notes | `accounts_admin`, `faculty`, `purchase_officer`, `staff`, `store_keeper` |
+| `psm.grn.acknowledge` | Indentor goods delivery acknowledgement | `faculty`, `staff` |
+| `psm.discrepancy.manage` | Log and resolve discrepancy reports | `purchase_officer`, `store_keeper` |
+| `psm.invoice.match` | Perform 3-way invoice matching and payment authorization | `accounts_admin` |

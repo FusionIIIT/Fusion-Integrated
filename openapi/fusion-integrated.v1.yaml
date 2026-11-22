@@ -1674,6 +1674,578 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/psm/discrepancies:
+    get:
+      operationId: psm_discrepancies_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscrepancyReport'
+          description: ''
+  /api/v1/psm/discrepancies/{id}/resolve:
+    post:
+      operationId: psm_discrepancies_resolve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscrepancyReport'
+          description: ''
+  /api/v1/psm/goods-receipts:
+    get:
+      operationId: psm_goods_receipts_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GoodsReceiptNote'
+          description: ''
+    post:
+      operationId: psm_goods_receipts_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GRNCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GRNCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GRNCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoodsReceiptNote'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/goods-receipts/{id}/acknowledge:
+    post:
+      operationId: psm_goods_receipts_ack
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoodsReceiptNote'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/goods-receipts/{id}/match-invoice:
+    post:
+      operationId: psm_invoice_match
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/indents:
+    get:
+      operationId: psm_indents_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Indent'
+          description: ''
+    post:
+      operationId: psm_indents_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IndentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IndentCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indent'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/indents/{id}:
+    get:
+      operationId: psm_indents_detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indent'
+          description: ''
+  /api/v1/psm/indents/{id}/cancel:
+    post:
+      operationId: psm_indents_cancel
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indent'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/indents/{id}/dept-action:
+    post:
+      operationId: psm_indents_dept_action
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndentAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IndentAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IndentAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indent'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/indents/{id}/director-action:
+    post:
+      operationId: psm_indents_director_action
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndentAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IndentAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IndentAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indent'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/indents/{id}/ps-action:
+    post:
+      operationId: psm_indents_ps_action
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndentAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IndentAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IndentAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indent'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/indents/{id}/submit:
+    post:
+      operationId: psm_indents_submit
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indent'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/items:
+    get:
+      operationId: psm_items_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItemMaster'
+          description: ''
+  /api/v1/psm/purchase-orders:
+    get:
+      operationId: psm_purchase_orders_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseOrder'
+          description: ''
+    post:
+      operationId: psm_purchase_orders_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/POCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/POCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/POCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/purchase-orders/{id}/issue:
+    post:
+      operationId: psm_purchase_orders_issue
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrder'
+          description: ''
+  /api/v1/psm/stock:
+    get:
+      operationId: psm_stock_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StockItem'
+          description: ''
+  /api/v1/psm/stock/fulfill:
+    post:
+      operationId: psm_stock_fulfill
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockIssue'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockIssue'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockIssue'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Indent'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/vendors:
+    get:
+      operationId: psm_vendors_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vendor'
+          description: ''
+    post:
+      operationId: psm_vendors_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vendor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Vendor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Vendor'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vendor'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/psm/vendors/{id}/verify:
+    post:
+      operationId: psm_vendors_verify
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vendor'
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1763,6 +2335,14 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - APPROVE
+      - REJECT
+      type: string
+      description: |-
+        * `APPROVE` - APPROVE
+        * `REJECT` - REJECT
     AddCandidates:
       type: object
       properties:
@@ -2082,6 +2662,18 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - CONSUMABLE
+      - EQUIPMENT
+      - SERVICE
+      - FURNITURE
+      type: string
+      description: |-
+        * `CONSUMABLE` - Consumable
+        * `EQUIPMENT` - Equipment
+        * `SERVICE` - Service
+        * `FURNITURE` - Furniture
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2322,6 +2914,78 @@ components:
           type: string
       required:
       - detail
+    DiscrepancyReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        discrepancy_code:
+          type: string
+          readOnly: true
+        grn:
+          type: integer
+        grn_number:
+          type: string
+          readOnly: true
+        reported_by_user_id:
+          type: integer
+          readOnly: true
+        discrepancy_type:
+          $ref: '#/components/schemas/DiscrepancyTypeEnum'
+        details:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DiscrepancyReportStatusEnum'
+          readOnly: true
+        resolution_summary:
+          type: string
+        resolved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - details
+      - discrepancy_code
+      - grn
+      - grn_number
+      - id
+      - reported_by_user_id
+      - resolved_at
+      - status
+    DiscrepancyReportStatusEnum:
+      enum:
+      - OPEN_HOLD_PAYMENT
+      - VENDOR_NOTIFIED
+      - REPLACED
+      - CREDIT_NOTE_ISSUED
+      - RESOLVED
+      type: string
+      description: |-
+        * `OPEN_HOLD_PAYMENT` - Open - Payment on Hold
+        * `VENDOR_NOTIFIED` - Vendor Notified
+        * `REPLACED` - Replaced
+        * `CREDIT_NOTE_ISSUED` - Credit Note Issued
+        * `RESOLVED` - Resolved
+    DiscrepancyTypeEnum:
+      enum:
+      - SHORTAGE
+      - DAMAGED
+      - SPEC_MISMATCH
+      - WRONG_ITEM
+      type: string
+      description: |-
+        * `SHORTAGE` - Shortage
+        * `DAMAGED` - Damaged Items
+        * `SPEC_MISMATCH` - Specification Mismatch
+        * `WRONG_ITEM` - Wrong Item Delivered
     DocumentLink:
       type: object
       description: A Drive link. Validated in core.files.drive.
@@ -2423,6 +3087,150 @@ components:
       - fee_reference
       - season
       - user_id
+    GRNCreate:
+      type: object
+      properties:
+        po_id:
+          type: integer
+        receipt_date:
+          type: string
+          format: date
+        challan_number:
+          type: string
+        invoice_number:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/GRNItemInput'
+      required:
+      - items
+      - po_id
+      - receipt_date
+    GRNItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        po_line_item:
+          type: integer
+        item_name:
+          type: string
+          readOnly: true
+        quantity_received:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        quantity_accepted:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        quantity_rejected:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        rejection_remarks:
+          type: string
+      required:
+      - id
+      - item_name
+      - po_line_item
+      - quantity_received
+    GRNItemInput:
+      type: object
+      properties:
+        po_line_item_id:
+          type: integer
+        quantity_received:
+          type: integer
+          minimum: 1
+        quantity_accepted:
+          type: integer
+          minimum: 0
+        quantity_rejected:
+          type: integer
+          minimum: 0
+          default: 0
+        rejection_remarks:
+          type: string
+      required:
+      - po_line_item_id
+      - quantity_accepted
+      - quantity_received
+    GoodsReceiptNote:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        grn_number:
+          type: string
+          readOnly: true
+        purchase_order:
+          type: integer
+        po_number:
+          type: string
+          readOnly: true
+        store_keeper_user_id:
+          type: integer
+          readOnly: true
+        challan_number:
+          type: string
+          maxLength: 128
+        invoice_number:
+          type: string
+          maxLength: 128
+        receipt_date:
+          type: string
+          format: date
+        status:
+          allOf:
+          - $ref: '#/components/schemas/GoodsReceiptNoteStatusEnum'
+          readOnly: true
+        indentor_acknowledged:
+          type: boolean
+          readOnly: true
+        indentor_acknowledged_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/GRNItem'
+          readOnly: true
+      required:
+      - created_at
+      - grn_number
+      - id
+      - indentor_acknowledged
+      - indentor_acknowledged_at
+      - items
+      - po_number
+      - purchase_order
+      - receipt_date
+      - status
+      - store_keeper_user_id
+    GoodsReceiptNoteStatusEnum:
+      enum:
+      - INSPECTION_PENDING
+      - ACCEPTED
+      - DISCREPANT
+      - CLOSED
+      type: string
+      description: |-
+        * `INSPECTION_PENDING` - Inspection Pending
+        * `ACCEPTED` - Accepted
+        * `DISCREPANT` - Discrepant
+        * `CLOSED` - Closed
     IncidentRecorded:
       type: object
       properties:
@@ -2433,6 +3241,178 @@ components:
       required:
       - incident
       - recommendation
+    Indent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        indent_number:
+          type: string
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        department_code:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 255
+        purpose:
+          type: string
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        estimated_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/IndentStatusEnum'
+          readOnly: true
+        current_approver_role:
+          type: string
+          readOnly: true
+        rejection_reason:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndentItem'
+          readOnly: true
+      required:
+      - created_at
+      - current_approver_role
+      - department_code
+      - estimated_total
+      - id
+      - indent_number
+      - items
+      - purpose
+      - rejection_reason
+      - status
+      - title
+      - updated_at
+      - user_id
+    IndentAction:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        remarks:
+          type: string
+      required:
+      - action
+    IndentCreate:
+      type: object
+      properties:
+        department_code:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          maxLength: 255
+        purpose:
+          type: string
+        priority:
+          type: string
+          default: NORMAL
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndentItemInput'
+      required:
+      - department_code
+      - items
+      - purpose
+      - title
+    IndentItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item_master:
+          type: integer
+        item_code:
+          type: string
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        quantity_requested:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        estimated_unit_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        specifications:
+          type: string
+        total_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - id
+      - item_code
+      - item_master
+      - item_name
+      - quantity_requested
+      - total_cost
+    IndentItemInput:
+      type: object
+      properties:
+        item_master_id:
+          type: integer
+        quantity_requested:
+          type: integer
+          minimum: 1
+        estimated_unit_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        specifications:
+          type: string
+      required:
+      - estimated_unit_cost
+      - item_master_id
+      - quantity_requested
+    IndentStatusEnum:
+      enum:
+      - DRAFT
+      - SUBMITTED
+      - PENDING_DEPT_APPROVAL
+      - PENDING_PS_REVIEW
+      - PENDING_DIRECTOR_APPROVAL
+      - APPROVED
+      - REJECTED
+      - CANCELLED
+      - FULFILLED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `SUBMITTED` - Submitted
+        * `PENDING_DEPT_APPROVAL` - Pending Department Approval
+        * `PENDING_PS_REVIEW` - Pending PS Review
+        * `PENDING_DIRECTOR_APPROVAL` - Pending Director Approval
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `CANCELLED` - Cancelled
+        * `FULFILLED` - Fulfilled
     InterviewRound:
       type: object
       properties:
@@ -2508,6 +3488,32 @@ components:
         * `tech` - Technical interview
         * `hr` - HR interview
         * `other` - Other
+    ItemMaster:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item_code:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        unit_of_measure:
+          $ref: '#/components/schemas/UnitOfMeasureEnum'
+        minimum_stock_level:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+      - id
+      - item_code
+      - name
     JobPosting:
       type: object
       properties:
@@ -2886,6 +3892,55 @@ components:
           maxLength: 300
       required:
       - season
+    POCreate:
+      type: object
+      properties:
+        indent_id:
+          type: integer
+        vendor_id:
+          type: integer
+        delivery_due_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - indent_id
+      - vendor_id
+    POLineItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item_master:
+          type: integer
+        item_code:
+          type: string
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        quantity_ordered:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - id
+      - item_code
+      - item_master
+      - item_name
+      - quantity_ordered
+      - total_cost
+      - unit_price
     PaginatedAnnouncementList:
       type: object
       required:
@@ -3145,6 +4200,30 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PriorityEnum:
+      enum:
+      - LOW
+      - NORMAL
+      - HIGH
+      - EMERGENCY
+      type: string
+      description: |-
+        * `LOW` - Low
+        * `NORMAL` - Normal
+        * `HIGH` - High
+        * `EMERGENCY` - Emergency
+    ProcurementMethodEnum:
+      enum:
+      - DIRECT
+      - QUOTATION
+      - TENDER
+      - GEM
+      type: string
+      description: |-
+        * `DIRECT` - Direct Procurement
+        * `QUOTATION` - Quotation / Committee
+        * `TENDER` - Open / Limited Tender
+        * `GEM` - Government e-Marketplace (GeM)
     ProfileDocument:
       type: object
       description: |-
@@ -3201,6 +4280,84 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    PurchaseOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        po_number:
+          type: string
+          readOnly: true
+        indent:
+          type: integer
+        vendor:
+          type: integer
+        vendor_name:
+          type: string
+          readOnly: true
+        procurement_method:
+          allOf:
+          - $ref: '#/components/schemas/ProcurementMethodEnum'
+          readOnly: true
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PurchaseOrderStatusEnum'
+          readOnly: true
+        delivery_due_date:
+          type: string
+          format: date
+          nullable: true
+        issued_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        issued_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/POLineItem'
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - indent
+      - issued_at
+      - issued_by_user_id
+      - lines
+      - po_number
+      - procurement_method
+      - status
+      - total_amount
+      - vendor
+      - vendor_name
+    PurchaseOrderStatusEnum:
+      enum:
+      - DRAFT
+      - ISSUED
+      - PARTIALLY_DELIVERED
+      - COMPLETED
+      - CANCELLED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `ISSUED` - Issued
+        * `PARTIALLY_DELIVERED` - Partially Delivered
+        * `COMPLETED` - Completed
+        * `CANCELLED` - Cancelled
     Recommendation:
       type: object
       description: |-
@@ -3691,6 +4848,44 @@ components:
       required:
       - available
       - season
+    StockIssue:
+      type: object
+      properties:
+        indent_id:
+          type: integer
+      required:
+      - indent_id
+    StockItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item_master:
+          type: integer
+        item_code:
+          type: string
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        quantity_on_hand:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        quantity_reserved:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        available_quantity:
+          type: integer
+          readOnly: true
+      required:
+      - available_quantity
+      - id
+      - item_code
+      - item_master
+      - item_name
     SubmitOfferLetter:
       type: object
       properties:
@@ -3769,6 +4964,22 @@ components:
       - application_id
       - redacted
       - results
+    UnitOfMeasureEnum:
+      enum:
+      - PIECE
+      - BOX
+      - KG
+      - METER
+      - PACKET
+      - SET
+      type: string
+      description: |-
+        * `PIECE` - Piece
+        * `BOX` - Box
+        * `KG` - Kilogram
+        * `METER` - Meter
+        * `PACKET` - Packet
+        * `SET` - Set
     UserRef:
       type: object
       properties:
@@ -3814,6 +5025,76 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    Vendor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        vendor_code:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        gstin:
+          type: string
+          maxLength: 15
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          maxLength: 32
+        address:
+          type: string
+        bank_account_number:
+          type: string
+          maxLength: 64
+        bank_ifsc:
+          type: string
+          maxLength: 32
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VendorStatusEnum'
+          readOnly: true
+        verified_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - gstin
+      - id
+      - name
+      - phone
+      - status
+      - vendor_code
+      - verified_at
+      - verified_by_user_id
+    VendorStatusEnum:
+      enum:
+      - PENDING_VERIFICATION
+      - VERIFIED
+      - BLACKLISTED
+      - SUSPENDED
+      type: string
+      description: |-
+        * `PENDING_VERIFICATION` - Pending Verification
+        * `VERIFIED` - Verified
+        * `BLACKLISTED` - Blacklisted
+        * `SUSPENDED` - Suspended
     WaiveIncident:
       type: object
       properties:
