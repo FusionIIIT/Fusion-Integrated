@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import io
 from decimal import Decimal
+from types import SimpleNamespace
 from typing import Any
 
 from django.db import transaction
@@ -14,10 +15,9 @@ from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedEr
 from fusion_auth.client import IamUnavailable, get_client
 from modules.iaa.domain import rules, workflow
 from modules.iaa.models import (
-    ActiveRoleSelection, Anomaly, ApprovalRule, ApprovalStep, AuditLog,
-    AuditObservation, DashboardNotification, DepartmentBudget, FinancialRecord,
-    FinanceQuery, FinancialYearPolicy, ObservationResponse, RoleAssignment,
-    SupportingDocument,
+    Anomaly, ApprovalRule, ApprovalStep, AuditLog, AuditObservation,
+    DashboardNotification, DepartmentBudget, FinancialRecord, FinanceQuery,
+    FinancialYearPolicy, ObservationResponse, SupportingDocument,
 )
 
 BASIC_ROLES = {"basic_user", "employee", "faculty", "staff", "department_representative"}
@@ -39,7 +39,18 @@ ROLE_ALIASES = {
 
 def normalize_role(value: Any) -> str:
     raw = str(value or "").strip()
-    return ROLE_ALIASES.get(raw.lower(), raw.lower().replace(" ", "_"))
+    lowered = raw.casefold().replace("_", " ").replace("-", " ")
+    if lowered in ROLE_ALIASES:
+        return ROLE_ALIASES[lowered]
+    # Actual IAM designations are department-specific (for example HOD (CSE)
+    # and Dean Academic); map them to the three distinct IAA authority classes.
+    if lowered == "hod" or lowered.startswith("hod ") or lowered.startswith("head of department"):
+        return "hod"
+    if lowered == "dean" or lowered.startswith("dean ") or lowered.startswith("dean ("):
+        return "dean"
+    if lowered == "director" or lowered.startswith("director "):
+        return "director"
+    return lowered.replace(" ", "_")
 
 
 def actor_role(actor) -> str:
@@ -57,11 +68,6 @@ def actor_role(actor) -> str:
     if roles and selected not in roles:
         raise PermissionDeniedError("The active IAM role is not assigned to this account.",
                                     code="invalid_active_role")
-    mirror = ActiveRoleSelection.objects.filter(user_id=actor.user_id).first()
-    if mirror and selected and normalize_role(mirror.role) != selected:
-        raise ConflictError(
-            "The active role changed in IAM. Refresh the Fusion session before continuing.",
-            code="active_role_refresh_required")
     if not selected:
         raise PermissionDeniedError("An active IAA role is required.",
                                     code="active_role_required")
@@ -108,10 +114,13 @@ def _notify_user(user_id: int | None, event_type: str, title: str, message: str,
 
 def _notify_roles(roles: set[str], event_type: str, title: str, message: str,
                   resource_type: str = "", resource_id: int | None = None) -> None:
-    ids = (RoleAssignment.objects.filter(is_active=True)
-           .filter(role__in=roles).values_list("user_id", flat=True).distinct())
-    for user_id in ids:
-        _notify_user(user_id, event_type, title, message, resource_type, resource_id)
+    """Publish to role inboxes; IAM remains the only source of role membership."""
+    for role in sorted({normalize_role(value) for value in roles}):
+        DashboardNotification.objects.create(
+            recipient_user_id=None, recipient_role=role, event_type=event_type,
+            title=title, message=message, resource_type=resource_type,
+            resource_id=resource_id,
+        )
 
 
 def _financial_year(today=None) -> str:
@@ -135,7 +144,11 @@ def visible_records(actor):
     if role in FINANCE_ROLES or role in AUDIT_ROLES:
         return qs
     if role in AUTHORITY_ROLES:
+        # Do not expose records for future queued levels. A role can see steps
+        # that are currently assigned or that it has actually decided/escalated.
         ids = ApprovalStep.objects.filter(
+            status__in=("pending", "approved", "rejected", "escalated"),
+        ).filter(
             Q(assigned_user_id=actor.user_id) | Q(authority_role__iexact=role),
         ).values_list("record_id", flat=True)
         return qs.filter(pk__in=ids).distinct()
@@ -203,10 +216,16 @@ def attach_document(actor, record_id: int, payload: dict) -> SupportingDocument:
     ref = str(payload.get("storage_reference", "")).strip()
     name = str(payload.get("name", "")).strip()
     if not ref or not name:
-        raise ConflictError("Document name and storage reference are required.")
+        raise ConflictError("Document name and Google Drive share link are required.")
+    from core.files import drive
+
+    try:
+        canonical_ref = drive.parse(ref)
+    except drive.InvalidDriveLink as exc:
+        raise ConflictError(exc.message, code=exc.code) from exc
     doc = SupportingDocument.objects.create(
         record=row, uploaded_by_id=actor.user_id, name=name,
-        storage_reference=ref, content_type=str(payload.get("content_type", "")),
+        storage_reference=canonical_ref.url, content_type=str(payload.get("content_type", "")),
         size_bytes=payload.get("size_bytes"),
     )
     _log(actor, "document.attached", "financial_record", row.pk, details={"document_id": doc.pk})
@@ -347,11 +366,15 @@ def _approval_levels(record: FinancialRecord) -> list[dict]:
                 "The configured approval route has no approval levels. Configure at least one eligible authority.",
                 code="approval_route_empty")
         return []
-    for level in levels:
+    for index, level in enumerate(levels):
         if normalize_role(level.get("role")) not in AUTHORITY_ROLES:
             raise ConflictError("Approval route contains an unsupported authority role.")
-        if level.get("timeout_hours") not in (None, "") and int(level["timeout_hours"]) <= 0:
-            raise ConflictError("Approval timeout must be a positive configured duration.")
+        if level.get("timeout_hours") not in (None, ""):
+            if int(level["timeout_hours"]) <= 0:
+                raise ConflictError("Approval timeout must be a positive configured duration.")
+            if index == len(levels) - 1:
+                raise ConflictError(
+                    "A timed approval level must have a subsequent configured authority for escalation.")
     return levels
 
 
@@ -416,7 +439,7 @@ def finance_validate(actor, record_id: int, *, policy_passed: bool = True,
 
     budget = DepartmentBudget.objects.select_for_update().filter(
         department=row.department, financial_year=row.financial_year, is_active=True).first()
-    require_budget = bool((policy.settings if policy else {}).get("budget_required", False))
+    require_budget = bool((policy.settings if policy else {}).get("budget_required", True))
     if budget:
         shortfall = rules.budget_shortfall(
             amount=row.amount, allocated=budget.allocated,
@@ -492,8 +515,39 @@ def decide_approval(actor, step_id: int, *, decision: str, remarks: str) -> Appr
     if step.assigned_user_id and step.assigned_user_id != actor.user_id:
         raise PermissionDeniedError("This approval is assigned to another authority.")
     if not rules.may_approve(creator_id=row.created_by_id, actor_id=actor.user_id):
-        raise PermissionDeniedError("A creator/claimant cannot approve their own request.",
-                                    code="segregation_of_duties")
+        # Skip this ineligible authority and move to the next configured level.
+        # Do not mutate anything unless an eligible successor exists.
+        actor_roles = {normalize_role(value) for value in getattr(actor, "roles", ())}
+        candidates = list(ApprovalStep.objects.select_for_update().filter(
+            record=row, step_number__gt=step.step_number, status="queued"
+        ).exclude(assigned_user_id=row.created_by_id).order_by("step_number"))
+        next_step = next((candidate for candidate in candidates
+                          if normalize_role(candidate.authority_role) not in actor_roles), None)
+        if next_step is None:
+            raise PermissionDeniedError(
+                "A creator/claimant cannot approve the same request, and no later eligible configured authority is available.",
+                code="segregation_of_duties")
+        before = row.status
+        step.status = "escalated"
+        step.save(update_fields=["status", "updated_at"])
+        next_step.status = "pending"
+        next_step.due_at = (timezone.now() + timezone.timedelta(hours=next_step.timeout_hours)
+                            if next_step.timeout_hours else None)
+        next_step.save(update_fields=["status", "due_at", "updated_at"])
+        row.current_approval_step = next_step.step_number
+        row.status = workflow.APPROVAL_PENDING
+        row.save(update_fields=["status", "current_approval_step", "updated_at"])
+        _log(actor, "approval.self_approval_routed", "financial_record", row.pk,
+             before, row.status, {"skipped_step_id": step.pk, "next_step_id": next_step.pk}, role)
+        if next_step.assigned_user_id:
+            _notify_user(next_step.assigned_user_id, "approval_routed",
+                         "IAA approval reassigned", f"Request #{row.pk} awaits your decision.",
+                         "financial_record", row.pk)
+        else:
+            _notify_roles({normalize_role(next_step.authority_role)}, "approval_routed",
+                          "IAA approval reassigned", f"Request #{row.pk} awaits your decision.",
+                          "financial_record", row.pk)
+        return step
     if not remarks.strip():
         raise ConflictError("Approval or rejection remarks are mandatory.",
                             code="approval_remarks_required")
@@ -523,7 +577,8 @@ def decide_approval(actor, step_id: int, *, decision: str, remarks: str) -> Appr
         else:
             row.status = workflow.APPROVED
     row.save(update_fields=["status", "current_approval_step", "updated_at"])
-    _log(actor, f"approval.{decision}d", "financial_record", row.pk, before, row.status,
+    action_name = "approval.approved" if decision == "approve" else "approval.rejected"
+    _log(actor, action_name, "financial_record", row.pk, before, row.status,
          {"approval_step_id": step.pk, "remarks": step.remarks}, role)
     _notify_user(row.created_by_id, f"approval_{decision}", "IAA approval decision",
                  f"Request #{row.pk} was {decision}d.", "financial_record", row.pk)
@@ -699,20 +754,19 @@ def verify_observation(actor, observation_id: int, *, satisfactory: bool,
 
 
 @transaction.atomic
-def switch_active_role(actor, role_name: str, auth_token: str | None) -> ActiveRoleSelection:
+def switch_active_role(actor, role_name: str, auth_token: str | None):
+    """Switch the session role in Fusion IAM; never mirror role membership locally."""
     if actor is None:
         raise PermissionDeniedError("Authentication required.", code="not_authenticated")
     chosen = normalize_role(role_name)
-    assigned = {normalize_role(r) for r in getattr(actor, "roles", ())}
+    assigned = {normalize_role(value) for value in getattr(actor, "roles", ())}
     if chosen not in assigned:
         raise PermissionDeniedError("You cannot activate a role that is not assigned by IAM.")
     if not auth_token:
         raise ConflictError("A session token is required to change the active IAM role.")
-    iam_role = next(
-        (str(role) for role in getattr(actor, "roles", ())
-         if normalize_role(role) == chosen),
-        role_name,
-    )
+    iam_role = next((str(value) for value in getattr(actor, "roles", ())
+                     if normalize_role(value) == chosen), role_name)
+    before = normalize_role(getattr(actor, "active_role", ""))
     try:
         get_client().set_active_role(auth_token, iam_role)
     except IamUnavailable as exc:
@@ -720,24 +774,10 @@ def switch_active_role(actor, role_name: str, auth_token: str | None) -> ActiveR
                             code="iam_role_switch_unavailable") from exc
     except ValueError as exc:
         raise ConflictError(str(exc), code="invalid_active_role") from exc
-    selection, _ = ActiveRoleSelection.objects.update_or_create(
-        user_id=actor.user_id, defaults={"role": chosen})
     _log(actor, "role.active_role_switched", "active_role", actor.user_id,
-         normalize_role(getattr(actor, "active_role", "")), chosen,
-         {"selected_role": chosen, "identity_provider": "Fusion IAM"}, chosen)
-    return selection
-
-
-@transaction.atomic
-def assign_role(actor, *, user_id: int, role_name: str, active: bool = True) -> RoleAssignment:
-    role = require(actor, "iaa.configuration.manage", roles=ADMIN_ROLES, operational=False)
-    assignment, _ = RoleAssignment.objects.update_or_create(
-        user_id=user_id, role=normalize_role(role_name),
-        defaults={"assigned_by_id": actor.user_id, "is_active": active},
-    )
-    _log(actor, "configuration.role_assignment", "role_assignment", assignment.pk,
-         details={"user_id": user_id, "role": assignment.role, "active": active}, role=role)
-    return assignment
+         before, chosen, {"selected_role": chosen, "identity_provider": "Fusion IAM"}, chosen)
+    # IAM invalidates its session cache; the client must refresh its session.
+    return SimpleNamespace(role=chosen)
 
 
 @transaction.atomic
@@ -816,12 +856,24 @@ def escalate_overdue_approvals(now=None) -> int:
         step.record.save(update_fields=["status", "current_approval_step", "updated_at"])
         _log(None, "approval.timeout_escalated", "financial_record", step.record_id,
              before, step.record.status, {"from_role": step.authority_role,
-                                          "to_role": next_step.authority_role if next_step else None},
+                                          "to_role": next_step.authority_role if next_step else None,
+                                          "route_exhausted": next_step is None},
              "system")
         if next_step:
-            _notify_roles({normalize_role(next_step.authority_role)}, "approval_escalated",
-                          "Overdue IAA approval escalated",
-                          f"Request #{step.record_id} was escalated to your role.",
+            if next_step.assigned_user_id:
+                _notify_user(next_step.assigned_user_id, "approval_escalated",
+                             "Overdue IAA approval escalated",
+                             f"Request #{step.record_id} was assigned to you.",
+                             "financial_record", step.record_id)
+            else:
+                _notify_roles({normalize_role(next_step.authority_role)}, "approval_escalated",
+                              "Overdue IAA approval escalated",
+                              f"Request #{step.record_id} was escalated to your role.",
+                              "financial_record", step.record_id)
+        else:
+            _notify_roles(FINANCE_ROLES, "approval_route_exhausted",
+                          "IAA approval route needs configuration",
+                          f"Request #{step.record_id} timed out with no further eligible configured authority.",
                           "financial_record", step.record_id)
         _notify_user(step.record.created_by_id, "approval_escalated", "IAA approval escalated",
                      f"Request #{step.record_id} was escalated to the next authority.",
@@ -865,7 +917,8 @@ def report_summary(actor) -> dict:
     decision_qs = ApprovalStep.objects.all()
     if role in AUTHORITY_ROLES:
         scoped_ids = ApprovalStep.objects.filter(
-            Q(authority_role=role) | Q(assigned_user_id=actor.user_id)
+            status__in=("pending", "approved", "rejected", "escalated"),
+        ).filter(Q(authority_role=role) | Q(assigned_user_id=actor.user_id)
         ).values_list("record_id", flat=True)
         qs = qs.filter(pk__in=scoped_ids).distinct()
         decision_qs = decision_qs.filter(
