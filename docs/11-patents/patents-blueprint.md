@@ -22,6 +22,9 @@
 | **B2** | Corrected cost escalation citation in §3.8 Open Item 4 to `BR-PMS-051` (replacing `BR-PMS-050`, which specifies administrative cost inclusion). | `BR-PMS-051` |
 | **B3.1** | Added explicit architectural note in §3.3 clarifying that `BW-PMS-08..10` (budgets) and `BW-PMS-12..13` (office actions) represent subordinate entity lifecycles tracked in `PatentBudgetLedger` and `OfficeActionRecord`, not in `PatentApplication.status`. | `BW-PMS-08..10`, `BW-PMS-12..13`, `CW-PMS-02`, `CW-PMS-03` |
 | **B3.2** | Added revision/resubmission path from `REJECTED` in §3.3 state machine table, validating that `REJECTED` applications may be revised within 60 days to transition to `RESUBMITTED` or expire to `EXPIRED`. | `BR-PMS-034`, `BR-PMS-035`, `BR-PMS-036`, `BR-PMS-038`, `UC-PMS-005` |
+| **S2.1** | Removed citations to non-existent rules `BR-PMS-062`, `063`, `064`, `071`, `072`. Corrected post-grant maintenance citations to `BR-PMS-059`, `060`, `061`, `100` in §3.3 and §3.5. Added external patent office boundary rules `BR-PMS-138` and `BR-PMS-142` to filing and office-action endpoints in §3.5. | `BR-PMS-059..061`, `BR-PMS-100`, `BR-PMS-138`, `BR-PMS-142` |
+| **S2.2** | Aligned `modify_decision` transition resulting state from `APPEAL_SUBMITTED` to `DECISION_MODIFIED` (instead of `APPROVED`), directly mirroring authoritative transition row 3 without inventing downstream assumptions. | `BW-PMS-05` (row 3), `UC-PMS-023` |
+| **S2.3** | Re-confirmed and highlighted subordinate lifecycle tracking in `PatentBudgetLedger` / `OfficeActionRecord` and `REJECTED` resubmission eligibility under `BR-PMS-034`. | `BW-PMS-08..10`, `BW-PMS-12..13`, `BR-PMS-034`, `UC-PMS-005` |
 
 ---
 
@@ -330,7 +333,7 @@ All lifecycle progression is mediated by a single transactional choke-point in `
 | `REJECTED` | `file_appeal` | `Applicant` | `APPEAL_SUBMITTED` | Appeal filed within allowed period with grounds/justification (`BR-PMS-092`, `093`, `094`, `UC-PMS-022`) |
 | `APPEAL_SUBMITTED`| `remand_appeal` | `Director` | `REMANDED` | Remanded for amendment (`BR-PMS-095`, `BW-PMS-03`) |
 | `APPEAL_SUBMITTED`| `uphold_rejection` | `Director` | `REJECTION_UPHELD`| Rejection confirmed (`BR-PMS-095`, `BW-PMS-04`) |
-| `APPEAL_SUBMITTED`| `modify_decision` | `Director` | `APPROVED` | Decision modified to approval (`BR-PMS-095`, `BW-PMS-05`) |
+| `APPEAL_SUBMITTED`| `modify_decision` | `Director` | `DECISION_MODIFIED`| Appeal outcome = Modify Decision; recorded per `BW-PMS-05` row 3 without downstream extrapolation (`BR-PMS-095`, `BW-PMS-05`) |
 | `REMANDED` | `resubmit` | `Applicant` | `RESUBMITTED` | Resubmission within amendment timeframe (`BW-PMS-03`) |
 | `APPROVED` | `assign_attorney` | `PCC_ADMIN` | `ASSIGNMENT_OFFERED` | Attorney on approved panel, expertise matched, no COI, sequential gate (`BR-PMS-040..045`, `BR-PMS-127`) |
 | `ASSIGNMENT_OFFERED` | `accept_assignment`| `Attorney` | `ATTORNEY_ASSIGNED` | Attorney accepts assignment (`UC-PMS-011`, `PMS-AFR-080`, `BW-PMS-06` row 2) |
@@ -339,9 +342,9 @@ All lifecycle progression is mediated by a single transactional choke-point in `
 | `ATTORNEY_ASSIGNED` | `start_assessment` | `Attorney` | `ASSESSMENT_IN_PROGRESS` | Patentability evaluation initiated (`UC-PMS-012`; opinion recommendations governed by `BR-PMS-046`) |
 | `ASSESSMENT_IN_PROGRESS`| `record_filing` | `Attorney` | `FILED` | Inventor agreements completed (`BR-PMS-020`, `078`), budget recorded (`BR-PMS-128`), format valid (`BR-PMS-055`, `056`) |
 | `FILED` | `record_grant` | `Attorney` / `PCC_ADMIN` | `GRANTED` | Official patent grant details recorded (`BR-PMS-059`) |
-| `GRANTED` | `schedule_renewal` | `SYSTEM` (Beat) | `MAINTENANCE_PENDING` | Maintenance fee deadline tracking active (`BR-PMS-059..062`) |
-| `MAINTENANCE_PENDING` | `approve_renewal` | `Director` | `RENEWED` | Renewal approved; next cycle scheduled (`BR-PMS-063`, `064`, `073..075`) |
-| `MAINTENANCE_PENDING` | `decline_renewal` | `Director` | `LAPSED` | Do Not Renew decision recorded (`BR-PMS-063`, `076`) |
+| `GRANTED` | `schedule_renewal` | `SYSTEM` (Beat) | `MAINTENANCE_PENDING` | Maintenance fee deadline tracking active (`BR-PMS-059`, `060`, `061`, `100`) |
+| `MAINTENANCE_PENDING` | `approve_renewal` | `Director` | `RENEWED` | Renewal approved; next cycle scheduled (`BR-PMS-059`, `060`, `061`, `100`, `BW-PMS-14`) |
+| `MAINTENANCE_PENDING` | `decline_renewal` | `Director` | `LAPSED` | Do Not Renew decision recorded (`BR-PMS-059`, `061`, `100`, `BW-PMS-15`) |
 | `DRAFT` | `withdraw` | `Applicant` | `WITHDRAWN` | Pre-filing withdrawal with reason (`BR-PMS-067`, `068`, `069`, `070`, `BW-PMS-16`) |
 | `SUBMITTED` | `withdraw` | `Applicant` | `WITHDRAWN` | Permitted if `SUBMITTED` is in configured withdrawal-eligible states (`BR-PMS-067`, `068`, `069`, `070`) |
 | `UNDER_REVIEW` | `withdraw` | `Applicant` | `WITHDRAWN` | Permitted if `UNDER_REVIEW` is in configured withdrawal-eligible states (`BR-PMS-067`, `068`, `069`, `070`) |
@@ -351,7 +354,7 @@ All lifecycle progression is mediated by a single transactional choke-point in `
 | `PENDING_REVIEW` | `withdraw` | `Applicant` | `WITHDRAWN` | Permitted if `PENDING_REVIEW` is in configured withdrawal-eligible states (`BR-PMS-067`, `068`, `069`, `070`) |
 | `ASSESSMENT_IN_PROGRESS`| `withdraw` | `Applicant` | `WITHDRAWN` | Permitted if `ASSESSMENT_IN_PROGRESS` is in configured withdrawal-eligible states (`BR-PMS-067`, `068`, `069`, `070`) |
 
-*Terminal states:* `WITHDRAWN`, `EXPIRED`, `REJECTION_UPHELD`, `LAPSED`.
+*Terminal states:* `WITHDRAWN`, `EXPIRED`, `REJECTION_UPHELD`, `DECISION_MODIFIED`, `LAPSED`.
 
 ---
 
@@ -603,11 +606,11 @@ All endpoints live under `/api/v1/patents/` and sit behind two gates:
 | `POST` | `applications/{id}/respond-assignment/`| `patents.attorney.respond_assignment` | Attorney accepts or declines assignment | `ApplicationDetailDTO` | `UC-PMS-011`, `PMS-AFR-080..081` |
 | `POST` | `applications/{id}/assessment/` | `patents.assessment.perform` | Records patentability opinion | `AssessmentOpinionDTO` | `UC-PMS-012`, `BR-PMS-046` |
 | `POST` | `applications/{id}/budget-decision/`| `patents.budget.approve` | Director approves/rejects budget; checks threshold | `BudgetLedgerEntryDTO` | `BR-PMS-048..053`, `128` |
-| `POST` | `applications/{id}/filing/` | `patents.filing.record` | Records external filing confirmation | `ApplicationDetailDTO` | `BR-PMS-020`, `055`, `056`, `078`, `128` |
-| `POST` | `applications/{id}/office-actions/`| `patents.office_action.record` | Logs official office action received | `OfficeActionDTO` | `BR-PMS-065`, `066` |
-| `POST` | `office-actions/{id}/response/`| `patents.office_action.respond` | Submits draft response to office action | `OfficeActionDTO` | `BR-PMS-065`, `146` |
+| `POST` | `applications/{id}/filing/` | `patents.filing.record` | Records external filing confirmation | `ApplicationDetailDTO` | `BR-PMS-020`, `055`, `056`, `078`, `128`, `138`, `142` |
+| `POST` | `applications/{id}/office-actions/`| `patents.office_action.record` | Logs official office action received | `OfficeActionDTO` | `BR-PMS-065`, `066`, `138` |
+| `POST` | `office-actions/{id}/response/`| `patents.office_action.respond` | Submits draft response to office action | `OfficeActionDTO` | `BR-PMS-065`, `138`, `142`, `146` |
 | `POST` | `office-actions/{id}/approve/` | `patents.office_action.approve` | Applicant approves response (when required) | `OfficeActionDTO` | `BR-PMS-146` |
-| `POST` | `applications/{id}/renewal-decision/`| `patents.maintenance.decide` | Director approves/declines post-grant renewal | `MaintenanceRecordDTO`| `BR-PMS-059..064` |
+| `POST` | `applications/{id}/renewal-decision/`| `patents.maintenance.decide` | Director approves/declines post-grant renewal | `MaintenanceRecordDTO`| `BR-PMS-059`, `060`, `061`, `100` |
 | `GET` | `attorney-panel/` | `patents.panel.manage` | List attorney panel members & workloads | `List[AttorneyPanelDTO]` | `BR-PMS-041`, `042`, `043` |
 | `POST` | `prior-art/search/` | `patents.prior_art.search` | Queries patent/literature references | `PriorArtResultDTO` | `UC-PMS-004`, `UC-PMS-012`, `BR-PMS-141` |
 | `POST` | `tech-transfer/` | `patents.tech_transfer.create` | Submits licensing/tech-transfer request | `TechTransferDTO` | `BR-PMS-088`, `091`, `UC-PMS-020` |
@@ -701,3 +704,4 @@ TASK_ROUTES = {
 4. **Daily Deadline Sweep Cadence:** A daily scheduled Celery beat task (`pms_sweep_deadlines` at 00:30 UTC) is chosen as a design choice to evaluate expirations and dispatch deadline alerts.
 5. **Lightweight Technology Transfer:** Implemented strictly as records and status trackers for licensing requests and agreements without payment or royalty pipelines.
 6. **Configurable Withdrawal Eligible Statuses:** In accordance with `BR-PMS-068` and `ISS-PMS-020`, pre-filing statuses eligible for withdrawal are maintained as a configurable list in `PatentPolicy` rather than hard-coded.
+7. **Strict Alignment to `DECISION_MODIFIED` on Appeal Modification:** `BW-PMS-05` (row 3) specifies `Resulting State: Decision Modified` with note *"No downstream state beyond the recorded appeal outcome is invented where the PS is silent"*. Rather than extrapolating `DECISION_MODIFIED` to `APPROVED`, the state machine directly records `DECISION_MODIFIED` as the resulting terminal appeal state.
