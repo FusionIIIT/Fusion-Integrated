@@ -1,0 +1,110 @@
+[
+  {
+    "test_id": "BR-TC-01",
+    "source_id": "BR-01 condition-true",
+    "purpose": "pf_number must be unique: creating a second profile with the same pf_number is rejected",
+    "preconditions": "An EmployeeProfile with pf_number='PF001' already exists",
+    "action_or_input": "Create another EmployeeProfile with pf_number='PF001' for a different user",
+    "expected_result": "IntegrityError is raised; second profile is not persisted",
+    "test_type": "model/domain"
+  },
+  {
+    "test_id": "BR-TC-02",
+    "source_id": "BR-01 condition-false",
+    "purpose": "Profile with a unique pf_number is accepted",
+    "preconditions": "No existing profile has pf_number='PF999'",
+    "action_or_input": "Create an EmployeeProfile with pf_number='PF999'",
+    "expected_result": "Profile is created successfully without error",
+    "test_type": "model/domain"
+  },
+  {
+    "test_id": "BR-TC-03",
+    "source_id": "BR-02 condition-true",
+    "purpose": "Work experience end_date earlier than start_date is rejected",
+    "preconditions": "Employee profile exists; user is authenticated",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with start_date='2024-06-01' and end_date='2023-01-01'",
+    "expected_result": "HTTP 400 with error message on end_date: 'End date cannot be earlier than start date.'",
+    "test_type": "API"
+  },
+  {
+    "test_id": "BR-TC-04",
+    "source_id": "BR-02 condition-false",
+    "purpose": "Work experience end_date equal to start_date is accepted",
+    "preconditions": "Employee profile exists; user is authenticated",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with start_date='2023-01-01' and end_date='2023-01-01'",
+    "expected_result": "HTTP 201 Created",
+    "test_type": "API"
+  },
+  {
+    "test_id": "BR-TC-05",
+    "source_id": "BR-03",
+    "purpose": "Work experience with null end_date (ongoing role) is allowed",
+    "preconditions": "Employee profile exists; user is authenticated",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ without end_date",
+    "expected_result": "HTTP 201 Created with end_date=null",
+    "test_type": "API"
+  },
+  {
+    "test_id": "BR-TC-06",
+    "source_id": "BR-04 condition-true",
+    "purpose": "Non-staff employee can only view their own profile (data isolation)",
+    "preconditions": "Two EmployeeProfiles exist for two different non-staff users",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/ authenticated as one of the non-staff employees",
+    "expected_result": "HTTP 200 returning only the authenticated employee's own profile; no other profile included",
+    "test_type": "API"
+  },
+  {
+    "test_id": "BR-TC-07",
+    "source_id": "BR-04 condition-false",
+    "purpose": "Staff user can view all employee profiles",
+    "preconditions": "Multiple EmployeeProfiles exist; staff user is authenticated",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/ as staff user",
+    "expected_result": "HTTP 200 returning all profiles",
+    "test_type": "API"
+  },
+  {
+    "test_id": "BR-TC-08",
+    "source_id": "BR-05",
+    "purpose": "Work experiences are scoped to the authenticated employee only",
+    "preconditions": "Two employees each have different WorkExperience entries",
+    "action_or_input": "GET /api/v1/hr-eis/experiences/ as employee A",
+    "expected_result": "HTTP 200 returning only employee A's work experiences; employee B's not visible",
+    "test_type": "API"
+  },
+  {
+    "test_id": "BR-TC-09",
+    "source_id": "BR-06",
+    "purpose": "Authentication is required for all API endpoints",
+    "preconditions": "No authentication token provided",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/ and GET /api/v1/hr-eis/experiences/ without auth",
+    "expected_result": "HTTP 401 for both endpoints",
+    "test_type": "API"
+  },
+  {
+    "test_id": "BR-TC-10",
+    "source_id": "BR-07",
+    "purpose": "Work experience automatically linked to authenticated employee's profile on create",
+    "preconditions": "Employee profile exists; user is authenticated",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with valid data (no employee field in payload)",
+    "expected_result": "HTTP 201; experience is linked to the authenticated user's EmployeeProfile in the database",
+    "test_type": "API"
+  },
+  {
+    "test_id": "BR-TC-11",
+    "source_id": "BR-08",
+    "purpose": "designation must be one of the allowed choices",
+    "preconditions": "User exists",
+    "action_or_input": "Create an EmployeeProfile with designation='DIRECTOR' (not in allowed choices)",
+    "expected_result": "Validation error raised; profile not persisted",
+    "test_type": "model/domain"
+  },
+  {
+    "test_id": "BR-TC-12",
+    "source_id": "BR-09",
+    "purpose": "department must be one of the allowed choices",
+    "preconditions": "User exists",
+    "action_or_input": "Create an EmployeeProfile with department='PHYSICS' (not in allowed choices)",
+    "expected_result": "Validation error raised; profile not persisted",
+    "test_type": "model/domain"
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "test_id": "WF-TC-01",
+    "source_id": "WF-01 profile-view-authenticated",
+    "purpose": "Authenticated employee successfully enters the view-profile workflow and receives their profile",
+    "preconditions": "Employee authenticated; EmployeeProfile exists",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/me/",
+    "expected_result": "HTTP 200 with profile data; workflow completes at 'profile returned' state",
+    "test_type": "API"
+  },
+  {
+    "test_id": "WF-TC-02",
+    "source_id": "WF-01 profile-view-unauthenticated",
+    "purpose": "Unauthenticated request is blocked at authentication gate in view-profile workflow",
+    "preconditions": "No authentication provided",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/me/ without auth",
+    "expected_result": "HTTP 401; workflow terminates at authentication check",
+    "test_type": "API"
+  },
+  {
+    "test_id": "WF-TC-03",
+    "source_id": "WF-01 profile-not-found",
+    "purpose": "Authenticated employee has no profile; workflow returns not-found state",
+    "preconditions": "User authenticated but no EmployeeProfile exists",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/me/",
+    "expected_result": "HTTP 404; workflow reaches 'profile not found' terminal state",
+    "test_type": "API"
+  },
+  {
+    "test_id": "WF-TC-04",
+    "source_id": "WF-02 add-experience-valid",
+    "purpose": "Employee traverses the add-work-experience workflow with valid data to completion",
+    "preconditions": "Employee authenticated; profile exists",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with valid data",
+    "expected_result": "HTTP 201; workflow reaches 'experience saved' terminal state",
+    "test_type": "API"
+  },
+  {
+    "test_id": "WF-TC-05",
+    "source_id": "WF-02 add-experience-validation-fail",
+    "purpose": "Employee submits invalid date range; workflow transitions to validation-error state",
+    "preconditions": "Employee authenticated; profile exists",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with end_date < start_date",
+    "expected_result": "HTTP 400; workflow halts at validation step, no record created",
+    "test_type": "API"
+  },
+  {
+    "test_id": "WF-TC-06",
+    "source_id": "WF-02 add-experience-unauthenticated",
+    "purpose": "Unauthenticated add-experience request blocked at auth gate",
+    "preconditions": "No authentication provided",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ without auth",
+    "expected_result": "HTTP 401; workflow terminates at authentication check",
+    "test_type": "API"
+  },
+  {
+    "test_id": "WF-TC-07",
+    "source_id": "WF-03 list-profiles-staff",
+    "purpose": "Staff user traverses list-all-profiles workflow and sees all records",
+    "preconditions": "Staff user authenticated; multiple profiles exist",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/ as staff user",
+    "expected_result": "HTTP 200 with all profiles; workflow completes at 'all profiles returned'",
+    "test_type": "API"
+  },
+  {
+    "test_id": "WF-TC-08",
+    "source_id": "WF-03 list-profiles-non-staff",
+    "purpose": "Non-staff employee traverses list-profiles workflow and sees only own profile",
+    "preconditions": "Non-staff user authenticated; multiple profiles exist",
+    "action_or_input": "GET /api/v1/hr-eis/profiles/ as non-staff employee",
+    "expected_result": "HTTP 200 with only own profile; workflow reaches 'filtered profile returned'",
+    "test_type": "API"
+  },
+  {
+    "test_id": "WF-TC-09",
+    "source_id": "WF-04 delete-experience-valid",
+    "purpose": "Employee deletes an existing work experience; workflow completes successfully",
+    "preconditions": "Employee authenticated; a WorkExperience exists for this employee",
+    "action_or_input": "DELETE /api/v1/hr-eis/experiences/<id>/",
+    "expected_result": "HTTP 204; record is gone from subsequent GET",
+    "test_type": "API"
+  },
+  {
+    "test_id": "WF-TC-10",
+    "source_id": "WF-05 auto-link-experience-on-create",
+    "purpose": "On create-experience workflow, system auto-links experience to the authenticated user's profile",
+    "preconditions": "Employee authenticated; profile exists",
+    "action_or_input": "POST /api/v1/hr-eis/experiences/ with valid payload (no employee field)",
+    "expected_result": "HTTP 201; WorkExperience.employee == authenticated user's EmployeeProfile in DB",
+    "test_type": "integration"
+  }
+]
