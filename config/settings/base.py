@@ -4,6 +4,7 @@ Every value comes from the environment. This service holds NO user table:
 identity, RBAC and directory data all come from Fusion_System_Administrator
 over HTTP — see fusion_auth/.
 """
+import json
 import os
 from pathlib import Path
 
@@ -51,6 +52,13 @@ def env_int(name, default=None):
         return default
 
 
+def env_json(name, default=None):
+    raw = env(name)
+    if raw is None:
+        return default
+    return json.loads(raw)
+
+
 def env_list(name, default=None):
     raw = env(name)
     if raw is None:
@@ -90,7 +98,53 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.badms",
 ]
+
+BADMS_STORAGE_PRIVATE = env_bool("BADMS_STORAGE_PRIVATE")
+BADMS_STORAGE_AES256 = env_bool("BADMS_STORAGE_AES256")
+BADMS_STORAGE_TLS = env_bool("BADMS_STORAGE_TLS")
+BADMS_STORAGE_BACKEND = env("BADMS_STORAGE_BACKEND", "local").lower()
+BADMS_S3_BUCKET = env("BADMS_S3_BUCKET", "")
+BADMS_S3_REGION = env("BADMS_S3_REGION", "")
+BADMS_S3_KMS_KEY_ID = env("BADMS_S3_KMS_KEY_ID", "")
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "badms": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+if BADMS_STORAGE_BACKEND not in {"local", "s3"}:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("BADMS_STORAGE_BACKEND must be local or s3.")
+if BADMS_STORAGE_BACKEND == "s3":
+    if not all((BADMS_S3_BUCKET, BADMS_S3_REGION, BADMS_S3_KMS_KEY_ID)):
+        from django.core.exceptions import ImproperlyConfigured
+        raise ImproperlyConfigured(
+            "S3 BADMS storage requires bucket, region, and customer-managed KMS key.")
+    STORAGES["badms"] = {
+        "BACKEND": "modules.badms.services.s3_storage.AES256S3Storage",
+        "OPTIONS": {
+            "bucket_name": BADMS_S3_BUCKET,
+            "region_name": BADMS_S3_REGION,
+            "default_acl": None,
+            "file_overwrite": False,
+            "querystring_auth": True,
+            "object_parameters": {
+                "ServerSideEncryption": "aws:kms",
+                "SSEKMSKeyId": BADMS_S3_KMS_KEY_ID,
+            },
+            "use_ssl": True,
+            "verify": True,
+        },
+    }
+BADMS_RETENTION_DAYS = env_json("BADMS_RETENTION_DAYS", {})
+BADMS_USER_QUOTA_BYTES = env_int("BADMS_USER_QUOTA_BYTES")
+BADMS_AVAILABLE_STORAGE_BYTES = env_int("BADMS_AVAILABLE_STORAGE_BYTES")
+BADMS_SYSADMIN_ALERT_EMAILS = env_list("BADMS_SYSADMIN_ALERT_EMAILS")
+BADMS_DIRECTOR_ALERT_EMAIL = env("BADMS_DIRECTOR_ALERT_EMAIL", "")
+BADMS_HOD_EMAILS = env_json("BADMS_HOD_EMAILS", {})
+BADMS_SYSADMIN_EMAILS = env_list("BADMS_SYSADMIN_EMAILS")
+BADMS_IT_SECURITY_EMAILS = env_list("BADMS_IT_SECURITY_EMAILS")
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
                   + PLATFORM_MODULES + DOMAIN_MODULES)
@@ -230,6 +284,9 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Non-academic platform. Independent modules, one login.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "BADMSClassification": ["Critical", "Sensitive", "Routine", "Archival"],
+    },
 }
 
 CORS_ALLOW_ALL_ORIGINS = False

@@ -7,6 +7,35 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `badms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `badms.backup.run_manual` | Trigger a manual backup | `Super Admin`, `System Administrator (SysAdmin)` |
+| `badms.backup.view` | View authorized backup status and history | `Super Admin`, `System Administrator (SysAdmin)`, `faculty`, `staff`, `student` |
+| `badms.backup.execute_scheduled` | Execute scheduled backups | _service only_ |
+| `badms.notifications.deliver` | Deliver BADMS notifications | _service only_ |
+| `badms.storage.monitor` | Monitor storage thresholds | _service only_ |
+| `badms.retention.enforce` | Enforce configured retention policy | _service only_ |
+| `badms.schedule_local.manage` | Manage local backup schedules | `System Administrator (SysAdmin)` |
+| `badms.schedule_global.manage` | Manage global backup schedules and defaults | `Super Admin` |
+| `badms.archive.create` | Submit archival requests | `faculty`, `staff`, `student` |
+| `badms.archive.view_self` | View own archival requests | `faculty`, `staff`, `student` |
+| `badms.archive.review_department` | Review department archival requests | `Department Head (HoD)` |
+| `badms.archive.classify` | Assign authoritative archival classification | `System Administrator (SysAdmin)` |
+| `badms.archive.encrypt` | Configure Sensitive archive encryption | `IT Security Team` |
+| `badms.archive.special` | Perform special archival operations | `Super Admin` |
+| `badms.restore.create` | Request data restoration | `faculty`, `staff`, `student` |
+| `badms.restore.view_self` | View own restoration requests | `faculty`, `staff`, `student` |
+| `badms.restore.approve` | Approve Sensitive restoration | `System Administrator (SysAdmin)` |
+| `badms.restore.execute` | Execute approved restoration | `System Administrator (SysAdmin)` |
+| `badms.storage_extension.create` | Request storage extension | `faculty`, `staff`, `student` |
+| `badms.storage_extension.review_department` | Review department storage requests | `Department Head (HoD)` |
+| `badms.audit.view` | View authorized audit history | `System Administrator (SysAdmin)` |
+| `badms.security.audit` | Review security audit reports | `IT Security Team` |
+| `badms.security_policy.manage` | Manage BADMS security and retention policy | `IT Security Team` |
+| `badms.reports.department` | View department reports | `Department Head (HoD)` |
+
 ## `directory`
 
 | Code | What it allows | Held by |
