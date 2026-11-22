@@ -1,0 +1,425 @@
+[
+  {
+    "test_id": "TC-FR-001",
+    "source_id": "AFR-LMS-001.1: Open dedicated course workspace (CFR-LMS-001)",
+    "purpose": "Verify that the system opens a dedicated course workspace when an authorized user selects their course.",
+    "preconditions": "A user is enrolled in, assigned to, or linked to Course C101 and logged into the LMS.",
+    "action_or_input": "The user selects Course C101 from their course list.",
+    "expected_result": "The system opens the dedicated course workspace (course home page) for Course C101.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-002",
+    "source_id": "AFR-LMS-001.2: Display course home information (CFR-LMS-001)",
+    "purpose": "Verify that the course home page displays syllabus, schedule, instructor(s), and TA(s).",
+    "preconditions": "Course C101 workspace is configured with syllabus, schedule, assigned instructors, and assigned TAs; authorized user is logged in.",
+    "action_or_input": "The user opens the course home page for Course C101.",
+    "expected_result": "The course home page displays the course syllabus, schedule, instructor(s), and TA(s).",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-003",
+    "source_id": "AFR-LMS-001.3: Restrict course-specific access (CFR-LMS-001)",
+    "purpose": "Verify that access to a course workspace is restricted and denied to users not enrolled in, assigned to, or linked to the course.",
+    "preconditions": "User U2 is not enrolled in, assigned to, or linked to Course C101; user U2 is logged into the LMS.",
+    "action_or_input": "User U2 attempts to access the course workspace URL or page for Course C101.",
+    "expected_result": "The system denies access to Course C101 workspace and displays an authorization error or restricts access.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-FR-004",
+    "source_id": "AFR-LMS-002.1: Configure assigned course workspace (CFR-LMS-002)",
+    "purpose": "Verify that an assigned Faculty member can configure the course workspace settings for their course.",
+    "preconditions": "Faculty F1 is assigned to Course C101 and logged into the LMS.",
+    "action_or_input": "Faculty F1 accesses workspace configuration for Course C101, updates workspace settings, and saves.",
+    "expected_result": "The system accepts and applies the workspace configuration updates for Course C101.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-005",
+    "source_id": "AFR-LMS-002.2: Publish and edit course details (CFR-LMS-002)",
+    "purpose": "Verify that Faculty can edit and publish course details for an assigned course.",
+    "preconditions": "Faculty F1 is assigned to Course C101; course details exist in the workspace.",
+    "action_or_input": "Faculty F1 edits the course description and syllabus text, then clicks publish.",
+    "expected_result": "The system updates and publishes the edited course details, making them visible in the course workspace.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-006",
+    "source_id": "AFR-LMS-003.1: Upload supported material types (CFR-LMS-003)",
+    "purpose": "Verify that Faculty can add course materials as files, external links, and text notes.",
+    "preconditions": "Faculty F1 is assigned to Course C101 and logged in.",
+    "action_or_input": "Faculty F1 adds three material items to Course C101: a file upload (document.pdf), a web link (https://example.com/ref), and a text note ('Lecture Summary').",
+    "expected_result": "The system successfully creates and saves all three material items with their respective types (file, link, note).",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-007",
+    "source_id": "AFR-LMS-003.2: Organize materials (CFR-LMS-003)",
+    "purpose": "Verify that Faculty can organize course materials into modules or weekly sections.",
+    "preconditions": "Faculty F1 is assigned to Course C101; course materials exist in the workspace.",
+    "action_or_input": "Faculty F1 creates a section 'Week 1 - Introduction' and assigns material items to this section.",
+    "expected_result": "The system organizes the materials under the specified module/weekly section.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-008",
+    "source_id": "AFR-LMS-003.3: Schedule future material release (CFR-LMS-003)",
+    "purpose": "Verify that Faculty can configure a future release date and time for course material.",
+    "preconditions": "Faculty F1 is assigned to Course C101; material item M1 is being added or edited.",
+    "action_or_input": "Faculty F1 sets the release date/time for M1 to a future date (T_future) and saves.",
+    "expected_result": "The system stores the future release date/time and marks material M1 as scheduled for future release.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-009",
+    "source_id": "AFR-LMS-003.4: Release scheduled material (CFR-LMS-003)",
+    "purpose": "Verify that scheduled course material becomes published and available to authorized course users when the scheduled release time is reached.",
+    "preconditions": "Material M1 in Course C101 is scheduled with release time T_release; system time reaches T_release.",
+    "action_or_input": "System time advances to T_release, and an enrolled student accesses the materials section of Course C101.",
+    "expected_result": "Material M1 transitions to published/available state and is visible to the authorized course student.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-FR-010",
+    "source_id": "AFR-LMS-004.1: Student read-only material access (CFR-LMS-004)",
+    "purpose": "Verify that an enrolled Student can view published course materials in read-only form.",
+    "preconditions": "Student S1 is registered in Course C101; published materials exist in Course C101.",
+    "action_or_input": "Student S1 navigates to the Course C101 materials section.",
+    "expected_result": "The system displays published course materials to Student S1 in read-only form without edit or upload controls.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-011",
+    "source_id": "AFR-LMS-004.2: TA read-only material access (CFR-LMS-004)",
+    "purpose": "Verify that an assigned TA can view published course materials in read-only form.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101; published materials exist in Course C101.",
+    "action_or_input": "TA1 navigates to the Course C101 materials section.",
+    "expected_result": "The system displays published course materials to TA1 in read-only form without material authoring or modification controls.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-012",
+    "source_id": "AFR-LMS-004.3: Observer read-only material access (CFR-LMS-004)",
+    "purpose": "Verify that a linked Observer can view published course materials in read-only form.",
+    "preconditions": "Observer O1 is linked to Course C101; published materials exist in Course C101.",
+    "action_or_input": "Observer O1 navigates to the Course C101 materials section.",
+    "expected_result": "The system displays published course materials to Observer O1 in read-only form with no edit, upload, or modification capabilities.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-013",
+    "source_id": "AFR-LMS-005.1: Faculty posts announcement (CFR-LMS-005)",
+    "purpose": "Verify that Faculty can post a course-wide announcement for an assigned course.",
+    "preconditions": "Faculty F1 is assigned to Course C101 and logged into the LMS.",
+    "action_or_input": "Faculty F1 enters announcement title 'Exam Date Update' and body 'Midterm is on Friday', then submits.",
+    "expected_result": "The system creates and publishes the announcement for Course C101.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-014",
+    "source_id": "AFR-LMS-005.2: Permitted TA posts announcement (CFR-LMS-005)",
+    "purpose": "Verify that a TA can post course announcements only when permitted, and is restricted when permission is not granted.",
+    "preconditions": "TA1 is assigned to Course C101 without announcement posting permission; TA2 is assigned to Course C101 with announcement posting permission.",
+    "action_or_input": "TA1 attempts to post an announcement; TA2 submits an announcement in Course C101.",
+    "expected_result": "The system blocks TA1 from posting the announcement due to lack of permission, and allows TA2 to successfully post the announcement.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-FR-015",
+    "source_id": "AFR-LMS-005.3: Timestamp announcement (CFR-LMS-005)",
+    "purpose": "Verify that the system records a timestamp for each posted course announcement.",
+    "preconditions": "Faculty F1 is assigned to Course C101; system clock is synchronized.",
+    "action_or_input": "Faculty F1 posts an announcement 'Welcome to Class' at timestamp T_post.",
+    "expected_result": "The system saves and displays the announcement with an accurate creation timestamp equal to T_post.",
+    "test_type": "Validation"
+  },
+  {
+    "test_id": "TC-FR-016",
+    "source_id": "AFR-LMS-005.4: Make announcement course-wide (CFR-LMS-005)",
+    "purpose": "Verify that a posted announcement is visible to all users enrolled in or linked to the course (Students, TAs, Observers).",
+    "preconditions": "An announcement A1 is posted in Course C101; Student S1 is enrolled, TA1 is assigned, and Observer O1 is linked to Course C101.",
+    "action_or_input": "Student S1, TA1, and Observer O1 each view the announcements section of Course C101.",
+    "expected_result": "The system displays announcement A1 to Student S1, TA1, and Observer O1.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-017",
+    "source_id": "AFR-LMS-006.1: Create assignment (CFR-LMS-006)",
+    "purpose": "Verify that Faculty can create a new assignment for an assigned course.",
+    "preconditions": "Faculty F1 is assigned to Course C101 and logged into the LMS.",
+    "action_or_input": "Faculty F1 initiates and submits a new assignment creation form for Course C101.",
+    "expected_result": "The system creates a new assignment record in Course C101.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-018",
+    "source_id": "AFR-LMS-006.2: Capture assignment configuration (CFR-LMS-006)",
+    "purpose": "Verify that the system captures and validates due date, instructions, submission type, and points possible when configuring an assignment.",
+    "preconditions": "Faculty F1 is creating an assignment in assigned Course C101.",
+    "action_or_input": "Faculty F1 enters due date (2026-12-01 23:59), instructions ('Solve exercises 1-5'), submission type ('file'), and points possible (100), then saves.",
+    "expected_result": "The system successfully captures and stores all four configuration fields (due date, instructions, submission type, points possible).",
+    "test_type": "Validation"
+  },
+  {
+    "test_id": "TC-FR-019",
+    "source_id": "AFR-LMS-006.3: Edit assignment (CFR-LMS-006)",
+    "purpose": "Verify that Faculty can edit an existing assignment in an assigned course.",
+    "preconditions": "Assignment A1 exists in Course C101; Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 updates the instructions and due date of Assignment A1 and saves the changes.",
+    "expected_result": "The system updates the assignment record with the edited instructions and due date.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-020",
+    "source_id": "AFR-LMS-006.4: Maintain draft before publication (CFR-LMS-006)",
+    "purpose": "Verify that a newly created or edited assignment remains in Draft state until explicitly published by Faculty.",
+    "preconditions": "Faculty F1 creates or edits Assignment A1 in Course C101 without triggering publish.",
+    "action_or_input": "Faculty F1 saves Assignment A1.",
+    "expected_result": "The system sets Assignment A1 status to 'Draft', keeping it unpublished and unavailable to students.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-021",
+    "source_id": "AFR-LMS-007.1: Publish assignment (CFR-LMS-007)",
+    "purpose": "Verify that Faculty can publish an assignment that is in Draft state.",
+    "preconditions": "Assignment A1 in Course C101 is in Draft state; Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 selects Assignment A1 and clicks publish.",
+    "expected_result": "The system transitions Assignment A1 status from Draft to Published.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-022",
+    "source_id": "AFR-LMS-007.2: Apply release-date visibility (CFR-LMS-007)",
+    "purpose": "Verify that a published assignment is withheld and not visible to students prior to its configured release date/time.",
+    "preconditions": "Assignment A1 is published in Course C101 with a future release date T_release; Student S1 is enrolled in Course C101; current time is before T_release.",
+    "action_or_input": "Student S1 accesses the assignments list for Course C101.",
+    "expected_result": "The system withholds Assignment A1; Assignment A1 is not visible or accessible to Student S1.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-FR-023",
+    "source_id": "AFR-LMS-007.3: Release scheduled assignment (CFR-LMS-007)",
+    "purpose": "Verify that a published assignment becomes available to authorized students when the configured release time is reached.",
+    "preconditions": "Assignment A1 is published in Course C101 with release time T_release; Student S1 is enrolled in Course C101.",
+    "action_or_input": "Current system time reaches T_release, and Student S1 views the assignments list for Course C101.",
+    "expected_result": "Assignment A1 is released and visible to Student S1 in the assignments list.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-FR-024",
+    "source_id": "AFR-LMS-007.4: View/download released assignment (CFR-LMS-007)",
+    "purpose": "Verify that a Student can view and download a released assignment for their registered course.",
+    "preconditions": "Assignment A1 is released in Course C101; Student S1 is registered in Course C101.",
+    "action_or_input": "Student S1 opens Assignment A1 and clicks download on the assignment file/materials.",
+    "expected_result": "The system displays assignment details and instructions to Student S1 and initiates the file download.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-025",
+    "source_id": "AFR-LMS-008.1: Submit configured work type (CFR-LMS-008)",
+    "purpose": "Verify that a Student can submit assignment work according to the configured submission type (file, text, or link).",
+    "preconditions": "Student S1 is registered in Course C101; Assignment A1 is released with submission type configured as file upload; submission window is open.",
+    "action_or_input": "Student S1 submits work matching the configured type (uploads document.pdf for file submission).",
+    "expected_result": "The system accepts the submission matching the configured type and confirms receipt.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-026",
+    "source_id": "AFR-LMS-008.2: Accept on-time submission (CFR-LMS-008)",
+    "purpose": "Verify that the system accepts and records a student submission made prior to the assignment due date.",
+    "preconditions": "Assignment A1 in Course C101 has due date T_due; Student S1 is registered; current time is before T_due.",
+    "action_or_input": "Student S1 submits assignment work before T_due.",
+    "expected_result": "The system accepts the submission, records it with an on-time timestamp, and updates submission status.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-FR-027",
+    "source_id": "AFR-LMS-009.1: View own submission history (CFR-LMS-009)",
+    "purpose": "Verify that a Student can view their own submission history for an assignment, and only their own history.",
+    "preconditions": "Student S1 is registered in Course C101 and has submitted work for Assignment A1.",
+    "action_or_input": "Student S1 navigates to the submission history page for Assignment A1.",
+    "expected_result": "The system displays Student S1's submission history, showing submitted files/content and timestamps; no other student's submissions are exposed.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-028",
+    "source_id": "AFR-LMS-009.2: View own submission status (CFR-LMS-009)",
+    "purpose": "Verify that the system displays the student's submission status as submitted, late, or missing where applicable.",
+    "preconditions": "Student S1 is registered in Course C101; Assignment A1 is submitted on time, Assignment A2 is unsubmitted past due date.",
+    "action_or_input": "Student S1 views their assignment list and submission status for Course C101.",
+    "expected_result": "The system displays status 'submitted' for Assignment A1 and status 'missing' (or 'late' where applicable) for Assignment A2.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-029",
+    "source_id": "AFR-LMS-010.1: Faculty grades submission (CFR-LMS-010)",
+    "purpose": "Verify that Faculty can grade an individual student submission by entering points and feedback.",
+    "preconditions": "Faculty F1 is assigned to Course C101; Student S1 has submitted work for Assignment A1.",
+    "action_or_input": "Faculty F1 opens Student S1's submission, enters points (90/100) and feedback ('Good analysis'), and saves.",
+    "expected_result": "The system saves the entered points and feedback for Student S1's submission.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-030",
+    "source_id": "AFR-LMS-010.2: TA grades submission (CFR-LMS-010)",
+    "purpose": "Verify that an assigned TA can grade an individual student submission by entering points and feedback.",
+    "preconditions": "TA1 is assigned to Course C101; Student S1 has submitted work for Assignment A1.",
+    "action_or_input": "TA1 opens Student S1's submission, enters points (85/100) and feedback ('Well structured'), and saves.",
+    "expected_result": "The system saves the entered points and feedback for Student S1's submission.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-031",
+    "source_id": "AFR-LMS-010.3: Attribute grading action (CFR-LMS-010)",
+    "purpose": "Verify that the system records the identity of the Faculty member or TA performing the grading action.",
+    "preconditions": "TA1 is assigned to Course C101; Student S1 has submitted work for Assignment A1.",
+    "action_or_input": "TA1 grades Student S1's submission and saves points and feedback.",
+    "expected_result": "The system attributes the grading action to TA1 and records TA1's user identity in the grading record.",
+    "test_type": "Validation"
+  },
+  {
+    "test_id": "TC-FR-032",
+    "source_id": "AFR-LMS-011.1: Hold grade in draft (CFR-LMS-011)",
+    "purpose": "Verify that entered grade and feedback are kept in Draft state until released.",
+    "preconditions": "Faculty F1 or TA1 grades Student S1's submission for Assignment A1 without triggering release.",
+    "action_or_input": "Faculty F1 saves the grade and feedback for Student S1.",
+    "expected_result": "The system stores the grade and feedback in 'Draft' state.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-033",
+    "source_id": "AFR-LMS-011.2: Hide draft grade from Student (CFR-LMS-011)",
+    "purpose": "Verify that students are prevented from viewing draft grades and feedback prior to release.",
+    "preconditions": "Student S1's submission for Assignment A1 has been graded, but the grade is in Draft state; Student S1 is logged in.",
+    "action_or_input": "Student S1 views the assignment submission and grades page for Assignment A1.",
+    "expected_result": "The system hides the draft grade and feedback; Student S1 cannot view the grade or comments before release.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-FR-034",
+    "source_id": "AFR-LMS-011.3: Faculty releases grade/feedback (CFR-LMS-011)",
+    "purpose": "Verify that Faculty can release draft grades and feedback to students.",
+    "preconditions": "Faculty F1 is assigned to Course C101; Assignment A1 has draft grades entered.",
+    "action_or_input": "Faculty F1 initiates and confirms the release of grades for Assignment A1.",
+    "expected_result": "The system transitions grades from Draft to Released state and makes them accessible to students.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-035",
+    "source_id": "AFR-LMS-012.1: View own released grade/feedback (CFR-LMS-012)",
+    "purpose": "Verify that a Student can view their own grade and feedback after release.",
+    "preconditions": "Grades for Assignment A1 in Course C101 have been released; Student S1 is enrolled in Course C101.",
+    "action_or_input": "Student S1 navigates to their grade report / assignment view for Assignment A1.",
+    "expected_result": "The system displays Student S1's points awarded and feedback comments.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-036",
+    "source_id": "AFR-LMS-012.2: Released grade is read-only to Student (CFR-LMS-012)",
+    "purpose": "Verify that released grade and feedback are presented to the Student in read-only form without edit permissions.",
+    "preconditions": "Student S1 is viewing their released grade and feedback for Assignment A1.",
+    "action_or_input": "Student S1 attempts to edit, modify, or submit changes to the displayed grade or feedback.",
+    "expected_result": "The system presents the grade and feedback in read-only form and prevents any modification by Student S1.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-FR-037",
+    "source_id": "AFR-LMS-013.1: Log post-release grade change actor (CFR-LMS-013)",
+    "purpose": "Verify that the system logs the identity of the actor who modifies a previously released grade.",
+    "preconditions": "Student S1's grade for Assignment A1 is already in Released state; Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 modifies Student S1's released score from 85 to 90 and saves.",
+    "expected_result": "The system logs the grade change and records Faculty F1's user identity in the audit trail.",
+    "test_type": "Validation"
+  },
+  {
+    "test_id": "TC-FR-038",
+    "source_id": "AFR-LMS-013.2: Log post-release grade change time (CFR-LMS-013)",
+    "purpose": "Verify that the system logs the timestamp when a released grade is changed.",
+    "preconditions": "Student S1's grade for Assignment A1 is in Released state; Faculty F1 modifies the grade at timestamp T_change.",
+    "action_or_input": "Faculty F1 submits a revised grade for Student S1 at timestamp T_change.",
+    "expected_result": "The system records an audit log entry containing the exact timestamp T_change of the modification.",
+    "test_type": "Validation"
+  },
+  {
+    "test_id": "TC-FR-039",
+    "source_id": "AFR-LMS-014.1: TA views course content (CFR-LMS-014)",
+    "purpose": "Verify that an assigned TA can view course details, published materials, and announcements.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101 and logged into the LMS.",
+    "action_or_input": "TA1 accesses the Course C101 workspace, opens course details, published materials, and announcements.",
+    "expected_result": "The system grants TA1 view access to course details, published materials, and announcements for Course C101.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-040",
+    "source_id": "AFR-LMS-014.2: TA views submissions (CFR-LMS-014)",
+    "purpose": "Verify that an assigned TA can view Student submissions for their assigned course.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101; students have submitted work for Assignment A1.",
+    "action_or_input": "TA1 opens the submissions list for Assignment A1 in Course C101.",
+    "expected_result": "The system displays student submissions to TA1 for grading and review.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-041",
+    "source_id": "AFR-LMS-014.3: TA cannot author assignments (CFR-LMS-014)",
+    "purpose": "Verify that the system prevents a TA from creating or editing assignments.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101 and logged into the LMS.",
+    "action_or_input": "TA1 attempts to create a new assignment or edit an existing assignment in Course C101.",
+    "expected_result": "The system blocks the action and returns an authorization error, preventing TA1 from creating or editing assignments.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-FR-042",
+    "source_id": "AFR-LMS-014.4: TA cannot author materials (CFR-LMS-014)",
+    "purpose": "Verify that the system prevents a TA from creating or editing course materials.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101 and logged into the LMS.",
+    "action_or_input": "TA1 attempts to upload new course materials or edit existing materials in Course C101.",
+    "expected_result": "The system blocks the action and returns an authorization error, preventing TA1 from creating or editing course materials.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-FR-043",
+    "source_id": "AFR-LMS-014.5: TA cannot modify course structure (CFR-LMS-014)",
+    "purpose": "Verify that the system prevents a TA from modifying course structure.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101 and logged into the LMS.",
+    "action_or_input": "TA1 attempts to add, reorder, or delete course modules or weekly sections in Course C101.",
+    "expected_result": "The system denies the modification request and displays an authorization error, preserving course structure.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-FR-044",
+    "source_id": "AFR-LMS-015.1: Observer reads permitted course content (CFR-LMS-015)",
+    "purpose": "Verify that an Observer can view course details, published materials, and announcements for the linked course in read-only form.",
+    "preconditions": "Observer O1 is linked to Course C101 and logged into the LMS.",
+    "action_or_input": "Observer O1 accesses Course C101 and views course details, published materials, and announcements.",
+    "expected_result": "The system allows Observer O1 to view course details, published materials, and announcements in read-only form.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-FR-045",
+    "source_id": "AFR-LMS-015.2: Observer cannot view submissions (CFR-LMS-015)",
+    "purpose": "Verify that the system prevents an Observer from viewing individual Student submissions.",
+    "preconditions": "Observer O1 is linked to Course C101; students have submitted work for Assignment A1.",
+    "action_or_input": "Observer O1 attempts to access student submissions for Assignment A1.",
+    "expected_result": "The system denies access and prevents Observer O1 from viewing any student submissions.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-FR-046",
+    "source_id": "AFR-LMS-015.3: Observer cannot view grades/student-specific data (CFR-LMS-015)",
+    "purpose": "Verify that the system prevents an Observer from viewing student grades or any other Student-specific data.",
+    "preconditions": "Observer O1 is linked to Course C101; student grades and records exist for Course C101.",
+    "action_or_input": "Observer O1 attempts to navigate to or query student grades, gradebooks, or individual student performance records.",
+    "expected_result": "The system blocks access and prevents Observer O1 from viewing any student grades or student-specific data.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-FR-047",
+    "source_id": "AFR-LMS-015.4: Observer has no write access (CFR-LMS-015)",
+    "purpose": "Verify that the system prevents an Observer from performing write actions anywhere in the LMS Course Management module.",
+    "preconditions": "Observer O1 is linked to Course C101 and logged into the LMS.",
+    "action_or_input": "Observer O1 attempts write operations in Course C101 (such as posting an announcement, uploading material, submitting an assignment, or grading).",
+    "expected_result": "The system rejects all write operations by Observer O1 with an authorization failure.",
+    "test_type": "Authorization"
+  }
+]

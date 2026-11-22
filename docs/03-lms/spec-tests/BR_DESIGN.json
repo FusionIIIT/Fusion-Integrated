@@ -1,0 +1,371 @@
+[
+  {
+    "test_id": "TC-BR-001",
+    "source_id": "BR-LMS-001 permitted",
+    "purpose": "Verify that a user enrolled in, assigned to, or linked to a course is permitted to access the course workspace.",
+    "preconditions": "Course C101 exists in Fusion LMS; User U1 is enrolled in, assigned to, or linked to Course C101 and is authenticated.",
+    "action_or_input": "User U1 requests access to the Course C101 workspace.",
+    "expected_result": "The system verifies the course-specific association, grants access, and opens the dedicated Course C101 workspace.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-002",
+    "source_id": "BR-LMS-001 prohibited",
+    "purpose": "Verify that a user without an established course association is prohibited from accessing the course workspace.",
+    "preconditions": "Course C101 exists in Fusion LMS; User U2 is authenticated but is not enrolled in, assigned to, or linked to Course C101.",
+    "action_or_input": "User U2 attempts to open or access the Course C101 workspace.",
+    "expected_result": "The system identifies that User U2 lacks a course-specific association, denies access, and withholds course workspace content.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-003",
+    "source_id": "BR-LMS-002 permitted",
+    "purpose": "Verify that a Student is granted course access when existing Fusion course-registration records confirm active course enrollment.",
+    "preconditions": "Course C101 exists; authoritative Fusion course-registration data indicates Student S1 has active registration in Course C101.",
+    "action_or_input": "Student S1 requests access to Course C101.",
+    "expected_result": "The system validates course membership against authoritative Fusion registration records and permits Student S1 to access Course C101.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-004",
+    "source_id": "BR-LMS-002 prohibited",
+    "purpose": "Verify that student course access is denied when existing Fusion course-registration records indicate no active registration.",
+    "preconditions": "Course C101 exists; authoritative Fusion course-registration data indicates Student S2 is not registered in (or has dropped) Course C101.",
+    "action_or_input": "Student S2 requests access to Course C101 in LMS.",
+    "expected_result": "The system evaluates authoritative Fusion registration data, determines absence of active course registration, and denies access to Student S2.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-005",
+    "source_id": "BR-LMS-003 permitted",
+    "purpose": "Verify that an Observer linked to a course is permitted read-only access to course details, published materials, and announcements.",
+    "preconditions": "Observer O1 is linked to Course C101; Course C101 workspace contains course details, published materials, and announcements.",
+    "action_or_input": "Observer O1 navigates to Course C101 workspace and views course details, published materials, and announcements.",
+    "expected_result": "The system displays Course C101 details, published materials, and announcements to Observer O1 in read-only format.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-006",
+    "source_id": "BR-LMS-003 prohibited (student data)",
+    "purpose": "Verify that an Observer is prohibited from viewing individual student submissions, grades, or other student-specific data.",
+    "preconditions": "Observer O1 is linked to Course C101; Student S1 has submissions and grades in Course C101.",
+    "action_or_input": "Observer O1 attempts to view individual student submissions, student grades, or student-specific progress in Course C101.",
+    "expected_result": "The system restricts access, conceals all student-specific data, and prevents Observer O1 from viewing student submissions and grades.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-007",
+    "source_id": "BR-LMS-003 prohibited (write actions)",
+    "purpose": "Verify that an Observer is prohibited from performing write or modification actions in the course workspace.",
+    "preconditions": "Observer O1 is linked to Course C101 and logged into the LMS.",
+    "action_or_input": "Observer O1 attempts write operations in Course C101, such as uploading material, posting an announcement, or submitting course work.",
+    "expected_result": "The system denies write authorization, rejects the modification attempt, and preserves course workspace state without changes.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-008",
+    "source_id": "BR-LMS-004 permitted",
+    "purpose": "Verify that an assigned Teaching Assistant (TA) is permitted to view course content, view student submissions, and grade submissions.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101; Course C101 contains published materials and student submissions awaiting evaluation.",
+    "action_or_input": "TA1 views Course C101 materials and student submissions, and submits grades and feedback for evaluated submissions.",
+    "expected_result": "The system grants TA1 access to view course content and submissions, and accepts TA1's grading evaluations.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-009",
+    "source_id": "BR-LMS-004 prohibited",
+    "purpose": "Verify that an assigned TA is prohibited from creating or editing assignments, course materials, or course structure.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101 and logged into the LMS.",
+    "action_or_input": "TA1 attempts to create or edit an assignment, upload or modify course materials, or configure course structure in Course C101.",
+    "expected_result": "The system denies authoring actions to TA1, rejects the creation or edit attempt, and returns an authorization restriction message.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-010",
+    "source_id": "BR-LMS-005 permitted",
+    "purpose": "Verify that course materials that are published and released are visible to Students, TAs, and Observers.",
+    "preconditions": "Material M1 in Course C101 is in Published state; User U1 is an authorized course member (Student, TA, or Observer).",
+    "action_or_input": "User U1 accesses the course materials section for Course C101.",
+    "expected_result": "The system displays published Material M1 and allows User U1 to access its content in read-only form.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-011",
+    "source_id": "BR-LMS-005 prohibited",
+    "purpose": "Verify that course materials that are unpublished remain invisible and inaccessible to Students, TAs, and Observers.",
+    "preconditions": "Material M2 in Course C101 is unpublished (draft); User U1 is an enrolled Student, assigned TA, or linked Observer.",
+    "action_or_input": "User U1 attempts to view or access unpublished Material M2 in Course C101.",
+    "expected_result": "The system hides unpublished Material M2, withholds its content, and denies access to User U1.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-012",
+    "source_id": "BR-LMS-006 permitted",
+    "purpose": "Verify that scheduled course material becomes available and accessible when the configured release date/time is reached.",
+    "preconditions": "Material M3 in Course C101 was configured with future release timestamp T_release; current time T_current is at or after T_release; Student S1 is enrolled.",
+    "action_or_input": "Student S1 accesses the course materials section of Course C101 at time T_current.",
+    "expected_result": "The system determines that the scheduled release timestamp is reached, releases Material M3, and makes it visible and accessible to Student S1.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-BR-013",
+    "source_id": "BR-LMS-006 prohibited",
+    "purpose": "Verify that course material configured with a future release date remains unavailable prior to the configured release date/time.",
+    "preconditions": "Material M3 in Course C101 is configured with future release timestamp T_release; current time T_current is before T_release; Student S1 is enrolled.",
+    "action_or_input": "Student S1 attempts to view or access Material M3 at time T_current.",
+    "expected_result": "The system maintains Material M3 in Scheduled state, withholds the content, and keeps Material M3 unavailable to Student S1.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-BR-014",
+    "source_id": "BR-LMS-007 permitted (Faculty)",
+    "purpose": "Verify that an assigned Faculty member is permitted to post course announcements.",
+    "preconditions": "Faculty F1 is assigned to Course C101 and logged into the LMS.",
+    "action_or_input": "Faculty F1 drafts and posts an announcement for Course C101.",
+    "expected_result": "The system verifies Faculty F1's posting authority, accepts the announcement, and publishes it to Course C101.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-015",
+    "source_id": "BR-LMS-007 permitted (TA with permission)",
+    "purpose": "Verify that an assigned TA is permitted to post course announcements when permission has been granted by Faculty.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101; Faculty has granted announcement posting permission to TA1 for Course C101.",
+    "action_or_input": "TA1 drafts and posts an announcement for Course C101.",
+    "expected_result": "The system validates that TA1 possesses announcement posting permission, accepts the announcement, and publishes it to Course C101.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-016",
+    "source_id": "BR-LMS-007 prohibited (TA without permission)",
+    "purpose": "Verify that an assigned TA is prohibited from posting course announcements when permission has not been granted by Faculty.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101; Faculty has not granted announcement posting permission to TA1 for Course C101.",
+    "action_or_input": "TA1 attempts to post an announcement for Course C101.",
+    "expected_result": "The system checks posting permissions, determines TA1 lacks permission, rejects the post, and displays an authorization restriction error.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-017",
+    "source_id": "BR-LMS-008 permitted",
+    "purpose": "Verify that a posted announcement is recorded with a timestamp and is visible course-wide to all enrolled or linked users.",
+    "preconditions": "An announcement Ann1 is posted in Course C101; users with roles Student, Faculty, TA, and Observer are enrolled in or linked to Course C101.",
+    "action_or_input": "Authorized course users access the announcements feed for Course C101.",
+    "expected_result": "The system displays Ann1 with its recorded posting timestamp to all users enrolled in or linked to Course C101.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-018",
+    "source_id": "BR-LMS-008 prohibited",
+    "purpose": "Verify that course announcements are prohibited from being viewed by users who are not enrolled in or linked to the course.",
+    "preconditions": "Announcement Ann1 exists in Course C101; User U3 is authenticated in LMS but has no enrollment or link to Course C101.",
+    "action_or_input": "User U3 attempts to view or access announcements in Course C101.",
+    "expected_result": "The system enforces course audience restriction, denies access, and does not expose Course C101 announcements to User U3.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-019",
+    "source_id": "BR-LMS-009 permitted",
+    "purpose": "Verify that an assignment defining due date, instructions, submission type, and points possible is accepted and published.",
+    "preconditions": "Faculty F1 is assigned to Course C101; assignment draft contains valid due date, instructions, submission type ('file'), and points possible (100).",
+    "action_or_input": "Faculty F1 initiates publication of the configured assignment.",
+    "expected_result": "The system validates that all four mandatory configuration fields are defined and successfully publishes the assignment.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-020",
+    "source_id": "BR-LMS-009 prohibited",
+    "purpose": "Verify that assignment publication is rejected when one or more required fields (due date, instructions, submission type, points possible) are missing.",
+    "preconditions": "Faculty F1 is assigned to Course C101; assignment draft is missing one or more required configuration fields.",
+    "action_or_input": "Faculty F1 attempts to publish the incomplete assignment draft.",
+    "expected_result": "The system detects missing required fields, rejects publication, displays validation error messages, and keeps the assignment in draft state.",
+    "test_type": "Validation"
+  },
+  {
+    "test_id": "TC-BR-021",
+    "source_id": "BR-LMS-010 permitted",
+    "purpose": "Verify that a newly created or edited assignment remains in Draft state until Faculty explicitly executes the publish action.",
+    "preconditions": "Faculty F1 is assigned to Course C101; Faculty F1 creates and saves an assignment without publishing it.",
+    "action_or_input": "Faculty F1 saves the newly created assignment as a draft.",
+    "expected_result": "The system records the assignment in Draft state and confirms it remains unpublished until an explicit publish action succeeds.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-022",
+    "source_id": "BR-LMS-010 prohibited",
+    "purpose": "Verify that an assignment in Draft state is prohibited from being viewed or accessed by enrolled Students.",
+    "preconditions": "Assignment A1 in Course C101 is in Draft state; Student S1 is enrolled in Course C101.",
+    "action_or_input": "Student S1 accesses the course assignment list or attempts to open Assignment A1.",
+    "expected_result": "The system withholds Draft Assignment A1, keeping it concealed and inaccessible to Student S1.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-023",
+    "source_id": "BR-LMS-011 permitted",
+    "purpose": "Verify that a published assignment becomes visible to Students when its configured release date/time condition is satisfied.",
+    "preconditions": "Assignment A2 in Course C101 has configured release timestamp T_release; current time T_current is at or after T_release; Student S1 is enrolled.",
+    "action_or_input": "Student S1 views the assignment list for Course C101 at time T_current.",
+    "expected_result": "The system evaluates the release condition, verifies T_current >= T_release, and exposes Assignment A2 to Student S1.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-BR-024",
+    "source_id": "BR-LMS-011 prohibited",
+    "purpose": "Verify that a published assignment configured with a future release date is withheld and invisible to Students prior to that release date/time.",
+    "preconditions": "Assignment A2 in Course C101 has future release timestamp T_release; current time T_current is before T_release; Student S1 is enrolled.",
+    "action_or_input": "Student S1 views the assignment list or attempts to access Assignment A2 at time T_current.",
+    "expected_result": "The system evaluates the release condition, determines release time is not yet reached, and withholds Assignment A2 from Student S1.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-BR-025",
+    "source_id": "BR-LMS-012 permitted",
+    "purpose": "Verify that a Student submission conforming to the configured submission type (file, text, or link) is accepted.",
+    "preconditions": "Assignment A1 in Course C101 is published with configured submission type 'file'; Student S1 is enrolled in Course C101.",
+    "action_or_input": "Student S1 submits an assignment file matching the configured 'file' submission type.",
+    "expected_result": "The system validates submission type conformity, accepts the file submission, and confirms successful submission.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-026",
+    "source_id": "BR-LMS-012 prohibited",
+    "purpose": "Verify that a Student submission failing to conform to the configured submission type is rejected.",
+    "preconditions": "Assignment A1 in Course C101 is configured strictly for 'file' submission type; Student S1 is enrolled in Course C101.",
+    "action_or_input": "Student S1 attempts to submit plain text or a URL link instead of a file for Assignment A1.",
+    "expected_result": "The system validates submission type, rejects the non-conforming submission, flags a type mismatch error, and records no submission.",
+    "test_type": "Validation"
+  },
+  {
+    "test_id": "TC-BR-027",
+    "source_id": "BR-LMS-013 permitted",
+    "purpose": "Verify that the system accepts and records a Student submission submitted before the configured assignment due date under the baseline rule.",
+    "preconditions": "Assignment A1 in Course C101 has due date T_due; Student S1 is enrolled in Course C101; current time is before T_due.",
+    "action_or_input": "Student S1 submits valid assignment work before T_due.",
+    "expected_result": "The system validates that the submission is made prior to the due date, accepts the on-time submission, and records the submission timestamp.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-BR-028",
+    "source_id": "BR-LMS-013 prohibited",
+    "purpose": "Verify that a submission attempted after the due date is not accepted under the baseline on-time rule, deferring late handling per ISS-LMS-001.",
+    "preconditions": "Assignment A1 in Course C101 has due date T_due; Student S1 is enrolled in Course C101; current time is after T_due.",
+    "action_or_input": "Student S1 attempts to submit assignment work after T_due.",
+    "expected_result": "The system determines current time exceeds T_due, does not process the submission as an on-time baseline submission, and defers late handling per unresolved policy ISS-LMS-001 without inventing unsupported behavior.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-BR-029",
+    "source_id": "BR-LMS-014 permitted",
+    "purpose": "Verify that an enrolled Student is permitted to view their own submission history and status.",
+    "preconditions": "Student S1 is enrolled in Course C101 and has submitted work for Assignment A1.",
+    "action_or_input": "Student S1 requests submission history and status for Assignment A1.",
+    "expected_result": "The system verifies Student S1's identity and returns only Student S1's own submission history, timestamp, and status.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-030",
+    "source_id": "BR-LMS-014 prohibited",
+    "purpose": "Verify that a Student is prohibited from viewing another student's submission history or status.",
+    "preconditions": "Student S1 and Student S2 are enrolled in Course C101; Student S2 has submitted work for Assignment A1.",
+    "action_or_input": "Student S1 attempts to access or query Student S2's submission history or status for Assignment A1.",
+    "expected_result": "The system enforces submission privacy, denies access to Student S2's submission records, and conceals other students' submissions.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-031",
+    "source_id": "BR-LMS-015 permitted (Faculty)",
+    "purpose": "Verify that an assigned Faculty member is permitted to grade submissions, and the grading action is attributed to the Faculty member.",
+    "preconditions": "Faculty F1 is assigned to Course C101; a submission for Assignment A1 in Course C101 awaits grading.",
+    "action_or_input": "Faculty F1 enters a score and feedback for the submission and saves the grade.",
+    "expected_result": "The system validates Faculty F1's grading authority, saves the score and feedback, and attributes the grading action to Faculty F1.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-032",
+    "source_id": "BR-LMS-015 permitted (TA)",
+    "purpose": "Verify that an assigned TA is permitted to grade submissions, and the grading action is attributed to the TA.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101; a submission for Assignment A1 in Course C101 awaits grading.",
+    "action_or_input": "TA1 enters a score and feedback for the submission and saves the grade.",
+    "expected_result": "The system validates TA1's grading role, saves the score and feedback, and attributes the grading action to TA1.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-033",
+    "source_id": "BR-LMS-015 prohibited",
+    "purpose": "Verify that grading actions are prohibited for users not assigned as Faculty or TA for the course.",
+    "preconditions": "User U4 is an enrolled Student or linked Observer in Course C101 (not assigned as Faculty or TA); a submission exists.",
+    "action_or_input": "User U4 attempts to enter or submit a grade and feedback for a submission in Course C101.",
+    "expected_result": "The system identifies User U4 lacks grading authority, rejects the grading action, and records no score or feedback.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-034",
+    "source_id": "BR-LMS-016 permitted",
+    "purpose": "Verify that grades and feedback become visible to the Student once released.",
+    "preconditions": "Student S1 submitted work for Assignment A1; the submission has been graded and the grade has been transitioned to Released state.",
+    "action_or_input": "Student S1 views their assignment grade page for Assignment A1.",
+    "expected_result": "The system identifies that the grade is in Released state and displays the score and feedback to Student S1.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-035",
+    "source_id": "BR-LMS-016 prohibited",
+    "purpose": "Verify that grades and feedback in Draft state remain invisible and withheld from Students.",
+    "preconditions": "Student S1 submitted work for Assignment A1; a grader entered a grade and feedback which remains in Draft (unreleased) state.",
+    "action_or_input": "Student S1 accesses their submission details or grade page for Assignment A1.",
+    "expected_result": "The system identifies that the grade is in Draft state, conceals score and feedback, and withholds unreleased grade information from Student S1.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-036",
+    "source_id": "BR-LMS-017 permitted",
+    "purpose": "Verify that assigned Faculty is authorized to release draft grades and feedback to Students.",
+    "preconditions": "Faculty F1 is assigned to Course C101; draft grades and feedback exist for Assignment A1.",
+    "action_or_input": "Faculty F1 executes the release grades action for Assignment A1.",
+    "expected_result": "The system verifies Faculty F1's release authority, updates grade state from Draft to Released, and makes grades visible to students.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-037",
+    "source_id": "BR-LMS-017 prohibited",
+    "purpose": "Verify that a Teaching Assistant (TA) is prohibited from releasing grades under the baseline specification.",
+    "preconditions": "Teaching Assistant TA1 is assigned to Course C101; draft grades exist for Assignment A1.",
+    "action_or_input": "TA1 attempts to execute the grade release action for Assignment A1.",
+    "expected_result": "The system determines TA1 lacks release authority under the baseline, denies the release action, and retains grades in Draft state.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-038",
+    "source_id": "BR-LMS-018 permitted",
+    "purpose": "Verify that an enrolled Student is permitted to view their own released grade and feedback in read-only form.",
+    "preconditions": "Student S1 is enrolled in Course C101; Student S1 has a released grade and feedback for Assignment A1.",
+    "action_or_input": "Student S1 accesses the grade view for Assignment A1.",
+    "expected_result": "The system displays Student S1's released score and feedback in read-only format without editing controls.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-BR-039",
+    "source_id": "BR-LMS-018 prohibited (modification)",
+    "purpose": "Verify that a Student is prohibited from modifying, editing, or tampering with their released grade or feedback.",
+    "preconditions": "Student S1 has a released grade and feedback for Assignment A1 in Course C101.",
+    "action_or_input": "Student S1 attempts to submit an edit, alteration, or override to the released grade score or feedback.",
+    "expected_result": "The system rejects the modification attempt, enforces read-only access for students, and preserves the released grade unchanged.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-040",
+    "source_id": "BR-LMS-018 prohibited (other student grade)",
+    "purpose": "Verify that a Student is prohibited from viewing another student's released grade and feedback.",
+    "preconditions": "Student S1 and Student S2 are enrolled in Course C101; Student S2 has a released grade for Assignment A1.",
+    "action_or_input": "Student S1 attempts to view or query Student S2's released grade and feedback.",
+    "expected_result": "The system validates authorization, denies access to Student S2's grade records, and displays only Student S1's own data.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-BR-041",
+    "source_id": "BR-LMS-019 permitted",
+    "purpose": "Verify that whenever an already-released grade is changed, the system logs the change recording actor identity and timestamp.",
+    "preconditions": "A submission for Assignment A1 in Course C101 has a previously released grade; Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 changes the score and feedback for the released grade and saves the modification.",
+    "expected_result": "The system updates the grade and creates an audit log entry recording who made the change (Faculty F1) and when (change timestamp).",
+    "test_type": "Audit"
+  }
+]

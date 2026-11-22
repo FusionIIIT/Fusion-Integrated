@@ -1,0 +1,380 @@
+[
+  {
+    "test_id": "TC-UC-001",
+    "source_id": "UC-LMS-001 Main Flow",
+    "purpose": "Verify that an authorized user can access the dedicated course workspace and view syllabus, schedule, instructor(s), and TA(s).",
+    "preconditions": "Course C101 exists in Fusion; User U1 is enrolled in, assigned to, or linked to Course C101; course details including syllabus, schedule, instructors, and TAs are configured.",
+    "action_or_input": "User U1 selects Course C101 from Fusion.",
+    "expected_result": "The system identifies Course C101 and User U1, validates course-specific access, opens the dedicated course workspace, and displays the syllabus, schedule, instructor(s), and TA(s).",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-002",
+    "source_id": "UC-LMS-001 Alternative A1",
+    "purpose": "Verify that access to the course workspace is denied when the requesting user is not authorized for the selected course.",
+    "preconditions": "Course C101 exists in Fusion; User U2 is logged into Fusion but is not enrolled in, assigned to, or linked to Course C101.",
+    "action_or_input": "User U2 attempts to open or navigate to the Course C101 workspace.",
+    "expected_result": "The system validates course-specific access, determines User U2 is not authorized, denies access, and does not expose course workspace content.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-003",
+    "source_id": "UC-LMS-001 Exception E1",
+    "purpose": "Verify that the system does not expose the course workspace when authoritative registration or association data are unavailable.",
+    "preconditions": "Course C101 exists; authoritative course-registration and link data source is unavailable or unreachable.",
+    "action_or_input": "User U1 attempts to open Course C101 workspace.",
+    "expected_result": "The system cannot confirm user authorization due to unavailable authoritative data, denies access, and does not expose the workspace.",
+    "test_type": "Exception"
+  },
+  {
+    "test_id": "TC-UC-004",
+    "source_id": "UC-LMS-002 Main Flow",
+    "purpose": "Verify that assigned Faculty can configure course workspace details and save/publish the changes.",
+    "preconditions": "Faculty F1 is assigned to Course C101 and logged into the LMS.",
+    "action_or_input": "Faculty F1 opens course-management controls for Course C101, edits course workspace details (syllabus and weekly schedule), and saves/publishes changes.",
+    "expected_result": "The system verifies Faculty F1's authorization for Course C101, stores the updated course details, and presents the updated details in the course workspace.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-005",
+    "source_id": "UC-LMS-002 Alternative A1",
+    "purpose": "Verify that assigned Faculty can edit previously published course details.",
+    "preconditions": "Faculty F1 is assigned to Course C101; course details have previously been published in the workspace.",
+    "action_or_input": "Faculty F1 edits previously published course details (updating syllabus description and schedule) and saves the modifications.",
+    "expected_result": "The system updates and stores the modified course details and presents the new information in the course workspace.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-006",
+    "source_id": "UC-LMS-002 Exception E1",
+    "purpose": "Verify that course details configuration is rejected for an unauthorized Faculty member not assigned to the course.",
+    "preconditions": "Faculty F2 is logged into the LMS but is not assigned to Course C101.",
+    "action_or_input": "Faculty F2 attempts to edit or configure course workspace details for Course C101.",
+    "expected_result": "The system rejects the configuration attempt due to unauthorized Faculty-course combination, and existing course details remain unchanged.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-007",
+    "source_id": "UC-LMS-003 Main Flow",
+    "purpose": "Verify that assigned Faculty can add a course material item to a module or weekly section and publish it immediately.",
+    "preconditions": "Faculty F1 is assigned to Course C101; course section 'Module 1' exists.",
+    "action_or_input": "Faculty F1 opens material-management controls, adds a file material, places it in 'Module 1', selects immediate publication, and saves.",
+    "expected_result": "The system validates and saves the material configuration, marking the material item as published and immediately available in the course workspace.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-008",
+    "source_id": "UC-LMS-003 Alternative A1",
+    "purpose": "Verify that assigned Faculty can edit and reorganize existing course materials.",
+    "preconditions": "Faculty F1 is assigned to Course C101; material item M1 exists in 'Module 1'.",
+    "action_or_input": "Faculty F1 edits material item M1, renames it, and updates its section placement to 'Module 2', then saves changes.",
+    "expected_result": "The system validates and saves the updated material configuration, moving M1 to 'Module 2' with the updated details.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-009",
+    "source_id": "UC-LMS-003 Exception E1",
+    "purpose": "Verify that course material write attempts by non-Faculty roles (TA, Observer, or Student) are rejected.",
+    "preconditions": "User U_non_faculty has role Student, TA, or Observer in Course C101.",
+    "action_or_input": "User U_non_faculty attempts to upload, edit, or delete a course material item in Course C101.",
+    "expected_result": "The system rejects the write attempt with an authorization error, commits no changes, and preserves existing materials unchanged.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-010",
+    "source_id": "UC-LMS-004 Main Flow",
+    "purpose": "Verify that an authorized course user can view published course materials in read-only form.",
+    "preconditions": "User U1 (Student, TA, or Observer) has authorized access to Course C101; material item M1 is published.",
+    "action_or_input": "User U1 opens the Materials area of Course C101 and selects published material item M1.",
+    "expected_result": "The system lists published materials available to the user and displays material item M1 in read-only form.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-011",
+    "source_id": "UC-LMS-004 Alternative A1",
+    "purpose": "Verify that scheduled or unpublished materials are omitted from the materials view until released.",
+    "preconditions": "Student S1 has access to Course C101; material item M_sched is marked Scheduled with a future release date.",
+    "action_or_input": "Student S1 opens the Materials area for Course C101.",
+    "expected_result": "The system displays published materials and omits scheduled material M_sched from the view until released.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-012",
+    "source_id": "UC-LMS-004 Exception E1",
+    "purpose": "Verify that access to course materials is denied to an unauthorized user not linked to the course.",
+    "preconditions": "User U_unauth is not enrolled in, assigned to, or linked to Course C101.",
+    "action_or_input": "User U_unauth attempts to open or view materials for Course C101.",
+    "expected_result": "The system denies access to course materials and exposes no material content to User U_unauth.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-013",
+    "source_id": "UC-LMS-005 Main Flow",
+    "purpose": "Verify that assigned Faculty can post a timestamped course-wide announcement.",
+    "preconditions": "Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 enters announcement title and content, and submits the announcement for Course C101.",
+    "expected_result": "The system verifies posting authority, timestamps and stores the announcement, and makes it visible course-wide to all enrolled/linked course users.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-014",
+    "source_id": "UC-LMS-005 Alternative A1",
+    "purpose": "Verify that a Teaching Assistant (TA) can post a course announcement when permitted by Faculty.",
+    "preconditions": "TA T1 is assigned to Course C101 and has announcement posting permission granted by Faculty for the course.",
+    "action_or_input": "TA T1 enters announcement content and submits the announcement for Course C101.",
+    "expected_result": "The system verifies posting authority, timestamps and stores the announcement, and makes it visible course-wide.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-015",
+    "source_id": "UC-LMS-005 Exception E1",
+    "purpose": "Verify that announcement posting attempts by unauthorized users (Student, Observer, or TA without permission) are rejected.",
+    "preconditions": "User U_unauth is a Student, Observer, or a TA without announcement posting permission in Course C101.",
+    "action_or_input": "User U_unauth attempts to post an announcement in Course C101.",
+    "expected_result": "The system rejects the posting attempt with an authorization error and does not store or publish the announcement.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-016",
+    "source_id": "UC-LMS-006 Main Flow",
+    "purpose": "Verify that an authorized user can view course announcements displayed with timestamps.",
+    "preconditions": "User U1 (Student, Faculty, TA, or Observer) is authorized for Course C101; announcements have been posted in the course.",
+    "action_or_input": "User U1 opens the Announcements area of Course C101.",
+    "expected_result": "The system retrieves course announcements, displays them with their respective timestamps, and allows User U1 to read the announcement content.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-017",
+    "source_id": "UC-LMS-006 Exception E1",
+    "purpose": "Verify that an unauthorized user not enrolled in or linked to the course is denied access to course announcements.",
+    "preconditions": "User U_unauth is not enrolled in, assigned to, or linked to Course C101.",
+    "action_or_input": "User U_unauth attempts to access or view announcements for Course C101.",
+    "expected_result": "The system denies access with an authorization error and exposes no announcement content.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-018",
+    "source_id": "UC-LMS-007 Main Flow",
+    "purpose": "Verify that assigned Faculty can create a new assignment with required configuration and save it in Draft state.",
+    "preconditions": "Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 opens assignment authoring, enters due date '2026-12-01', instructions 'Complete homework 1', submission type 'file', and points possible 100, then saves.",
+    "expected_result": "The system validates required assignment data, saves the assignment, and stores it in Draft state until publication.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-019",
+    "source_id": "UC-LMS-007 Alternative A1",
+    "purpose": "Verify that assigned Faculty can edit an existing Draft assignment.",
+    "preconditions": "Faculty F1 is assigned to Course C101; Assignment A1 exists in Draft state.",
+    "action_or_input": "Faculty F1 opens Draft Assignment A1, modifies the points possible from 100 to 50 and updates instructions, then saves.",
+    "expected_result": "The system validates the updated data, saves the changes, and maintains Assignment A1 in Draft state.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-020",
+    "source_id": "UC-LMS-007 Exception E1",
+    "purpose": "Verify that assignment authoring or editing attempts by non-Faculty users (TA, Student, or Observer) are rejected.",
+    "preconditions": "User U_non_faculty has role TA, Student, or Observer in Course C101.",
+    "action_or_input": "User U_non_faculty attempts to create or edit an assignment in Course C101.",
+    "expected_result": "The system rejects the assignment-authoring attempt with an authorization error and commits no changes.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-021",
+    "source_id": "UC-LMS-008 Main Flow",
+    "purpose": "Verify that assigned Faculty can publish a valid Draft assignment for immediate release, making it Available to Students.",
+    "preconditions": "Faculty F1 is assigned to Course C101; Assignment A1 is in Draft state with valid configuration and immediate release timing.",
+    "action_or_input": "Faculty F1 confirms publication of Draft Assignment A1.",
+    "expected_result": "The system validates assignment configuration, marks Assignment A1 as Published, and makes it Available to Students.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-022",
+    "source_id": "UC-LMS-008 Alternative A1",
+    "purpose": "Verify that publishing a Draft assignment configured with future-dated release marks it Scheduled for Release awaiting automated release processing.",
+    "preconditions": "Faculty F1 is assigned to Course C101; Assignment A2 is in Draft state configured with a future release date/time.",
+    "action_or_input": "Faculty F1 confirms publication of Assignment A2 with future-dated release.",
+    "expected_result": "The system validates configuration, marks Assignment A2 as Published and Scheduled for Release, withholding student availability until UC-LMS-015 processing.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-023",
+    "source_id": "UC-LMS-008 Exception E1",
+    "purpose": "Verify that an invalid Draft assignment cannot be published.",
+    "preconditions": "Faculty F1 is assigned to Course C101; Assignment A_inv is in Draft state but has invalid or missing required configuration (e.g. missing due date or points).",
+    "action_or_input": "Faculty F1 attempts to publish Assignment A_inv.",
+    "expected_result": "The system configuration validation fails, rejects publication, and leaves Assignment A_inv in Draft state.",
+    "test_type": "Validation"
+  },
+  {
+    "test_id": "TC-UC-024",
+    "source_id": "UC-LMS-009 Main Flow",
+    "purpose": "Verify that an enrolled Student can view assignment details and download content for a published and released assignment.",
+    "preconditions": "Student S1 is registered in Course C101; Assignment A1 is published and its release condition is satisfied (Available).",
+    "action_or_input": "Student S1 opens Assignments area in Course C101, selects Assignment A1, and downloads published assignment content.",
+    "expected_result": "The system lists Assignment A1 as visible, displays assignment instructions, due date, submission type, and points possible, and permits content download.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-025",
+    "source_id": "UC-LMS-009 Alternative A1",
+    "purpose": "Verify that future-dated unreleased assignments are omitted and not shown to Students.",
+    "preconditions": "Student S1 is registered in Course C101; Assignment A_future is published but configured with a future release date that has not yet arrived.",
+    "action_or_input": "Student S1 opens the Assignments area in Course C101.",
+    "expected_result": "The system omits Assignment A_future from the assignment list and does not expose its details or download content to Student S1.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-026",
+    "source_id": "UC-LMS-009 Exception E1",
+    "purpose": "Verify that an unauthorized user not enrolled in the course is denied access to view or download course assignments.",
+    "preconditions": "User U_unauth is not registered in, assigned to, or linked to Course C101.",
+    "action_or_input": "User U_unauth attempts to access the Assignments area or download an assignment in Course C101.",
+    "expected_result": "The system denies access with an authorization error and exposes no assignment content.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-027",
+    "source_id": "UC-LMS-010 Main Flow",
+    "purpose": "Verify that an enrolled Student can submit on-time assignment work matching the configured submission type.",
+    "preconditions": "Student S1 is registered in Course C101; Assignment A1 is available with submission type 'file'; current time is before the configured due date.",
+    "action_or_input": "Student S1 opens Assignment A1, uploads a valid file matching the configured submission type, and confirms submission.",
+    "expected_result": "The system validates submission type and timing, records the submission with a submission timestamp, and marks the status as submitted.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-028",
+    "source_id": "UC-LMS-010 Exception E1",
+    "purpose": "Verify that a student submission with a type inconsistent with assignment configuration is rejected.",
+    "preconditions": "Student S1 is registered in Course C101; Assignment A1 is available and configured strictly for 'file' submission type.",
+    "action_or_input": "Student S1 attempts to submit text or a URL link instead of a file for Assignment A1.",
+    "expected_result": "The system validates submission type, rejects the submission as inconsistent with assignment configuration, and records no submission.",
+    "test_type": "Validation"
+  },
+  {
+    "test_id": "TC-UC-029",
+    "source_id": "UC-LMS-011 Main Flow",
+    "purpose": "Verify that an enrolled Student can view their own assignment submission history and status.",
+    "preconditions": "Student S1 is registered in Course C101; Assignment A1 exists; Student S1 has submitted work for Assignment A1.",
+    "action_or_input": "Student S1 opens submission details/history for Assignment A1.",
+    "expected_result": "The system identifies Student S1, retrieves only Student S1's submissions for Assignment A1, and displays the submission history and status.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-030",
+    "source_id": "UC-LMS-011 Alternative A1",
+    "purpose": "Verify that the system displays appropriate submission status values including submitted, late, or missing where applicable.",
+    "preconditions": "Student S1 is registered in Course C101; Assignment A1 has an on-time submission; Assignment A2 has an unsubmitted overdue state.",
+    "action_or_input": "Student S1 views submission history and status for Assignment A1 and Assignment A2.",
+    "expected_result": "The system displays status 'submitted' for Assignment A1 and status 'missing' (or 'late' where applicable) for Assignment A2.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-031",
+    "source_id": "UC-LMS-011 Exception E1",
+    "purpose": "Verify that a student is denied access to view another student's submission data.",
+    "preconditions": "Student S1 and Student S2 are registered in Course C101; Student S1 has submitted work for Assignment A1.",
+    "action_or_input": "Student S2 attempts to access or view Student S1's submission details or files for Assignment A1.",
+    "expected_result": "The system denies access with an authorization error and ensures no other student's submission data are exposed.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-032",
+    "source_id": "UC-LMS-012 Main Flow",
+    "purpose": "Verify that assigned Faculty or TA can grade a student submission, entering points and feedback stored in Draft state with actor attribution.",
+    "preconditions": "Grader G1 is assigned Faculty or TA for Course C101; student submission SUB1 exists for Assignment A1.",
+    "action_or_input": "Grader G1 opens submission SUB1, enters points (85) and feedback ('Good work'), and saves the grade.",
+    "expected_result": "The system verifies grading authority, records the grading action with Grader G1's identity, and stores grade and feedback in Draft state.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-033",
+    "source_id": "UC-LMS-012 Alternative A1",
+    "purpose": "Verify that changing a released grade creates an audit record capturing actor identity and timestamp.",
+    "preconditions": "Grader G1 is authorized for Course C101; student submission SUB1 has a grade that was previously released.",
+    "action_or_input": "Grader G1 modifies the points from 85 to 90 on the released grade of SUB1 and saves the change.",
+    "expected_result": "The system creates an audit record logging the actor identity (Grader G1) and timestamp of the post-release grade modification.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-034",
+    "source_id": "UC-LMS-012 Exception E1",
+    "purpose": "Verify that a grading attempt by an unauthorized grader not assigned to the course is rejected.",
+    "preconditions": "User U_unauth is not assigned as Faculty or TA for Course C101; student submission SUB1 exists.",
+    "action_or_input": "User U_unauth attempts to enter or submit points/feedback for submission SUB1.",
+    "expected_result": "The system rejects the grading attempt due to unauthorized grader-course combination, and commits no grade changes.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-035",
+    "source_id": "UC-LMS-013 Main Flow",
+    "purpose": "Verify that assigned Faculty can release draft grades and feedback, making them visible to students.",
+    "preconditions": "Faculty F1 is assigned to Course C101; graded submissions for Assignment A1 have grades and feedback in Draft state.",
+    "action_or_input": "Faculty F1 initiates release of draft grades for Assignment A1.",
+    "expected_result": "The system verifies Faculty release authority, transitions grades from Draft to Released, and makes released grades and feedback available to corresponding students.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-036",
+    "source_id": "UC-LMS-013 Exception E1",
+    "purpose": "Verify that a Teaching Assistant (TA) cannot perform grade release under the baseline specification.",
+    "preconditions": "TA T1 is assigned to Course C101; draft grades exist for Assignment A1.",
+    "action_or_input": "TA T1 attempts to execute grade release for Assignment A1.",
+    "expected_result": "The system rejects the release action with an authorization error, ensuring draft grades remain hidden from students.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-037",
+    "source_id": "UC-LMS-014 Main Flow",
+    "purpose": "Verify that an enrolled Student can view their own released grade and feedback in read-only form.",
+    "preconditions": "Student S1 is registered in Course C101; grade and feedback for Student S1's submission have been released by Faculty.",
+    "action_or_input": "Student S1 opens Grades for Course C101 / Assignment A1.",
+    "expected_result": "The system retrieves Student S1's released grade and feedback, displaying them in read-only form.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-038",
+    "source_id": "UC-LMS-014 Alternative A1",
+    "purpose": "Verify that draft or unreleased grades are omitted and not shown to Students.",
+    "preconditions": "Student S1 is registered in Course C101; Student S1 has submitted work; grade is stored in Draft state and has not been released.",
+    "action_or_input": "Student S1 opens Grades for Course C101 / Assignment A1.",
+    "expected_result": "The system withholds unreleased draft grade data and displays no grade or feedback to Student S1.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-039",
+    "source_id": "UC-LMS-014 Exception E1",
+    "purpose": "Verify that access to another student's grade or feedback is denied.",
+    "preconditions": "Student S1 and Student S2 are registered in Course C101; Student S1 has a released grade.",
+    "action_or_input": "Student S2 attempts to access or view Student S1's grade or feedback data.",
+    "expected_result": "The system denies access with an authorization error and does not expose another student's grade data.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-UC-040",
+    "source_id": "UC-LMS-015 Main Flow",
+    "purpose": "Verify that scheduled content is automatically transitioned to Published/Available and made visible when its configured release time is reached.",
+    "preconditions": "Content ITEM1 (material or assignment) in Course C101 is in Scheduled state with release time reached and remains valid for publication.",
+    "action_or_input": "System evaluates scheduled content when configured release date/time is reached.",
+    "expected_result": "The system identifies ITEM1, verifies eligibility, transitions content state to Published/Available, and makes it visible to the authorized audience.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-041",
+    "source_id": "UC-LMS-015 Alternative A1",
+    "purpose": "Verify that no release occurs if scheduled content was withdrawn or unpublished before its release time.",
+    "preconditions": "Content ITEM_withdrawn was configured for future release but was withdrawn/unpublished by Faculty prior to release time.",
+    "action_or_input": "System evaluates scheduled releases when the original scheduled date/time is reached.",
+    "expected_result": "The system verifies eligibility, detects that the content was withdrawn/unpublished, and executes no release, leaving content unpublished.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-UC-042",
+    "source_id": "UC-LMS-015 Exception E1",
+    "purpose": "Verify that if release processing encounters a failure, content remains unavailable and the failure is recorded for operational handling.",
+    "preconditions": "Content ITEM_err is in Scheduled state with release time reached; an internal release execution error occurs.",
+    "action_or_input": "System executes scheduled content release processing and encounters a failure during state transition.",
+    "expected_result": "Content remains unavailable and unexposed, and the system records the failure for operational handling.",
+    "test_type": "Exception"
+  }
+]
