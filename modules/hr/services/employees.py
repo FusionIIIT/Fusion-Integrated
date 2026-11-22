@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import date
+
 from django.db import transaction
 
 from core.api.exceptions import ConflictError, NotFoundError
@@ -19,6 +21,14 @@ EDITABLE_FIELDS = {
     "service_history",
     "retirement_status",
 }
+
+
+def _audit_snapshot(values: dict) -> dict:
+    """Store date-valued employee fields as JSON-compatible ISO strings."""
+    return {
+        key: value.isoformat() if isinstance(value, date) else value
+        for key, value in values.items()
+    }
 
 
 def employee_record(*, user_id: int, principal) -> EmployeeRecord:
@@ -115,6 +125,6 @@ def update_employee_record(*, actor, user_id: int, changes: dict) -> EmployeeRec
         entity_type="employee",
         entity_id=record.pk,
         action="employee.updated",
-        details={"before": before, "after": changes},
+        details={"before": _audit_snapshot(before), "after": _audit_snapshot(changes)},
     )
     return record

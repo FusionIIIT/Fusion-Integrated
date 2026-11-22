@@ -238,7 +238,11 @@ def test_br_040_missing_required_field_prohibited(hr_caller):
         "/api/v1/hr/claims/create/",
         user_id=UID_FACULTY_1,
         role="faculty",
-        data={"request_type": "cpda_advance", "purpose": "", "amount": "8000.00"},
+        data={
+            "request_type": "cpda_advance",
+            "purpose": "Conference",
+            "amount": "8000.00",
+        },
     )
     assert res.status_code in (400, 422)
 

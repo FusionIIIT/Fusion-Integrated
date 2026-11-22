@@ -49,7 +49,12 @@ def test_uc_039_alternative_a1_missing_cpda_advance_fields(hr_caller):
         "/api/v1/hr/claims/create/",
         user_id=UID_FACULTY_1,
         role="faculty",
-        data={"request_type": "cpda_advance", "purpose": "", "amount": "5000.00"},
+        data={
+            "request_type": "cpda_advance",
+            "purpose": "",
+            "amount": "5000.00",
+            "supporting_document_links": [VALID_DRIVE_LINK],
+        },
     )
     assert res.status_code in (400, 422)
 
@@ -105,7 +110,8 @@ def test_uc_042_alternative_a1_missing_cpda_reimbursement_fields(hr_caller):
         data={
             "request_type": "cpda_reimbursement",
             "purpose": "Conference Reg",
-            "supporting_documents": [],
+            "amount": "7000.00",
+            "supporting_document_links": [],
         },
     )
     assert res.status_code in (400, 422)

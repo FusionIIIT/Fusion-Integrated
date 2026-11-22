@@ -2,6 +2,7 @@
 
 import pytest
 
+from modules.hr.models import AuditEvent
 from modules.hr.tests.spec.conftest import (
     UID_FACULTY_1,
     UID_FACULTY_2,
@@ -162,6 +163,10 @@ def test_br_011_consistent_update_permitted(hr_caller):
         data={"appointment_start_date": "2023-01-01", "appointment_end_date": "2025-12-31"},
     )
     assert res.status_code == 200
+    audit_event = AuditEvent.objects.get(
+        entity_type="employee", entity_id=emp.pk, action="employee.updated"
+    )
+    assert audit_event.details["after"]["appointment_start_date"] == "2023-01-01"
 
 
 def test_br_012_partial_update_rollback_prohibited(hr_caller):

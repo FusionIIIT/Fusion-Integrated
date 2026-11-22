@@ -2,6 +2,7 @@
 
 import pytest
 
+from modules.hr.models import AuditEvent
 from modules.hr.tests.spec.conftest import (
     UID_FACULTY_1,
     UID_HR_ADMIN,
@@ -195,6 +196,10 @@ def test_fr_058_preserve_service_record_consistency(hr_caller):
         data={"appointment_start_date": "2024-01-01", "appointment_end_date": "2024-12-31"},
     )
     assert res.status_code == 200
+    audit_event = AuditEvent.objects.get(
+        entity_type="employee", entity_id=emp.pk, action="employee.updated"
+    )
+    assert audit_event.details["after"]["appointment_start_date"] == "2024-01-01"
     emp.refresh_from_db()
     assert str(emp.appointment_start_date) == "2024-01-01"
 
