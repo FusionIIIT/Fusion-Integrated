@@ -74,8 +74,9 @@ def is_high_value(amount, threshold) -> bool:
     return amount >= threshold
 
 
-def approval_eligible(*, creator_id: int, approver_id: int,
-                      assigned_role: str, active_role: str) -> bool:
+def approval_eligible(
+    *, creator_id: int, approver_id: int, assigned_role: str, active_role: str
+) -> bool:
     return creator_id != approver_id and assigned_role == active_role
 
 

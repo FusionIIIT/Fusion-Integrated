@@ -47,5 +47,3 @@ def require(actor, permission: str, *, roles: set[str] | None = None) -> str:
     if has is None or not has(permission):
         raise AuthorizationError("The active role is not permitted to perform this action.")
     return role
-
-

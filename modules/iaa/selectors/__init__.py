@@ -2,8 +2,12 @@
 
 from modules.iaa.authorization import active_role, actor_id
 from modules.iaa.models import (
-    Anomaly, ApprovalStep, AuditObservation, ExpenseRequest,
-    IaaNotificationOutbox, TravelClaim,
+    Anomaly,
+    ApprovalStep,
+    AuditObservation,
+    ExpenseRequest,
+    IaaNotificationOutbox,
+    TravelClaim,
 )
 
 
@@ -59,4 +63,3 @@ def observations_for(actor):
 
 def notifications_for(actor):
     return IaaNotificationOutbox.objects.filter(recipient_user_id=actor_id(actor))
-

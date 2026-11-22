@@ -1,9 +1,17 @@
 from rest_framework import serializers
 
 from modules.iaa.models import (
-    Anomaly, ApprovalRoute, ApprovalStep, AuditObservation, BudgetAllocation,
-    ExpenseRequest, IaaNotificationOutbox, IaaPolicy, IaaSupportingDocument,
-    ObservationResponse, TravelClaim,
+    Anomaly,
+    ApprovalRoute,
+    ApprovalStep,
+    AuditObservation,
+    BudgetAllocation,
+    ExpenseRequest,
+    IaaNotificationOutbox,
+    IaaPolicy,
+    IaaSupportingDocument,
+    ObservationResponse,
+    TravelClaim,
 )
 
 
@@ -13,10 +21,21 @@ class ExpenseReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpenseRequest
         fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at", "creator_user_id", "status",
-                            "assigned_finance_user_id", "assigned_route", "clarification",
-                            "finance_notes", "decision_remarks", "recorded_at",
-                            "recorded_by_user_id", "lock_version")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "creator_user_id",
+            "status",
+            "assigned_finance_user_id",
+            "assigned_route",
+            "clarification",
+            "finance_notes",
+            "decision_remarks",
+            "recorded_at",
+            "recorded_by_user_id",
+            "lock_version",
+        )
 
     def get_supporting_documents(self, obj):
         return document_references(obj.supporting_documents)
@@ -39,10 +58,20 @@ class TravelClaimReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = TravelClaim
         fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at", "claimant_user_id", "status",
-                            "assigned_finance_user_id", "assigned_route", "clarification",
-                            "finance_notes", "decision_remarks", "recorded_at",
-                            "recorded_by_user_id")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "claimant_user_id",
+            "status",
+            "assigned_finance_user_id",
+            "assigned_route",
+            "clarification",
+            "finance_notes",
+            "decision_remarks",
+            "recorded_at",
+            "recorded_by_user_id",
+        )
 
     def get_supporting_documents(self, obj):
         return document_references(obj.supporting_documents)
@@ -57,8 +86,14 @@ def document_references(refs):
 class TravelClaimWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = TravelClaim
-        fields = ("department", "trip_start", "trip_end", "purpose", "amount",
-                  "supporting_documents")
+        fields = (
+            "department",
+            "trip_start",
+            "trip_end",
+            "purpose",
+            "amount",
+            "supporting_documents",
+        )
 
     def validate_amount(self, value):
         if value <= 0:
@@ -70,18 +105,41 @@ class ApprovalStepSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApprovalStep
         fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at", "record_type", "record_id",
-                            "route", "level", "authority_role", "assignee_user_id",
-                            "status", "due_at", "decided_at", "remarks")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "record_type",
+            "record_id",
+            "route",
+            "level",
+            "authority_role",
+            "assignee_user_id",
+            "status",
+            "due_at",
+            "decided_at",
+            "remarks",
+        )
 
 
 class AnomalySerializer(serializers.ModelSerializer):
     class Meta:
         model = Anomaly
         fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at", "record_type", "record_id",
-                            "category", "description", "is_automatic", "status",
-                            "resolver_role", "resolver_user_id", "resolution_remarks")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "record_type",
+            "record_id",
+            "category",
+            "description",
+            "is_automatic",
+            "status",
+            "resolver_role",
+            "resolver_user_id",
+            "resolution_remarks",
+        )
 
 
 class ObservationSerializer(serializers.ModelSerializer):
@@ -90,13 +148,22 @@ class ObservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuditObservation
         fields = "__all__"
-        read_only_fields = ("id", "created_at", "updated_at", "record_type", "record_id",
-                            "auditor_user_id", "owner_user_id", "department", "finding", "status")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "record_type",
+            "record_id",
+            "auditor_user_id",
+            "owner_user_id",
+            "department",
+            "finding",
+            "status",
+        )
 
     def get_responses(self, obj):
-        result = []
-        for response in ObservationResponse.objects.filter(observation=obj):
-            result.append({
+        return [
+            {
                 "id": response.pk,
                 "responder_user_id": response.responder_user_id,
                 "corrective_action": response.corrective_action,
@@ -105,16 +172,25 @@ class ObservationSerializer(serializers.ModelSerializer):
                 "satisfactory": response.satisfactory,
                 "verification_remarks": response.verification_remarks,
                 "created_at": response.created_at,
-            })
-        return result
+            }
+            for response in ObservationResponse.objects.filter(observation=obj)
+        ]
 
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = IaaNotificationOutbox
         fields = "__all__"
-        read_only_fields = ("id", "recipient_user_id", "record_type", "record_id", "event",
-                            "payload", "created_at", "delivered_at")
+        read_only_fields = (
+            "id",
+            "recipient_user_id",
+            "record_type",
+            "record_id",
+            "event",
+            "payload",
+            "created_at",
+            "delivered_at",
+        )
 
 
 class ActionSerializer(serializers.Serializer):
@@ -159,7 +235,8 @@ class AnomalyResolutionSerializer(serializers.Serializer):
     remarks = serializers.CharField()
     next_resolver_user_id = serializers.IntegerField(min_value=1, required=False)
     next_resolver_role = serializers.ChoiceField(
-        choices=("finance_staff", "auditor", "hod", "dean", "director"), required=False)
+        choices=("finance_staff", "auditor", "hod", "dean", "director"), required=False
+    )
 
 
 class ObservationCreateSerializer(serializers.Serializer):
@@ -171,8 +248,16 @@ class ObservationCreateSerializer(serializers.Serializer):
 class PolicySerializer(serializers.ModelSerializer):
     class Meta:
         model = IaaPolicy
-        fields = ("id", "name", "financial_year_start_month", "ta_high_value_threshold",
-                  "approval_timeout_hours", "parameters", "is_active", "updated_at")
+        fields = (
+            "id",
+            "name",
+            "financial_year_start_month",
+            "ta_high_value_threshold",
+            "approval_timeout_hours",
+            "parameters",
+            "is_active",
+            "updated_at",
+        )
         read_only_fields = ("id", "updated_at")
 
     def validate_financial_year_start_month(self, value):
@@ -184,17 +269,36 @@ class PolicySerializer(serializers.ModelSerializer):
 class ApprovalRouteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApprovalRoute
-        fields = ("id", "request_type", "department", "amount_from", "amount_through",
-                  "level", "authority_role", "assignee_user_id", "timeout_hours",
-                  "next_route", "is_active")
+        fields = (
+            "id",
+            "request_type",
+            "department",
+            "amount_from",
+            "amount_through",
+            "level",
+            "authority_role",
+            "assignee_user_id",
+            "timeout_hours",
+            "next_route",
+            "is_active",
+        )
 
 
 class BudgetAllocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = BudgetAllocation
-        fields = ("id", "department", "financial_year", "budget_code", "allocated_amount",
-                  "committed_amount", "available_amount", "configured_by_user_id",
-                  "created_at", "updated_at")
+        fields = (
+            "id",
+            "department",
+            "financial_year",
+            "budget_code",
+            "allocated_amount",
+            "committed_amount",
+            "available_amount",
+            "configured_by_user_id",
+            "created_at",
+            "updated_at",
+        )
         read_only_fields = ("id", "configured_by_user_id", "created_at", "updated_at")
 
     def validate(self, attrs):
@@ -205,9 +309,13 @@ class BudgetAllocationSerializer(serializers.ModelSerializer):
         if allocated is not None and (allocated < 0 or committed < 0 or available < 0):
             raise serializers.ValidationError("Budget amounts cannot be negative.")
         if allocated is not None and committed > allocated:
-            raise serializers.ValidationError({"committed_amount": "Cannot exceed the allocated amount."})
+            raise serializers.ValidationError(
+                {"committed_amount": "Cannot exceed the allocated amount."}
+            )
         if allocated is not None and available > allocated:
-            raise serializers.ValidationError({"available_amount": "Cannot exceed the allocated amount."})
+            raise serializers.ValidationError(
+                {"available_amount": "Cannot exceed the allocated amount."}
+            )
         if allocated is not None and committed + available > allocated:
             raise serializers.ValidationError(
                 "Committed and available amounts cannot exceed the allocated amount."
