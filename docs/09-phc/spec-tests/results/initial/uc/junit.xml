@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="6" time="1.138" timestamp="2026-11-22T19:54:57.447698+05:30" hostname="LAPTOP-FF79NG73"><testcase classname="modules.phc.tests.test_uc" name="test_patient_reads_only_own_records_and_can_download_pdf" time="0.593" /><testcase classname="modules.phc.tests.test_uc" name="test_patient_schedule_visibility_and_attendance" time="0.010" /><testcase classname="modules.phc.tests.test_uc" name="test_staff_can_create_visit_and_add_linked_prescription" time="0.011" /><testcase classname="modules.phc.tests.test_uc" name="test_staff_can_log_ambulance_and_publish_patient_advisory" time="0.012" /><testcase classname="modules.phc.tests.test_uc" name="test_patient_cannot_create_staff_visit" time="0.004" /><testcase classname="modules.phc.tests.test_uc" name="test_staff_can_report_consumed_inventory_from_stock_audit" time="0.008"><failure message="assert 400 == 200&#10; +  where 400 = &lt;Response status_code=400, &quot;application/json&quot;&gt;.status_code">phc_client = &lt;function phc_client.&lt;locals&gt;.make at 0x0000020A5FAE6200&gt;
+
+    def test_staff_can_report_consumed_inventory_from_stock_audit(phc_client):
+        from decimal import Decimal
+    
+        from modules.phc.models import InventoryAudit, InventoryItem
+    
+        item = InventoryItem.objects.create(name="Masks", unit="box")
+        InventoryAudit.objects.create(
+            item=item, delta=Decimal("-3"), quantity_before=Decimal("10"),
+            quantity_after=Decimal("7"), actor_user_id=900,
+        )
+        InventoryAudit.objects.create(
+            item=item, delta=Decimal("-2"), quantity_before=Decimal("7"),
+            quantity_after=Decimal("5"), actor_user_id=900,
+        )
+        InventoryAudit.objects.create(
+            item=item, delta=Decimal("4"), quantity_before=Decimal("5"),
+            quantity_after=Decimal("9"), actor_user_id=900,
+        )
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.report.view",))
+        response = staff.get("/api/v1/phc/reports/?type=inventory_consumption")
+&gt;       assert response.status_code == 200
+E       assert 400 == 200
+E        +  where 400 = &lt;Response status_code=400, "application/json"&gt;.status_code
+
+modules\phc\tests\test_uc.py:131: AssertionError</failure></testcase></testsuite></testsuites>

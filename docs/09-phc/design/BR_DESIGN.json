@@ -1,0 +1,16 @@
+{
+  "strategy": "BR",
+  "source": "PHC business-rule specifications v1.1 final synchronized",
+  "executed_case_count": 54,
+  "final_run": {"passed": 54, "failed": 0, "skipped": 0},
+  "cases": [
+    {"id":"BR-01","requirements":["PHC-BR-04","PHC-BR-05","AFR-PHC-013","AFR-PHC-014"],"oracle":"employee only; prescription must exist and belong to claimant"},
+    {"id":"BR-02","requirements":["PHC-BR-06","AFR-PHC-015"],"oracle":"configured expense-date window is enforced, including boundary"},
+    {"id":"BR-03","requirements":["PHC-BR-02","PHC-BR-03","AFR-PHC-012","AFR-PHC-036"],"oracle":"ownership-scoped record access and role-based function access"},
+    {"id":"BR-04","requirements":["PHC-BR-07","AFR-PHC-024","AFR-PHC-025","AFR-PHC-026"],"oracle":"stock change is audited; below-threshold change queues staff warning; negative stock is rejected"},
+    {"id":"BR-05","requirements":["PHC-BR-09","AFR-PHC-037"],"oracle":"covered record and inventory actions append audit evidence"},
+    {"id":"BR-06","requirements":["PHC-BR-12","AFR-PHC-035"],"oracle":"patient-identifiable fields are not included in patient-derived report output"},
+    {"id":"BR-07","requirements":["CFR-PHC-010","AFR-PHC-034","AFR-PHC-035"],"oracle":"demographics report groups patient and visit counts by student/employee category without exposing identifiers"}
+  ],
+  "limitations": "Tests assert the current stated module contract; no unstated privacy, delivery, or retention rule is added."
+}

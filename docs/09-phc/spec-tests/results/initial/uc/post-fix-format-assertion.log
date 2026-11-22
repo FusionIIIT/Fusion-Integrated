@@ -1,0 +1,76 @@
+.....F                                                                   [100%]
+================================== FAILURES ===================================
+__________ test_staff_can_report_consumed_inventory_from_stock_audit __________
+
+phc_client = <function phc_client.<locals>.make at 0x000002A13C1F1580>
+
+    def test_staff_can_report_consumed_inventory_from_stock_audit(phc_client):
+        from decimal import Decimal
+    
+        from modules.phc.models import InventoryAudit, InventoryItem
+    
+        item = InventoryItem.objects.create(name="Masks", unit="box")
+        InventoryAudit.objects.create(
+            item=item, delta=Decimal("-3"), quantity_before=Decimal("10"),
+            quantity_after=Decimal("7"), actor_user_id=900,
+        )
+        InventoryAudit.objects.create(
+            item=item, delta=Decimal("-2"), quantity_before=Decimal("7"),
+            quantity_after=Decimal("5"), actor_user_id=900,
+        )
+        InventoryAudit.objects.create(
+            item=item, delta=Decimal("4"), quantity_before=Decimal("5"),
+            quantity_after=Decimal("9"), actor_user_id=900,
+        )
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.report.view",))
+        response = staff.get("/api/v1/phc/reports/?type=inventory_consumption")
+        assert response.status_code == 200
+        row = response.json()["items"][0]
+        assert row["item_name"] == "Masks"
+>       assert row["quantity_consumed"] == "5.00"
+E       AssertionError: assert '5' == '5.00'
+E         
+E         - 5.00
+E         + 5
+
+modules\phc\tests\test_uc.py:134: AssertionError
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.4-final-0 _______________
+
+Name                                     Stmts   Miss  Cover
+------------------------------------------------------------
+modules\phc\__init__.py                      0      0   100%
+modules\phc\api\__init__.py                  0      0   100%
+modules\phc\api\serializers.py             122      6    95%
+modules\phc\api\urls.py                      3      0   100%
+modules\phc\api\views.py                   348    126    64%
+modules\phc\apps.py                          6      0   100%
+modules\phc\contracts.py                     0      0   100%
+modules\phc\domain\__init__.py               0      0   100%
+modules\phc\domain\reimbursement.py         13      7    46%
+modules\phc\domain\state_machine.py         33     10    70%
+modules\phc\migrations\0001_initial.py       8      0   100%
+modules\phc\migrations\__init__.py           0      0   100%
+modules\phc\models.py                      199     19    90%
+modules\phc\registry.py                      7      7     0%
+modules\phc\selectors\__init__.py            0      0   100%
+modules\phc\selectors\scoping.py            44     17    61%
+modules\phc\services\__init__.py             0      0   100%
+modules\phc\services\inventory.py           58     43    26%
+modules\phc\services\notifications.py       45     35    22%
+modules\phc\services\operations.py          41     12    71%
+modules\phc\services\pdf.py                 54      3    94%
+modules\phc\services\records.py             18      0   100%
+modules\phc\services\reimbursement.py       60     41    32%
+modules\phc\services\schedules.py           23     15    35%
+modules\phc\tests\__init__.py                0      0   100%
+modules\phc\tests\conftest.py               19      2    89%
+modules\phc\tests\test_br.py                43     43     0%
+modules\phc\tests\test_fr.py                31     31     0%
+modules\phc\tests\test_uc.py                54      0   100%
+modules\phc\tests\test_wf.py                47     47     0%
+------------------------------------------------------------
+TOTAL                                     1276    464    64%
+Coverage XML written to file docs\09-phc\spec-tests\results\uc\coverage.xml
+=========================== short test summary info ===========================
+FAILED modules/phc/tests/test_uc.py::test_staff_can_report_consumed_inventory_from_stock_audit

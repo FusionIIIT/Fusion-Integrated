@@ -1,0 +1,117 @@
+FFF..                                                                    [100%]
+================================== FAILURES ===================================
+______ test_claim_submit_requires_employee_own_prescription_expense_date ______
+
+phc_client = <function phc_client.<locals>.make at 0x0000020D243CF100>
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+
+    def test_claim_submit_requires_employee_own_prescription_expense_date(phc_client, prescription):
+        student = phc_client(uid=1001, kind="student", permissions=("phc.claim.submit",))
+        payload = {"prescription_id": prescription.pk, "amount_claimed": "20.00"}
+        assert student.post("/api/v1/phc/claims/submit/", payload, format="json").status_code == 403
+        employee = phc_client(uid=1001, kind="faculty", permissions=("phc.claim.submit",))
+        other = phc_client(uid=2002, kind="staff", permissions=("phc.claim.submit",))
+>       assert employee.post("/api/v1/phc/claims/submit/", payload, format="json").status_code == 201
+E       assert 409 == 201
+E        +  where 409 = <Response status_code=409, "application/json">.status_code
+E        +    where <Response status_code=409, "application/json"> = post('/api/v1/phc/claims/submit/', {'prescription_id': 1, 'amount_claimed': '20.00'}, format='json')
+E        +      where post = <rest_framework.test.APIClient object at 0x0000020D24472710>.post
+
+modules\phc\tests\test_br.py:15: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-22 19:45:24 WARNING django.request Forbidden: /api/v1/phc/claims/submit/
+2026-11-22 19:45:24 WARNING django.request Conflict: /api/v1/phc/claims/submit/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:293 Forbidden: /api/v1/phc/claims/submit/
+WARNING  django.request:log.py:293 Conflict: /api/v1/phc/claims/submit/
+________ test_claimant_only_sees_own_claims_and_status_change_notifies ________
+
+prescription = <Prescription: rx#1 Paracetamol patient=1001>
+phc_client = <function phc_client.<locals>.make at 0x0000020D24CBB9C0>
+
+    def test_claimant_only_sees_own_claims_and_status_change_notifies(prescription, phc_client):
+        from modules.phc.models import PhcNotification, ReimbursementClaim
+        claim = ReimbursementClaim.objects.create(user_id=1001, prescription=prescription,
+                                                   amount_claimed=Decimal("12.00"))
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.claim.review_phc",))
+        assert staff.post(f"/api/v1/phc/claims/{claim.pk}/review/").status_code == 200
+        assert PhcNotification.objects.filter(recipient_user_id=1001,
+                                               event_type="claim_status_changed").exists()
+        claimant = phc_client(uid=1001, kind="faculty", permissions=("phc.claim.view_self",))
+        foreign = phc_client(uid=2002, kind="faculty", permissions=("phc.claim.view_self",))
+>       assert claimant.get(f"/api/v1/phc/claims/my/{claim.pk}/").status_code == 200
+E       assert 404 == 200
+E        +  where 404 = <Response status_code=404, "application/json">.status_code
+E        +    where <Response status_code=404, "application/json"> = get('/api/v1/phc/claims/my/1/')
+E        +      where get = <rest_framework.test.APIClient object at 0x0000020D24C7CC30>.get
+
+modules\phc\tests\test_br.py:29: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-22 19:45:24 INFO fusion.phc.notifications phc.notify.claim_status claim=1 to=pending_accounts_verification\n2026-11-22 19:45:24 INFO fusion.phc.reimbursement phc.claim.advanced claim=1 pending_phc_review\u2192pending_accounts_verification by=900\n2026-11-22 19:45:24 WARNING django.request Not Found: /api/v1/phc/claims/my/1/
+------------------------------ Captured log call ------------------------------
+INFO     fusion.phc.notifications:notifications.py:63 phc.notify.claim_status claim=1 to=pending_accounts_verification\nINFO     fusion.phc.reimbursement:reimbursement.py:146 phc.claim.advanced claim=1 pending_phc_review\u2192pending_accounts_verification by=900\nWARNING  django.request:log.py:293 Not Found: /api/v1/phc/claims/my/1/
+_____________ test_submission_window_configuration_is_staff_only ______________
+
+phc_client = <function phc_client.<locals>.make at 0x0000020D24CF6A20>
+
+    def test_submission_window_configuration_is_staff_only(phc_client):
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.claim.configure",))
+        patient = phc_client(uid=1001, permissions=())
+        changed = staff.patch("/api/v1/phc/claims/config/", {"submission_window_days": 30},
+                              format="json")
+>       assert changed.status_code == 200
+E       assert 403 == 200
+E        +  where 403 = <Response status_code=403, "application/json">.status_code
+
+modules\phc\tests\test_br.py:38: AssertionError
+---------------------------- Captured stderr call -----------------------------
+2026-11-22 19:45:24 WARNING django.request Forbidden: /api/v1/phc/claims/config/
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:293 Forbidden: /api/v1/phc/claims/config/
+============================== warnings summary ===============================
+modules/phc/tests/test_br.py::test_claimant_only_sees_own_claims_and_status_change_notifies
+  C:\Users\user\Downloads\assignment9\Fusion-Integrated\.venv\Lib\site-packages\rest_framework\fields.py:1015: UserWarning: min_value should be an integer or Decimal instance.
+    warnings.warn("min_value should be an integer or Decimal instance.")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.4-final-0 _______________
+
+Name                                     Stmts   Miss  Cover
+------------------------------------------------------------
+modules\phc\__init__.py                      0      0   100%
+modules\phc\api\__init__.py                  0      0   100%
+modules\phc\api\serializers.py             122      6    95%
+modules\phc\api\urls.py                      3      0   100%
+modules\phc\api\views.py                   350    159    55%
+modules\phc\apps.py                          6      0   100%
+modules\phc\contracts.py                     0      0   100%
+modules\phc\domain\__init__.py               0      0   100%
+modules\phc\domain\reimbursement.py         13      5    62%
+modules\phc\domain\state_machine.py         33      7    79%
+modules\phc\migrations\0001_initial.py       8      0   100%
+modules\phc\migrations\__init__.py           0      0   100%
+modules\phc\models.py                      199     17    91%
+modules\phc\selectors\__init__.py            0      0   100%
+modules\phc\selectors\scoping.py            44     20    55%
+modules\phc\services\__init__.py             0      0   100%
+modules\phc\services\inventory.py           58     30    48%
+modules\phc\services\notifications.py       47     29    38%
+modules\phc\services\operations.py          37     22    41%
+modules\phc\services\pdf.py                 54     54     0%
+modules\phc\services\records.py             18     10    44%
+modules\phc\services\reimbursement.py       60     22    63%
+modules\phc\services\schedules.py           25     15    40%
+modules\phc\tests\__init__.py                0      0   100%
+modules\phc\tests\conftest.py               19      0   100%
+modules\phc\tests\test_br.py                43      4    91%
+modules\phc\tests\test_fr.py                30     30     0%
+modules\phc\tests\test_uc.py                41     41     0%
+modules\phc\tests\test_wf.py                45     45     0%
+------------------------------------------------------------
+TOTAL                                     1255    516    59%
+Coverage XML written to file docs\09-phc\spec-tests\results\br\coverage.xml
+=========================== short test summary info ===========================
+FAILED modules/phc/tests/test_br.py::test_claim_submit_requires_employee_own_prescription_expense_date
+FAILED modules/phc/tests/test_br.py::test_claimant_only_sees_own_claims_and_status_change_notifies
+FAILED modules/phc/tests/test_br.py::test_submission_window_configuration_is_staff_only

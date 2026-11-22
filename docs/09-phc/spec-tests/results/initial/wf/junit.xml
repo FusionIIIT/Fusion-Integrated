@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="4" time="1.133" timestamp="2026-11-22T19:46:37.430322+05:30" hostname="LAPTOP-FF79NG73"><testcase classname="modules.phc.tests.test_wf" name="test_reimbursement_approved_path_and_terminal_payment" time="0.584"><failure message="KeyError: 'status'">phc_client = &lt;function phc_client.&lt;locals&gt;.make at 0x000001858D62ADE0&gt;
+prescription = &lt;Prescription: rx#1 Paracetamol patient=1001&gt;
+
+    def test_reimbursement_approved_path_and_terminal_payment(phc_client, prescription):
+        from modules.phc.models import ReimbursementClaim, ReimbursementAudit
+        employee = phc_client(uid=1001, kind="faculty", permissions=("phc.claim.submit",))
+        submit = employee.post("/api/v1/phc/claims/submit/", {
+            "prescription_id": prescription.pk, "amount_claimed": "45.00",
+        }, format="json")
+        assert submit.status_code == 201
+        claim_id = submit.json()["id"]
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.claim.review_phc",))
+        accounts = phc_client(uid=901, kind="staff", permissions=("phc.claim.verify", "phc.claim.payment"))
+        authority = phc_client(uid=902, kind="staff", permissions=("phc.claim.decide",))
+&gt;       assert staff.post(f"/api/v1/phc/claims/{claim_id}/review/").json()["status"] == "pending_accounts_verification"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'status'
+
+modules\phc\tests\test_wf.py:20: KeyError</failure></testcase><testcase classname="modules.phc.tests.test_wf" name="test_rejected_claim_cannot_be_reopened_or_paid" time="0.007"><failure message="KeyError: 'status'">phc_client = &lt;function phc_client.&lt;locals&gt;.make at 0x000001858A864F40&gt;
+prescription = &lt;Prescription: rx#1 Paracetamol patient=1001&gt;
+
+    def test_rejected_claim_cannot_be_reopened_or_paid(phc_client, prescription):
+        from modules.phc.models import ReimbursementClaim
+        claim = ReimbursementClaim.objects.create(user_id=1001, prescription=prescription,
+                                                   amount_claimed=Decimal("10"),
+                                                   status="pending_sanction")
+        authority = phc_client(uid=902, kind="staff", permissions=("phc.claim.decide",))
+        accounts = phc_client(uid=901, kind="staff", permissions=("phc.claim.payment",))
+&gt;       assert authority.post(f"/api/v1/phc/claims/{claim.pk}/decide/", {"approve": False},
+                              format="json").json()["status"] == "rejected"
+E       KeyError: 'status'
+
+modules\phc\tests\test_wf.py:35: KeyError</failure></testcase><testcase classname="modules.phc.tests.test_wf" name="test_requisition_approval_fulfillment_does_not_change_inventory" time="0.017"><failure message="KeyError: 'status'">phc_client = &lt;function phc_client.&lt;locals&gt;.make at 0x000001858A865800&gt;
+
+    def test_requisition_approval_fulfillment_does_not_change_inventory(phc_client):
+        from modules.phc.models import InventoryItem
+        item = InventoryItem.objects.create(name="Gloves", stock_quantity=Decimal("8"))
+        staff = phc_client(uid=900, kind="staff", permissions=(
+            "phc.requisition.submit", "phc.requisition.fulfill"))
+        created = staff.post("/api/v1/phc/requisitions/create/", {
+            "title": "Gloves", "line_items": [{"item_name": "Gloves", "quantity": "10"}],
+        }, format="json")
+        assert created.status_code == 201
+        req_id = created.json()["id"]
+        authority = phc_client(uid=902, kind="staff", permissions=("phc.requisition.decide",))
+        assert authority.post(f"/api/v1/phc/requisitions/{req_id}/decide/",
+                              {"approve": True}, format="json").json()["status"] == "approved"
+&gt;       assert staff.post(f"/api/v1/phc/requisitions/{req_id}/fulfill/").json()["status"] == "fulfilled"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'status'
+
+modules\phc\tests\test_wf.py:53: KeyError</failure></testcase><testcase classname="modules.phc.tests.test_wf" name="test_requisition_rejection_is_terminal" time="0.015" /></testsuite></testsuites>

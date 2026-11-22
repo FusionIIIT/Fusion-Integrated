@@ -13,6 +13,30 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `phc`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `phc.schedule.view` | View doctor schedule | `employee`, `patient` |
+| `phc.schedule.manage` | Create and publish doctor schedules | `phc_staff` |
+| `phc.attendance.mark` | Mark doctor real-time attendance | `phc_staff` |
+| `phc.record.view_self` | View own medical records | `employee`, `patient` |
+| `phc.record.manage` | Create and manage patient records | `phc_staff` |
+| `phc.claim.submit` | Submit a reimbursement claim | `employee` |
+| `phc.claim.view_self` | View own reimbursement claims | `employee` |
+| `phc.claim.review_phc` | PHC Staff review of reimbursement claims | `phc_staff` |
+| `phc.claim.verify` | Accounts & Audit: verify reimbursement | `accounts_audit` |
+| `phc.claim.decide` | Approving Authority: decide reimbursement sanction | `approving_authority` |
+| `phc.claim.payment` | Accounts & Audit: process reimbursement payment | `accounts_audit` |
+| `phc.claim.configure` | Configure the reimbursement submission window | `phc_staff` |
+| `phc.inventory.manage` | Manage PHC inventory stock | `phc_staff` |
+| `phc.requisition.submit` | Submit procurement requisitions | `phc_staff` |
+| `phc.requisition.decide` | Approve or reject procurement requisitions | `approving_authority` |
+| `phc.requisition.fulfill` | Mark requisition as fulfilled | `phc_staff` |
+| `phc.ambulance.log` | Record ambulance usage | `phc_staff` |
+| `phc.announcement.publish` | Publish health advisories | `phc_staff` |
+| `phc.report.view` | Generate PHC administrative reports | `phc_staff` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

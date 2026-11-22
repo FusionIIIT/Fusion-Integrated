@@ -1,0 +1,86 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______ test_demographics_report_aggregates_visits_by_patient_category ________
+
+phc_client = <function phc_client.<locals>.make at 0x000001534B4DA660>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001534B4AD940>
+
+    def test_demographics_report_aggregates_visits_by_patient_category(
+        phc_client, monkeypatch
+    ):
+        from types import SimpleNamespace
+    
+        from modules.directory import contracts as directory_contracts
+        from modules.phc.models import PatientVisit
+    
+        PatientVisit.objects.create(
+            user_id=1001, visit_date="2026-11-01", chief_complaint="A",
+            recorded_by_user_id=900,
+        )
+        PatientVisit.objects.create(
+            user_id=1001, visit_date="2026-11-02", chief_complaint="B",
+            recorded_by_user_id=900,
+        )
+        PatientVisit.objects.create(
+            user_id=2002, visit_date="2026-11-02", chief_complaint="C",
+            recorded_by_user_id=900,
+        )
+        monkeypatch.setattr(
+            directory_contracts,
+            "get_users",
+            lambda user_ids: {
+                1001: SimpleNamespace(kind="student"),
+                2002: SimpleNamespace(kind="faculty"),
+            },
+        )
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.report.view",))
+        response = staff.get("/api/v1/phc/reports/?type=demographics")
+        assert response.status_code == 200
+>       assert response.json()["patient_groups"] == [
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            {"category": "employee", "patients": 1, "visits": 1},
+            {"category": "student", "patients": 1, "visits": 2},
+        ]
+E       KeyError: 'patient_groups'
+
+modules\phc\tests\test_br.py:110: KeyError
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.4-final-0 _______________
+
+Name                                     Stmts   Miss  Cover
+------------------------------------------------------------
+modules\phc\__init__.py                      0      0   100%
+modules\phc\api\__init__.py                  0      0   100%
+modules\phc\api\serializers.py             122      6    95%
+modules\phc\api\urls.py                      3      0   100%
+modules\phc\api\views.py                   358    188    47%
+modules\phc\apps.py                          6      0   100%
+modules\phc\contracts.py                     0      0   100%
+modules\phc\domain\__init__.py               0      0   100%
+modules\phc\domain\reimbursement.py         13      7    46%
+modules\phc\domain\state_machine.py         33     10    70%
+modules\phc\migrations\0001_initial.py       8      0   100%
+modules\phc\migrations\__init__.py           0      0   100%
+modules\phc\models.py                      199     19    90%
+modules\phc\registry.py                      7      7     0%
+modules\phc\selectors\__init__.py            0      0   100%
+modules\phc\selectors\scoping.py            44     21    52%
+modules\phc\services\__init__.py             0      0   100%
+modules\phc\services\inventory.py           58     43    26%
+modules\phc\services\notifications.py       45     35    22%
+modules\phc\services\operations.py          41     25    39%
+modules\phc\services\pdf.py                 54     54     0%
+modules\phc\services\records.py             25     15    40%
+modules\phc\services\reimbursement.py       60     41    32%
+modules\phc\services\schedules.py           23     15    35%
+modules\phc\tests\__init__.py                0      0   100%
+modules\phc\tests\conftest.py               19      4    79%
+modules\phc\tests\test_br.py                55     35    36%
+modules\phc\tests\test_fr.py                31     31     0%
+modules\phc\tests\test_uc.py                62     62     0%
+modules\phc\tests\test_wf.py                49     49     0%
+------------------------------------------------------------
+TOTAL                                     1315    667    49%
+Coverage XML written to file docs\09-phc\spec-tests\results\initial\br\demographics-coverage.xml
+=========================== short test summary info ===========================
+FAILED modules/phc/tests/test_br.py::test_demographics_report_aggregates_visits_by_patient_category

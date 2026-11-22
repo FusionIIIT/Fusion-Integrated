@@ -1,0 +1,94 @@
+.....................FF............                                      [100%]
+================================== FAILURES ===================================
+______________ test_uc_staff_creates_inventory_items[zero-stock] ______________
+
+phc_client = <function phc_client.<locals>.make at 0x000002AB7A05D940>
+name = 'Cotton', stock = '0'
+
+    @pytest.mark.parametrize("name,stock", [("Cotton", "0"), ("Gloves", "12.50")], ids=["zero-stock", "fractional-stock"])
+    def test_uc_staff_creates_inventory_items(phc_client, name, stock):
+        response = phc_client(uid=900, kind="staff", permissions=("phc.inventory.manage",)).post(
+            "/api/v1/phc/inventory/create/",
+            {"name": name, "stock_quantity": stock, "reorder_threshold": "2", "unit": "pack"},
+            format="json",
+        )
+        assert response.status_code == 201
+        assert response.json()["name"] == name
+>       assert Decimal(response.json()["stock_quantity"]) == Decimal(stock)
+               ^^^^^^^
+E       NameError: name 'Decimal' is not defined
+
+modules\phc\tests\test_uc.py:287: NameError
+___________ test_uc_staff_creates_inventory_items[fractional-stock] ___________
+
+phc_client = <function phc_client.<locals>.make at 0x000002AB7A05CFE0>
+name = 'Gloves', stock = '12.50'
+
+    @pytest.mark.parametrize("name,stock", [("Cotton", "0"), ("Gloves", "12.50")], ids=["zero-stock", "fractional-stock"])
+    def test_uc_staff_creates_inventory_items(phc_client, name, stock):
+        response = phc_client(uid=900, kind="staff", permissions=("phc.inventory.manage",)).post(
+            "/api/v1/phc/inventory/create/",
+            {"name": name, "stock_quantity": stock, "reorder_threshold": "2", "unit": "pack"},
+            format="json",
+        )
+        assert response.status_code == 201
+        assert response.json()["name"] == name
+>       assert Decimal(response.json()["stock_quantity"]) == Decimal(stock)
+               ^^^^^^^
+E       NameError: name 'Decimal' is not defined
+
+modules\phc\tests\test_uc.py:287: NameError
+============================== warnings summary ===============================
+modules/phc/tests/test_uc.py::test_uc_employee_tracks_their_claim[faculty-claimant]
+modules/phc/tests/test_uc.py::test_uc_employee_tracks_their_claim[staff-claimant]
+modules/phc/tests/test_uc.py::test_uc_authorized_reviewer_filters_claim_queue_by_status[phc-queue]
+modules/phc/tests/test_uc.py::test_uc_authorized_reviewer_filters_claim_queue_by_status[sanction-queue]
+modules/phc/tests/test_uc.py::test_uc_staff_submits_requisition_with_requested_line_items[single-line]
+modules/phc/tests/test_uc.py::test_uc_staff_submits_requisition_with_requested_line_items[multiple-lines]
+  C:\Users\user\Downloads\assignment9\Fusion-Integrated\.venv\Lib\site-packages\rest_framework\fields.py:1015: UserWarning: min_value should be an integer or Decimal instance.
+    warnings.warn("min_value should be an integer or Decimal instance.")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.4-final-0 _______________
+
+Name                                     Stmts   Miss  Cover
+------------------------------------------------------------
+modules\phc\__init__.py                      0      0   100%
+modules\phc\api\__init__.py                  0      0   100%
+modules\phc\api\serializers.py             122      2    98%
+modules\phc\api\urls.py                      3      0   100%
+modules\phc\api\views.py                   358     95    73%
+modules\phc\apps.py                          6      0   100%
+modules\phc\contracts.py                     0      0   100%
+modules\phc\domain\__init__.py               0      0   100%
+modules\phc\domain\reimbursement.py         13      7    46%
+modules\phc\domain\state_machine.py         33     10    70%
+modules\phc\migrations\0001_initial.py       8      0   100%
+modules\phc\migrations\__init__.py           0      0   100%
+modules\phc\models.py                      199     18    91%
+modules\phc\registry.py                      7      7     0%
+modules\phc\selectors\__init__.py            0      0   100%
+modules\phc\selectors\scoping.py            44      7    84%
+modules\phc\services\__init__.py             0      0   100%
+modules\phc\services\inventory.py           58     37    36%
+modules\phc\services\notifications.py       45     35    22%
+modules\phc\services\operations.py          57     23    60%
+modules\phc\services\pdf.py                 54      3    94%
+modules\phc\services\records.py             25      0   100%
+modules\phc\services\reimbursement.py       60     41    32%
+modules\phc\services\schedules.py           23     10    57%
+modules\phc\tests\__init__.py                0      0   100%
+modules\phc\tests\conftest.py               19      0   100%
+modules\phc\tests\test_br.py               115    115     0%
+modules\phc\tests\test_fr.py                93     93     0%
+modules\phc\tests\test_uc.py               163      0   100%
+modules\phc\tests\test_wf.py                82     82     0%
+------------------------------------------------------------
+TOTAL                                     1587    585    63%
+Coverage XML written to file docs\09-phc\spec-tests\results\expanded-initial\uc\coverage.xml
+=========================== short test summary info ===========================
+FAILED modules/phc/tests/test_uc.py::test_uc_staff_creates_inventory_items[zero-stock]
+FAILED modules/phc/tests/test_uc.py::test_uc_staff_creates_inventory_items[fractional-stock]
+2 failed, 33 passed, 6 warnings in 1.51s
+pytest_exit_code=1

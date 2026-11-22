@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.134" timestamp="2026-11-22T19:58:31.613499+05:30" hostname="LAPTOP-FF79NG73"><testcase classname="modules.phc.tests.test_uc" name="test_staff_can_search_patient_profile" time="0.648"><failure message="assert 404 == 200&#10; +  where 404 = &lt;HttpResponseNotFound status_code=404, &quot;text/html; charset=utf-8&quot;&gt;.status_code">phc_client = &lt;function phc_client.&lt;locals&gt;.make at 0x000002B336A5F880&gt;
+
+    def test_staff_can_search_patient_profile(phc_client):
+        from modules.directory.models import UserRef
+    
+        UserRef.objects.create(user_id=1001, username="student-1001",
+                               display_name="Asha Patient", kind="student")
+        staff = phc_client(uid=900, kind="staff", permissions=("phc.record.manage",))
+        response = staff.get("/api/v1/phc/patients/search/?q=Asha")
+&gt;       assert response.status_code == 200
+E       assert 404 == 200
+E        +  where 404 = &lt;HttpResponseNotFound status_code=404, "text/html; charset=utf-8"&gt;.status_code
+
+modules\phc\tests\test_uc.py:77: AssertionError</failure></testcase></testsuite></testsuites>
