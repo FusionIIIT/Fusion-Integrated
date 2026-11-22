@@ -50,7 +50,7 @@ class ArchiveUserCreateSerializer(serializers.Serializer):
     email = serializers.EmailField()
     user_kind = serializers.CharField(max_length=16)
     is_deactivated = serializers.BooleanField(default=True)
-    deactivated_at = serializers.DateTimeField(required=False, allow_null=True)
+    deactivated_at = serializers.DateTimeField(required=False, allow_null=True, default=None)
     has_pending_transactions = serializers.BooleanField(default=False)
     archival_reason = serializers.CharField()
     metadata_snapshot = serializers.JSONField(required=False, default=dict)
