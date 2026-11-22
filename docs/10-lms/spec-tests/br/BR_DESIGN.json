@@ -1,0 +1,27 @@
+{
+  "strategy": "br",
+  "module": "lms",
+  "source_of_truth": ["Problem Statement v1.0", "Business Rule Specifications v1.0 (BR-LMS-001..019)"],
+  "note": "Design only — no production code consulted. Unresolved policy is recorded and NOT turned into fabricated behavior.",
+  "rules": [
+    { "source_id": "BR-LMS-001", "name": "Course-specific access control", "type": "Authorization", "applies_to": ["UC-LMS-001","UC-LMS-004","UC-LMS-006","UC-LMS-009"], "statement": "A user may access a course workspace only for a course in which the user is enrolled, assigned, or otherwise linked." },
+    { "source_id": "BR-LMS-003", "name": "Observer read-only and student-data restriction", "type": "Authorization/Privacy", "applies_to": ["UC-LMS-001","UC-LMS-004","UC-LMS-006"], "statement": "Observer read-only on course details/materials/announcements. No student submissions/grades. No write access anywhere." },
+    { "source_id": "BR-LMS-004", "name": "TA authoring restriction", "type": "Authorization", "applies_to": ["UC-LMS-002","UC-LMS-003","UC-LMS-005","UC-LMS-007","UC-LMS-012"], "statement": "TA cannot create/edit assignments, materials, or course structure. TA may grade and post announcements where permitted." },
+    { "source_id": "BR-LMS-005", "name": "Published material visibility", "type": "Lifecycle/Visibility", "applies_to": ["UC-LMS-003","UC-LMS-004","UC-LMS-015"], "statement": "Students/TAs/Observers see only published materials. Draft/scheduled omitted until released." },
+    { "source_id": "BR-LMS-006", "name": "Scheduled material release", "type": "Trigger/Time", "applies_to": ["UC-LMS-003","UC-LMS-015"], "statement": "Future-release material stays Scheduled until release time; not exposed prematurely." },
+    { "source_id": "BR-LMS-007", "name": "Announcement posting authority", "type": "Authorization", "applies_to": ["UC-LMS-005"], "statement": "Faculty posts announcements. TA posts only where permitted. Unauthorized posting rejected." },
+    { "source_id": "BR-LMS-008", "name": "Announcement timestamp and audience", "type": "Lifecycle/Visibility", "applies_to": ["UC-LMS-005","UC-LMS-006"], "statement": "Announcements timestamped and visible to all users enrolled/linked to the course." },
+    { "source_id": "BR-LMS-009", "name": "Assignment required configuration", "type": "Validation", "applies_to": ["UC-LMS-007","UC-LMS-008"], "statement": "Assignment requires due date, instructions, submission type, points possible." },
+    { "source_id": "BR-LMS-010", "name": "Assignment draft-before-publication", "type": "Lifecycle", "applies_to": ["UC-LMS-007","UC-LMS-008"], "statement": "Assignment stored in Draft until published; not visible to students before publication." },
+    { "source_id": "BR-LMS-011", "name": "Assignment release-date visibility", "type": "Trigger/Time/Visibility", "applies_to": ["UC-LMS-008","UC-LMS-009","UC-LMS-015"], "statement": "Assignment visibility to students follows configured release date." },
+    { "source_id": "BR-LMS-012", "name": "Submission-type conformity", "type": "Validation", "applies_to": ["UC-LMS-010"], "statement": "Submission must use the submission type configured for the assignment: file, text, or link." },
+    { "source_id": "BR-LMS-013", "name": "Baseline on-time submission", "type": "Time/Validation", "applies_to": ["UC-LMS-010"], "statement": "On-time submission before due date supported. Late-submission behavior unresolved — not invented." },
+    { "source_id": "BR-LMS-014", "name": "Submission ownership/privacy", "type": "Authorization/Privacy", "applies_to": ["UC-LMS-010","UC-LMS-011"], "statement": "Student views only own submission history and status. No other student's data exposed." },
+    { "source_id": "BR-LMS-015", "name": "Grading authority and attribution", "type": "Authorization/Audit", "applies_to": ["UC-LMS-012"], "statement": "Faculty and TAs may grade submissions for the applicable course. Each grading action attributed to the person who performed it." },
+    { "source_id": "BR-LMS-016", "name": "Draft grade visibility", "type": "Lifecycle/Visibility", "applies_to": ["UC-LMS-012","UC-LMS-013","UC-LMS-014"], "statement": "Grades/feedback remain Draft and invisible to Students until released." },
+    { "source_id": "BR-LMS-017", "name": "Grade release authority", "type": "Authorization", "applies_to": ["UC-LMS-013"], "statement": "Faculty releases grades. TA grading does not by itself release grades." },
+    { "source_id": "BR-LMS-018", "name": "Released grade read-only to Student", "type": "Authorization/Visibility", "applies_to": ["UC-LMS-013","UC-LMS-014"], "statement": "After release, Student views own grade/feedback read-only. No student write access." },
+    { "source_id": "BR-LMS-019", "name": "Post-release grade-change audit", "type": "Audit", "applies_to": ["UC-LMS-012"], "statement": "Whenever a released grade is changed, log who and when." },
+    { "source_id": "UNRESOLVED", "name": "Not tested (open policy)", "type": "n/a", "applies_to": [], "statement": "Late-submission (ISS-LMS-001), resubmission, TA-permission config, Observer linkage, notification channel, post-release grade-change authority (ISS-LMS-006)." }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "strategy": "uc",
+  "module": "lms",
+  "source_of_truth": ["Problem Statement v1.0", "Use Case Specifications v1.0 (UC-LMS-001..015)"],
+  "note": "Design only — no production code consulted. Open policy not asserted (late-submission, resubmission, TA-permission config, Observer linkage, notification channel, post-release grade change).",
+  "use_cases": [
+    { "source_id": "UC-LMS-001", "name": "Access Course Workspace", "actor": "Student/Faculty/TA/Observer", "main_flow": "identify course+user -> validate access -> open workspace -> display syllabus/schedule/instructor/TA", "alt": "access not authorized -> denied", "exc": "registration data unavailable -> do not expose workspace" },
+    { "source_id": "UC-LMS-002", "name": "Manage Course Details", "actor": "Faculty", "main_flow": "verify Faculty auth -> edit/configure -> save/publish -> store and present", "alt": "Faculty may edit published details", "exc": "unauthorized Faculty-course rejected" },
+    { "source_id": "UC-LMS-003", "name": "Manage Course Materials", "actor": "Faculty", "main_flow": "add file/link/note -> place in module/weekly section -> choose release timing -> validate and save -> immediate=published, future=Scheduled", "alt": "Faculty may edit/reorganize existing material", "exc": "TA/Observer/Student write attempts rejected" },
+    { "source_id": "UC-LMS-004", "name": "View Published Course Materials", "actor": "Student/TA/Observer", "main_flow": "list published materials -> open item -> display read-only", "alt": "scheduled/unpublished omitted until released", "exc": "unauthorized course access denied" },
+    { "source_id": "UC-LMS-005", "name": "Post Course Announcement", "actor": "Faculty/TA", "main_flow": "enter content -> verify posting authority -> submit -> timestamp and store -> visible course-wide", "alt": "TA posting only where permitted", "exc": "unauthorized posting rejected" },
+    { "source_id": "UC-LMS-006", "name": "View Course Announcements", "actor": "Student/Faculty/TA/Observer", "main_flow": "retrieve announcements -> display with timestamps -> read content", "exc": "unauthorized course access denied" },
+    { "source_id": "UC-LMS-007", "name": "Create or Edit Assignment", "actor": "Faculty", "main_flow": "create new/open existing editable -> enter due date/instructions/submission type/points -> validate -> save -> stored in Draft", "alt": "Faculty edits existing Draft assignment", "exc": "TA/Student/Observer authoring rejected" },
+    { "source_id": "UC-LMS-008", "name": "Publish Assignment", "actor": "Faculty", "main_flow": "select assignment -> publish (immediate or scheduled) -> available to students per release date", "exc": "unreleased/unauthorized content not exposed" },
+    { "source_id": "UC-LMS-009", "name": "View Assignment", "actor": "Student", "main_flow": "student views available/published assignments for course", "exc": "draft/future-release not visible" },
+    { "source_id": "UC-LMS-010", "name": "Submit Assignment", "actor": "Student", "main_flow": "student chooses Submit -> use configured submission type -> before due date -> on-time submission recorded", "exc": "no invalid submission recorded; late behavior unresolved (ISS-LMS-001)" },
+    { "source_id": "UC-LMS-011", "name": "View Own Submission History", "actor": "Student", "main_flow": "student opens submission details/history -> views own status only", "exc": "no other student's data exposed" },
+    { "source_id": "UC-LMS-012", "name": "Grade Submission", "actor": "Faculty/TA", "main_flow": "open student submission -> record points and feedback -> attributed to actor", "exc": "no unauthorized grade change committed" },
+    { "source_id": "UC-LMS-013", "name": "Release Grades", "actor": "Faculty", "main_flow": "Faculty chooses to release -> draft grades/feedback become Released and visible", "exc": "draft grades remain hidden; TA grading alone does not release" },
+    { "source_id": "UC-LMS-014", "name": "View Own Released Grade", "actor": "Student", "main_flow": "student opens Grades -> views own released grade/feedback read-only", "exc": "unreleased/other-student grade data not exposed" },
+    { "source_id": "UC-LMS-015", "name": "Scheduled Release", "actor": "Event-triggered", "main_flow": "configured release time reached -> scheduled material/assignment becomes Published/Available", "exc": "content not exposed prematurely" }
+  ],
+  "unresolved_not_tested": [ "Late-submission (ISS-LMS-001)", "Resubmission/attempt limits", "TA announcement/grading per-course config", "Observer linkage granularity", "Notification channel", "Post-release grade-change authority (ISS-LMS-006)" ]
+}

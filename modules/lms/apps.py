@@ -1,0 +1,6 @@
+from django.apps import AppConfig
+
+
+class LmsConfig(AppConfig):
+    name = "modules.lms"
+    label = "lms"

@@ -1,0 +1,16 @@
+{
+  "strategy": "wf",
+  "module": "lms",
+  "source_of_truth": ["Use Case Specifications v1.0 (Related Workflow columns)"],
+  "note": "Design only — no production code consulted. Workflow ids from UC specs: BW-LMS-01..05 (basis), CW-LMS-01, CW-LMS-02 (composite).",
+  "workflows": [
+    { "source_id": "BW-LMS-01", "name": "Scheduled material release", "trigger": "configured release time reached", "outcome": "scheduled material becomes Published", "guard": "not exposed prematurely" },
+    { "source_id": "BW-LMS-02", "name": "Student submits assignment", "trigger": "student chooses Submit before due date", "outcome": "on-time submission recorded", "guard": "no invalid submission recorded" },
+    { "source_id": "BW-LMS-03", "name": "Content visibility gating", "trigger": "release date / publication state", "outcome": "content visible only when published/released", "guard": "draft/scheduled/future not exposed" },
+    { "source_id": "BW-LMS-04", "name": "Faculty grades submission", "trigger": "Faculty/TA opens submission for grading", "outcome": "grade recorded with actor attribution", "guard": "no unauthorized grade change" },
+    { "source_id": "BW-LMS-05", "name": "Faculty releases grades", "trigger": "Faculty chooses release", "outcome": "draft grades become Released and visible", "guard": "draft remains hidden; TA grading alone does not release" },
+    { "source_id": "CW-LMS-01", "name": "Composite: material lifecycle", "steps": "create draft -> schedule -> scheduled release -> published -> student views", "guard": "each state transition valid" },
+    { "source_id": "CW-LMS-02", "name": "Composite: grade lifecycle", "steps": "submit -> grade (draft) -> release -> student views read-only -> optional change audit", "guard": "audit log on change" }
+  ],
+  "unresolved_not_tested": [ "Late-submission handling in BW-LMS-02", "Resubmission in CW-LMS-02" ]
+}
