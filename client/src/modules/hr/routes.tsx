@@ -3,14 +3,14 @@ import { Navigate, type RouteObject } from "react-router-dom";
 
 import { RequirePermission } from "../../auth/RequirePermission";
 
-const RecordsPage = lazy(() => import("../hr_eis/pages/RecordsPage"));
-const ClaimsPage = lazy(() => import("../hr_eis/pages/ClaimsPage"));
-const AppraisalsPage = lazy(() => import("../hr_eis/pages/AppraisalsPage"));
+const RecordsPage = lazy(() => import("./pages/RecordsPage"));
+const ClaimsPage = lazy(() => import("./pages/ClaimsPage"));
+const AppraisalsPage = lazy(() => import("./pages/AppraisalsPage"));
 const AdministrationPage = lazy(
-  () => import("../hr_eis/pages/AdministrationPage"));
+  () => import("./pages/AdministrationPage"));
 const NotificationsPage = lazy(
-  () => import("../hr_eis/pages/NotificationsPage"));
-const LeavesPage = lazy(() => import("../hr_eis/pages/LeavesPage"));
+  () => import("./pages/NotificationsPage"));
+const LeavesPage = lazy(() => import("./pages/LeavesPage"));
 
 function office(permission: string, page: ReactNode) {
   return <RequirePermission permission={permission}>{page}</RequirePermission>;

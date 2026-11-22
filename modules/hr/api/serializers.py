@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.files import drive
@@ -22,6 +23,15 @@ from modules.hr.models import (
 )
 
 
+def named_choice_field(name, choices, *, read_only=False):
+    field_type = type(f"{name}Field", (serializers.ChoiceField,), {})
+    field_type = extend_schema_field(
+        {"type": "string", "enum": list(serializers.ChoiceField(choices=choices).choices)},
+        component_name=name,
+    )(field_type)
+    return field_type(choices=choices, read_only=read_only)
+
+
 class LeaveBalanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveBalance
@@ -30,6 +40,9 @@ class LeaveBalanceSerializer(serializers.ModelSerializer):
 
 
 class EmployeeRecordSerializer(serializers.ModelSerializer):
+    employee_category = named_choice_field(
+        "EmployeeRecordCategory", EmployeeRecord.CATEGORY, read_only=True
+    )
     leave_balances = LeaveBalanceSerializer(many=True, read_only=True)
 
     class Meta:
@@ -122,6 +135,10 @@ class ClaimIntegrationStatusSerializer(serializers.ModelSerializer):
 
 
 class ClaimSerializer(serializers.ModelSerializer):
+    employee_category = named_choice_field(
+        "ClaimEmployeeCategory", EmployeeRecord.CATEGORY, read_only=True
+    )
+    request_type = named_choice_field("ClaimRequestType", CLAIM_REQUEST_TYPES, read_only=True)
     integration_statuses = ClaimIntegrationStatusSerializer(many=True, read_only=True)
     request_type_display = serializers.CharField(source="get_request_type_display", read_only=True)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
@@ -152,7 +169,7 @@ class ClaimSerializer(serializers.ModelSerializer):
 
 
 class ClaimCreateSerializer(serializers.Serializer):
-    request_type = serializers.ChoiceField(choices=CLAIM_REQUEST_TYPES)
+    request_type = named_choice_field("ClaimCreateRequestType", CLAIM_REQUEST_TYPES)
     purpose = serializers.CharField(max_length=500, required=False, allow_blank=True, default="")
     amount = serializers.DecimalField(
         max_digits=12, decimal_places=2, required=False, allow_null=True
@@ -184,7 +201,7 @@ class ClaimVerificationSerializer(serializers.Serializer):
 
 
 class ClaimDecisionSerializer(serializers.Serializer):
-    action = serializers.ChoiceField(choices=("approve", "reject", "forward"))
+    action = named_choice_field("ClaimDecisionAction", ("approve", "reject", "forward"))
     note = serializers.CharField(max_length=500, required=False, allow_blank=True, default="")
 
 
@@ -237,11 +254,18 @@ class ReviewerAssignmentSerializer(serializers.Serializer):
 
 
 class AppraisalReviewSerializer(serializers.Serializer):
-    action = serializers.ChoiceField(choices=("forward", "finalize"))
+    action = named_choice_field("AppraisalReviewAction", ("forward", "finalize"))
     note = serializers.CharField(max_length=1000, required=False, allow_blank=True, default="")
 
 
 class WorkflowRouteSerializer(serializers.ModelSerializer):
+    employee_category = named_choice_field(
+        "WorkflowRouteEmployeeCategory", WorkflowRoute.CATEGORIES, read_only=True
+    )
+    request_type = named_choice_field(
+        "WorkflowRouteRequestType", WorkflowRoute.REQUEST_TYPES, read_only=True
+    )
+
     class Meta:
         model = WorkflowRoute
         fields = (
@@ -295,7 +319,7 @@ class LeaveRequestCreateSerializer(serializers.Serializer):
 
 
 class LeaveDecisionSerializer(serializers.Serializer):
-    action = serializers.ChoiceField(choices=("approve", "reject", "forward"))
+    action = named_choice_field("LeaveDecisionAction", ("approve", "reject", "forward"))
     note = serializers.CharField(max_length=1000, required=False, allow_blank=True, default="")
 
 
@@ -327,12 +351,10 @@ class LeaveBalanceManageReadSerializer(serializers.ModelSerializer):
 
 
 class WorkflowRouteWriteSerializer(serializers.Serializer):
-    employee_category = serializers.ChoiceField(
-        choices=tuple(code for code, _ in EmployeeRecord.CATEGORY)
+    employee_category = named_choice_field(
+        "WorkflowRouteWriteEmployeeCategory", EmployeeRecord.CATEGORY
     )
-    request_type = serializers.ChoiceField(
-        choices=tuple(code for code, _ in WorkflowRoute.REQUEST_TYPES)
-    )
+    request_type = named_choice_field("WorkflowRouteWriteRequestType", WorkflowRoute.REQUEST_TYPES)
     steps = serializers.ListField(child=serializers.DictField(), allow_empty=False)
     reminder_after_hours = serializers.IntegerField(min_value=1, required=False, allow_null=True)
 
