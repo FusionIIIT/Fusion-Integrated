@@ -25,7 +25,10 @@ def _unique_slug(name: str) -> str:
 
 def _is_slug_clash(exc: IntegrityError) -> bool:
     diag = getattr(exc.__cause__, "diag", None)
-    return getattr(diag, "constraint_name", None) == f"{Company._meta.db_table}_slug_key"
+    if getattr(diag, "constraint_name", None) == f"{Company._meta.db_table}_slug_key":
+        return True
+    msg = str(exc).lower()
+    return "placement_company.slug" in msg or "placement_company_slug" in msg
 
 
 def _create_with_unique_slug(**fields) -> Company:

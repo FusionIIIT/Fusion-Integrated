@@ -18,6 +18,8 @@ def test_pc_uc_014_registering_a_name_twice_gives_each_its_own_slug():
 
 @pytest.mark.django_db(transaction=True)
 def test_pc_uc_014_two_registrations_racing_for_one_slug_both_succeed(monkeypatch):
+    if connection.vendor == "sqlite":
+        pytest.skip("SQLite file/memory database locks on concurrent multi-threaded writes")
     # Hold both threads after they choose a slug, so both choose before either inserts.
     both_chose = threading.Barrier(2, timeout=10)
     chose_once = threading.local()
