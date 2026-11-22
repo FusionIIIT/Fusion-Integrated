@@ -2,14 +2,14 @@ import os
 
 from celery import Celery
 
+from modules.iaa.schedule import BEAT_SCHEDULE as IAA_SCHEDULE
+from modules.iaa.schedule import TASK_ROUTES as IAA_ROUTES
 from modules.placement.schedule import (
     BEAT_SCHEDULE as PLACEMENT_SCHEDULE,
 )
 from modules.placement.schedule import (
     TASK_ROUTES as PLACEMENT_ROUTES,
 )
-from modules.iaa.schedule import BEAT_SCHEDULE as IAA_SCHEDULE
-from modules.iaa.schedule import TASK_ROUTES as IAA_ROUTES
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
 app = Celery("fusion_integrated")

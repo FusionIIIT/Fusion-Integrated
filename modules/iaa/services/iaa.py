@@ -1,4 +1,5 @@
 """Transactional IAA services. All writes are atomic and audit logged."""
+
 from __future__ import annotations
 
 import csv
@@ -15,9 +16,18 @@ from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedEr
 from fusion_auth.client import IamUnavailable, get_client
 from modules.iaa.domain import rules, workflow
 from modules.iaa.models import (
-    Anomaly, ApprovalRule, ApprovalStep, AuditLog, AuditObservation,
-    DashboardNotification, DepartmentBudget, FinancialRecord, FinanceQuery,
-    FinancialYearPolicy, ObservationResponse, SupportingDocument,
+    Anomaly,
+    ApprovalRule,
+    ApprovalStep,
+    AuditLog,
+    AuditObservation,
+    DashboardNotification,
+    DepartmentBudget,
+    FinanceQuery,
+    FinancialRecord,
+    FinancialYearPolicy,
+    ObservationResponse,
+    SupportingDocument,
 )
 
 BASIC_ROLES = {"basic_user", "employee", "faculty", "staff", "department_representative"}
@@ -26,14 +36,22 @@ AUTHORITY_ROLES = {"hod", "dean", "director"}
 AUDIT_ROLES = {"auditor"}
 ADMIN_ROLES = {"system_admin"}
 ROLE_ALIASES = {
-    "basic user": "basic_user", "basic_user": "basic_user",
+    "basic user": "basic_user",
+    "basic_user": "basic_user",
     "department representative": "department_representative",
-    "finance staff": "finance_staff", "hod": "hod",
-    "head of department": "hod", "head_of_department": "hod",
-    "dean": "dean", "director": "director", "auditor": "auditor",
-    "system admin": "system_admin", "system_admin": "system_admin",
-    "administrator": "system_admin", "employee": "employee",
-    "faculty": "faculty", "staff": "staff",
+    "finance staff": "finance_staff",
+    "hod": "hod",
+    "head of department": "hod",
+    "head_of_department": "hod",
+    "dean": "dean",
+    "director": "director",
+    "auditor": "auditor",
+    "system admin": "system_admin",
+    "system_admin": "system_admin",
+    "administrator": "system_admin",
+    "employee": "employee",
+    "faculty": "faculty",
+    "staff": "staff",
 }
 
 
@@ -64,23 +82,26 @@ def actor_role(actor) -> str:
     if len(roles) > 1 and not selected:
         raise PermissionDeniedError(
             "Select an active IAA role in Fusion before performing a role-specific action.",
-            code="active_role_required")
+            code="active_role_required",
+        )
     if roles and selected not in roles:
-        raise PermissionDeniedError("The active IAM role is not assigned to this account.",
-                                    code="invalid_active_role")
+        raise PermissionDeniedError(
+            "The active IAM role is not assigned to this account.", code="invalid_active_role"
+        )
     if not selected:
-        raise PermissionDeniedError("An active IAA role is required.",
-                                    code="active_role_required")
+        raise PermissionDeniedError("An active IAA role is required.", code="active_role_required")
     return selected
 
 
-def require(actor, permission: str, *, roles: set[str] | None = None,
-            operational: bool = True) -> str:
+def require(
+    actor, permission: str, *, roles: set[str] | None = None, operational: bool = True
+) -> str:
     role = actor_role(actor)
     if operational and role in ADMIN_ROLES:
         raise PermissionDeniedError(
             "System Admin may configure IAA but cannot access operational financial records.",
-            code="admin_operational_separation")
+            code="admin_operational_separation",
+        )
     if roles and role not in roles:
         raise PermissionDeniedError("The active IAA role cannot perform this action.")
     checker = getattr(actor, "has_permission", None)
@@ -89,36 +110,67 @@ def require(actor, permission: str, *, roles: set[str] | None = None,
     return role
 
 
-def _log(actor, action: str, resource_type: str, resource_id: int | None = None,
-         from_status: str = "", to_status: str = "", details: dict | None = None,
-         role: str | None = None) -> AuditLog:
+def _log(
+    actor,
+    action: str,
+    resource_type: str,
+    resource_id: int | None = None,
+    from_status: str = "",
+    to_status: str = "",
+    details: dict | None = None,
+    role: str | None = None,
+) -> AuditLog:
     return AuditLog.objects.create(
         actor_user_id=getattr(actor, "user_id", None),
         actor_role=role or (actor_role(actor) if actor is not None else "system"),
-        action=action, resource_type=resource_type, resource_id=resource_id,
-        from_status=from_status, to_status=to_status, details=details or {},
+        action=action,
+        resource_type=resource_type,
+        resource_id=resource_id,
+        from_status=from_status,
+        to_status=to_status,
+        details=details or {},
     )
 
 
-def _notify_user(user_id: int | None, event_type: str, title: str, message: str,
-                 resource_type: str = "", resource_id: int | None = None,
-                 role: str = "") -> None:
+def _notify_user(
+    user_id: int | None,
+    event_type: str,
+    title: str,
+    message: str,
+    resource_type: str = "",
+    resource_id: int | None = None,
+    role: str = "",
+) -> None:
     if user_id is None:
         return
     DashboardNotification.objects.create(
-        recipient_user_id=user_id, recipient_role=role, event_type=event_type,
-        title=title, message=message, resource_type=resource_type,
+        recipient_user_id=user_id,
+        recipient_role=role,
+        event_type=event_type,
+        title=title,
+        message=message,
+        resource_type=resource_type,
         resource_id=resource_id,
     )
 
 
-def _notify_roles(roles: set[str], event_type: str, title: str, message: str,
-                  resource_type: str = "", resource_id: int | None = None) -> None:
+def _notify_roles(
+    roles: set[str],
+    event_type: str,
+    title: str,
+    message: str,
+    resource_type: str = "",
+    resource_id: int | None = None,
+) -> None:
     """Publish to role inboxes; IAM remains the only source of role membership."""
     for role in sorted({normalize_role(value) for value in roles}):
         DashboardNotification.objects.create(
-            recipient_user_id=None, recipient_role=role, event_type=event_type,
-            title=title, message=message, resource_type=resource_type,
+            recipient_user_id=None,
+            recipient_role=role,
+            event_type=event_type,
+            title=title,
+            message=message,
+            resource_type=resource_type,
             resource_id=resource_id,
         )
 
@@ -126,11 +178,13 @@ def _notify_roles(roles: set[str], event_type: str, title: str, message: str,
 def _financial_year(today=None) -> str:
     today = today or timezone.localdate()
     policy = FinancialYearPolicy.objects.filter(
-        is_active=True, starts_on__lte=today, ends_on__gte=today).first()
+        is_active=True, starts_on__lte=today, ends_on__gte=today
+    ).first()
     if policy is None:
         raise ConflictError(
             "No active IAA financial year is configured for today's date.",
-            code="financial_year_not_configured")
+            code="financial_year_not_configured",
+        )
     return policy.financial_year
 
 
@@ -146,11 +200,15 @@ def visible_records(actor):
     if role in AUTHORITY_ROLES:
         # Do not expose records for future queued levels. A role can see steps
         # that are currently assigned or that it has actually decided/escalated.
-        ids = ApprovalStep.objects.filter(
-            status__in=("pending", "approved", "rejected", "escalated"),
-        ).filter(
-            Q(assigned_user_id=actor.user_id) | Q(authority_role__iexact=role),
-        ).values_list("record_id", flat=True)
+        ids = (
+            ApprovalStep.objects.filter(
+                status__in=("pending", "approved", "rejected", "escalated"),
+            )
+            .filter(
+                Q(assigned_user_id=actor.user_id) | Q(authority_role__iexact=role),
+            )
+            .values_list("record_id", flat=True)
+        )
         return qs.filter(pk__in=ids).distinct()
     raise PermissionDeniedError("No IAA record visibility is assigned to this role.")
 
@@ -167,13 +225,18 @@ def create_record(actor, payload: dict, *, kind: str) -> FinancialRecord:
     permission = "iaa.ta.create" if kind == "ta" else "iaa.request.create"
     require(actor, permission, roles=BASIC_ROLES)
     financial_year = str(payload.get("financial_year") or _financial_year())
-    if not FinancialYearPolicy.objects.filter(financial_year=financial_year, is_active=True).exists():
+    if not FinancialYearPolicy.objects.filter(
+        financial_year=financial_year, is_active=True
+    ).exists():
         raise ConflictError(
             "The selected financial year is not active or configured.",
-            code="financial_year_not_configured")
+            code="financial_year_not_configured",
+        )
     row = FinancialRecord.objects.create(
-        record_kind=kind, request_type=str(payload.get("request_type", "TA" if kind == "ta" else "")),
-        created_by_id=actor.user_id, department=str(payload.get("department", "")).strip(),
+        record_kind=kind,
+        request_type=str(payload.get("request_type", "TA" if kind == "ta" else "")),
+        created_by_id=actor.user_id,
+        department=str(payload.get("department", "")).strip(),
         amount=Decimal(str(payload.get("amount", "0"))),
         description=str(payload.get("description", "")),
         financial_year=financial_year,
@@ -182,8 +245,7 @@ def create_record(actor, payload: dict, *, kind: str) -> FinancialRecord:
         trip_purpose=str(payload.get("trip_purpose", "")),
         trip_details=payload.get("trip_details") or {},
     )
-    _log(actor, "record.created", "financial_record", row.pk, "", row.status,
-         {"record_kind": kind})
+    _log(actor, "record.created", "financial_record", row.pk, "", row.status, {"record_kind": kind})
     return row
 
 
@@ -192,29 +254,48 @@ def update_draft(actor, record_id: int, payload: dict) -> FinancialRecord:
     row = FinancialRecord.objects.select_for_update().filter(pk=record_id).first()
     if row is None:
         raise NotFoundError("IAA record not found.")
-    role = require(actor, "iaa.ta.create" if row.record_kind == "ta" else "iaa.request.create",
-                   roles=BASIC_ROLES)
+    role = require(
+        actor,
+        "iaa.ta.create" if row.record_kind == "ta" else "iaa.request.create",
+        roles=BASIC_ROLES,
+    )
     if row.created_by_id != actor.user_id:
         raise PermissionDeniedError("Only the creator may edit this draft.")
     if row.status != workflow.DRAFT:
         raise ConflictError("Submitted records are locked; use a supported clarification response.")
-    allowed = {"request_type", "department", "amount", "description", "trip_start_date",
-               "trip_end_date", "trip_purpose", "trip_details"}
+    allowed = {
+        "request_type",
+        "department",
+        "amount",
+        "description",
+        "trip_start_date",
+        "trip_end_date",
+        "trip_purpose",
+        "trip_details",
+    }
     for key in allowed & payload.keys():
         setattr(row, key, payload[key])
     row.save()
-    _log(actor, "record.draft_updated", "financial_record", row.pk, row.status, row.status, role=role)
+    _log(
+        actor, "record.draft_updated", "financial_record", row.pk, row.status, row.status, role=role
+    )
     return row
 
 
 @transaction.atomic
 def attach_document(actor, record_id: int, payload: dict) -> SupportingDocument:
-    row = FinancialRecord.objects.select_for_update().filter(
-        pk=record_id, created_by_id=actor.user_id, status=workflow.DRAFT).first()
+    row = (
+        FinancialRecord.objects.select_for_update()
+        .filter(pk=record_id, created_by_id=actor.user_id, status=workflow.DRAFT)
+        .first()
+    )
     if row is None:
         raise NotFoundError("Draft not found in your scope.")
-    require(actor, "iaa.ta.create" if row.record_kind == "ta" else "iaa.request.create",
-            roles=BASIC_ROLES)
+    require(
+        actor,
+        "iaa.ta.create" if row.record_kind == "ta" else "iaa.request.create",
+        roles=BASIC_ROLES,
+    )
     ref = str(payload.get("storage_reference", "")).strip()
     name = str(payload.get("name", "")).strip()
     if not ref or not name:
@@ -226,8 +307,11 @@ def attach_document(actor, record_id: int, payload: dict) -> SupportingDocument:
     except drive.InvalidDriveLink as exc:
         raise ConflictError(exc.message, code=exc.code) from exc
     doc = SupportingDocument.objects.create(
-        record=row, uploaded_by_id=actor.user_id, name=name,
-        storage_reference=canonical_ref.url, content_type=str(payload.get("content_type", "")),
+        record=row,
+        uploaded_by_id=actor.user_id,
+        name=name,
+        storage_reference=canonical_ref.url,
+        content_type=str(payload.get("content_type", "")),
         size_bytes=payload.get("size_bytes"),
     )
     _log(actor, "document.attached", "financial_record", row.pk, details={"document_id": doc.pk})
@@ -236,8 +320,11 @@ def attach_document(actor, record_id: int, payload: dict) -> SupportingDocument:
 
 @transaction.atomic
 def submit_record(actor, record_id: int) -> FinancialRecord:
-    row = FinancialRecord.objects.select_for_update().filter(
-        pk=record_id, created_by_id=actor.user_id).first()
+    row = (
+        FinancialRecord.objects.select_for_update()
+        .filter(pk=record_id, created_by_id=actor.user_id)
+        .first()
+    )
     if row is None:
         raise NotFoundError("Draft not found in your scope.")
     permission = "iaa.ta.submit" if row.record_kind == "ta" else "iaa.request.submit"
@@ -246,31 +333,53 @@ def submit_record(actor, record_id: int) -> FinancialRecord:
         raise ConflictError("Only a Draft can be formally submitted.")
     policy = FinancialYearPolicy.objects.filter(financial_year=row.financial_year).first()
     settings = policy.settings if policy else {}
-    needs_docs = bool(settings.get("ta_requires_documents", True)) if row.record_kind == "ta" else bool(settings.get("expense_requires_documents", False))
+    needs_docs = (
+        bool(settings.get("ta_requires_documents", True))
+        if row.record_kind == "ta"
+        else bool(settings.get("expense_requires_documents", False))
+    )
     payload = {
-        "request_type": row.request_type, "department": row.department,
-        "amount": row.amount, "description": row.description,
-        "trip_start_date": row.trip_start_date, "trip_end_date": row.trip_end_date,
+        "request_type": row.request_type,
+        "department": row.department,
+        "amount": row.amount,
+        "description": row.description,
+        "trip_start_date": row.trip_start_date,
+        "trip_end_date": row.trip_end_date,
         "trip_purpose": row.trip_purpose,
     }
     issues = rules.submission_errors(
-        payload, kind=row.record_kind, attachment_count=row.attachments.count(),
+        payload,
+        kind=row.record_kind,
+        attachment_count=row.attachments.count(),
         required_documents=needs_docs,
     )
     if issues:
-        raise ConflictError("Submission is incomplete.", code="submission_incomplete",
-                            details=[{"field": x.field, "code": x.code, "message": x.message}
-                                     for x in issues])
+        raise ConflictError(
+            "Submission is incomplete.",
+            code="submission_incomplete",
+            details=[{"field": x.field, "code": x.code, "message": x.message} for x in issues],
+        )
     before = row.status
     row.status = workflow.SUBMITTED
     row.submitted_at = timezone.now()
     row.save(update_fields=["status", "submitted_at", "updated_at"])
     _log(actor, "record.submitted", "financial_record", row.pk, before, row.status, role=role)
-    _notify_roles(FINANCE_ROLES, "submission", "IAA request submitted",
-                  f"Financial request #{row.pk} is awaiting Finance review.",
-                  "financial_record", row.pk)
-    _notify_user(row.created_by_id, "submission", "Request submitted",
-                 f"Your IAA request #{row.pk} was submitted.", "financial_record", row.pk)
+    _notify_roles(
+        FINANCE_ROLES,
+        "submission",
+        "IAA request submitted",
+        f"Financial request #{row.pk} is awaiting Finance review.",
+        "financial_record",
+        row.pk,
+    )
+    _notify_user(
+        row.created_by_id,
+        "submission",
+        "Request submitted",
+        f"Your IAA request #{row.pk} was submitted.",
+        "financial_record",
+        row.pk,
+    )
     return row
 
 
@@ -285,22 +394,41 @@ def request_clarification(actor, record_id: int, question: str) -> FinanceQuery:
     if not question.strip():
         raise ConflictError("A clarification question is required.")
     before = row.status
-    query = FinanceQuery.objects.create(record=row, asked_by_id=actor.user_id, question=question.strip())
+    query = FinanceQuery.objects.create(
+        record=row, asked_by_id=actor.user_id, question=question.strip()
+    )
     row.status = workflow.QUERY_RAISED
     row.save(update_fields=["status", "updated_at"])
-    _log(actor, "finance.query_raised", "financial_record", row.pk, before, row.status,
-         {"query_id": query.pk}, role)
-    _notify_user(row.created_by_id, "clarification", "Finance clarification requested",
-                 f"Please respond to clarification on IAA request #{row.pk}.",
-                 "financial_record", row.pk)
+    _log(
+        actor,
+        "finance.query_raised",
+        "financial_record",
+        row.pk,
+        before,
+        row.status,
+        {"query_id": query.pk},
+        role,
+    )
+    _notify_user(
+        row.created_by_id,
+        "clarification",
+        "Finance clarification requested",
+        f"Please respond to clarification on IAA request #{row.pk}.",
+        "financial_record",
+        row.pk,
+    )
     return query
 
 
 @transaction.atomic
 def respond_to_query(actor, query_id: int, response_text: str) -> FinanceQuery:
     require(actor, "iaa.query.respond", roles=BASIC_ROLES)
-    query = FinanceQuery.objects.select_for_update().select_related("record").filter(
-        pk=query_id, record__created_by_id=actor.user_id, status="open").first()
+    query = (
+        FinanceQuery.objects.select_for_update()
+        .select_related("record")
+        .filter(pk=query_id, record__created_by_id=actor.user_id, status="open")
+        .first()
+    )
     if query is None:
         raise NotFoundError("Open Finance query not found in your scope.")
     if not response_text.strip():
@@ -309,33 +437,57 @@ def respond_to_query(actor, query_id: int, response_text: str) -> FinanceQuery:
     query.status = "responded"
     query.responded_by_id = actor.user_id
     query.responded_at = timezone.now()
-    query.save(update_fields=["response", "status", "responded_by_id", "responded_at", "updated_at"])
+    query.save(
+        update_fields=["response", "status", "responded_by_id", "responded_at", "updated_at"]
+    )
     row = query.record
     before = row.status
     row.status = workflow.QUERY_RESPONDED
     row.save(update_fields=["status", "updated_at"])
-    _log(actor, "finance.query_responded", "financial_record", row.pk, before, row.status,
-         {"query_id": query.pk})
-    _notify_roles(FINANCE_ROLES, "clarification_response", "Clarification response received",
-                  f"Request #{row.pk} has a new clarification response.", "financial_record", row.pk)
+    _log(
+        actor,
+        "finance.query_responded",
+        "financial_record",
+        row.pk,
+        before,
+        row.status,
+        {"query_id": query.pk},
+    )
+    _notify_roles(
+        FINANCE_ROLES,
+        "clarification_response",
+        "Clarification response received",
+        f"Request #{row.pk} has a new clarification response.",
+        "financial_record",
+        row.pk,
+    )
     return query
 
 
 def _approval_levels(record: FinancialRecord) -> list[dict]:
     qs = ApprovalRule.objects.filter(is_active=True)
-    candidates = [{
-        "record_kind": x.record_kind, "request_type": x.request_type,
-        "department": x.department, "min_amount": x.min_amount,
-        "max_amount": x.max_amount, "priority": x.priority,
-        "levels": x.levels, "is_active": x.is_active,
-    } for x in qs]
+    candidates = [
+        {
+            "record_kind": x.record_kind,
+            "request_type": x.request_type,
+            "department": x.department,
+            "min_amount": x.min_amount,
+            "max_amount": x.max_amount,
+            "priority": x.priority,
+            "levels": x.levels,
+            "is_active": x.is_active,
+        }
+        for x in qs
+    ]
     selected = rules.select_approval_rule(
-        candidates, kind=record.record_kind, request_type=record.request_type,
-        department=record.department, amount=record.amount,
+        candidates,
+        kind=record.record_kind,
+        request_type=record.request_type,
+        department=record.department,
+        amount=record.amount,
     )
     if selected is None:
-        policy = FinancialYearPolicy.objects.filter(
-            financial_year=record.financial_year).first()
+        policy = FinancialYearPolicy.objects.filter(financial_year=record.financial_year).first()
         config = policy.settings if policy else {}
         threshold = config.get("ta_high_value_threshold")
         # A TA claim is routed only when the institution has configured the
@@ -346,27 +498,35 @@ def _approval_levels(record: FinancialRecord) -> list[dict]:
             return []
         raise ConflictError(
             "No configured approval route matches this request. Ask System Admin to configure approval hierarchy and thresholds.",
-            code="approval_route_not_configured")
+            code="approval_route_not_configured",
+        )
     configured_levels = selected.get("levels") or []
     # A configured named assignee who is the claimant is ineligible under
     # segregation of duties; skip that authority and continue to the next
     # configured level instead of creating an approval that can never pass.
-    levels = [level for level in configured_levels
-              if level.get("user_id") in (None, "")
-              or int(level["user_id"]) != int(record.created_by_id)]
+    levels = [
+        level
+        for level in configured_levels
+        if level.get("user_id") in (None, "") or int(level["user_id"]) != int(record.created_by_id)
+    ]
     if configured_levels and not levels:
         raise ConflictError(
             "Every configured approver is ineligible under segregation of duties.",
-            code="no_eligible_approver")
+            code="no_eligible_approver",
+        )
     if not levels:
-        policy = FinancialYearPolicy.objects.filter(
-            financial_year=record.financial_year).first()
+        policy = FinancialYearPolicy.objects.filter(financial_year=record.financial_year).first()
         config = policy.settings if policy else {}
         threshold = config.get("ta_high_value_threshold")
-        if record.record_kind != "ta" or threshold in (None, "") or record.amount >= Decimal(str(threshold)):
+        if (
+            record.record_kind != "ta"
+            or threshold in (None, "")
+            or record.amount >= Decimal(str(threshold))
+        ):
             raise ConflictError(
                 "The configured approval route has no approval levels. Configure at least one eligible authority.",
-                code="approval_route_empty")
+                code="approval_route_empty",
+            )
         return []
     for index, level in enumerate(levels):
         if normalize_role(level.get("role")) not in AUTHORITY_ROLES:
@@ -376,18 +536,22 @@ def _approval_levels(record: FinancialRecord) -> list[dict]:
                 raise ConflictError("Approval timeout must be a positive configured duration.")
             if index == len(levels) - 1:
                 raise ConflictError(
-                    "A timed approval level must have a subsequent configured authority for escalation.")
+                    "A timed approval level must have a subsequent configured authority for escalation."
+                )
     return levels
 
 
 def _deadline(level: dict):
     hours = level.get("timeout_hours")
-    return timezone.now() + timezone.timedelta(hours=int(hours)) if hours not in (None, "") else None
+    return (
+        timezone.now() + timezone.timedelta(hours=int(hours)) if hours not in (None, "") else None
+    )
 
 
 @transaction.atomic
-def finance_validate(actor, record_id: int, *, policy_passed: bool = True,
-                     remarks: str = "") -> FinancialRecord:
+def finance_validate(
+    actor, record_id: int, *, policy_passed: bool = True, remarks: str = ""
+) -> FinancialRecord:
     row = FinancialRecord.objects.select_for_update().filter(pk=record_id).first()
     if row is None:
         raise NotFoundError("IAA record not found.")
@@ -401,7 +565,8 @@ def finance_validate(actor, record_id: int, *, policy_passed: bool = True,
         if not isinstance(ta_policy, dict):
             raise ConflictError(
                 "TA policy is not configured for this financial year. Configure it before verification.",
-                code="ta_policy_not_configured")
+                code="ta_policy_not_configured",
+            )
         if row.trip_start_date is None or row.trip_end_date is None:
             raise ConflictError("TA trip dates are required.", code="ta_trip_dates_required")
         if row.trip_end_date < row.trip_start_date:
@@ -432,48 +597,101 @@ def finance_validate(actor, record_id: int, *, policy_passed: bool = True,
         before = row.status
         row.status = workflow.REJECTED
         row.save(update_fields=["status", "updated_at"])
-        _log(actor, "finance.policy_rejected", "financial_record", row.pk,
-             before, row.status, {"remarks": remarks.strip()}, role)
-        _notify_user(row.created_by_id, "ta_rejected" if row.record_kind == "ta" else "request_rejected",
-                     "IAA request rejected", f"Request #{row.pk} failed the applicable policy checks.",
-                     "financial_record", row.pk)
+        _log(
+            actor,
+            "finance.policy_rejected",
+            "financial_record",
+            row.pk,
+            before,
+            row.status,
+            {"remarks": remarks.strip()},
+            role,
+        )
+        _notify_user(
+            row.created_by_id,
+            "ta_rejected" if row.record_kind == "ta" else "request_rejected",
+            "IAA request rejected",
+            f"Request #{row.pk} failed the applicable policy checks.",
+            "financial_record",
+            row.pk,
+        )
         return row
 
-    budget = DepartmentBudget.objects.select_for_update().filter(
-        department=row.department, financial_year=row.financial_year, is_active=True).first()
+    budget = (
+        DepartmentBudget.objects.select_for_update()
+        .filter(department=row.department, financial_year=row.financial_year, is_active=True)
+        .first()
+    )
     require_budget = bool((policy.settings if policy else {}).get("budget_required", True))
     if budget:
         shortfall = rules.budget_shortfall(
-            amount=row.amount, allocated=budget.allocated,
-            spent=budget.spent, committed=budget.committed)
+            amount=row.amount,
+            allocated=budget.allocated,
+            spent=budget.spent,
+            committed=budget.committed,
+        )
         if shortfall > 0:
             before = row.status
             row.status = workflow.ANOMALY_PENDING
             row.save(update_fields=["status", "updated_at"])
             anomaly = Anomaly.objects.create(
-                record=row, category="budget_shortfall", severity="high",
+                record=row,
+                category="budget_shortfall",
+                severity="high",
                 title="Departmental budget insufficiency",
                 details=f"Budget shortfall: {shortfall}. Request is not auto-rejected.",
-                raised_by_id=None, resolver_role="finance_staff",
+                raised_by_id=None,
+                resolver_role="finance_staff",
             )
-            _log(None, "anomaly.auto_created", "anomaly", anomaly.pk, "", anomaly.status,
-                 {"record_id": row.pk, "shortfall": str(shortfall)}, "system")
-            _log(actor, "finance.budget_anomaly", "financial_record", row.pk,
-                 before, row.status, {"anomaly_id": anomaly.pk}, role)
-            _notify_roles(FINANCE_ROLES | AUDIT_ROLES, "anomaly", "Budget anomaly created",
-                          f"Budget insufficiency for IAA request #{row.pk}.",
-                          "anomaly", anomaly.pk)
+            _log(
+                None,
+                "anomaly.auto_created",
+                "anomaly",
+                anomaly.pk,
+                "",
+                anomaly.status,
+                {"record_id": row.pk, "shortfall": str(shortfall)},
+                "system",
+            )
+            _log(
+                actor,
+                "finance.budget_anomaly",
+                "financial_record",
+                row.pk,
+                before,
+                row.status,
+                {"anomaly_id": anomaly.pk},
+                role,
+            )
+            _notify_roles(
+                FINANCE_ROLES | AUDIT_ROLES,
+                "anomaly",
+                "Budget anomaly created",
+                f"Budget insufficiency for IAA request #{row.pk}.",
+                "anomaly",
+                anomaly.pk,
+            )
             return row
     elif require_budget:
-        raise ConflictError("No departmental budget is configured for this financial year.",
-                            code="budget_not_configured")
+        raise ConflictError(
+            "No departmental budget is configured for this financial year.",
+            code="budget_not_configured",
+        )
 
     before = row.status
     row.validated_at = timezone.now()
     row.status = workflow.FINANCE_VALIDATED
     row.save(update_fields=["status", "validated_at", "updated_at"])
-    _log(actor, "finance.validated", "financial_record", row.pk,
-         before, row.status, {"policy_passed": True}, role)
+    _log(
+        actor,
+        "finance.validated",
+        "financial_record",
+        row.pk,
+        before,
+        row.status,
+        {"policy_passed": True},
+        role,
+    )
 
     levels = _approval_levels(row)
     if levels:
@@ -481,36 +699,60 @@ def finance_validate(actor, record_id: int, *, policy_passed: bool = True,
         row.current_approval_step = 1
         for index, level in enumerate(levels, start=1):
             ApprovalStep.objects.create(
-                record=row, step_number=index, authority_role=normalize_role(level["role"]),
+                record=row,
+                step_number=index,
+                authority_role=normalize_role(level["role"]),
                 assigned_user_id=level.get("user_id"),
                 status="pending" if index == 1 else "queued",
                 timeout_hours=level.get("timeout_hours") or None,
                 due_at=_deadline(level) if index == 1 else None,
             )
         first = levels[0]
-        _notify_roles({normalize_role(first["role"])}, "approval_pending",
-                      "IAA approval assigned", f"Request #{row.pk} awaits your decision.",
-                      "financial_record", row.pk)
+        _notify_roles(
+            {normalize_role(first["role"])},
+            "approval_pending",
+            "IAA approval assigned",
+            f"Request #{row.pk} awaits your decision.",
+            "financial_record",
+            row.pk,
+        )
     else:
         row.status = workflow.VERIFIED if row.record_kind == "ta" else workflow.APPROVED
     row.save(update_fields=["status", "current_approval_step", "updated_at"])
-    _log(actor, "approval.route_created" if levels else "finance.directly_approved",
-         "financial_record", row.pk, workflow.FINANCE_VALIDATED, row.status,
-         {"approval_levels": len(levels)}, role)
-    _notify_user(row.created_by_id, "finance_validated", "Finance review completed",
-                 f"Your IAA request #{row.pk} passed Finance validation.",
-                 "financial_record", row.pk)
+    _log(
+        actor,
+        "approval.route_created" if levels else "finance.directly_approved",
+        "financial_record",
+        row.pk,
+        workflow.FINANCE_VALIDATED,
+        row.status,
+        {"approval_levels": len(levels)},
+        role,
+    )
+    _notify_user(
+        row.created_by_id,
+        "finance_validated",
+        "Finance review completed",
+        f"Your IAA request #{row.pk} passed Finance validation.",
+        "financial_record",
+        row.pk,
+    )
     return row
 
 
 @transaction.atomic
 def decide_approval(actor, step_id: int, *, decision: str, remarks: str) -> ApprovalStep:
     role = require(actor, "iaa.approval.decide", roles=AUTHORITY_ROLES)
-    step = ApprovalStep.objects.select_for_update().select_related("record").filter(pk=step_id).first()
+    step = (
+        ApprovalStep.objects.select_for_update().select_related("record").filter(pk=step_id).first()
+    )
     if step is None:
         raise NotFoundError("Approval step not found.")
     row = step.record
-    if step.status != "pending" or row.status not in (workflow.APPROVAL_PENDING, workflow.ESCALATED):
+    if step.status != "pending" or row.status not in (
+        workflow.APPROVAL_PENDING,
+        workflow.ESCALATED,
+    ):
         raise ConflictError("This approval is not currently pending.")
     if normalize_role(step.authority_role) != role:
         raise PermissionDeniedError("The active authority role does not match this approval.")
@@ -520,39 +762,71 @@ def decide_approval(actor, step_id: int, *, decision: str, remarks: str) -> Appr
         # Skip this ineligible authority and move to the next configured level.
         # Do not mutate anything unless an eligible successor exists.
         actor_roles = {normalize_role(value) for value in getattr(actor, "roles", ())}
-        candidates = list(ApprovalStep.objects.select_for_update().filter(
-            record=row, step_number__gt=step.step_number, status="queued"
-        ).exclude(assigned_user_id=row.created_by_id).order_by("step_number"))
-        next_step = next((candidate for candidate in candidates
-                          if normalize_role(candidate.authority_role) not in actor_roles), None)
+        candidates = list(
+            ApprovalStep.objects.select_for_update()
+            .filter(record=row, step_number__gt=step.step_number, status="queued")
+            .exclude(assigned_user_id=row.created_by_id)
+            .order_by("step_number")
+        )
+        next_step = next(
+            (
+                candidate
+                for candidate in candidates
+                if normalize_role(candidate.authority_role) not in actor_roles
+            ),
+            None,
+        )
         if next_step is None:
             raise PermissionDeniedError(
                 "A creator/claimant cannot approve the same request, and no later eligible configured authority is available.",
-                code="segregation_of_duties")
+                code="segregation_of_duties",
+            )
         before = row.status
         step.status = "escalated"
         step.save(update_fields=["status", "updated_at"])
         next_step.status = "pending"
-        next_step.due_at = (timezone.now() + timezone.timedelta(hours=next_step.timeout_hours)
-                            if next_step.timeout_hours else None)
+        next_step.due_at = (
+            timezone.now() + timezone.timedelta(hours=next_step.timeout_hours)
+            if next_step.timeout_hours
+            else None
+        )
         next_step.save(update_fields=["status", "due_at", "updated_at"])
         row.current_approval_step = next_step.step_number
         row.status = workflow.APPROVAL_PENDING
         row.save(update_fields=["status", "current_approval_step", "updated_at"])
-        _log(actor, "approval.self_approval_routed", "financial_record", row.pk,
-             before, row.status, {"skipped_step_id": step.pk, "next_step_id": next_step.pk}, role)
+        _log(
+            actor,
+            "approval.self_approval_routed",
+            "financial_record",
+            row.pk,
+            before,
+            row.status,
+            {"skipped_step_id": step.pk, "next_step_id": next_step.pk},
+            role,
+        )
         if next_step.assigned_user_id:
-            _notify_user(next_step.assigned_user_id, "approval_routed",
-                         "IAA approval reassigned", f"Request #{row.pk} awaits your decision.",
-                         "financial_record", row.pk)
+            _notify_user(
+                next_step.assigned_user_id,
+                "approval_routed",
+                "IAA approval reassigned",
+                f"Request #{row.pk} awaits your decision.",
+                "financial_record",
+                row.pk,
+            )
         else:
-            _notify_roles({normalize_role(next_step.authority_role)}, "approval_routed",
-                          "IAA approval reassigned", f"Request #{row.pk} awaits your decision.",
-                          "financial_record", row.pk)
+            _notify_roles(
+                {normalize_role(next_step.authority_role)},
+                "approval_routed",
+                "IAA approval reassigned",
+                f"Request #{row.pk} awaits your decision.",
+                "financial_record",
+                row.pk,
+            )
         return step
     if not remarks.strip():
-        raise ConflictError("Approval or rejection remarks are mandatory.",
-                            code="approval_remarks_required")
+        raise ConflictError(
+            "Approval or rejection remarks are mandatory.", code="approval_remarks_required"
+        )
     if decision not in ("approve", "reject"):
         raise ConflictError("Decision must be approve or reject.")
     before = row.status
@@ -561,29 +835,65 @@ def decide_approval(actor, step_id: int, *, decision: str, remarks: str) -> Appr
     step.decided_role = role
     step.decided_at = timezone.now()
     step.remarks = remarks.strip()
-    step.save(update_fields=["status", "decided_by_id", "decided_role", "decided_at", "remarks", "updated_at"])
+    step.save(
+        update_fields=[
+            "status",
+            "decided_by_id",
+            "decided_role",
+            "decided_at",
+            "remarks",
+            "updated_at",
+        ]
+    )
     if decision == "reject":
         row.status = workflow.REJECTED
     else:
-        next_step = ApprovalStep.objects.select_for_update().filter(
-            record=row, step_number__gt=step.step_number, status="queued").order_by("step_number").first()
+        next_step = (
+            ApprovalStep.objects.select_for_update()
+            .filter(record=row, step_number__gt=step.step_number, status="queued")
+            .order_by("step_number")
+            .first()
+        )
         if next_step:
             next_step.status = "pending"
-            next_step.due_at = timezone.now() + timezone.timedelta(hours=next_step.timeout_hours) if next_step.timeout_hours else None
+            next_step.due_at = (
+                timezone.now() + timezone.timedelta(hours=next_step.timeout_hours)
+                if next_step.timeout_hours
+                else None
+            )
             next_step.save(update_fields=["status", "due_at", "updated_at"])
             row.current_approval_step = next_step.step_number
             row.status = workflow.APPROVAL_PENDING
-            _notify_roles({normalize_role(next_step.authority_role)}, "approval_pending",
-                          "Next IAA approval assigned", f"Request #{row.pk} awaits your decision.",
-                          "financial_record", row.pk)
+            _notify_roles(
+                {normalize_role(next_step.authority_role)},
+                "approval_pending",
+                "Next IAA approval assigned",
+                f"Request #{row.pk} awaits your decision.",
+                "financial_record",
+                row.pk,
+            )
         else:
             row.status = workflow.APPROVED
     row.save(update_fields=["status", "current_approval_step", "updated_at"])
     action_name = "approval.approved" if decision == "approve" else "approval.rejected"
-    _log(actor, action_name, "financial_record", row.pk, before, row.status,
-         {"approval_step_id": step.pk, "remarks": step.remarks}, role)
-    _notify_user(row.created_by_id, f"approval_{decision}", "IAA approval decision",
-                 f"Request #{row.pk} was {decision}d.", "financial_record", row.pk)
+    _log(
+        actor,
+        action_name,
+        "financial_record",
+        row.pk,
+        before,
+        row.status,
+        {"approval_step_id": step.pk, "remarks": step.remarks},
+        role,
+    )
+    _notify_user(
+        row.created_by_id,
+        f"approval_{decision}",
+        "IAA approval decision",
+        f"Request #{row.pk} was {decision}d.",
+        "financial_record",
+        row.pk,
+    )
     return step
 
 
@@ -593,39 +903,84 @@ def record_completion(actor, record_id: int) -> FinancialRecord:
     row = FinancialRecord.objects.select_for_update().filter(pk=record_id).first()
     if row is None:
         raise NotFoundError("IAA record not found.")
-    allowed = (workflow.APPROVED, workflow.VERIFIED) if row.record_kind == "ta" else (workflow.APPROVED,)
+    allowed = (
+        (workflow.APPROVED, workflow.VERIFIED) if row.record_kind == "ta" else (workflow.APPROVED,)
+    )
     if row.status not in allowed:
-        raise ConflictError("Only verified standard TA or approved financial records may be internally recorded.")
+        raise ConflictError(
+            "Only verified standard TA or approved financial records may be internally recorded."
+        )
     before = row.status
     row.status = workflow.RECORDED
     row.recorded_at = timezone.now()
     row.save(update_fields=["status", "recorded_at", "updated_at"])
-    _log(actor, "record.internal_completion", "financial_record", row.pk, before, row.status,
-         {"monetary_transfer_executed": False}, role)
-    _notify_user(row.created_by_id, "recorded", "IAA record completed",
-                 f"Request #{row.pk} was internally recorded. No payment was executed.",
-                 "financial_record", row.pk)
+    _log(
+        actor,
+        "record.internal_completion",
+        "financial_record",
+        row.pk,
+        before,
+        row.status,
+        {"monetary_transfer_executed": False},
+        role,
+    )
+    _notify_user(
+        row.created_by_id,
+        "recorded",
+        "IAA record completed",
+        f"Request #{row.pk} was internally recorded. No payment was executed.",
+        "financial_record",
+        row.pk,
+    )
     return row
 
 
 @transaction.atomic
-def _flag_anomaly_internal(actor, row: FinancialRecord, category: str, details: str,
-                           *, severity: str = "medium", role: str | None = None) -> Anomaly:
-    policy = (FinancialYearPolicy.objects.filter(
-        financial_year=row.financial_year).first() if row else None)
+def _flag_anomaly_internal(
+    actor,
+    row: FinancialRecord,
+    category: str,
+    details: str,
+    *,
+    severity: str = "medium",
+    role: str | None = None,
+) -> Anomaly:
+    policy = (
+        FinancialYearPolicy.objects.filter(financial_year=row.financial_year).first()
+        if row
+        else None
+    )
     resolver_map = (policy.settings or {}).get("anomaly_resolvers", {}) if policy else {}
     resolver_role = normalize_role(resolver_map.get(category, "finance_staff"))
     if resolver_role not in FINANCE_ROLES | AUTHORITY_ROLES | AUDIT_ROLES:
         raise ConflictError("The configured anomaly resolver role is not an eligible IAA resolver.")
     anomaly = Anomaly.objects.create(
-        record=row, category=category, severity=severity,
-        title=category.replace("_", " ").title(), details=details,
-        raised_by_id=getattr(actor, "user_id", None), resolver_role=resolver_role,
+        record=row,
+        category=category,
+        severity=severity,
+        title=category.replace("_", " ").title(),
+        details=details,
+        raised_by_id=getattr(actor, "user_id", None),
+        resolver_role=resolver_role,
     )
-    _log(actor, "anomaly.flagged", "anomaly", anomaly.pk, "", anomaly.status,
-         {"record_id": row.pk, "category": category}, role)
-    _notify_roles(FINANCE_ROLES | AUDIT_ROLES, "anomaly", "IAA anomaly flagged",
-                  f"Anomaly #{anomaly.pk} requires review.", "anomaly", anomaly.pk)
+    _log(
+        actor,
+        "anomaly.flagged",
+        "anomaly",
+        anomaly.pk,
+        "",
+        anomaly.status,
+        {"record_id": row.pk, "category": category},
+        role,
+    )
+    _notify_roles(
+        FINANCE_ROLES | AUDIT_ROLES,
+        "anomaly",
+        "IAA anomaly flagged",
+        f"Anomaly #{anomaly.pk} requires review.",
+        "anomaly",
+        anomaly.pk,
+    )
     return anomaly
 
 
@@ -636,17 +991,23 @@ def flag_anomaly(actor, payload: dict) -> Anomaly:
         raise ConflictError("Select the financial record associated with this anomaly.")
     record = get_record(actor, int(payload["record_id"]))
     return _flag_anomaly_internal(
-        actor, record, str(payload.get("category", "material_anomaly")),
+        actor,
+        record,
+        str(payload.get("category", "material_anomaly")),
         str(payload.get("details", "")).strip(),
-        severity=str(payload.get("severity", "medium")), role=role,
+        severity=str(payload.get("severity", "medium")),
+        role=role,
     )
 
 
 @transaction.atomic
 def resolve_anomaly(actor, anomaly_id: int, *, action: str, resolution: str) -> Anomaly:
-    role = require(actor, "iaa.anomaly.resolve",
-                   roles=FINANCE_ROLES | AUTHORITY_ROLES | AUDIT_ROLES)
-    anomaly = Anomaly.objects.select_for_update().select_related("record").filter(pk=anomaly_id).first()
+    role = require(
+        actor, "iaa.anomaly.resolve", roles=FINANCE_ROLES | AUTHORITY_ROLES | AUDIT_ROLES
+    )
+    anomaly = (
+        Anomaly.objects.select_for_update().select_related("record").filter(pk=anomaly_id).first()
+    )
     if anomaly is None:
         raise NotFoundError("Anomaly not found.")
     if anomaly.resolver_user_id and anomaly.resolver_user_id != actor.user_id:
@@ -660,7 +1021,9 @@ def resolve_anomaly(actor, anomaly_id: int, *, action: str, resolution: str) -> 
     if action == "escalate" and anomaly.status == workflow.ANOMALY_ESCALATED:
         raise ConflictError("An anomaly may be escalated only once.")
     before = anomaly.status
-    anomaly.status = workflow.ANOMALY_RESOLVED if action == "resolve" else workflow.ANOMALY_ESCALATED
+    anomaly.status = (
+        workflow.ANOMALY_RESOLVED if action == "resolve" else workflow.ANOMALY_ESCALATED
+    )
     anomaly.resolution = resolution.strip()
     if action == "resolve":
         anomaly.resolved_at = timezone.now()
@@ -669,8 +1032,14 @@ def resolve_anomaly(actor, anomaly_id: int, *, action: str, resolution: str) -> 
     if action == "resolve" and anomaly.record and anomaly.record.status == workflow.ANOMALY_PENDING:
         anomaly.record.status = workflow.SUBMITTED
         anomaly.record.save(update_fields=["status", "updated_at"])
-    _notify_user(anomaly.raised_by_id, "anomaly_update", "IAA anomaly updated",
-                 f"Anomaly #{anomaly.pk} is now {anomaly.status}.", "anomaly", anomaly.pk)
+    _notify_user(
+        anomaly.raised_by_id,
+        "anomaly_update",
+        "IAA anomaly updated",
+        f"Anomaly #{anomaly.pk} is now {anomaly.status}.",
+        "anomaly",
+        anomaly.pk,
+    )
     return anomaly
 
 
@@ -683,26 +1052,47 @@ def raise_observation(actor, payload: dict) -> AuditObservation:
     if record.record_kind != record_kind:
         raise NotFoundError("Financial record not found in the selected record type.")
     observation = AuditObservation.objects.create(
-        record_kind=record_kind, record_id=record_id, department=record.department,
-        title=str(payload.get("title", "")).strip(), details=str(payload.get("details", "")).strip(),
-        raised_by_id=actor.user_id, concerned_user_id=record.created_by_id,
+        record_kind=record_kind,
+        record_id=record_id,
+        department=record.department,
+        title=str(payload.get("title", "")).strip(),
+        details=str(payload.get("details", "")).strip(),
+        raised_by_id=actor.user_id,
+        concerned_user_id=record.created_by_id,
     )
     if not observation.title or not observation.details:
         raise ConflictError("Observation title and details are required.")
-    _log(actor, "audit.observation_raised", "audit_observation", observation.pk,
-         "", observation.status, {"record_id": record_id}, role)
-    _notify_user(record.created_by_id, "audit_observation", "Audit observation raised",
-                 f"An audit observation was raised for record #{record_id}.",
-                 "audit_observation", observation.pk)
+    _log(
+        actor,
+        "audit.observation_raised",
+        "audit_observation",
+        observation.pk,
+        "",
+        observation.status,
+        {"record_id": record_id},
+        role,
+    )
+    _notify_user(
+        record.created_by_id,
+        "audit_observation",
+        "Audit observation raised",
+        f"An audit observation was raised for record #{record_id}.",
+        "audit_observation",
+        observation.pk,
+    )
     return observation
 
 
 @transaction.atomic
-def respond_observation(actor, observation_id: int, *, response_text: str,
-                        evidence_references: list | None = None) -> ObservationResponse:
+def respond_observation(
+    actor, observation_id: int, *, response_text: str, evidence_references: list | None = None
+) -> ObservationResponse:
     require(actor, "iaa.observation.respond", roles=BASIC_ROLES)
-    obs = AuditObservation.objects.select_for_update().filter(
-        pk=observation_id, status=workflow.OBSERVATION_OPEN).first()
+    obs = (
+        AuditObservation.objects.select_for_update()
+        .filter(pk=observation_id, status=workflow.OBSERVATION_OPEN)
+        .first()
+    )
     if obs is None:
         raise NotFoundError("Open observation not found.")
     if obs.concerned_user_id and obs.concerned_user_id != actor.user_id:
@@ -710,32 +1100,51 @@ def respond_observation(actor, observation_id: int, *, response_text: str,
     if not response_text.strip():
         raise ConflictError("Corrective-action response is required.")
     response = ObservationResponse.objects.create(
-        observation=obs, submitted_by_id=actor.user_id,
-        response_text=response_text.strip(), evidence_references=evidence_references or [],
+        observation=obs,
+        submitted_by_id=actor.user_id,
+        response_text=response_text.strip(),
+        evidence_references=evidence_references or [],
     )
     before = obs.status
     obs.status = workflow.OBSERVATION_RESPONDED
     obs.save(update_fields=["status", "updated_at"])
-    _log(actor, "audit.observation_responded", "audit_observation", obs.pk,
-         before, obs.status, {"response_id": response.pk})
-    _notify_roles(AUDIT_ROLES, "observation_response", "Audit response received",
-                  f"Observation #{obs.pk} is ready for verification.",
-                  "audit_observation", obs.pk)
+    _log(
+        actor,
+        "audit.observation_responded",
+        "audit_observation",
+        obs.pk,
+        before,
+        obs.status,
+        {"response_id": response.pk},
+    )
+    _notify_roles(
+        AUDIT_ROLES,
+        "observation_response",
+        "Audit response received",
+        f"Observation #{obs.pk} is ready for verification.",
+        "audit_observation",
+        obs.pk,
+    )
     return response
 
 
 @transaction.atomic
-def verify_observation(actor, observation_id: int, *, satisfactory: bool,
-                       remarks: str) -> AuditObservation:
+def verify_observation(
+    actor, observation_id: int, *, satisfactory: bool, remarks: str
+) -> AuditObservation:
     role = require(actor, "iaa.observation.verify", roles=AUDIT_ROLES)
-    obs = AuditObservation.objects.select_for_update().filter(
-        pk=observation_id, status=workflow.OBSERVATION_RESPONDED).first()
+    obs = (
+        AuditObservation.objects.select_for_update()
+        .filter(pk=observation_id, status=workflow.OBSERVATION_RESPONDED)
+        .first()
+    )
     if obs is None:
         raise NotFoundError("Responded observation not found.")
     response = obs.responses.order_by("-created_at").first()
     has_evidence = bool(response and response.evidence_references)
     can_close = rules.may_close_observation(
-        satisfactory=satisfactory, has_response=bool(response and response.response_text),
+        satisfactory=satisfactory,
+        has_response=bool(response and response.response_text),
         has_evidence=has_evidence,
     )
     before = obs.status
@@ -746,12 +1155,34 @@ def verify_observation(actor, observation_id: int, *, satisfactory: bool,
     obs.verified_at = timezone.now()
     obs.verification_remarks = remarks.strip()
     obs.closed_at = timezone.now() if satisfactory else None
-    obs.save(update_fields=["status", "verified_by_id", "verified_at",
-                            "verification_remarks", "closed_at", "updated_at"])
-    _log(actor, "audit.observation_verified", "audit_observation", obs.pk,
-         before, obs.status, {"satisfactory": satisfactory, "remarks": remarks}, role)
-    _notify_user(obs.concerned_user_id, "observation_verified", "Audit response reviewed",
-                 f"Observation #{obs.pk} is now {obs.status}.", "audit_observation", obs.pk)
+    obs.save(
+        update_fields=[
+            "status",
+            "verified_by_id",
+            "verified_at",
+            "verification_remarks",
+            "closed_at",
+            "updated_at",
+        ]
+    )
+    _log(
+        actor,
+        "audit.observation_verified",
+        "audit_observation",
+        obs.pk,
+        before,
+        obs.status,
+        {"satisfactory": satisfactory, "remarks": remarks},
+        role,
+    )
+    _notify_user(
+        obs.concerned_user_id,
+        "observation_verified",
+        "Audit response reviewed",
+        f"Observation #{obs.pk} is now {obs.status}.",
+        "audit_observation",
+        obs.pk,
+    )
     return obs
 
 
@@ -766,18 +1197,30 @@ def switch_active_role(actor, role_name: str, auth_token: str | None):
         raise PermissionDeniedError("You cannot activate a role that is not assigned by IAM.")
     if not auth_token:
         raise ConflictError("A session token is required to change the active IAM role.")
-    iam_role = next((str(value) for value in getattr(actor, "roles", ())
-                     if normalize_role(value) == chosen), role_name)
+    iam_role = next(
+        (str(value) for value in getattr(actor, "roles", ()) if normalize_role(value) == chosen),
+        role_name,
+    )
     before = normalize_role(getattr(actor, "active_role", ""))
     try:
         get_client().set_active_role(auth_token, iam_role)
     except IamUnavailable as exc:
-        raise ConflictError(f"Fusion IAM could not update the active role: {exc}",
-                            code="iam_role_switch_unavailable") from exc
+        raise ConflictError(
+            f"Fusion IAM could not update the active role: {exc}",
+            code="iam_role_switch_unavailable",
+        ) from exc
     except ValueError as exc:
         raise ConflictError(str(exc), code="invalid_active_role") from exc
-    _log(actor, "role.active_role_switched", "active_role", actor.user_id,
-         before, chosen, {"selected_role": chosen, "identity_provider": "Fusion IAM"}, chosen)
+    _log(
+        actor,
+        "role.active_role_switched",
+        "active_role",
+        actor.user_id,
+        before,
+        chosen,
+        {"selected_role": chosen, "identity_provider": "Fusion IAM"},
+        chosen,
+    )
     # IAM invalidates its session cache; the client must refresh its session.
     return SimpleNamespace(role=chosen)
 
@@ -792,7 +1235,11 @@ def configure_approval_rule(actor, payload: dict) -> ApprovalRule:
         raise ConflictError("An approval route cannot repeat the same authority role.")
     minimum = payload.get("min_amount")
     maximum = payload.get("max_amount")
-    if minimum is not None and maximum is not None and Decimal(str(minimum)) > Decimal(str(maximum)):
+    if (
+        minimum is not None
+        and maximum is not None
+        and Decimal(str(minimum)) > Decimal(str(maximum))
+    ):
         raise ConflictError("Approval route minimum amount cannot exceed its maximum.")
     for level in levels:
         timeout = level.get("timeout_hours")
@@ -805,33 +1252,56 @@ def configure_approval_rule(actor, payload: dict) -> ApprovalRule:
         record_kind=str(payload.get("record_kind", "")),
         request_type=str(payload.get("request_type", "")),
         department=str(payload.get("department", "")),
-        min_amount=payload.get("min_amount"), max_amount=payload.get("max_amount"),
-        levels=levels, priority=int(payload.get("priority", 100)),
+        min_amount=payload.get("min_amount"),
+        max_amount=payload.get("max_amount"),
+        levels=levels,
+        priority=int(payload.get("priority", 100)),
         is_active=bool(payload.get("is_active", True)),
     )
-    _log(actor, "configuration.approval_rule_created", "approval_rule", rule.pk,
-         details={"levels": levels}, role=role)
+    _log(
+        actor,
+        "configuration.approval_rule_created",
+        "approval_rule",
+        rule.pk,
+        details={"levels": levels},
+        role=role,
+    )
     return rule
 
 
 @transaction.atomic
 def configure_financial_year(actor, payload: dict) -> FinancialYearPolicy:
     role = require(actor, "iaa.configuration.manage", roles=ADMIN_ROLES, operational=False)
-    if payload.get("starts_on") and payload.get("ends_on") and payload["ends_on"] < payload["starts_on"]:
+    if (
+        payload.get("starts_on")
+        and payload.get("ends_on")
+        and payload["ends_on"] < payload["starts_on"]
+    ):
         raise ConflictError("Financial year end must be on or after its start.")
-    overlapping = FinancialYearPolicy.objects.exclude(
-        financial_year=str(payload["financial_year"])
-    ).filter(starts_on__lte=payload["ends_on"], ends_on__gte=payload["starts_on"]).exists()
+    overlapping = (
+        FinancialYearPolicy.objects.exclude(financial_year=str(payload["financial_year"]))
+        .filter(starts_on__lte=payload["ends_on"], ends_on__gte=payload["starts_on"])
+        .exists()
+    )
     if overlapping:
         raise ConflictError("Financial year dates overlap another configured financial year.")
     policy, _ = FinancialYearPolicy.objects.update_or_create(
         financial_year=str(payload["financial_year"]),
-        defaults={"starts_on": payload["starts_on"], "ends_on": payload["ends_on"],
-                  "settings": payload.get("settings") or {},
-                  "is_active": bool(payload.get("is_active", True))},
+        defaults={
+            "starts_on": payload["starts_on"],
+            "ends_on": payload["ends_on"],
+            "settings": payload.get("settings") or {},
+            "is_active": bool(payload.get("is_active", True)),
+        },
     )
-    _log(actor, "configuration.financial_year_updated", "financial_year_policy",
-         policy.pk, details={"financial_year": policy.financial_year}, role=role)
+    _log(
+        actor,
+        "configuration.financial_year_updated",
+        "financial_year_policy",
+        policy.pk,
+        details={"financial_year": policy.financial_year},
+        role=role,
+    )
     return policy
 
 
@@ -839,47 +1309,84 @@ def configure_financial_year(actor, payload: dict) -> FinancialYearPolicy:
 def escalate_overdue_approvals(now=None) -> int:
     """IAA-UC-203: event worker for configured overdue authority decisions."""
     now = now or timezone.now()
-    steps = (ApprovalStep.objects.select_for_update().select_related("record")
-             .filter(status="pending", due_at__isnull=False, due_at__lte=now))
+    steps = (
+        ApprovalStep.objects.select_for_update()
+        .select_related("record")
+        .filter(status="pending", due_at__isnull=False, due_at__lte=now)
+    )
     count = 0
     for step in steps:
-        next_step = ApprovalStep.objects.select_for_update().filter(
-            record=step.record, step_number__gt=step.step_number, status="queued"
-        ).exclude(assigned_user_id=step.record.created_by_id).order_by("step_number").first()
+        next_step = (
+            ApprovalStep.objects.select_for_update()
+            .filter(record=step.record, step_number__gt=step.step_number, status="queued")
+            .exclude(assigned_user_id=step.record.created_by_id)
+            .order_by("step_number")
+            .first()
+        )
         before = step.record.status
         step.status = "escalated"
         step.save(update_fields=["status", "updated_at"])
         if next_step:
             next_step.status = "pending"
-            next_step.due_at = now + timezone.timedelta(hours=next_step.timeout_hours) if next_step.timeout_hours else None
+            next_step.due_at = (
+                now + timezone.timedelta(hours=next_step.timeout_hours)
+                if next_step.timeout_hours
+                else None
+            )
             next_step.save(update_fields=["status", "due_at", "updated_at"])
             step.record.current_approval_step = next_step.step_number
         step.record.status = workflow.ESCALATED
         step.record.save(update_fields=["status", "current_approval_step", "updated_at"])
-        _log(None, "approval.timeout_escalated", "financial_record", step.record_id,
-             before, step.record.status, {"from_role": step.authority_role,
-                                          "to_role": next_step.authority_role if next_step else None,
-                                          "route_exhausted": next_step is None},
-             "system")
+        _log(
+            None,
+            "approval.timeout_escalated",
+            "financial_record",
+            step.record_id,
+            before,
+            step.record.status,
+            {
+                "from_role": step.authority_role,
+                "to_role": next_step.authority_role if next_step else None,
+                "route_exhausted": next_step is None,
+            },
+            "system",
+        )
         if next_step:
             if next_step.assigned_user_id:
-                _notify_user(next_step.assigned_user_id, "approval_escalated",
-                             "Overdue IAA approval escalated",
-                             f"Request #{step.record_id} was assigned to you.",
-                             "financial_record", step.record_id)
+                _notify_user(
+                    next_step.assigned_user_id,
+                    "approval_escalated",
+                    "Overdue IAA approval escalated",
+                    f"Request #{step.record_id} was assigned to you.",
+                    "financial_record",
+                    step.record_id,
+                )
             else:
-                _notify_roles({normalize_role(next_step.authority_role)}, "approval_escalated",
-                              "Overdue IAA approval escalated",
-                              f"Request #{step.record_id} was escalated to your role.",
-                              "financial_record", step.record_id)
+                _notify_roles(
+                    {normalize_role(next_step.authority_role)},
+                    "approval_escalated",
+                    "Overdue IAA approval escalated",
+                    f"Request #{step.record_id} was escalated to your role.",
+                    "financial_record",
+                    step.record_id,
+                )
         else:
-            _notify_roles(FINANCE_ROLES, "approval_route_exhausted",
-                          "IAA approval route needs configuration",
-                          f"Request #{step.record_id} timed out with no further eligible configured authority.",
-                          "financial_record", step.record_id)
-        _notify_user(step.record.created_by_id, "approval_escalated", "IAA approval escalated",
-                     f"Request #{step.record_id} was escalated to the next authority.",
-                     "financial_record", step.record_id)
+            _notify_roles(
+                FINANCE_ROLES,
+                "approval_route_exhausted",
+                "IAA approval route needs configuration",
+                f"Request #{step.record_id} timed out with no further eligible configured authority.",
+                "financial_record",
+                step.record_id,
+            )
+        _notify_user(
+            step.record.created_by_id,
+            "approval_escalated",
+            "IAA approval escalated",
+            f"Request #{step.record_id} was escalated to the next authority.",
+            "financial_record",
+            step.record_id,
+        )
         count += 1
     return count
 
@@ -895,9 +1402,9 @@ def visible_anomalies(actor):
         return qs
     if role in AUTHORITY_ROLES:
         record_ids = visible_records(actor).values_list("pk", flat=True)
-        return qs.filter(Q(record_id__in=record_ids) |
-                         Q(resolver_role=role) |
-                         Q(resolver_user_id=actor.user_id))
+        return qs.filter(
+            Q(record_id__in=record_ids) | Q(resolver_role=role) | Q(resolver_user_id=actor.user_id)
+        )
     raise PermissionDeniedError("No anomaly visibility is assigned to this role.")
 
 
@@ -918,32 +1425,30 @@ def report_summary(actor) -> dict:
     qs = FinancialRecord.objects.all()
     decision_qs = ApprovalStep.objects.all()
     if role in AUTHORITY_ROLES:
-        scoped_ids = ApprovalStep.objects.filter(
-            status__in=("pending", "approved", "rejected", "escalated"),
-        ).filter(Q(authority_role=role) | Q(assigned_user_id=actor.user_id)
-        ).values_list("record_id", flat=True)
-        qs = qs.filter(pk__in=scoped_ids).distinct()
-        decision_qs = decision_qs.filter(
-            Q(authority_role=role) | Q(assigned_user_id=actor.user_id)
+        scoped_ids = (
+            ApprovalStep.objects.filter(
+                status__in=("pending", "approved", "rejected", "escalated"),
+            )
+            .filter(Q(authority_role=role) | Q(assigned_user_id=actor.user_id))
+            .values_list("record_id", flat=True)
         )
-    counts = {state: qs.filter(status=state).count()
-              for state, _ in FinancialRecord.STATUSES}
+        qs = qs.filter(pk__in=scoped_ids).distinct()
+        decision_qs = decision_qs.filter(Q(authority_role=role) | Q(assigned_user_id=actor.user_id))
+    counts = {state: qs.filter(status=state).count() for state, _ in FinancialRecord.STATUSES}
     record_ids = qs.values_list("pk", flat=True)
     if role in AUTHORITY_ROLES:
         anomalies_qs = Anomaly.objects.filter(
-            Q(record_id__in=record_ids) | Q(resolver_role=role) |
-            Q(resolver_user_id=actor.user_id))
+            Q(record_id__in=record_ids) | Q(resolver_role=role) | Q(resolver_user_id=actor.user_id)
+        )
     else:
         anomalies_qs = Anomaly.objects.all()
     observations_qs = AuditObservation.objects.filter(record_id__in=record_ids)
     decisions = decision_qs.exclude(decided_at__isnull=True)
-    turnaround = [
-        (step.decided_at - step.created_at).total_seconds()
-        for step in decisions
-    ]
+    turnaround = [(step.decided_at - step.created_at).total_seconds() for step in decisions]
     avg_hours = (sum(turnaround) / len(turnaround) / 3600) if turnaround else None
     return {
-        "record_status_counts": counts, "total_records": qs.count(),
+        "record_status_counts": counts,
+        "total_records": qs.count(),
         "total_anomalies": anomalies_qs.count(),
         "open_anomalies": anomalies_qs.filter(status="open").count(),
         "total_observations": observations_qs.count(),
@@ -967,9 +1472,14 @@ def configure_department_budget(actor, payload: dict) -> DepartmentBudget:
     )
     if min(budget.allocated, budget.spent, budget.committed) < 0:
         raise ConflictError("Budget amounts cannot be negative.")
-    _log(actor, "configuration.department_budget_updated", "department_budget",
-         budget.pk, details={"department": budget.department,
-                             "financial_year": budget.financial_year}, role=role)
+    _log(
+        actor,
+        "configuration.department_budget_updated",
+        "department_budget",
+        budget.pk,
+        details={"department": budget.department, "financial_year": budget.financial_year},
+        role=role,
+    )
     return budget
 
 
@@ -979,8 +1489,7 @@ def audit_logs_for(actor):
 
 
 def build_csv_report(actor) -> str:
-    require(actor, "iaa.report.export",
-            roles=FINANCE_ROLES | AUTHORITY_ROLES | AUDIT_ROLES)
+    require(actor, "iaa.report.export", roles=FINANCE_ROLES | AUTHORITY_ROLES | AUDIT_ROLES)
     data = report_summary(actor)
     stream = io.StringIO()
     writer = csv.writer(stream)
@@ -990,7 +1499,9 @@ def build_csv_report(actor) -> str:
     writer.writerow(["open_anomalies", data["open_anomalies"]])
     writer.writerow(["total_observations", data["total_observations"]])
     writer.writerow(["open_observations", data["open_observations"]])
-    writer.writerow(["average_approval_turnaround_hours", data["average_approval_turnaround_hours"] or ""])
+    writer.writerow(
+        ["average_approval_turnaround_hours", data["average_approval_turnaround_hours"] or ""]
+    )
     for key, value in data["record_status_counts"].items():
         writer.writerow([f"records_{key}", value])
     return stream.getvalue()

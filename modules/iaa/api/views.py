@@ -1,4 +1,5 @@
 """IAA REST API. All authorization is repeated in the service layer."""
+
 from django.db.models import Q
 from django.http import HttpResponse
 from django.utils import timezone
@@ -11,8 +12,12 @@ from core.api.exceptions import NotFoundError
 from fusion_auth.permissions import HasModuleGrant
 from modules.iaa.api import serializers as s
 from modules.iaa.models import (
-    ApprovalRule, ApprovalStep, DashboardNotification, FinancialRecord,
-    FinancialYearPolicy, NotificationReceipt,
+    ApprovalRule,
+    ApprovalStep,
+    DashboardNotification,
+    FinancialRecord,
+    FinancialYearPolicy,
+    NotificationReceipt,
 )
 from modules.iaa.services import iaa as service
 
@@ -26,8 +31,11 @@ def actor(request):
 def page(qs, serializer):
     total = qs.count()
     rows = list(qs[:200])
-    return {"results": serializer(rows, many=True).data,
-            "count": total, "has_more": total > len(rows)}
+    return {
+        "results": serializer(rows, many=True).data,
+        "count": total,
+        "has_more": total > len(rows),
+    }
 
 
 class IAAView(APIView):
@@ -53,7 +61,9 @@ class FinancialRecordListCreateView(IAAView):
     def post(self, request):
         serializer = s.FinancialRecordWriteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        row = service.create_record(actor(request), serializer.validated_data, kind="expense_voucher")
+        row = service.create_record(
+            actor(request), serializer.validated_data, kind="expense_voucher"
+        )
         return Response(s.FinancialRecordSerializer(row).data, status=status.HTTP_201_CREATED)
 
 
@@ -61,7 +71,10 @@ class FinancialRecordDetailView(IAAView):
     @extend_schema(operation_id="iaa_request_retrieve", responses=s.FinancialRecordSerializer)
     def get(self, request, pk):
         role = service.actor_role(actor(request))
-        service.require(actor(request), "iaa.request.view_self" if role in service.BASIC_ROLES else "iaa.request.view")
+        service.require(
+            actor(request),
+            "iaa.request.view_self" if role in service.BASIC_ROLES else "iaa.request.view",
+        )
         row = service.get_record(actor(request), pk)
         return Response(s.FinancialRecordSerializer(row).data)
 
@@ -81,7 +94,9 @@ class FinancialRecordSubmitView(IAAView):
 
 
 class RecordAttachmentView(IAAView):
-    @extend_schema(request=s.SupportingDocumentInputSerializer, responses=s.SupportingDocumentSerializer)
+    @extend_schema(
+        request=s.SupportingDocumentInputSerializer, responses=s.SupportingDocumentSerializer
+    )
     def post(self, request, pk):
         serializer = s.SupportingDocumentInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -93,14 +108,21 @@ class FinanceQueryView(IAAView):
     @extend_schema(responses=s.PageSerializer)
     def get(self, request, pk):
         row = service.get_record(actor(request), pk)
-        service.require(actor(request), "iaa.request.view_self" if service.actor_role(actor(request)) in service.BASIC_ROLES else "iaa.request.view")
+        service.require(
+            actor(request),
+            "iaa.request.view_self"
+            if service.actor_role(actor(request)) in service.BASIC_ROLES
+            else "iaa.request.view",
+        )
         return Response(page(row.queries.order_by("created_at"), s.FinanceQuerySerializer))
 
     @extend_schema(request=s.QueryInputSerializer, responses=s.FinanceQuerySerializer)
     def post(self, request, pk):
         serializer = s.QueryInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        query = service.request_clarification(actor(request), pk, serializer.validated_data["question"])
+        query = service.request_clarification(
+            actor(request), pk, serializer.validated_data["question"]
+        )
         return Response(s.FinanceQuerySerializer(query).data, status=status.HTTP_201_CREATED)
 
 
@@ -117,13 +139,16 @@ class FinanceQueueView(IAAView):
     @extend_schema(responses=s.PageSerializer)
     def get(self, request):
         service.require(actor(request), "iaa.finance.validate", roles=service.FINANCE_ROLES)
-        qs = FinancialRecord.objects.filter(
-            status__in=("submitted", "query_responded")).order_by("submitted_at")
+        qs = FinancialRecord.objects.filter(status__in=("submitted", "query_responded")).order_by(
+            "submitted_at"
+        )
         return Response(page(qs, s.FinancialRecordSerializer))
 
 
 class FinanceValidateView(IAAView):
-    @extend_schema(request=s.FinanceValidationInputSerializer, responses=s.FinancialRecordSerializer)
+    @extend_schema(
+        request=s.FinanceValidationInputSerializer, responses=s.FinancialRecordSerializer
+    )
     def post(self, request, pk):
         serializer = s.FinanceValidationInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -135,7 +160,10 @@ class TAListCreateView(IAAView):
     @extend_schema(responses=s.PageSerializer)
     def get(self, request):
         role = service.actor_role(actor(request))
-        service.require(actor(request), "iaa.ta.view_self" if role in service.BASIC_ROLES else "iaa.request.view")
+        service.require(
+            actor(request),
+            "iaa.ta.view_self" if role in service.BASIC_ROLES else "iaa.request.view",
+        )
         qs = service.visible_records(actor(request)).filter(record_kind="ta")
         state = request.query_params.get("status")
         if state:
@@ -175,8 +203,12 @@ class ApprovalQueueView(IAAView):
     def get(self, request):
         role = service.require(actor(request), "iaa.approval.view", roles=service.AUTHORITY_ROLES)
         qs = ApprovalStep.objects.filter(status="pending", authority_role=role)
-        qs = qs.filter(Q(assigned_user_id__isnull=True) | Q(assigned_user_id=actor(request).user_id))
-        return Response(page(qs.select_related("record").order_by("due_at"), s.ApprovalStepSerializer))
+        qs = qs.filter(
+            Q(assigned_user_id__isnull=True) | Q(assigned_user_id=actor(request).user_id)
+        )
+        return Response(
+            page(qs.select_related("record").order_by("due_at"), s.ApprovalStepSerializer)
+        )
 
 
 class ApprovalDecisionView(IAAView):
@@ -198,8 +230,14 @@ class RecordCompletionView(IAAView):
 class AnomalyListCreateView(IAAView):
     @extend_schema(responses=s.PageSerializer)
     def get(self, request):
-        service.require(actor(request), "iaa.anomaly.view",
-                        roles=service.FINANCE_ROLES | service.AUDIT_ROLES | service.AUTHORITY_ROLES | service.BASIC_ROLES)
+        service.require(
+            actor(request),
+            "iaa.anomaly.view",
+            roles=service.FINANCE_ROLES
+            | service.AUDIT_ROLES
+            | service.AUTHORITY_ROLES
+            | service.BASIC_ROLES,
+        )
         qs = service.visible_anomalies(actor(request))
         state = request.query_params.get("status")
         if state:
@@ -235,7 +273,9 @@ class ObservationListCreateView(IAAView):
     @extend_schema(responses=s.PageSerializer)
     def get(self, request):
         role = service.actor_role(actor(request))
-        permission = "iaa.audit.review" if role in service.AUDIT_ROLES else "iaa.observation.respond"
+        permission = (
+            "iaa.audit.review" if role in service.AUDIT_ROLES else "iaa.observation.respond"
+        )
         service.require(actor(request), permission, roles=service.AUDIT_ROLES | service.BASIC_ROLES)
         qs = service.visible_observations(actor(request))
         state = request.query_params.get("status")
@@ -252,16 +292,22 @@ class ObservationListCreateView(IAAView):
 
 
 class ObservationRespondView(IAAView):
-    @extend_schema(request=s.ObservationResponseInputSerializer, responses=s.ObservationResponseSerializer)
+    @extend_schema(
+        request=s.ObservationResponseInputSerializer, responses=s.ObservationResponseSerializer
+    )
     def post(self, request, pk):
         serializer = s.ObservationResponseInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         response = service.respond_observation(actor(request), pk, **serializer.validated_data)
-        return Response(s.ObservationResponseSerializer(response).data, status=status.HTTP_201_CREATED)
+        return Response(
+            s.ObservationResponseSerializer(response).data, status=status.HTTP_201_CREATED
+        )
 
 
 class ObservationVerifyView(IAAView):
-    @extend_schema(request=s.ObservationVerifyInputSerializer, responses=s.AuditObservationSerializer)
+    @extend_schema(
+        request=s.ObservationVerifyInputSerializer, responses=s.AuditObservationSerializer
+    )
     def post(self, request, pk):
         serializer = s.ObservationVerifyInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -278,8 +324,11 @@ class ReportSummaryView(IAAView):
 class ReportExportView(IAAView):
     @extend_schema(responses={(200, "text/csv"): OpenApiTypes.STR})
     def get(self, request):
-        service.require(actor(request), "iaa.report.export",
-                        roles=service.FINANCE_ROLES | service.AUTHORITY_ROLES | service.AUDIT_ROLES)
+        service.require(
+            actor(request),
+            "iaa.report.export",
+            roles=service.FINANCE_ROLES | service.AUTHORITY_ROLES | service.AUDIT_ROLES,
+        )
         csv_data = service.build_csv_report(actor(request))
         response = HttpResponse(csv_data, content_type="text/csv; charset=utf-8")
         response["Content-Disposition"] = 'attachment; filename="iaa-report.csv"'
@@ -299,14 +348,22 @@ class NotificationListView(IAAView):
         total = qs.count()
         rows = list(qs[:200])
         role_ids = [row.pk for row in rows if row.recipient_user_id is None]
-        receipts = {receipt.notification_id: receipt.read_at
-                    for receipt in NotificationReceipt.objects.filter(
-                        notification_id__in=role_ids, recipient_user_id=user_id)}
+        receipts = {
+            receipt.notification_id: receipt.read_at
+            for receipt in NotificationReceipt.objects.filter(
+                notification_id__in=role_ids, recipient_user_id=user_id
+            )
+        }
         for row in rows:
             if row.recipient_user_id is None:
                 row.read_at = receipts.get(row.pk)
-        return Response({"results": s.NotificationSerializer(rows, many=True).data,
-                         "count": total, "has_more": total > len(rows)})
+        return Response(
+            {
+                "results": s.NotificationSerializer(rows, many=True).data,
+                "count": total,
+                "has_more": total > len(rows),
+            }
+        )
 
 
 class NotificationReadView(IAAView):
@@ -315,15 +372,20 @@ class NotificationReadView(IAAView):
         service.require(actor(request), "iaa.notification.view")
         user_id = actor(request).user_id
         active_role = service.actor_role(actor(request))
-        row = DashboardNotification.objects.filter(pk=pk).filter(
-            Q(recipient_user_id=user_id)
-            | Q(recipient_user_id__isnull=True, recipient_role=active_role)
-        ).first()
+        row = (
+            DashboardNotification.objects.filter(pk=pk)
+            .filter(
+                Q(recipient_user_id=user_id)
+                | Q(recipient_user_id__isnull=True, recipient_role=active_role)
+            )
+            .first()
+        )
         if row is None:
             raise NotFoundError("Notification not found.")
         if row.recipient_user_id is None:
             receipt, _ = NotificationReceipt.objects.update_or_create(
-                notification=row, recipient_user_id=user_id,
+                notification=row,
+                recipient_user_id=user_id,
                 defaults={"read_at": timezone.now()},
             )
             row.read_at = receipt.read_at
@@ -337,23 +399,29 @@ class ActiveRoleView(IAAView):
     @extend_schema(responses=OpenApiTypes.OBJECT)
     def get(self, request):
         current = service.actor_role(actor(request))
-        return Response({"active_role": current,
-                         "available_roles": [service.normalize_role(x) for x in actor(request).roles]})
+        return Response(
+            {
+                "active_role": current,
+                "available_roles": [service.normalize_role(x) for x in actor(request).roles],
+            }
+        )
 
     @extend_schema(request=s.RoleSwitchSerializer, responses=OpenApiTypes.OBJECT)
     def post(self, request):
         serializer = s.RoleSwitchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         selection = service.switch_active_role(
-            actor(request), serializer.validated_data["role"], request.auth)
+            actor(request), serializer.validated_data["role"], request.auth
+        )
         return Response({"active_role": selection.role})
 
 
 class ApprovalRuleView(IAAView):
     @extend_schema(responses=s.PageSerializer)
     def get(self, request):
-        service.require(actor(request), "iaa.configuration.manage",
-                        roles=service.ADMIN_ROLES, operational=False)
+        service.require(
+            actor(request), "iaa.configuration.manage", roles=service.ADMIN_ROLES, operational=False
+        )
         return Response(page(ApprovalRule.objects.order_by("priority"), s.ApprovalRuleSerializer))
 
     @extend_schema(request=s.ApprovalRuleInputSerializer, responses=s.ApprovalRuleSerializer)
@@ -367,27 +435,43 @@ class ApprovalRuleView(IAAView):
 class FinancialYearPolicyView(IAAView):
     @extend_schema(responses=s.PageSerializer)
     def get(self, request):
-        service.require(actor(request), "iaa.configuration.manage",
-                        roles=service.ADMIN_ROLES, operational=False)
-        return Response(page(FinancialYearPolicy.objects.order_by("-starts_on"), s.FinancialYearPolicySerializer))
+        service.require(
+            actor(request), "iaa.configuration.manage", roles=service.ADMIN_ROLES, operational=False
+        )
+        return Response(
+            page(
+                FinancialYearPolicy.objects.order_by("-starts_on"), s.FinancialYearPolicySerializer
+            )
+        )
 
-    @extend_schema(request=s.FinancialYearPolicyInputSerializer, responses=s.FinancialYearPolicySerializer)
+    @extend_schema(
+        request=s.FinancialYearPolicyInputSerializer, responses=s.FinancialYearPolicySerializer
+    )
     def post(self, request):
         serializer = s.FinancialYearPolicyInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         row = service.configure_financial_year(actor(request), serializer.validated_data)
         return Response(s.FinancialYearPolicySerializer(row).data, status=status.HTTP_201_CREATED)
 
+
 class DepartmentBudgetView(IAAView):
     @extend_schema(responses=s.PageSerializer)
     def get(self, request):
-        service.require(actor(request), "iaa.configuration.manage",
-                        roles=service.ADMIN_ROLES, operational=False)
+        service.require(
+            actor(request), "iaa.configuration.manage", roles=service.ADMIN_ROLES, operational=False
+        )
         from modules.iaa.models import DepartmentBudget
-        return Response(page(DepartmentBudget.objects.order_by("department", "financial_year"),
-                             s.DepartmentBudgetSerializer))
 
-    @extend_schema(request=s.DepartmentBudgetInputSerializer, responses=s.DepartmentBudgetSerializer)
+        return Response(
+            page(
+                DepartmentBudget.objects.order_by("department", "financial_year"),
+                s.DepartmentBudgetSerializer,
+            )
+        )
+
+    @extend_schema(
+        request=s.DepartmentBudgetInputSerializer, responses=s.DepartmentBudgetSerializer
+    )
     def post(self, request):
         serializer = s.DepartmentBudgetInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
