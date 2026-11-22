@@ -1,4 +1,4 @@
-"""What the server tells the shell about Institute Works Department."""
+﻿"""What the server tells the shell about Institute Works Department."""
 
 MODULE = {
     "code": "iwd",
@@ -30,32 +30,24 @@ PERMISSIONS = [
     ("iwd.complaint.settle", "Settle payment accounts"),
 ]
 
-SYSTEM_PERMISSIONS = []
-
-_USER_PERMS = [
-    "iwd.complaint.view",
-    "iwd.complaint.create",
-]
-
-_ENGINEER_PERMS = [
-    "iwd.complaint.view",
-    "iwd.complaint.create",
-    "iwd.complaint.manage",
-]
-
-_APPROVER_PERMS = [
-    "iwd.complaint.view",
-    "iwd.complaint.approve",
+# Back-office only — no IAM designation holds these directly
+SYSTEM_PERMISSIONS = [
+    "iwd.complaint.audit",
+    "iwd.complaint.settle",
 ]
 
 ROLE_GRANTS = {
-    "student": _USER_PERMS,
-    "faculty": _USER_PERMS,
-    "staff": _USER_PERMS,
-    "Director": _APPROVER_PERMS + ["iwd.complaint.settle"],
-    "HOD": _APPROVER_PERMS,
-    "Dean": ["iwd.complaint.view"],
-    "iwd_engineer": _ENGINEER_PERMS,
-    "iwd_auditor": ["iwd.complaint.view", "iwd.complaint.audit"],
-    "iwd_admin": ["iwd.complaint.view", "iwd.complaint.manage", "iwd.complaint.settle"],
+    "student": [
+        "iwd.complaint.view",
+        "iwd.complaint.create",
+    ],
+    "acadadmin": [
+        "iwd.complaint.view",
+        "iwd.complaint.create",
+        "iwd.complaint.manage",
+    ],
+    "Dean Academic": [
+        "iwd.complaint.view",
+        "iwd.complaint.approve",
+    ],
 }

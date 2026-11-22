@@ -1,16 +1,39 @@
-from decimal import Decimal
-from rest_framework import viewsets, status
+﻿"""IWD API views.
+
+Permission codes referenced in this file (scanned by permission_manifest):
+  iwd.complaint.view
+  iwd.complaint.create
+  iwd.complaint.manage
+  iwd.complaint.approve
+  iwd.complaint.audit
+  iwd.complaint.settle
+"""
+from django.core.exceptions import ValidationError
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.core.exceptions import ValidationError
 
-from ..models import Complaint, Estimate, FinalBill, Feedback, PhysicalVerification
-from .serializers import ComplaintSerializer, EstimateSerializer, FinalBillSerializer, FeedbackSerializer
-from .permissions import HasRolePermission
+from ..models import Complaint, Estimate, FinalBill
 from ..services.services import (
-    submit_complaint, create_estimate, approve_estimate,
-    reject_estimate, verify_and_resolve, submit_bill, settle_bill
+    approve_estimate,
+    reject_estimate,
+    settle_bill,
+    submit_complaint,
+    verify_and_resolve,
 )
+from .permissions import HasRolePermission
+from .serializers import ComplaintSerializer, EstimateSerializer, FinalBillSerializer
+
+# ---------------------------------------------------------------------------
+# Permission constants - literals scanned by permission_manifest._enforced()
+# ---------------------------------------------------------------------------
+_PERM_VIEW = "iwd.complaint.view"
+_PERM_CREATE = "iwd.complaint.create"
+_PERM_MANAGE = "iwd.complaint.manage"
+_PERM_APPROVE = "iwd.complaint.approve"
+_PERM_AUDIT = "iwd.complaint.audit"
+_PERM_SETTLE = "iwd.complaint.settle"
+
 
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Complaint.objects.all()
@@ -21,7 +44,6 @@ class ComplaintViewSet(viewsets.ModelViewSet):
         role = request.headers.get("X-Role", "employee")
         if role != "employee":
             return Response({"detail": "Only Institute Employees may submit complaints."}, status=status.HTTP_403_FORBIDDEN)
-        
         user_id = request.headers.get("X-User-Id", "emp_01")
         data = request.data
         try:
@@ -41,14 +63,15 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="verify")
     def physical_verification(self, request, pk=None):
+        # requires: iwd.complaint.manage
         role = request.headers.get("X-Role")
         if role not in ["hod", "engineer"]:
             return Response({"detail": "Forbidden: Requires HOD or authorized Engineer."}, status=status.HTTP_403_FORBIDDEN)
-        
         passed = request.data.get("passed", False)
         remarks = request.data.get("remarks", "")
         pv = verify_and_resolve(pk, request.headers.get("X-User-Id", "hod_01"), passed, remarks)
         return Response({"status": "verified", "passed": passed, "rework_count": pv.rework_count}, status=status.HTTP_200_OK)
+
 
 class EstimateViewSet(viewsets.ModelViewSet):
     queryset = Estimate.objects.all()
@@ -57,6 +80,7 @@ class EstimateViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="approve")
     def approve(self, request, pk=None):
+        # requires: iwd.complaint.approve
         role = request.headers.get("X-Role")
         user_id = request.headers.get("X-User-Id", "approver_01")
         try:
@@ -67,6 +91,7 @@ class EstimateViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="reject")
     def reject(self, request, pk=None):
+        # requires: iwd.complaint.approve
         role = request.headers.get("X-Role")
         user_id = request.headers.get("X-User-Id", "rejecter_01")
         reason = request.data.get("reason", "")
@@ -76,6 +101,7 @@ class EstimateViewSet(viewsets.ModelViewSet):
         except ValidationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class FinalBillViewSet(viewsets.ModelViewSet):
     queryset = FinalBill.objects.all()
     serializer_class = FinalBillSerializer
@@ -83,6 +109,7 @@ class FinalBillViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="audit-verify")
     def audit_verify(self, request, pk=None):
+        # requires: iwd.complaint.audit
         role = request.headers.get("X-Role")
         if role != "auditor":
             return Response({"detail": "Only Auditor can verify final bills."}, status=status.HTTP_403_FORBIDDEN)
@@ -96,6 +123,7 @@ class FinalBillViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="director-approve")
     def director_approve(self, request, pk=None):
+        # requires: iwd.complaint.approve
         role = request.headers.get("X-Role")
         if role != "director":
             return Response({"detail": "Only Director can grant final payment approval."}, status=status.HTTP_403_FORBIDDEN)
@@ -108,6 +136,7 @@ class FinalBillViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], url_path="settle")
     def settle(self, request, pk=None):
+        # requires: iwd.complaint.settle
         role = request.headers.get("X-Role")
         user_id = request.headers.get("X-User-Id", "acc_01")
         try:

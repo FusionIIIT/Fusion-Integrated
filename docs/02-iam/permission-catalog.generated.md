@@ -17,12 +17,12 @@ For the intended taxonomy of modules not yet built, see
 
 | Code | What it allows | Held by |
 |---|---|---|
-| `iwd.complaint.view` | View maintenance complaints | `Dean`, `Director`, `HOD`, `faculty`, `iwd_admin`, `iwd_auditor`, `iwd_engineer`, `staff`, `student` |
-| `iwd.complaint.create` | Submit maintenance complaints | `faculty`, `iwd_engineer`, `staff`, `student` |
-| `iwd.complaint.manage` | Manage complaints and estimates | `iwd_admin`, `iwd_engineer` |
-| `iwd.complaint.approve` | Approve works and estimates | `Director`, `HOD` |
-| `iwd.complaint.audit` | Audit and verify final bills | `iwd_auditor` |
-| `iwd.complaint.settle` | Settle payment accounts | `Director`, `iwd_admin` |
+| `iwd.complaint.view` | View maintenance complaints | `Dean Academic`, `acadadmin`, `student` |
+| `iwd.complaint.create` | Submit maintenance complaints | `acadadmin`, `student` |
+| `iwd.complaint.manage` | Manage complaints and estimates | `acadadmin` |
+| `iwd.complaint.approve` | Approve works and estimates | `Dean Academic` |
+| `iwd.complaint.audit` | Audit and verify final bills | _service only_ |
+| `iwd.complaint.settle` | Settle payment accounts | _service only_ |
 
 ## `placement_cell`
 
