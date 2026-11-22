@@ -1,5 +1,6 @@
 import pytest
 from rest_framework.test import APIClient
+
 from fusion_auth.client import IamSession
 from modules.hreis.registry import ROLE_GRANTS
 

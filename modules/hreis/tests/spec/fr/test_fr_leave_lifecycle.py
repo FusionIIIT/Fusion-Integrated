@@ -1,7 +1,8 @@
-import pytest
 from datetime import date
-from decimal import Decimal
-from modules.hreis.models import EmployeeServiceRecord, HrAuditLog, LeaveRequest
+
+import pytest
+
+from modules.hreis.models import EmployeeServiceRecord, HrAuditLog
 from modules.hreis.services.leaves import decide_leave_request, submit_leave_request
 
 pytestmark = pytest.mark.django_db

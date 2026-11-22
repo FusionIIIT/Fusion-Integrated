@@ -1,7 +1,8 @@
 import pytest
 from rest_framework.test import APIClient
+
 from conftest import make_session
-from modules.hreis.models import EmployeeServiceRecord, HrAuditLog
+from modules.hreis.models import EmployeeServiceRecord
 from modules.hreis.registry import ROLE_GRANTS
 
 pytestmark = pytest.mark.django_db

@@ -1,6 +1,8 @@
-import pytest
 from datetime import date
-from modules.hreis.models import EmployeeServiceRecord, LeaveRequest
+
+import pytest
+
+from modules.hreis.models import EmployeeServiceRecord
 from modules.hreis.services.leaves import decide_leave_request, submit_leave_request
 
 pytestmark = pytest.mark.django_db

@@ -1,6 +1,8 @@
-import pytest
 from datetime import date
 from decimal import Decimal
+
+import pytest
+
 from modules.hreis.models import CpdaRequest, EmployeeServiceRecord, LtcRequest
 
 pytestmark = pytest.mark.django_db

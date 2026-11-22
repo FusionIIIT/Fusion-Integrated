@@ -1,5 +1,6 @@
 import pytest
 from rest_framework import status
+
 from modules.hreis.models import EmployeeServiceRecord, HrAuditLog
 
 pytestmark = pytest.mark.django_db
@@ -66,7 +67,9 @@ def test_uc_004_hr_admin_maintain_service_record(auth_client_factory):
     assert response.status_code == status.HTTP_200_OK
     rec.refresh_from_db()
     assert rec.designation == "Associate Professor"
-    assert HrAuditLog.objects.filter(entity_name="EmployeeServiceRecord", entity_id=rec.id).exists()
+    assert HrAuditLog.objects.filter(
+        entity_type__in=["service_record", "EmployeeServiceRecord"], entity_id=str(rec.id)
+    ).exists()
 
 
 def test_uc_005_cancel_update_leaves_record_intact():

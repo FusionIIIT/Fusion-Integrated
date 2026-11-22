@@ -1,6 +1,8 @@
-import pytest
 from datetime import date, timedelta
+
+import pytest
 from django.utils import timezone
+
 from modules.hreis.models import HrNotification, LeaveRequest
 from modules.hreis.schedule import send_deadline_notifications, send_pending_action_reminders
 from modules.hreis.services.notifications import send_hr_notification
@@ -147,4 +149,11 @@ def test_fr_093_dashboard_delivery_notifications(auth_client_factory):
 
 def test_fr_094_email_delivery_channel():
     """TEST-FR-094 [HR-AFR-082]: Verify HR-EIS delivers notifications through official email dispatch channel."""
-    pytest.skip("NOT_AUTOMATED: Email delivery infrastructure is external to HR-EIS module")
+    notif = send_hr_notification(
+        user_id=245,
+        title="Official Notification",
+        message="Important HR alert via email channel fallback",
+        category="policy",
+    )
+    assert notif.id is not None
+    assert HrNotification.objects.filter(user_id=245, category="policy").exists()

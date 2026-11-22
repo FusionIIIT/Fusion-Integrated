@@ -1,9 +1,10 @@
-import pytest
 from datetime import date
 from decimal import Decimal
+
+import pytest
+
 from modules.hreis.models import (
     AppraisalSubmission,
-    EmployeeServiceRecord,
     HrAuditLog,
     LtcRequest,
 )

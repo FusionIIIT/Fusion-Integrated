@@ -1,7 +1,9 @@
-import pytest
 from datetime import date
 from decimal import Decimal
+
+import pytest
 from rest_framework import status
+
 from modules.hreis.models import EmployeeServiceRecord, LtcRequest
 from modules.hreis.services.claims import settle_ltc_claim
 

@@ -1,5 +1,7 @@
-import pytest
 from decimal import Decimal
+
+import pytest
+
 from core.api.exceptions import BadRequestError
 from modules.hreis.models import CpdaRequest, EmployeeServiceRecord, HrAuditLog
 from modules.hreis.services.claims import (

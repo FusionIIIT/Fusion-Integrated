@@ -1,6 +1,7 @@
 import pytest
 from rest_framework import status
-from modules.hreis.models import HrAuditLog, WorkflowConfiguration
+
+from modules.hreis.models import HrAuditLog
 from modules.hreis.services.workflow_config import update_workflow_config
 
 pytestmark = pytest.mark.django_db
@@ -19,7 +20,6 @@ def test_uc_051_hr_admin_configure_workflow(auth_client_factory):
 
 def test_uc_052_configure_out_of_scope_settings(auth_client_factory):
     """TEST-UC-052 [HR-UC-017 Alternative A1]: Verify HR-EIS rejects configuring settings outside module scope."""
-    from modules.hreis.services.workflow_config import update_workflow_config
     # Updating valid module configuration works
     config = update_workflow_config("leave_policy", {"auto_forward": True})
     assert config.configuration_key == "leave_policy"

@@ -1,7 +1,7 @@
+
 import pytest
-from datetime import date
-from decimal import Decimal
-from modules.hreis.models import AppraisalSubmission, EmployeeServiceRecord
+
+from modules.hreis.models import EmployeeServiceRecord
 from modules.hreis.services.appraisals import (
     assign_appraisal_reviewers,
     finalize_appraisal,

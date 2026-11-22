@@ -1,5 +1,6 @@
 import pytest
 from django.core.exceptions import PermissionDenied
+
 from modules.hreis.models import HrAuditLog
 from modules.hreis.services.audit import log_hr_action
 

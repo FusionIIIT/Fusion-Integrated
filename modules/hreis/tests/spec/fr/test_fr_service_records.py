@@ -1,7 +1,12 @@
-import pytest
 from datetime import date
+
+import pytest
+
 from modules.hreis.models import EmployeeServiceRecord
-from modules.hreis.services.service_records import get_or_create_service_record, update_service_record
+from modules.hreis.services.service_records import (
+    get_or_create_service_record,
+    update_service_record,
+)
 
 pytestmark = pytest.mark.django_db
 

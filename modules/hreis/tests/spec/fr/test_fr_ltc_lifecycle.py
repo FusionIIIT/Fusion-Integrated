@@ -1,6 +1,8 @@
-import pytest
 from datetime import date
 from decimal import Decimal
+
+import pytest
+
 from modules.hreis.models import EmployeeServiceRecord, HrAuditLog, LtcRequest
 from modules.hreis.services.claims import (
     decide_ltc_request,

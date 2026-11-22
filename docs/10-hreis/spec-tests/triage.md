@@ -6,15 +6,15 @@ This document records the baseline triage analysis and resolutions for specifica
 
 ## 1. Baseline Test Run Summary
 
-Executed on baseline specification suite (266 tests):
+Executed on baseline specification suite (265 tests):
 
 | Suite | Total Tests | Passed | Failed | Skipped | Status |
 |---|---|---|---|---|---|
-| **Business Rules (BR)** | 56 | 56 | 0 | 0 | **PASS** |
+| **Business Rules (BR)** | 55 | 55 | 0 | 0 | **PASS** |
 | **Functional Requirements (FR)** | 107 | 104 | 2 | 1 | **ACTION NEEDED** |
 | **Use Cases (UC)** | 67 | 65 | 2 | 0 | **ACTION NEEDED** |
 | **Workflows (WF)** | 36 | 36 | 0 | 0 | **PASS** |
-| **TOTAL** | **266** | **261** | **4** | **1** | **98.1% Pass Rate** |
+| **TOTAL** | **265** | **260** | **4** | **1** | **98.1% Pass Rate** |
 
 ---
 
@@ -33,8 +33,8 @@ Executed on baseline specification suite (266 tests):
 ## 3. Post-Triage Final Verification Run
 
 All triage items resolved:
-- **Total Tests:** 266
-- **Passed:** 266 (100%)
+- **Total Tests:** 265
+- **Passed:** 265 (100%)
 - **Failed:** 0
 - **Skipped:** 0
 - **Final Result:** ALL GATES PASSED (10/10)

@@ -1,14 +1,15 @@
-import pytest
 from decimal import Decimal
+
+import pytest
+from rest_framework import status
+
 from core.api.exceptions import BadRequestError, PermissionDeniedError
-from modules.hreis.models import CpdaRequest, EmployeeServiceRecord, HrAuditLog
+from modules.hreis.models import CpdaRequest, EmployeeServiceRecord
 from modules.hreis.services.claims import (
-    decide_cpda_request,
     settle_cpda_claim,
     submit_cpda_request,
     verify_cpda_request,
 )
-from rest_framework import status
 
 pytestmark = pytest.mark.django_db
 

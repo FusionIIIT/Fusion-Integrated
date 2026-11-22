@@ -1,6 +1,7 @@
 import pytest
+
 from core.api.exceptions import BadRequestError
-from modules.hreis.models import AppraisalSubmission, EmployeeServiceRecord
+from modules.hreis.models import EmployeeServiceRecord
 from modules.hreis.services.appraisals import (
     assign_appraisal_reviewers,
     finalize_appraisal,

@@ -1,9 +1,11 @@
-import pytest
 from datetime import date
-from core.api.exceptions import BadRequestError
-from modules.hreis.models import EmployeeServiceRecord, HrAuditLog, LeaveRequest
-from modules.hreis.services.leaves import decide_leave_request, submit_leave_request
+
+import pytest
 from rest_framework import status
+
+from core.api.exceptions import BadRequestError
+from modules.hreis.models import EmployeeServiceRecord, HrAuditLog
+from modules.hreis.services.leaves import decide_leave_request, submit_leave_request
 
 pytestmark = pytest.mark.django_db
 

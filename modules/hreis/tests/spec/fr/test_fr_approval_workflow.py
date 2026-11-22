@@ -1,6 +1,7 @@
-import pytest
 from datetime import date
-from decimal import Decimal
+
+import pytest
+
 from modules.hreis.models import EmployeeServiceRecord, LeaveRequest
 from modules.hreis.services.leaves import submit_leave_request
 
@@ -84,7 +85,7 @@ def test_fr_014_route_faculty_final_approvals_to_director(auth_client_factory):
 
 def test_fr_015_authority_determined_by_category_and_type():
     """TEST-FR-015 [HR-AFR-009]: Verify HR-EIS determines approval authority strictly by employee category and request type."""
-    from modules.hreis.domain.workflow import get_next_authority, DEFAULT_APPROVAL_HIERARCHY
+    from modules.hreis.domain.workflow import DEFAULT_APPROVAL_HIERARCHY, get_next_authority
 
     first_faculty = get_next_authority("", "faculty", DEFAULT_APPROVAL_HIERARCHY)
     first_staff = get_next_authority("", "staff", DEFAULT_APPROVAL_HIERARCHY)

@@ -1,6 +1,7 @@
 import pytest
+from rest_framework import status
+
 from core.api.exceptions import BadRequestError, PermissionDeniedError
-from modules.hreis.models import AppraisalSubmission, EmployeeServiceRecord
 from modules.hreis.services.appraisals import (
     assign_appraisal_reviewers,
     finalize_appraisal,
@@ -8,7 +9,6 @@ from modules.hreis.services.appraisals import (
     submit_appraisal_review,
 )
 from modules.hreis.services.workflow_config import update_workflow_config
-from rest_framework import status
 
 pytestmark = pytest.mark.django_db
 

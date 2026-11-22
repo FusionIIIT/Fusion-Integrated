@@ -1,6 +1,7 @@
 import pytest
 from rest_framework import status
-from modules.hreis.models import EmployeeServiceRecord, HrAuditLog
+
+from modules.hreis.models import EmployeeServiceRecord
 
 pytestmark = pytest.mark.django_db
 
