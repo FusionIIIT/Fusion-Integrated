@@ -164,11 +164,35 @@ def test_csv_export_pii_needs_permission_then_audits_both(data, api_as):
         reports.ACT_EXPORT, reports.ACT_PII_VIEW}
 
 
-def test_pdf_returns_501_and_is_not_audited(data, api_as):
+def test_afr_152_pdf_export_is_a_real_pdf_and_audited_like_csv(data, api_as):
+    """AFR-152: fmt=pdf returns an application/pdf attachment and writes the same audit row."""
     r = api_as(permissions=[EXPORT]).get(f"{BASE}/daily_summary/export?fmt=pdf")
-    assert r.status_code == 501
-    assert r.json()["error"]["code"] == "pdf_backend_unavailable"
+    assert r.status_code == 200
+    assert r["Content-Type"] == "application/pdf"
+    assert r["Content-Disposition"].startswith('attachment; filename="vms-daily_summary-')
+    assert r["Content-Disposition"].endswith('.pdf"')
+    body = b"".join(r.streaming_content) if r.streaming else r.content
+    assert body.startswith(b"%PDF-1.4") and body.rstrip().endswith(b"%%EOF")
+    assert b"Daily summary" in body
+    log = AuditLog.objects.get(action=reports.ACT_EXPORT)
+    assert log.detail["format"] == "pdf" and log.detail["pii"] is False
+
+
+def test_afr_152_pdf_export_still_needs_the_export_permission(data, api_as):
+    assert api_as(permissions=[]).get(f"{BASE}/daily_summary/export?fmt=pdf").status_code == 403
     assert not AuditLog.objects.exists()
+
+
+def test_pdf_export_of_pii_is_gated_and_audited_like_csv(data, api_as):
+    url = f"{BASE}/frequent_visitors/export?fmt=pdf&start={D1}&end={D3}&anonymize=false"
+    assert api_as(permissions=[EXPORT]).get(url).status_code == 403
+    r = api_as(permissions=[EXPORT, PII]).get(url)
+    assert r.status_code == 200 and b"Person 1" in r.content
+    assert set(AuditLog.objects.values_list("action", flat=True)) == {
+        reports.ACT_EXPORT, reports.ACT_PII_VIEW}
+
+
+def test_unknown_export_format_is_still_a_400(data, api_as):
     assert api_as(permissions=[EXPORT]).get(
         f"{BASE}/daily_summary/export?fmt=docx").status_code == 400
 

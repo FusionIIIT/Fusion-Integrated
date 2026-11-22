@@ -1,4 +1,5 @@
 """Report endpoints (VMS-UC-007). GET only: reports never change data."""
+from django.http import HttpResponse
 from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -41,4 +42,8 @@ class ReportExportView(APIView):
     def get(self, request, key):
         fmt = request.query_params.get("fmt", "csv")
         out = reports.export(request.principal, key, _params(request), fmt)
+        if out["format"] == "pdf":
+            response = HttpResponse(out["content"], content_type="application/pdf")
+            response["Content-Disposition"] = f'attachment; filename="{out["filename"]}"'
+            return response
         return stream(filename=out["filename"], header=out["header"], rows=out["rows"])

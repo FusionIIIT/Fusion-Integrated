@@ -8,8 +8,9 @@ an id) and phone/email/ID are masked. Un-masked output needs
 
 Catalogue is the reports SRS 3.10 names plus ``event_attendance`` (selectors/events.py)
 and ``muster_history`` (EmergencyMuster rows).
-PDF export: no PDF library is installed, so ``fmt=pdf`` answers 501
-(service request h-1); no dependency was added.
+Exports are CSV or PDF. The PDF is written by ``services/common/pdf.py``, a small
+dependency-free writer (no PDF library is installed and none was added); both formats are
+audited the same way (AFR-151, AFR-152).
 """
 from __future__ import annotations
 
@@ -22,18 +23,16 @@ from types import SimpleNamespace
 
 from django.conf import settings
 from django.utils import timezone
-from rest_framework import status as http
 
 from core.api.exceptions import (
     BadRequestError,
-    DomainError,
     NotFoundError,
     PermissionDeniedError,
 )
 from modules.directory import contracts as directory
 from modules.vms.models import Gate, RoleAssignment
 from modules.vms.selectors import reports as sel
-from modules.vms.services.common import audit, authz
+from modules.vms.services.common import audit, authz, pdf
 
 PERM_VIEW = "vms.report.view"
 PERM_EXPORT = "vms.report.export"
@@ -45,12 +44,6 @@ GRANULARITIES = ("day", "week", "month")
 ACT_PII_VIEW = "vms.report.pii_view"
 ACT_EXPORT = "vms.report.exported"
 UNKNOWN_DEPARTMENT = "Unknown"
-
-
-class NotImplementedFormat(DomainError):
-    code = "pdf_backend_unavailable"
-    status_code = http.HTTP_501_NOT_IMPLEMENTED
-    message = "PDF export is not available: no PDF backend is installed."
 
 
 @dataclass(frozen=True)
@@ -337,6 +330,11 @@ def run(actor, key: str, params: dict | None = None) -> dict:
     return out
 
 
+def _title(key: str) -> str:
+    report = CATALOGUE.get(key)
+    return f"VMS report: {report.title if report else key}"
+
+
 def export(actor, key: str, params: dict | None = None, fmt: str = "csv") -> dict:
     """Report for export (UC-007 step 4). Returns ``{filename, header, rows}``.
 
@@ -345,8 +343,6 @@ def export(actor, key: str, params: dict | None = None, fmt: str = "csv") -> dic
     authz.require(actor, PERM_EXPORT)
     if fmt not in FORMATS:
         raise BadRequestError("fmt must be csv or pdf.", code="validation_error")
-    if fmt == "pdf":
-        raise NotImplementedFormat()          # service request h-1
     p = validate(key, params)
     out = _build(actor, p)
     audit.record(actor=actor, action=ACT_EXPORT, entity=_ref(key), detail={
@@ -357,6 +353,15 @@ def export(actor, key: str, params: dict | None = None, fmt: str = "csv") -> dic
                      detail={"params": p.public(), "rows": len(out["rows"]),
                              "export": True})
     cols = out["columns"]
-    return {"filename": f"vms-{key}-{p.start}-{p.end}.csv", "header": cols,
-            "rows": ([r.get(c) for c in cols] for r in out["rows"]),
-            "row_count": len(out["rows"]), "truncated": out["truncated"]}
+    base = f"vms-{key}-{p.start}-{p.end}"
+    result = {"filename": f"{base}.{fmt}", "format": fmt, "header": cols,
+              "rows": ([r.get(c) for c in cols] for r in out["rows"]),
+              "row_count": len(out["rows"]), "truncated": out["truncated"]}
+    if fmt == "pdf":
+        subtitle = f"{p.start} to {p.end}" + (" (anonymised)" if p.anonymize else "")
+        if out["truncated"]:
+            subtitle += " - truncated"
+        result["content"] = pdf.render_table(
+            title=_title(key), subtitle=subtitle, header=cols, rows=result["rows"])
+        result["rows"] = iter(())
+    return result

@@ -149,14 +149,15 @@ def reporter():
     return f.make_actor(permissions=[VIEW, EXPORT], user_id=4000)
 
 
-def test_uc_007_report_pdf_export_supported_or_explicitly_rejected_per_srs(reporter):
-    """VMS-UC-007: pdf is explicitly rejected (501) and nothing is audited; bad fmt is 400."""
-    with pytest.raises(reports.NotImplementedFormat) as e:
-        reports.export(reporter, "daily_summary", {}, fmt="pdf")
-    assert e.value.code == "pdf_backend_unavailable" and e.value.status_code == 501
+def test_uc_007_report_pdf_export_is_supported_and_bad_format_is_400(reporter):
+    """VMS-UC-007, AFR-152: pdf exports with content; an unknown format is 400, unaudited."""
+    out = reports.export(reporter, "daily_summary", {}, fmt="pdf")
+    assert out["format"] == "pdf" and out["filename"].endswith(".pdf")
+    assert out["content"].startswith(b"%PDF-1.4")
+    assert AuditLog.objects.filter(action=reports.ACT_EXPORT).count() == 1
     with pytest.raises(BadRequestError):
         reports.export(reporter, "daily_summary", {}, fmt="xlsx")
-    assert not AuditLog.objects.filter(action=reports.ACT_EXPORT).exists()
+    assert AuditLog.objects.filter(action=reports.ACT_EXPORT).count() == 1
 
 
 def test_uc_007_report_audit_row_written_per_pii_run():
