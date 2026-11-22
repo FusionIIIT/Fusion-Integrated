@@ -1,0 +1,1172 @@
+[
+  {
+    "test_id": "TEST-FR-001",
+    "source_id": "HR-CFR-001 consolidated-rbac-and-security",
+    "purpose": "Verify that HR-EIS enforces Fusion-assigned RBAC across module functions, respects institutional control of role assignments, and restricts unauthorized access or data modification.",
+    "preconditions": "Fusion RBAC configured with distinct accounts: HR Administrator, Employee, Approving Authorities (HOD, Registrar, Director), and Accountant.",
+    "action_or_input": "Authenticate as each role and attempt authorized and unauthorized operations across HR-EIS endpoints (viewing records, creating service records, submitting requests, approving requests).",
+    "expected_result": "Authorized roles are permitted to perform their respective designated operations; unauthorized roles are blocked from sensitive and employee-specific data with access refusal (403 Forbidden).",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-002",
+    "source_id": "HR-CFR-002 consolidated-employee-request-self-service",
+    "purpose": "Verify that an Employee can initiate supported HR service requests and track the status of requests submitted by the Employee.",
+    "preconditions": "Active authenticated Employee user account in HR-EIS.",
+    "action_or_input": "Submit a valid HR service request (e.g., leave, LTC, CPDA) as an Employee and subsequently query the request status tracking interface.",
+    "expected_result": "Request is successfully submitted, assigned a pending status, and visible with its lifecycle progression in the Employee's request tracking list.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-003",
+    "source_id": "HR-CFR-003 consolidated-approval-workflow-routing-integrity",
+    "purpose": "Verify that HR-EIS selects and enforces applicable approval authority routing by employee category and request type, supports Approved/Rejected/Forwarded outcomes, and prevents workflow bypass or alterations.",
+    "preconditions": "Configured approval workflows for faculty and non-teaching staff; pending HR requests awaiting authority review.",
+    "action_or_input": "Route request through designated approval sequence (HOD, Registrar, Director); execute valid transitions (Approve, Reject, Forward) and attempt out-of-order authority actions.",
+    "expected_result": "Requests route strictly according to employee category and request type; valid actions advance the workflow or finalize status; out-of-order or unauthorized authority bypass attempts are rejected.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-004",
+    "source_id": "HR-CFR-004 consolidated-hr-administrator-capabilities",
+    "purpose": "Verify that HR-EIS provides the HR Administrator with authorized capabilities to manage service records, verify HR requests, configure workflow settings, assign reviewers, and monitor audits.",
+    "preconditions": "Authenticated user holding the HR Administrator role in HR-EIS.",
+    "action_or_input": "Execute HR Administrator operational actions: update an employee service record, verify submitted LTC/CPDA documentation, configure in-scope workflow parameters, assign an appraisal reviewer, and inspect audit logs.",
+    "expected_result": "All operational actions execute successfully with changes persisted, verified, and logged.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-005",
+    "source_id": "HR-CFR-005 consolidated-accountant-claim-processing",
+    "purpose": "Verify that HR-EIS allows the Accountant to verify financial correctness, process approved LTC and CPDA claims, and record external payment or disbursement status.",
+    "preconditions": "Authenticated user holding the Accountant role; approved LTC and CPDA claims ready for financial settlement in HR-EIS.",
+    "action_or_input": "As Accountant, verify financial amounts, mark claims processed for financial settlement, and record payment/disbursement statuses received from external payroll or finance systems.",
+    "expected_result": "Financial correctness check succeeds, claim status updates to processed/disbursed, and settlement details are auditable in HR-EIS.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-006",
+    "source_id": "HR-CFR-006 consolidated-employee-service-record-management",
+    "purpose": "Verify that HR-EIS maintains a centralized service record for each employee, restricts creation/modification to HR Administrators, allows Employees read-only access to their own record, and preserves record consistency.",
+    "preconditions": "Centralized employee service records populated in HR-EIS.",
+    "action_or_input": "HR Administrator updates service record attributes; Employee attempts to view own record, view another employee's record, and modify own record.",
+    "expected_result": "HR Administrator updates succeed atomically; Employee successfully views own record in read-only mode; Employee attempts to view another's record or alter official records are refused.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-007",
+    "source_id": "HR-CFR-007 consolidated-leave-management-lifecycle",
+    "purpose": "Verify the complete leave management lifecycle including leave application for supported types, mandatory field validation, balance validation, approval routing, automated balance deduction, and transaction logging.",
+    "preconditions": "Active Employee with initialized leave balances; designated Approving Authority.",
+    "action_or_input": "Employee submits a leave request with leave type, duration, and justification; Approving Authority approves the leave request.",
+    "expected_result": "Submission validates balance and eligibility; on approval, employee leave balance is automatically decremented and the transaction is permanently logged.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-008",
+    "source_id": "HR-CFR-008 consolidated-yearly-appraisal-lifecycle",
+    "purpose": "Verify the yearly appraisal lifecycle including submission within configured windows, reviewer assignment, authority evaluation, service record archival, and post-closure immutability.",
+    "preconditions": "Active appraisal submission window configured; authenticated Employee, HR Administrator, and appraisal Reviewer.",
+    "action_or_input": "Employee submits yearly appraisal form; HR Administrator assigns reviewer; reviewer evaluates and authority finalizes; verify archival in service record and attempt post-closure edit.",
+    "expected_result": "Appraisal is submitted, reviewed, finalized, and archived in the employee service record; post-closure modification attempts are rejected.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-009",
+    "source_id": "HR-CFR-009 consolidated-ltc-management-lifecycle",
+    "purpose": "Verify the complete LTC lifecycle including advance and reimbursement requests on prescribed forms, HR verification, approval routing, Accountant processing, payment status recording, and audit history preservation.",
+    "preconditions": "Authenticated Employee, HR Administrator, Approving Authority, and Accountant.",
+    "action_or_input": "Employee submits LTC advance/reimbursement request; HR Administrator verifies documentation and eligibility; Authority approves; Accountant processes and records payment status; inspect audit trail on rejection/return.",
+    "expected_result": "LTC request moves through verification, approval, and settlement stages; payment status is linked to payroll records; rejected/returned requests retain complete audit history.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-010",
+    "source_id": "HR-CFR-010 consolidated-cpda-management-lifecycle",
+    "purpose": "Verify the complete CPDA lifecycle including advance/reimbursement submission with required purpose, amount, and documents, HR verification, approval routing, Accountant processing, and auditable disbursement recording.",
+    "preconditions": "Authenticated Employee, HR Administrator, Approving Authority, and Accountant.",
+    "action_or_input": "Employee submits CPDA claim with purpose, amount, and attachments; HR Administrator verifies claim; Authority approves; Accountant records disbursement.",
+    "expected_result": "CPDA request validates required elements, advances through verification and approval hierarchy, and records auditable disbursement details.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-011",
+    "source_id": "HR-CFR-011 consolidated-hr-notifications",
+    "purpose": "Verify that HR-EIS generates and exposes notifications for request submissions, workflow decisions (approval, rejection, forwarding), pending action reminders, and policy/deadline updates across dashboard and email delivery paths.",
+    "preconditions": "Configured notification triggers and active user accounts.",
+    "action_or_input": "Trigger request submission, workflow approval/rejection/forwarding events, pending action reminders, and policy updates; inspect generated notifications.",
+    "expected_result": "Appropriate notifications are generated for target recipients and dispatched to dashboard notification feeds and email delivery interfaces.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-012",
+    "source_id": "HR-CFR-012 consolidated-audit-and-compliance",
+    "purpose": "Verify that HR-EIS logs all HR transactions with actor identity, timestamp, and action performed, enforces log immutability and role-restricted access, and supports compliance review.",
+    "preconditions": "HR transactions executed in the system; authenticated HR Administrator and unauthorized Employee account.",
+    "action_or_input": "Execute an HR action; inspect created audit log entry; attempt to edit or delete the audit entry; attempt access as unauthorized Employee.",
+    "expected_result": "Audit entry captures actor identity, timestamp, and action; log modification/deletion is prevented; unauthorized access is refused; HR Administrator can view logs for compliance review.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-FR-013",
+    "source_id": "HR-CFR-013 consolidated-external-system-integration",
+    "purpose": "Verify that HR-EIS exchanges claim payment/disbursement statuses with payroll systems, accounting statuses with finance systems, and identity/role information with Fusion modules without owning external execution semantics.",
+    "preconditions": "Configured integration status synchronization interfaces for payroll, finance, and platform identity.",
+    "action_or_input": "Simulate status exchange events for approved claims with payroll and finance, and query identity consistency with platform modules.",
+    "expected_result": "HR-EIS records external status synchronization accurately in real time where configured, while leaving external payroll and financial execution semantics outside HR-EIS.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-014",
+    "source_id": "HR-CFR-014 consolidated-payroll-salary-scope-boundary",
+    "purpose": "Verify the architectural scope boundary that HR-EIS does not modify external payroll rules or salary structures during HR financial claim recording and exchange.",
+    "preconditions": "Authenticated user in HR-EIS.",
+    "action_or_input": "Attempt to invoke operations to alter payroll calculation rules or modify institute salary structure definitions via HR-EIS interfaces.",
+    "expected_result": "HR-EIS provides no endpoints or functionality to modify payroll rules or salary structures; operations are refused or unsupported, preserving external domain integrity.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-015",
+    "source_id": "HR-AFR-001 rbac-actor-permissions",
+    "purpose": "Verify that HR-EIS operates under Fusion RBAC for actor permissions across all module endpoints.",
+    "preconditions": "Authenticated session with assigned Fusion RBAC roles (Employee, HR Administrator, Accountant, Approving Authorities).",
+    "action_or_input": "Access HR-EIS module views and API endpoints with role-appropriate permissions.",
+    "expected_result": "HR-EIS verifies assigned RBAC permissions and permits access only when required role/permission is present.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-016",
+    "source_id": "HR-AFR-094 enforce-fusion-rbac-functions",
+    "purpose": "Verify that HR-EIS enforces Fusion RBAC for all HR-EIS functional actions.",
+    "preconditions": "Authenticated users with specific functional permissions.",
+    "action_or_input": "Execute HR-EIS functions (leave application, verification, approval, settlement) and verify role validation.",
+    "expected_result": "Functional actions are permitted only for users whose assigned roles match required permissions for the action.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-017",
+    "source_id": "HR-AFR-095 support-simultaneous-multiple-roles",
+    "purpose": "Verify that HR-EIS supports users holding multiple roles simultaneously (e.g., Faculty Employee who is also HOD).",
+    "preconditions": "User account assigned both 'Employee' and 'HOD' (Approving Authority) roles.",
+    "action_or_input": "Authenticate as the multi-role user; submit a personal leave request as an Employee, then switch context/act as HOD to review a departmental request.",
+    "expected_result": "System correctly recognizes both role entitlements; user can perform both self-service employee actions and authority approval actions.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-018",
+    "source_id": "HR-AFR-096 role-assignment-institutional-authorities-only",
+    "purpose": "Verify that HR-EIS allows role assignment only by institutional authorities and rejects routine HR actor attempts.",
+    "preconditions": "Authenticated regular Employee session and institutional authority session.",
+    "action_or_input": "Regular Employee attempts to assign HR-EIS roles; institutional authority assigns an HR-EIS role via platform RBAC.",
+    "expected_result": "Employee attempt to assign roles is refused (403 Forbidden); institutional authority assignment succeeds.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-019",
+    "source_id": "HR-AFR-097 role-reassignment-institutional-authorities-only",
+    "purpose": "Verify that HR-EIS allows role reassignment only by institutional authorities.",
+    "preconditions": "Existing role assignments in the platform; regular user and institutional authority accounts.",
+    "action_or_input": "Regular Employee attempts to reassign an HR authority role; institutional authority reassigns the role.",
+    "expected_result": "Unauthorized role reassignment is blocked (403 Forbidden); institutional authority reassignment is processed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-020",
+    "source_id": "HR-AFR-098 restrict-sensitive-data-authorized-roles",
+    "purpose": "Verify that HR-EIS restricts access to sensitive HR data to authorized roles only.",
+    "preconditions": "Sensitive HR records (e.g. employee master records, confidential appraisal reviews) exist in HR-EIS.",
+    "action_or_input": "Attempt access to sensitive records using an unauthorized actor role.",
+    "expected_result": "HR-EIS blocks unauthorized access with 403 Forbidden, preserving data confidentiality and prior valid state.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-021",
+    "source_id": "HR-AFR-099 restrict-employee-to-own-data",
+    "purpose": "Verify that HR-EIS restricts Employees to accessing only their own employee data.",
+    "preconditions": "Employee A and Employee B exist with separate service and request records.",
+    "action_or_input": "Employee A submits a request to view or query Employee B's personal service records or request details.",
+    "expected_result": "Request is refused with 403 Forbidden; Employee A cannot access Employee B's private employee data.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-022",
+    "source_id": "HR-AFR-100 prevent-unauthorized-access-hr-data",
+    "purpose": "Verify that HR-EIS prevents unauthorized access to HR-EIS data by unauthenticated or anonymous actors.",
+    "preconditions": "Unauthenticated request context (no valid authentication credentials or session token).",
+    "action_or_input": "Attempt to access protected HR-EIS endpoints (service records, leave requests, appraisals).",
+    "expected_result": "HR-EIS rejects the request with 401 Unauthorized or 403 Forbidden, preventing access to HR data.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-023",
+    "source_id": "HR-AFR-101 prevent-unauthorized-modification-hr-data",
+    "purpose": "Verify that HR-EIS prevents unauthorized modification of HR-EIS data.",
+    "preconditions": "Existing HR-EIS records (leave request, service record, financial claim).",
+    "action_or_input": "User without modification rights attempts POST, PUT, PATCH, or DELETE on existing HR-EIS records.",
+    "expected_result": "Modification attempt is blocked with 403 Forbidden; target data remains unaltered in its prior valid state.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-024",
+    "source_id": "HR-AFR-002 employee-submit-hr-requests",
+    "purpose": "Verify that HR-EIS allows an Employee to submit HR-related service requests.",
+    "preconditions": "Authenticated Employee with valid profile.",
+    "action_or_input": "Employee initiates and submits a valid HR request (leave, LTC, CPDA, or appraisal).",
+    "expected_result": "HR-EIS accepts the submission, validates payload, stores the request in pending state, and returns success (201 Created).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-025",
+    "source_id": "HR-AFR-004 employee-track-own-request-statuses",
+    "purpose": "Verify that HR-EIS allows an Employee to track statuses of HR-related requests submitted by the Employee.",
+    "preconditions": "Authenticated Employee with several previously submitted HR requests in various states (Pending, Approved, Rejected).",
+    "action_or_input": "Employee requests the list and detail views of their submitted HR requests.",
+    "expected_result": "HR-EIS returns all requests submitted by the Employee along with accurate real-time statuses and progression history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-026",
+    "source_id": "HR-AFR-006 route-dept-approvals-to-hod",
+    "purpose": "Verify that HR-EIS routes department-level approvals to the Head of Department (HOD) where applicable.",
+    "preconditions": "Employee in a department submits an HR request requiring departmental approval; HOD account exists.",
+    "action_or_input": "Submit request and check the designated pending authority assignment.",
+    "expected_result": "Request is routed to the HOD's approval queue for department-level review.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-027",
+    "source_id": "HR-AFR-007 route-non-teaching-approvals-to-registrar",
+    "purpose": "Verify that HR-EIS routes non-teaching staff approvals to the Registrar where applicable.",
+    "preconditions": "Non-teaching staff employee submits an HR request requiring institute administrative review; Registrar account exists.",
+    "action_or_input": "Submit non-teaching staff request and verify the assigned approval authority.",
+    "expected_result": "Request is routed to the Registrar's approval queue according to non-teaching staff routing rules.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-028",
+    "source_id": "HR-AFR-008 route-faculty-approvals-to-director",
+    "purpose": "Verify that HR-EIS routes faculty-level or final authority approvals to the Director where applicable.",
+    "preconditions": "Faculty member submits an HR request requiring directorate approval (e.g., sabbatical leave, special entitlement); Director account exists.",
+    "action_or_input": "Submit faculty-level request and inspect the assigned approving authority.",
+    "expected_result": "Request is routed to the Director's approval queue for executive review.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-029",
+    "source_id": "HR-AFR-009 determine-authority-by-category-and-type",
+    "purpose": "Verify that HR-EIS determines approval authority strictly by employee category and request type.",
+    "preconditions": "Configured approval matrix mapping combinations of (Faculty, Non-Teaching) and (Leave, LTC, CPDA, Appraisal) to authorities.",
+    "action_or_input": "Submit distinct requests varying employee category and request type; observe the authority assigned.",
+    "expected_result": "Approval authority is determined strictly by the category-request type matrix without arbitrary routing.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-030",
+    "source_id": "HR-AFR-070 route-requests-rule-based-workflows",
+    "purpose": "Verify that HR-EIS routes all HR requests through configured rule-based workflows.",
+    "preconditions": "HR requests submitted across various modules (Leave, LTC, CPDA).",
+    "action_or_input": "Submit requests and inspect the workflow execution path from initial submission through sequential states.",
+    "expected_result": "All requests follow deterministic rule-based state transitions according to workflow rules.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-031",
+    "source_id": "HR-AFR-071 support-request-outcome-approved",
+    "purpose": "Verify that HR-EIS supports the request outcome or transition: Approved.",
+    "preconditions": "Pending request assigned to an Approving Authority.",
+    "action_or_input": "Approving Authority executes the 'Approve' action on the pending request.",
+    "expected_result": "Request status transitions to Approved, triggers downstream events (e.g. balance deduction or accountant handoff), and records decision.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-032",
+    "source_id": "HR-AFR-072 support-request-outcome-rejected",
+    "purpose": "Verify that HR-EIS supports the request outcome or transition: Rejected.",
+    "preconditions": "Pending request assigned to an Approving Authority.",
+    "action_or_input": "Approving Authority executes the 'Reject' action on the pending request with required justification.",
+    "expected_result": "Request status transitions to Rejected, workflow terminates, audit record is preserved, and applicant is notified.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-033",
+    "source_id": "HR-AFR-073 support-request-outcome-forwarded",
+    "purpose": "Verify that HR-EIS supports the request outcome or transition: Forwarded to next authority.",
+    "preconditions": "Multi-tier request currently at intermediate authority level (e.g. HOD review before Director).",
+    "action_or_input": "Intermediate authority executes the 'Forward' action on the pending request.",
+    "expected_result": "Request status transitions to Forwarded, and request is queued to the next designated authority in the hierarchy.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-034",
+    "source_id": "HR-AFR-074 enforce-authority-roles-using-rbac",
+    "purpose": "Verify that HR-EIS enforces authority roles using RBAC during HR request workflows.",
+    "preconditions": "Request pending review by specific authority role (e.g. Registrar); user without that role.",
+    "action_or_input": "User without Registrar role attempts to approve or reject the request pending Registrar review.",
+    "expected_result": "Action is refused with 403 Forbidden; only users with the specific assigned authority role can decide the request.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-035",
+    "source_id": "HR-AFR-075 prevent-authority-bypassing-workflow-order",
+    "purpose": "Verify that HR-EIS prevents any authority from bypassing workflow order.",
+    "preconditions": "Multi-stage request currently awaiting stage 1 approval (e.g. HOD); stage 2 authority (Director) account.",
+    "action_or_input": "Stage 2 authority attempts to approve or decide the request before stage 1 authority has acted.",
+    "expected_result": "HR-EIS rejects the out-of-order action with an error (400 Bad Request or 403 Forbidden), preserving stage 1 pending state.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-036",
+    "source_id": "HR-AFR-076 prevent-authority-altering-workflow-order",
+    "purpose": "Verify that HR-EIS prevents any authority from altering workflow order.",
+    "preconditions": "Active configured workflow path for an HR request.",
+    "action_or_input": "Authority attempts to dynamically redirect, skip an intermediate authority, or re-sequence workflow steps during request processing.",
+    "expected_result": "Modification of workflow order during processing is blocked; request adheres strictly to the configured sequence.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-037",
+    "source_id": "HR-AFR-106 not-allow-manual-bypass-approval-workflows",
+    "purpose": "Verify that HR-EIS does not allow manual bypass of configured approval workflows.",
+    "preconditions": "Submitted HR request in pending approval state.",
+    "action_or_input": "Actor attempts to manually force request state directly to 'Approved' or 'Disbursed' without executing prescribed workflow steps.",
+    "expected_result": "Direct manual bypass is blocked; state changes require legitimate authority decisions via workflow endpoints.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-038",
+    "source_id": "HR-AFR-010 hr-admin-manage-master-service-records",
+    "purpose": "Verify that HR-EIS allows the HR Administrator to manage employee master and service records.",
+    "preconditions": "Authenticated HR Administrator user account.",
+    "action_or_input": "HR Administrator creates a new employee master record or updates service record attributes (designation, department).",
+    "expected_result": "Operation is accepted and persisted with 200 OK or 201 Created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-039",
+    "source_id": "HR-AFR-011 hr-admin-verify-hr-requests",
+    "purpose": "Verify that HR-EIS allows the HR Administrator to verify submitted HR requests (documentation and eligibility).",
+    "preconditions": "Submitted LTC or CPDA request pending HR Administrator verification.",
+    "action_or_input": "HR Administrator reviews documentation and executes 'Verify' action on the request.",
+    "expected_result": "Verification is recorded, request transitions to 'Verified' state, and moves to approval routing.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-040",
+    "source_id": "HR-AFR-012 hr-admin-configure-hr-workflows",
+    "purpose": "Verify that HR-EIS allows the HR Administrator to configure HR workflows where configuration is within HR-EIS scope.",
+    "preconditions": "Authenticated HR Administrator user account.",
+    "action_or_input": "HR Administrator updates in-scope workflow settings (e.g. appraisal submission window dates, reminder trigger thresholds).",
+    "expected_result": "Workflow configuration parameters are successfully updated and applied to subsequent workflow executions.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-041",
+    "source_id": "HR-AFR-013 hr-admin-assign-appraisal-reviewers",
+    "purpose": "Verify that HR-EIS allows the HR Administrator to assign reviewers for appraisal evaluation.",
+    "preconditions": "Submitted appraisal form awaiting reviewer assignment; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator assigns designated faculty/authority reviewers to the submitted appraisal.",
+    "expected_result": "Reviewer assignment is successfully recorded and the appraisal becomes actionable in the assigned reviewer's queue.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-042",
+    "source_id": "HR-AFR-014 hr-admin-monitor-compliance-and-audits",
+    "purpose": "Verify that HR-EIS allows the HR Administrator to monitor compliance and audits using authorized HR-EIS records.",
+    "preconditions": "Authenticated HR Administrator; historical HR transaction logs exist.",
+    "action_or_input": "HR Administrator accesses audit and compliance query interfaces.",
+    "expected_result": "System returns authorized audit logs and compliance history filtered by date, actor, or transaction type.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-043",
+    "source_id": "HR-AFR-015 accountant-process-approved-ltc-claims",
+    "purpose": "Verify that HR-EIS allows the Accountant to process approved LTC claims for financial settlement recording.",
+    "preconditions": "Approved LTC claim awaiting settlement; authenticated Accountant user.",
+    "action_or_input": "Accountant accesses approved LTC claim and records financial settlement processing.",
+    "expected_result": "LTC claim status is updated to processed for settlement, and settlement details are saved.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-044",
+    "source_id": "HR-AFR-016 accountant-process-approved-cpda-claims",
+    "purpose": "Verify that HR-EIS allows the Accountant to process approved CPDA claims for financial settlement recording.",
+    "preconditions": "Approved CPDA claim awaiting settlement; authenticated Accountant user.",
+    "action_or_input": "Accountant accesses approved CPDA claim and records financial settlement processing.",
+    "expected_result": "CPDA claim status is updated to processed for settlement, and settlement details are saved.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-045",
+    "source_id": "HR-AFR-017 accountant-verify-financial-correctness",
+    "purpose": "Verify that HR-EIS allows the Accountant to verify financial correctness of LTC and CPDA claims.",
+    "preconditions": "Approved claim with submitted expenditure bills; authenticated Accountant user.",
+    "action_or_input": "Accountant performs financial correctness check and verifies amounts against entitlement rules.",
+    "expected_result": "Accountant verification is recorded; claim proceeds to settlement recording if valid or flagged if discrepant.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-046",
+    "source_id": "HR-AFR-018 record-payment-disbursement-status",
+    "purpose": "Verify that HR-EIS records payment or disbursement status for approved financial claims when received from payroll or finance systems.",
+    "preconditions": "Processed LTC/CPDA claim in HR-EIS; external integration payment status notification.",
+    "action_or_input": "Receive payment/disbursement status payload from payroll or finance system for the claim.",
+    "expected_result": "HR-EIS updates claim payment status (e.g. Disbursed/Paid) with external reference and timestamp.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-047",
+    "source_id": "HR-AFR-003 employee-view-own-service-record",
+    "purpose": "Verify that HR-EIS allows an Employee to view the Employee's own service records.",
+    "preconditions": "Authenticated Employee with existing service record.",
+    "action_or_input": "Employee navigates to personal service record view.",
+    "expected_result": "HR-EIS displays the Employee's personal service record details.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-048",
+    "source_id": "HR-AFR-019 maintain-centralized-service-record",
+    "purpose": "Verify that HR-EIS maintains a centralized service record for each employee.",
+    "preconditions": "Employee profiles loaded into HR-EIS.",
+    "action_or_input": "Query employee service record by employee ID from the centralized data store.",
+    "expected_result": "A unique authoritative service record is retrieved containing all core employee information.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-049",
+    "source_id": "HR-AFR-020 include-appointment-details-service-record",
+    "purpose": "Verify that HR-EIS includes appointment details in the employee service record.",
+    "preconditions": "Employee service record created with appointment metadata (date of joining, appointment type).",
+    "action_or_input": "Retrieve employee service record data.",
+    "expected_result": "Service record payload explicitly includes appointment details.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-050",
+    "source_id": "HR-AFR-021 include-department-service-record",
+    "purpose": "Verify that HR-EIS includes department in the employee service record.",
+    "preconditions": "Employee service record created with assigned department.",
+    "action_or_input": "Retrieve employee service record data.",
+    "expected_result": "Service record payload explicitly includes the department attribute.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-051",
+    "source_id": "HR-AFR-022 include-designation-service-record",
+    "purpose": "Verify that HR-EIS includes designation in the employee service record.",
+    "preconditions": "Employee service record created with assigned designation.",
+    "action_or_input": "Retrieve employee service record data.",
+    "expected_result": "Service record payload explicitly includes the designation attribute.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-052",
+    "source_id": "HR-AFR-023 include-service-history-service-record",
+    "purpose": "Verify that HR-EIS includes service history in the employee service record.",
+    "preconditions": "Employee service record with historical promotions, transfers, or increments.",
+    "action_or_input": "Retrieve employee service record data.",
+    "expected_result": "Service record payload includes the complete service history chronology.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-053",
+    "source_id": "HR-AFR-024 include-leave-balances-service-record",
+    "purpose": "Verify that HR-EIS includes leave balances in the employee service record.",
+    "preconditions": "Employee service record initialized with leave balances across categories.",
+    "action_or_input": "Retrieve employee service record data.",
+    "expected_result": "Service record payload explicitly includes current leave balances.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-054",
+    "source_id": "HR-AFR-025 include-retirement-status-service-record",
+    "purpose": "Verify that HR-EIS includes retirement status in the employee service record.",
+    "preconditions": "Employee service record created with retirement eligibility date and status.",
+    "action_or_input": "Retrieve employee service record data.",
+    "expected_result": "Service record payload explicitly includes retirement status and retirement date.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-055",
+    "source_id": "HR-AFR-026 restrict-creation-service-records-hr-admin",
+    "purpose": "Verify that HR-EIS restricts creation of employee service records to HR Administrators and blocks other actors.",
+    "preconditions": "Authenticated non-HR-Admin account (e.g. Employee, Approving Authority).",
+    "action_or_input": "Attempt to create a new employee service record via POST endpoint.",
+    "expected_result": "Creation is refused with 403 Forbidden; only HR Administrator is permitted to create service records.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-056",
+    "source_id": "HR-AFR-027 restrict-modification-service-records-hr-admin",
+    "purpose": "Verify that HR-EIS restricts modification of employee service records to HR Administrators and blocks other actors.",
+    "preconditions": "Existing employee service record; authenticated non-HR-Admin account.",
+    "action_or_input": "Attempt to update an existing employee service record via PUT/PATCH endpoint.",
+    "expected_result": "Modification is refused with 403 Forbidden; service record remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-057",
+    "source_id": "HR-AFR-028 employee-view-own-service-record-read-only",
+    "purpose": "Verify that HR-EIS allows Employees to view their own service records in read-only mode.",
+    "preconditions": "Authenticated Employee accessing their own service record.",
+    "action_or_input": "Employee queries service record via GET endpoint.",
+    "expected_result": "Employee successfully retrieves service record details with read-only permissions (no edit capabilities afforded).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-058",
+    "source_id": "HR-AFR-102 preserve-service-record-consistency",
+    "purpose": "Verify that HR-EIS preserves service record consistency during updates.",
+    "preconditions": "Existing employee service record; authenticated HR Administrator.",
+    "action_or_input": "Execute valid multi-field update on service record (department change and designation update).",
+    "expected_result": "Update is applied consistently across all record relations with no orphan or contradictory data.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-059",
+    "source_id": "HR-AFR-103 prevent-partial-updates-corrupting-records",
+    "purpose": "Verify that HR-EIS prevents partial updates from corrupting service records.",
+    "preconditions": "Existing employee service record; authenticated HR Administrator.",
+    "action_or_input": "Submit an update payload containing a mix of valid fields and an invalid/faulty field that triggers an internal validation failure.",
+    "expected_result": "Transaction rolls back entirely; no partial field updates are written; service record retains its prior valid state.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-060",
+    "source_id": "HR-AFR-107 not-permit-employees-alter-official-records",
+    "purpose": "Verify that HR-EIS does not permit Employees to alter official service records.",
+    "preconditions": "Authenticated Employee session.",
+    "action_or_input": "Employee submits a PATCH/PUT request attempting to alter designation or service history on their own service record.",
+    "expected_result": "Request is refused with 403 Forbidden; official record data cannot be modified by the employee.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-061",
+    "source_id": "HR-AFR-029 employee-apply-for-leave",
+    "purpose": "Verify that HR-EIS allows Employees to apply for leave requests.",
+    "preconditions": "Authenticated Employee with available leave balance.",
+    "action_or_input": "Employee submits a complete and valid leave request payload.",
+    "expected_result": "Leave request is accepted and created with status 'Pending' (201 Created).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-062",
+    "source_id": "HR-AFR-030 support-casual-leave-type",
+    "purpose": "Verify that HR-EIS supports Casual leave as an available leave request type.",
+    "preconditions": "Authenticated Employee with Casual leave balance.",
+    "action_or_input": "Submit leave request specifying leave_type='Casual'.",
+    "expected_result": "Leave request is accepted as Casual leave type without error.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-063",
+    "source_id": "HR-AFR-031 support-restricted-leave-type",
+    "purpose": "Verify that HR-EIS supports Restricted leave as an available leave request type.",
+    "preconditions": "Authenticated Employee with Restricted leave balance.",
+    "action_or_input": "Submit leave request specifying leave_type='Restricted'.",
+    "expected_result": "Leave request is accepted as Restricted leave type without error.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-064",
+    "source_id": "HR-AFR-032 support-medical-leave-type",
+    "purpose": "Verify that HR-EIS supports Medical leave as an available leave request type.",
+    "preconditions": "Authenticated Employee with Medical leave balance.",
+    "action_or_input": "Submit leave request specifying leave_type='Medical'.",
+    "expected_result": "Leave request is accepted as Medical leave type without error.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-065",
+    "source_id": "HR-AFR-033 support-earned-leave-type",
+    "purpose": "Verify that HR-EIS supports Earned leave as an available leave request type.",
+    "preconditions": "Authenticated Employee with Earned leave balance.",
+    "action_or_input": "Submit leave request specifying leave_type='Earned'.",
+    "expected_result": "Leave request is accepted as Earned leave type without error.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-066",
+    "source_id": "HR-AFR-034 support-vacation-leave-type",
+    "purpose": "Verify that HR-EIS supports Vacation leave as an available leave request type.",
+    "preconditions": "Authenticated Employee with Vacation leave balance.",
+    "action_or_input": "Submit leave request specifying leave_type='Vacation'.",
+    "expected_result": "Leave request is accepted as Vacation leave type without error.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-067",
+    "source_id": "HR-AFR-035 support-sabbatical-leave-type",
+    "purpose": "Verify that HR-EIS supports Sabbatical leave as an available leave request type.",
+    "preconditions": "Authenticated eligible Faculty Employee with Sabbatical leave eligibility.",
+    "action_or_input": "Submit leave request specifying leave_type='Sabbatical'.",
+    "expected_result": "Leave request is accepted as Sabbatical leave type without error.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-068",
+    "source_id": "HR-AFR-036 valid-leave-type-provided",
+    "purpose": "Verify that HR-EIS accepts a leave request when valid leave type is specified.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit leave request with valid leave_type parameter provided alongside duration and justification.",
+    "expected_result": "Validation succeeds and leave request is accepted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-069",
+    "source_id": "HR-AFR-036 omit-leave-type-rejected",
+    "purpose": "Verify that HR-EIS requires leave type and rejects leave requests where leave type is omitted.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit leave request payload omitting the leave_type field.",
+    "expected_result": "Request is rejected with validation error (400 Bad Request) stating leave type is required.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-FR-070",
+    "source_id": "HR-AFR-037 valid-leave-duration-provided",
+    "purpose": "Verify that HR-EIS accepts a leave request when valid leave duration is specified.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit leave request with explicit valid duration (e.g. start_date, end_date, total_days=3).",
+    "expected_result": "Validation succeeds and leave request duration is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-071",
+    "source_id": "HR-AFR-037 omit-leave-duration-rejected",
+    "purpose": "Verify that HR-EIS requires leave duration and rejects leave requests where duration is omitted or empty.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit leave request payload omitting leave duration (or invalid date span).",
+    "expected_result": "Request is rejected with validation error (400 Bad Request) stating duration is required.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-FR-072",
+    "source_id": "HR-AFR-038 valid-leave-justification-provided",
+    "purpose": "Verify that HR-EIS accepts a leave request when valid justification is specified.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit leave request including a non-empty justification string.",
+    "expected_result": "Validation succeeds and leave request is accepted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-073",
+    "source_id": "HR-AFR-038 omit-leave-justification-rejected",
+    "purpose": "Verify that HR-EIS requires justification and rejects leave requests where justification is omitted or blank.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit leave request payload with justification omitted or empty string.",
+    "expected_result": "Request is rejected with validation error (400 Bad Request) stating justification is required.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-FR-074",
+    "source_id": "HR-AFR-039 valid-leave-balance-accepted",
+    "purpose": "Verify that HR-EIS accepts a leave request submission when requested duration is within available leave balance.",
+    "preconditions": "Employee has 10 days of Casual leave balance.",
+    "action_or_input": "Employee submits Casual leave request for 3 days.",
+    "expected_result": "Leave balance validation passes; request is accepted and queued for approval.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-075",
+    "source_id": "HR-AFR-039 insufficient-leave-balance-rejected",
+    "purpose": "Verify that HR-EIS validates leave balance and rejects leave requests where duration exceeds available balance.",
+    "preconditions": "Employee has 2 days of Casual leave balance.",
+    "action_or_input": "Employee attempts to submit Casual leave request for 5 days.",
+    "expected_result": "Request is rejected before acceptance with error indicating insufficient leave balance (400 Bad Request).",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-FR-076",
+    "source_id": "HR-AFR-040 valid-leave-eligibility-accepted",
+    "purpose": "Verify that HR-EIS accepts a leave request when employee meets eligibility criteria for the requested leave type.",
+    "preconditions": "Permanent faculty member eligible for Sabbatical leave.",
+    "action_or_input": "Submit Sabbatical leave request meeting eligibility criteria.",
+    "expected_result": "Eligibility validation passes and request is accepted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-077",
+    "source_id": "HR-AFR-040 ineligibility-leave-rejected",
+    "purpose": "Verify that HR-EIS validates leave eligibility and rejects requests from employees not eligible for the requested leave type.",
+    "preconditions": "Contractual employee ineligible for Sabbatical leave.",
+    "action_or_input": "Contractual employee attempts to submit Sabbatical leave request.",
+    "expected_result": "Request is rejected with validation error indicating ineligibility for requested leave type.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-FR-078",
+    "source_id": "HR-AFR-041 route-leave-predefined-hierarchy",
+    "purpose": "Verify that HR-EIS routes leave requests through a predefined approval hierarchy.",
+    "preconditions": "Leave request submitted by Faculty employee.",
+    "action_or_input": "Observe initial routing of submitted leave request.",
+    "expected_result": "Request routes to the predefined hierarchy authority (HOD) for that employee category and leave type.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-079",
+    "source_id": "HR-AFR-042 update-leave-balances-automatically-on-approval",
+    "purpose": "Verify that HR-EIS updates employee leave balances automatically when leave is approved.",
+    "preconditions": "Employee has 10 days Casual leave; pending 3-day Casual leave request awaiting final approval.",
+    "action_or_input": "Approving Authority approves the leave request.",
+    "expected_result": "Employee Casual leave balance is automatically reduced from 10 to 7 in the service record.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-080",
+    "source_id": "HR-AFR-043 permanently-log-all-leave-transactions",
+    "purpose": "Verify that HR-EIS permanently logs all leave transactions.",
+    "preconditions": "Leave request created, approved, or rejected in HR-EIS.",
+    "action_or_input": "Query transaction/audit log for the leave request ID.",
+    "expected_result": "Detailed audit entries exist for submission, review, approval, and balance adjustments.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-FR-081",
+    "source_id": "HR-AFR-044 employee-submit-yearly-appraisal",
+    "purpose": "Verify that HR-EIS allows Employees to submit yearly appraisal forms within active submission window.",
+    "preconditions": "Active yearly appraisal submission window; authenticated Employee.",
+    "action_or_input": "Employee submits completed yearly appraisal form payload.",
+    "expected_result": "Appraisal form is accepted with status 'Submitted' (201 Created).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-082",
+    "source_id": "HR-AFR-045 submission-within-window-accepted",
+    "purpose": "Verify that HR-EIS accepts yearly appraisal form submission within configured submission window.",
+    "preconditions": "Current date is within configured start and end dates of the appraisal submission window.",
+    "action_or_input": "Employee submits appraisal form within the active window.",
+    "expected_result": "Submission is accepted successfully.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-083",
+    "source_id": "HR-AFR-045 submission-outside-window-rejected",
+    "purpose": "Verify that HR-EIS restricts yearly appraisal form submission to configured submission windows and rejects submissions outside window.",
+    "preconditions": "Current date is past the configured appraisal window deadline (closed window).",
+    "action_or_input": "Employee attempts to submit yearly appraisal form when window is closed.",
+    "expected_result": "Submission is rejected with error (400 Bad Request or 403 Forbidden) indicating submission window is closed.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-FR-084",
+    "source_id": "HR-AFR-046 hr-admin-assign-appraisal-reviewers",
+    "purpose": "Verify that HR-EIS allows the HR Administrator to assign reviewers for appraisal evaluation.",
+    "preconditions": "Submitted appraisal form awaiting reviewer assignment; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator assigns specific evaluators to the appraisal record.",
+    "expected_result": "Reviewer assignment is saved, and reviewers are granted evaluation access.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-085",
+    "source_id": "HR-AFR-047 route-appraisal-designated-authorities",
+    "purpose": "Verify that HR-EIS routes appraisal workflows through designated authorities for review and finalization.",
+    "preconditions": "Assigned reviewers have submitted evaluations.",
+    "action_or_input": "Workflow routes appraisal to designated finalizing authority (e.g. Director).",
+    "expected_result": "Appraisal is queued for finalization decision by the designated authority.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-086",
+    "source_id": "HR-AFR-048 archive-finalized-appraisals-service-record",
+    "purpose": "Verify that HR-EIS archives finalized appraisals in the employee service record.",
+    "preconditions": "Appraisal approved and closed by final authority.",
+    "action_or_input": "Query employee service record after appraisal finalization.",
+    "expected_result": "Finalized appraisal report is archived and accessible in the employee's historical service record.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-087",
+    "source_id": "HR-AFR-049 prevent-modification-appraisal-after-closure",
+    "purpose": "Verify that HR-EIS prevents modification of appraisal records after closure.",
+    "preconditions": "Finalized and closed appraisal record.",
+    "action_or_input": "Attempt to update, edit, or delete the closed appraisal record.",
+    "expected_result": "Operation is rejected with 403 Forbidden or 400 Bad Request; closed appraisal remains immutable.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-088",
+    "source_id": "HR-AFR-050 employee-submit-ltc-advance-request",
+    "purpose": "Verify that HR-EIS allows Employees to submit LTC advance requests using prescribed forms.",
+    "preconditions": "Authenticated Employee eligible for LTC.",
+    "action_or_input": "Employee submits LTC advance request using prescribed form attributes (block year, travel dates, advance amount requested).",
+    "expected_result": "LTC advance request is accepted with status 'Submitted' (201 Created).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-089",
+    "source_id": "HR-AFR-051 employee-submit-ltc-reimbursement-request",
+    "purpose": "Verify that HR-EIS allows Employees to submit LTC reimbursement requests using prescribed forms.",
+    "preconditions": "Authenticated Employee with journey completed.",
+    "action_or_input": "Employee submits LTC reimbursement request with tickets and expense details on prescribed form.",
+    "expected_result": "LTC reimbursement request is accepted with status 'Submitted' (201 Created).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-090",
+    "source_id": "HR-AFR-052 hr-admin-verify-ltc-documentation",
+    "purpose": "Verify that HR-EIS allows HR Administrator to verify LTC documentation.",
+    "preconditions": "Submitted LTC request with attached travel documentation; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator inspects documents and marks documentation verified.",
+    "expected_result": "Documentation verification status is updated and recorded in HR-EIS.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-091",
+    "source_id": "HR-AFR-053 hr-admin-verify-ltc-eligibility",
+    "purpose": "Verify that HR-EIS allows HR Administrator to verify LTC eligibility.",
+    "preconditions": "Submitted LTC request; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator checks block year eligibility and confirms applicant entitlement.",
+    "expected_result": "Eligibility verification status is updated and recorded in HR-EIS.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-092",
+    "source_id": "HR-AFR-054 route-verified-ltc-through-hierarchy",
+    "purpose": "Verify that HR-EIS routes verified LTC requests through the approval hierarchy.",
+    "preconditions": "LTC request with documentation and eligibility verified by HR Administrator.",
+    "action_or_input": "HR Administrator completes verification step.",
+    "expected_result": "Request advances in workflow and routes to the designated Approving Authority (e.g. Registrar or Director).",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-093",
+    "source_id": "HR-AFR-055 accountant-process-approved-ltc-claims",
+    "purpose": "Verify that HR-EIS allows Accountant to process approved LTC claims for financial settlement recording.",
+    "preconditions": "Approved LTC claim; authenticated Accountant user.",
+    "action_or_input": "Accountant processes claim for financial settlement.",
+    "expected_result": "Accountant processing is saved; claim advances to settlement-ready state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-094",
+    "source_id": "HR-AFR-056 record-payment-status-ltc-claims",
+    "purpose": "Verify that HR-EIS records payment status for LTC claims.",
+    "preconditions": "Settled LTC claim awaiting payment confirmation.",
+    "action_or_input": "Record payment status update (e.g. 'Disbursed', reference ID, payment date) on the LTC claim.",
+    "expected_result": "Payment status is stored on the claim and displayed in tracking views.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-095",
+    "source_id": "HR-AFR-057 link-ltc-payment-status-to-payroll-without-modifying-rules",
+    "purpose": "Verify that HR-EIS links LTC payment status to payroll systems without modifying payroll rules.",
+    "preconditions": "LTC claim payment recorded.",
+    "action_or_input": "Synchronize payment status to external payroll linkage interface.",
+    "expected_result": "Payment status link is established while external payroll rules remain unmodified.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-096",
+    "source_id": "HR-AFR-058 retain-full-audit-history-rejected-ltc",
+    "purpose": "Verify that HR-EIS retains full audit history for rejected LTC requests.",
+    "preconditions": "Pending LTC request.",
+    "action_or_input": "Approving Authority rejects LTC request with comments.",
+    "expected_result": "Request transitions to 'Rejected'; complete audit trail of submission, verification, and rejection reason is preserved.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-FR-097",
+    "source_id": "HR-AFR-059 retain-full-audit-history-returned-ltc",
+    "purpose": "Verify that HR-EIS retains full audit history for returned LTC requests.",
+    "preconditions": "Pending LTC request.",
+    "action_or_input": "Authority returns LTC request for correction/clarification.",
+    "expected_result": "Request transitions to 'Returned'; complete audit history including return notes is retained.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-FR-098",
+    "source_id": "HR-AFR-060 employee-submit-cpda-advance-request",
+    "purpose": "Verify that HR-EIS allows Employees to submit CPDA advance requests.",
+    "preconditions": "Authenticated Employee eligible for CPDA.",
+    "action_or_input": "Employee submits CPDA advance request with purpose, amount, and supporting documents.",
+    "expected_result": "CPDA advance request is accepted with status 'Submitted' (201 Created).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-099",
+    "source_id": "HR-AFR-061 employee-submit-cpda-reimbursement-request",
+    "purpose": "Verify that HR-EIS allows Employees to submit CPDA reimbursement requests.",
+    "preconditions": "Authenticated Employee with CPDA expenses incurred.",
+    "action_or_input": "Employee submits CPDA reimbursement request with expenditure bills and details.",
+    "expected_result": "CPDA reimbursement request is accepted with status 'Submitted' (201 Created).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-100",
+    "source_id": "HR-AFR-062 valid-cpda-purpose-provided",
+    "purpose": "Verify that HR-EIS accepts a CPDA request when purpose is specified.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit CPDA request with explicit purpose string (e.g. 'International Conference Registration').",
+    "expected_result": "Validation succeeds and CPDA request is accepted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-101",
+    "source_id": "HR-AFR-062 omit-cpda-purpose-rejected",
+    "purpose": "Verify that HR-EIS requires purpose and rejects CPDA requests where purpose is omitted.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit CPDA request payload with purpose omitted or empty.",
+    "expected_result": "Request is rejected with validation error (400 Bad Request) stating purpose is required.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-FR-102",
+    "source_id": "HR-AFR-063 valid-cpda-amount-provided",
+    "purpose": "Verify that HR-EIS accepts a CPDA request when valid amount is specified.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit CPDA request with valid positive numerical amount (e.g. 25000.00).",
+    "expected_result": "Validation succeeds and amount is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-103",
+    "source_id": "HR-AFR-063 omit-cpda-amount-rejected",
+    "purpose": "Verify that HR-EIS requires amount and rejects CPDA requests where amount is omitted or invalid.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit CPDA request payload with amount omitted, null, or zero/negative.",
+    "expected_result": "Request is rejected with validation error (400 Bad Request) stating amount is required.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-FR-104",
+    "source_id": "HR-AFR-064 valid-cpda-supporting-docs-provided",
+    "purpose": "Verify that HR-EIS accepts a CPDA request when supporting documents are included.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit CPDA request with valid supporting document attachments/references.",
+    "expected_result": "Validation succeeds and supporting documents are linked to the request.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-105",
+    "source_id": "HR-AFR-064 omit-cpda-supporting-docs-rejected",
+    "purpose": "Verify that HR-EIS requires supporting documents and rejects CPDA requests where supporting documents are omitted.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Submit CPDA request payload with supporting documents omitted or empty list.",
+    "expected_result": "Request is rejected with validation error (400 Bad Request) stating supporting documents are required.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-FR-106",
+    "source_id": "HR-AFR-065 hr-admin-verify-cpda-claims-before-routing",
+    "purpose": "Verify that HR-EIS allows HR Administrator to verify CPDA claims before approval routing.",
+    "preconditions": "Submitted CPDA claim; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator verifies CPDA purpose, amount entitlement, and attachments.",
+    "expected_result": "Claim verification is recorded; claim is approved for routing to approval authority.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-107",
+    "source_id": "HR-AFR-066 route-verified-cpda-approval-routing",
+    "purpose": "Verify that HR-EIS routes verified CPDA claims through approval routing.",
+    "preconditions": "CPDA claim verified by HR Administrator.",
+    "action_or_input": "Advance claim into approval hierarchy.",
+    "expected_result": "Claim routes to the designated Approving Authority (e.g. HOD / Dean / Director) according to policy.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-FR-108",
+    "source_id": "HR-AFR-067 accountant-process-approved-cpda-claims",
+    "purpose": "Verify that HR-EIS allows Accountant to process approved CPDA claims.",
+    "preconditions": "Approved CPDA claim; authenticated Accountant user.",
+    "action_or_input": "Accountant verifies financial details and marks claim processed for settlement.",
+    "expected_result": "Claim settlement processing is recorded successfully.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-109",
+    "source_id": "HR-AFR-068 record-cpda-disbursement-details",
+    "purpose": "Verify that HR-EIS records CPDA disbursement details.",
+    "preconditions": "Processed CPDA claim.",
+    "action_or_input": "Record disbursement transaction details (voucher number, disbursement date, net amount paid).",
+    "expected_result": "Disbursement details are saved on the claim record.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-110",
+    "source_id": "HR-AFR-069 make-cpda-disbursement-records-auditable",
+    "purpose": "Verify that HR-EIS makes CPDA disbursement records auditable.",
+    "preconditions": "Disbursed CPDA claim in HR-EIS.",
+    "action_or_input": "Query audit logs for the CPDA disbursement transaction.",
+    "expected_result": "Complete audit trail showing claim history, approving actors, and disbursement details is retrieved.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-FR-111",
+    "source_id": "HR-AFR-005 employee-notifications-requests-and-policies",
+    "purpose": "Verify that HR-EIS notifies an Employee about relevant HR request events and policy/deadline events.",
+    "preconditions": "Authenticated Employee with notifications enabled.",
+    "action_or_input": "Trigger request status change and policy announcement for the employee.",
+    "expected_result": "Notifications are generated and visible in the Employee's notification list.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-112",
+    "source_id": "HR-AFR-077 generate-notifications-request-submission",
+    "purpose": "Verify that HR-EIS generates notifications for request submission.",
+    "preconditions": "Employee submits an HR request.",
+    "action_or_input": "Execute request submission.",
+    "expected_result": "System creates submission confirmation notification for the applicant and action notification for the next reviewer.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-113",
+    "source_id": "HR-AFR-078 generate-notifications-approval-rejection-forwarding",
+    "purpose": "Verify that HR-EIS generates notifications for approval, rejection, or forwarding events.",
+    "preconditions": "Pending request assigned to Approving Authority.",
+    "action_or_input": "Authority approves, rejects, or forwards the request.",
+    "expected_result": "System generates corresponding decision notification to applicant and relevant workflow parties.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-114",
+    "source_id": "HR-AFR-079 generate-notifications-pending-action-reminders",
+    "purpose": "Verify that HR-EIS generates notifications for pending action reminders.",
+    "preconditions": "Actionable request has remained pending beyond the configured reminder threshold.",
+    "action_or_input": "Trigger reminder processing for aging pending requests.",
+    "expected_result": "Reminder notification is generated and delivered to the pending authority.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-115",
+    "source_id": "HR-AFR-080 generate-notifications-policy-deadline-updates",
+    "purpose": "Verify that HR-EIS generates notifications for policy or deadline updates.",
+    "preconditions": "Appraisal window deadline configured or updated in HR-EIS.",
+    "action_or_input": "Publish a deadline announcement or policy update in HR-EIS.",
+    "expected_result": "Deadline notification is generated for all applicable employee accounts.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-116",
+    "source_id": "HR-AFR-081 deliver-notifications-dashboard",
+    "purpose": "Verify that HR-EIS delivers notifications through the system dashboard.",
+    "preconditions": "Generated notifications in HR-EIS.",
+    "action_or_input": "Query dashboard notification feed API for the authenticated user.",
+    "expected_result": "Dashboard notification items are returned with title, message, timestamp, and read status.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-117",
+    "source_id": "HR-AFR-082 deliver-notifications-official-email",
+    "purpose": "Verify that HR-EIS dispatches notifications through the official email integration interface.",
+    "preconditions": "Generated notification with email delivery flag.",
+    "action_or_input": "Process notification dispatch queue.",
+    "expected_result": "Notification is passed to the email service with recipient official email address and message body.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-118",
+    "source_id": "HR-AFR-083 log-every-hr-transaction",
+    "purpose": "Verify that HR-EIS logs every HR transaction.",
+    "preconditions": "Transactional operations executed in HR-EIS (create, update, approve, reject, disburse).",
+    "action_or_input": "Execute an HR transaction and query the audit subsystem.",
+    "expected_result": "An audit log record is created for the transaction.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-FR-119",
+    "source_id": "HR-AFR-084 audit-logs-include-actor-identity",
+    "purpose": "Verify that HR-EIS audit logs include actor identity.",
+    "preconditions": "Authenticated user performs an HR transaction.",
+    "action_or_input": "Inspect the audit log entry created for the transaction.",
+    "expected_result": "Audit entry explicitly records the actor ID/username who executed the action.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-FR-120",
+    "source_id": "HR-AFR-085 audit-logs-include-timestamp",
+    "purpose": "Verify that HR-EIS audit logs include a valid timestamp.",
+    "preconditions": "HR transaction executed at a known system time.",
+    "action_or_input": "Inspect the audit log entry created for the transaction.",
+    "expected_result": "Audit entry contains an accurate ISO timestamp of when the action occurred.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-FR-121",
+    "source_id": "HR-AFR-086 audit-logs-include-action-performed",
+    "purpose": "Verify that HR-EIS audit logs include the action performed.",
+    "preconditions": "HR transaction executed (e.g. 'APPROVE_LEAVE', 'UPDATE_SERVICE_RECORD').",
+    "action_or_input": "Inspect the audit log entry created for the transaction.",
+    "expected_result": "Audit entry explicitly details the specific action performed and impacted entity.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-FR-122",
+    "source_id": "HR-AFR-087 audit-logs-immutable",
+    "purpose": "Verify that HR-EIS audit logs are immutable and reject modification or deletion attempts.",
+    "preconditions": "Existing audit log record in HR-EIS.",
+    "action_or_input": "Attempt to execute PUT, PATCH, or DELETE operation on an audit log record.",
+    "expected_result": "Operation is rejected (403 Forbidden or 405 Method Not Allowed); audit record remains immutable.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-123",
+    "source_id": "HR-AFR-088 restrict-audit-log-access-authorized-roles",
+    "purpose": "Verify that HR-EIS restricts audit log access to authorized roles only and blocks unauthorized users.",
+    "preconditions": "Authenticated regular Employee session and HR Administrator session.",
+    "action_or_input": "Employee attempts to query audit log endpoint; HR Administrator queries audit log endpoint.",
+    "expected_result": "Employee query is refused with 403 Forbidden; HR Administrator query is permitted (200 OK).",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-124",
+    "source_id": "HR-AFR-089 support-compliance-through-logged-transactions",
+    "purpose": "Verify that HR-EIS supports compliance with institutional HR and financial policies through logged HR-EIS transactions.",
+    "preconditions": "Logged transactions across leave, appraisal, LTC, and CPDA.",
+    "action_or_input": "Generate compliance query report aggregating logged lifecycle actions for an employee or department.",
+    "expected_result": "Complete chronologically consistent transaction history is returned providing full regulatory traceability.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-FR-125",
+    "source_id": "HR-AFR-090 integrate-payroll-disbursement-status-exchange",
+    "purpose": "Verify that HR-EIS integrates with the payroll system for disbursement-status exchange related to approved claims.",
+    "preconditions": "Approved LTC/CPDA claim in HR-EIS; simulated payroll status interface.",
+    "action_or_input": "Exchange claim disbursement status payload with the payroll system.",
+    "expected_result": "Disbursement status exchange payload is validated and recorded without claiming payroll execution ownership.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-126",
+    "source_id": "HR-AFR-091 integrate-finance-accounting-status-exchange",
+    "purpose": "Verify that HR-EIS integrates with the finance system for accounting-status exchange related to approved claims.",
+    "preconditions": "Approved LTC/CPDA claim in HR-EIS; simulated finance system interface.",
+    "action_or_input": "Exchange accounting status payload with the finance system.",
+    "expected_result": "Accounting status is recorded in HR-EIS without executing external finance-system ledger postings.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-127",
+    "source_id": "HR-AFR-092 integrate-fusion-modules-identity-role-consistency",
+    "purpose": "Verify that HR-EIS integrates with other Fusion modules for identity and role consistency.",
+    "preconditions": "Core user identity and role assignment updated in Fusion IAM.",
+    "action_or_input": "Synchronize and query user identity/role context within HR-EIS.",
+    "expected_result": "HR-EIS reflects consistent user identity and role context across Fusion modules.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-128",
+    "source_id": "HR-AFR-093 synchronize-integration-data-real-time",
+    "purpose": "Verify that HR-EIS synchronizes integration data automatically and in real time where configured.",
+    "preconditions": "Real-time integration webhook or event handler configured for claim status updates.",
+    "action_or_input": "Trigger status event from integration endpoint.",
+    "expected_result": "HR-EIS automatically updates claim state in real time upon event receipt.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-129",
+    "source_id": "HR-AFR-104 not-modify-payroll-rules",
+    "purpose": "Verify that HR-EIS does not modify payroll rules.",
+    "preconditions": "Authenticated user in HR-EIS.",
+    "action_or_input": "Attempt to invoke any action or endpoint to alter external payroll calculation rules via HR-EIS.",
+    "expected_result": "HR-EIS rejects or disallows operation; payroll rule configuration is outside HR-EIS boundary and cannot be modified.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-130",
+    "source_id": "HR-AFR-105 not-modify-salary-structures",
+    "purpose": "Verify that HR-EIS does not modify salary structures.",
+    "preconditions": "Authenticated user in HR-EIS.",
+    "action_or_input": "Attempt to invoke any action or endpoint to alter institute salary grade or pay scale structures via HR-EIS.",
+    "expected_result": "HR-EIS rejects or disallows operation; salary structures remain outside HR-EIS and cannot be modified.",
+    "test_type": "negative"
+  }
+]

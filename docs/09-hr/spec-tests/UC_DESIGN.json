@@ -1,0 +1,605 @@
+[
+  {
+    "test_id": "TEST-UC-001",
+    "source_id": "HR-UC-001 Main Flow",
+    "purpose": "Verify that an authenticated Employee can view their own official service record in read-only mode with all specified record attributes displayed.",
+    "preconditions": "Employee is authenticated through Fusion and has an assigned HR-EIS role; an employee service record exists containing appointment details, department, designation, service history, leave balances, and retirement status.",
+    "action_or_input": "Employee navigates to and requests the personal service-record view.",
+    "expected_result": "HR-EIS identifies the Employee's own service record using authenticated identity, displays appointment details, department, designation, service history, leave balances, and retirement status in read-only mode, and prevents modification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-002",
+    "source_id": "HR-UC-001 Alternative A1",
+    "purpose": "Verify that if an Employee holds another authorized HR-EIS role, the Employee-role view remains restricted to own-record and read-only.",
+    "preconditions": "User holds both Employee and another HR-EIS role (e.g. HOD / Approving Authority).",
+    "action_or_input": "User accesses personal service record function under Employee role context.",
+    "expected_result": "The Employee-role view remains strictly read-only and confined to the user's own service record without leaking other employees' data.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-003",
+    "source_id": "HR-UC-001 Exception E1",
+    "purpose": "Verify that if an actor's role does not authorize service-record access, HR-EIS denies access and preserves data confidentiality.",
+    "preconditions": "User account without an authorized HR-EIS role (or unauthenticated actor).",
+    "action_or_input": "Attempt to access the service-record endpoint.",
+    "expected_result": "HR-EIS denies access with 403 Forbidden (or 401 Unauthorized), logs the denied access attempt, and discloses no service-record data.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-004",
+    "source_id": "HR-UC-002 Main Flow",
+    "purpose": "Verify that HR Administrator can create or modify official employee master and service records with valid data and consistent commit.",
+    "preconditions": "HR Administrator is authenticated with authorized HR-EIS administrative role; required source information for the update is available.",
+    "action_or_input": "HR Administrator selects employee service record, updates maintained fields (appointment details, department, designation, service history, leave balances, retirement status), and commits changes.",
+    "expected_result": "HR-EIS validates update, applies it as a consistent record update, updates official record, and records the transaction in the immutable audit trail.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-005",
+    "source_id": "HR-UC-002 Alternative A1",
+    "purpose": "Verify that HR Administrator can cancel service record updates before commit without making any official record changes.",
+    "preconditions": "HR Administrator opens an existing employee service record for edit.",
+    "action_or_input": "HR Administrator enters modifications in the update interface but triggers 'Cancel' before committing.",
+    "expected_result": "HR-EIS discards pending changes; official service record remains completely unchanged in its prior state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-006",
+    "source_id": "HR-UC-002 Exception E1",
+    "purpose": "Verify that HR-EIS rejects partial, inconsistent, or unauthorized service record updates and preserves prior official record data.",
+    "preconditions": "Existing official employee service record in HR-EIS.",
+    "action_or_input": "Attempt a service record update containing contradictory/invalid field data, or attempt update as non-HR Administrator.",
+    "expected_result": "HR-EIS rejects the commit with an error (400 Bad Request or 403 Forbidden); entire transaction is rolled back preserving prior valid state.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-007",
+    "source_id": "HR-UC-003 Main Flow",
+    "purpose": "Verify that an Employee can submit a valid leave request that validates balance/eligibility, enters the approval workflow, and triggers notifications.",
+    "preconditions": "Employee has an authorized HR-EIS role and an employee service record with sufficient leave balance and active eligibility.",
+    "action_or_input": "Employee selects a supported leave type (Casual, Restricted, Medical, Earned, Vacation, or Sabbatical), enters duration and justification, and submits.",
+    "expected_result": "HR-EIS validates required fields, leave balance, and eligibility; records request as Submitted; determines applicable approval authority from employee category and request type; routes to that authority; logs submission; and triggers submission notification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-UC-008",
+    "source_id": "HR-UC-003 Alternative A1",
+    "purpose": "Verify that if leave validation does not pass (e.g. insufficient balance or missing fields), the request is rejected and does not enter the workflow.",
+    "preconditions": "Employee has 1 day of leave balance remaining.",
+    "action_or_input": "Employee attempts to submit a leave request for 5 days.",
+    "expected_result": "Validation fails; HR-EIS does not accept the request for submission; rejection reason is displayed; request does not enter the approval workflow.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-UC-009",
+    "source_id": "HR-UC-003 Exception E1",
+    "purpose": "Verify that if RBAC denies the leave submission action, HR-EIS blocks submission and does not create a routed request.",
+    "preconditions": "User account without authorized Employee role (e.g. disabled account or unauthorized role).",
+    "action_or_input": "Attempt to submit a leave request via POST endpoint.",
+    "expected_result": "HR-EIS blocks submission with 403 Forbidden; no request record or workflow instance is created.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-010",
+    "source_id": "HR-UC-004 Main Flow",
+    "purpose": "Verify that Approving Authority can review a pending request and approve it, executing automatic balance update for leave or accountant handoff for claims.",
+    "preconditions": "HR request is in Pending Current Authority state; actor is the selected authority under configured routing rules and RBAC.",
+    "action_or_input": "Approving Authority reviews request details and selects 'Approve' outcome.",
+    "expected_result": "HR-EIS records Approved decision with actor identity, timestamp, and status; automatically decrements leave balance for leave requests (or makes claim available to Accountant for LTC/CPDA); triggers decision notification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-UC-011",
+    "source_id": "HR-UC-004 Alternative A1",
+    "purpose": "Verify that Approving Authority can reject a pending request, recording rejection remarks and ending the approval path.",
+    "preconditions": "HR request is in Pending Current Authority state; actor is the authorized authority.",
+    "action_or_input": "Approving Authority selects 'Reject' outcome with rejection comments.",
+    "expected_result": "HR-EIS records request as Rejected, ends approval path for the request, retains audit record, and triggers rejection notification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-UC-012",
+    "source_id": "HR-UC-004 Alternative A2",
+    "purpose": "Verify that an intermediate Approving Authority can forward a pending request to the next configured authority in the hierarchy.",
+    "preconditions": "Multi-tier request in Pending Current Authority state (e.g. at HOD stage with Director as next authority).",
+    "action_or_input": "Approving Authority selects 'Forward to next authority' outcome.",
+    "expected_result": "HR-EIS determines next configured authority, transitions request to Pending Next Authority, queues it to the next authority, and triggers forwarding notification.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-UC-013",
+    "source_id": "HR-UC-004 Exception E1",
+    "purpose": "Verify that if the actor is not the current authorized authority or attempts to bypass/alter workflow order, HR-EIS blocks the decision.",
+    "preconditions": "HR request pending review by Stage 1 authority (HOD); actor is Stage 2 authority (Director) or unauthorized user.",
+    "action_or_input": "Actor attempts to submit approval decision on the pending request out of sequence.",
+    "expected_result": "HR-EIS blocks the decision with an error (400 Bad Request or 403 Forbidden); request remains in its current pending state without transition.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-014",
+    "source_id": "HR-UC-005 Main Flow",
+    "purpose": "Verify that an Employee can track the current status and traceable progression history of their own submitted HR requests.",
+    "preconditions": "Employee has an authorized HR-EIS role and submitted requests exist in the system.",
+    "action_or_input": "Employee queries the request status tracking view for their submitted request.",
+    "expected_result": "HR-EIS verifies request ownership under Employee role and displays current status, progression trace, and history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-015",
+    "source_id": "HR-UC-005 Alternative A1",
+    "purpose": "Verify that when no matching request exists for the Employee, HR-EIS reports that no authorized matching request is available.",
+    "preconditions": "Authenticated Employee with no submitted requests matching search criteria (or invalid request ID).",
+    "action_or_input": "Employee queries request tracking with a non-existent request ID.",
+    "expected_result": "HR-EIS returns clean response reporting no matching request found (404 Not Found or empty list), without system failure.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-016",
+    "source_id": "HR-UC-005 Exception E1",
+    "purpose": "Verify that if an Employee attempts to access another employee's request without an authorized role, HR-EIS denies access.",
+    "preconditions": "Request belongs to Employee A; authenticated user is Employee B (without administrative role).",
+    "action_or_input": "Employee B attempts to retrieve tracking/details of Employee A's request.",
+    "expected_result": "HR-EIS denies access with 403 Forbidden; request details are not disclosed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-017",
+    "source_id": "HR-UC-006 Main Flow",
+    "purpose": "Verify that an Employee can complete and submit the yearly appraisal form when the configured submission window is active.",
+    "preconditions": "Configured yearly appraisal submission window is currently active; authenticated Employee.",
+    "action_or_input": "Employee opens appraisal form, completes required self-appraisal sections, and submits.",
+    "expected_result": "HR-EIS confirms submission window is active, accepts submission, records appraisal with status 'Submitted', and logs the event.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-018",
+    "source_id": "HR-UC-006 Alternative A1",
+    "purpose": "Verify that if the configured appraisal submission window is not active, HR-EIS does not accept the submission.",
+    "preconditions": "Appraisal submission window has passed its deadline or is not yet open.",
+    "action_or_input": "Employee attempts to submit yearly appraisal form outside the active window.",
+    "expected_result": "HR-EIS rejects the submission with error (400 Bad Request or 403 Forbidden); no appraisal submission is recorded.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-UC-019",
+    "source_id": "HR-UC-006 Exception E1",
+    "purpose": "Verify that unauthorized appraisal submission attempts are blocked by RBAC.",
+    "preconditions": "Actor lacking authorized Employee appraisal submission role (e.g. external or non-appraised category).",
+    "action_or_input": "Attempt to submit appraisal form via POST endpoint.",
+    "expected_result": "HR-EIS blocks submission with 403 Forbidden; no appraisal record is created.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-020",
+    "source_id": "HR-UC-007 Main Flow",
+    "purpose": "Verify that HR Administrator can assign required reviewers for appraisal evaluation.",
+    "preconditions": "Submitted appraisal in Pending Reviewer Assignment state; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator opens submitted appraisal, selects qualified reviewer(s) according to policy, and confirms assignment.",
+    "expected_result": "HR-EIS records reviewer assignment, queues appraisal for evaluation in the assigned reviewer's queue, and logs transaction.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-021",
+    "source_id": "HR-UC-007 Alternative A1",
+    "purpose": "Verify that HR Administrator can revise reviewer assignment before review begins without altering appraisal outcome.",
+    "preconditions": "Appraisal has assigned reviewer but evaluation has not yet commenced; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator updates reviewer assignment to a different designated reviewer.",
+    "expected_result": "HR-EIS updates reviewer assignment successfully; appraisal evaluation queue updates accordingly; appraisal outcome is unaffected.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-022",
+    "source_id": "HR-UC-007 Exception E1",
+    "purpose": "Verify that an unauthorized user cannot assign appraisal reviewers.",
+    "preconditions": "Submitted appraisal awaiting reviewer assignment; authenticated regular Employee account.",
+    "action_or_input": "Employee attempts to invoke reviewer assignment endpoint.",
+    "expected_result": "HR-EIS blocks the action with 403 Forbidden; reviewer assignments remain unchanged.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-023",
+    "source_id": "HR-UC-008 Main Flow",
+    "purpose": "Verify that Approving Authority can review an assigned appraisal, record evaluation ratings, and finalize it into the employee service record.",
+    "preconditions": "Appraisal has completed reviewer evaluations and is routed to designated finalizing authority (Director).",
+    "action_or_input": "Finalizing authority opens appraisal, records final evaluation remarks/ratings, and executes finalization.",
+    "expected_result": "HR-EIS finalizes appraisal, archives report in employee service record, marks appraisal closed/immutable, and logs transaction.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-UC-024",
+    "source_id": "HR-UC-008 Alternative A1",
+    "purpose": "Verify that an additional designated-authority review traversal occurs before finalization when configured, following configured routes.",
+    "preconditions": "Multi-tier appraisal workflow requiring intermediate authority review before finalization.",
+    "action_or_input": "Intermediate authority reviews and forwards appraisal to next designated finalizing authority.",
+    "expected_result": "Appraisal advances along configured appraisal route to next designated authority without semantic deviation.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-UC-025",
+    "source_id": "HR-UC-008 Exception E1",
+    "purpose": "Verify that modification of an appraisal record after closure is blocked.",
+    "preconditions": "Finalized and closed appraisal record archived in service record.",
+    "action_or_input": "Attempt to update, edit ratings, or alter comments on the closed appraisal record.",
+    "expected_result": "HR-EIS rejects the modification with 403 Forbidden or 400 Bad Request; closed appraisal remains immutable.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-026",
+    "source_id": "HR-UC-008 Exception E2",
+    "purpose": "Verify that an actor not currently designated for review cannot finalize the appraisal.",
+    "preconditions": "Appraisal currently pending review by designated authority; actor is another authority or non-designated user.",
+    "action_or_input": "Non-designated actor attempts to finalize the appraisal.",
+    "expected_result": "HR-EIS blocks finalization with 403 Forbidden; appraisal remains in its pending review state.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-027",
+    "source_id": "HR-UC-009 Main Flow",
+    "purpose": "Verify that an Employee can submit an LTC advance request using the prescribed form for HR verification.",
+    "preconditions": "Authenticated Employee eligible for LTC advance.",
+    "action_or_input": "Employee completes prescribed LTC advance form (block year, travel dates, requested advance) and submits.",
+    "expected_result": "HR-EIS records request as Submitted for HR verification, logs submission, and triggers submission notification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-028",
+    "source_id": "HR-UC-009 Exception E1",
+    "purpose": "Verify that unauthorized LTC advance submission is blocked and no request enters verification.",
+    "preconditions": "Unauthenticated actor or actor without authorized Employee role.",
+    "action_or_input": "Attempt to submit LTC advance request.",
+    "expected_result": "HR-EIS blocks submission with 401 Unauthorized or 403 Forbidden; no LTC request enters verification.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-029",
+    "source_id": "HR-UC-010 Main Flow",
+    "purpose": "Verify that an Employee can submit an LTC reimbursement request using the prescribed form for HR verification.",
+    "preconditions": "Authenticated Employee with journey completed and supporting tickets available.",
+    "action_or_input": "Employee completes prescribed LTC reimbursement form with travel details and expense documentation, and submits.",
+    "expected_result": "HR-EIS records request as Submitted for HR verification, logs submission, and triggers submission notification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-030",
+    "source_id": "HR-UC-010 Exception E1",
+    "purpose": "Verify that unauthorized LTC reimbursement submission is blocked and no request enters verification.",
+    "preconditions": "Unauthenticated or unauthorized user account.",
+    "action_or_input": "Attempt to submit LTC reimbursement request.",
+    "expected_result": "HR-EIS blocks submission with 401/403; no request record is created.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-031",
+    "source_id": "HR-UC-011 Main Flow",
+    "purpose": "Verify that HR Administrator can verify LTC documentation and eligibility, placing verified requests into approval routing.",
+    "preconditions": "Submitted LTC request awaiting verification; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator inspects submitted documents, validates block year eligibility against configured rules, and records verification.",
+    "expected_result": "HR-EIS records verification result, determines applicable approval route, places request in Pending Current Authority state, and logs event.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-UC-032",
+    "source_id": "HR-UC-011 Alternative A1",
+    "purpose": "Verify that if LTC verification cannot be confirmed, the request does not enter approval routing and is retained with audit record.",
+    "preconditions": "Submitted LTC request with invalid or missing documentation; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator determines verification cannot be confirmed and marks verification unconfirmed.",
+    "expected_result": "Request does not enter approval routing; HR-EIS retains the request and records verification/audit record without inventing unsupported outcomes.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-033",
+    "source_id": "HR-UC-011 Exception E1",
+    "purpose": "Verify that unauthorized LTC verification attempts are blocked.",
+    "preconditions": "Submitted LTC request; authenticated regular Employee account.",
+    "action_or_input": "Employee attempts to invoke LTC verification endpoint.",
+    "expected_result": "HR-EIS blocks action with 403 Forbidden; verification status is not updated.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-034",
+    "source_id": "HR-UC-012 Main Flow",
+    "purpose": "Verify that Accountant can verify financial correctness of approved LTC claim, record settlement processing, and record payment status.",
+    "preconditions": "LTC claim is approved and available for financial settlement; authenticated Accountant user.",
+    "action_or_input": "Accountant opens approved claim, verifies financial correctness against configured rules, records settlement processing, and records payment status.",
+    "expected_result": "HR-EIS updates claim settlement status, exchanges/records disbursement status, and retains processing and status changes in audit trail.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-035",
+    "source_id": "HR-UC-012 Alternative A1",
+    "purpose": "Verify that if external payment status is not yet available, claim remains in Financial Processing Recorded until later status received.",
+    "preconditions": "LTC claim processed for settlement by Accountant, but external payment has not yet executed in payroll/finance.",
+    "action_or_input": "Accountant records settlement processing without immediate payment confirmation.",
+    "expected_result": "Claim transitions to and remains in 'Financial Processing Recorded' state until external payment notification is received.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-036",
+    "source_id": "HR-UC-012 Exception E1",
+    "purpose": "Verify the architectural scope boundary that HR-EIS does not execute payroll, accounting, bank transfers, or modify payroll rules/salary structures.",
+    "preconditions": "Authenticated Accountant user in HR-EIS.",
+    "action_or_input": "Attempt to invoke payroll rule alteration or direct bank transfer execution via HR-EIS LTC claim interface.",
+    "expected_result": "Operation is rejected or unsupported; HR-EIS restricts processing to HR-EIS-side settlement recording without executing external payroll/banking operations.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-037",
+    "source_id": "HR-UC-012 Exception E2",
+    "purpose": "Verify that unauthorized financial claim processing on LTC requests is blocked.",
+    "preconditions": "Approved LTC claim; authenticated non-Accountant user (e.g. Employee).",
+    "action_or_input": "Non-Accountant attempts to invoke settlement processing endpoint.",
+    "expected_result": "HR-EIS blocks processing with 403 Forbidden; claim financial status remains unchanged.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-038",
+    "source_id": "HR-UC-013 Main Flow",
+    "purpose": "Verify that an Employee can submit a CPDA advance request containing required purpose, amount, and supporting documents.",
+    "preconditions": "Authenticated Employee eligible for CPDA.",
+    "action_or_input": "Employee opens CPDA advance form, provides valid purpose, amount, and supporting documents, and submits.",
+    "expected_result": "HR-EIS validates required information, records request as Submitted / Awaiting HR Verification, and triggers submission notification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-039",
+    "source_id": "HR-UC-013 Alternative A1",
+    "purpose": "Verify that if required information (purpose, amount, or documents) is missing, HR-EIS does not accept CPDA advance submission.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Employee submits CPDA advance request omitting purpose or amount.",
+    "expected_result": "HR-EIS rejects submission with validation error (400 Bad Request); request does not enter verification queue.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-UC-040",
+    "source_id": "HR-UC-013 Exception E1",
+    "purpose": "Verify that unauthorized CPDA advance submission attempts are blocked.",
+    "preconditions": "User without authorized Employee role.",
+    "action_or_input": "Attempt to submit CPDA advance request.",
+    "expected_result": "HR-EIS blocks submission with 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-041",
+    "source_id": "HR-UC-014 Main Flow",
+    "purpose": "Verify that an Employee can submit a CPDA reimbursement request containing required purpose, amount, and bills.",
+    "preconditions": "Authenticated Employee with valid incurred CPDA expenses.",
+    "action_or_input": "Employee opens CPDA reimbursement form, provides purpose, expense amount, attaches supporting bills, and submits.",
+    "expected_result": "HR-EIS validates required information, records request as Submitted / Awaiting HR Verification, and triggers submission notification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-042",
+    "source_id": "HR-UC-014 Alternative A1",
+    "purpose": "Verify that if required information is missing, HR-EIS does not accept CPDA reimbursement submission.",
+    "preconditions": "Authenticated Employee.",
+    "action_or_input": "Employee submits CPDA reimbursement request omitting supporting document bills.",
+    "expected_result": "HR-EIS rejects submission with validation error (400 Bad Request); request is not accepted.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-UC-043",
+    "source_id": "HR-UC-014 Exception E1",
+    "purpose": "Verify that unauthorized CPDA reimbursement submission attempts are blocked.",
+    "preconditions": "User without authorized Employee role.",
+    "action_or_input": "Attempt to submit CPDA reimbursement request.",
+    "expected_result": "HR-EIS blocks submission with 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-044",
+    "source_id": "HR-UC-015 Main Flow",
+    "purpose": "Verify that HR Administrator can verify a submitted CPDA claim and route it to the applicable approval path.",
+    "preconditions": "Submitted CPDA claim awaiting verification; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator opens claim, verifies purpose, amount, and supporting documents, and confirms verification.",
+    "expected_result": "HR-EIS records verification result, routes claim to applicable approval path, places it in Pending Current Authority state, and logs event.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-UC-045",
+    "source_id": "HR-UC-015 Alternative A1",
+    "purpose": "Verify that if CPDA verification cannot be confirmed, claim does not enter approval routing and remains outside verified state.",
+    "preconditions": "Submitted CPDA claim with non-compliant documentation; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator determines claim cannot be confirmed and marks verification unconfirmed.",
+    "expected_result": "Claim does not enter approval routing; claim remains outside verified state; verification status is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-046",
+    "source_id": "HR-UC-015 Exception E1",
+    "purpose": "Verify that unauthorized CPDA claim verification is blocked.",
+    "preconditions": "Submitted CPDA claim; authenticated non-HR-Admin account.",
+    "action_or_input": "Attempt to invoke CPDA verification endpoint.",
+    "expected_result": "HR-EIS blocks action with 403 Forbidden; verification status is not updated.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-047",
+    "source_id": "HR-UC-016 Main Flow",
+    "purpose": "Verify that Accountant can process approved CPDA claim, verify financial correctness, and record disbursement details in audit trail.",
+    "preconditions": "CPDA claim is approved; authenticated Accountant user.",
+    "action_or_input": "Accountant opens approved claim, verifies financial correctness against configured rules, and records HR-EIS-side disbursement details.",
+    "expected_result": "HR-EIS records disbursement details, updates claim state, exchanges status with payroll/finance where applicable, and records details in audit trail.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-048",
+    "source_id": "HR-UC-016 Alternative A1",
+    "purpose": "Verify that if external disbursement status is not yet available, claim remains in Financial Processing Recorded until status becomes available.",
+    "preconditions": "CPDA claim processed by Accountant awaiting external bank/finance disbursement confirmation.",
+    "action_or_input": "Accountant records processing without immediate external confirmation.",
+    "expected_result": "Claim status remains in 'Financial Processing Recorded' until external confirmation payload is received.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-049",
+    "source_id": "HR-UC-016 Exception E1",
+    "purpose": "Verify the architectural scope boundary that HR-EIS does not execute payroll, accounting, bank transfers, or modify payroll rules/salary structures during CPDA claim processing.",
+    "preconditions": "Authenticated Accountant user in HR-EIS.",
+    "action_or_input": "Attempt to execute banking disbursement or alter salary/payroll structures via CPDA interface.",
+    "expected_result": "HR-EIS rejects operation; processing is restricted to recording HR-EIS status without executing external financial transactions.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-050",
+    "source_id": "HR-UC-016 Exception E2",
+    "purpose": "Verify that unauthorized processing of CPDA claims is blocked.",
+    "preconditions": "Approved CPDA claim; authenticated non-Accountant user.",
+    "action_or_input": "Non-Accountant attempts to execute CPDA settlement processing endpoint.",
+    "expected_result": "HR-EIS blocks processing with 403 Forbidden; claim status is unchanged.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-051",
+    "source_id": "HR-UC-017 Main Flow",
+    "purpose": "Verify that HR Administrator can configure in-scope workflow settings and record authorized changes in audit trail.",
+    "preconditions": "HR Administrator has authorized configuration role; applicable workflow setting is within module scope.",
+    "action_or_input": "HR Administrator selects in-scope setting (e.g. appraisal submission window dates, reminder trigger threshold), enters valid values, and saves.",
+    "expected_result": "HR-EIS validates change against role restrictions and workflow-order constraints, saves configuration, and records audit entry.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-052",
+    "source_id": "HR-UC-017 Alternative A1",
+    "purpose": "Verify that if a requested setting belongs to platform RBAC or an external system, HR-EIS does not provide it as an HR-EIS workflow setting.",
+    "preconditions": "Authenticated HR Administrator.",
+    "action_or_input": "HR Administrator attempts to manage platform RBAC role definitions or external payroll rules via HR-EIS workflow settings.",
+    "expected_result": "HR-EIS does not provide or expose external system settings; request is rejected as out-of-scope.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-053",
+    "source_id": "HR-UC-017 Exception E1",
+    "purpose": "Verify that unauthorized configuration or an attempt to configure a manual workflow bypass is rejected.",
+    "preconditions": "Existing HR-EIS workflow configuration.",
+    "action_or_input": "Unauthorized user attempts to update configuration, or HR Admin attempts to configure a setting that manually bypasses required workflow order.",
+    "expected_result": "HR-EIS rejects the attempt with 403 Forbidden or 400 Bad Request; workflow integrity constraints are preserved.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-054",
+    "source_id": "HR-UC-018 Main Flow",
+    "purpose": "Verify that HR Administrator can review authorized audit records (actor, timestamp, action) while preserving audit-log immutability.",
+    "preconditions": "HR Administrator has authorized audit review role; transaction audit records exist in HR-EIS.",
+    "action_or_input": "HR Administrator queries audit records across leave, LTC, CPDA, and service-record scopes.",
+    "expected_result": "HR-EIS displays authorized audit records containing actor identity, timestamp, and action performed, while preserving log immutability.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-UC-055",
+    "source_id": "HR-UC-018 Alternative A1",
+    "purpose": "Verify that audit history for rejected or returned LTC requests remains available when querying compliance and audit records.",
+    "preconditions": "Rejected or returned LTC requests exist with historical review notes.",
+    "action_or_input": "HR Administrator queries audit history for the rejected or returned LTC requests.",
+    "expected_result": "Full historical audit trail of submission, verification, and return/rejection reasons is displayed.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TEST-UC-056",
+    "source_id": "HR-UC-018 Exception E1",
+    "purpose": "Verify that access outside the actor's authorized audit scope is denied.",
+    "preconditions": "Authenticated user without audit authorization (e.g. Employee or unauthorized authority).",
+    "action_or_input": "Attempt to access compliance and audit query endpoints.",
+    "expected_result": "HR-EIS denies access with 403 Forbidden; audit records are not disclosed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-057",
+    "source_id": "HR-UC-019 Main Flow",
+    "purpose": "Verify that an actor can view HR-EIS notifications generated for relevant submission, decision, reminder, or policy events.",
+    "preconditions": "Actor has authorized HR-EIS role; notifications exist addressed to the actor/role.",
+    "action_or_input": "Actor navigates to and queries the HR-EIS notification view.",
+    "expected_result": "HR-EIS displays notifications generated for applicable events through the dashboard interface; official email delivery is handled externally.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-058",
+    "source_id": "HR-UC-019 Alternative A1",
+    "purpose": "Verify that policy/deadline notifications are displayed only where relevant policy/deadline information is configured or represented in HR-EIS.",
+    "preconditions": "Configured policy/deadline event in HR-EIS.",
+    "action_or_input": "Query notifications for policy/deadline announcement.",
+    "expected_result": "Notification is returned if configured/represented in HR-EIS; if unconfigured, no placeholder or spurious notification is shown.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-059",
+    "source_id": "HR-UC-019 Exception E1",
+    "purpose": "Verify that notifications not addressed to the actor or role are not disclosed.",
+    "preconditions": "Notification addressed exclusively to User A.",
+    "action_or_input": "User B queries notification feed.",
+    "expected_result": "User B does not receive or see User A's private notification; notifications remain confidential to addressed recipients.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-060",
+    "source_id": "HR-UC-021 Main Flow",
+    "purpose": "Verify that HR-EIS generates an authorized reminder notification when a pending action reaches configured reminder condition without changing request state.",
+    "preconditions": "HR request is in pending-action state; reminder condition (e.g. aging threshold) is met; authorized recipient authority is determined.",
+    "action_or_input": "Trigger event-based reminder evaluation.",
+    "expected_result": "HR-EIS generates reminder notification with relevant request context, exposes it through dashboard and email delivery paths; underlying request state and workflow order remain unchanged.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-061",
+    "source_id": "HR-UC-021 Alternative A1",
+    "purpose": "Verify that if the pending action is resolved before the reminder condition is evaluated, no reminder is generated.",
+    "preconditions": "Pending request was approved or rejected prior to reminder evaluation.",
+    "action_or_input": "Execute reminder evaluation process.",
+    "expected_result": "HR-EIS evaluates request, confirms pending action is already resolved, and generates no reminder notification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-062",
+    "source_id": "HR-UC-021 Alternative A2",
+    "purpose": "Verify that if a user holds multiple roles, only the role/actor currently responsible for the pending action is addressed in reminder notifications.",
+    "preconditions": "Recipient holds multiple roles (e.g. Employee and HOD); pending action requires HOD review.",
+    "action_or_input": "Generate reminder notification for the pending departmental request.",
+    "expected_result": "Reminder notification explicitly addresses the recipient in their capacity as HOD (the responsible pending role) rather than general employee.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-063",
+    "source_id": "HR-UC-021 Exception E1",
+    "purpose": "Verify that if no authorized recipient can be determined, HR-EIS does not disclose request information to an unauthorized user, leaving request unchanged.",
+    "preconditions": "Pending request where configured recipient routing is indeterminate or recipient account is deactivated.",
+    "action_or_input": "Trigger reminder evaluation on the indeterminate request.",
+    "expected_result": "HR-EIS does not dispatch notification to unauthorized recipients; request state and workflow order remain unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-064",
+    "source_id": "HR-UC-022 Main Flow",
+    "purpose": "Verify that HR-EIS generates an authorized notification for a configured policy/deadline event without altering unrelated HR request state.",
+    "preconditions": "Relevant policy/deadline information is configured or represented in HR-EIS; authorized recipients can be determined.",
+    "action_or_input": "Trigger policy/deadline event notification generation.",
+    "expected_result": "HR-EIS identifies configured event and authorized recipients, generates notification using configured information, exposes it via dashboard and email paths; no unrelated HR request state is changed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-065",
+    "source_id": "HR-UC-022 Alternative A1",
+    "purpose": "Verify that if policy/deadline information is not configured or represented in HR-EIS, no notification is generated.",
+    "preconditions": "No policy/deadline update has been configured or represented in HR-EIS.",
+    "action_or_input": "Execute policy notification check.",
+    "expected_result": "HR-EIS confirms absence of configured event; no notification is generated.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-066",
+    "source_id": "HR-UC-022 Alternative A2",
+    "purpose": "Verify that recipient scope for policy/deadline update notifications strictly follows configured role and access restrictions.",
+    "preconditions": "Policy update configured targeting specifically 'Faculty' employee category.",
+    "action_or_input": "Generate policy update notifications.",
+    "expected_result": "Notifications are generated exclusively for accounts in the targeted Faculty role scope; non-teaching staff outside scope do not receive it.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-067",
+    "source_id": "HR-UC-022 Exception E1",
+    "purpose": "Verify that if recipient authorization cannot be established, HR-EIS does not disclose notification content to that recipient.",
+    "preconditions": "Actor attempting to access policy update notification without necessary authorization credentials.",
+    "action_or_input": "Attempt to retrieve restricted policy notification.",
+    "expected_result": "HR-EIS denies access and withholds notification content.",
+    "test_type": "negative"
+  }
+]

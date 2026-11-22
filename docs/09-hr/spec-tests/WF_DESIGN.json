@@ -1,0 +1,407 @@
+[
+  {
+    "test_id": "TEST-WF-001",
+    "source_id": "BW-HR-01 direct-approval-path",
+    "purpose": "Execute the complete finite path from draft leave request to approved leave without forwarding, verifying automatic leave balance update.",
+    "preconditions": "Employee has sufficient leave balance (10 days); initial state is Draft Leave Request.",
+    "action_or_input": "Step 1: Employee submits valid 3-day leave request. Step 2: Approving Authority approves the pending request.",
+    "expected_result": "Step 1: Request transitions to 'Pending Current Authority'. Step 2: Request transitions to 'Approved \u2014 Leave Balance Updated', and employee leave balance decrements to 7.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-002",
+    "source_id": "BW-HR-01 transition-1-draft-to-pending",
+    "purpose": "Verify Transition 1 of BW-HR-01: Employee submitting valid leave request transitions from Draft Leave Request to Pending Current Authority.",
+    "preconditions": "Employee is authenticated; supported leave type selected; valid duration, justification, balance, and eligibility.",
+    "action_or_input": "Employee executes submit action on the validated leave request.",
+    "expected_result": "Leave request transitions from 'Draft Leave Request' to 'Pending Current Authority' and is queued to the designated authority.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-003",
+    "source_id": "BW-HR-01 transition-2-pending-to-approved",
+    "purpose": "Verify Transition 2 of BW-HR-01: Approving Authority approving pending request transitions to Approved with leave balance update.",
+    "preconditions": "Leave request is in 'Pending Current Authority' state; actor is authorized Approving Authority.",
+    "action_or_input": "Approving Authority executes 'Approve' action on the pending request.",
+    "expected_result": "Request transitions from 'Pending Current Authority' to 'Approved \u2014 Leave Balance Updated', balance decrements, and decision is logged.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-004",
+    "source_id": "BW-HR-02 rejection-path",
+    "purpose": "Execute the complete finite path from draft leave request through submission to rejection by Approving Authority.",
+    "preconditions": "Employee has available leave balance; request starts in Draft Leave Request.",
+    "action_or_input": "Step 1: Employee submits valid leave request. Step 2: Approving Authority reviews and rejects request with justification comments.",
+    "expected_result": "Step 1: Request transitions to 'Pending Current Authority'. Step 2: Request transitions to 'Rejected', workflow terminates, and balance is not decremented.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-005",
+    "source_id": "BW-HR-02 transition-2-pending-to-rejected",
+    "purpose": "Verify Transition 2 of BW-HR-02: Approving Authority rejecting pending request transitions to terminal Rejected state.",
+    "preconditions": "Leave request is in 'Pending Current Authority' state; actor is authorized Approving Authority.",
+    "action_or_input": "Approving Authority selects 'Reject' outcome with rejection remarks.",
+    "expected_result": "Request transitions from 'Pending Current Authority' to 'Rejected', ending the approval path.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-006",
+    "source_id": "BW-HR-03 forward-one-traversal-path",
+    "purpose": "Execute exactly one traversal of the approval-authority forwarding loop from submission to Pending Next Authority.",
+    "preconditions": "Multi-tier leave request in Draft state requiring intermediate (e.g. HOD) and higher (Director) authority review.",
+    "action_or_input": "Step 1: Employee submits valid request. Step 2: Intermediate Approving Authority executes 'Forward to next authority'.",
+    "expected_result": "Step 1: Request transitions to 'Pending Current Authority'. Step 2: Request transitions to 'Pending Next Authority' and queues to next configured authority.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-007",
+    "source_id": "BW-HR-03 transition-2-pending-to-forwarded",
+    "purpose": "Verify Transition 2 of BW-HR-03: Approving Authority forwarding request transitions to Pending Next Authority.",
+    "preconditions": "Leave request in 'Pending Current Authority' state at intermediate authority level.",
+    "action_or_input": "Intermediate authority executes 'Forward to next authority' decision.",
+    "expected_result": "Request transitions from 'Pending Current Authority' to 'Pending Next Authority', determining next configured authority.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-008",
+    "source_id": "CW-HR-01 forward-and-approve-sequence",
+    "purpose": "Execute composite leave request lifecycle combining valid submission, intermediate forwarding, and subsequent final approval.",
+    "preconditions": "Multi-tier leave request (Faculty long leave requiring HOD then Director review); Employee balance is 15 days.",
+    "action_or_input": "1. Employee submits 5-day leave request. 2. HOD forwards to Director. 3. Director approves request.",
+    "expected_result": "Request transitions: Draft -> Pending Current Authority (HOD) -> Pending Next Authority (Director) -> Approved \u2014 Leave Balance Updated; balance decrements to 10.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-009",
+    "source_id": "CW-HR-01 prohibited-bypass-draft-to-approved",
+    "purpose": "Verify prohibited transition in CW-HR-01: An actor cannot manually force transition from Draft Leave Request directly to Approved.",
+    "preconditions": "Leave request in Draft Leave Request state.",
+    "action_or_input": "Attempt to invoke approve endpoint directly without intermediate submission and authority review.",
+    "expected_result": "HR-EIS rejects the invalid transition with an error (400 Bad Request); request remains in Draft state.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-010",
+    "source_id": "CW-HR-01 prohibited-action-on-terminal-rejected",
+    "purpose": "Verify prohibited transition in CW-HR-01: No workflow transition can be executed on a terminal Rejected leave request.",
+    "preconditions": "Leave request in terminal 'Rejected' state.",
+    "action_or_input": "Attempt to invoke Approve or Forward action on the Rejected leave request.",
+    "expected_result": "HR-EIS rejects action with 400 Bad Request; terminal Rejected state is immutable.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-011",
+    "source_id": "BW-HR-04 direct-finalization-path",
+    "purpose": "Execute finite appraisal path with zero intermediate authority traversal from submission through reviewer assignment to finalization.",
+    "preconditions": "Appraisal submission window active; initial state is Appraisal Not Submitted.",
+    "action_or_input": "Step 1: Employee submits appraisal. Step 2: HR Administrator assigns reviewer. Step 3: Reviewer evaluates and final designated authority finalizes appraisal.",
+    "expected_result": "Transitions: Appraisal Not Submitted -> Submitted -> Reviewer Assigned / Pending Review -> Finalized \u2014 Archived \u2014 Closed.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-012",
+    "source_id": "BW-HR-04 transition-1-not-submitted-to-submitted",
+    "purpose": "Verify Transition 1 of BW-HR-04: Submitting appraisal form during active window transitions from Appraisal Not Submitted to Submitted.",
+    "preconditions": "Appraisal submission window is active; initial state is Appraisal Not Submitted.",
+    "action_or_input": "Employee submits completed appraisal form.",
+    "expected_result": "Appraisal transitions from 'Appraisal Not Submitted' to 'Submitted'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-013",
+    "source_id": "BW-HR-04 transition-2-submitted-to-reviewer-assigned",
+    "purpose": "Verify Transition 2 of BW-HR-04: HR Administrator assigning reviewer transitions appraisal to Reviewer Assigned / Pending Review.",
+    "preconditions": "Appraisal in 'Submitted' state; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator selects and confirms reviewer assignment.",
+    "expected_result": "Appraisal transitions from 'Submitted' to 'Reviewer Assigned / Pending Review'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-014",
+    "source_id": "BW-HR-04 transition-3-pending-review-to-finalized",
+    "purpose": "Verify Transition 3 of BW-HR-04: Final designated authority finalization transitions appraisal to Finalized \u2014 Archived \u2014 Closed.",
+    "preconditions": "Appraisal in 'Reviewer Assigned / Pending Review'; actor is final designated authority.",
+    "action_or_input": "Final designated authority executes finalization.",
+    "expected_result": "Appraisal transitions from 'Reviewer Assigned / Pending Review' to 'Finalized \u2014 Archived \u2014 Closed', archived in service record.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-015",
+    "source_id": "BW-HR-05 additional-authority-traversal-path",
+    "purpose": "Execute appraisal path with exactly one additional designated-authority traversal before finalization.",
+    "preconditions": "Appraisal submission window active; appraisal configured for multi-authority review.",
+    "action_or_input": "Step 1: Employee submits. Step 2: HR Admin assigns reviewer. Step 3: Intermediate authority reviews and advances to next authority. Step 4: Final authority finalizes.",
+    "expected_result": "Transitions: Appraisal Not Submitted -> Submitted -> Reviewer Assigned -> Pending Next Appraisal Authority -> Finalized \u2014 Archived \u2014 Closed.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-016",
+    "source_id": "BW-HR-05 transition-3-pending-review-to-next-authority",
+    "purpose": "Verify Transition 3 of BW-HR-05: Review by non-final authority transitions appraisal to Pending Next Appraisal Authority.",
+    "preconditions": "Appraisal in 'Reviewer Assigned / Pending Review'; actor is intermediate authority.",
+    "action_or_input": "Intermediate authority submits review comments and advances appraisal.",
+    "expected_result": "Appraisal transitions to 'Pending Next Appraisal Authority'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-017",
+    "source_id": "CW-HR-02 complete-lifecycle-sequence",
+    "purpose": "Execute composite yearly appraisal lifecycle combining submission, reviewer assignment, authority review, and archival closure.",
+    "preconditions": "Appraisal window active; Employee, HR Admin, Reviewer, and Director accounts configured.",
+    "action_or_input": "Run end-to-end appraisal lifecycle sequence from initial submission to final closure.",
+    "expected_result": "Appraisal successfully progresses through all lifecycle states and archives in employee service record upon closure.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-018",
+    "source_id": "CW-HR-02 prohibited-finalize-before-reviewer-assignment",
+    "purpose": "Verify prohibited transition in CW-HR-02: Authority cannot finalize an appraisal that is in Submitted state before reviewer assignment.",
+    "preconditions": "Appraisal in 'Submitted' state (reviewer not yet assigned).",
+    "action_or_input": "Authority attempts to execute finalization directly on Submitted appraisal.",
+    "expected_result": "HR-EIS rejects the out-of-order transition with an error (400 Bad Request); appraisal must complete reviewer assignment.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-019",
+    "source_id": "CW-HR-02 prohibited-modify-finalized-appraisal",
+    "purpose": "Verify prohibited transition in CW-HR-02: No state transition or modification can be executed on a Finalized \u2014 Archived \u2014 Closed appraisal.",
+    "preconditions": "Appraisal in terminal 'Finalized \u2014 Archived \u2014 Closed' state.",
+    "action_or_input": "Attempt to submit ratings or trigger transition on closed appraisal.",
+    "expected_result": "HR-EIS rejects the action with 403 Forbidden or 400 Bad Request; closed appraisal state is immutable.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-020",
+    "source_id": "BW-HR-06 advance-approved-and-processed-path",
+    "purpose": "Execute complete finite path for LTC Advance through verification, direct approval, and Accountant financial processing.",
+    "preconditions": "Authenticated Employee eligible for LTC advance; initial state is Draft LTC Advance.",
+    "action_or_input": "Step 1: Employee submits advance form. Step 2: HR Admin verifies documentation/eligibility. Step 3: Authority approves. Step 4: Accountant records financial settlement.",
+    "expected_result": "Transitions: Draft LTC Advance -> Submitted / Awaiting HR Verification -> Pending Current Authority -> Approved LTC Claim -> Financial Processing Recorded.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-021",
+    "source_id": "BW-HR-06 transition-1-draft-to-submitted",
+    "purpose": "Verify Transition 1 of BW-HR-06: Submitting prescribed LTC advance form transitions from Draft to Submitted / Awaiting HR Verification.",
+    "preconditions": "Employee fills prescribed LTC advance form.",
+    "action_or_input": "Employee submits LTC advance request.",
+    "expected_result": "Request transitions from 'Draft LTC Advance' to 'Submitted / Awaiting HR Verification'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-022",
+    "source_id": "BW-HR-06 transition-2-verification-to-pending-authority",
+    "purpose": "Verify Transition 2 of BW-HR-06: HR Administrator verification transitions LTC request to Pending Current Authority.",
+    "preconditions": "LTC request in 'Submitted / Awaiting HR Verification'; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator validates documentation and eligibility, confirming verification.",
+    "expected_result": "Request transitions from 'Submitted / Awaiting HR Verification' to 'Pending Current Authority'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-023",
+    "source_id": "BW-HR-06 transition-3-pending-to-approved-claim",
+    "purpose": "Verify Transition 3 of BW-HR-06: Approving Authority approval transitions LTC request to Approved LTC Claim.",
+    "preconditions": "LTC request in 'Pending Current Authority'; actor is authorized Approving Authority.",
+    "action_or_input": "Approving Authority executes 'Approve' action.",
+    "expected_result": "Request transitions from 'Pending Current Authority' to 'Approved LTC Claim', available for financial processing.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-024",
+    "source_id": "BW-HR-06 transition-4-approved-to-financial-processing",
+    "purpose": "Verify Transition 4 of BW-HR-06: Accountant settlement recording transitions Approved LTC Claim to Financial Processing Recorded.",
+    "preconditions": "LTC claim in 'Approved LTC Claim' state; authenticated Accountant.",
+    "action_or_input": "Accountant verifies financial correctness and records settlement processing.",
+    "expected_result": "Claim transitions from 'Approved LTC Claim' to 'Financial Processing Recorded'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-025",
+    "source_id": "BW-HR-07 reimbursement-approved-and-processed-path",
+    "purpose": "Execute complete finite path for LTC Reimbursement through verification, direct approval, and Accountant financial processing.",
+    "preconditions": "Authenticated Employee with journey completed; initial state is Draft LTC Reimbursement.",
+    "action_or_input": "Step 1: Employee submits reimbursement form. Step 2: HR Admin verifies documentation. Step 3: Authority approves. Step 4: Accountant records financial settlement.",
+    "expected_result": "Transitions: Draft LTC Reimbursement -> Submitted / Awaiting HR Verification -> Pending Current Authority -> Approved LTC Claim -> Financial Processing Recorded.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-026",
+    "source_id": "BW-HR-07 transition-1-reimbursement-draft-to-submitted",
+    "purpose": "Verify Transition 1 of BW-HR-07: Submitting prescribed LTC reimbursement form transitions to Submitted / Awaiting HR Verification.",
+    "preconditions": "Employee fills prescribed LTC reimbursement form with bills.",
+    "action_or_input": "Employee submits LTC reimbursement request.",
+    "expected_result": "Request transitions from 'Draft LTC Reimbursement' to 'Submitted / Awaiting HR Verification'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-027",
+    "source_id": "BW-HR-08 rejection-path",
+    "purpose": "Execute finite LTC path from verified request to rejection by Approving Authority.",
+    "preconditions": "LTC request verified by HR Administrator in 'Pending Current Authority' state.",
+    "action_or_input": "Approving Authority reviews request and selects 'Reject' outcome with rejection comments.",
+    "expected_result": "Request transitions from 'Pending Current Authority' to 'Rejected', workflow ends, and audit history is retained.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-028",
+    "source_id": "BW-HR-09 forward-one-traversal-path",
+    "purpose": "Execute exactly one forwarding traversal after LTC verification from Pending Current Authority to Pending Next Authority.",
+    "preconditions": "Verified LTC request in 'Pending Current Authority' at intermediate authority level.",
+    "action_or_input": "Intermediate authority executes 'Forward to next authority'.",
+    "expected_result": "Request transitions from 'Pending Current Authority' to 'Pending Next Authority', queued to next configured authority.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-029",
+    "source_id": "CW-HR-03 forward-and-settlement-sequence",
+    "purpose": "Execute composite LTC lifecycle combining submission, HR verification, intermediate forwarding, final approval, and financial processing.",
+    "preconditions": "Multi-tier LTC request (e.g. requires Registrar then Director approval); authenticated actors.",
+    "action_or_input": "Employee submits -> HR Admin verifies -> Registrar forwards -> Director approves -> Accountant records settlement.",
+    "expected_result": "Request progresses sequentially through all states: Submitted -> Pending Registrar -> Pending Director -> Approved -> Financial Processing Recorded.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-030",
+    "source_id": "CW-HR-03 prohibited-skip-hr-verification",
+    "purpose": "Verify prohibited transition in CW-HR-03: Authority cannot approve an LTC request directly from Submitted / Awaiting HR Verification state.",
+    "preconditions": "LTC request in 'Submitted / Awaiting HR Verification' state.",
+    "action_or_input": "Authority attempts to invoke approve endpoint before HR Admin verification is completed.",
+    "expected_result": "HR-EIS rejects the out-of-order action with 400 Bad Request; request must be verified by HR Administrator first.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-031",
+    "source_id": "CW-HR-03 prohibited-settlement-before-approval",
+    "purpose": "Verify prohibited transition in CW-HR-03: Accountant cannot record settlement processing on an unapproved LTC request.",
+    "preconditions": "LTC request in 'Pending Current Authority' state (not yet approved).",
+    "action_or_input": "Accountant attempts to invoke settlement processing endpoint on the pending request.",
+    "expected_result": "HR-EIS rejects the invalid transition with 400 Bad Request; claims must be in 'Approved LTC Claim' state before settlement.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-032",
+    "source_id": "CW-HR-03 prohibited-action-on-terminal-rejected-ltc",
+    "purpose": "Verify prohibited transition in CW-HR-03: No transition can be executed on a terminal Rejected LTC request.",
+    "preconditions": "LTC request in terminal 'Rejected' state.",
+    "action_or_input": "Attempt to execute Approve, Forward, or Settlement action on Rejected LTC request.",
+    "expected_result": "HR-EIS rejects action with 400 Bad Request; terminal Rejected state is immutable.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-033",
+    "source_id": "BW-HR-10 advance-approved-and-processed-path",
+    "purpose": "Execute complete finite path for CPDA Advance through validation, HR verification, direct approval, and Accountant processing.",
+    "preconditions": "Authenticated Employee eligible for CPDA; initial state is Draft CPDA Advance.",
+    "action_or_input": "Step 1: Employee submits advance with purpose, amount, docs. Step 2: HR Admin verifies claim. Step 3: Authority approves. Step 4: Accountant records disbursement.",
+    "expected_result": "Transitions: Draft CPDA Advance -> Submitted / Awaiting HR Verification -> Pending Current Authority -> Approved CPDA Claim -> Financial Processing / Disbursement Recorded.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-034",
+    "source_id": "BW-HR-10 transition-1-draft-to-submitted",
+    "purpose": "Verify Transition 1 of BW-HR-10: Submitting CPDA advance with required fields transitions from Draft to Submitted / Awaiting HR Verification.",
+    "preconditions": "Employee fills CPDA advance payload with purpose, amount, and attachments.",
+    "action_or_input": "Employee submits CPDA advance request.",
+    "expected_result": "Request transitions from 'Draft CPDA Advance' to 'Submitted / Awaiting HR Verification'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-035",
+    "source_id": "BW-HR-10 transition-2-verification-to-pending-authority",
+    "purpose": "Verify Transition 2 of BW-HR-10: HR Administrator verification transitions CPDA claim to Pending Current Authority.",
+    "preconditions": "CPDA claim in 'Submitted / Awaiting HR Verification'; authenticated HR Administrator.",
+    "action_or_input": "HR Administrator validates claim purpose, amount, and documents, confirming verification.",
+    "expected_result": "Claim transitions to 'Pending Current Authority' in approval hierarchy.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-036",
+    "source_id": "BW-HR-10 transition-3-pending-to-approved-claim",
+    "purpose": "Verify Transition 3 of BW-HR-10: Approving Authority approval transitions CPDA claim to Approved CPDA Claim.",
+    "preconditions": "CPDA claim in 'Pending Current Authority'; actor is authorized Approving Authority.",
+    "action_or_input": "Approving Authority executes 'Approve' action.",
+    "expected_result": "Claim transitions from 'Pending Current Authority' to 'Approved CPDA Claim'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-037",
+    "source_id": "BW-HR-10 transition-4-approved-to-disbursement-recorded",
+    "purpose": "Verify Transition 4 of BW-HR-10: Accountant disbursement recording transitions Approved CPDA Claim to Financial Processing / Disbursement Recorded.",
+    "preconditions": "CPDA claim in 'Approved CPDA Claim' state; authenticated Accountant.",
+    "action_or_input": "Accountant verifies financial correctness and records disbursement details.",
+    "expected_result": "Claim transitions from 'Approved CPDA Claim' to 'Financial Processing / Disbursement Recorded'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-038",
+    "source_id": "BW-HR-11 reimbursement-approved-and-processed-path",
+    "purpose": "Execute complete finite path for CPDA Reimbursement through validation, HR verification, direct approval, and Accountant processing.",
+    "preconditions": "Authenticated Employee with CPDA expense bills; initial state is Draft CPDA Reimbursement.",
+    "action_or_input": "Step 1: Employee submits reimbursement. Step 2: HR Admin verifies claim. Step 3: Authority approves. Step 4: Accountant records settlement.",
+    "expected_result": "Transitions: Draft CPDA Reimbursement -> Submitted / Awaiting HR Verification -> Pending Current Authority -> Approved CPDA Claim -> Financial Processing / Disbursement Recorded.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-039",
+    "source_id": "BW-HR-11 transition-1-reimbursement-draft-to-submitted",
+    "purpose": "Verify Transition 1 of BW-HR-11: Submitting CPDA reimbursement form transitions to Submitted / Awaiting HR Verification.",
+    "preconditions": "Employee fills CPDA reimbursement form with purpose, amount, and expenditure bills.",
+    "action_or_input": "Employee submits CPDA reimbursement request.",
+    "expected_result": "Request transitions from 'Draft CPDA Reimbursement' to 'Submitted / Awaiting HR Verification'.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-040",
+    "source_id": "BW-HR-12 rejection-path",
+    "purpose": "Execute finite CPDA path from verified claim to rejection by Approving Authority.",
+    "preconditions": "CPDA claim verified by HR Administrator in 'Pending Current Authority' state.",
+    "action_or_input": "Approving Authority reviews claim and selects 'Reject' outcome with rejection comments.",
+    "expected_result": "Claim transitions from 'Pending Current Authority' to 'Rejected', workflow ends, and audit history is retained.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-041",
+    "source_id": "BW-HR-13 forward-one-traversal-path",
+    "purpose": "Execute exactly one forwarding traversal after CPDA verification from Pending Current Authority to Pending Next Authority.",
+    "preconditions": "Verified CPDA claim in 'Pending Current Authority' at intermediate authority level (e.g. HOD).",
+    "action_or_input": "Intermediate authority executes 'Forward to next authority'.",
+    "expected_result": "Claim transitions from 'Pending Current Authority' to 'Pending Next Authority', queued to next configured authority.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-042",
+    "source_id": "CW-HR-04 forward-and-disbursement-sequence",
+    "purpose": "Execute composite CPDA lifecycle combining submission, HR verification, intermediate forwarding, final approval, and disbursement recording.",
+    "preconditions": "Multi-tier CPDA claim requiring HOD then Director review; authenticated actors.",
+    "action_or_input": "Employee submits -> HR Admin verifies -> HOD forwards -> Director approves -> Accountant records disbursement.",
+    "expected_result": "Claim progresses through all lifecycle states: Submitted -> Pending HOD -> Pending Director -> Approved -> Financial Processing / Disbursement Recorded.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-043",
+    "source_id": "CW-HR-04 prohibited-skip-hr-verification",
+    "purpose": "Verify prohibited transition in CW-HR-04: Authority cannot approve a CPDA claim directly from Submitted / Awaiting HR Verification state.",
+    "preconditions": "CPDA claim in 'Submitted / Awaiting HR Verification' state.",
+    "action_or_input": "Authority attempts to invoke approve endpoint before HR Admin verification is completed.",
+    "expected_result": "HR-EIS rejects the out-of-order action with 400 Bad Request; claim must be verified by HR Administrator first.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-044",
+    "source_id": "CW-HR-04 prohibited-disbursement-before-approval",
+    "purpose": "Verify prohibited transition in CW-HR-04: Accountant cannot record disbursement on an unapproved CPDA claim.",
+    "preconditions": "CPDA claim in 'Pending Current Authority' state (not yet approved).",
+    "action_or_input": "Accountant attempts to invoke disbursement endpoint on the pending claim.",
+    "expected_result": "HR-EIS rejects the invalid transition with 400 Bad Request; claims must be in 'Approved CPDA Claim' state before disbursement.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-045",
+    "source_id": "CW-HR-04 prohibited-action-on-terminal-rejected-cpda",
+    "purpose": "Verify prohibited transition in CW-HR-04: No transition can be executed on a terminal Rejected CPDA claim.",
+    "preconditions": "CPDA claim in terminal 'Rejected' state.",
+    "action_or_input": "Attempt to execute Approve, Forward, or Disbursement action on Rejected CPDA claim.",
+    "expected_result": "HR-EIS rejects action with 400 Bad Request; terminal Rejected state is immutable.",
+    "test_type": "negative"
+  }
+]
