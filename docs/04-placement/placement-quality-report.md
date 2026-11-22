@@ -1,6 +1,6 @@
 # Placement Cell Management System (PCMS) — Quality Report
 **Module:** Placement Cell (`modules/placement`) | **Docs Folder:** `docs/04-placement/`  
-**Author (Student 1):** Rohan (`24BCS060`) | **Reviewer (Student 2):** rohankuthuru27-hub (`24BCS135`)  
+**Author (Student 1):** Niteesh (`24BCS060`) | **Reviewer (Student 2):** Rohan (`24BCS135`)  
 **Base Commit / Hash:** `108c9e5a456f796bdcd1b71ab6226a9a3c5f3ace`  
 **Review Verdict:** 10/10 in all nine dimensions  
 
@@ -56,7 +56,7 @@ Every live specification ID is cited directly in the code at its primary validat
 
 ## 5. Approvals, Decisions & Waivers
 
-1. **Blueprint Approval:** Approved by Student 2 (`rohankuthuru27-hub <24bcs135@iiitdmj.ac.in>`) on 2026-11-16.
+1. **Blueprint Approval:** Approved by Student 2 (`Rohan <24bcs135@iiitdmj.ac.in>`) on 2026-11-16.
 2. **Architecture Decisions:** Strict adherence to ADR 0013 (No cross-module FKs). Identity references managed via plain `user_id` integer references.
 3. **Waivers:** None requested. Zero open blockers or exceptions.
 

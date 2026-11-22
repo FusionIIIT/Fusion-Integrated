@@ -1,6 +1,6 @@
 # Module Blueprint: Placement Cell Management System (PCMS)
 **Module Code:** `placement` | **Docs Folder:** `docs/04-placement/` | **Environment:** `module-only`  
-**Author (Student 1):** Rohan (`24BCS060`) | **Approver (Student 2):** Partner (`24BCS135`)  
+**Author (Student 1):** Niteesh (`24BCS060`) | **Approver (Student 2):** Rohan (`24BCS135`)  
 **Approval Date:** 2026-11-16 | **Status:** APPROVED BY STUDENT 2
 
 ---
@@ -150,6 +150,6 @@ Registered in `modules/placement/schedule.py` and `config/celery.py`:
 ## 8. Approvals, Known Gaps & Decisions (Step 3.8)
 
 - **Approval Record:**
-  > "Approved by Student 2 (Partner <24bcs135@iiitdmj.ac.in>) on 2026-11-16. Blueprint satisfies all 64 AFRs, 22 UCs, 26 BRs, and 12 Workflows without introducing unsupported platform dependencies."
+  > "Approved by Student 2 (Rohan <24bcs135@iiitdmj.ac.in>) on 2026-11-16. Blueprint satisfies all 64 AFRs, 22 UCs, 26 BRs, and 12 Workflows without introducing unsupported platform dependencies."
 - **Known Gaps:** None. All live specification obligations are mapped to active implementation files.
 - **External Dependencies:** Only standard Fusion-Integrated stack (Django 5.2, DRF, Celery, React 18, TypeScript 5).
