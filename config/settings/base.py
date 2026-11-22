@@ -66,6 +66,7 @@ ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
 DJANGO_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",
+    "django.contrib.sessions",
     "django.contrib.staticfiles",
 ]
 
@@ -125,7 +126,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": env("DB_NAME", "fusion_integrated"),
         "USER": env("DB_USER", "fusion_admin"),
-        "PASSWORD": env("DB_PASSWORD", ""),
+        "PASSWORD": env("DB_PASSWORD", "Julie@04"),
         "HOST": env("DB_HOST", "127.0.0.1"),
         "PORT": env("DB_PORT", "5432"),
         # MUST stay 0 under PgBouncer transaction pooling, which leaks session state.
