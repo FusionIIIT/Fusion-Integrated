@@ -8,7 +8,8 @@ purpose: >
 
 This is real work on a real platform. The module you are assigned will go into production if
 it clears review. There is no simplified version of the standard for a student assignment —
-[`definition-of-done.md`](definition-of-done.md) and §8 of the prompt apply exactly as written.
+§8 of the prompt applies exactly as written. It already includes what still applies from
+[`definition-of-done.md`](definition-of-done.md); where the two differ, the prompt governs.
 
 You have to follow these steps in order. Do not skip ahead to Step 5 because you already know
 what the prompt says — Steps 1 through 4 are what make the prompt work *for your specific
@@ -57,15 +58,16 @@ not need them — the prompt's §1 tells you exactly what to read instead.
 
 You have to confirm all of this before you go further:
 
-- [ ] `docker compose up` brings up postgres, redis, the IAM and the platform, all healthy
+- [ ] `docker compose up -d` brings up Postgres and both Redis instances, healthy; the IAM
+      (from `Fusion_System_Administrator`) and the platform (`make dev`) are running
 - [ ] `cd client && npm run dev` runs standalone — this is where you will demo your module
 - [ ] You can log in with a test account and see `modules/placement` working, so you know
       the fixture is actually loaded
 
-## Step 4 — Fill in the prompt's five blanks, before you paste anything
+## Step 4 — Fill in the prompt's six blanks, before you paste anything
 
 Open [`new-module-prompt.md`](new-module-prompt.md) but do not paste it yet. You have to
-write down the five values that go in its §0 first, using what you got in Step 1:
+write down the six values that go in it first, using what you got in Step 1:
 
 | Blank | Your value | Where it came from |
 |---|---|---|
@@ -74,22 +76,24 @@ write down the five values that go in its §0 first, using what you got in Step 
 | `ID_PREFIX` | _you fill this in_ | you read it off the spec documents yourself, once you have the folder |
 | `module_code` | _you fill this in_ | already given to you — Step 1 |
 | `ENVIRONMENT` | `module-only` | fixed — this is the value for every student assignment |
+| `NN` | _you fill this in_ | the number of your module's `docs/` folder, from your mentor |
 
-You have to fill these into the prompt text itself before you paste it. Do not paste the
+You have to fill these into the prompt text itself, everywhere they appear, before you
+paste it. Do not paste the
 prompt with the bracketed placeholders still in it and fill them in afterward — the AI
 session needs the real values from the first line.
 
 ## Step 5 — Paste the prompt into a fresh AI session
 
 You have to copy everything between `--- PROMPT BEGINS ---` and `--- PROMPT ENDS ---`, with
-your five blanks already filled in, into a **brand-new** AI coding session — not one that
+your six blanks already filled in, into a **brand-new** AI coding session — not one that
 already has other context in it. Do not summarise the prompt, do not trim it, do not
 paraphrase a section you think you already understand. The length is deliberate.
 
 ## Step 6 — Work through the prompt's own steps
 
 From here the prompt drives itself — it is itself written as an explicit numbered sequence
-(Step 0.1 through Step 7.6, covering read → questions → blueprint → backend → tests →
+(Step 0.1 through Step 10.4, covering read → questions → blueprint → backend → tests →
 frontend → ops). At each one, you have to **answer what it asks and get approval where it
 asks for approval** — you do not get to skip ahead because a later step looks easy.
 
@@ -137,9 +141,9 @@ spec folder it implements in the description.
 
 ## Step 10 — Self-check against the definition of done, before requesting review
 
-You have to pull the full checklist from the prompt's §8 and
-[`definition-of-done.md`](definition-of-done.md)'s **"A pull request"** and **"A module"**
-sections, and run it on yourself before you ask anyone to review. The short version:
+You have to pull the full checklist from the prompt's §8, which already includes what still
+applies from [`definition-of-done.md`](definition-of-done.md), and run it on yourself before
+you ask anyone to review. The short version:
 
 - [ ] `make check` and `make check-client` both green — `tsc` finished, not just `npm test`
 - [ ] Every live spec id is implemented and cited at its enforcement point, or listed as a
