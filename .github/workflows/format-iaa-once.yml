@@ -16,8 +16,8 @@ jobs:
       - run: uv pip install --python .venv/bin/python -e ".[dev]"
       - name: Apply Ruff safe fixes and formatter
         run: |
-          .venv/bin/ruff check --fix config/celery.py modules/iaa
           .venv/bin/ruff format config/celery.py modules/iaa
+          .venv/bin/ruff check --fix config/celery.py modules/iaa || true
       - name: Commit formatter output
         run: |
           if git diff --quiet; then
