@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.iaa",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -214,6 +215,7 @@ REST_FRAMEWORK = {
         "recruiter_invite_accept": "10/hour",
         "apply": "30/hour",
         "export": "5/hour",
+        "iaa_write": "60/min",
         "upload": "20/hour",
         "directory_search": "120/hour",
     },
