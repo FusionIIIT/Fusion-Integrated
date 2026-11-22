@@ -13,6 +13,19 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave.view_self` | View own leave requests, balance, and history | `Director`, `Unit Head`, `faculty`, `staff` |
+| `elm.leave.view_all` | View leave requests assigned for processing or administration | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Leave Administrator`, `Registrar`, `Unit Head` |
+| `elm.leave.create` | Create and submit leave requests | `Director`, `Unit Head`, `faculty`, `staff` |
+| `elm.leave.substitute` | Respond to substitute/responsibility requests | `Director`, `Unit Head`, `faculty`, `staff` |
+| `elm.leave.review` | Review and route leave requests as Unit Head or Establishment | `Deputy Registrar (Estt.)`, `Unit Head` |
+| `elm.leave.sanction` | Make final leave sanction and resumption decisions | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar` |
+| `elm.leave.manage` | Maintain ELM policy, calendar, hierarchy, and authorized records | `Leave Administrator` |
+| `elm.leave.export` | Export an accessible leave application | `Director`, `Leave Administrator`, `Unit Head`, `faculty`, `staff` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
