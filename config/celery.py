@@ -2,6 +2,12 @@ import os
 
 from celery import Celery
 
+from modules.department.schedule import (
+    BEAT_SCHEDULE as DEPARTMENT_SCHEDULE,
+)
+from modules.department.schedule import (
+    TASK_ROUTES as DEPARTMENT_ROUTES,
+)
 from modules.placement.schedule import (
     BEAT_SCHEDULE as PLACEMENT_SCHEDULE,
 )
@@ -15,5 +21,5 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 # Each module owns its timers; this only merges them, so modules stay removable.
-app.conf.beat_schedule = {**PLACEMENT_SCHEDULE}
-app.conf.task_routes = {**PLACEMENT_ROUTES}
+app.conf.beat_schedule = {**PLACEMENT_SCHEDULE, **DEPARTMENT_SCHEDULE}
+app.conf.task_routes = {**PLACEMENT_ROUTES, **DEPARTMENT_ROUTES}
