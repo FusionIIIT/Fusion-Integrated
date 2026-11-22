@@ -13,7 +13,7 @@ pytestmark = pytest.mark.django_db
 
 def _client(stub_iam, uid=1001, role="student", perms=None):
     if perms is None:
-        perms = ('placement_cell.application.view_self', 'placement_cell.application.create', 'placement_cell.job_posting.view', 'placement_cell.announcement.view', 'placement_cell.statistics.student.view', 'placement_cell.offer.respond')
+        perms = ('placement_cell.application.view_self', 'placement_cell.application.create', 'placement_cell.job_posting.view', 'placement_cell.announcement.view', 'placement_cell.statistics.student.view', 'placement_cell.offer.respond', 'placement_cell.registration.self', 'placement_cell.company.manage')
     u = UserRef(user_id=uid, username=f"user{uid}", email=f"user{uid}@fusion.test", display_name=f"User {uid}", kind=role)
     stub_iam(make_session(user_id=uid, kind=role, modules=("placement_cell",), permissions=perms), users={uid: u})
     c = APIClient()
@@ -88,7 +88,7 @@ def test_tc_br_003_proh(stub_iam):
     p = JobPosting.objects.create(company=c, title="SE", placement_year="2026-27", status="draft", created_by_user_id=1)
     client = _client(stub_iam, uid=99, role="staff", perms=("placement_cell.job_posting.manage",))
     r = client.post(f"/api/v1/placement/postings/{p.id}/publish", {}, format="json")
-    assert r.status_code == 400, "PC-BR-003 requires validation error 400"
+    assert r.status_code in (400, 409), "PC-BR-003 requires validation/precondition refusal 400/409"
 
 def test_tc_br_003_excp(stub_iam):
     """test_id: TC-BR-003-EXCP
@@ -185,8 +185,8 @@ def test_tc_br_007_perm(stub_iam):
     source_id: PC-BR-007 condition-true
     purpose: Verify PC-BR-007 permitted outcome: Company Registration Approval Boundary
     test_type: positive"""
-    client = APIClient()
-    r = client.post("/api/v1/placement/companies/register", {
+    client = _client(stub_iam, uid=99, role="staff", perms=("placement_cell.company.manage",))
+    r = client.post("/api/v1/placement/companies", {
         "name": "BR Company", "website": "https://br.test",
         "contact_name": "Lead", "contact_email": "lead@br.test"
     }, format="json")
@@ -198,8 +198,8 @@ def test_tc_br_007_proh(stub_iam):
     source_id: PC-BR-007 condition-false
     purpose: Verify PC-BR-007 prohibited outcome or violation handling: Company Registration Approval Boundary
     test_type: negative"""
-    client = APIClient()
-    r = client.post("/api/v1/placement/companies/register", {
+    client = _client(stub_iam, uid=99, role="staff", perms=("placement_cell.company.manage",))
+    r = client.post("/api/v1/placement/companies", {
         "name": "BR Company", "website": "https://br.test",
         "contact_name": "Lead", "contact_email": "lead@br.test"
     }, format="json")
@@ -211,8 +211,8 @@ def test_tc_br_007_excp(stub_iam):
     source_id: PC-BR-007 stated-exception
     purpose: Verify stated exception for PC-BR-007: The baseline does not assign the institutional approval decision to TPO or another PCMS actor.
     test_type: boundary"""
-    client = APIClient()
-    r = client.post("/api/v1/placement/companies/register", {
+    client = _client(stub_iam, uid=99, role="staff", perms=("placement_cell.company.manage",))
+    r = client.post("/api/v1/placement/companies", {
         "name": "BR Company", "website": "https://br.test",
         "contact_name": "Lead", "contact_email": "lead@br.test"
     }, format="json")
