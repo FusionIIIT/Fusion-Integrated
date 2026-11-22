@@ -1,0 +1,353 @@
+[
+  {
+    "test_id": "TC-LMS-001",
+    "source_id": "BR-LMS-001 permitted-access",
+    "purpose": "Verify that an authenticated user enrolled in, assigned to, or linked to a course is granted access to the course workspace.",
+    "preconditions": "Course C101 exists in the system; User U1 is enrolled in C101 as a student (or assigned as Faculty/TA/Observer); User U1 is authenticated.",
+    "action_or_input": "User U1 requests access to the course workspace for C101.",
+    "expected_result": "Access is granted (HTTP 200); course workspace home page displays syllabus, schedule, instructors, and TAs.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-002",
+    "source_id": "BR-LMS-001 prohibited-access",
+    "purpose": "Verify that an authenticated user not enrolled in, assigned to, or linked to a course is denied access to its course workspace.",
+    "preconditions": "Course C101 exists; User U2 is authenticated but has no enrollment, assignment, or linkage to C101.",
+    "action_or_input": "User U2 requests access to the course workspace for C101.",
+    "expected_result": "Access is denied (HTTP 403 Forbidden); course workspace content is not displayed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-003",
+    "source_id": "BR-LMS-002 fusion-registered-student",
+    "purpose": "Verify that student course access is granted based on active Fusion course-registration records.",
+    "preconditions": "Course C101 exists; Student S1 has an active registration record for C101 in Fusion registration data; Student S1 is authenticated.",
+    "action_or_input": "Student S1 requests access to course workspace C101.",
+    "expected_result": "Access is granted based on Fusion registration data; Student S1 successfully enters the C101 course workspace.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-004",
+    "source_id": "BR-LMS-002 fusion-unregistered-student",
+    "purpose": "Verify that a student without an active Fusion course-registration record is denied access to the course workspace.",
+    "preconditions": "Course C101 exists; Student S2 is an active student in Fusion but has no registration record for C101; Student S2 is authenticated.",
+    "action_or_input": "Student S2 requests access to course workspace C101.",
+    "expected_result": "Access is denied (HTTP 403 Forbidden) based on the absence of Fusion course-registration data.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-005",
+    "source_id": "BR-LMS-003 observer-read-permitted",
+    "purpose": "Verify that an Observer linked to a course can read course details, published materials, and announcements.",
+    "preconditions": "Course C101 exists with published materials and announcements; Observer O1 is linked to C101; Observer O1 is authenticated.",
+    "action_or_input": "Observer O1 requests course details, published materials list, and announcements list for C101.",
+    "expected_result": "Read access is granted (HTTP 200); course details, published materials, and announcements are returned in read-only form.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-006",
+    "source_id": "BR-LMS-003 observer-student-data-prohibited",
+    "purpose": "Verify that an Observer linked to a course is prohibited from viewing individual student submissions, grades, or student-specific data.",
+    "preconditions": "Course C101 exists; Student S1 has submitted work and received a grade; Observer O1 is linked to C101; Observer O1 is authenticated.",
+    "action_or_input": "Observer O1 attempts to view Student S1's submission, grade, or submission history for C101.",
+    "expected_result": "Access is denied (HTTP 403 Forbidden); no student-specific submission or grade data is disclosed.",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TC-LMS-007",
+    "source_id": "BR-LMS-003 observer-write-action-prohibited",
+    "purpose": "Verify that an Observer has no write access anywhere in the course module.",
+    "preconditions": "Course C101 exists; Observer O1 is linked to C101; Observer O1 is authenticated.",
+    "action_or_input": "Observer O1 attempts write operations: creating an announcement, uploading material, submitting an assignment, and entering a grade.",
+    "expected_result": "All write operations are rejected (HTTP 403 Forbidden); no course records are created or modified.",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TC-LMS-008",
+    "source_id": "BR-LMS-004 ta-content-and-grading-permitted",
+    "purpose": "Verify that an assigned TA can view permitted course content, view student submissions, and grade submissions.",
+    "preconditions": "Course C101 exists; TA T1 is assigned to C101; Student S1 has submitted work for an assignment; TA T1 is authenticated.",
+    "action_or_input": "TA T1 requests course content, views Student S1's submission, and inputs points and feedback.",
+    "expected_result": "Actions are permitted (HTTP 200); submission details are displayed, and TA grading input is accepted and stored.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-009",
+    "source_id": "BR-LMS-004 ta-authoring-prohibited",
+    "purpose": "Verify that an assigned TA is prohibited from creating or editing assignments, materials, or course structure.",
+    "preconditions": "Course C101 exists; TA T1 is assigned to C101; TA T1 is authenticated.",
+    "action_or_input": "TA T1 attempts to create a new assignment, edit an assignment, upload course material, and alter course structure.",
+    "expected_result": "All authoring and editing actions are rejected (HTTP 403 Forbidden); assignments, materials, and course structure remain unchanged.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-010",
+    "source_id": "BR-LMS-005 published-material-visible",
+    "purpose": "Verify that published/released course materials are accessible to Students, TAs, and Observers.",
+    "preconditions": "Course C101 has course material M1 with status Published; Student S1, TA T1, and Observer O1 are associated with C101.",
+    "action_or_input": "Student S1, TA T1, and Observer O1 independently request to view/download material M1.",
+    "expected_result": "Material M1 is visible and successfully returned in read-only form to Student S1, TA T1, and Observer O1 (HTTP 200).",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-LMS-011",
+    "source_id": "BR-LMS-005 unpublished-material-hidden",
+    "purpose": "Verify that unpublished/unreleased course materials are not accessible or visible to Students, TAs, or Observers.",
+    "preconditions": "Course C101 has course material M2 in unpublished/draft state; Student S1, TA T1, and Observer O1 are associated with C101.",
+    "action_or_input": "Student S1, TA T1, and Observer O1 attempt to list materials or directly access M2.",
+    "expected_result": "Material M2 is excluded from materials listing and direct access requests are denied (HTTP 403 or HTTP 404).",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-LMS-012",
+    "source_id": "BR-LMS-006 scheduled-material-before-release",
+    "purpose": "Verify that course material configured with a future release date remains unavailable before that date/time.",
+    "preconditions": "Course C101 has material M3 configured with a future release timestamp T_release; current system time is T_current < T_release; Student S1 is enrolled in C101.",
+    "action_or_input": "Student S1 requests the course materials list and attempts direct access to M3 at T_current.",
+    "expected_result": "Material M3 maintains Scheduled status, does not appear in published materials, and direct access is denied.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-LMS-013",
+    "source_id": "BR-LMS-006 scheduled-material-at-release",
+    "purpose": "Verify that course material configured with a future release date automatically becomes available once release date/time is reached.",
+    "preconditions": "Course C101 has material M3 configured with release timestamp T_release; system clock advances to T_now >= T_release; Student S1 is enrolled in C101.",
+    "action_or_input": "Student S1 requests the course materials list and views M3 at T_now.",
+    "expected_result": "Material M3 transitions to released state and is visible and downloadable by Student S1 (HTTP 200).",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-LMS-014",
+    "source_id": "BR-LMS-007 faculty-post-permitted",
+    "purpose": "Verify that Faculty assigned to a course can post course announcements.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned to C101; Faculty F1 is authenticated.",
+    "action_or_input": "Faculty F1 submits a course announcement with title and content.",
+    "expected_result": "Announcement is created and posted successfully (HTTP 201 Created).",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-015",
+    "source_id": "BR-LMS-007 ta-post-permitted",
+    "purpose": "Verify that a TA can post a course announcement when permitted by Faculty for the course.",
+    "preconditions": "Course C101 exists; TA T1 is assigned to C101; Faculty has granted announcement-posting permission to T1 for C101; TA T1 is authenticated.",
+    "action_or_input": "TA T1 submits a course announcement with title and content.",
+    "expected_result": "Announcement is created and posted successfully (HTTP 201 Created).",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-016",
+    "source_id": "BR-LMS-007 ta-post-prohibited",
+    "purpose": "Verify that a TA cannot post a course announcement when not permitted by Faculty for that course.",
+    "preconditions": "Course C101 exists; TA T2 is assigned to C101; TA T2 does NOT have announcement-posting permission for C101; TA T2 is authenticated.",
+    "action_or_input": "TA T2 attempts to post a course announcement for C101.",
+    "expected_result": "Action is denied (HTTP 403 Forbidden); no announcement is posted.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-017",
+    "source_id": "BR-LMS-008 announcement-timestamp-and-enrolled-audience",
+    "purpose": "Verify that a posted announcement records a valid timestamp and is visible course-wide to all enrolled/linked users.",
+    "preconditions": "Course C101 has enrolled Student S1, assigned Faculty F1, assigned TA T1, and linked Observer O1; Faculty F1 posts announcement A1 at timestamp T1.",
+    "action_or_input": "Student S1, TA T1, and Observer O1 query announcements for course C101.",
+    "expected_result": "Announcement A1 displays creation timestamp T1 and is visible in the announcements list to S1, T1, and O1.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-LMS-018",
+    "source_id": "BR-LMS-008 unlinked-audience-exclusion",
+    "purpose": "Verify that an announcement is not visible to users not enrolled in or linked to the course.",
+    "preconditions": "Course C101 has posted announcement A1; User U3 has no enrollment, assignment, or linkage to C101; User U3 is authenticated.",
+    "action_or_input": "User U3 attempts to view announcement A1 or fetch C101 announcements list.",
+    "expected_result": "Access is denied (HTTP 403 Forbidden); announcement content is not returned.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-019",
+    "source_id": "BR-LMS-009 complete-configuration-publication",
+    "purpose": "Verify that an assignment defining due date, instructions, submission type, and points possible passes validation and can be published.",
+    "preconditions": "Faculty F1 is assigned to course C101; assignment draft A_valid defines due date='2026-09-30 23:59', instructions='Complete lab report', submission type='file', and points possible=100.",
+    "action_or_input": "Faculty F1 triggers the publish action on assignment A_valid.",
+    "expected_result": "Validation succeeds; assignment status is updated to Published (HTTP 200).",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-LMS-020",
+    "source_id": "BR-LMS-009 missing-required-field-publication",
+    "purpose": "Verify that an assignment missing any required configuration field (due date, instructions, submission type, points possible) cannot be published.",
+    "preconditions": "Faculty F1 is assigned to course C101; assignment draft A_invalid defines instructions, submission type, and due date, but points possible is missing.",
+    "action_or_input": "Faculty F1 attempts to publish assignment A_invalid.",
+    "expected_result": "Publication fails validation (HTTP 400 Bad Request); required field error is reported and assignment remains in Draft state.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-LMS-021",
+    "source_id": "BR-LMS-010 draft-state-before-publication",
+    "purpose": "Verify that an assignment remains in Draft state upon creation and before Faculty publishes it.",
+    "preconditions": "Faculty F1 creates a new assignment for course C101 with all required fields configured but does not trigger publish.",
+    "action_or_input": "Faculty F1 saves the assignment and queries its lifecycle state.",
+    "expected_result": "Assignment state is confirmed as 'Draft'; assignment is not published and not exposed to students.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-LMS-022",
+    "source_id": "BR-LMS-010 publish-action-transition",
+    "purpose": "Verify that an assignment transitions from Draft to Published state upon explicit publish action by Faculty.",
+    "preconditions": "Assignment A1 in course C101 is in Draft state with complete required configuration; Faculty F1 is authenticated.",
+    "action_or_input": "Faculty F1 executes the publish action on assignment A1.",
+    "expected_result": "Assignment state successfully transitions from 'Draft' to 'Published'.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-LMS-023",
+    "source_id": "BR-LMS-011 before-release-date-hidden",
+    "purpose": "Verify that a published assignment with a future release date is not visible to Students before that date/time.",
+    "preconditions": "Assignment A1 in C101 is Published with release timestamp T_release in the future; current system time is T_current < T_release; Student S1 is enrolled in C101.",
+    "action_or_input": "Student S1 requests the assignments list for course C101 at T_current.",
+    "expected_result": "Assignment A1 is omitted from Student S1's assignments list and direct access is denied/hidden (HTTP 404 or 403).",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-LMS-024",
+    "source_id": "BR-LMS-011 at-release-date-visible",
+    "purpose": "Verify that a published assignment becomes visible to Students once its configured release date/time condition is satisfied.",
+    "preconditions": "Assignment A1 in C101 is Published with release timestamp T_release; system clock reaches T_now >= T_release; Student S1 is enrolled in C101.",
+    "action_or_input": "Student S1 requests the assignments list for course C101 at T_now.",
+    "expected_result": "Assignment A1 appears in Student S1's assignments list, displaying instructions, due date, submission type, and points possible.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-LMS-025",
+    "source_id": "BR-LMS-012 conforming-submission-type",
+    "purpose": "Verify that a student submission matching the assignment's configured submission type (file, text, or link) is accepted.",
+    "preconditions": "Course C101 has published assignment A1 with submission type configured as 'file'; Student S1 is enrolled in C101; current time is before due date.",
+    "action_or_input": "Student S1 submits an assignment payload containing a valid file upload.",
+    "expected_result": "Submission is accepted and validated successfully (HTTP 201 Created); submission status is marked as 'submitted'.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-LMS-026",
+    "source_id": "BR-LMS-012 non-conforming-submission-type",
+    "purpose": "Verify that a student submission not conforming to the assignment's configured submission type is rejected.",
+    "preconditions": "Course C101 has published assignment A1 configured strictly for 'file' submission; Student S1 is enrolled in C101; current time is before due date.",
+    "action_or_input": "Student S1 attempts to submit text or a URL link instead of a file.",
+    "expected_result": "Submission is rejected (HTTP 400 Bad Request); validation error indicates non-conforming submission type.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-LMS-027",
+    "source_id": "BR-LMS-013 baseline-on-time-submission",
+    "purpose": "Verify that a Student submission made prior to the configured due date is accepted as an on-time submission.",
+    "preconditions": "Assignment A1 has due date T_due; current time T_sub is strictly before T_due (T_sub < T_due); Student S1 is enrolled and submits conforming payload.",
+    "action_or_input": "Student S1 submits work for assignment A1 at timestamp T_sub.",
+    "expected_result": "Submission is accepted and recorded; submission status is marked as 'submitted' and timestamp T_sub is stored.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-LMS-028",
+    "source_id": "BR-LMS-014 student-own-submission-view",
+    "purpose": "Verify that a Student can view their own submission history and status.",
+    "preconditions": "Student S1 has submitted work for assignment A1 in course C101; Student S1 is authenticated.",
+    "action_or_input": "Student S1 requests their submission history and status for assignment A1.",
+    "expected_result": "Request succeeds (HTTP 200); Student S1's own submission details, timestamp, and status ('submitted') are returned.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-029",
+    "source_id": "BR-LMS-014 other-student-submission-prohibited",
+    "purpose": "Verify that a Student cannot view another student's submission history or status.",
+    "preconditions": "Student S1 and Student S2 are enrolled in C101; Student S2 has submitted work for assignment A1; Student S1 is authenticated.",
+    "action_or_input": "Student S1 attempts to view Student S2's submission history or status for assignment A1.",
+    "expected_result": "Access is denied (HTTP 403 Forbidden); Student S2's submission details are not returned.",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TC-LMS-030",
+    "source_id": "BR-LMS-015 faculty-grading-attribution",
+    "purpose": "Verify that Faculty can grade an individual submission and the grading action is attributed to the Faculty user.",
+    "preconditions": "Faculty F1 is assigned to C101; Student S1 has submitted work for assignment A1; Faculty F1 is authenticated.",
+    "action_or_input": "Faculty F1 submits points (85) and feedback ('Well done') for Student S1's submission.",
+    "expected_result": "Grade and feedback are saved; audit record attributes Faculty F1 as the grader.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-031",
+    "source_id": "BR-LMS-015 ta-grading-attribution",
+    "purpose": "Verify that a TA can grade an individual submission and the grading action is attributed to the TA user.",
+    "preconditions": "TA T1 is assigned to C101; Student S1 has submitted work for assignment A1; TA T1 is authenticated.",
+    "action_or_input": "TA T1 submits points (80) and feedback ('Good effort') for Student S1's submission.",
+    "expected_result": "Grade and feedback are saved; audit record attributes TA T1 as the grader.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-032",
+    "source_id": "BR-LMS-015 unauthorized-grading-prohibited",
+    "purpose": "Verify that an unauthorized user (such as a Student or Observer) cannot grade a submission.",
+    "preconditions": "Student S1 and Observer O1 are associated with C101; Student S2 has submitted work for assignment A1.",
+    "action_or_input": "Student S1 (and Observer O1) attempts to submit a grade and feedback for Student S2's submission.",
+    "expected_result": "Grading attempt is denied (HTTP 403 Forbidden); submission grade remains unchanged.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-033",
+    "source_id": "BR-LMS-016 draft-grade-hidden-from-student",
+    "purpose": "Verify that grades and feedback in Draft state are invisible to the Student.",
+    "preconditions": "Submission of Student S1 has been graded by Faculty/TA; grade and feedback are saved in Draft state (unreleased); Student S1 is authenticated.",
+    "action_or_input": "Student S1 views the assignment and course grade page.",
+    "expected_result": "Draft grade and feedback are not visible to Student S1; grade status indicates pending release.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-LMS-034",
+    "source_id": "BR-LMS-016 released-grade-visible-to-student",
+    "purpose": "Verify that once grades are released, the Student can view their grade and feedback.",
+    "preconditions": "Submission of Student S1 has been graded and the grade has been released; Student S1 is authenticated.",
+    "action_or_input": "Student S1 views the assignment and course grade page.",
+    "expected_result": "Released grade (points) and feedback are visible to Student S1 (HTTP 200).",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-LMS-035",
+    "source_id": "BR-LMS-017 faculty-grade-release",
+    "purpose": "Verify that Faculty has the authority to release grades and feedback to Students.",
+    "preconditions": "Faculty F1 is assigned to C101; draft grades exist for assignment A1 submissions; Faculty F1 is authenticated.",
+    "action_or_input": "Faculty F1 triggers the grade release action for assignment A1.",
+    "expected_result": "Grades transition from Draft to Released state; release action succeeds (HTTP 200).",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-036",
+    "source_id": "BR-LMS-017 ta-grade-release-prohibited",
+    "purpose": "Verify that a TA cannot release grades and that TA grading does not by itself release grades.",
+    "preconditions": "TA T1 is assigned to C101; draft grades exist for assignment A1; TA T1 is authenticated.",
+    "action_or_input": "TA T1 attempts to trigger the grade release action for assignment A1.",
+    "expected_result": "Action is denied (HTTP 403 Forbidden); grades remain in Draft state and are not released to students.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-037",
+    "source_id": "BR-LMS-018 student-view-released-grade-read-only",
+    "purpose": "Verify that after grade release, a Student views their own grade and feedback strictly in read-only form.",
+    "preconditions": "Grade and feedback for Student S1's submission have been released by Faculty; Student S1 is authenticated.",
+    "action_or_input": "Student S1 requests their grade and feedback details.",
+    "expected_result": "Grade and feedback are presented in read-only form; no edit controls or input fields are available to Student S1.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-038",
+    "source_id": "BR-LMS-018 student-edit-grade-prohibited",
+    "purpose": "Verify that a Student cannot perform write or edit operations on their released grade or feedback.",
+    "preconditions": "Grade and feedback for Student S1's submission have been released; Student S1 is authenticated.",
+    "action_or_input": "Student S1 sends an update/PUT/PATCH request attempting to modify points or feedback of their submission.",
+    "expected_result": "Request is rejected (HTTP 403 Forbidden); grade and feedback remain unaltered.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-LMS-039",
+    "source_id": "BR-LMS-019 post-release-grade-change-logged",
+    "purpose": "Verify that whenever a released grade is changed, an audit record is logged with the actor identity and timestamp.",
+    "preconditions": "Submission for Student S1 in C101 has a released grade (points: 85); Faculty F1 is authenticated.",
+    "action_or_input": "Faculty F1 updates the released grade to points: 90 with updated feedback at timestamp T_change.",
+    "expected_result": "Grade is updated to 90 and an audit log entry is created recording Faculty F1's user ID, timestamp T_change, previous grade (85), and new grade (90).",
+    "test_type": "audit"
+  }
+]
