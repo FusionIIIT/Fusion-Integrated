@@ -1,5 +1,5 @@
 # Spec tests: gymkhana
-Student 1 (git author name): Ayushnotafk
+Student 1 (git author name): Aman-022
 Student 2 (git author name): Ayushnotafk
 Design commit (hash and subject): 732e171 Freeze Gymkhana specification-based test designs (FR, BR, UC, WF)
 Baseline commit (hash and subject): e3c1b78 Add gymkhana spec tests and baseline triage log
