@@ -273,10 +273,7 @@ def test_payroll_and_salary_structures_are_outside_hr_eis_write_scope():
     from modules.hreis.registry import PERMISSIONS
 
     assert set(FAMILIES) == {"leave", "appraisal", "ltc", "cpda"}
-    assert all(
-        "payroll" not in code and "salary" not in code
-        for code, _description in PERMISSIONS
-    )
+    assert all("payroll" not in code and "salary" not in code for code, _description in PERMISSIONS)
     assert all(
         model._meta.db_table.startswith("hreis_")
         for model in apps.get_app_config("hreis").get_models()
@@ -291,10 +288,7 @@ def test_iam_role_assignment_and_reassignment_are_not_hr_eis_write_actions():
     from modules.hreis.registry import PERMISSIONS, ROLE_GRANTS
 
     codes = {code for code, _description in PERMISSIONS}
-    assert not any(
-        code.startswith(("hreis.role.", "hreis.designation."))
-        for code in codes
-    )
+    assert not any(code.startswith(("hreis.role.", "hreis.designation.")) for code in codes)
     assert not any(
         "assign-role" in (route.name or "") or "reassign-role" in (route.name or "")
         for route in urlpatterns

@@ -7,9 +7,7 @@ export default defineConfig({
   testDir: "./e2e",
   globalSetup: "./e2e/global-setup.ts",
   fullyParallel: true,
-  // Shared Fusion IAM refreshes the same developer test designations during
-  // sign-in. Serial browsers avoid a uniqueness race in that external IAM
-  // service and keep the full cross-module suite deterministic.
+  // Serial browsers avoid concurrent test-designation refreshes in synthetic IAM.
   workers: 1,
   forbidOnly: CI,
   retries: CI ? 1 : 0,

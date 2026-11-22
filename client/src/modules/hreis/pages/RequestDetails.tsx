@@ -30,9 +30,10 @@ export function RequestDetailsContent({ id }: { id: number }) {
       {!!data.claim_summary?.status_history?.length && <>
         <Text fw={600}>Reported financial status history</Text>
         {data.claim_summary.status_history.map((event, index) => <Card withBorder key={index}>
-          <Text fw={600}>{label(event.payment_status)}</Text>
+          <Text fw={600}>{label(event.payment_status ?? "External status unavailable")}</Text>
           <Text size="sm" style={{ overflowWrap: "anywhere" }}>
-            {event.source_system}: {event.external_status_reference}
+            {event.source_system && event.external_status_reference
+              ? `${event.source_system}: ${event.external_status_reference}` : "Awaiting a verified external report"}
           </Text>
           <Text size="xs" c="dimmed">{new Date(event.recorded_at).toLocaleString()}</Text>
         </Card>)}

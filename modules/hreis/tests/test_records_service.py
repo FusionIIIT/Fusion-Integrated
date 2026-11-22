@@ -10,9 +10,9 @@ from core.api.exceptions import (
     NotFoundError,
     PermissionDeniedError,
 )
-from fusion_auth.principal import Principal
 from modules.hreis.models import AuditEvent, EmployeeServiceRecord, ServiceRecordRevision
 from modules.hreis.services import records
+from modules.hreis.tests.actors import Principal
 
 pytestmark = pytest.mark.django_db
 
@@ -240,8 +240,11 @@ def test_hr_administrator_cannot_create_or_mutate_own_official_service_record(ne
     assert not EmployeeServiceRecord.objects.exists()
 
     own = EmployeeServiceRecord.objects.create(
-        user_id=99, appointment_details={}, department="CSE",
-        designation_snapshot="HR administrator", service_history=[],
+        user_id=99,
+        appointment_details={},
+        department="CSE",
+        designation_snapshot="HR administrator",
+        service_history=[],
         revision=1,
     )
     with pytest.raises(NotFoundError) as denied_update:

@@ -3,6 +3,8 @@
 from django.db import models
 from django.db.models import Q
 
+MAX_POLICY_VERSION = 2_147_483_647
+
 
 class HRPolicyVersion(models.Model):
     family = models.CharField(max_length=40)

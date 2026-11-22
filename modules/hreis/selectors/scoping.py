@@ -1,8 +1,4 @@
-"""Every HR-EIS read starts with active-role and row-level narrowing.
-
-An unauthorized request ID is absent from the queryset, so detail views return
-404 rather than confirming that another employee's record exists.
-"""
+"""Every HR-EIS read starts with active-role and row-level narrowing."""
 
 from __future__ import annotations
 
@@ -60,8 +56,7 @@ def requests_for(actor) -> QuerySet[HRRequest]:
     if actor.active_role in SELF_ROLES:
         return base.filter(user_id=actor.user_id)
     if actor.active_role == "Accounts Admin" and (
-        actor.has_permission("hreis.finance.review")
-        or actor.has_permission("hreis.finance.update")
+        actor.has_permission("hreis.finance.review") or actor.has_permission("hreis.finance.update")
     ):
         return base.filter(
             family__in=["ltc", "cpda"],
@@ -84,7 +79,8 @@ def requests_for(actor) -> QuerySet[HRRequest]:
                 | Q(route_step=0, appraisal__reviewer_user_ids__contains=[actor.user_id])
             )
         return (
-            base.exclude(user_id=actor.user_id).filter(
+            base.exclude(user_id=actor.user_id)
+            .filter(
                 authority_steps__designation=actor.active_role,
                 authority_steps__position=F("route_step"),
             )

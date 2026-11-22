@@ -1,9 +1,4 @@
-"""IAM manifest and server-driven navigation for live HR-EIS routes.
-
-Finance uses a provisional mapping to the existing IAM 'Accounts Admin'
-designation. This is a Student 1 implementation assumption, not proof that
-the institute approved the assignment of financial responsibility.
-"""
+"""IAM manifest and server-driven navigation for live HR-EIS routes."""
 
 MODULE = {
     "code": "hreis",
@@ -183,12 +178,9 @@ NAV_ITEMS = [
     },
 ]
 
-def readiness() -> list[str]:
-    """Explain missing authoritative policy prerequisites before HR-EIS is activated.
 
-    The HR specification intentionally contains no institutional quotas, dated
-    appraisal window or approval matrix. Never replace those with sample defaults.
-    """
+def readiness() -> list[str]:
+    """Explain missing authoritative policy prerequisites before HR-EIS is activated."""
     from django.utils import timezone
 
     from modules.hreis.models import HRPolicyVersion
@@ -204,12 +196,12 @@ def readiness() -> list[str]:
     for family, fields in required.items():
         active = list(
             HRPolicyVersion.objects.filter(
-                family=family, effective_from__lte=now,
+                family=family,
+                effective_from__lte=now,
             ).order_by("-effective_from", "-version")[:2]
         )
         if not active or (
-            active[0].effective_until is not None
-            and active[0].effective_until <= now
+            active[0].effective_until is not None and active[0].effective_until <= now
         ):
             missing.append(
                 f"Publish an approved, currently effective {family.upper()} "
@@ -225,20 +217,26 @@ def readiness() -> list[str]:
             )
             overlapping = previous.effective_until is None or previous.effective_until > now
             if overlapping and not superseded:
-                missing.append(
-                    f"Resolve overlapping effective {family.upper()} policy versions."
-                )
+                missing.append(f"Resolve overlapping effective {family.upper()} policy versions.")
                 continue
-        parameters = active[0].parameters
-        absent = [
-            key for key in fields
-            if not isinstance(parameters, dict)
-            or not isinstance(parameters.get(key), (list, dict))
-            or not parameters[key]
-        ]
-        if absent:
-            missing.append(
-                f"Complete {family.upper()} policy v{active[0].version}: "
+        missing.extend(_incomplete_policy(family, fields, active[0]))
+    return missing
+
+
+def _incomplete_policy(family, fields, policy):
+    parameters = policy.parameters
+    absent = [
+        key
+        for key in fields
+        if not isinstance(parameters, dict)
+        or not isinstance(parameters.get(key), (list, dict))
+        or not parameters[key]
+    ]
+    if absent:
+        return [
+            (
+                f"Complete {family.upper()} policy v{policy.version}: "
                 f"configure {', '.join(absent)} from approved institutional rules."
             )
-    return missing
+        ]
+    return []

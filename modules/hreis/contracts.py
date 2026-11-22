@@ -1,9 +1,4 @@
-"""HR-EIS's read-only inter-module public contract.
-
-These batched projections expose only the minimum records needed by other
-trusted Fusion modules. No caller receives forms, medical reasons, review notes,
-attachment references or service-history content.
-"""
+"""HR-EIS's read-only inter-module public contract."""
 
 from __future__ import annotations
 
@@ -60,9 +55,7 @@ def get_employee_service_summaries(
     }
 
 
-def get_employee_leave_balances(
-    user_ids: Sequence[int], leave_type: str
-) -> dict[int, Decimal]:
+def get_employee_leave_balances(user_ids: Sequence[int], leave_type: str) -> dict[int, Decimal]:
     from modules.hreis.domain.leave import LEAVE_TYPES
 
     if leave_type not in LEAVE_TYPES:
@@ -87,9 +80,7 @@ def get_request_statuses(
     if not ids:
         return {}
     return {
-        row.pk: RequestStatusDTO(
-            request_id=row.pk, family=row.family, state=row.state
-        )
+        row.pk: RequestStatusDTO(request_id=row.pk, family=row.family, state=row.state)
         for row in HRRequest.objects.filter(pk__in=ids)
     }
 
@@ -101,7 +92,8 @@ def get_approved_claim_statuses(
     if not ids:
         return {}
     rows = HRRequest.objects.filter(
-        pk__in=ids, family__in=("ltc", "cpda"),
+        pk__in=ids,
+        family__in=("ltc", "cpda"),
         state__in=("approved", "financial_processing_recorded"),
     ).select_related("claim")
     return {
@@ -111,7 +103,8 @@ def get_approved_claim_statuses(
             state=row.state,
             externally_reported_payment_status=(
                 row.claim.financial_processing_details.get("payment_status")
-                if row.state == "financial_processing_recorded" else None
+                if row.state == "financial_processing_recorded"
+                else None
             ),
         )
         for row in rows

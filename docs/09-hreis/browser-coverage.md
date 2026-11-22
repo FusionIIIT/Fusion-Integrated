@@ -80,3 +80,25 @@ These tests cover implemented module boundaries. They do not certify external
 payments, document storage, institutional policies, Student 2 approvals or the
 independent specification suites. Those boundaries remain explicit in the quality
 report and traceability record.
+
+Both HR-UC-012 A1 and HR-UC-016 A1 also record processing with no invented
+external source, reference or status. The owner sees an unavailable-status
+history entry. Later status updates have separate immutable entries.
+
+The expanded suite has 58 cases, including 49 HR-EIS cases. It exercises all
+twelve registry designations and every protected deep link with a module grant
+but no corresponding permission. Temporary IAM permissions are snapshotted,
+restored and followed by a session refresh; the runner also restores a leftover
+snapshot during failure cleanup. The keyboard-only leave case uses Tab,
+typing and Enter throughout submission.
+
+Set `E2E_EVIDENCE_DIR` to retain actor observations and runserver logs. Generate
+the reviewable walkthrough with:
+
+```bash
+.venv/bin/python ops/docs/hreis_browser_walkthrough.py "$E2E_EVIDENCE_DIR"
+```
+
+The generator refuses unsuccessful scenarios or request observations without
+matching actual method/path/status/timestamp log evidence. The committed
+`browser-walkthrough.md` is a synthetic execution record, not an external-provider certificate.

@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from django.db import transaction
-from django.utils import timezone
-from drf_spectacular.utils import OpenApiExample, extend_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,6 +10,7 @@ from rest_framework.views import APIView
 from core.api.exceptions import BadRequestError, NotFoundError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.hreis.api import serializers as s
+from modules.hreis.api.examples import operation_examples
 from modules.hreis.api.throttles import HREISWriteThrottleMixin
 from modules.hreis.domain.routing import AUTHORITY_DESIGNATIONS
 from modules.hreis.selectors import scoping
@@ -22,6 +21,9 @@ from modules.hreis.services import (
     policies,
     records,
     transitions,
+)
+from modules.hreis.services import (
+    notifications as notification_services,
 )
 from modules.hreis.services import requests as request_services
 
@@ -39,6 +41,7 @@ class MyRecordView(APIView):
     permission_classes = [MODULE, VIEW_RECORD]
 
     @extend_schema(
+        examples=operation_examples(None, "RecordReadSerializer", "MyRecordView"),
         responses={200: s.RecordReadSerializer},
         summary="Read the current employee's own service record",
     )
@@ -49,7 +52,11 @@ class MyRecordView(APIView):
             .first()
         )
         if record is None:
-            raise NotFoundError("No accessible service record was found.", code="record_not_found")
+            raise NotFoundError(
+                "No accessible service record was found. Refresh your current HR view or contact "
+                "HR for help.",
+                code="record_not_found",
+            )
         return Response(s.RecordReadSerializer(record).data)
 
 
@@ -66,6 +73,7 @@ class RecordListCreateView(HREISWriteThrottleMixin, generics.ListAPIView):
         return scoping.service_records_for(_actor(self.request)).order_by("user_id")
 
     @extend_schema(
+        examples=operation_examples(None, "RecordReadSerializer", "RecordListCreateView"),
         responses={200: s.RecordReadSerializer(many=True)},
         summary="List employee records visible to this role",
     )
@@ -75,19 +83,9 @@ class RecordListCreateView(HREISWriteThrottleMixin, generics.ListAPIView):
     @extend_schema(
         request=s.RecordCreateSerializer,
         responses={201: s.RecordReadSerializer},
-        examples=[
-            OpenApiExample(
-                "Service record",
-                request_only=True,
-                value={
-                    "user_id": 42,
-                    "appointment_details": {"date": "2026-01-01"},
-                    "department": "CSE",
-                    "designation_snapshot": "Professor",
-                    "service_history": [],
-                },
-            )
-        ],
+        examples=operation_examples(
+            "RecordCreateSerializer", "RecordReadSerializer", "RecordListCreateView"
+        ),
     )
     def post(self, request):
         payload = s.RecordCreateSerializer(data=request.data)
@@ -117,25 +115,26 @@ class RecordDetailView(HREISWriteThrottleMixin, APIView):
         )
 
     @extend_schema(
+        examples=operation_examples(None, "RecordReadSerializer", "RecordDetailView"),
         responses={200: s.RecordReadSerializer},
         summary="Read a service record within this role's row scope",
     )
     def get(self, request, pk):
         row = scoping.service_records_for(_actor(request)).filter(pk=pk).first()
         if row is None:
-            raise NotFoundError("No accessible service record was found.", code="record_not_found")
+            raise NotFoundError(
+                "No accessible service record was found. Refresh your current HR view or contact "
+                "HR for help.",
+                code="record_not_found",
+            )
         return Response(s.RecordReadSerializer(row).data)
 
     @extend_schema(
         request=s.RecordUpdateSerializer,
         responses={200: s.RecordReadSerializer},
-        examples=[
-            OpenApiExample(
-                "Revision",
-                request_only=True,
-                value={"expected_revision": 1, "department": "Design"},
-            )
-        ],
+        examples=operation_examples(
+            "RecordUpdateSerializer", "RecordReadSerializer", "RecordDetailView"
+        ),
     )
     def patch(self, request, pk):
         payload = s.RecordUpdateSerializer(data=request.data)
@@ -144,7 +143,8 @@ class RecordDetailView(HREISWriteThrottleMixin, APIView):
         expected_revision = data.pop("expected_revision")
         if not data:
             raise BadRequestError(
-                "No official field was supplied for update.", code="empty_service_fields"
+                "No official field was supplied for update. Check the submitted fields and retry.",
+                code="empty_service_fields",
             )
         row = records.update_record(
             _actor(request),
@@ -159,7 +159,13 @@ class RecordDetailView(HREISWriteThrottleMixin, APIView):
 class ReviewerAssignmentView(HREISWriteThrottleMixin, APIView):
     permission_classes = [MODULE, HasPermission("hreis.appraisal.assign")]
 
-    @extend_schema(request=s.ReviewerAssignmentSerializer, responses={200: s.RequestReadSerializer})
+    @extend_schema(
+        examples=operation_examples(
+            "ReviewerAssignmentSerializer", "RequestReadSerializer", "ReviewerAssignmentView"
+        ),
+        request=s.ReviewerAssignmentSerializer,
+        responses={200: s.RequestReadSerializer},
+    )
     def post(self, request, pk):
         payload = s.ReviewerAssignmentSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
@@ -175,7 +181,13 @@ class ReviewerAssignmentView(HREISWriteThrottleMixin, APIView):
 class AppraisalDecisionView(HREISWriteThrottleMixin, APIView):
     permission_classes = [MODULE, HasPermission("hreis.appraisal.approve")]
 
-    @extend_schema(request=s.AppraisalDecisionSerializer, responses={200: s.RequestReadSerializer})
+    @extend_schema(
+        examples=operation_examples(
+            "AppraisalDecisionSerializer", "RequestReadSerializer", "AppraisalDecisionView"
+        ),
+        request=s.AppraisalDecisionSerializer,
+        responses={200: s.RequestReadSerializer},
+    )
     def post(self, request, pk):
         payload = s.AppraisalDecisionSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
@@ -191,7 +203,13 @@ class AppraisalDecisionView(HREISWriteThrottleMixin, APIView):
 class ClaimReviewView(HREISWriteThrottleMixin, APIView):
     permission_classes = [MODULE, HasPermission("hreis.claim.review")]
 
-    @extend_schema(request=s.ClaimReviewSerializer, responses={200: s.RequestReadSerializer})
+    @extend_schema(
+        examples=operation_examples(
+            "ClaimReviewSerializer", "RequestReadSerializer", "ClaimReviewView"
+        ),
+        request=s.ClaimReviewSerializer,
+        responses={200: s.RequestReadSerializer},
+    )
     def post(self, request, pk):
         payload = s.ClaimReviewSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
@@ -208,6 +226,9 @@ class FinancialReviewView(HREISWriteThrottleMixin, APIView):
     permission_classes = [MODULE, HasPermission("hreis.finance.review")]
 
     @extend_schema(
+        examples=operation_examples(
+            "FinancialReviewSerializer", "FinancialReviewReadSerializer", "FinancialReviewView"
+        ),
         request=s.FinancialReviewSerializer,
         responses={200: s.FinancialReviewReadSerializer},
         summary="Independently attest financial correctness of an approved HR claim",
@@ -216,7 +237,8 @@ class FinancialReviewView(HREISWriteThrottleMixin, APIView):
         payload = s.FinancialReviewSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         review = finance.verify_financial_correctness(
-            _actor(request), request_id=pk,
+            _actor(request),
+            request_id=pk,
             **payload.validated_data,
             idempotency_key=request.headers.get("Idempotency-Key", ""),
         )
@@ -227,7 +249,11 @@ class FinancialProcessingView(HREISWriteThrottleMixin, APIView):
     permission_classes = [MODULE, HasPermission("hreis.finance.update")]
 
     @extend_schema(
-        request=s.FinancialProcessingSerializer, responses={200: s.RequestReadSerializer},
+        examples=operation_examples(
+            "FinancialProcessingSerializer", "RequestReadSerializer", "FinancialProcessingView"
+        ),
+        request=s.FinancialProcessingSerializer,
+        responses={200: s.RequestReadSerializer},
         summary="Record externally referenced Accountant financial processing",
     )
     def post(self, request, pk):
@@ -244,10 +270,17 @@ class FinancialProcessingView(HREISWriteThrottleMixin, APIView):
 
 class RequestDecisionView(HREISWriteThrottleMixin, APIView):
     permission_classes = [
-        MODULE, HasPermission("hreis.leave.approve", "hreis.claim.approve"),
+        MODULE,
+        HasPermission("hreis.leave.approve", "hreis.claim.approve"),
     ]
 
-    @extend_schema(request=s.DecisionSerializer, responses={200: s.RequestReadSerializer})
+    @extend_schema(
+        examples=operation_examples(
+            "DecisionSerializer", "RequestReadSerializer", "RequestDecisionView"
+        ),
+        request=s.DecisionSerializer,
+        responses={200: s.RequestReadSerializer},
+    )
     def post(self, request, pk):
         payload = s.DecisionSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
@@ -264,6 +297,11 @@ class VerifiedLeaveCreditView(HREISWriteThrottleMixin, APIView):
     permission_classes = [MODULE, HasPermission("hreis.balance.manage")]
 
     @extend_schema(
+        examples=operation_examples(
+            "VerifiedLeaveCreditSerializer",
+            "VerifiedLeaveCreditReadSerializer",
+            "VerifiedLeaveCreditView",
+        ),
         request=s.VerifiedLeaveCreditSerializer,
         responses={201: s.VerifiedLeaveCreditReadSerializer},
         summary="Record HR-verified leave entitlement credit against an explicit source",
@@ -284,7 +322,13 @@ class VerifiedLeaveCreditView(HREISWriteThrottleMixin, APIView):
 class LeaveSubmitView(HREISWriteThrottleMixin, APIView):
     permission_classes = [MODULE, HasPermission("hreis.leave.create")]
 
-    @extend_schema(request=s.LeaveSubmitSerializer, responses={201: s.RequestReadSerializer})
+    @extend_schema(
+        examples=operation_examples(
+            "LeaveSubmitSerializer", "RequestReadSerializer", "LeaveSubmitView"
+        ),
+        request=s.LeaveSubmitSerializer,
+        responses={201: s.RequestReadSerializer},
+    )
     def post(self, request):
         payload = s.LeaveSubmitSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
@@ -299,7 +343,13 @@ class LeaveSubmitView(HREISWriteThrottleMixin, APIView):
 class ClaimSubmitView(HREISWriteThrottleMixin, APIView):
     permission_classes = [MODULE, HasPermission("hreis.claim.create")]
 
-    @extend_schema(request=s.ClaimSubmitSerializer, responses={201: s.RequestReadSerializer})
+    @extend_schema(
+        examples=operation_examples(
+            "ClaimSubmitSerializer", "RequestReadSerializer", "ClaimSubmitView"
+        ),
+        request=s.ClaimSubmitSerializer,
+        responses={201: s.RequestReadSerializer},
+    )
     def post(self, request):
         payload = s.ClaimSubmitSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
@@ -314,7 +364,13 @@ class ClaimSubmitView(HREISWriteThrottleMixin, APIView):
 class AppraisalSubmitView(HREISWriteThrottleMixin, APIView):
     permission_classes = [MODULE, HasPermission("hreis.appraisal.create")]
 
-    @extend_schema(request=s.AppraisalSubmitSerializer, responses={201: s.RequestReadSerializer})
+    @extend_schema(
+        examples=operation_examples(
+            "AppraisalSubmitSerializer", "RequestReadSerializer", "AppraisalSubmitView"
+        ),
+        request=s.AppraisalSubmitSerializer,
+        responses={201: s.RequestReadSerializer},
+    )
     def post(self, request):
         payload = s.AppraisalSubmitSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
@@ -340,6 +396,7 @@ class PolicyListCreateView(HREISWriteThrottleMixin, generics.ListAPIView):
         return HRPolicyVersion.objects.order_by("-effective_from", "-version")
 
     @extend_schema(
+        examples=operation_examples(None, "PolicyReadSerializer", "PolicyListCreateView"),
         responses={200: s.PolicyReadSerializer(many=True)},
         summary="Read configured institutional HR policy revisions",
     )
@@ -350,6 +407,9 @@ class PolicyListCreateView(HREISWriteThrottleMixin, generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
     @extend_schema(
+        examples=operation_examples(
+            "PolicyCreateSerializer", "PolicyReadSerializer", "PolicyListCreateView"
+        ),
         request=s.PolicyCreateSerializer,
         responses={201: s.PolicyReadSerializer},
         summary="Record an explicit immutable HR policy version",
@@ -370,12 +430,12 @@ class ComplianceRequestListView(generics.ListAPIView):
     permission_classes = [MODULE, HasPermission("hreis.audit.view")]
 
     def get_queryset(self):
-        return (
-            scoping.compliance_requests_for(_actor(self.request))
-            .order_by("-created_at", "-pk")
-        )
+        return scoping.compliance_requests_for(_actor(self.request)).order_by("-created_at", "-pk")
 
     @extend_schema(
+        examples=operation_examples(
+            None, "ComplianceRequestSerializer", "ComplianceRequestListView"
+        ),
         responses={200: s.ComplianceRequestSerializer(many=True)},
         summary="HR-only compliance status of all requests, excluding private forms",
     )
@@ -387,6 +447,9 @@ class ComplianceRequestDetailView(APIView):
     permission_classes = [MODULE, HasPermission("hreis.audit.view")]
 
     @extend_schema(
+        examples=operation_examples(
+            None, "ComplianceRequestSerializer", "ComplianceRequestDetailView"
+        ),
         responses={200: s.ComplianceRequestSerializer},
         summary="Read a single redacted HR compliance request status",
     )
@@ -394,7 +457,9 @@ class ComplianceRequestDetailView(APIView):
         row = scoping.compliance_requests_for(_actor(request)).filter(pk=pk).first()
         if row is None:
             raise NotFoundError(
-                "No accessible compliance status was found.", code="compliance_not_found"
+                "No accessible compliance status was found. Refresh your current HR view or "
+                "contact HR for help.",
+                code="compliance_not_found",
             )
         return Response(s.ComplianceRequestSerializer(row).data)
 
@@ -412,6 +477,7 @@ class RequestListView(generics.ListAPIView):
         )
 
     @extend_schema(
+        examples=operation_examples(None, "RequestReadSerializer", "RequestListView"),
         responses={200: s.RequestReadSerializer(many=True)},
         summary="Track HR requests in the current acting role's scope",
     )
@@ -441,6 +507,7 @@ class ApprovalQueueView(generics.ListAPIView):
         )
 
     @extend_schema(
+        examples=operation_examples(None, "RequestReadSerializer", "ApprovalQueueView"),
         responses={200: s.RequestReadSerializer(many=True)},
         summary="Current HR-EIS approval queue for the actor's designated role",
     )
@@ -452,6 +519,7 @@ class RequestDetailView(APIView):
     permission_classes = [MODULE, HasPermission("hreis.request.view")]
 
     @extend_schema(
+        examples=operation_examples(None, "RequestDetailReadSerializer", "RequestDetailView"),
         responses={200: s.RequestDetailReadSerializer},
         summary="Read one request only within the current role's server-side scope",
     )
@@ -464,7 +532,11 @@ class RequestDetailView(APIView):
             .first()
         )
         if row is None:
-            raise NotFoundError("No accessible HR request was found.", code="request_not_found")
+            raise NotFoundError(
+                "No accessible HR request was found. Refresh your current HR view or contact HR "
+                "for help.",
+                code="request_not_found",
+            )
         return Response(s.RequestDetailReadSerializer(row).data)
 
 
@@ -472,6 +544,7 @@ class MyLeaveBalancesView(APIView):
     permission_classes = [MODULE, VIEW_RECORD]
 
     @extend_schema(
+        examples=operation_examples(None, "MyLeaveBalancesSerializer", "MyLeaveBalancesView"),
         summary="Read the authenticated user's verified ledger balances",
         responses={200: s.MyLeaveBalancesSerializer},
     )
@@ -479,49 +552,30 @@ class MyLeaveBalancesView(APIView):
         actor = _actor(request)
         record = scoping.service_records_for(actor).filter(user_id=actor.user_id).first()
         if record is None:
-            raise NotFoundError("No service record is accessible.", code="record_not_found")
-        return Response({
-            "user_id": actor.user_id,
-            "leave_balances": s.RecordReadSerializer(record).data["leave_balances"],
-        })
+            raise NotFoundError(
+                "No service record is accessible. Refresh your current HR view or contact HR for "
+                "help.",
+                code="record_not_found",
+            )
+        return Response(
+            {
+                "user_id": actor.user_id,
+                "leave_balances": s.RecordReadSerializer(record).data["leave_balances"],
+            }
+        )
 
 
 class NotificationMarkReadView(HREISWriteThrottleMixin, APIView):
     permission_classes = [MODULE, HasPermission("hreis.notification.view")]
 
     @extend_schema(
+        examples=operation_examples(None, "NotificationReadSerializer", "NotificationMarkReadView"),
         request=None,
         responses={200: s.NotificationReadSerializer},
         summary="Mark one of the current user's notifications as read",
     )
-    @transaction.atomic
     def post(self, request, pk):
-        from modules.hreis.models import AuditEvent
-
-        actor = _actor(request)
-        row = (
-            scoping.notifications_for(actor)
-            .select_for_update()
-            .filter(pk=pk)
-            .first()
-        )
-        if row is None:
-            raise NotFoundError(
-                "No accessible notification was found.", code="notification_not_found"
-            )
-        if row.read_at is None:
-            row.read_at = timezone.now()
-            row.save(update_fields=["read_at"])
-            AuditEvent.objects.create(
-                event_key=f"notification-read:{row.pk}:{actor.user_id}",
-                actor_user_id=actor.user_id,
-                acting_designation=actor.active_role,
-                subject_user_id=actor.user_id,
-                action="notification_read",
-                resource_kind="notification",
-                resource_id=row.pk,
-                data={},
-            )
+        row = notification_services.mark_notification_read(_actor(request), notification_id=pk)
         return Response(s.NotificationReadSerializer(row).data)
 
 
@@ -533,6 +587,7 @@ class NotificationListView(generics.ListAPIView):
         return scoping.notifications_for(_actor(self.request)).order_by("-created_at", "-pk")
 
     @extend_schema(
+        examples=operation_examples(None, "NotificationReadSerializer", "NotificationListView"),
         responses={200: s.NotificationReadSerializer(many=True)},
         summary="See notifications addressed to the current employee",
     )
@@ -548,6 +603,7 @@ class AuditListView(generics.ListAPIView):
         return scoping.audit_events_for(_actor(self.request)).order_by("-recorded_at", "-pk")
 
     @extend_schema(
+        examples=operation_examples(None, "AuditReadSerializer", "AuditListView"),
         responses={200: s.AuditReadSerializer(many=True)},
         summary="View role-restricted HR compliance audit history",
     )

@@ -1,8 +1,4 @@
-"""Audited HR workflow decisions by the currently assigned authority.
-
-Only a verified IAM active designation may act. Every decision snapshots one
-state transition and notification in the same database transaction.
-"""
+"""Audited HR workflow decisions by the currently assigned authority."""
 
 from __future__ import annotations
 
@@ -23,10 +19,31 @@ from modules.hreis.models import (
     OutboxEvent,
 )
 from modules.hreis.services.authz import require
-from modules.hreis.services.requests import _key, _route
+from modules.hreis.services.requests import _freeze_route, _key, _route
 
 _ADMIN = frozenset({"hradmin"})
 _AUTHORITY = routing.AUTHORITY_DESIGNATIONS
+
+
+def _decision_notification(row, move, key):
+    Notification.objects.create(
+        event_key=f"notification:{key}",
+        recipient_user_id=row.user_id,
+        request=row,
+        title=f"{row.family.upper()} request: {move.event}",
+        message=f"Your request is now {move.target.replace('_', ' ')}.",
+    )
+    OutboxEvent.objects.create(
+        event_key=f"outbox:{key}",
+        event_type="hreis.notification",
+        payload={
+            "request_id": row.pk,
+            "subject_user_id": row.user_id,
+            "family": row.family,
+            "state": row.state,
+            "event": move.event,
+        },
+    )
 
 
 def _append(actor, row, move, key, *, reason="", step_after=None):
@@ -64,24 +81,56 @@ def _append(actor, row, move, key, *, reason="", step_after=None):
             "specification": move.specification,
         },
     )
-    Notification.objects.create(
-        event_key=f"notification:{key}",
-        recipient_user_id=row.user_id,
-        request=row,
-        title=f"{row.family.upper()} request: {move.event}",
-        message=f"Your request is now {move.target.replace('_', ' ')}.",
+    _decision_notification(row, move, key)
+    return row
+
+
+def _verified_claim_route(row):
+    employee = EmployeeServiceRecord.objects.filter(user_id=row.user_id).first()
+    if employee is None:
+        raise ConflictError(
+            "Employee service record is missing. Contact HR to resolve this before retrying.",
+            code="employee_record_missing",
+        )
+    from modules.directory.contracts import get_users
+
+    user = get_users([row.user_id]).get(row.user_id)
+    if user is None or user.kind not in {"faculty", "staff"}:
+        raise ConflictError(
+            "Employee category cannot be independently verified. Contact HR to resolve this "
+            "before retrying.",
+            code="employee_identity_unavailable",
+        )
+    if row.policy_version_id is None:
+        raise ConflictError(
+            "Claim has no frozen institutional policy. Contact HR to resolve this before retrying.",
+            code="policy_unavailable",
+        )
+    return _route(row.family, user.kind, employee.department, row.policy_version)
+
+
+def _pending_claim_for_review(actor, request_id):
+    row = (
+        HRRequest.objects.select_for_update()
+        .filter(
+            pk=request_id,
+            family__in=("ltc", "cpda"),
+            state=workflow.AWAITING_HR_VERIFICATION,
+        )
+        .first()
     )
-    OutboxEvent.objects.create(
-        event_key=f"outbox:{key}",
-        event_type="hreis.notification",
-        payload={
-            "request_id": row.pk,
-            "subject_user_id": row.user_id,
-            "family": row.family,
-            "state": row.state,
-            "event": move.event,
-        },
-    )
+    if row is None:
+        raise NotFoundError(
+            "No pending HR-verification claim was found. Refresh your current HR view or "
+            "contact HR for help.",
+            code="claim_not_pending_verification",
+        )
+    if row.user_id == actor.user_id:
+        raise NotFoundError(
+            "No claim is assigned to you for independent review. Refresh your current HR view "
+            "or contact HR for help.",
+            code="claim_not_assigned",
+        )
     return row
 
 
@@ -96,23 +145,7 @@ def verify_claim(
 ) -> HRRequest:
     require(actor, "hreis.claim.review", allowed_roles=_ADMIN)
     key = _key(idempotency_key)
-    row = (
-        HRRequest.objects.select_for_update()
-        .filter(
-            pk=request_id,
-            family__in=("ltc", "cpda"),
-            state=workflow.AWAITING_HR_VERIFICATION,
-        )
-        .first()
-    )
-    if row is None:
-        raise NotFoundError(
-            "No pending HR-verification claim was found.", code="claim_not_pending_verification"
-        )
-    if row.user_id == actor.user_id:
-        raise NotFoundError(
-            "No claim is assigned to you for independent review.", code="claim_not_assigned"
-        )
+    row = _pending_claim_for_review(actor, request_id)
     if (
         not isinstance(document_review_reference, str)
         or not document_review_reference.strip()
@@ -123,20 +156,7 @@ def verify_claim(
             "Record the evidence and eligibility basis of HR review.",
             code="missing_review_evidence",
         )
-    employee = EmployeeServiceRecord.objects.filter(user_id=row.user_id).first()
-    if employee is None:
-        raise ConflictError("Employee service record is missing.", code="employee_record_missing")
-    from modules.directory.contracts import get_users
-
-    user = get_users([row.user_id]).get(row.user_id)
-    if user is None or user.kind not in {"faculty", "staff"}:
-        raise ConflictError(
-            "Employee category cannot be independently verified.",
-            code="employee_identity_unavailable",
-        )
-    if row.policy_version_id is None:
-        raise ConflictError("Claim has no frozen institutional policy.", code="policy_unavailable")
-    route = _route(row.family, user.kind, employee.department, row.policy_version)
+    route = _verified_claim_route(row)
     guards = {
         "documents_verified": True,
         "eligibility_verified": True,
@@ -152,13 +172,7 @@ def verify_claim(
     )
     row.claim.hr_verified_by_user_id = actor.user_id
     row.claim.save(update_fields=["hr_verified_by_user_id"])
-    for position, designation in enumerate(route.authorities):
-        ApprovalRouteStep.objects.create(
-            request=row,
-            position=position,
-            designation=designation,
-            policy_version_label=route.version,
-        )
+    _freeze_route(row, route)
     return _append(
         actor,
         row,
@@ -173,7 +187,8 @@ def _route_snapshot(row) -> routing.ApprovalRoute:
     steps = list(ApprovalRouteStep.objects.filter(request=row).order_by("position"))
     if not steps or [s.position for s in steps] != list(range(len(steps))):
         raise ConflictError(
-            "The frozen approval route is unavailable.", code="route_snapshot_missing"
+            "The frozen approval route is unavailable. Contact HR to resolve this before retrying.",
+            code="route_snapshot_missing",
         )
     return routing.ApprovalRoute(
         family=row.family,
@@ -184,53 +199,9 @@ def _route_snapshot(row) -> routing.ApprovalRoute:
     )
 
 
-@transaction.atomic
-def decide_request(
-    actor, *, request_id: int, event: str, reason: str, idempotency_key: str
-) -> HRRequest:
-    if event not in {"approve", "reject", "forward"}:
-        raise BadRequestError("Choose approve, reject or forward.", code="invalid_decision")
-    # This endpoint supports leave/LTC/CPDA. Annual appraisal has a distinct
-    # finalization and reviewer-assignment procedure.
-    row = (
-        HRRequest.objects.select_for_update()
-        .filter(
-            pk=request_id,
-            family__in=("leave", "ltc", "cpda"),
-            state=workflow.PENDING_AUTHORITY,
-        )
-        .first()
-    )
-    if row is None:
-        raise NotFoundError("No pending approval request was found.", code="request_not_pending")
-    if row.user_id == getattr(actor, "user_id", None):
-        raise NotFoundError(
-            "No request is assigned to your current role.", code="request_not_assigned"
-        )
-    permission = "hreis.leave.approve" if row.family == "leave" else "hreis.claim.approve"
-    require(actor, permission, allowed_roles=_AUTHORITY)
-    key = _key(idempotency_key)
-    route = _route_snapshot(row)
-    try:
-        routing.require_current_authority(route, row.route_step, actor.active_role)
-    except routing.RouteError as exc:
-        raise NotFoundError(
-            "No request is assigned to your current role.", code="request_not_assigned"
-        ) from exc
-    if event == "reject" and (not isinstance(reason, str) or not reason.strip()):
-        raise BadRequestError("Give the rejection reason.", code="rejection_reason_missing")
-    if event == "approve" and row.route_step != len(route.authorities) - 1:
-        raise ConflictError("Forward to the next assigned authority first.", code="route_not_final")
-    if event == "forward" and row.route_step == len(route.authorities) - 1:
-        raise ConflictError("There is no later approval authority.", code="route_complete")
-    guards = {
-        "current_authority": True,
-        "balance_valid": True,
-        "next_authority_exists": event == "forward",
-    }
+def _approved_leave_duration(row, event):
     if event == "approve" and row.family == "leave":
-        # Serialize all leave approvals for this employee through one stable row,
-        # so two concurrent approvals cannot both spend the same opening balance.
+        # The employee lock prevents concurrent approvals from spending the same balance.
         EmployeeServiceRecord.objects.select_for_update().get(user_id=row.user_id)
         total = leave.ledger_balance(
             LeaveLedgerEntry.objects.filter(
@@ -242,12 +213,82 @@ def decide_request(
             duration = Decimal(row.payload["duration"])
         except (KeyError, ValueError, TypeError) as exc:
             raise ConflictError(
-                "The frozen leave duration is invalid.", code="invalid_leave_duration"
+                "The frozen leave duration is invalid. Contact HR to resolve this before retrying.",
+                code="invalid_leave_duration",
             ) from exc
         if not duration.is_finite() or duration <= 0 or total < duration:
             raise ConflictError(
-                "The employee does not have enough leave balance.", code="insufficient_balance"
+                "The employee does not have enough leave balance. Contact HR to resolve this "
+                "before retrying.",
+                code="insufficient_balance",
             )
+        return duration
+    return None
+
+
+def _require_decision_route(actor, row, route, event, reason):
+    try:
+        routing.require_current_authority(route, row.route_step, actor.active_role)
+    except routing.RouteError as exc:
+        raise NotFoundError(
+            "No request is assigned to your current role. Refresh your current HR view or "
+            "contact HR for help.",
+            code="request_not_assigned",
+        ) from exc
+    if event == "reject" and (not isinstance(reason, str) or not reason.strip()):
+        raise BadRequestError("Give the rejection reason.", code="rejection_reason_missing")
+    if event == "approve" and row.route_step != len(route.authorities) - 1:
+        raise ConflictError("Forward to the next assigned authority first.", code="route_not_final")
+    if event == "forward" and row.route_step == len(route.authorities) - 1:
+        raise ConflictError(
+            "There is no later approval authority. Contact HR to resolve this before retrying.",
+            code="route_complete",
+        )
+
+
+def _pending_decision(actor, request_id):
+    row = (
+        HRRequest.objects.select_for_update()
+        .filter(
+            pk=request_id,
+            family__in=("leave", "ltc", "cpda"),
+            state=workflow.PENDING_AUTHORITY,
+        )
+        .first()
+    )
+    if row is None:
+        raise NotFoundError(
+            "No pending approval request was found. Refresh your current HR view or contact "
+            "HR for help.",
+            code="request_not_pending",
+        )
+    if row.user_id == getattr(actor, "user_id", None):
+        raise NotFoundError(
+            "No request is assigned to your current role. Refresh your current HR view or "
+            "contact HR for help.",
+            code="request_not_assigned",
+        )
+    permission = "hreis.leave.approve" if row.family == "leave" else "hreis.claim.approve"
+    require(actor, permission, allowed_roles=_AUTHORITY)
+    return row
+
+
+@transaction.atomic
+def decide_request(
+    actor, *, request_id: int, event: str, reason: str, idempotency_key: str
+) -> HRRequest:
+    if event not in {"approve", "reject", "forward"}:
+        raise BadRequestError("Choose approve, reject or forward.", code="invalid_decision")
+    row = _pending_decision(actor, request_id)
+    key = _key(idempotency_key)
+    route = _route_snapshot(row)
+    _require_decision_route(actor, row, route, event, reason)
+    guards = {
+        "current_authority": True,
+        "balance_valid": True,
+        "next_authority_exists": event == "forward",
+    }
+    duration = _approved_leave_duration(row, event)
     move = workflow.resolve(
         row.family,
         row.state,

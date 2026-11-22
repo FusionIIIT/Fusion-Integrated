@@ -17,6 +17,7 @@ from modules.hreis.models import (
     LeaveLedgerEntry,
     Notification,
 )
+from modules.hreis.models.policies import MAX_POLICY_VERSION
 
 
 class StrictInputSerializer(serializers.Serializer):
@@ -55,6 +56,8 @@ class RecordListSerializer(serializers.ListSerializer):
 
 
 class RecordReadSerializer(serializers.ModelSerializer):
+    appointment_details = serializers.DictField(child=serializers.JSONField(), read_only=True)
+    service_history = serializers.ListField(child=serializers.JSONField(), read_only=True)
     leave_balances = serializers.SerializerMethodField()
 
     @extend_schema_field(serializers.DictField(child=serializers.CharField()))
@@ -85,14 +88,12 @@ class RecordReadSerializer(serializers.ModelSerializer):
 
 class MyLeaveBalancesSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(read_only=True)
-    leave_balances = serializers.DictField(
-        child=serializers.CharField(), read_only=True
-    )
+    leave_balances = serializers.DictField(child=serializers.CharField(), read_only=True)
 
 
 class RecordCreateSerializer(StrictInputSerializer):
-    user_id = serializers.IntegerField(min_value=1)
-    appointment_details = serializers.JSONField()
+    user_id = serializers.IntegerField(min_value=1, max_value=2_147_483_647)
+    appointment_details = serializers.DictField(child=serializers.JSONField())
     department = serializers.CharField(max_length=120, allow_blank=False)
     designation_snapshot = serializers.CharField(max_length=150, allow_blank=False)
     service_history = serializers.ListField()
@@ -102,8 +103,8 @@ class RecordCreateSerializer(StrictInputSerializer):
 
 
 class RecordUpdateSerializer(StrictInputSerializer):
-    expected_revision = serializers.IntegerField(min_value=0)
-    appointment_details = serializers.JSONField(required=False)
+    expected_revision = serializers.IntegerField(min_value=0, max_value=2_147_483_647)
+    appointment_details = serializers.DictField(child=serializers.JSONField(), required=False)
     department = serializers.CharField(max_length=120, required=False, allow_blank=False)
     designation_snapshot = serializers.CharField(max_length=150, required=False, allow_blank=False)
     service_history = serializers.ListField(required=False)
@@ -111,6 +112,8 @@ class RecordUpdateSerializer(StrictInputSerializer):
 
 
 class PolicyReadSerializer(serializers.ModelSerializer):
+    parameters = serializers.DictField(child=serializers.JSONField(), read_only=True)
+
     class Meta:
         model = HRPolicyVersion
         fields = (
@@ -129,14 +132,14 @@ class PolicyReadSerializer(serializers.ModelSerializer):
 
 class PolicyCreateSerializer(StrictInputSerializer):
     family = serializers.ChoiceField(choices=("leave", "appraisal", "ltc", "cpda"))
-    version = serializers.IntegerField(min_value=1)
+    version = serializers.IntegerField(min_value=1, max_value=MAX_POLICY_VERSION)
     effective_from = serializers.DateTimeField()
     effective_until = serializers.DateTimeField(required=False, allow_null=True, default=None)
-    parameters = serializers.JSONField()
+    parameters = serializers.DictField(child=serializers.JSONField())
 
 
 class VerifiedLeaveCreditSerializer(StrictInputSerializer):
-    user_id = serializers.IntegerField(min_value=1)
+    user_id = serializers.IntegerField(min_value=1, max_value=2_147_483_647)
     leave_type = serializers.ChoiceField(
         choices=("Casual", "Restricted", "Medical", "Earned", "Vacation", "Sabbatical")
     )
@@ -166,7 +169,9 @@ class LeaveSubmitSerializer(StrictInputSerializer):
 class ClaimSubmitSerializer(StrictInputSerializer):
     family = serializers.ChoiceField(choices=("ltc", "cpda"))
     subtype = serializers.ChoiceField(choices=("advance", "reimbursement"))
-    prescribed_form_reference = serializers.CharField(required=False, allow_blank=True)
+    prescribed_form_reference = serializers.CharField(
+        required=False, allow_blank=True, max_length=250
+    )
     purpose = serializers.CharField(required=False, allow_blank=True)
     amount = serializers.DecimalField(
         max_digits=20, decimal_places=6, required=False, min_value=Decimal("0.000001")
@@ -179,12 +184,12 @@ class ClaimSubmitSerializer(StrictInputSerializer):
 
 class AppraisalSubmitSerializer(StrictInputSerializer):
     period_key = serializers.CharField(max_length=80, allow_blank=False)
-    submitted_form = serializers.JSONField()
+    submitted_form = serializers.DictField(child=serializers.JSONField(), allow_empty=False)
 
 
 class ReviewerAssignmentSerializer(StrictInputSerializer):
     reviewer_user_ids = serializers.ListField(
-        child=serializers.IntegerField(min_value=1),
+        child=serializers.IntegerField(min_value=1, max_value=2_147_483_647),
         allow_empty=False,
     )
 
@@ -204,7 +209,7 @@ class DecisionSerializer(StrictInputSerializer):
 
 
 class FinancialReviewSerializer(StrictInputSerializer):
-    financial_review_reference = serializers.CharField(allow_blank=False)
+    financial_review_reference = serializers.CharField(allow_blank=False, max_length=250)
 
 
 class FinancialReviewReadSerializer(serializers.Serializer):
@@ -214,18 +219,25 @@ class FinancialReviewReadSerializer(serializers.Serializer):
 
 
 class FinancialProcessingSerializer(StrictInputSerializer):
-    financial_review_reference = serializers.CharField(allow_blank=False)
-    source_system = serializers.ChoiceField(choices=("payroll", "finance"))
-    external_status_reference = serializers.CharField(allow_blank=False)
+    financial_review_reference = serializers.CharField(allow_blank=False, max_length=250)
+    source_system = serializers.ChoiceField(
+        choices=("payroll", "finance"), required=False, allow_null=True, default=None
+    )
+    external_status_reference = serializers.CharField(
+        allow_blank=False, max_length=250, required=False, allow_null=True, default=None
+    )
     payment_status = serializers.ChoiceField(
-        choices=("processing", "payment_pending", "paid", "failed")
+        choices=("processing", "payment_pending", "paid", "failed"),
+        required=False,
+        allow_null=True,
+        default=None,
     )
 
 
 class FinancialStatusReadSerializer(serializers.Serializer):
-    source_system = serializers.CharField()
-    external_status_reference = serializers.CharField()
-    payment_status = serializers.CharField()
+    source_system = serializers.CharField(allow_null=True)
+    external_status_reference = serializers.CharField(allow_null=True)
+    payment_status = serializers.CharField(allow_null=True)
     recorded_at = serializers.DateTimeField()
 
 
@@ -253,12 +265,18 @@ class ComplianceRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = HRRequest
         fields = (
-            "id", "user_id", "family", "state", "created_at", "submitted_at",
+            "id",
+            "user_id",
+            "family",
+            "state",
+            "created_at",
+            "submitted_at",
         )
         read_only_fields = fields
 
 
 class RequestReadSerializer(serializers.ModelSerializer):
+    payload = serializers.DictField(child=serializers.JSONField(), read_only=True)
     claim_summary = serializers.SerializerMethodField()
     appraisal_summary = serializers.SerializerMethodField()
     route_total_steps = serializers.SerializerMethodField()
@@ -339,7 +357,8 @@ class RequestDetailReadSerializer(RequestReadSerializer):
     @extend_schema_field(RequestTransitionReadSerializer(many=True))
     def get_history(self, row):
         return RequestTransitionReadSerializer(
-            row.transitions.order_by("recorded_at", "pk"), many=True,
+            row.transitions.order_by("recorded_at", "pk"),
+            many=True,
         ).data
 
     class Meta(RequestReadSerializer.Meta):
@@ -348,6 +367,8 @@ class RequestDetailReadSerializer(RequestReadSerializer):
 
 
 class AuditReadSerializer(serializers.ModelSerializer):
+    data = serializers.DictField(child=serializers.JSONField(), read_only=True)
+
     class Meta:
         model = AuditEvent
         fields = (

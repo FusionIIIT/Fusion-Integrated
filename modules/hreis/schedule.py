@@ -1,10 +1,4 @@
-"""HR-EIS tasks have no assumed institutional scheduling cadence.
-
-Operators may explicitly configure infrastructure *polling* intervals below;
-actual reminder eligibility and recipients remain versioned policy values.
-With no configuration, commands and Celery tasks can be run manually but
-no periodic HR-EIS job is scheduled.
-"""
+"""HR-EIS tasks have no assumed institutional scheduling cadence."""
 
 from __future__ import annotations
 

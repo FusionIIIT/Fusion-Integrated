@@ -1,16 +1,11 @@
-"""Employee HR request submission, validated against active institutional policy.
-
-This module does not invent leave quotas, approval authorities, appraisal windows,
-document verification outcomes, or financial approval. Each record is an atomic
-request, transition, audit event and dashboard notification.
-"""
+"""Employee HR request submission, validated against active institutional policy."""
 
 from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError
@@ -42,7 +37,9 @@ def _employee_record(actor, permission: str) -> EmployeeServiceRecord:
     row = EmployeeServiceRecord.objects.filter(user_id=actor.user_id).first()
     if row is None:
         raise NotFoundError(
-            "Your official service record is not yet available.", code="employee_record_missing"
+            "Your official service record is not yet available. Refresh your current HR view "
+            "or contact HR for help.",
+            code="employee_record_missing",
         )
     return row
 
@@ -51,7 +48,10 @@ def _key(key: str) -> str:
     if not isinstance(key, str) or not 1 <= len(key) <= 100 or not key.strip():
         raise BadRequestError("Provide a unique operation key.", code="missing_idempotency_key")
     if HRRequestTransition.objects.filter(idempotency_key=key).exists():
-        raise ConflictError("This request has already been submitted.", code="operation_replayed")
+        raise ConflictError(
+            "This request has already been submitted. Contact HR to resolve this before retrying.",
+            code="operation_replayed",
+        )
     return key
 
 
@@ -59,7 +59,9 @@ def _route(family: str, kind: str, department: str, policy) -> routing.ApprovalR
     route_rows = policy.parameters.get("routes")
     if not isinstance(route_rows, list):
         raise ConflictError(
-            "No approval routes are configured for this policy.", code="policy_route_missing"
+            "No approval routes are configured for this policy. Contact HR to resolve this "
+            "before retrying.",
+            code="policy_route_missing",
         )
     configured = {}
     for row in route_rows:
@@ -77,38 +79,17 @@ def _route(family: str, kind: str, department: str, policy) -> routing.ApprovalR
         raise ConflictError(str(exc), code=exc.code) from exc
 
 
-def _persist(
-    actor,
-    *,
-    family: str,
-    subtype: str,
-    state: str,
-    payload: dict,
-    policy,
-    transition,
-    key: str,
-    route=None,
-    submitted_at=None,
-) -> HRRequest:
-    row = HRRequest.objects.create(
-        user_id=actor.user_id,
-        family=family,
-        subtype=subtype,
-        state=state,
-        payload=payload,
-        policy_version=policy,
-        version=1,
-        route_step=0,
-        submitted_at=submitted_at or timezone.now(),
-    )
-    if route is not None:
-        for index, designation in enumerate(route.authorities):
-            ApprovalRouteStep.objects.create(
-                request=row,
-                position=index,
-                designation=designation,
-                policy_version_label=route.version,
-            )
+def _freeze_route(row, route):
+    for position, designation in enumerate(route.authorities):
+        ApprovalRouteStep.objects.create(
+            request=row,
+            position=position,
+            designation=designation,
+            policy_version_label=route.version,
+        )
+
+
+def _submission_evidence(actor, row, transition, key, family, state):
     HRRequestTransition.objects.create(
         request=row,
         source=transition.source,
@@ -148,16 +129,39 @@ def _persist(
             "state": state,
         },
     )
+
+
+def _persist(
+    actor,
+    *,
+    family: str,
+    subtype: str,
+    state: str,
+    payload: dict,
+    policy,
+    transition,
+    key: str,
+    route=None,
+    submitted_at=None,
+) -> HRRequest:
+    row = HRRequest.objects.create(
+        user_id=actor.user_id,
+        family=family,
+        subtype=subtype,
+        state=state,
+        payload=payload,
+        policy_version=policy,
+        version=1,
+        route_step=0,
+        submitted_at=submitted_at or timezone.now(),
+    )
+    if route is not None:
+        _freeze_route(row, route)
+    _submission_evidence(actor, row, transition, key, family, state)
     return row
 
 
-@transaction.atomic
-def submit_leave(
-    actor, *, leave_type: str, duration: Decimal, justification: str, idempotency_key: str
-) -> HRRequest:
-    record = _employee_record(actor, "hreis.leave.create")
-    key = _key(idempotency_key)
-    policy = current_policy("leave")
+def _validated_leave(actor, policy, leave_type, duration, justification):
     eligibility = (
         policy.parameters.get("eligibility", {})
         .get(
@@ -181,6 +185,17 @@ def submit_leave(
         )
     except leave.InvalidLeaveRequest as exc:
         raise ConflictError(str(exc), code=exc.code) from exc
+    return valid
+
+
+@transaction.atomic
+def submit_leave(
+    actor, *, leave_type: str, duration: Decimal, justification: str, idempotency_key: str
+) -> HRRequest:
+    record = _employee_record(actor, "hreis.leave.create")
+    key = _key(idempotency_key)
+    policy = current_policy("leave")
+    valid = _validated_leave(actor, policy, leave_type, duration, justification)
     route = _route("leave", actor.kind, record.department, policy)
     move = workflow.resolve(
         "leave",
@@ -239,8 +254,7 @@ def submit_claim(
         except claims.InvalidClaim as exc:
             raise BadRequestError(str(exc), code=exc.code) from exc
         detail = {"purpose": valid.purpose, "amount": valid.amount}
-        # Document references are unverified at submission; no ClaimDocument
-        # records are invented until a trusted upload service can validate them.
+        # A submitted reference does not prove a trusted upload or verification.
         payload = {"document_references": list(valid.document_references)}
         guards = {"purpose_present": True, "amount_present": True, "documents_present": True}
     move = workflow.resolve(family, "draft", "submit", "employee", guard_results=guards)
@@ -258,11 +272,49 @@ def submit_claim(
     return row
 
 
+def _require_open_appraisal_window(policy):
+    window = policy.parameters.get("submission_window")
+    if not isinstance(window, dict):
+        raise ConflictError(
+            "Appraisal submission dates are not configured. Contact HR to resolve this before "
+            "retrying.",
+            code="appraisal_window_missing",
+        )
+    start = datetime.fromisoformat(window["start"])
+    end = datetime.fromisoformat(window["end"])
+    now = timezone.now()
+    if not start <= now < end:
+        raise ConflictError(
+            "The appraisal submission window is closed. Contact HR to resolve this before "
+            "retrying.",
+            code="appraisal_window_closed",
+        )
+
+
+def _create_appraisal_detail(row, record, period_key, submitted_form):
+    try:
+        with transaction.atomic():
+            AppraisalDetail.objects.create(
+                request=row,
+                employee_record=record,
+                period_key=period_key,
+                submitted_form=submitted_form,
+            )
+    except IntegrityError as exc:
+        constraint = getattr(getattr(exc.__cause__, "diag", None), "constraint_name", None)
+        if constraint != "hr_appraisal_record_period_unique":
+            raise
+        raise ConflictError(
+            "An appraisal already exists for this period. Open it in Annual Appraisals.",
+            code="appraisal_already_submitted",
+        ) from exc
+
+
 @transaction.atomic
 def submit_appraisal(
     actor, *, period_key: str, submitted_form: dict, idempotency_key: str
 ) -> HRRequest:
-    _employee_record(actor, "hreis.appraisal.create")
+    record = _employee_record(actor, "hreis.appraisal.create")
     key = _key(idempotency_key)
     if not isinstance(period_key, str) or not period_key.strip() or len(period_key) > 80:
         raise BadRequestError("Provide the appraisal period.", code="invalid_period")
@@ -270,26 +322,19 @@ def submit_appraisal(
         raise BadRequestError(
             "Provide the completed appraisal form.", code="missing_appraisal_form"
         )
+    period_key = period_key.strip()
+    # The owner row serializes the duplicate check even before an appraisal exists.
+    EmployeeServiceRecord.objects.select_for_update().get(pk=record.pk)
     policy = current_policy("appraisal")
-    window = policy.parameters.get("submission_window")
-    if not isinstance(window, dict):
-        raise ConflictError(
-            "Appraisal submission dates are not configured.", code="appraisal_window_missing"
-        )
-    start = datetime.fromisoformat(window["start"])
-    end = datetime.fromisoformat(window["end"])
-    now = timezone.now()
-    if not start <= now < end:
-        raise ConflictError(
-            "The appraisal submission window is closed.", code="appraisal_window_closed"
-        )
+    _require_open_appraisal_window(policy)
     if HRRequest.objects.filter(
         family="appraisal",
         user_id=actor.user_id,
         appraisal__period_key=period_key,
     ).exists():
         raise ConflictError(
-            "This period already has an appraisal.", code="appraisal_already_submitted"
+            "This period already has an appraisal. Contact HR to resolve this before retrying.",
+            code="appraisal_already_submitted",
         )
     move = workflow.resolve(
         "appraisal",
@@ -308,9 +353,5 @@ def submit_appraisal(
         transition=move,
         key=key,
     )
-    AppraisalDetail.objects.create(
-        request=row,
-        period_key=period_key,
-        submitted_form=submitted_form,
-    )
+    _create_appraisal_detail(row, record, period_key, submitted_form)
     return row

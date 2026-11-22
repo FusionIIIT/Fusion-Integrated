@@ -12,7 +12,7 @@ import type { HRPolicyInput } from "../api/types";
 
 export function PolicyManagement() {
   const { can } = useAuth();
-  const policies = usePolicies();
+  const policies = usePolicies(can("hreis.policy.view"));
   const create = useCreatePolicy();
   const [expanded, setExpanded] = useState(false);
   const [family, setFamily] = useState<HRPolicyInput["family"]>("leave");
@@ -40,17 +40,17 @@ export function PolicyManagement() {
         parameters: config as Record<string, unknown>,
       }, {
         onSuccess: () => {
-          notifications.show({ color: "green", title: "Policy version recorded",
+          notifications.show({ position: "top-center", color: "green", title: "Policy version recorded",
             message: "The version is immutable and has an audit entry." });
           setExpanded(false);
         },
-        onError: (error) => notifications.show({
+        onError: (error) => notifications.show({ position: "top-center",
           color: "red", title: "Could not record HR policy",
           message: errorMessage(error),
         }),
       });
     } catch (error) {
-      notifications.show({ color: "red", title: "Invalid policy input",
+      notifications.show({ position: "top-center", color: "red", title: "Invalid policy input",
         message: error instanceof Error ? error.message : "Check policy values." });
     }
   }
@@ -66,6 +66,7 @@ export function PolicyManagement() {
       {policies.error && <Text c="red" size="sm">
         Could not load the current policy versions: {errorMessage(policies.error)}
       </Text>}
+      {policies.isPending && <Text c="dimmed">Loading policy versions...</Text>}
       {policies.data && <Card withBorder>
         {policies.data.results.length === 0 ? <Text c="dimmed">
           No policy versions are configured. Request submissions requiring policy

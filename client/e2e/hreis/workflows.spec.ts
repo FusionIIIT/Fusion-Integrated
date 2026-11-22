@@ -3,19 +3,27 @@ import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import type { Page } from "@playwright/test";
 
-import { type AccountKey } from "../accounts";
+import { ACCOUNTS, type AccountKey } from "../accounts";
 import { stateFile } from "../support/session";
-import { actAs, expect, signedInAs, test as base } from "../support/test";
+import { actAs, expect, openSidebar, sidebar, signedInAs, test as base } from "../support/test";
+import { observe, observeApi, saveWalkthrough, type WalkRequest } from "./evidence";
 
 const API = "/api/v1/hreis";
-const test = base.extend<{ actor: (key: AccountKey) => Promise<Page> }>({
-  actor: async ({ browser, baseURL }, use) => {
+const test = base.extend<{ actor: (key: AccountKey) => Promise<Page>; evidence: WalkRequest[] }>({
+  evidence: [async ({ page }, use, info) => {
+    const rows: WalkRequest[] = [];
+    observe(page, ACCOUNTS.hrEmployee.role, ACCOUNTS.hrEmployee.username, rows);
+    await use(rows);
+    saveWalkthrough(info, rows);
+  }, { auto: true }],
+  actor: async ({ browser, baseURL, evidence }, use) => {
     const pages = new Map<AccountKey, Page>();
     const problems: string[] = [];
     await use(async (key) => {
       if (!pages.has(key)) {
         const context = await browser.newContext({ baseURL, storageState: stateFile(key) });
         const page = await context.newPage();
+        observe(page, ACCOUNTS[key].role, ACCOUNTS[key].username, evidence);
         // Actor pages get the same runtime guards as the primary employee page.
         page.on("pageerror", (error) => problems.push(error.message));
         page.on("console", (message) => {
@@ -45,6 +53,48 @@ test.beforeAll(() => {
   }
 });
 
+for (const [role, account] of [
+  ["faculty", "hrOtherAuthority"], ["staff", "hrEmployee"], ["hradmin", "hrAdmin"],
+  ["Accounts Admin", "hrAccountant"], ["HOD (CSE)", "hrReviewer"],
+  ["HOD (Design)", "hrOtherAuthority"], ["HOD (ECE)", "hrOtherAuthority"],
+  ["HOD (Liberal Arts)", "hrOtherAuthority"], ["HOD (ME)", "hrOtherAuthority"],
+  ["HOD (NS)", "hrOtherAuthority"], ["Registrar", "hrAuthority"], ["Director", "hrOtherAuthority"],
+] as const) {
+  test(`HR-UC-002/005/018/019 role walkthrough: ${role}`, async ({ browser, baseURL, evidence }) => {
+    const context = await browser.newContext({ baseURL, storageState: stateFile(account) });
+    const rolePage = await context.newPage();
+    const errors: string[] = [];
+    rolePage.on("pageerror", (error) => errors.push(error.message));
+    rolePage.on("response", (response) => {
+      if (response.url().includes("/api/") && response.status() >= 500) errors.push(`${response.status()} ${response.url()}`);
+    });
+    try {
+      await rolePage.goto("/");
+      await openSidebar(rolePage);
+      const picker = sidebar(rolePage).getByRole("combobox", { name: "Switch role" });
+      if (await picker.count() > 0 && await picker.inputValue() !== role) {
+        const switched = rolePage.waitForResponse((response) => response.url().endsWith("/api/v1/me") && response.request().method() === "PATCH");
+        await picker.selectOption(role);
+        expect((await switched).status()).toBe(200);
+      }
+      observe(rolePage, role, ACCOUNTS[account].username, evidence);
+      const session = await rolePage.request.get("/api/v1/me");
+      expect((await session.json()).active_role).toBe(role);
+      const path = role === "hradmin" ? "/hreis/audit/" : ["faculty", "staff"].includes(role)
+        ? "/hreis/service-records/me/" : role === "Accounts Admin" ? "/hreis/requests/" : "/hreis/requests/approvals/";
+      const response = await rolePage.request.get(`/api/v1${path}`);
+      expect(response.status()).toBe(role === "faculty" ? 404 : 200);
+      observeApi(response, role, ACCOUNTS[account].username, evidence);
+      await rolePage.goto(role === "hradmin" ? "/hreis/audit" : ["faculty", "staff"].includes(role)
+        ? "/hreis/my-record" : role === "Accounts Admin" ? "/hreis/finance" : "/hreis/approvals");
+      await expect(rolePage.getByRole("heading", { level: 2 }).first()).toBeVisible();
+      await rolePage.goto("/hreis/notifications");
+      await expect(rolePage.getByRole("heading", { name: "HR Notifications" })).toBeVisible();
+      expect(errors).toEqual([]);
+    } finally { await context.close(); }
+  });
+}
+
 test("HR-UC-001/002: HR creates an official record, employee reads it, and stale edits fail", async ({ actor }) => {
   const employee = await actor("hrAuthority");
   const me = await employee.request.get("/api/v1/me");
@@ -71,7 +121,8 @@ test("HR-UC-001/002: HR creates an official record, employee reads it, and stale
 
 test("HR-UC-003: cookie writes require CSRF and cannot override request ownership", async ({ page }) => {
   const before = await page.request.get(`${API}/requests/`);
-  const count = (await before.json()).count;
+  const original = (await before.json()).results as { id: number }[];
+  expect(Array.isArray(original)).toBe(true);
   const data = { leave_type: "Casual", duration: "1", justification: "Synthetic security probe" };
   const missingCsrf = await page.request.post(`${API}/requests/leave/`, {
     data, headers: { "Idempotency-Key": "no-csrf-synthetic" },
@@ -80,7 +131,9 @@ test("HR-UC-003: cookie writes require CSRF and cannot override request ownershi
   expect((await missingCsrf.json()).error.message).toContain("CSRF");
   const forged = await post(page, "/requests/leave/", { ...data, user_id: 900099 }, "forged-owner");
   expect(forged.status()).toBe(400);
-  expect((await (await page.request.get(`${API}/requests/`)).json()).count).toBe(count);
+  const after = await page.request.get(`${API}/requests/`);
+  expect((await after.json()).results.map((request: { id: number }) => request.id))
+    .toEqual(original.map((request) => request.id));
 });
 
 function row(page: Page, id: number) {
@@ -186,7 +239,7 @@ test("HR-UC-003/004/005: leave forwards, approves once, debits once and notifies
   await expect(history.getByText("Workflow history", { exact: true })).toBeVisible();
   await expect(history.getByText("approve — approved", { exact: true })).toBeVisible();
   await expect(history.getByText("Acting role: Registrar", { exact: true })).toBeVisible();
-  await page.screenshot({ path: test.info().outputPath("leave-approved-history.png"), fullPage: true });
+  await page.screenshot({ path: test.info().outputPath("leave-approved-history.png"), fullPage: true, animations: "disabled" });
   await page.goto("/hreis/notifications");
   await expect(page.getByText("LEAVE request: approve", { exact: true }).first()).toBeVisible();
 });
@@ -215,7 +268,48 @@ test("HR-UC-003 exception: insufficient leave cannot create a request", async ({
   expect(await balance(page)).toBe(before);
 });
 
+test("HR-UC-003 keyboard-only submission reaches a visible pending request", async ({ page }) => {
+  await page.goto("/hreis/leave");
+  async function tabTo(target: ReturnType<Page["getByRole"]>) {
+    for (let index = 0; index < 60; index++) {
+      if (await target.evaluate((element) => element === document.activeElement)) return;
+      await page.keyboard.press("Tab");
+    }
+    throw new Error("Keyboard focus could not reach the expected HR control.");
+  }
+  await tabTo(page.getByRole("button", { name: "Apply for leave" }));
+  await page.keyboard.press("Enter");
+  await tabTo(page.getByRole("textbox", { name: "Duration (days)" }));
+  await page.keyboard.type("1");
+  await tabTo(page.getByRole("textbox", { name: "Justification" }));
+  await page.keyboard.type("Synthetic keyboard-only request");
+  await tabTo(page.getByRole("dialog").getByRole("button", { name: "Submit request", exact: true }));
+  const response = page.waitForResponse((result) => result.url().endsWith(`${API}/requests/leave/`) && result.request().method() === "POST");
+  await page.keyboard.press("Enter");
+  const created = await response;
+  expect(created.status()).toBe(201);
+  await expect(row(page, (await created.json()).id)).toContainText("Pending Authority");
+});
+
 for (const family of ["ltc", "cpda"] as const) {
+  test(`HR-UC-${family === "ltc" ? "012" : "016"} A1: processing before external status is available`, async ({ page, actor }) => {
+    const hr = await actor("hrAdmin");
+    const first = await actor("hrReviewer");
+    const final = await actor("hrAuthority");
+    const id = await reviewedClaim(page, hr, first, final, family, "advance");
+    const accountant = await actor("hrAccountant");
+    await accountant.goto("/hreis/finance");
+    await row(accountant, id).getByRole("button", { name: "Record finance status" }).click();
+    await accountant.getByRole("textbox", { name: "Financial review evidence reference" }).fill("SYNTHETIC-PROCESSING-REVIEW");
+    await accountant.getByRole("checkbox").uncheck();
+    const recorded = await submit(accountant, `/requests/${id}/financial-processing/`, "Record financial processing");
+    expect(recorded.state).toBe("financial_processing_recorded");
+    expect(recorded.claim_summary.payment_status).toBeNull();
+    await page.goto("/hreis/claims");
+    await row(page, id).getByRole("button", { name: "Details", exact: true }).click();
+    await expect(page.getByRole("dialog").getByText("External status unavailable", { exact: true })).toBeVisible();
+    await expect(page.getByRole("dialog").getByText("Awaiting a verified external report", { exact: true })).toBeVisible();
+  });
   for (const subtype of ["advance", "reimbursement"] as const) {
     test(`HR-UC-${family === "ltc" ? "009/010/011/012" : "013/014/015/016"}: ${family} ${subtype} through HR, approval and Accountant`, async ({ page, actor }) => {
       const hr = await actor("hrAdmin");

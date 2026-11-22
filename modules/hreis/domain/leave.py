@@ -1,9 +1,4 @@
-"""Specification-derived leave validation and exact arithmetic.
-
-The spec lists six leave types and requires a balance/eligibility check,
-but supplies no numerical allocations or accrual policy. The caller must
-provide verified policy outcomes; missing values are a refusal, not a grant.
-"""
+"""Specification-derived leave validation and exact arithmetic."""
 
 from __future__ import annotations
 
@@ -42,7 +37,9 @@ def ledger_balance(entries: Iterable[Decimal]) -> Decimal:
     for value in entries:
         if not isinstance(value, Decimal) or not value.is_finite():
             raise InvalidLeaveRequest(
-                "invalid_entry", "Leave ledger entries must be finite decimals."
+                "invalid_entry",
+                "Leave ledger entries must be finite decimals. Contact HR to resolve this before "
+                "retrying.",
             )
         total += value
     return total
@@ -64,16 +61,25 @@ def validate_submission(
         raise InvalidLeaveRequest("missing_justification", "Explain the reason for your leave.")
     if available_balance is None or is_eligible is None:
         raise InvalidLeaveRequest(
-            "policy_unavailable", "Leave balance or eligibility policy is not configured."
+            "policy_unavailable",
+            "Leave balance or eligibility policy is not configured. Contact HR to resolve "
+            "this before retrying.",
         )
     if not isinstance(available_balance, Decimal) or not available_balance.is_finite():
-        raise InvalidLeaveRequest("invalid_balance", "The leave balance cannot be verified.")
+        raise InvalidLeaveRequest(
+            "invalid_balance",
+            "The leave balance cannot be verified. Contact HR to resolve this before retrying.",
+        )
     if is_eligible is not True:
         raise InvalidLeaveRequest(
-            "ineligible", "This leave type is not available under your policy."
+            "ineligible",
+            "This leave type is not available under your policy. Contact HR to resolve this "
+            "before retrying.",
         )
     if available_balance < duration:
         raise InvalidLeaveRequest(
-            "insufficient_balance", "There is not enough leave balance available."
+            "insufficient_balance",
+            "There is not enough leave balance available. Contact HR to resolve this before "
+            "retrying.",
         )
     return ValidatedLeave(leave_type, duration, justification.strip())

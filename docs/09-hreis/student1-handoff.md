@@ -7,12 +7,15 @@
 
 ## Read first
 
-- `hreis-quality-report.md`, section 24: current verification and open boundaries;
+- `hreis-quality-report.md`, section 25: current verification and open boundaries;
   earlier numbered sections are historical checkpoints.
 - `browser-coverage.md`: all 21 live use-case mappings and isolated test commands.
 - `hreis-blueprint.md`: source interpretation and unresolved institutional choices.
-- `hreis-traceability-status.md`: 193 live IDs, 187 direct builder-test links and
+- `hreis-traceability-status.md`: 193 live IDs, 188 direct builder-test links and
   six explicit source/integration gaps.
+- `browser-walkthrough.md`: all twelve designations and real request-log evidence.
+- `hreis-reference.md`: generated, validated enforcement links for 193 live IDs.
+- `review-remediation.md`: the initial independent scorecard and candidate fixes.
 - `procedure-deviation.md`: owner's instruction to continue, and the absence of
   independent written Student 2 approval.
 - `student2-approval-request.md`: unsigned paperwork for later review.
@@ -32,7 +35,8 @@ appraisals into immutable service history. Self-approval is refused.
 
 Accountant correctness review and externally referenced status recording are
 separate permissions. Terminal financial statuses are immutable, and each
-recorded status has an immutable historical entry. These operations record
+recorded status has an immutable historical entry. Processing can be recorded
+while external status is unavailable, then a later report is appended. These operations record
 externally attested information; they do not execute or verify an actual payment.
 
 Workflow notifications, configured pending-action reminders and policy/deadline
@@ -56,6 +60,9 @@ Builder tests are under `modules/hreis/tests`, frontend tests under
 `client/src/modules/hreis`, and browser journeys under `client/e2e/hreis`.
 Raw logs, audit output and previous mutation/mobile evidence are outside Git at
 `D:\HR(EIS)\lab 9\evidence` and the adjacent mutation-results directories.
+
+The unmerged module now has one clean initial migration. Use a fresh database
+for a clean installation; preserve and separately upgrade any older draft data.
 
 ## Deferred boundaries
 

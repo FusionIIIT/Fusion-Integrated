@@ -7,7 +7,6 @@ import pytest
 from django.utils import timezone
 
 from core.api.exceptions import BadRequestError, ConflictError, PermissionDeniedError
-from fusion_auth.principal import Principal
 from modules.hreis.models import (
     AppraisalDetail,
     ApprovalRouteStep,
@@ -23,6 +22,7 @@ from modules.hreis.models import (
     OutboxEvent,
 )
 from modules.hreis.services import requests as service
+from modules.hreis.tests.actors import Principal
 
 pytestmark = pytest.mark.django_db
 

@@ -35,6 +35,10 @@ def validate_ltc(subtype: str, prescribed_form_reference: str) -> LTCSubmission:
         raise InvalidClaim("unsupported_subtype", "Choose an LTC advance or reimbursement.")
     if not isinstance(prescribed_form_reference, str) or not prescribed_form_reference.strip():
         raise InvalidClaim("missing_form", "Submit the prescribed LTC form.")
+    if len(prescribed_form_reference.strip()) > 250:
+        raise InvalidClaim(
+            "invalid_form_reference", "Use an LTC form reference of at most 250 characters."
+        )
     return LTCSubmission(subtype, prescribed_form_reference.strip())
 
 
@@ -62,12 +66,22 @@ def validate_financial_recording(
 ) -> None:
     """An accountant can record observed status, not execute a payment."""
     if claim_approved is not True:
-        raise InvalidClaim("not_approved", "Only an approved claim can enter financial processing.")
+        raise InvalidClaim(
+            "not_approved",
+            "Only an approved claim can enter financial processing. Contact HR to resolve "
+            "this before retrying.",
+        )
     if correctness_verified is None:
         raise InvalidClaim(
-            "policy_unavailable", "Financial correctness criteria are not configured."
+            "policy_unavailable",
+            "Financial correctness criteria are not configured. Contact HR to resolve this "
+            "before retrying.",
         )
     if correctness_verified is not True:
-        raise InvalidClaim("incorrect_claim", "The claim has not passed financial verification.")
+        raise InvalidClaim(
+            "incorrect_claim",
+            "The claim has not passed financial verification. Contact HR to resolve this "
+            "before retrying.",
+        )
     # Whether a payment/status integration exists is an external contract.
     # A successful check authorizes recording, never executing, a payment.

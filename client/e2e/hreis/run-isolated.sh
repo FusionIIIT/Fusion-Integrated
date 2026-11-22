@@ -15,6 +15,7 @@ iam_token_name=""
 created=0
 output="${E2E_EVIDENCE_DIR:-$(mktemp -d /tmp/hreis-e2e-evidence.XXXXXX)}"
 mkdir -p "$output"
+export HREIS_E2E_PERMISSION_SNAPSHOT="$output/iam-staff-permissions.json"
 as_runner() { if [[ $(id -u) == 0 ]]; then runuser -u "$runner_user" -- "$@"; else "$@"; fi; }
 iam_command() {
   (cd "$E2E_IAM_DIR/Backend/backend"
@@ -29,6 +30,9 @@ cleanup() {
   fi
   if [[ -n "$iam_token_name" ]]; then
     iam_command service_token --revoke "$iam_token_name"
+  fi
+  if [[ -f "$HREIS_E2E_PERMISSION_SNAPSHOT" ]]; then
+    HREIS_E2E_PERMISSION_OPERATION=restore iam_command shell -c "exec(open('$repo/client/e2e/hreis/iam-permissions.py').read())"
   fi
 }
 trap cleanup EXIT

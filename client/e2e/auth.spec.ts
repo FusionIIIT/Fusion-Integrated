@@ -1,4 +1,5 @@
 import { ACCOUNTS, PASSWORD } from "./accounts";
+import { LOGIN_RETRY_MS, LOGIN_TRIES } from "./support/session";
 import {
   expect, openModuleNav, sidebar, signIn, submitUntilSignedIn, test, uniqueName,
 } from "./support/test";
@@ -14,7 +15,17 @@ test.describe("sign-in", () => {
     await page.getByRole("textbox", { name: /username/i })
       .fill(uniqueName("e2e-nobody").replace(/\s/g, "-"));
     await page.getByRole("textbox", { name: /password/i }).fill(`${PASSWORD}-wrong`);
-    await page.getByRole("button", { name: "Sign in" }).click();
+    for (let attempt = 0; attempt < LOGIN_TRIES; attempt++) {
+      const response = page.waitForResponse((result) =>
+        result.url().endsWith("/api/v1/auth/login") && result.request().method() === "POST");
+      await page.getByRole("button", { name: "Sign in" }).click();
+      const denied = await response;
+      if (denied.status() !== 429) {
+        expect([400, 401]).toContain(denied.status());
+        break;
+      }
+      if (attempt + 1 < LOGIN_TRIES) await page.waitForTimeout(LOGIN_RETRY_MS);
+    }
 
     await expect(page.getByRole("alert")).toContainText("Incorrect username or password");
     await expect(page).toHaveURL(/\/login/);

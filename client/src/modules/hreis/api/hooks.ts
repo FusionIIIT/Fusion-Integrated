@@ -7,7 +7,7 @@ import type {
   ClaimReviewInput, CreateRecord,
   FinancialReviewInput, FinancialReviewRecord, FinancialProcessingInput,
   HRAudit, HRComplianceRequestStatus, HRNotification, HRPolicy,
-  HRPolicyInput, HRRequest, HRRequestDetail, LeaveInput, Page, RequestDecisionInput,
+  HRPolicyInput, HRRequest, HRRequestDetail, LeaveBalances, LeaveInput, Page, RequestDecisionInput,
   ServiceRecord, UpdateRecord, VerifiedLeaveCreditInput, VerifiedLeaveCreditRecord,
 } from "./types";
 
@@ -90,11 +90,32 @@ export function useCreateServiceRecord() {
   });
 }
 
-export function usePolicies() {
+export function usePolicies(enabled = true) {
   return useQuery({
     queryKey: [...key, "policies"],
+    enabled,
     queryFn: async () => (await http.get<Page<HRPolicy>>("/hreis/policies/")).data,
   });
+}
+
+export function useOwnLeaveBalances() {
+  return useQuery({ queryKey: [...key, "balances"],
+    queryFn: async () => (await http.get<LeaveBalances>("/hreis/leave/balances/")).data });
+}
+
+export function useServiceRecord(id: number) {
+  return useQuery({ queryKey: [...key, "record", id],
+    queryFn: async () => (await http.get<ServiceRecord>(`/hreis/service-records/${id}/`)).data });
+}
+
+export function useComplianceRequest(id: number) {
+  return useQuery({ queryKey: [...key, "compliance", id],
+    queryFn: async () => (await http.get<HRComplianceRequestStatus>(`/hreis/compliance/requests/${id}/`)).data });
+}
+
+export function useMarkNotificationRead() {
+  return useAction<{ id: number }, HRNotification>(
+    ({ id }) => `/hreis/notifications/${id}/read/`, () => ({}));
 }
 
 function useAction<TBody, TResult>(url: (body: TBody) => string,

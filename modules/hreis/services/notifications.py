@@ -1,9 +1,4 @@
-"""Policy-driven HR-EIS notification creation and official-email handoff.
-
-No reminder interval, role recipient, policy deadline or institutional
-announcement is assumed. All generated messages go to configured users only,
-with idempotent durable dashboard and outbox entries before email delivery.
-"""
+"""Policy-driven HR-EIS notification creation and official-email handoff."""
 
 from __future__ import annotations
 
@@ -14,6 +9,7 @@ from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
 
+from core.api.exceptions import NotFoundError
 from modules.directory.contracts import get_users
 from modules.hreis.models import (
     ApprovalRouteStep,
@@ -23,6 +19,8 @@ from modules.hreis.models import (
     Notification,
     OutboxEvent,
 )
+from modules.hreis.selectors.scoping import notifications_for
+from modules.hreis.services.authz import require
 
 _PENDING = frozenset(
     {
@@ -33,6 +31,31 @@ _PENDING = frozenset(
         "pending_next_appraisal_authority",
     }
 )
+
+
+@transaction.atomic
+def mark_notification_read(actor, *, notification_id: int):
+    require(actor, "hreis.notification.view")
+    row = notifications_for(actor).select_for_update().filter(pk=notification_id).first()
+    if row is None:
+        raise NotFoundError(
+            "Open HR Notifications and choose an available notice.",
+            code="notification_not_found",
+        )
+    if row.read_at is None:
+        row.read_at = timezone.now()
+        row.save(update_fields=["read_at"])
+        AuditEvent.objects.create(
+            event_key=f"notification-read:{row.pk}:{actor.user_id}",
+            actor_user_id=actor.user_id,
+            acting_designation=actor.active_role,
+            subject_user_id=actor.user_id,
+            action="notification_read",
+            resource_kind="notification",
+            resource_id=row.pk,
+            data={},
+        )
+    return row
 
 
 @transaction.atomic
@@ -76,9 +99,7 @@ def _current_action(row):
         row.family == "appraisal" and row.state == "submitted"
     ):
         return "hradmin", None
-    step = ApprovalRouteStep.objects.filter(
-        request=row, position=row.route_step
-    ).first()
+    step = ApprovalRouteStep.objects.filter(request=row, position=row.route_step).first()
     if step is None:
         return None, None
     assigned_ids = None
@@ -116,9 +137,8 @@ def create_pending_action_reminders(*, now=None) -> int:
         if not isinstance(selected, list):
             continue
         for user_id in sorted({uid for uid in selected if type(uid) is int and uid > 0}):
-            if (
-                user_id == row.user_id
-                or (directly_assigned is not None and user_id not in directly_assigned)
+            if user_id == row.user_id or (
+                directly_assigned is not None and user_id not in directly_assigned
             ):
                 continue
             if _enqueue(
@@ -169,13 +189,54 @@ def create_policy_deadline_notifications(*, now=None) -> int:
     return count
 
 
-def deliver_pending_notifications(*, limit=100) -> tuple[int, int]:
-    """Hand durable notifications to the configured Django email backend.
+def _deliver_one(pk, notices, users):
+    with transaction.atomic():
+        event = (
+            OutboxEvent.objects.select_for_update(skip_locked=True)
+            .filter(
+                pk=pk,
+                event_type="hreis.notification",
+                dispatched_at__isnull=True,
+                attempts__lt=5,
+            )
+            .first()
+        )
+        if event is None:
+            return (0, 0)
+        tag = f"notification:{event.event_key.removeprefix('outbox:')}"
+        notice = notices.get(tag)
+        user = users.get(notice.recipient_user_id) if notice else None
+        email = (
+            (getattr(user, "email", "") or "").strip() if getattr(user, "is_active", True) else ""
+        )
+        if not email:
+            event.attempts += 1
+            event.save(update_fields=["attempts"])
+            return (0, 1)
+        try:
+            result = send_mail(
+                subject=notice.title,
+                message=notice.message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+        except Exception:  # noqa: BLE001 - keep a failed outbox row retryable for any mail provider error
+            event.attempts += 1
+            event.save(update_fields=["attempts"])
+            return (0, 1)
+        if result != 1:
+            event.attempts += 1
+            event.save(update_fields=["attempts"])
+            return (0, 1)
+        event.attempts += 1
+        event.dispatched_at = timezone.now()
+        event.save(update_fields=["attempts", "dispatched_at"])
+        return (1, 0)
 
-    Rows with unresolved identity/email or SMTP failures remain pending.
-    The database serializes workers; no outgoing status claims external delivery
-    beyond the configured mail backend's successful handoff.
-    """
+
+def deliver_pending_notifications(*, limit=100) -> tuple[int, int]:
+    """Hand durable notifications to the configured Django email backend."""
     if type(limit) is not int or limit < 1:
         raise ValueError("Notification delivery limit must be a positive integer.")
     queued = list(
@@ -195,10 +256,7 @@ def deliver_pending_notifications(*, limit=100) -> tuple[int, int]:
         for _, event_key in queued
         if event_key.startswith("outbox:")
     ]
-    notices = {
-        n.event_key: n
-        for n in Notification.objects.filter(event_key__in=tags)
-    }
+    notices = {n.event_key: n for n in Notification.objects.filter(event_key__in=tags)}
     user_ids = sorted({n.recipient_user_id for n in notices.values()})
     try:
         users = get_users(user_ids)
@@ -208,49 +266,7 @@ def deliver_pending_notifications(*, limit=100) -> tuple[int, int]:
 
     sent = failed = 0
     for pk, _event_key in queued:
-        with transaction.atomic():
-            event = (
-                OutboxEvent.objects.select_for_update(skip_locked=True)
-                .filter(
-                    pk=pk, event_type="hreis.notification",
-                    dispatched_at__isnull=True, attempts__lt=5,
-                )
-                .first()
-            )
-            if event is None:
-                continue
-            tag = f"notification:{event.event_key.removeprefix('outbox:')}"
-            notice = notices.get(tag)
-            user = users.get(notice.recipient_user_id) if notice else None
-            email = (
-                (getattr(user, "email", "") or "").strip()
-                if getattr(user, "is_active", True) else ""
-            )
-            if not email:
-                event.attempts += 1
-                event.save(update_fields=["attempts"])
-                failed += 1
-                continue
-            try:
-                result = send_mail(
-                    subject=notice.title,
-                    message=notice.message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[email],
-                    fail_silently=False,
-                )
-            except Exception:  # noqa: BLE001 - keep a failed outbox row retryable for any mail provider error
-                event.attempts += 1
-                event.save(update_fields=["attempts"])
-                failed += 1
-                continue
-            if result != 1:
-                event.attempts += 1
-                event.save(update_fields=["attempts"])
-                failed += 1
-                continue
-            event.attempts += 1
-            event.dispatched_at = timezone.now()
-            event.save(update_fields=["attempts", "dispatched_at"])
-            sent += 1
+        delivered, retryable = _deliver_one(pk, notices, users)
+        sent += delivered
+        failed += retryable
     return sent, failed

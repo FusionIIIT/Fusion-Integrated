@@ -23,15 +23,13 @@ class Command(BaseCommand):
                 event_type="hreis.notification", dispatched_at__isnull=True
             ).count()
             exhausted = OutboxEvent.objects.filter(
-                event_type="hreis.notification",
-                dispatched_at__isnull=True, attempts__gte=5
+                event_type="hreis.notification", dispatched_at__isnull=True, attempts__gte=5
             ).count()
             self.stdout.write(f"HR-EIS outbox: {pending} pending, {exhausted} exhausted.")
             return
         if options["retry_failed"]:
             count = OutboxEvent.objects.filter(
-                event_type="hreis.notification",
-                dispatched_at__isnull=True, attempts__gte=5
+                event_type="hreis.notification", dispatched_at__isnull=True, attempts__gte=5
             ).update(attempts=0)
             self.stdout.write(f"Requeued {count} exhausted HR-EIS notifications.")
             return

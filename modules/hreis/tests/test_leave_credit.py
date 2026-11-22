@@ -7,13 +7,13 @@ import pytest
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from conftest import make_session
 from modules.hreis.models import (
     AuditEvent,
     EmployeeServiceRecord,
     HRPolicyVersion,
     LeaveLedgerEntry,
 )
+from modules.hreis.tests.actors import make_session
 
 pytestmark = pytest.mark.django_db
 URL = "/api/v1/hreis/leave-balances/credits/"
@@ -30,18 +30,30 @@ def source(user_ref):
     )
     now = timezone.now()
     policy = HRPolicyVersion.objects.create(
-        family="leave", version=1, effective_from=now - timedelta(days=1),
+        family="leave",
+        version=1,
+        effective_from=now - timedelta(days=1),
         parameters={"eligibility": {"faculty": {"Casual": True, "Medical": False}}},
-        approved_by_user_id=99, approved_designation="hradmin",
+        approved_by_user_id=99,
+        approved_designation="hradmin",
     )
     return {10: user_ref(10, "Employee Ten", kind="faculty")}, policy
 
 
-def client(stub_iam, *, role="hradmin", user_id=99, permissions=("hreis.balance.manage",), users=None):
-    stub_iam(make_session(
-        user_id=user_id, kind="staff", active_role=role, roles=(role,),
-        permissions=permissions, modules=("hreis",),
-    ), users=users)
+def client(
+    stub_iam, *, role="hradmin", user_id=99, permissions=("hreis.balance.manage",), users=None
+):
+    stub_iam(
+        make_session(
+            user_id=user_id,
+            kind="staff",
+            active_role=role,
+            roles=(role,),
+            permissions=permissions,
+            modules=("hreis",),
+        ),
+        users=users,
+    )
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token synthetic-test-token")
     return c
@@ -71,8 +83,11 @@ def test_hr_afr_024_036_credits_are_verified_and_audited(stub_iam, source):
     assert event.action == "leave_balance_credit"
     assert event.data["evidence_reference"] == "signed-leave-register-page-25"
     employee = client(
-        stub_iam, role="faculty", user_id=10,
-        permissions=("hreis.service_record.view",), users=users,
+        stub_iam,
+        role="faculty",
+        user_id=10,
+        permissions=("hreis.service_record.view",),
+        users=users,
     )
     record = employee.get("/api/v1/hreis/service-records/me/")
     assert record.status_code == 200
@@ -82,17 +97,35 @@ def test_hr_afr_024_036_credits_are_verified_and_audited(stub_iam, source):
 def test_unauthorized_and_self_credit_denied(stub_iam, source):
     users, _ = source
     staff = client(stub_iam, role="staff", user_id=10, users=users)
-    assert staff.post(
-        URL, payload(), format="json", HTTP_IDEMPOTENCY_KEY="role-bypass",
-    ).status_code == 403
+    assert (
+        staff.post(
+            URL,
+            payload(),
+            format="json",
+            HTTP_IDEMPOTENCY_KEY="role-bypass",
+        ).status_code
+        == 403
+    )
     self_admin = client(stub_iam, user_id=10, users=users)
-    assert self_admin.post(
-        URL, payload(), format="json", HTTP_IDEMPOTENCY_KEY="self-credit",
-    ).status_code == 404
+    assert (
+        self_admin.post(
+            URL,
+            payload(),
+            format="json",
+            HTTP_IDEMPOTENCY_KEY="self-credit",
+        ).status_code
+        == 404
+    )
     administrator = client(stub_iam, permissions=(), users=users)
-    assert administrator.post(
-        URL, payload(), format="json", HTTP_IDEMPOTENCY_KEY="no-grant",
-    ).status_code == 403
+    assert (
+        administrator.post(
+            URL,
+            payload(),
+            format="json",
+            HTTP_IDEMPOTENCY_KEY="no-grant",
+        ).status_code
+        == 403
+    )
     assert not LeaveLedgerEntry.objects.exists()
 
 
@@ -103,13 +136,15 @@ def test_replay_and_invalid_evidence_never_credit_twice(stub_iam, source):
     assert first.status_code == 201, first.content
     again = c.post(URL, payload(), format="json", HTTP_IDEMPOTENCY_KEY="manual-credit-1")
     assert again.status_code == 409
-    for idx, item in enumerate([
-        {**payload(), "quantity": "-3"},
-        {**payload(), "evidence_reference": ""},
-        {**payload(), "leave_type": "Medical"},
-        {**payload(), "leave_type": "Other"},
-        {**payload(), "user_id": 100},
-    ]):
+    for idx, item in enumerate(
+        [
+            {**payload(), "quantity": "-3"},
+            {**payload(), "evidence_reference": ""},
+            {**payload(), "leave_type": "Medical"},
+            {**payload(), "leave_type": "Other"},
+            {**payload(), "user_id": 100},
+        ]
+    ):
         response = c.post(URL, item, format="json", HTTP_IDEMPOTENCY_KEY=f"invalid-{idx}")
         assert response.status_code in {400, 404, 409}, response.content
     assert LeaveLedgerEntry.objects.count() == 1

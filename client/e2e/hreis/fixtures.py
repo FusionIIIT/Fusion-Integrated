@@ -1,6 +1,5 @@
 """Synthetic fixtures restricted to disposable HR-EIS browser databases."""
-# Django must initialize before importing ORM models in this standalone fixture.
-# ruff: noqa: E402
+# ruff: noqa: E402 -- Standalone fixtures must initialize Django before ORM imports.
 
 import json
 import os

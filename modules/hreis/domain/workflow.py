@@ -1,9 +1,4 @@
-"""Declarative HR-EIS workflow edges from the live BW-HR / CW-HR specifications.
-
-No configuration value, approval route, leave entitlement or external finance
-status is inferred here. Services must derive guard facts from trusted,
-effective-dated policy and the current IAM role, not from user-submitted flags.
-"""
+"""Declarative HR-EIS workflow edges from the live BW-HR / CW-HR specifications."""
 
 from __future__ import annotations
 
@@ -290,11 +285,7 @@ if len(_INDEX) != len(TRANSITIONS):
 def resolve(
     family: str, source: str, event: str, actor: str, *, guard_results: Mapping[str, bool]
 ) -> Transition:
-    """Resolve one legal move, denying any missing/false guard.
-
-    Services own the policy evaluation and current-role/step lookup. In
-    particular, clients must never supply guard_results directly.
-    """
+    """Resolve one legal move, denying any missing/false guard."""
     if family not in FAMILIES:
         raise UnknownWorkflow(f"Unknown HR request family: {family!r}.")
     transition = _INDEX.get((family, source, event))

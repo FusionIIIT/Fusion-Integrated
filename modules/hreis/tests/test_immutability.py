@@ -118,6 +118,11 @@ def test_appraisal_freezes_after_finalization():
     )
     appraisal = hr.AppraisalDetail.objects.create(
         request=request,
+        employee_record=hr.EmployeeServiceRecord.objects.create(
+            user_id=21,
+            department="CSE",
+            designation_snapshot="Synthetic",
+        ),
         period_key="2026",
     )
     hr.AppraisalDetail.objects.filter(pk=appraisal.pk).update(

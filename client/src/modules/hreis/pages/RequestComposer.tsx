@@ -7,17 +7,18 @@ import { errorMessage } from "../../../lib/http";
 import {
   useSubmitAppraisal, useSubmitClaim, useSubmitLeave,
 } from "../api/hooks";
+import type { LeaveInput } from "../api/types";
 
 type Mode = "leave" | "ltc" | "cpda" | "appraisal" | null;
 
-const leaveTypes = [
+const leaveTypes: LeaveInput["leave_type"][] = [
   "Casual", "Restricted", "Medical", "Earned", "Vacation", "Sabbatical",
 ];
 
 export function RequestComposer({ only }: { only?: "leave" | "claims" | "appraisal" }) {
   const { can } = useAuth();
   const [mode, setMode] = useState<Mode>(null);
-  const [leaveType, setLeaveType] = useState("Casual");
+  const [leaveType, setLeaveType] = useState<LeaveInput["leave_type"]>("Casual");
   const [duration, setDuration] = useState("");
   const [justification, setJustification] = useState("");
   const [subtype, setSubtype] = useState<"advance" | "reimbursement">("advance");
@@ -122,7 +123,8 @@ export function RequestComposer({ only }: { only?: "leave" | "claims" | "apprais
           </Alert>
           {mode === "leave" && <>
             <Select label="Leave type" required data={leaveTypes}
-              value={leaveType} onChange={(value) => setLeaveType(value || "Casual")} />
+              value={leaveType} onChange={(value) => setLeaveType(
+                leaveTypes.find((item) => item === value) ?? "Casual")} />
             <TextInput label="Duration (days)" required value={duration}
               onChange={(event) => setDuration(event.currentTarget.value)} />
             <Textarea label="Justification" required autosize minRows={3}

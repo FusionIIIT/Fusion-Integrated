@@ -1,5 +1,6 @@
 """Spec-driven reminder/deadline events, recipient isolation and mail handoff."""
 
+from dataclasses import replace
 from datetime import timedelta
 from io import StringIO
 from types import SimpleNamespace
@@ -13,6 +14,7 @@ from modules.hreis.models import (
     AppraisalDetail,
     ApprovalRouteStep,
     AuditEvent,
+    EmployeeServiceRecord,
     HRPolicyVersion,
     HRRequest,
     Notification,
@@ -35,18 +37,22 @@ def policy(family="leave", conditions=None):
     )
 
 
-def pending_request(p, family="leave", owner=10, state="pending_authority", designation="HOD (CSE)"):
+def pending_request(
+    p, family="leave", owner=10, state="pending_authority", designation="HOD (CSE)"
+):
     row = HRRequest.objects.create(
-        user_id=owner, family=family, state=state,
-        policy_version=p, route_step=0, version=1,
+        user_id=owner,
+        family=family,
+        state=state,
+        policy_version=p,
+        route_step=0,
+        version=1,
     )
     if designation:
         ApprovalRouteStep.objects.create(
             request=row, position=0, designation=designation, policy_version_label="demo"
         )
-    HRRequest.objects.filter(pk=row.pk).update(
-        updated_at=timezone.now() - timedelta(hours=3)
-    )
+    HRRequest.objects.filter(pk=row.pk).update(updated_at=timezone.now() - timedelta(hours=3))
     return HRRequest.objects.get(pk=row.pk)
 
 
@@ -54,10 +60,12 @@ def test_hr_uc_021_reminder_only_for_current_configured_authority_and_once():
     # HR-AFR-079, HR-AFR-081, BR-HR-024, BR-HR-033:
     # only configured current assignees receive a single dashboard reminder.
     # HR-CFR-011, HR-UC-021, BR-HR-024, BR-HR-033.
-    p = policy(conditions={
-        "pending_reminder_after_hours": 2,
-        "reminder_recipients": {"HOD (CSE)": [10, 200], "Registrar": [201]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 2,
+            "reminder_recipients": {"HOD (CSE)": [10, 200], "Registrar": [201]},
+        }
+    )
     row = pending_request(p)
     assert ns.create_pending_action_reminders() == 1
     assert ns.create_pending_action_reminders() == 0
@@ -77,23 +85,35 @@ def test_hr_uc_021_reminder_only_for_current_configured_authority_and_once():
 
 
 def test_hr_uc_021_unconfigured_or_not_due_does_not_notify():
-    p = policy(conditions={
-        "pending_reminder_after_hours": 10,
-        "reminder_recipients": {"HOD (CSE)": [200]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 10,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
     pending_request(p)
     assert ns.create_pending_action_reminders() == 0
     assert not Notification.objects.exists()
 
 
 def test_hr_uc_021_appraisal_ignores_unassigned_same_role_reviewer():
-    p = policy("appraisal", {
-        "pending_reminder_after_hours": 1,
-        "reminder_recipients": {"HOD (CSE)": [200, 201]},
-    })
+    p = policy(
+        "appraisal",
+        {
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200, 201]},
+        },
+    )
     row = pending_request(p, family="appraisal", state="pending_review")
     AppraisalDetail.objects.create(
-        request=row, period_key="FY2026", reviewer_user_ids=[200],
+        request=row,
+        period_key="FY2026",
+        reviewer_user_ids=[200],
+        employee_record=EmployeeServiceRecord.objects.create(
+            user_id=row.user_id,
+            department="CSE",
+            designation_snapshot="Synthetic",
+        ),
         submitted_form={"summary": "teaching"},
     )
     assert ns.create_pending_action_reminders() == 1
@@ -101,10 +121,12 @@ def test_hr_uc_021_appraisal_ignores_unassigned_same_role_reviewer():
 
 
 def test_hr_uc_021_no_assignment_means_no_notification():
-    p = policy(conditions={
-        "pending_reminder_after_hours": 1,
-        "reminder_recipients": {"HOD (CSE)": [200]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
     pending_request(p, designation=None)
     assert ns.create_pending_action_reminders() == 0
     assert not Notification.objects.exists()
@@ -115,10 +137,13 @@ def test_hr_uc_022_policy_notice_only_when_explicitly_due_and_idempotent():
     # no institution policy or deadline is invented by the notification worker.
     # HR-UC-022: no synthetic policy content and no undocumented broadcast.
     now = timezone.now()
-    policy("leave", {
-        "policy_notice_at": (now - timedelta(minutes=5)).isoformat(),
-        "policy_notice_recipients": [200],
-    })
+    policy(
+        "leave",
+        {
+            "policy_notice_at": (now - timedelta(minutes=5)).isoformat(),
+            "policy_notice_recipients": [200],
+        },
+    )
     assert ns.create_policy_deadline_notifications() == 1
     assert ns.create_policy_deadline_notifications() == 0
     notice = Notification.objects.get()
@@ -132,16 +157,18 @@ def test_worker_hand_off_retries_then_marks_success_only_on_mail_backend_accepta
 ):
     # HR-AFR-082, BR-HR-024: SMTP handoff is retried and marked only
     # after the configured backend accepts the one intended recipient.
-    p = policy(conditions={
-        "pending_reminder_after_hours": 1,
-        "reminder_recipients": {"HOD (CSE)": [200]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
     pending_request(p)
     ns.create_pending_action_reminders()
     event = OutboxEvent.objects.get()
-    monkeypatch.setattr(ns, "get_users", lambda ids: {
-        200: SimpleNamespace(email="configured@example.edu")
-    })
+    monkeypatch.setattr(
+        ns, "get_users", lambda ids: {200: SimpleNamespace(email="configured@example.edu")}
+    )
     with patch.object(ns, "send_mail", side_effect=OSError("mail backend unavailable")):
         assert ns.deliver_pending_notifications() == (0, 1)
     event.refresh_from_db()
@@ -173,10 +200,12 @@ def test_no_unapproved_automatic_notification_cadence(monkeypatch):
 
 
 def test_unknown_directory_email_keeps_outbox_unmarked(monkeypatch):
-    p = policy(conditions={
-        "pending_reminder_after_hours": 1,
-        "reminder_recipients": {"HOD (CSE)": [200]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
     pending_request(p)
     ns.create_pending_action_reminders()
     monkeypatch.setattr(ns, "get_users", lambda ids: {})
@@ -199,13 +228,16 @@ def test_manual_notification_command_and_celery_schedule():
     assert "Generated 0 reminders and 0 policy notices" in text.getvalue()
 
 
-@pytest.mark.parametrize("conditions", [
-    {"pending_reminder_after_hours": 0, "reminder_recipients": {"HOD (CSE)": [200]}},
-    {"pending_reminder_after_hours": 2, "reminder_recipients": {"Unknown": [200]}},
-    {"pending_reminder_after_hours": 2, "reminder_recipients": {"HOD (CSE)": [200, 200]}},
-    {"policy_notice_at": "2026-01-01", "policy_notice_recipients": [200]},
-    {"policy_notice_recipients": [200]},
-])
+@pytest.mark.parametrize(
+    "conditions",
+    [
+        {"pending_reminder_after_hours": 0, "reminder_recipients": {"HOD (CSE)": [200]}},
+        {"pending_reminder_after_hours": 2, "reminder_recipients": {"Unknown": [200]}},
+        {"pending_reminder_after_hours": 2, "reminder_recipients": {"HOD (CSE)": [200, 200]}},
+        {"policy_notice_at": "2026-01-01", "policy_notice_recipients": [200]},
+        {"policy_notice_recipients": [200]},
+    ],
+)
 def test_invalid_notification_policy_not_published(conditions):
     from core.api.exceptions import BadRequestError
     from modules.hreis.services.policies import _check_parameters
@@ -215,10 +247,12 @@ def test_invalid_notification_policy_not_published(conditions):
 
 
 def test_notification_worker_leaves_identity_service_failure_pending(monkeypatch):
-    p = policy(conditions={
-        "pending_reminder_after_hours": 1,
-        "reminder_recipients": {"HOD (CSE)": [200]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
     pending_request(p)
     assert ns.create_pending_action_reminders() == 1
 
@@ -235,15 +269,17 @@ def test_notification_worker_leaves_identity_service_failure_pending(monkeypatch
 
 
 def test_notification_backend_returning_zero_is_not_delivery(monkeypatch):
-    p = policy(conditions={
-        "pending_reminder_after_hours": 1,
-        "reminder_recipients": {"HOD (CSE)": [200]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
     pending_request(p)
     ns.create_pending_action_reminders()
-    monkeypatch.setattr(ns, "get_users", lambda ids: {
-        200: SimpleNamespace(email="configured@example.edu")
-    })
+    monkeypatch.setattr(
+        ns, "get_users", lambda ids: {200: SimpleNamespace(email="configured@example.edu")}
+    )
     with patch.object(ns, "send_mail", return_value=0):
         assert ns.deliver_pending_notifications() == (0, 1)
     event = OutboxEvent.objects.get()
@@ -251,18 +287,20 @@ def test_notification_backend_returning_zero_is_not_delivery(monkeypatch):
 
 
 def test_notification_retry_limit_and_requeue_only_explicitly(monkeypatch):
-    p = policy(conditions={
-        "pending_reminder_after_hours": 1,
-        "reminder_recipients": {"HOD (CSE)": [200]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
     pending_request(p)
     ns.create_pending_action_reminders()
     outbox = OutboxEvent.objects.get()
     outbox.attempts = 5
     outbox.save(update_fields=["attempts"])
-    monkeypatch.setattr(ns, "get_users", lambda ids: {
-        200: SimpleNamespace(email="configured@example.edu")
-    })
+    monkeypatch.setattr(
+        ns, "get_users", lambda ids: {200: SimpleNamespace(email="configured@example.edu")}
+    )
     with patch.object(ns, "send_mail") as send:
         assert ns.deliver_pending_notifications() == (0, 0)
     send.assert_not_called()
@@ -277,14 +315,20 @@ def test_notification_retry_limit_and_requeue_only_explicitly(monkeypatch):
 
 def test_notification_generation_skips_invalid_policy_dates_and_recipients():
     now = timezone.now()
-    policy("ltc", {
-        "policy_notice_at": "not-a-timestamp",
-        "policy_notice_recipients": [200],
-    })
-    policy("cpda", {
-        "policy_notice_at": (now + timedelta(days=1)).isoformat(),
-        "policy_notice_recipients": [200],
-    })
+    policy(
+        "ltc",
+        {
+            "policy_notice_at": "not-a-timestamp",
+            "policy_notice_recipients": [200],
+        },
+    )
+    policy(
+        "cpda",
+        {
+            "policy_notice_at": (now + timedelta(days=1)).isoformat(),
+            "policy_notice_recipients": [200],
+        },
+    )
     assert ns.create_policy_deadline_notifications() == 0
     assert not Notification.objects.exists()
 
@@ -297,15 +341,17 @@ def test_notification_commands_refuse_zero_delivery_limit():
 
 
 def test_notification_worker_accepts_valid_delivery_command(monkeypatch):
-    p = policy(conditions={
-        "pending_reminder_after_hours": 1,
-        "reminder_recipients": {"HOD (CSE)": [200]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
     pending_request(p)
     ns.create_pending_action_reminders()
-    monkeypatch.setattr(ns, "get_users", lambda ids: {
-        200: SimpleNamespace(email="configured@example.edu")
-    })
+    monkeypatch.setattr(
+        ns, "get_users", lambda ids: {200: SimpleNamespace(email="configured@example.edu")}
+    )
     with patch.object(ns, "send_mail", return_value=1):
         text = StringIO()
         call_command("hreis_notifications", "--deliver", stdout=text)
@@ -322,18 +368,23 @@ def test_email_worker_never_consumes_non_email_hr_outbox_events(monkeypatch):
         strict=True,
     ):
         OutboxEvent.objects.create(
-            event_key=key, event_type=kind,
+            event_key=key,
+            event_type=kind,
             payload={"resource_id": 42},
         )
-    p = policy(conditions={
-        "pending_reminder_after_hours": 1,
-        "reminder_recipients": {"HOD (CSE)": [200]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
     pending_request(p)
     assert ns.create_pending_action_reminders() == 1
-    monkeypatch.setattr(ns, "get_users", lambda ids: {
-        200: SimpleNamespace(email="active@example.edu", is_active=True)
-    })
+    monkeypatch.setattr(
+        ns,
+        "get_users",
+        lambda ids: {200: SimpleNamespace(email="active@example.edu", is_active=True)},
+    )
     with patch.object(ns, "send_mail", return_value=1) as mail:
         assert ns.deliver_pending_notifications() == (1, 0)
     mail.assert_called_once()
@@ -346,22 +397,51 @@ def test_email_worker_never_consumes_non_email_hr_outbox_events(monkeypatch):
     text = StringIO()
     call_command("hreis_notifications", "--retry-failed", stdout=text)
     assert "Requeued 0" in text.getvalue()
-    assert set(OutboxEvent.objects.filter(
-        event_key__in=non_email_keys
-    ).values_list("attempts", flat=True)) == {5}
+    assert set(
+        OutboxEvent.objects.filter(event_key__in=non_email_keys).values_list("attempts", flat=True)
+    ) == {5}
 
 
 def test_inactive_iam_user_must_not_receive_hr_email(monkeypatch):
     # HR-AFR-098 / BR-HR-030: no sensitive mail to a disabled account.
-    p = policy(conditions={
-        "pending_reminder_after_hours": 1,
-        "reminder_recipients": {"HOD (CSE)": [200]},
-    })
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
     pending_request(p)
     assert ns.create_pending_action_reminders() == 1
-    monkeypatch.setattr(ns, "get_users", lambda ids: {
-        200: SimpleNamespace(email="former.staff@example.edu", is_active=False)
-    })
+    monkeypatch.setattr(
+        ns,
+        "get_users",
+        lambda ids: {200: SimpleNamespace(email="former.staff@example.edu", is_active=False)},
+    )
+    with patch.object(ns, "send_mail") as mail:
+        assert ns.deliver_pending_notifications() == (0, 1)
+    mail.assert_not_called()
+    event = OutboxEvent.objects.get()
+    assert event.attempts == 1 and event.dispatched_at is None
+
+
+def test_inactive_directory_projection_is_preserved_through_real_public_contract(
+    stub_iam, user_ref
+):
+    # HR-AFR-098 / BR-HR-030: use the actual directory DTO, not a substituted DTO.
+    inactive = replace(
+        user_ref(200, kind="staff"),
+        is_active=False,
+        email="inactive@example.invalid",
+    )
+    stub_iam(None, users={200: inactive})
+    p = policy(
+        conditions={
+            "pending_reminder_after_hours": 1,
+            "reminder_recipients": {"HOD (CSE)": [200]},
+        }
+    )
+    pending_request(p)
+    assert ns.create_pending_action_reminders() == 1
     with patch.object(ns, "send_mail") as mail:
         assert ns.deliver_pending_notifications() == (0, 1)
     mail.assert_not_called()

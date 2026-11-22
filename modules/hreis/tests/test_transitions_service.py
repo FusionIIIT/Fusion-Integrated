@@ -8,7 +8,6 @@ import pytest
 from django.utils import timezone
 
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError
-from fusion_auth.principal import Principal
 from modules.hreis.models import (
     AuditEvent,
     EmployeeServiceRecord,
@@ -19,6 +18,7 @@ from modules.hreis.models import (
 )
 from modules.hreis.services import requests as submissions
 from modules.hreis.services import transitions
+from modules.hreis.tests.actors import Principal
 
 pytestmark = pytest.mark.django_db
 
@@ -148,9 +148,7 @@ def test_leave_requires_current_role_and_final_authority(route):
 
 def test_request_owner_cannot_advance_their_own_leave_approval(route):
     row = leave_request(route)
-    owner_acting_as_hod = actor(
-        10, "HOD (CSE)", "faculty", ("hreis.leave.approve",)
-    )
+    owner_acting_as_hod = actor(10, "HOD (CSE)", "faculty", ("hreis.leave.approve",))
     with pytest.raises(NotFoundError) as exc:
         transitions.decide_request(
             owner_acting_as_hod,
@@ -163,9 +161,7 @@ def test_request_owner_cannot_advance_their_own_leave_approval(route):
     row.refresh_from_db()
     assert row.state == "pending_authority"
     assert row.route_step == 0
-    assert not HRRequestTransition.objects.filter(
-        request=row, event="forward"
-    ).exists()
+    assert not HRRequestTransition.objects.filter(request=row, event="forward").exists()
 
 
 def test_reject_requires_reason_and_never_debits(route):

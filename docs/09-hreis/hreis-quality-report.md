@@ -1,6 +1,6 @@
 # HR-EIS quality report — Assignment 9 (Student 1)
 
-**As of:** 2026-11-22; latest checkpoint in section 24, earlier sections are historical.
+**As of:** 2026-11-22; latest checkpoint in section 25, earlier sections are historical.
 **Branch:** `module/hreis`
 **Status:** DEVELOPMENT / NOT APPROVED / NOT READY FOR A 10/10 CLAIM
 
@@ -498,7 +498,7 @@ intermediate code-review and test counts only where actual evidence exists.
 
 ### Independent preflight (not the official review)
 
-An independent read-only AI preflight examined the uncommitted working tree and
+An independent read-only preflight examined the uncommitted working tree and
 returned **NOT APPROVED** with several concrete functional and security
 findings. The original complete output is saved at
 `D:\HR(EIS)\lab 9\evidence\A9-20261121-preflight-independent-review-uncommitted.txt`.
@@ -690,7 +690,7 @@ The owner reports Student 2's verbal acceptance of the plan and will seek
 written approval, shared-file change approval, any provider/rule rulings
 and the independent Student 2 testing **on handoff**. No such written
 approval is fabricated here. No clean committed-clone nine-dimensional
-10/10 verdict has been obtained, and no AI Git commit, push, PR, or
+10/10 verdict has been obtained, and no automated Git commit, push, PR, or
 production rollout occurred. The independent preflight is not a substitute.
 
 **Final checks:** Record the exact post-change `make check`,
@@ -728,7 +728,7 @@ formal clean committed-clone nine-dimension scorecard.
   policy.manage grants, rejects conflicting version definitions and
   atomically refuses partial imports. No policy values are invented.
 - R1-11: deterministic generator ops/docs/hreis_reference.py produces
-  docs/09-hreis/hreis-reference.generated.md from real registry and
+  docs/09-hreis/hreis-reference.md from real registry and
   workflow declarations. It includes caveats for external providers.
 - R1-12: a real PostgreSQL two-thread test submitted two independent
   two-day final leave approvals against one three-day balance: one succeeds,
@@ -789,7 +789,7 @@ approval, production SMTP, payment or real payroll integration.
   (returned LTC claims lack a canonical return transition).
 - Existing Accounts Admin designation remains a PROVISIONAL mapping
   to the source HR Accountant actor, not an institutional ruling.
-- No AI Git commit, push, PR, student-written approval, Student 2
+- No automated Git commit, push, PR, student-written approval, Student 2
   independent specification tests or formal clean-clone 10/10 review
   has been performed by the builder. The original NOT APPROVED
   preflight output remains preserved.
@@ -837,7 +837,7 @@ fixes**; there is no new post-fix formal reviewer verdict. A fresh committed
 clone review requires a human Student 1 Git commit and separate session.
 
 The handoff index is docs/09-hreis/student1-handoff.md. The source, local DB
-volumes, and all evidence are preserved. No AI commit, push, PR, bank
+volumes, and all evidence are preserved. No automated commit, push, PR, bank
 execution, external sync, or fabricated student approval has occurred.
 
 ## 22. Post-fix mutation and deployment supplement (2026-11-22)
@@ -987,3 +987,75 @@ preserved while the current implementation remains based on latest upstream main
 The owner explicitly requested the current commit/push handoff. No institutional
 pull request, production deployment, external payment or Student 2 message is
 part of this technical handoff.
+
+## 25. Review-driven technical verification (2026-11-22)
+
+This checkpoint supersedes section 24's counts. It records technical evidence;
+the required written approvals, protected-file ruling and final independent
+verdict remain distinct. Student 2's reserved tests/spec and spec-tests folders
+have not been authored or changed.
+
+| Quality gate | Latest completed result |
+|---|---|
+| Complete backend `make check` | PASS, 806 test outcomes; Django, lint, architecture, FK boundaries, plural contracts, route/nav, migrations, permissions and OpenAPI checks |
+| Complete frontend `make check-client` | PASS, 67 tests, TypeScript and production build; nonfatal 514.84 kB main-chunk warning |
+| Module combined coverage | PASS, 377 tests, 92.13% against 90% |
+| Pure domain combined coverage | PASS, 377 tests, 95.79% against 95% |
+| Complete Chromium suite | PASS, 58 tests: 49 HR-EIS cases and 9 shared/platform cases |
+| Production-settings deployment checks | PASS, zero unsilenced issues; existing production settings silence two documented warnings |
+| Frontend dependency audit | Zero known vulnerabilities |
+| Installed Python dependency audit | Zero known vulnerabilities; editable local application excluded |
+| Schema/client/reference consistency | OpenAPI regenerated, wire types derived from it, 193 enforcement links resolve, deterministic output checks pass |
+| Migration lifecycle | One initial migration; fresh apply, reverse-to-zero and reapply succeed with immutable triggers retained |
+
+The backend outcome count is read from the completed pytest progress output
+(the repository's double-quiet configuration omits the numerical summary).
+The exact coverage commands remain those in section 24. Final logs and audit
+JSON are in `D:\HR(EIS)\lab 9\evidence\A9-20261122-quality-*.log`,
+`A9-20261122-dependency-audit-final.json` and
+`A9-20261122-python-dependency-audit-final.json`.
+
+The synthetic browser suite covers all 21 live use cases, both unavailable
+external-status alternatives, all twelve registry designations, ten direct
+permission-negative routes and a keyboard-only leave submission.
+[`browser-walkthrough.md`](browser-walkthrough.md) contains actor/dump-account
+rows with actual matched runserver lines; [`browser-coverage.md`](browser-coverage.md)
+describes the test isolation and use-case map. Full raw logs remain outside Git.
+Each run drops its disposable database, restores temporary IAM permissions and
+revokes its temporary service credential. No institutional policy or provider is seeded.
+
+New technical changes and their regression evidence are listed individually in
+[`review-remediation.md`](review-remediation.md). Important corrections include
+database-enforced appraisal uniqueness, finite input bounds, independently
+permission-gated controls, unknown external status with later immutable history,
+service-owned notification writes, platform throttling, complete endpoint gate
+and query-budget matrices, concurrent task redelivery, actual directory refresh,
+HTTP-boundary frontend tests and generated API examples/types.
+
+The initial migration is for this unmerged module's clean installation. The
+development database was backed up and upgraded through the interim integrity
+migration before consolidation; its records were preserved. Both the old chain
+and `dev-before-r1-integrity.dump` remain outside Git. Do not reverse or reset a
+database containing records to adopt this clean initial set; older draft schemas
+need a separately checked data-preserving upgrade.
+
+Direct builder-test citations now cover 188/193 live IDs. Five remain uncited;
+six broader source/integration obligations remain unresolved, including the
+partially verified identity-consistency obligation. No unresolved requirement is
+treated as a signed accepted gap. External storage, finance/payroll exchange,
+official delivery configuration, the provisional Accounts Admin mapping and
+the undefined LTC return outcome retain the limitations stated in the blueprint.
+
+Independent round 1 reviewed clean committed checkout
+`e93cc164218353145556f591d672d5f1c78c8ef5` and returned **not yet**.
+Its scores were **3 / 1 / 7 / 4 / 0 / 1 / 3 / 2 / 9**, in the prescribed order.
+The full output and SHA-256 are recorded in review-remediation.md. The candidate
+addresses its technical findings, while R1-01, R1-02 and the unresolved part of
+R1-06 remain explicit. No 10/10 is inferred from passing automated gates.
+
+A second fresh checkout with its own dependencies is prepared for the next
+committed-clone review. The branch's earlier Student 1 prototype history was
+preserved by a merge; the verified implementation remains based on upstream
+main `5595be6628b4cdc6f8b47cf74bac267a2470f780`. The owner's current request
+authorizes the technical Git handoff. It does not supply Student 2 signatures,
+a production deployment or the final institutional pull request.

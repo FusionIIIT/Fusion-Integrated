@@ -109,6 +109,13 @@ def test_ltc_requires_actual_prescribed_form(form):
     assert exc.value.code == "missing_form"
 
 
+def test_ltc_form_reference_is_never_silently_truncated_at_storage_boundary():
+    assert claims.validate_ltc("advance", "x" * 250).prescribed_form_reference == "x" * 250
+    with pytest.raises(claims.InvalidClaim) as refused:
+        claims.validate_ltc("advance", "x" * 251)
+    assert refused.value.code == "invalid_form_reference"
+
+
 @pytest.mark.parametrize("purpose", ["", "  ", None])
 def test_cpda_requires_purpose(purpose):
     with pytest.raises(claims.InvalidClaim) as exc:

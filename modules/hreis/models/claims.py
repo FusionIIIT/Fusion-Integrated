@@ -52,22 +52,23 @@ class ClaimDocument(models.Model):
 
 
 class FinancialStatusProjection(models.Model):
-    """Append-only attestation of an external claim status, never a payment order.
+    """Append-only attestation of an external claim status, never a payment order."""
 
-    BR-HR-018/022/027/035: each new status is an independent recorded event;
-    ClaimDetail's JSON field is only the convenient latest-value projection.
-    """
-    claim = models.ForeignKey(
-        ClaimDetail, on_delete=models.PROTECT, related_name="status_history"
-    )
+    claim = models.ForeignKey(ClaimDetail, on_delete=models.PROTECT, related_name="status_history")
     event_key = models.CharField(max_length=180, unique=True)
-    source_system = models.CharField(
-        max_length=16, choices=[("finance", "Finance"), ("payroll", "Payroll")]
+    source_system = models.CharField(  # noqa: DJ001 -- No external source is available yet.
+        max_length=16,
+        choices=[("finance", "Finance"), ("payroll", "Payroll")],
+        null=True,
     )
-    external_status_reference = models.CharField(max_length=250)
+    external_status_reference = models.CharField(  # noqa: DJ001 -- No external reference exists yet.
+        max_length=250,
+        null=True,
+    )
     financial_review_reference = models.CharField(max_length=250)
-    payment_status = models.CharField(
+    payment_status = models.CharField(  # noqa: DJ001 -- Unavailable status is not a payment state.
         max_length=20,
+        null=True,
         choices=[
             ("processing", "Processing"),
             ("payment_pending", "Payment pending"),

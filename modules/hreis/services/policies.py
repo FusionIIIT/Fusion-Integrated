@@ -1,8 +1,4 @@
-"""Effective-dated, append-only HR policy maintenance and active lookup.
-
-Every quantitative entitlement and authority route is supplied as documented
-institutional policy. This service has intentionally no default values.
-"""
+"""Effective-dated, append-only HR policy maintenance and active lookup."""
 
 from __future__ import annotations
 
@@ -20,6 +16,7 @@ from modules.hreis.domain.routing import (
     validate_route,
 )
 from modules.hreis.models import AuditEvent, HRPolicyVersion
+from modules.hreis.models.policies import MAX_POLICY_VERSION
 from modules.hreis.services.authz import require
 
 _ADMIN = frozenset({"hradmin"})
@@ -37,12 +34,23 @@ def _check_parameters(family: str, parameters: dict) -> None:
     allowed = {"routes", "eligibility", "submission_window", "conditions"}
     if set(parameters) - allowed:
         raise BadRequestError(
-            "Policy contains an unknown configuration field.", code="policy_unknown_field"
+            "Policy contains an unknown configuration field. Check the submitted fields and retry.",
+            code="policy_unknown_field",
         )
+    _check_routes(family, parameters)
+    _check_eligibility(family, parameters)
+    _check_window(family, parameters)
+    _check_conditions(family, parameters)
+
+
+def _check_routes(family, parameters):
     if "routes" in parameters:
         routes = parameters["routes"]
         if not isinstance(routes, list):
-            raise BadRequestError("Approval routes must be an array.", code="invalid_routes")
+            raise BadRequestError(
+                "Approval routes must be an array. Check the submitted fields and retry.",
+                code="invalid_routes",
+            )
         unique = set()
         for row in routes:
             if (
@@ -58,13 +66,16 @@ def _check_parameters(family: str, parameters: dict) -> None:
                 or not isinstance(row["authorities"], list)
             ):
                 raise BadRequestError(
-                    "Each route needs employee_kind, department and authorities.",
+                    "Each route needs employee_kind, department and authorities. Check the "
+                    "submitted fields and retry.",
                     code="invalid_routes",
                 )
             key = (row["employee_kind"], row["department"])
             if key in unique:
                 raise BadRequestError(
-                    "Each employee group and department has one route.", code="duplicate_route"
+                    "Each employee group and department has one route. Check the submitted fields "
+                    "and retry.",
+                    code="duplicate_route",
                 )
             unique.add(key)
             try:
@@ -79,18 +90,25 @@ def _check_parameters(family: str, parameters: dict) -> None:
                 )
             except (RouteError, TypeError, KeyError) as exc:
                 raise BadRequestError(
-                    "Approval route is not valid for verified IAM roles.", code="invalid_routes"
+                    "Choose an approval route using verified IAM authority roles.",
+                    code="invalid_routes",
                 ) from exc
+
+
+def _check_eligibility(family, parameters):
     if "eligibility" in parameters:
         if family != "leave":
             raise BadRequestError(
-                "Eligibility by leave type belongs only to leave policy.",
+                "Eligibility by leave type belongs only to leave policy. Check the submitted "
+                "fields and retry.",
                 code="wrong_policy_family",
             )
         rules = parameters["eligibility"]
         if not isinstance(rules, dict) or set(rules) - _KINDS:
             raise BadRequestError(
-                "Leave eligibility must be keyed by employee kind.", code="invalid_eligibility"
+                "Leave eligibility must be keyed by employee kind. Check the submitted fields and "
+                "retry.",
+                code="invalid_eligibility",
             )
         from modules.hreis.domain.leave import LEAVE_TYPES
 
@@ -101,35 +119,52 @@ def _check_parameters(family: str, parameters: dict) -> None:
                 or any(type(value) is not bool for value in choices.values())
             ):
                 raise BadRequestError(
-                    "Each leave type needs an explicit eligibility boolean.",
+                    "Each leave type needs an explicit eligibility boolean. Check the submitted "
+                    "fields and retry.",
                     code="invalid_eligibility",
                 )
+
+
+def _check_window(family, parameters):
     if "submission_window" in parameters:
         if family != "appraisal":
             raise BadRequestError(
-                "Submission window belongs only to appraisal policy.", code="wrong_policy_family"
+                "Submission window belongs only to appraisal policy. Check the submitted fields "
+                "and retry.",
+                code="wrong_policy_family",
             )
         window = parameters["submission_window"]
         if not isinstance(window, dict) or set(window) != {"start", "end"}:
             raise BadRequestError(
-                "Appraisal window must declare start and end.", code="invalid_window"
+                "Appraisal window must declare start and end. Check the submitted fields and "
+                "retry.",
+                code="invalid_window",
             )
         try:
             start = datetime.fromisoformat(window["start"])
             end = datetime.fromisoformat(window["end"])
         except (TypeError, ValueError) as exc:
             raise BadRequestError(
-                "Appraisal dates must be ISO 8601 timestamps.", code="invalid_window"
+                "Appraisal dates must be ISO 8601 timestamps. Check the submitted fields and "
+                "retry.",
+                code="invalid_window",
             ) from exc
         if timezone.is_naive(start) or timezone.is_naive(end) or start >= end:
             raise BadRequestError(
-                "Appraisal submission window must be time-zone aware.", code="invalid_window"
+                "Appraisal submission window must be time-zone aware. Check the submitted fields "
+                "and retry.",
+                code="invalid_window",
             )
+
+
+def _check_conditions(family, parameters):
     if "conditions" in parameters:
         conditions = parameters["conditions"]
         if not isinstance(conditions, dict):
             raise BadRequestError(
-                "Policy conditions must be a key/value object.", code="invalid_conditions"
+                "Policy conditions must be a key/value object. Check the submitted fields and "
+                "retry.",
+                code="invalid_conditions",
             )
         reminder_fields = {"pending_reminder_after_hours", "reminder_recipients"}
         if reminder_fields.intersection(conditions):
@@ -154,31 +189,38 @@ def _check_parameters(family: str, parameters: dict) -> None:
                     "Provide a positive reminder delay and configured authority user IDs.",
                     code="invalid_reminder_config",
                 )
-        policy_fields = {"policy_notice_at", "policy_notice_recipients"}
-        if policy_fields.intersection(conditions):
-            at = conditions.get("policy_notice_at")
-            recipients = conditions.get("policy_notice_recipients")
-            try:
-                due = datetime.fromisoformat(at) if isinstance(at, str) else None
-            except ValueError:
-                due = None
-            if (
-                due is None
-                or timezone.is_naive(due)
-                or not isinstance(recipients, list)
-                or not recipients
-                or any(type(user_id) is not int or user_id <= 0 for user_id in recipients)
-                or len(set(recipients)) != len(recipients)
-            ):
-                raise BadRequestError(
-                    "Configure a timezone-aware notice date and recipient user IDs.",
-                    code="invalid_policy_notice",
-                )
+        _check_policy_notice(conditions)
+
+
+def _check_policy_notice(conditions):
+    policy_fields = {"policy_notice_at", "policy_notice_recipients"}
+    if policy_fields.intersection(conditions):
+        at = conditions.get("policy_notice_at")
+        recipients = conditions.get("policy_notice_recipients")
+        try:
+            due = datetime.fromisoformat(at) if isinstance(at, str) else None
+        except ValueError:
+            due = None
+        if (
+            due is None
+            or timezone.is_naive(due)
+            or not isinstance(recipients, list)
+            or not recipients
+            or any(type(user_id) is not int or user_id <= 0 for user_id in recipients)
+            or len(set(recipients)) != len(recipients)
+        ):
+            raise BadRequestError(
+                "Configure a timezone-aware notice date and recipient user IDs.",
+                code="invalid_policy_notice",
+            )
 
 
 def current_policy(family: str, *, at=None) -> HRPolicyVersion:
     if family not in _FAMILIES:
-        raise BadRequestError("Unknown HR policy family.", code="unknown_policy_family")
+        raise BadRequestError(
+            "Unknown HR policy family. Check the submitted fields and retry.",
+            code="unknown_policy_family",
+        )
     now = at or timezone.now()
     policies = list(
         HRPolicyVersion.objects.filter(
@@ -187,11 +229,12 @@ def current_policy(family: str, *, at=None) -> HRPolicyVersion:
         ).order_by("-effective_from", "-version")[:2]
     )
     if not policies or (
-        policies[0].effective_until is not None
-        and policies[0].effective_until <= now
+        policies[0].effective_until is not None and policies[0].effective_until <= now
     ):
         raise ConflictError(
-            "No effective institutional policy is configured.", code="policy_unavailable"
+            "No effective institutional policy is configured. Contact HR to resolve this "
+            "before retrying.",
+            code="policy_unavailable",
         )
     if len(policies) > 1:
         previous = policies[1]
@@ -202,8 +245,51 @@ def current_policy(family: str, *, at=None) -> HRPolicyVersion:
         )
         overlapping = previous.effective_until is None or previous.effective_until > now
         if overlapping and not superseded:
-            raise ConflictError("Institutional policy periods overlap.", code="ambiguous_policy")
+            raise ConflictError(
+                "Institutional policy periods overlap. Contact HR to resolve this before retrying.",
+                code="ambiguous_policy",
+            )
     return policies[0]
+
+
+def _check_effective_dates(effective_from, effective_until):
+    if (
+        not isinstance(effective_from, datetime)
+        or timezone.is_naive(effective_from)
+        or (
+            effective_until is not None
+            and (
+                not isinstance(effective_until, datetime)
+                or timezone.is_naive(effective_until)
+                or effective_until <= effective_from
+            )
+        )
+    ):
+        raise BadRequestError("Provide valid effective policy dates.", code="invalid_policy_dates")
+
+
+def _require_nonoverlapping_policy(family, version, effective_from, effective_until):
+    # A static family lock also serializes the first policy publication.
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT pg_advisory_xact_lock(%s)", [_FAMILY_LOCKS[family]])
+    # Endpoints are exclusive; a successor may begin when its predecessor ends.
+    overlaps = HRPolicyVersion.objects.filter(family=family).filter(
+        Q(effective_until__isnull=True) | Q(effective_until__gt=effective_from)
+    )
+    if effective_until is not None:
+        overlaps = overlaps.filter(effective_from__lt=effective_until)
+    # A later higher version supersedes its immutable open-ended predecessor.
+    overlaps = overlaps.exclude(
+        effective_until__isnull=True,
+        effective_from__lt=effective_from,
+        version__lt=version,
+    )
+    if overlaps.exists():
+        raise ConflictError(
+            "The new policy overlaps an existing version. Contact HR to resolve this before "
+            "retrying.",
+            code="policy_overlap",
+        )
 
 
 @transaction.atomic
@@ -218,45 +304,25 @@ def create_policy(
     idempotency_key: str,
 ) -> HRPolicyVersion:
     require(actor, "hreis.policy.manage", allowed_roles=_ADMIN)
-    if family not in _FAMILIES or type(version) is not int or version <= 0:
-        raise BadRequestError("Unknown policy family/version.", code="invalid_policy")
     if (
-        not isinstance(effective_from, datetime)
-        or timezone.is_naive(effective_from)
-        or (
-            effective_until is not None
-            and (
-                not isinstance(effective_until, datetime)
-                or timezone.is_naive(effective_until)
-                or effective_until <= effective_from
-            )
-        )
+        family not in _FAMILIES
+        or type(version) is not int
+        or not 1 <= version <= MAX_POLICY_VERSION
     ):
-        raise BadRequestError("Provide valid effective policy dates.", code="invalid_policy_dates")
+        raise BadRequestError(
+            f"Choose a supported policy family and a version from 1 to {MAX_POLICY_VERSION}.",
+            code="invalid_policy",
+        )
+    _check_effective_dates(effective_from, effective_until)
     _check_parameters(family, parameters)
     if not isinstance(idempotency_key, str) or not 1 <= len(idempotency_key) <= 100:
         raise BadRequestError("Provide a unique request key.", code="missing_idempotency_key")
     if AuditEvent.objects.filter(event_key=f"policy:{idempotency_key}").exists():
-        raise ConflictError("Policy operation already exists.", code="operation_replayed")
-    # Serialize policy publication per family, even when no policy row exists yet.
-    # The advisory lock key is a static internal constant, never request SQL text.
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT pg_advisory_xact_lock(%s)", [_FAMILY_LOCKS[family]])
-    # Endpoints are exclusive; a successor may begin when its predecessor ends.
-    overlaps = HRPolicyVersion.objects.filter(family=family).filter(
-        Q(effective_until__isnull=True) | Q(effective_until__gt=effective_from)
-    )
-    if effective_until is not None:
-        overlaps = overlaps.filter(effective_from__lt=effective_until)
-    # An immutable open-ended predecessor may be superseded by a later,
-    # higher-versioned policy of either duration. Its history stays unchanged.
-    overlaps = overlaps.exclude(
-        effective_until__isnull=True,
-        effective_from__lt=effective_from,
-        version__lt=version,
-    )
-    if overlaps.exists():
-        raise ConflictError("The new policy overlaps an existing version.", code="policy_overlap")
+        raise ConflictError(
+            "Policy operation already exists. Contact HR to resolve this before retrying.",
+            code="operation_replayed",
+        )
+    _require_nonoverlapping_policy(family, version, effective_from, effective_until)
     row = HRPolicyVersion.objects.create(
         family=family,
         version=version,

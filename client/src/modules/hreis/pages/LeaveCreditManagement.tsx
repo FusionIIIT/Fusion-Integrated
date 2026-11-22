@@ -7,8 +7,9 @@ import { notifications } from "@mantine/notifications";
 import { useAuth } from "../../../auth/AuthProvider";
 import { errorMessage } from "../../../lib/http";
 import { useRecordVerifiedLeaveCredit } from "../api/hooks";
+import type { VerifiedLeaveCreditInput } from "../api/types";
 
-const leaveTypes = [
+const leaveTypes: VerifiedLeaveCreditInput["leave_type"][] = [
   "Casual", "Restricted", "Medical", "Earned", "Vacation", "Sabbatical",
 ];
 
@@ -16,7 +17,7 @@ export function LeaveCreditManagement() {
   const { can } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const [userId, setUserId] = useState("");
-  const [leaveType, setLeaveType] = useState("Casual");
+  const [leaveType, setLeaveType] = useState<VerifiedLeaveCreditInput["leave_type"]>("Casual");
   const [quantity, setQuantity] = useState("");
   const [evidence, setEvidence] = useState("");
   const credit = useRecordVerifiedLeaveCredit();
@@ -27,7 +28,7 @@ export function LeaveCreditManagement() {
     const days = Number(quantity);
     if (!Number.isSafeInteger(employee) || employee <= 0 || !Number.isFinite(days) || days <= 0
       || !evidence.trim()) {
-      notifications.show({
+      notifications.show({ position: "top-center",
         color: "red", title: "Invalid credit",
         message: "Provide a valid employee ID, positive number of days and evidence reference.",
       });
@@ -40,7 +41,7 @@ export function LeaveCreditManagement() {
       evidence_reference: evidence.trim(),
     }, {
       onSuccess: () => {
-        notifications.show({
+        notifications.show({ position: "top-center",
           color: "green", title: "Verified leave credit recorded",
           message: "An immutable ledger credit and HR audit event were created.",
         });
@@ -48,7 +49,7 @@ export function LeaveCreditManagement() {
         setQuantity("");
         setEvidence("");
       },
-      onError: (error) => notifications.show({
+      onError: (error) => notifications.show({ position: "top-center",
         color: "red", title: "Credit was not recorded", message: errorMessage(error),
       }),
     });
@@ -75,7 +76,7 @@ export function LeaveCreditManagement() {
           <TextInput label="Employee directory ID" required value={userId}
             onChange={(event) => setUserId(event.currentTarget.value)} />
           <Select label="Leave type" required data={leaveTypes} value={leaveType}
-            onChange={(value) => setLeaveType(value || "Casual")} />
+            onChange={(value) => setLeaveType(leaveTypes.find((item) => item === value) ?? "Casual")} />
           <TextInput label="Verified credit (days)" required value={quantity}
             onChange={(event) => setQuantity(event.currentTarget.value)} />
           <TextInput label="Approved evidence or register reference" required

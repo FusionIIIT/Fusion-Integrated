@@ -1,8 +1,4 @@
-"""Atomic HR administrator maintenance of official employee service records.
-
-The source of identity stays the directory/IAM. Only HR-owned service fields
-are created or updated here; leave balance comes from the separate ledger.
-"""
+"""Atomic HR administrator maintenance of official employee service records."""
 
 from __future__ import annotations
 
@@ -37,7 +33,8 @@ def _validated_fields(fields: dict, *, creating: bool) -> dict:
     unknown = set(fields) - _EDITABLE
     if unknown:
         raise BadRequestError(
-            "Only HR-owned service fields can be modified.", code="unsupported_service_fields"
+            "Only HR-owned service fields can be modified. Check the submitted fields and retry.",
+            code="unsupported_service_fields",
         )
     if creating and not {
         "appointment_details",
@@ -46,7 +43,8 @@ def _validated_fields(fields: dict, *, creating: bool) -> dict:
         "service_history",
     } <= set(fields):
         raise BadRequestError(
-            "The official service record is incomplete.", code="missing_service_fields"
+            "The official service record is incomplete. Check the submitted fields and retry.",
+            code="missing_service_fields",
         )
     for name, value in fields.items():
         if name in {"department", "designation_snapshot", "retirement_status"}:
@@ -61,10 +59,14 @@ def _validated_fields(fields: dict, *, creating: bool) -> dict:
                 )
         elif name == "appointment_details" and not isinstance(value, dict):
             raise BadRequestError(
-                "Appointment details must be a record.", code="invalid_appointment_details"
+                "Appointment details must be a record. Check the submitted fields and retry.",
+                code="invalid_appointment_details",
             )
         elif name == "service_history" and not isinstance(value, list):
-            raise BadRequestError("Service history must be a list.", code="invalid_service_history")
+            raise BadRequestError(
+                "Service history must be a list. Check the submitted fields and retry.",
+                code="invalid_service_history",
+            )
     return fields
 
 
@@ -106,7 +108,9 @@ def _require_employee(user_id: int) -> None:
     employee = get_users([user_id]).get(user_id)
     if employee is None or employee.kind not in {"faculty", "staff"}:
         raise NotFoundError(
-            "The employee is not in the authorized directory.", code="employee_not_found"
+            "The employee is not in the authorized directory. Refresh your current HR view or "
+            "contact HR for help.",
+            code="employee_not_found",
         )
 
 
@@ -117,7 +121,8 @@ def create_record(
     require(actor, _CREATE, allowed_roles=_ADMIN_ROLES)
     if user_id == actor.user_id:
         raise NotFoundError(
-            "An HR administrator cannot create their own official record.",
+            "An HR administrator cannot create their own official record. Refresh your "
+            "current HR view or contact HR for help.",
             code="service_record_not_assigned",
         )
     validated = _validated_fields(fields, creating=True)
@@ -130,10 +135,16 @@ def create_record(
         raise BadRequestError("Provide an idempotency key.", code="missing_idempotency_key")
     if AuditEvent.objects.filter(event_key=f"service:{idempotency_key}").exists():
         raise ConflictError(
-            "That service-record operation was already recorded.", code="operation_replayed"
+            "That service-record operation was already recorded. Contact HR to resolve this "
+            "before retrying.",
+            code="operation_replayed",
         )
     if EmployeeServiceRecord.objects.filter(user_id=user_id).exists():
-        raise ConflictError("An official service record already exists.", code="record_exists")
+        raise ConflictError(
+            "An official service record already exists. Contact HR to resolve this before "
+            "retrying.",
+            code="record_exists",
+        )
     record = EmployeeServiceRecord.objects.create(
         user_id=user_id,
         revision=1,
@@ -141,6 +152,27 @@ def create_record(
     )
     _audit(record, actor, "create", idempotency_key, validated)
     return record
+
+
+def _preserve_appraisal_archives(record, validated):
+    if "service_history" in validated:
+        # Only the appraisal service may append finalized appraisal snapshots.
+        old_archives = [
+            item
+            for item in record.service_history
+            if isinstance(item, dict) and item.get("kind") == "appraisal"
+        ]
+        new_archives = [
+            item
+            for item in validated["service_history"]
+            if isinstance(item, dict) and item.get("kind") == "appraisal"
+        ]
+        if old_archives != new_archives:
+            raise ConflictError(
+                "A finalized appraisal archive cannot be added, modified, or removed here. "
+                "Contact HR to resolve this before retrying.",
+                code="appraisal_archive_immutable",
+            )
 
 
 @transaction.atomic
@@ -163,10 +195,15 @@ def update_record(
         .first()
     )
     if record is None:
-        raise NotFoundError("The service record was not found.", code="record_not_found")
+        raise NotFoundError(
+            "The service record was not found. Refresh your current HR view or contact HR for "
+            "help.",
+            code="record_not_found",
+        )
     if record.user_id == actor.user_id:
         raise NotFoundError(
-            "An HR administrator cannot change their own official record.",
+            "An HR administrator cannot change their own official record. Refresh your "
+            "current HR view or contact HR for help.",
             code="service_record_not_assigned",
         )
     if record.revision != expected_revision:
@@ -175,26 +212,11 @@ def update_record(
         )
     if AuditEvent.objects.filter(event_key=f"service:{idempotency_key}").exists():
         raise ConflictError(
-            "That service-record operation was already recorded.", code="operation_replayed"
+            "That service-record operation was already recorded. Contact HR to resolve this "
+            "before retrying.",
+            code="operation_replayed",
         )
-    if "service_history" in validated:
-        # Finalized appraisals enter this history through the appraisal service,
-        # never through a general HR record edit. Preserve their exact snapshots.
-        old_archives = [
-            item
-            for item in record.service_history
-            if isinstance(item, dict) and item.get("kind") == "appraisal"
-        ]
-        new_archives = [
-            item
-            for item in validated["service_history"]
-            if isinstance(item, dict) and item.get("kind") == "appraisal"
-        ]
-        if old_archives != new_archives:
-            raise ConflictError(
-                "A finalized appraisal archive cannot be added, modified, or removed here.",
-                code="appraisal_archive_immutable",
-            )
+    _preserve_appraisal_archives(record, validated)
     for name, value in validated.items():
         setattr(record, name, value)
     record.revision += 1

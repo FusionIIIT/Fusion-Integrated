@@ -1,10 +1,15 @@
-import { Card, Container, Stack, Text } from "@mantine/core";
+import { Button, Card, Container, Stack, Text } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 
+import { useAuth } from "../../../auth/AuthProvider";
+import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { useNotifications } from "../api/hooks";
+import { useMarkNotificationRead, useNotifications } from "../api/hooks";
 
 export default function NotificationsPage() {
+  const { can } = useAuth();
+  const markRead = useMarkNotificationRead();
   const { data, error, isPending } = useNotifications();
   return (
     <Container size="lg">
@@ -23,6 +28,12 @@ export default function NotificationsPage() {
               <Text size="xs" c="dimmed" mt="sm">
                 {new Date(notification.created_at).toLocaleString()}
               </Text>
+              {notification.read_at ? <Text size="xs" c="dimmed">Read</Text>
+                : can("hreis.notification.view") && <Button variant="light" size="xs" mt="sm"
+                  loading={markRead.isPending} onClick={() => markRead.mutate({ id: notification.id }, {
+                    onError: (failure) => notifications.show({ position: "top-center", color: "red",
+                      title: "Could not mark notification read", message: errorMessage(failure) }),
+                  })}>Mark as read</Button>}
             </Card>
           ))}
         </Stack>

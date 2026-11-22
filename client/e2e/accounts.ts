@@ -17,6 +17,9 @@ export const ACCOUNTS = {
   hrReviewer: { username: "fac00021", role: "HOD (CSE)", grants: ["HOD (CSE)"] },
   hrAuthority: { username: "stf00003", role: "Registrar", grants: ["Registrar"] },
   hrAccountant: { username: "stf00004", role: "Accounts Admin", grants: ["Accounts Admin"] },
+  hrOtherAuthority: { username: "fac00050", role: "Director", grants: [
+    "HOD (Design)", "HOD (ECE)", "HOD (Liberal Arts)", "HOD (ME)", "HOD (NS)", "Director",
+  ] },
 } as const satisfies Record<string, Account>;
 
 export type AccountKey = keyof typeof ACCOUNTS;

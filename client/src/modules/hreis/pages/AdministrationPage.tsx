@@ -4,6 +4,7 @@ import {
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 
+import { useAuth } from "../../../auth/AuthProvider";
 import { errorMessage } from "../../../lib/http";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { PageHeader } from "../../../ui/components/PageHeader";
@@ -80,6 +81,7 @@ export function changedRecordFields(
 }
 
 export default function AdministrationPage() {
+  const { can } = useAuth();
   const { data, isPending, error } = useServiceRecords();
   const createRecord = useCreateServiceRecord();
   const updateRecord = useUpdateServiceRecord();
@@ -105,27 +107,27 @@ export default function AdministrationPage() {
     try {
       fields = parseFields(form);
     } catch (e) {
-      notifications.show({
+      notifications.show({ position: "top-center",
         color: "red", title: "Invalid record fields",
         message: e instanceof Error ? e.message : "Check the record values.",
       });
       return;
     }
     const onSuccess = () => {
-      notifications.show({
+      notifications.show({ position: "top-center",
         color: "green", title: "Service record saved",
         message: "The change and its audit revision have been recorded.",
       });
       setOpened(false);
     };
-    const onError = (e: unknown) => notifications.show({
+    const onError = (e: unknown) => notifications.show({ position: "top-center",
       color: "red", title: "Could not save service record",
       message: errorMessage(e),
     });
     if (editing) {
       const changes = changedRecordFields(editing, fields);
       if (Object.keys(changes).length === 0) {
-        notifications.show({
+        notifications.show({ position: "top-center",
           color: "blue", title: "No changes to record",
           message: "Edit an official field before saving a new revision.",
         });
@@ -150,7 +152,8 @@ export default function AdministrationPage() {
       <PageHeader title="HR Administration"
         subtitle="Create and maintain official employee service records" />
       <Group justify="flex-end" mb="md">
-        <Button onClick={openCreate}>Create employee record</Button>
+        {can("hreis.service_record.create")
+          && <Button onClick={openCreate}>Create employee record</Button>}
       </Group>
       {error && <ErrorState error={error} />}
       {isPending && <Text c="dimmed">Loading service records...</Text>}
@@ -173,9 +176,9 @@ export default function AdministrationPage() {
                   <Table.Td>{record.designation_snapshot}</Table.Td>
                   <Table.Td>{record.revision}</Table.Td>
                   <Table.Td>
-                    <Button size="xs" variant="light" onClick={() => openEdit(record)}>
+                    {can("hreis.service_record.update") && <Button size="xs" variant="light" onClick={() => openEdit(record)}>
                       Edit
-                    </Button>
+                    </Button>}
                   </Table.Td>
                 </Table.Tr>
               ))}</Table.Tbody>

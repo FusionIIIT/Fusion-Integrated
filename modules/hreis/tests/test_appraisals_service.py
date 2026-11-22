@@ -7,7 +7,6 @@ import pytest
 from django.utils import timezone
 
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError
-from fusion_auth.principal import Principal
 from modules.hreis.models import (
     AppraisalDetail,
     EmployeeServiceRecord,
@@ -16,6 +15,7 @@ from modules.hreis.models import (
 )
 from modules.hreis.services import appraisals, records
 from modules.hreis.services import requests as submissions
+from modules.hreis.tests.actors import Principal
 
 pytestmark = pytest.mark.django_db
 
@@ -195,12 +195,16 @@ def test_unknown_reviewers_and_unauthorized_role_are_refused(submitted):
 def test_three_stage_appraisal_can_forward_twice_then_finalize(monkeypatch):
     # HR-UC-008, BR-HR-014, BW-HR-05: repeated forward never loses the route.
     EmployeeServiceRecord.objects.create(
-        user_id=10, department="CSE", designation_snapshot="Professor",
-        appointment_details={}, service_history=[],
+        user_id=10,
+        department="CSE",
+        designation_snapshot="Professor",
+        appointment_details={},
+        service_history=[],
     )
     now = timezone.now()
     HRPolicyVersion.objects.create(
-        family="appraisal", version=1,
+        family="appraisal",
+        version=1,
         effective_from=now - timedelta(days=1),
         effective_until=now + timedelta(days=1),
         parameters={
@@ -208,15 +212,20 @@ def test_three_stage_appraisal_can_forward_twice_then_finalize(monkeypatch):
                 "start": (now - timedelta(hours=2)).isoformat(),
                 "end": (now + timedelta(hours=2)).isoformat(),
             },
-            "routes": [{
-                "employee_kind": "faculty", "department": "CSE",
-                "authorities": ["HOD (CSE)", "Registrar", "Director"],
-            }],
+            "routes": [
+                {
+                    "employee_kind": "faculty",
+                    "department": "CSE",
+                    "authorities": ["HOD (CSE)", "Registrar", "Director"],
+                }
+            ],
         },
-        approved_by_user_id=99, approved_designation="hradmin",
+        approved_by_user_id=99,
+        approved_designation="hradmin",
     )
     monkeypatch.setattr(
-        appraisals, "get_users",
+        appraisals,
+        "get_users",
         lambda ids: {i: SimpleNamespace(kind="faculty") for i in ids if i in {10, 201}},
     )
     row = submissions.submit_appraisal(
@@ -227,7 +236,9 @@ def test_three_stage_appraisal_can_forward_twice_then_finalize(monkeypatch):
     )
     row = appraisals.assign_reviewers(
         principal(99, "hradmin", ("hreis.appraisal.assign",)),
-        request_id=row.pk, reviewer_user_ids=[201], idempotency_key="three-step-assign",
+        request_id=row.pk,
+        reviewer_user_ids=[201],
+        idempotency_key="three-step-assign",
     )
     for user, role, expected_step in [
         (201, "HOD (CSE)", 1),
@@ -235,31 +246,38 @@ def test_three_stage_appraisal_can_forward_twice_then_finalize(monkeypatch):
     ]:
         row = appraisals.review_appraisal(
             principal(user, role, ("hreis.appraisal.approve",)),
-            request_id=row.pk, event="forward",
+            request_id=row.pk,
+            event="forward",
             idempotency_key=f"three-step-forward-{expected_step}",
         )
         assert row.route_step == expected_step
         assert row.state == "pending_next_appraisal_authority"
     final = appraisals.review_appraisal(
         principal(203, "Director", ("hreis.appraisal.approve",)),
-        request_id=row.pk, event="finalize", idempotency_key="three-step-final",
+        request_id=row.pk,
+        event="finalize",
+        idempotency_key="three-step-final",
     )
     assert final.state == "finalized"
-    assert EmployeeServiceRecord.objects.get(user_id=10).service_history[-1][
-        "period_key"
-    ] == "FY2027"
+    assert (
+        EmployeeServiceRecord.objects.get(user_id=10).service_history[-1]["period_key"] == "FY2027"
+    )
 
 
 def test_one_stage_appraisal_finalizes_without_unneeded_forward(monkeypatch):
     # BW-HR-04, HR-UC-008, HR-AFR-047, BR-HR-014:
     # a route whose only authority is the current assigned reviewer closes directly.
     EmployeeServiceRecord.objects.create(
-        user_id=10, department="CSE", designation_snapshot="Professor",
-        appointment_details={}, service_history=[],
+        user_id=10,
+        department="CSE",
+        designation_snapshot="Professor",
+        appointment_details={},
+        service_history=[],
     )
     now = timezone.now()
     HRPolicyVersion.objects.create(
-        family="appraisal", version=1,
+        family="appraisal",
+        version=1,
         effective_from=now - timedelta(hours=1),
         effective_until=now + timedelta(days=1),
         parameters={
@@ -267,15 +285,20 @@ def test_one_stage_appraisal_finalizes_without_unneeded_forward(monkeypatch):
                 "start": (now - timedelta(minutes=10)).isoformat(),
                 "end": (now + timedelta(hours=2)).isoformat(),
             },
-            "routes": [{
-                "employee_kind": "faculty", "department": "CSE",
-                "authorities": ["HOD (CSE)"],
-            }],
+            "routes": [
+                {
+                    "employee_kind": "faculty",
+                    "department": "CSE",
+                    "authorities": ["HOD (CSE)"],
+                }
+            ],
         },
-        approved_by_user_id=99, approved_designation="hradmin",
+        approved_by_user_id=99,
+        approved_designation="hradmin",
     )
     monkeypatch.setattr(
-        appraisals, "get_users",
+        appraisals,
+        "get_users",
         lambda ids: {i: SimpleNamespace(kind="faculty") for i in ids if i in {10, 201}},
     )
     submitted = submissions.submit_appraisal(
@@ -293,7 +316,8 @@ def test_one_stage_appraisal_finalizes_without_unneeded_forward(monkeypatch):
     assert assigned.state == "pending_review" and assigned.route_step == 0
     closed = appraisals.review_appraisal(
         principal(201, "HOD (CSE)", ("hreis.appraisal.approve",), "faculty"),
-        request_id=submitted.pk, event="finalize",
+        request_id=submitted.pk,
+        event="finalize",
         idempotency_key="direct-final-finalize",
     )
     assert closed.state == "finalized" and closed.route_step == 0
@@ -307,17 +331,23 @@ def test_hr_administrator_cannot_assign_reviewers_to_own_appraisal():
     # people evaluating an appraisal they submitted in another acting role.
     from modules.hreis.models import HRRequest
 
-    own = HRRequest.objects.create(
-        user_id=99, family="appraisal", state="submitted"
-    )
+    own = HRRequest.objects.create(user_id=99, family="appraisal", state="submitted")
     AppraisalDetail.objects.create(
-        request=own, period_key="FY2026",
-        submitted_form={"teaching": "self-submitted"}, reviewer_user_ids=[],
+        request=own,
+        period_key="FY2026",
+        employee_record=EmployeeServiceRecord.objects.create(
+            user_id=99,
+            department="CSE",
+            designation_snapshot="Synthetic HR",
+        ),
+        submitted_form={"teaching": "self-submitted"},
+        reviewer_user_ids=[],
     )
     with pytest.raises(NotFoundError) as error:
         appraisals.assign_reviewers(
             principal(99, "hradmin", ("hreis.appraisal.assign",)),
-            request_id=own.pk, reviewer_user_ids=[201],
+            request_id=own.pk,
+            reviewer_user_ids=[201],
             idempotency_key="self-committee-selection",
         )
     assert error.value.code == "appraisal_not_assigned"

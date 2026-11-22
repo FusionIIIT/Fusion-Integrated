@@ -29,9 +29,7 @@ def _policy(family, parameters, *, start=None, end=None, version=1):
 
 
 def _routes():
-    return [
-        {"employee_kind": "faculty", "department": "CSE", "authorities": ["HOD (CSE)"]}
-    ]
+    return [{"employee_kind": "faculty", "department": "CSE", "authorities": ["HOD (CSE)"]}]
 
 
 def test_seed_modules_marks_unconfigured_hr_eis_planned():

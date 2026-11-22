@@ -6,9 +6,9 @@ import pytest
 from django.utils import timezone
 
 from core.api.exceptions import BadRequestError, ConflictError, PermissionDeniedError
-from fusion_auth.principal import Principal
 from modules.hreis.models import AuditEvent, HRPolicyVersion
 from modules.hreis.services import policies
+from modules.hreis.tests.actors import Principal
 
 pytestmark = pytest.mark.django_db
 
@@ -74,6 +74,15 @@ def test_version_is_immutable_audited_and_current():
     event = AuditEvent.objects.get(event_key="policy:policy-v1")
     assert event.actor_user_id == 99
     assert event.data == {"family": "leave", "version": 1}
+
+
+@pytest.mark.parametrize("version", [2147483648, 10**100])
+def test_policy_service_rejects_versions_outside_storage_range(version):
+    with pytest.raises(BadRequestError) as error:
+        create(version=version)
+    assert error.value.code == "invalid_policy"
+    assert not HRPolicyVersion.objects.exists()
+    assert not AuditEvent.objects.exists()
 
 
 def test_uncertain_or_conflicting_policy_is_refused():
@@ -150,14 +159,19 @@ def test_open_ended_immutable_policy_can_be_superseded_by_higher_version():
     # BR-HR-025: a new immutable version succeeds without modifying its predecessor.
     now = timezone.now()
     original = policies.create_policy(
-        actor(), family="leave", version=1,
+        actor(),
+        family="leave",
+        version=1,
         effective_from=now - timedelta(days=2),
-        effective_until=None, parameters=payload(),
+        effective_until=None,
+        parameters=payload(),
         idempotency_key="open-policy-first",
     )
     original_end = original.effective_until
     successor = policies.create_policy(
-        actor(), family="leave", version=2,
+        actor(),
+        family="leave",
+        version=2,
         effective_from=now + timedelta(hours=1),
         effective_until=None,
         parameters=payload(),
@@ -169,9 +183,12 @@ def test_open_ended_immutable_policy_can_be_superseded_by_higher_version():
     assert policies.current_policy("leave", at=now + timedelta(hours=2)).pk == successor.pk
     with pytest.raises(ConflictError):
         policies.create_policy(
-            actor(), family="leave", version=1,
+            actor(),
+            family="leave",
+            version=1,
             effective_from=now + timedelta(hours=3),
-            effective_until=None, parameters=payload(),
+            effective_until=None,
+            parameters=payload(),
             idempotency_key="bad-policy-regression",
         )
     assert HRPolicyVersion.objects.count() == 2
@@ -181,22 +198,27 @@ def test_bounded_successor_supersedes_immutable_open_version_without_revival():
     # BR-HR-025: bounded successor publication never edits or revives the old policy.
     now = timezone.now()
     first = policies.create_policy(
-        actor(), family="leave", version=1,
-        effective_from=now - timedelta(days=2), effective_until=None,
-        parameters=payload(), idempotency_key="bounded-predecessor",
+        actor(),
+        family="leave",
+        version=1,
+        effective_from=now - timedelta(days=2),
+        effective_until=None,
+        parameters=payload(),
+        idempotency_key="bounded-predecessor",
     )
     second = policies.create_policy(
-        actor(), family="leave", version=2,
+        actor(),
+        family="leave",
+        version=2,
         effective_from=now + timedelta(hours=1),
         effective_until=now + timedelta(hours=3),
-        parameters=payload(), idempotency_key="bounded-successor",
+        parameters=payload(),
+        idempotency_key="bounded-successor",
     )
     first.refresh_from_db()
     assert first.effective_until is None
     assert policies.current_policy("leave", at=now).pk == first.pk
-    assert policies.current_policy(
-        "leave", at=now + timedelta(hours=2)
-    ).pk == second.pk
+    assert policies.current_policy("leave", at=now + timedelta(hours=2)).pk == second.pk
     with pytest.raises(ConflictError) as expired:
         policies.current_policy("leave", at=now + timedelta(hours=4))
     assert expired.value.code == "policy_unavailable"
@@ -226,7 +248,9 @@ def test_concurrent_overlapping_policy_publications_serialize(monkeypatch):
         close_old_connections()
         try:
             return policies.create_policy(
-                actor(), family="leave", version=version,
+                actor(),
+                family="leave",
+                version=version,
                 effective_from=now - timedelta(hours=1),
                 effective_until=now + timedelta(hours=2),
                 parameters=payload(),

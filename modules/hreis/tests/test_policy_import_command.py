@@ -1,4 +1,5 @@
 """Policy file import requires verified IAM HR authority and explicit source data."""
+
 import json
 from datetime import timedelta
 from io import StringIO
@@ -20,18 +21,24 @@ def _file(tmp_path):
     now = timezone.now()
     path = tmp_path / "institute-rules.json"
     payload = {
-        "policies": [{
-            "family": "leave", "version": 7,
-            "effective_from": (now - timedelta(days=1)).isoformat(),
-            "effective_until": (now + timedelta(days=2)).isoformat(),
-            "parameters": {
-                "eligibility": {"staff": {"Casual": True}},
-                "routes": [{
-                    "employee_kind": "staff", "department": "CSE",
-                    "authorities": ["Registrar"],
-                }],
-            },
-        }],
+        "policies": [
+            {
+                "family": "leave",
+                "version": 7,
+                "effective_from": (now - timedelta(days=1)).isoformat(),
+                "effective_until": (now + timedelta(days=2)).isoformat(),
+                "parameters": {
+                    "eligibility": {"staff": {"Casual": True}},
+                    "routes": [
+                        {
+                            "employee_kind": "staff",
+                            "department": "CSE",
+                            "authorities": ["Registrar"],
+                        }
+                    ],
+                },
+            }
+        ],
     }
     path.write_text(json.dumps(payload), encoding="utf-8")
     return path, payload
@@ -39,13 +46,18 @@ def _file(tmp_path):
 
 def _iam(monkeypatch, *, role="hradmin", permissions=("hreis.policy.manage",)):
     session = IamSession(
-        user_id=99, username="authorized-test-hr",
-        display_name="Test HR operator", kind="staff",
-        active_role=role, roles=(role,),
-        permissions=frozenset(permissions), modules=("hreis",),
+        user_id=99,
+        username="authorized-test-hr",
+        display_name="Test HR operator",
+        kind="staff",
+        active_role=role,
+        roles=(role,),
+        permissions=frozenset(permissions),
+        modules=("hreis",),
     )
     monkeypatch.setattr(
-        hreis_import_policies, "get_client",
+        hreis_import_policies,
+        "get_client",
         lambda: SimpleNamespace(resolve_session=lambda *, auth_token: session),
     )
     monkeypatch.setenv("HREIS_OPERATOR_IAM_TOKEN", "synthetic-iam-session-only")
@@ -86,6 +98,7 @@ def test_import_fails_without_authorized_iam_or_when_file_changes(tmp_path, monk
     file.write_text(json.dumps(payload), encoding="utf-8")
     with pytest.raises(CommandError, match="different immutable fields"):
         call_command("hreis_import_policies", policy_file=str(file))
-    assert HRPolicyVersion.objects.get(family="leave").parameters[
-        "eligibility"
-    ]["staff"]["Casual"] is True
+    assert (
+        HRPolicyVersion.objects.get(family="leave").parameters["eligibility"]["staff"]["Casual"]
+        is True
+    )

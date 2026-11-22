@@ -211,6 +211,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": ["core.api.throttling.PrincipalScopedThrottle"],
     # Only endpoints opting in via `throttle_scope` are limited.
     "DEFAULT_THROTTLE_RATES": {
+        "hreis_write": "60/min",
         "recruiter_login": "5/min",
         "recruiter_invite_accept": "10/hour",
         "apply": "30/hour",

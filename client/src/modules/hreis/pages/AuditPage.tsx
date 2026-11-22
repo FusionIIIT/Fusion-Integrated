@@ -30,7 +30,8 @@ export default function AuditPage() {
                   <Table.Td>{event.acting_designation} #{event.actor_user_id}</Table.Td>
                   <Table.Td>{event.action}</Table.Td>
                   <Table.Td>{event.resource_kind} #{event.resource_id}</Table.Td>
-                  <Table.Td>{event.data.revision ?? "�"}</Table.Td>
+                  <Table.Td>{typeof event.data.revision === "number"
+                    ? event.data.revision : "Not recorded"}</Table.Td>
                 </Table.Tr>
               ))}</Table.Tbody>
             </Table>

@@ -90,6 +90,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedAuditReadList'
+              examples:
+                SyntheticResponse:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 1
+                      actor_user_id: 99
+                      acting_designation: hradmin
+                      subject_user_id: 10
+                      action: create
+                      resource_kind: service_record
+                      resource_id: 1
+                      data:
+                        revision: 1
+                      recorded_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/compliance/requests/:
     get:
@@ -118,6 +135,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedComplianceRequestList'
+              examples:
+                SyntheticResponse:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 7
+                      user_id: 10
+                      family: leave
+                      state: pending_authority
+                      created_at: '2026-11-22T10:00:00+05:30'
+                      submitted_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/compliance/requests/{id}/:
     get:
@@ -139,6 +169,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ComplianceRequest'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 7
+                    user_id: 10
+                    family: leave
+                    state: pending_authority
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    submitted_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/leave-balances/credits/:
     post:
@@ -151,6 +191,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/VerifiedLeaveCredit'
+            examples:
+              SyntheticRequest:
+                value:
+                  user_id: 10
+                  leave_type: Casual
+                  quantity: '3.0000'
+                  evidence_reference: SYNTHETIC-REGISTER
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/VerifiedLeaveCredit'
@@ -166,6 +214,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VerifiedLeaveCreditRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 1
+                    user_id: 10
+                    leave_type: Casual
+                    quantity: '3.0000'
+                    recorded_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/leave/balances/:
     get:
@@ -181,6 +238,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MyLeaveBalances'
+              examples:
+                SyntheticResponse:
+                  value:
+                    user_id: 10
+                    leave_balances:
+                      Casual: '3.0000'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/notifications/:
     get:
@@ -209,6 +273,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedNotificationReadList'
+              examples:
+                SyntheticResponse:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 9
+                      title: LEAVE request submitted
+                      message: Your HR request was recorded.
+                      request_id: 7
+                      created_at: '2026-11-22T10:00:00+05:30'
+                      read_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/notifications/{id}/read/:
     post:
@@ -230,6 +307,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotificationRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 9
+                    title: LEAVE request submitted
+                    message: Your HR request was recorded.
+                    request_id: 7
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    read_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/policies/:
     get:
@@ -258,6 +345,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedPolicyReadList'
+              examples:
+                SyntheticResponse:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - family: leave
+                      version: 1
+                      effective_from: '2026-11-22T10:00:00+05:30'
+                      effective_until: null
+                      parameters:
+                        eligibility:
+                          faculty:
+                            Casual: true
+                        routes:
+                        - employee_kind: faculty
+                          department: CSE
+                          authorities:
+                          - Registrar
+                      id: 1
+                      approved_by_user_id: 99
+                      approved_designation: hradmin
+                      recorded_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
     post:
       operationId: v1_hreis_policies_create
@@ -269,6 +380,23 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PolicyCreate'
+            examples:
+              SyntheticRequest:
+                value:
+                  family: leave
+                  version: 1
+                  effective_from: '2026-11-22T10:00:00+05:30'
+                  effective_until: null
+                  parameters:
+                    eligibility:
+                      faculty:
+                        Casual: true
+                    routes:
+                    - employee_kind: faculty
+                      department: CSE
+                      authorities:
+                      - Registrar
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/PolicyCreate'
@@ -284,6 +412,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PolicyRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    family: leave
+                    version: 1
+                    effective_from: '2026-11-22T10:00:00+05:30'
+                    effective_until: null
+                    parameters:
+                      eligibility:
+                        faculty:
+                          Casual: true
+                      routes:
+                      - employee_kind: faculty
+                        department: CSE
+                        authorities:
+                        - Registrar
+                    id: 1
+                    approved_by_user_id: 99
+                    approved_designation: hradmin
+                    recorded_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/:
     get:
@@ -312,6 +461,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedRequestReadList'
+              examples:
+                SyntheticResponse:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 7
+                      user_id: 10
+                      family: leave
+                      subtype: Casual
+                      state: pending_authority
+                      payload:
+                        duration: '1'
+                        justification: Synthetic leave request
+                      claim_summary: null
+                      appraisal_summary: null
+                      route_step: 0
+                      route_total_steps: 1
+                      submitted_at: '2026-11-22T10:00:00+05:30'
+                      created_at: '2026-11-22T10:00:00+05:30'
+                      updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/{id}/:
     get:
@@ -333,6 +504,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestDetailRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 7
+                    user_id: 10
+                    family: leave
+                    subtype: Casual
+                    state: pending_authority
+                    payload:
+                      duration: '1'
+                      justification: Synthetic leave request
+                    claim_summary: null
+                    appraisal_summary: null
+                    route_step: 0
+                    route_total_steps: 1
+                    submitted_at: '2026-11-22T10:00:00+05:30'
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                    history:
+                    - source: draft
+                      event: submit
+                      target: pending_authority
+                      acting_designation: faculty
+                      reason: ''
+                      recorded_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/{id}/appraisal-decision/:
     post:
@@ -350,6 +547,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AppraisalDecision'
+            examples:
+              SyntheticRequest:
+                value:
+                  event: finalize
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/AppraisalDecision'
@@ -365,6 +567,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 7
+                    user_id: 10
+                    family: appraisal
+                    subtype: ''
+                    state: finalized
+                    payload:
+                      period_key: FY2026
+                    claim_summary: null
+                    appraisal_summary:
+                      period_key: FY2026
+                      submitted_form:
+                        summary: Synthetic teaching activity
+                      reviewer_user_ids:
+                      - 21
+                    route_step: 0
+                    route_total_steps: 1
+                    submitted_at: '2026-11-22T10:00:00+05:30'
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/{id}/assign-reviewers/:
     post:
@@ -382,6 +607,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReviewerAssignment'
+            examples:
+              SyntheticRequest:
+                value:
+                  reviewer_user_ids:
+                  - 21
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/ReviewerAssignment'
@@ -397,6 +628,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 7
+                    user_id: 10
+                    family: appraisal
+                    subtype: ''
+                    state: pending_review
+                    payload:
+                      period_key: FY2026
+                    claim_summary: null
+                    appraisal_summary:
+                      period_key: FY2026
+                      submitted_form:
+                        summary: Synthetic teaching activity
+                      reviewer_user_ids:
+                      - 21
+                    route_step: 0
+                    route_total_steps: 1
+                    submitted_at: '2026-11-22T10:00:00+05:30'
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/{id}/decision/:
     post:
@@ -414,6 +668,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Decision'
+            examples:
+              SyntheticRequest:
+                value:
+                  event: reject
+                  reason: Supply the missing signed evidence.
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/Decision'
@@ -429,6 +689,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 7
+                    user_id: 10
+                    family: leave
+                    subtype: Casual
+                    state: rejected
+                    payload:
+                      duration: '1'
+                      justification: Synthetic leave request
+                    claim_summary: null
+                    appraisal_summary: null
+                    route_step: 0
+                    route_total_steps: 1
+                    submitted_at: '2026-11-22T10:00:00+05:30'
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/{id}/financial-processing/:
     post:
@@ -447,6 +726,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FinancialProcessing'
+            examples:
+              SyntheticRequest:
+                value:
+                  financial_review_reference: SYNTHETIC-FINANCIAL-REVIEW
+                  source_system: finance
+                  external_status_reference: SYNTHETIC-REPORT
+                  payment_status: payment_pending
+                summary: Synthetic request
+              ExternalStatusUnavailable:
+                value:
+                  financial_review_reference: SYNTHETIC-FINANCIAL-REVIEW
+                summary: External status unavailable
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/FinancialProcessing'
@@ -462,6 +753,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 7
+                    user_id: 10
+                    family: ltc
+                    subtype: advance
+                    state: financial_processing_recorded
+                    payload:
+                      prescribed_form_reference: SYNTHETIC-LTC-FORM
+                    claim_summary:
+                      purpose: ''
+                      amount: null
+                      prescribed_form_reference: SYNTHETIC-LTC-FORM
+                      hr_verified: true
+                      financial_verified: true
+                      payment_status: payment_pending
+                      status_history:
+                      - source_system: finance
+                        external_status_reference: SYNTHETIC-REPORT
+                        payment_status: payment_pending
+                        recorded_at: '2026-11-22T10:00:00+05:30'
+                    appraisal_summary: null
+                    route_step: 0
+                    route_total_steps: 1
+                    submitted_at: '2026-11-22T10:00:00+05:30'
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/{id}/financial-review/:
     post:
@@ -480,6 +800,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FinancialReview'
+            examples:
+              SyntheticRequest:
+                value:
+                  financial_review_reference: SYNTHETIC-FINANCIAL-REVIEW
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/FinancialReview'
@@ -495,6 +820,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FinancialReviewRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    request_id: 7
+                    financial_review_reference: SYNTHETIC-FINANCIAL-REVIEW
+                    reviewed_by_user_id: 200
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/{id}/verify-claim/:
     post:
@@ -512,6 +844,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ClaimReview'
+            examples:
+              SyntheticRequest:
+                value:
+                  document_review_reference: SYNTHETIC-REVIEW
+                  eligibility_basis: Manually checked institutional evidence
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/ClaimReview'
@@ -527,6 +865,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 7
+                    user_id: 10
+                    family: ltc
+                    subtype: advance
+                    state: pending_authority
+                    payload:
+                      prescribed_form_reference: SYNTHETIC-LTC-FORM
+                    claim_summary:
+                      purpose: ''
+                      amount: null
+                      prescribed_form_reference: SYNTHETIC-LTC-FORM
+                      hr_verified: true
+                      financial_verified: false
+                      payment_status: null
+                      status_history: []
+                    appraisal_summary: null
+                    route_step: 0
+                    route_total_steps: 1
+                    submitted_at: '2026-11-22T10:00:00+05:30'
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/appraisals/:
     post:
@@ -538,6 +901,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AppraisalSubmit'
+            examples:
+              SyntheticRequest:
+                value:
+                  period_key: FY2026
+                  submitted_form:
+                    summary: Synthetic teaching activity
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/AppraisalSubmit'
@@ -553,6 +923,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 7
+                    user_id: 10
+                    family: appraisal
+                    subtype: ''
+                    state: submitted
+                    payload:
+                      period_key: FY2026
+                    claim_summary: null
+                    appraisal_summary:
+                      period_key: FY2026
+                      submitted_form:
+                        summary: Synthetic teaching activity
+                      reviewer_user_ids: []
+                    route_step: 0
+                    route_total_steps: 1
+                    submitted_at: '2026-11-22T10:00:00+05:30'
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/approvals/:
     get:
@@ -581,6 +973,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedRequestReadList'
+              examples:
+                SyntheticResponse:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 7
+                      user_id: 10
+                      family: leave
+                      subtype: Casual
+                      state: pending_authority
+                      payload:
+                        duration: '1'
+                        justification: Synthetic leave request
+                      claim_summary: null
+                      appraisal_summary: null
+                      route_step: 0
+                      route_total_steps: 1
+                      submitted_at: '2026-11-22T10:00:00+05:30'
+                      created_at: '2026-11-22T10:00:00+05:30'
+                      updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/claims/:
     post:
@@ -592,6 +1006,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ClaimSubmit'
+            examples:
+              SyntheticRequest:
+                value:
+                  family: ltc
+                  subtype: advance
+                  prescribed_form_reference: SYNTHETIC-LTC-FORM
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/ClaimSubmit'
@@ -607,6 +1028,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 7
+                    user_id: 10
+                    family: ltc
+                    subtype: advance
+                    state: awaiting_hr_verification
+                    payload:
+                      prescribed_form_reference: SYNTHETIC-LTC-FORM
+                    claim_summary:
+                      purpose: ''
+                      amount: null
+                      prescribed_form_reference: SYNTHETIC-LTC-FORM
+                      hr_verified: false
+                      financial_verified: false
+                      payment_status: null
+                      status_history: []
+                    appraisal_summary: null
+                    route_step: 0
+                    route_total_steps: 1
+                    submitted_at: '2026-11-22T10:00:00+05:30'
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/requests/leave/:
     post:
@@ -618,6 +1064,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LeaveSubmit'
+            examples:
+              SyntheticRequest:
+                value:
+                  leave_type: Casual
+                  duration: '1'
+                  justification: Synthetic leave request
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/LeaveSubmit'
@@ -633,6 +1086,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RequestRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 7
+                    user_id: 10
+                    family: leave
+                    subtype: Casual
+                    state: pending_authority
+                    payload:
+                      duration: '1'
+                      justification: Synthetic leave request
+                    claim_summary: null
+                    appraisal_summary: null
+                    route_step: 0
+                    route_total_steps: 1
+                    submitted_at: '2026-11-22T10:00:00+05:30'
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/service-records/:
     get:
@@ -661,6 +1133,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedRecordReadList'
+              examples:
+                SyntheticResponse:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 1
+                      user_id: 10
+                      appointment_details:
+                        date: '2026-01-01'
+                      department: CSE
+                      designation_snapshot: Synthetic Professor
+                      service_history: []
+                      retirement_status: ''
+                      revision: 1
+                      leave_balances:
+                        Casual: '3.0000'
+                      updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
     post:
       operationId: v1_hreis_service_records_create
@@ -672,15 +1163,15 @@ paths:
             schema:
               $ref: '#/components/schemas/RecordCreate'
             examples:
-              ServiceRecord:
+              SyntheticRequest:
                 value:
-                  user_id: 42
+                  user_id: 10
                   appointment_details:
                     date: '2026-01-01'
                   department: CSE
-                  designation_snapshot: Professor
+                  designation_snapshot: Synthetic Professor
                   service_history: []
-                summary: Service record
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/RecordCreate'
@@ -696,6 +1187,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecordRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 1
+                    user_id: 10
+                    appointment_details:
+                      date: '2026-01-01'
+                    department: CSE
+                    designation_snapshot: Synthetic Professor
+                    service_history: []
+                    retirement_status: ''
+                    revision: 1
+                    leave_balances:
+                      Casual: '3.0000'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/service-records/{id}/:
     get:
@@ -717,6 +1224,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecordRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 1
+                    user_id: 10
+                    appointment_details:
+                      date: '2026-01-01'
+                    department: CSE
+                    designation_snapshot: Synthetic Professor
+                    service_history: []
+                    retirement_status: ''
+                    revision: 1
+                    leave_balances:
+                      Casual: '3.0000'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
     patch:
       operationId: v1_hreis_service_records_partial_update
@@ -734,10 +1257,11 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchedRecordUpdate'
             examples:
-              Revision:
+              SyntheticRequest:
                 value:
                   expected_revision: 1
-                  department: Design
+                  department: ECE
+                summary: Synthetic request
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/PatchedRecordUpdate'
@@ -752,6 +1276,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecordRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 1
+                    user_id: 10
+                    appointment_details:
+                      date: '2026-01-01'
+                    department: CSE
+                    designation_snapshot: Synthetic Professor
+                    service_history: []
+                    retirement_status: ''
+                    revision: 1
+                    leave_balances:
+                      Casual: '3.0000'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/hreis/service-records/me/:
     get:
@@ -767,6 +1307,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecordRead'
+              examples:
+                SyntheticResponse:
+                  value:
+                    id: 1
+                    user_id: 10
+                    appointment_details:
+                      date: '2026-01-01'
+                    department: CSE
+                    designation_snapshot: Synthetic Professor
+                    service_history: []
+                    retirement_status: ''
+                    revision: 1
+                    leave_balances:
+                      Casual: '3.0000'
+                    updated_at: '2026-11-22T10:00:00+05:30'
+                  summary: Synthetic response
           description: ''
   /api/v1/me:
     get:
@@ -2690,7 +3246,9 @@ components:
         period_key:
           type: string
           maxLength: 80
-        submitted_form: {}
+        submitted_form:
+          type: object
+          additionalProperties: {}
       required:
       - period_key
       - submitted_form
@@ -2766,6 +3324,8 @@ components:
           type: integer
           readOnly: true
         data:
+          type: object
+          additionalProperties: {}
           readOnly: true
         recorded_at:
           type: string
@@ -2889,6 +3449,7 @@ components:
           $ref: '#/components/schemas/SubtypeEnum'
         prescribed_form_reference:
           type: string
+          maxLength: 250
         purpose:
           type: string
         amount:
@@ -3338,22 +3899,29 @@ components:
       properties:
         financial_review_reference:
           type: string
+          maxLength: 250
         source_system:
-          $ref: '#/components/schemas/SourceSystemEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/SourceSystemEnum'
+          - $ref: '#/components/schemas/NullEnum'
         external_status_reference:
           type: string
+          nullable: true
+          maxLength: 250
         payment_status:
-          $ref: '#/components/schemas/PaymentStatusEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/PaymentStatusEnum'
+          - $ref: '#/components/schemas/NullEnum'
       required:
-      - external_status_reference
       - financial_review_reference
-      - payment_status
-      - source_system
     FinancialReview:
       type: object
       properties:
         financial_review_reference:
           type: string
+          maxLength: 250
       required:
       - financial_review_reference
     FinancialReviewRead:
@@ -3374,10 +3942,13 @@ components:
       properties:
         source_system:
           type: string
+          nullable: true
         external_status_reference:
           type: string
+          nullable: true
         payment_status:
           type: string
+          nullable: true
         recorded_at:
           type: string
           format: date-time
@@ -3772,6 +4343,9 @@ components:
       - read_at
       - request_id
       - title
+    NullEnum:
+      enum:
+      - null
     OffCampusRecord:
       type: object
       properties:
@@ -4239,8 +4813,11 @@ components:
       properties:
         expected_revision:
           type: integer
+          maximum: 2147483647
           minimum: 0
-        appointment_details: {}
+        appointment_details:
+          type: object
+          additionalProperties: {}
         department:
           type: string
           maxLength: 120
@@ -4337,6 +4914,7 @@ components:
           $ref: '#/components/schemas/PolicyCreateFamilyEnum'
         version:
           type: integer
+          maximum: 2147483647
           minimum: 1
         effective_from:
           type: string
@@ -4345,7 +4923,9 @@ components:
           type: string
           format: date-time
           nullable: true
-        parameters: {}
+        parameters:
+          type: object
+          additionalProperties: {}
       required:
       - effective_from
       - family
@@ -4385,6 +4965,8 @@ components:
           readOnly: true
           nullable: true
         parameters:
+          type: object
+          additionalProperties: {}
           readOnly: true
         approved_by_user_id:
           type: integer
@@ -4486,8 +5068,11 @@ components:
       properties:
         user_id:
           type: integer
+          maximum: 2147483647
           minimum: 1
-        appointment_details: {}
+        appointment_details:
+          type: object
+          additionalProperties: {}
         department:
           type: string
           maxLength: 120
@@ -4548,6 +5133,8 @@ components:
           type: integer
           readOnly: true
         appointment_details:
+          type: object
+          additionalProperties: {}
           readOnly: true
         department:
           type: string
@@ -4556,6 +5143,8 @@ components:
           type: string
           readOnly: true
         service_history:
+          type: array
+          items: {}
           readOnly: true
         leave_balances:
           type: object
@@ -4822,6 +5411,8 @@ components:
           type: string
           readOnly: true
         payload:
+          type: object
+          additionalProperties: {}
           readOnly: true
         claim_summary:
           allOf:
@@ -4892,6 +5483,8 @@ components:
           type: string
           readOnly: true
         payload:
+          type: object
+          additionalProperties: {}
           readOnly: true
         claim_summary:
           allOf:
@@ -4984,6 +5577,7 @@ components:
           type: array
           items:
             type: integer
+            maximum: 2147483647
             minimum: 1
       required:
       - reviewer_user_ids
@@ -5356,6 +5950,7 @@ components:
       properties:
         user_id:
           type: integer
+          maximum: 2147483647
           minimum: 1
         leave_type:
           $ref: '#/components/schemas/LeaveTypeEnum'

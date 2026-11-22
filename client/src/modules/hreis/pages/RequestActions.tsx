@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  Alert, Button, Drawer, Group, Select, Stack, Text, Textarea, TextInput,
+  Alert, Button, Checkbox, Drawer, Group, Select, Stack, Text, Textarea, TextInput,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 
@@ -27,6 +27,7 @@ export function RequestActions({ request }: { request: HRRequest }) {
   const [financialEvidence, setFinancialEvidence] = useState("");
   const [sourceSystem, setSourceSystem] = useState<"finance" | "payroll">("finance");
   const [statusReference, setStatusReference] = useState("");
+  const [externalStatusAvailable, setExternalStatusAvailable] = useState(true);
   const [paymentStatus, setPaymentStatus] =
     useState<"processing" | "payment_pending" | "paid" | "failed">("payment_pending");
   const verifyClaim = useVerifyClaim();
@@ -110,9 +111,10 @@ export function RequestActions({ request }: { request: HRRequest }) {
       finance.mutate({
         id: request.id,
         financial_review_reference: financialEvidence,
-        source_system: sourceSystem,
-        external_status_reference: statusReference,
-        payment_status: paymentStatus,
+        ...(externalStatusAvailable ? {
+          source_system: sourceSystem, external_status_reference: statusReference,
+          payment_status: paymentStatus,
+        } : {}),
       }, { onSuccess: success, onError: failure });
     }
   }
@@ -199,6 +201,12 @@ export function RequestActions({ request }: { request: HRRequest }) {
             <TextInput label="Financial review evidence reference" required
               value={financialEvidence}
               onChange={(event) => setFinancialEvidence(event.currentTarget.value)} />
+            <Checkbox label="External status is available" checked={externalStatusAvailable}
+              onChange={(event) => setExternalStatusAvailable(event.currentTarget.checked)} />
+            {!externalStatusAvailable && <Text size="sm">
+              Record financial processing now. Leave external status unavailable until a verified report arrives.
+            </Text>}
+            {externalStatusAvailable && <>
             <Select label="External source system" required value={sourceSystem}
               data={[{ value: "finance", label: "Finance" },
                 { value: "payroll", label: "Payroll" }]}
@@ -215,6 +223,7 @@ export function RequestActions({ request }: { request: HRRequest }) {
                   value === "processing" || value === "paid" || value === "failed"
                     ? value : "payment_pending"
                 )} />
+            </>}
           </>}
           {mode === "appraisal" && <Alert color="blue" title="Assigned appraisal action">
             {isFinalAuthority ? "Finalize and archive the reviewed appraisal."
@@ -224,7 +233,8 @@ export function RequestActions({ request }: { request: HRRequest }) {
             <Button variant="default" disabled={pending}
               onClick={() => setMode(null)}>Cancel</Button>
             <Button loading={pending} onClick={submit}>
-              {mode === "finance" ? "Record external status"
+              {mode === "finance" ? externalStatusAvailable
+                ? "Record external status" : "Record financial processing"
                 : mode === "financial_review" ? "Record finance review" : "Record decision"}
             </Button>
           </Group>

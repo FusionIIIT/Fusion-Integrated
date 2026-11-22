@@ -9,7 +9,6 @@ import pytest
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from conftest import make_session
 from modules.hreis.models import (
     AuditEvent,
     EmployeeServiceRecord,
@@ -20,6 +19,7 @@ from modules.hreis.models import (
     OutboxEvent,
 )
 from modules.hreis.services import notifications as email_service
+from modules.hreis.tests.actors import make_session
 
 pytestmark = pytest.mark.django_db
 
@@ -103,7 +103,8 @@ def test_leave_http_creates_audited_request_without_premature_debit(stub_iam, mo
     outbound = OutboxEvent.objects.get(event_key="outbox:http-leave-1")
     assert outbound.event_type == "hreis.notification"
     monkeypatch.setattr(
-        email_service, "get_users",
+        email_service,
+        "get_users",
         lambda ids: {10: SimpleNamespace(email="employee@example.edu", is_active=True)},
     )
     with patch.object(email_service, "send_mail", return_value=1) as mail:

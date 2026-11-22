@@ -2,7 +2,6 @@
 
 import pytest
 
-from fusion_auth.principal import Principal
 from modules.hreis.models import (
     ApprovalRouteStep,
     AuditEvent,
@@ -11,6 +10,7 @@ from modules.hreis.models import (
     Notification,
 )
 from modules.hreis.selectors import scoping
+from modules.hreis.tests.actors import Principal
 
 pytestmark = pytest.mark.django_db
 
@@ -149,9 +149,7 @@ def test_approver_sees_only_current_step_and_authorized_family(assigned_requests
 
 def test_authority_queue_excludes_approvers_own_requests(assigned_requests):
     own_request, _other, _closed = assigned_requests
-    owner_as_hod = _actor(
-        10, "HOD (CSE)", scoping.P_REQUEST_VIEW, "hreis.leave.approve"
-    )
+    owner_as_hod = _actor(10, "HOD (CSE)", scoping.P_REQUEST_VIEW, "hreis.leave.approve")
     assert not scoping.requests_for(owner_as_hod).filter(pk=own_request.pk).exists()
 
 
@@ -189,21 +187,16 @@ def test_audit_scoping_is_hradmin_only():
 
 def test_hradmin_queue_limited_to_verification_and_unassigned_appraisals():
     # HR-CFR-001, BR-HR-030: no global disclosure of medical/leave requests.
-    own_leave = HRRequest.objects.create(
-        user_id=10, family="leave", state="pending_authority"
-    )
+    own_leave = HRRequest.objects.create(user_id=10, family="leave", state="pending_authority")
     verification = HRRequest.objects.create(
         user_id=20, family="ltc", state="awaiting_hr_verification"
     )
-    appraisal = HRRequest.objects.create(
-        user_id=20, family="appraisal", state="submitted"
-    )
-    approved = HRRequest.objects.create(
-        user_id=20, family="cpda", state="approved"
-    )
+    appraisal = HRRequest.objects.create(user_id=20, family="appraisal", state="submitted")
+    approved = HRRequest.objects.create(user_id=20, family="cpda", state="approved")
     hr = _actor(99, "hradmin", scoping.P_REQUEST_VIEW)
     assert set(scoping.requests_for(hr).values_list("pk", flat=True)) == {
-        verification.pk, appraisal.pk
+        verification.pk,
+        appraisal.pk,
     }
     assert not scoping.requests_for(hr).filter(pk__in=[own_leave.pk, approved.pk]).exists()
 
