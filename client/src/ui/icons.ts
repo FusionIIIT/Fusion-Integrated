@@ -3,20 +3,22 @@
  *
  *  Named imports ONLY. `import * as Fa` defeats tree-shaking and ships ~1 MB. */
 import {
-  FaBriefcase, FaBuilding, FaBullhorn, FaCalendarAlt, FaChartBar,
+  FaArchive, FaBriefcase, FaBuilding, FaBullhorn, FaCalendarAlt, FaChartBar,
   FaCheckDouble, FaCircle, FaClipboardCheck, FaClipboardList, FaCog,
-  FaExternalLinkAlt,
+  FaDatabase, FaExternalLinkAlt, FaHdd,
   FaFileSignature, FaGraduationCap, FaIdBadge, FaIdCard, FaLayerGroup,
-  FaSignOutAlt, FaThLarge, FaUserCheck, FaUserTie, FaUsers,
+  FaListAlt, FaShieldAlt, FaSignOutAlt, FaThLarge, FaUndoAlt,
+  FaUserCheck, FaUserTie, FaUsers,
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
 
 export const ICONS = {
-  FaBriefcase, FaBuilding, FaBullhorn, FaCalendarAlt, FaChartBar,
+  FaArchive, FaBriefcase, FaBuilding, FaBullhorn, FaCalendarAlt, FaChartBar,
   FaCheckDouble, FaCircle, FaClipboardCheck, FaClipboardList, FaCog,
-  FaExternalLinkAlt,
+  FaDatabase, FaExternalLinkAlt, FaHdd,
   FaFileSignature, FaGraduationCap, FaIdBadge, FaIdCard, FaLayerGroup,
-  FaSignOutAlt, FaThLarge, FaUserCheck, FaUserTie, FaUsers,
+  FaListAlt, FaShieldAlt, FaSignOutAlt, FaThLarge, FaUndoAlt,
+  FaUserCheck, FaUserTie, FaUsers,
 } as const;
 
 export type IconKey = keyof typeof ICONS;

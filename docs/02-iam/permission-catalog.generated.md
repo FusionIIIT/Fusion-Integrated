@@ -7,6 +7,34 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `badms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `badms.backup.view` | View authorized backup history | `Super Admin`, `SysAdmin`, `faculty`, `staff`, `student` |
+| `badms.backup.create` | Trigger a manual backup | `Super Admin`, `SysAdmin` |
+| `badms.schedule.view` | View backup schedules | `Super Admin`, `SysAdmin` |
+| `badms.schedule.create` | Create a backup schedule | `Super Admin`, `SysAdmin` |
+| `badms.schedule.update` | Update a backup schedule | `Super Admin`, `SysAdmin` |
+| `badms.archive.view` | View authorized archival requests | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `IT Security Team`, `Super Admin`, `SysAdmin`, `faculty`, `staff`, `student` |
+| `badms.archive.create` | Submit an archival request | `Super Admin`, `faculty`, `staff`, `student` |
+| `badms.archive.review` | Review an archival request | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Super Admin`, `SysAdmin` |
+| `badms.archive.approve` | Decide an archival request | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `badms.archive.assign` | Assign an authoritative classification | `Super Admin`, `SysAdmin` |
+| `badms.encryption.manage` | Configure Sensitive-data encryption | `IT Security Team` |
+| `badms.restore.view` | View authorized restoration requests | `Super Admin`, `SysAdmin`, `faculty`, `staff`, `student` |
+| `badms.restore.create` | Request restoration | `faculty`, `staff`, `student` |
+| `badms.restore.approve` | Approve Sensitive-data restoration | `Super Admin`, `SysAdmin` |
+| `badms.restore.restore` | Execute an approved restoration | `Super Admin`, `SysAdmin`, `faculty`, `staff`, `student` |
+| `badms.storage_extension.view` | View authorized storage requests | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `faculty`, `staff`, `student` |
+| `badms.storage_extension.create` | Request a storage extension | `faculty`, `staff`, `student` |
+| `badms.storage_extension.review` | Review a storage extension request | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `badms.storage_extension.approve` | Decide a storage extension request | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `badms.audit_event.view` | View authorized audit history | `IT Security Team`, `Super Admin`, `SysAdmin` |
+| `badms.audit_event.create` | Record an audit event | _service only_ |
+| `badms.report.view` | View authorized operational reports | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `IT Security Team`, `Super Admin`, `SysAdmin` |
+| `badms.security_policy.manage` | Manage BADMS security policy versions | `IT Security Team` |
+
 ## `directory`
 
 | Code | What it allows | Held by |
