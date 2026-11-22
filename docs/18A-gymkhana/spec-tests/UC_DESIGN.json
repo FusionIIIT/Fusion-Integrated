@@ -1,0 +1,884 @@
+[
+  {
+    "test_id": "TC-UC-001",
+    "source_id": "UC-GYM-001 - Create club with valid data",
+    "purpose": "Verify main success scenario of club creation.",
+    "preconditions": "Student Admin authenticated and authorized; Valid student records exist for coordinator and co-coordinator; Valid faculty record exists for Club Faculty Councillor",
+    "action_or_input": "As Student Admin submit club name, description, an allowed category, valid coordinator, valid co-coordinator, valid Club Faculty Councillor",
+    "expected_result": "A new club exists with status open, referencing the selected coordinator, co-coordinator and councillor; success confirmation is returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-002",
+    "source_id": "UC-GYM-001 - Reject invalid coordinator",
+    "purpose": "Verify invalid coordinator is identified and club is not created.",
+    "preconditions": "Student Admin authenticated and authorized; Valid co-coordinator and councillor exist",
+    "action_or_input": "Submit creation with a coordinator identity that does not resolve to a valid student record",
+    "expected_result": "System identifies the coordinator assignment as invalid; no club is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-003",
+    "source_id": "UC-GYM-001 - Reject invalid co-coordinator",
+    "purpose": "Verify invalid co-coordinator is identified and club is not created.",
+    "preconditions": "Student Admin authenticated and authorized; Valid coordinator and councillor exist",
+    "action_or_input": "Submit creation with a co-coordinator identity that does not resolve to a valid student record",
+    "expected_result": "System identifies the co-coordinator assignment as invalid; no club is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-004",
+    "source_id": "UC-GYM-001 - Reject invalid Club Faculty Councillor",
+    "purpose": "Verify invalid faculty councillor is identified and club is not created.",
+    "preconditions": "Student Admin authenticated and authorized; Valid coordinator and co-coordinator exist",
+    "action_or_input": "Submit creation with a councillor identity that does not resolve to a valid faculty record",
+    "expected_result": "System identifies the councillor assignment as invalid; no club is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-005",
+    "source_id": "UC-GYM-001 - Correct an invalid assignment and resubmit",
+    "purpose": "Verify the alternative flow allows correction without a club having been created.",
+    "preconditions": "Student Admin authenticated and authorized",
+    "action_or_input": "Submit creation with an invalid leader; Confirm no club exists; Resubmit with the invalid assignment corrected",
+    "expected_result": "First submission creates nothing; corrected submission creates exactly one club with status open.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-UC-006",
+    "source_id": "UC-GYM-001 - Non-Student-Admin cannot create club",
+    "purpose": "Verify authorization precondition for club creation.",
+    "preconditions": "An authenticated user who is not a Student Admin (e.g., a Student)",
+    "action_or_input": "Attempt to create a club with otherwise valid data",
+    "expected_result": "No club is created. Exact rejection response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-007",
+    "source_id": "UC-GYM-001 - Storage failure leaves no club",
+    "purpose": "Verify exception flow when data cannot be stored.",
+    "preconditions": "Valid creation request; Ability to force a persistence failure in the test environment",
+    "action_or_input": "Submit the valid request while storage is made to fail",
+    "expected_result": "No club (and no partial club record treated as successful) exists; the system reports failure.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-008",
+    "source_id": "UC-GYM-001 - Category outside allowed set",
+    "purpose": "Probe handling of a category that is not an allowed club category.",
+    "preconditions": "Student Admin authenticated and authorized; Valid leaders and councillor",
+    "action_or_input": "Submit creation with a category value not in the allowed set",
+    "expected_result": "Not explicitly specified. Step 2 requires an 'allowed' category; the UC does not state the outcome for a disallowed one. Assertion limited to: the outcome is recorded for review (see ambiguity AMB-02).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-009",
+    "source_id": "UC-GYM-002 - Book session with all fields incl. poster",
+    "purpose": "Verify main success scenario for session booking.",
+    "preconditions": "Actor is coordinator/co-coordinator of a confirmed club; A configured venue exists with no sessions/events on the chosen date",
+    "action_or_input": "Submit venue, date, valid start/end time, description and a poster",
+    "expected_result": "Session is stored; student notification is initiated; booking is confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-010",
+    "source_id": "UC-GYM-002 - Book session without poster",
+    "purpose": "Verify poster is optional for sessions.",
+    "preconditions": "Same as TC-UC-009",
+    "action_or_input": "Submit all fields except the poster",
+    "expected_result": "Session is created, notification initiated, booking confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-011",
+    "source_id": "UC-GYM-002 - Partial overlap with existing session",
+    "purpose": "Verify conflict rejection against an existing session on same venue/date.",
+    "preconditions": "Existing session at venue V on date D from 10:00 to 12:00",
+    "action_or_input": "Book session at V on D from 11:00 to 13:00",
+    "expected_result": "Booking is rejected and actor is asked to select another slot; no new session recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-012",
+    "source_id": "UC-GYM-002 - Overlap with existing event (cross-type)",
+    "purpose": "Verify session booking is checked against events, not only sessions.",
+    "preconditions": "Existing event at venue V on date D from 10:00 to 12:00",
+    "action_or_input": "Book session at V on D from 11:00 to 13:00",
+    "expected_result": "Booking is rejected; no new session recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-013",
+    "source_id": "UC-GYM-002 - Identical slot as existing session",
+    "purpose": "Boundary: exact same venue/date/start/end.",
+    "preconditions": "Existing session at V on D from 10:00 to 12:00",
+    "action_or_input": "Book session at V on D from 10:00 to 12:00",
+    "expected_result": "Booking is rejected as an overlap; no new session recorded.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-014",
+    "source_id": "UC-GYM-002 - Requested slot contained within existing slot",
+    "purpose": "Boundary: new slot fully inside an existing one.",
+    "preconditions": "Existing session at V on D from 10:00 to 14:00",
+    "action_or_input": "Book session at V on D from 11:00 to 12:00",
+    "expected_result": "Booking is rejected as an overlap; no new session recorded.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-015",
+    "source_id": "UC-GYM-002 - Same time at a different venue",
+    "purpose": "Verify conflict check is scoped to the same venue.",
+    "preconditions": "Existing session at venue V1 on D 10:00-12:00; Second configured venue V2",
+    "action_or_input": "Book session at V2 on D 10:00-12:00",
+    "expected_result": "Session is created and confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-016",
+    "source_id": "UC-GYM-002 - Same time on a different date",
+    "purpose": "Verify conflict check is scoped to the same date.",
+    "preconditions": "Existing session at V on D1 10:00-12:00",
+    "action_or_input": "Book session at V on D2 10:00-12:00",
+    "expected_result": "Session is created and confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-017",
+    "source_id": "UC-GYM-002 - End time before start time",
+    "purpose": "Verify invalid time range rejection.",
+    "preconditions": "Actor is club head of a confirmed club",
+    "action_or_input": "Book session with start 12:00 and end 10:00",
+    "expected_result": "No successful booking is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-018",
+    "source_id": "UC-GYM-002 - Invalid (non-configured) venue",
+    "purpose": "Verify invalid venue rejection.",
+    "preconditions": "Actor is club head of a confirmed club",
+    "action_or_input": "Book session with a venue that is not configured",
+    "expected_result": "No successful booking is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-019",
+    "source_id": "UC-GYM-002 - Non-head of the club cannot book session",
+    "purpose": "Verify only the applicable coordinator/co-coordinator can book.",
+    "preconditions": "Authenticated user who is a Student or a Club Head of a different club",
+    "action_or_input": "Attempt to book a session for the club",
+    "expected_result": "No session is created. Exact rejection response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-020",
+    "source_id": "UC-GYM-002 - Club not confirmed (open)",
+    "purpose": "Probe precondition 'club exists and is confirmed'.",
+    "preconditions": "Club with status open whose head is the actor",
+    "action_or_input": "Attempt to book a session",
+    "expected_result": "Not explicitly specified. Record the outcome; stated precondition implies booking should not proceed (see AMB-04).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-021",
+    "source_id": "UC-GYM-002 - Notification failure before acceptance",
+    "purpose": "Verify exception flow: no booking recorded when notification processing fails before acceptance.",
+    "preconditions": "Valid booking request; Ability to force notification-service failure",
+    "action_or_input": "Submit valid booking while notification processing fails",
+    "expected_result": "No successful booking is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-022",
+    "source_id": "UC-GYM-002 - Storage failure on session",
+    "purpose": "Verify exception flow when the session cannot be stored.",
+    "preconditions": "Valid booking request; Ability to force a storage failure",
+    "action_or_input": "Submit valid booking while storage fails",
+    "expected_result": "No successful booking is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-023",
+    "source_id": "UC-GYM-002 - Retry with another slot after conflict",
+    "purpose": "Verify alternative flow: actor selects another slot after rejection.",
+    "preconditions": "Existing session at V on D 10:00-12:00",
+    "action_or_input": "Attempt 11:00-13:00 and observe rejection; Rebook at V on D 12:00-13:00 or at another non-overlapping time",
+    "expected_result": "First attempt rejected with nothing stored; second attempt creates a session and confirms. (Choose a slot clearly non-overlapping, e.g., 14:00-15:00, to avoid the adjacency ambiguity.)",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-UC-024",
+    "source_id": "UC-GYM-002 - Adjacent slots (end equals existing start)",
+    "purpose": "Boundary probe: touching but not overlapping slots.",
+    "preconditions": "Existing session at V on D 10:00-12:00",
+    "action_or_input": "Book session at V on D 12:00-13:00",
+    "expected_result": "Not specified whether touching slots are 'overlapping'. Outcome recorded for clarification (see AMB-05).",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-025",
+    "source_id": "UC-GYM-002 - Start time equals end time",
+    "purpose": "Boundary probe: zero-length time range.",
+    "preconditions": "Actor is club head of a confirmed club",
+    "action_or_input": "Book session with start 10:00 and end 10:00",
+    "expected_result": "Not specified whether a zero-length range is valid. Outcome recorded for clarification (see AMB-06).",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-026",
+    "source_id": "UC-GYM-003 - Book event with valid data",
+    "purpose": "Verify main success scenario for event booking.",
+    "preconditions": "Actor is coordinator/co-coordinator of a confirmed club; Valid faculty context; Configured venue free on date",
+    "action_or_input": "Submit event name, faculty context, venue, date, start/end time, poster, description",
+    "expected_result": "Event is stored; student notification initiated; booking confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-027",
+    "source_id": "UC-GYM-003 - Event overlaps existing session (cross-type)",
+    "purpose": "Verify event booking is checked against sessions.",
+    "preconditions": "Existing session at V on D 10:00-12:00",
+    "action_or_input": "Book event at V on D 11:00-13:00",
+    "expected_result": "Booking rejected; actor asked to choose another slot; no event stored.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-028",
+    "source_id": "UC-GYM-003 - Event overlaps existing event",
+    "purpose": "Verify event-vs-event conflict rejection.",
+    "preconditions": "Existing event at V on D 10:00-12:00",
+    "action_or_input": "Book event at V on D 11:00-13:00",
+    "expected_result": "Booking rejected; no event stored.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-029",
+    "source_id": "UC-GYM-003 - Invalid faculty reference",
+    "purpose": "Verify rejection of an invalid faculty reference.",
+    "preconditions": "Actor is club head of a confirmed club",
+    "action_or_input": "Book event with a faculty reference that is not valid",
+    "expected_result": "No successful event booking is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-030",
+    "source_id": "UC-GYM-003 - Invalid time range for event",
+    "purpose": "Verify invalid time range rejection.",
+    "preconditions": "Actor is club head of a confirmed club",
+    "action_or_input": "Book event with end time before start time",
+    "expected_result": "No successful event booking is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-031",
+    "source_id": "UC-GYM-003 - Invalid venue for event",
+    "purpose": "Verify invalid venue rejection.",
+    "preconditions": "Actor is club head of a confirmed club",
+    "action_or_input": "Book event with a non-configured venue",
+    "expected_result": "No successful event booking is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-032",
+    "source_id": "UC-GYM-003 - Non-head cannot book event",
+    "purpose": "Verify authorization for event booking.",
+    "preconditions": "Authenticated Student or Club Head of another club",
+    "action_or_input": "Attempt to book an event for the club",
+    "expected_result": "No event is created. Exact rejection response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-033",
+    "source_id": "UC-GYM-003 - Club not confirmed (open) cannot book event",
+    "purpose": "Probe precondition 'club exists and is confirmed'.",
+    "preconditions": "Club with status open, actor is its head",
+    "action_or_input": "Attempt to book an event",
+    "expected_result": "Not explicitly specified; precondition implies booking should not proceed (see AMB-04).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-034",
+    "source_id": "UC-GYM-003 - Storage failure on event",
+    "purpose": "Verify exception flow when event cannot be stored.",
+    "preconditions": "Valid request; Ability to force storage failure",
+    "action_or_input": "Submit valid event booking while storage fails",
+    "expected_result": "No successful event booking is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-035",
+    "source_id": "UC-GYM-003 - Same time at a different venue allowed for events",
+    "purpose": "Verify event conflict check is scoped to same venue.",
+    "preconditions": "Existing event at V1 on D 10:00-12:00; Second configured venue V2",
+    "action_or_input": "Book event at V2 on D 10:00-12:00",
+    "expected_result": "Event is created and confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-036",
+    "source_id": "UC-GYM-004 - Apply for membership to confirmed club",
+    "purpose": "Verify main success scenario of membership application.",
+    "preconditions": "Student authenticated; Confirmed club exists; Student has no prior application to it",
+    "action_or_input": "Select the club; Enter achievements/description; Submit",
+    "expected_result": "Application recorded for the authenticated student with status open; submission confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-037",
+    "source_id": "UC-GYM-004 - Duplicate application to same club",
+    "purpose": "Verify duplicate rejection leaves existing application unchanged.",
+    "preconditions": "Student already has an open application to club C",
+    "action_or_input": "Submit another application to C with different description",
+    "expected_result": "Duplicate is rejected; the existing application is unchanged; no second application exists.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-038",
+    "source_id": "UC-GYM-004 - Apply to a different club with an existing application",
+    "purpose": "Verify alternative flow allowing applications to different clubs.",
+    "preconditions": "Student has an open application to club C1; Confirmed club C2 exists",
+    "action_or_input": "Apply to C2",
+    "expected_result": "New open application to C2 is created; the C1 application is unchanged.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-039",
+    "source_id": "UC-GYM-004 - Apply to a club that is not confirmed",
+    "purpose": "Probe precondition 'selected club exists and is confirmed'.",
+    "preconditions": "Club with status open exists",
+    "action_or_input": "Attempt to apply to the open club",
+    "expected_result": "Not explicitly specified; precondition implies the application should not be accepted (see AMB-04).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-040",
+    "source_id": "UC-GYM-004 - Unauthenticated user cannot apply",
+    "purpose": "Verify authentication precondition.",
+    "preconditions": "No authenticated session",
+    "action_or_input": "Attempt to submit an application",
+    "expected_result": "No application is created. Exact response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-041",
+    "source_id": "UC-GYM-004 - Available clubs offered for application are confirmed clubs",
+    "purpose": "Verify step 1: confirmed clubs are displayed/selectable.",
+    "preconditions": "One confirmed club and one open club exist",
+    "action_or_input": "Request the list of clubs available for application",
+    "expected_result": "The confirmed club is available for selection; the open club is not stated to be available.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-042",
+    "source_id": "UC-GYM-005 - Approve a single application with remarks",
+    "purpose": "Verify main success scenario.",
+    "preconditions": "Actor is club head of club C; Open application to C exists",
+    "action_or_input": "Approve the application with remarks",
+    "expected_result": "Application status changes open to confirmed; remarks stored; approval confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-043",
+    "source_id": "UC-GYM-005 - Approve without remarks",
+    "purpose": "Verify remarks are optional ('may enter').",
+    "preconditions": "Same as TC-UC-042",
+    "action_or_input": "Approve the application without remarks",
+    "expected_result": "Application becomes confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-044",
+    "source_id": "UC-GYM-005 - Approve multiple applications in one interaction",
+    "purpose": "Verify bulk approval alternative flow.",
+    "preconditions": "Actor is club head of C; Three open applications to C",
+    "action_or_input": "Select all three and approve",
+    "expected_result": "All three become confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-045",
+    "source_id": "UC-GYM-005 - Mixed batch: independent evaluation",
+    "purpose": "Verify each application is evaluated independently.",
+    "preconditions": "Actor is club head of C; Two open applications and one already confirmed application to C",
+    "action_or_input": "Submit all three in one approval interaction",
+    "expected_result": "The two open applications become confirmed; the already-confirmed application is not changed.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-046",
+    "source_id": "UC-GYM-005 - Application belonging to another club is not changed",
+    "purpose": "Verify cross-club approval is blocked.",
+    "preconditions": "Actor is club head of C1; Open application exists for club C2",
+    "action_or_input": "Attempt to approve the C2 application as C1 head",
+    "expected_result": "The application is not changed (remains open).",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-047",
+    "source_id": "UC-GYM-005 - Non-club-head cannot approve",
+    "purpose": "Verify only the applicable club head can approve.",
+    "preconditions": "Authenticated Student with open application to C present",
+    "action_or_input": "Attempt to approve the application",
+    "expected_result": "The application remains open. Exact response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-048",
+    "source_id": "UC-GYM-005 - Approve an application that is no longer open",
+    "purpose": "Verify re-approval of a confirmed application does nothing.",
+    "preconditions": "Application to C with status confirmed (with prior remarks)",
+    "action_or_input": "Attempt to approve again with different remarks",
+    "expected_result": "Application is not changed (status and stored remarks unchanged).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-049",
+    "source_id": "UC-GYM-005 - Pending list scoped to actor's club",
+    "purpose": "Verify step 1 shows pending applications for the actor's club only.",
+    "preconditions": "Open applications exist for clubs C1 and C2; Actor is head of C1",
+    "action_or_input": "Request pending applications",
+    "expected_result": "Only open applications for C1 are shown.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-050",
+    "source_id": "UC-GYM-005 - Apply then approve lifecycle (BW-GYM-01)",
+    "purpose": "Verify membership workflow from open to confirmed.",
+    "preconditions": "Confirmed club C; Student S; Club head of C",
+    "action_or_input": "S applies to C; Verify status open; Club head approves; Verify status confirmed",
+    "expected_result": "Application transitions open to confirmed with remarks stored.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-UC-051",
+    "source_id": "UC-GYM-006 - Create poll with valid definition",
+    "purpose": "Verify main success scenario.",
+    "preconditions": "Actor is club head; Valid batch/branch target groups exist",
+    "action_or_input": "Submit title, description, expiry, two or more choices, target batch and branch",
+    "expected_result": "Active poll with choices and target audience exists; notification initiated for students in the target groups; creation confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-052",
+    "source_id": "UC-GYM-006 - Poll with one choice",
+    "purpose": "Boundary below the minimum choice count.",
+    "preconditions": "Actor is club head",
+    "action_or_input": "Submit poll with exactly one choice",
+    "expected_result": "Poll is not created.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-053",
+    "source_id": "UC-GYM-006 - Poll with zero choices",
+    "purpose": "Negative: no choices.",
+    "preconditions": "Actor is club head",
+    "action_or_input": "Submit poll with no choices",
+    "expected_result": "Poll is not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-054",
+    "source_id": "UC-GYM-006 - Poll with exactly two choices",
+    "purpose": "Boundary at the minimum choice count.",
+    "preconditions": "Actor is club head",
+    "action_or_input": "Submit valid poll with exactly two choices",
+    "expected_result": "Poll is created with both choices.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-055",
+    "source_id": "UC-GYM-006 - All branches for a batch",
+    "purpose": "Verify alternative flow: a branch selection representing all branches.",
+    "preconditions": "Actor is club head; All-branches option configured for a batch",
+    "action_or_input": "Create poll targeting the batch with the all-branches option",
+    "expected_result": "Poll is created and targets students of that batch across all branches.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-056",
+    "source_id": "UC-GYM-006 - Invalid target information",
+    "purpose": "Verify invalid target groups block creation.",
+    "preconditions": "Actor is club head",
+    "action_or_input": "Submit otherwise valid poll with an invalid batch/branch target",
+    "expected_result": "Poll is not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-057",
+    "source_id": "UC-GYM-006 - Notifications reach only target-group students",
+    "purpose": "Verify notification audience follows the target selection.",
+    "preconditions": "Students inside and outside the selected batch/branch",
+    "action_or_input": "Create poll for the selected batch/branch; Inspect initiated notifications",
+    "expected_result": "Notifications are initiated for students in the selected target groups; none for students outside them.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-058",
+    "source_id": "UC-GYM-006 - Non-club-head cannot create poll",
+    "purpose": "Verify authorization.",
+    "preconditions": "Authenticated Student",
+    "action_or_input": "Attempt to create a poll",
+    "expected_result": "No poll is created. Exact response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-059",
+    "source_id": "UC-GYM-006 - Poll targeting multiple batch/branch groups",
+    "purpose": "Verify multiple target groups are supported ('target groups').",
+    "preconditions": "Actor is club head; Students in two target groups",
+    "action_or_input": "Create poll with two target groups",
+    "expected_result": "Poll is created and students of both groups are in the target audience.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-060",
+    "source_id": "UC-GYM-007 - Cast a vote in eligible active poll",
+    "purpose": "Verify main success scenario.",
+    "preconditions": "Authenticated student in target group; Active unexpired poll; Student has not voted",
+    "action_or_input": "Select one choice and submit",
+    "expected_result": "One vote recorded; chosen choice tally increases by one; student recorded as having voted; success confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-061",
+    "source_id": "UC-GYM-007 - Duplicate vote rejected",
+    "purpose": "Verify one vote per student.",
+    "preconditions": "Student has already voted in the poll",
+    "action_or_input": "Attempt to vote again (same or different choice)",
+    "expected_result": "Vote is rejected; tally unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-062",
+    "source_id": "UC-GYM-007 - Ineligible student cannot vote",
+    "purpose": "Verify target-group eligibility.",
+    "preconditions": "Student not in any target group of the poll",
+    "action_or_input": "Attempt to vote",
+    "expected_result": "Vote is rejected; tally unchanged.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-063",
+    "source_id": "UC-GYM-007 - Vote in expired poll",
+    "purpose": "Verify expired poll is not active.",
+    "preconditions": "Eligible student; Poll whose expiration date has passed",
+    "action_or_input": "Attempt to vote",
+    "expected_result": "Vote is rejected; tally unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-064",
+    "source_id": "UC-GYM-007 - Unauthenticated user cannot vote",
+    "purpose": "Verify authentication precondition.",
+    "preconditions": "No authenticated session; Active poll",
+    "action_or_input": "Attempt to vote",
+    "expected_result": "No vote is recorded. Exact response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-065",
+    "source_id": "UC-GYM-007 - Multiple eligible students vote independently",
+    "purpose": "Verify tally aggregates one vote per eligible student.",
+    "preconditions": "Active poll with choices A and B; Three eligible students",
+    "action_or_input": "Student 1 and 2 vote A, student 3 votes B",
+    "expected_result": "Tally is A=2, B=1.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-066",
+    "source_id": "UC-GYM-007 - Poll presented with its choices",
+    "purpose": "Verify step 1 presentation of an eligible active poll.",
+    "preconditions": "Active poll available to student",
+    "action_or_input": "Student opens the poll",
+    "expected_result": "Poll and its choices are presented.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-067",
+    "source_id": "UC-GYM-007 - Poll lifecycle: create, vote, repeat vote (BW-GYM-02)",
+    "purpose": "Verify end-to-end polling workflow.",
+    "preconditions": "Club head; eligible and ineligible students",
+    "action_or_input": "Club head creates poll for a target group; Eligible student votes; Same student votes again; Ineligible student votes",
+    "expected_result": "Poll created; first vote counted; second vote and ineligible vote rejected; final tally shows one vote.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-UC-068",
+    "source_id": "UC-GYM-008 - Change leadership with valid students",
+    "purpose": "Verify main success scenario.",
+    "preconditions": "Actor is current Club Head of club C; Two valid student records distinct from current leaders",
+    "action_or_input": "Submit new coordinator and co-coordinator for C",
+    "expected_result": "Club references the new coordinator and co-coordinator only; change confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-069",
+    "source_id": "UC-GYM-008 - Invalid proposed coordinator",
+    "purpose": "Verify leadership unchanged on invalid coordinator.",
+    "preconditions": "Actor is current Club Head",
+    "action_or_input": "Submit invalid coordinator with valid co-coordinator",
+    "expected_result": "Current leadership remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-070",
+    "source_id": "UC-GYM-008 - Invalid proposed co-coordinator",
+    "purpose": "Verify leadership unchanged on invalid co-coordinator.",
+    "preconditions": "Actor is current Club Head",
+    "action_or_input": "Submit valid coordinator with invalid co-coordinator",
+    "expected_result": "Current leadership remains unchanged (including the coordinator).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-071",
+    "source_id": "UC-GYM-008 - Proposed leader is not a student",
+    "purpose": "Verify both proposed leaders must be students.",
+    "preconditions": "Actor is current Club Head; A faculty (non-student) identity exists",
+    "action_or_input": "Propose the faculty identity as coordinator",
+    "expected_result": "Current leadership remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-072",
+    "source_id": "UC-GYM-008 - Unauthorized actor cannot change leadership",
+    "purpose": "Verify authorization.",
+    "preconditions": "Authenticated user who is not a current Club Head of C",
+    "action_or_input": "Attempt to change leadership of C",
+    "expected_result": "Current leadership remains unchanged.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-073",
+    "source_id": "UC-GYM-008 - Failed change keeps existing leadership",
+    "purpose": "Verify minimal guarantee when the change fails.",
+    "preconditions": "Valid request; Ability to force a failure during update",
+    "action_or_input": "Submit change while the update fails",
+    "expected_result": "Existing leadership remains intact.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-074",
+    "source_id": "UC-GYM-008 - Superseded designations retired, new ones recorded",
+    "purpose": "Verify current designations are consistent after change.",
+    "preconditions": "Club C with current coordinator and co-coordinator",
+    "action_or_input": "Change leadership; Inspect current leadership designations",
+    "expected_result": "New coordinator/co-coordinator hold current designations; previous leaders no longer hold current leadership designations.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-075",
+    "source_id": "UC-GYM-008 - Former head loses Club Head authority",
+    "purpose": "Verify the consequence of retiring old designations.",
+    "preconditions": "Leadership change completed for C",
+    "action_or_input": "Former coordinator attempts a Club Head action for C (e.g., approve membership)",
+    "expected_result": "Action is not permitted; the new coordinator can perform it.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-UC-076",
+    "source_id": "UC-GYM-009 - Submit valid budget request",
+    "purpose": "Verify main success scenario.",
+    "preconditions": "Actor is Club Head of confirmed club",
+    "action_or_input": "Enter purpose, positive amount, supporting file, description; submit",
+    "expected_result": "Request is stored with status open; submission confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-077",
+    "source_id": "UC-GYM-009 - Amount of zero",
+    "purpose": "Boundary: smallest non-negative amount.",
+    "preconditions": "Actor is Club Head of confirmed club",
+    "action_or_input": "Submit with amount 0 and valid file",
+    "expected_result": "Request is accepted and stored as open (0 is non-negative).",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-078",
+    "source_id": "UC-GYM-009 - Negative amount",
+    "purpose": "Verify negative amount rejection.",
+    "preconditions": "Actor is Club Head of confirmed club",
+    "action_or_input": "Submit with amount -100 and valid file",
+    "expected_result": "Request is rejected and not stored as a valid submission.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-079",
+    "source_id": "UC-GYM-009 - Amount just below zero",
+    "purpose": "Boundary: smallest negative value.",
+    "preconditions": "Actor is Club Head of confirmed club",
+    "action_or_input": "Submit with amount -0.01 and valid file",
+    "expected_result": "Request is rejected and not stored.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-UC-080",
+    "source_id": "UC-GYM-009 - Missing supporting file",
+    "purpose": "Verify required file enforcement.",
+    "preconditions": "Actor is Club Head of confirmed club",
+    "action_or_input": "Submit with valid amount and no file",
+    "expected_result": "Request is rejected and not stored.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-081",
+    "source_id": "UC-GYM-009 - Non-club-head cannot request budget",
+    "purpose": "Verify authorization.",
+    "preconditions": "Authenticated Student or Club Head of another club",
+    "action_or_input": "Attempt to submit a budget request for the club",
+    "expected_result": "No budget request is stored. Exact response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-082",
+    "source_id": "UC-GYM-009 - Club not confirmed (open) cannot request budget",
+    "purpose": "Probe precondition 'club exists and is confirmed'.",
+    "preconditions": "Open club whose head is the actor",
+    "action_or_input": "Attempt a budget request",
+    "expected_result": "Not explicitly specified; precondition implies the request should not proceed (see AMB-04).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-083",
+    "source_id": "UC-GYM-010 - Submit valid event report",
+    "purpose": "Verify main success scenario.",
+    "preconditions": "Actor is Club Head; Event/activity has occurred; Valid student incharge exists",
+    "action_or_input": "Enter club, student incharge, event name, description, date/time; upload report file; submit",
+    "expected_result": "Report is stored and available in the club repository; submission confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-084",
+    "source_id": "UC-GYM-010 - Missing report file",
+    "purpose": "Verify required file enforcement.",
+    "preconditions": "Actor is Club Head",
+    "action_or_input": "Submit all fields without the report/details file",
+    "expected_result": "Report is not accepted.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-085",
+    "source_id": "UC-GYM-010 - Invalid student incharge reference",
+    "purpose": "Verify invalid required references reject the report.",
+    "preconditions": "Actor is Club Head",
+    "action_or_input": "Submit with a student incharge that is not a valid student",
+    "expected_result": "Report is not accepted.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-086",
+    "source_id": "UC-GYM-010 - Non-club-head cannot submit report",
+    "purpose": "Verify authorization.",
+    "preconditions": "Authenticated Student or Club Head of another club",
+    "action_or_input": "Attempt to submit a report for the club",
+    "expected_result": "No report is stored. Exact response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-087",
+    "source_id": "UC-GYM-010 - Report for an event that has not occurred",
+    "purpose": "Probe precondition 'relevant event/activity has occurred'.",
+    "preconditions": "Actor is Club Head; Event date in the future",
+    "action_or_input": "Submit report with a future date/time",
+    "expected_result": "Not specified how the system verifies or enforces this precondition (see AMB-09). Outcome recorded only.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-088",
+    "source_id": "UC-GYM-010 - Submitted report reviewable by councillor",
+    "purpose": "Verify cross-UC hand-off: a stored report is available to the assigned councillor.",
+    "preconditions": "Club C with assigned Club Faculty Councillor F; Club head of C",
+    "action_or_input": "Club head submits valid report; F lists reports for C and opens it",
+    "expected_result": "The report appears in F's list; metadata and file are available.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-UC-089",
+    "source_id": "UC-GYM-011 - Approve an open club",
+    "purpose": "Verify main success scenario.",
+    "preconditions": "Student Admin authorized; Club with status open",
+    "action_or_input": "Approve the club",
+    "expected_result": "Status changes from open to confirmed; approval confirmed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-090",
+    "source_id": "UC-GYM-011 - Approve a club that is not open",
+    "purpose": "Verify no transition for non-open club.",
+    "preconditions": "Club already confirmed",
+    "action_or_input": "Attempt to approve",
+    "expected_result": "No approval transition occurs; status remains confirmed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-091",
+    "source_id": "UC-GYM-011 - Non-Student-Admin cannot approve club",
+    "purpose": "Verify authorization.",
+    "preconditions": "Open club exists; Authenticated Club Head or Student",
+    "action_or_input": "Attempt to approve the club",
+    "expected_result": "Club remains open. Exact response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-092",
+    "source_id": "UC-GYM-011 - Approval update failure retains status",
+    "purpose": "Verify failure guarantee.",
+    "preconditions": "Open club; Ability to force update failure",
+    "action_or_input": "Approve while update fails",
+    "expected_result": "Club retains status open.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-UC-093",
+    "source_id": "UC-GYM-011 - Club lifecycle: create, approve, book (BW-GYM-03)",
+    "purpose": "Verify the club creation/approval workflow and its effect on bookings.",
+    "preconditions": "Student Admin; valid leaders and councillor",
+    "action_or_input": "Student Admin creates club (open); Club head attempts booking while open and observe; Student Admin approves club; Club head books a session at a free slot",
+    "expected_result": "Club is open after creation, confirmed after approval; booking succeeds after approval. Behavior of the pre-approval booking attempt is unspecified (AMB-04), so only the post-approval outcome is asserted.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-UC-094",
+    "source_id": "UC-GYM-012 - Councillor lists and opens a report",
+    "purpose": "Verify main success scenario.",
+    "preconditions": "Faculty user is assigned Club Faculty Councillor of C; At least one submitted report exists for C",
+    "action_or_input": "Open club report area; Select a report",
+    "expected_result": "Submitted reports for C are listed; selected report's metadata is displayed and its file is made available.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-UC-095",
+    "source_id": "UC-GYM-012 - Unassigned faculty denied access",
+    "purpose": "Verify exception flow: faculty not assigned to the club.",
+    "preconditions": "Authenticated faculty user not assigned to club C; Report exists for C",
+    "action_or_input": "Attempt to access C's reports",
+    "expected_result": "Access to C's reports is denied; no report content is exposed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-096",
+    "source_id": "UC-GYM-012 - Councillor sees only assigned club's reports",
+    "purpose": "Verify the list is scoped to the assigned club.",
+    "preconditions": "Reports exist for clubs C1 and C2; Faculty is councillor of C1 only",
+    "action_or_input": "List reports",
+    "expected_result": "Only C1 reports are listed; no C2 report content exposed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-097",
+    "source_id": "UC-GYM-012 - Unauthenticated access denied",
+    "purpose": "Verify authentication precondition.",
+    "preconditions": "No authenticated session; Report exists",
+    "action_or_input": "Attempt to access the report area",
+    "expected_result": "No report content is exposed. Exact response is not specified.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-UC-098",
+    "source_id": "UC-GYM-012 - Assigned councillor, no reports exist",
+    "purpose": "Probe precondition 'at least one submitted report is available'.",
+    "preconditions": "Assigned councillor; No reports for the club",
+    "action_or_input": "Open club report area",
+    "expected_result": "Not specified (see AMB-10). Outcome recorded only.",
+    "test_type": "boundary"
+  }
+]

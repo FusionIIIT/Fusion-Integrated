@@ -1,0 +1,236 @@
+[
+  {
+    "test_id": "WF-T01",
+    "source_id": "BW-GYM-01 transition 1 (No Membership Application \u2192 Membership Application Open) via UC-GYM-004",
+    "purpose": "Verify that a student can apply to a confirmed club when no application to that club exists, moving the workflow from 'No Membership Application' to 'Membership Application Open'.",
+    "preconditions": "A club exists in state Club Confirmed. A student exists with no membership application and no membership for that club.",
+    "action_or_input": "The student submits a membership application to the confirmed club (UC-GYM-004 / Apply for Club Membership).",
+    "expected_result": "Submission succeeds. An application record exists for the student and club in state 'Membership Application Open'. The student is not yet a confirmed member. The application is visible as pending/open to the applicable Club Head.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-T02",
+    "source_id": "BW-GYM-01 transition 2 (Membership Application Open \u2192 Membership Confirmed) via UC-GYM-005",
+    "purpose": "Verify that the applicable Club Head can approve an open application, moving the workflow from 'Membership Application Open' to 'Membership Confirmed'.",
+    "preconditions": "A student application to a confirmed club is in state 'Membership Application Open'. The acting user is the applicable Club Head of that club.",
+    "action_or_input": "The Club Head selects approval for the open application (UC-GYM-005 / Approve Club Membership).",
+    "expected_result": "Approval succeeds. The application state becomes 'Membership Confirmed' and the student is recorded as a confirmed member of that club.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-T03",
+    "source_id": "BW-GYM-01 end-to-end path (transitions 1\u21922)",
+    "purpose": "Verify the complete connected progression from no application through open application to confirmed membership.",
+    "preconditions": "A confirmed club exists with an applicable Club Head. A student has no application to that club.",
+    "action_or_input": "Step 1: the student applies (UC-GYM-004). Step 2: the applicable Club Head approves the resulting open application (UC-GYM-005).",
+    "expected_result": "After step 1 the state is 'Membership Application Open'; after step 2 the state is 'Membership Confirmed'. The states occur in this order and no other states are observed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-T04",
+    "source_id": "BW-GYM-01 transition 1 guard: club is confirmed (negative)",
+    "purpose": "Verify that the workflow does not advance when the target club is not confirmed.",
+    "preconditions": "A club exists in state Club Open (not confirmed). A student has no application to it.",
+    "action_or_input": "The student attempts to apply for membership to the unconfirmed club (UC-GYM-004).",
+    "expected_result": "The submission is rejected. No application is created and the workflow remains at 'No Membership Application'. (The exact error message is not specified.)",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T05",
+    "source_id": "BW-GYM-01 transition 1 guard: no duplicate same-club application (negative)",
+    "purpose": "Verify that a second application to the same club is blocked while the first remains open, so the workflow does not re-enter transition 1.",
+    "preconditions": "A student already has an application to a confirmed club in state 'Membership Application Open'.",
+    "action_or_input": "The same student submits another membership application to the same club (UC-GYM-004).",
+    "expected_result": "The duplicate submission is rejected. Only one application exists for the student and club, and its state remains 'Membership Application Open'. (Behavior for a duplicate after membership is confirmed is not specified in this workflow and is not tested.)",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T06",
+    "source_id": "BW-GYM-01 transition 2 guard: actor is applicable Club Head (negative)",
+    "purpose": "Verify that a user who is not the applicable Club Head cannot approve an open application.",
+    "preconditions": "An application is in state 'Membership Application Open' for a confirmed club. The acting user is not the Club Head of that club (e.g., the applicant student or a Club Head of a different club).",
+    "action_or_input": "The non-applicable user attempts to approve the application (UC-GYM-005).",
+    "expected_result": "Approval is rejected. The application remains 'Membership Application Open' and no membership is confirmed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T07",
+    "source_id": "BW-GYM-01 transition 2 guard: application remains open (negative)",
+    "purpose": "Verify that approval cannot be performed on an application that is not open. The specification does not define how an application leaves the open state other than approval, so this tests re-approval of an already confirmed application.",
+    "preconditions": "An application has already been approved and is in state 'Membership Confirmed'. The acting user is the applicable Club Head.",
+    "action_or_input": "The Club Head attempts to approve the same application again (UC-GYM-005).",
+    "expected_result": "The second approval is not accepted as a new transition. The state remains 'Membership Confirmed' and no duplicate membership is created. (Ambiguity: the specification states only that the application must remain open; the exact rejection behavior is unspecified.)",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T08",
+    "source_id": "BW-GYM-02 transition 1 (Poll Not Available \u2192 Poll Open / Target Audience Defined / Student Not Yet Voted) via UC-GYM-006",
+    "purpose": "Verify that the applicable Club Head can create a poll with at least two choices and valid target groups, moving the workflow to the open poll state.",
+    "preconditions": "No poll exists. The acting user is the applicable Club Head. At least one valid student target group exists.",
+    "action_or_input": "The Club Head creates a poll with two or more choices and valid selected target groups (UC-GYM-006 / Create Voting Poll).",
+    "expected_result": "Poll creation succeeds. The poll is open, its target audience is the selected groups, and no student in the target audience has yet voted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-T09",
+    "source_id": "BW-GYM-02 transition 2 (Student Not Yet Voted \u2192 Student Vote Recorded) via UC-GYM-007",
+    "purpose": "Verify that an eligible targeted student can record one vote in an active poll.",
+    "preconditions": "A poll is open, active/unexpired, with a defined target audience. The student belongs to the target audience and has not voted.",
+    "action_or_input": "The student votes for one of the poll choices (UC-GYM-007 / Vote in Poll).",
+    "expected_result": "The vote is accepted and recorded for that student. The poll remains open with the target audience defined, and the student's state becomes 'Student Vote Recorded'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-T10",
+    "source_id": "BW-GYM-02 end-to-end path (transitions 1\u21922)",
+    "purpose": "Verify the complete finite path from poll creation by a Club Head to one eligible targeted student recording one vote.",
+    "preconditions": "An applicable Club Head and a student belonging to a valid target group exist. No poll exists.",
+    "action_or_input": "Step 1: the Club Head creates a poll with at least two choices targeting the student's group (UC-GYM-006). Step 2: the targeted student votes (UC-GYM-007).",
+    "expected_result": "After step 1: 'Poll Open / Target Audience Defined / Student Not Yet Voted'. After step 2: 'Poll Open / Target Audience Defined / Student Vote Recorded'. The states occur in this order.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-T11",
+    "source_id": "BW-GYM-02 transition 1 guard: at least two choices (negative)",
+    "purpose": "Verify that poll creation fails when fewer than two choices are supplied.",
+    "preconditions": "The acting user is the applicable Club Head. A valid target group exists.",
+    "action_or_input": "The Club Head attempts to create a poll with only one choice (UC-GYM-006).",
+    "expected_result": "Creation is rejected. No poll is created and the workflow remains at 'Poll Not Available'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T12",
+    "source_id": "BW-GYM-02 transition 1 guard: valid target groups (negative)",
+    "purpose": "Verify that poll creation fails when the target groups are invalid.",
+    "preconditions": "The acting user is the applicable Club Head.",
+    "action_or_input": "The Club Head attempts to create a poll with at least two choices but with an invalid target group (UC-GYM-006). (Ambiguity: the specification does not define what makes a group invalid or whether an empty target selection counts as invalid; the test uses a group identifier that does not exist.)",
+    "expected_result": "Creation is rejected. No poll is created and the workflow remains at 'Poll Not Available'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T13",
+    "source_id": "BW-GYM-02 transition 1 guard: actor is applicable Club Head (negative)",
+    "purpose": "Verify that a user who is not the applicable Club Head cannot create a poll.",
+    "preconditions": "The acting user is not an applicable Club Head (e.g., an ordinary student).",
+    "action_or_input": "The user attempts to create a poll with at least two choices and valid target groups (UC-GYM-006).",
+    "expected_result": "Creation is rejected. No poll is created and the workflow remains at 'Poll Not Available'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T14",
+    "source_id": "BW-GYM-02 transition 2 guard: poll active/unexpired (negative)",
+    "purpose": "Verify that a targeted student cannot vote in an expired poll.",
+    "preconditions": "A poll exists whose active period has expired. The student belongs to the target audience and has not voted.",
+    "action_or_input": "The student attempts to vote (UC-GYM-007).",
+    "expected_result": "The vote is rejected. No vote is recorded and the student's state remains 'Student Not Yet Voted'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T15",
+    "source_id": "BW-GYM-02 transition 2 guard: student belongs to target audience (negative)",
+    "purpose": "Verify that a student outside the target audience cannot vote.",
+    "preconditions": "A poll is open and active, targeted at specific groups. The student does not belong to any targeted group.",
+    "action_or_input": "The non-targeted student attempts to vote (UC-GYM-007).",
+    "expected_result": "The vote is rejected. No vote is recorded for that student.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T16",
+    "source_id": "BW-GYM-02 transition 2 guard: student has not voted (negative)",
+    "purpose": "Verify that a student who has already voted cannot vote a second time.",
+    "preconditions": "A poll is open and active. The targeted student's state is 'Student Vote Recorded'.",
+    "action_or_input": "The same student attempts to vote again (UC-GYM-007).",
+    "expected_result": "The second vote is rejected. Only the original vote remains recorded and the student's state remains 'Student Vote Recorded'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T17",
+    "source_id": "BW-GYM-03 transition 1 (Club Not Created \u2192 Club Open) via UC-GYM-001",
+    "purpose": "Verify that the Student Admin can create a new club with valid data, moving the workflow to 'Club Open'.",
+    "preconditions": "No club record exists for the new club. The acting user is the Student Admin. Valid required data is available: valid student coordinator and co-coordinator, valid faculty as Faculty Councillor, and an allowed category.",
+    "action_or_input": "The Student Admin creates the club with all required data (UC-GYM-001 / Create New Club).",
+    "expected_result": "Creation succeeds. A club record exists in state 'Club Open' (not yet confirmed) with the supplied coordinator, co-coordinator, Faculty Councillor and category.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-T18",
+    "source_id": "BW-GYM-03 transition 2 (Club Open \u2192 Club Confirmed) via UC-GYM-011",
+    "purpose": "Verify that the Student Admin can approve an open club, moving the workflow to 'Club Confirmed'.",
+    "preconditions": "A club exists in state 'Club Open'. The acting user is the Student Admin.",
+    "action_or_input": "The Student Admin approves the club (UC-GYM-011 / Approve Club).",
+    "expected_result": "The update succeeds and the club state becomes 'Club Confirmed'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-T19",
+    "source_id": "BW-GYM-03 end-to-end path (transitions 1\u21922)",
+    "purpose": "Verify the complete Student Admin club lifecycle from no club record through open creation to confirmed club.",
+    "preconditions": "No club record exists. The acting user is the Student Admin with valid creation data.",
+    "action_or_input": "Step 1: the Student Admin creates the club (UC-GYM-001). Step 2: the same Student Admin approves it (UC-GYM-011).",
+    "expected_result": "After step 1 the club is 'Club Open'; after step 2 it is 'Club Confirmed'. The states occur in this order.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-T20",
+    "source_id": "BW-GYM-03 transition 1 guard: required data supplied (negative)",
+    "purpose": "Verify that club creation fails when required data is missing.",
+    "preconditions": "The acting user is the Student Admin. (Ambiguity: the specification does not enumerate which data fields are required; the test omits one clearly required item, such as the coordinator.)",
+    "action_or_input": "The Student Admin attempts to create a club with a required item omitted (UC-GYM-001).",
+    "expected_result": "Creation is rejected. No club record is created and the workflow remains at 'Club Not Created'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T21",
+    "source_id": "BW-GYM-03 transition 1 guard: coordinator/co-coordinator are valid students (negative)",
+    "purpose": "Verify that club creation fails when the coordinator or co-coordinator is not a valid student.",
+    "preconditions": "The acting user is the Student Admin. A user who is not a valid student exists (e.g., a faculty member or a nonexistent user).",
+    "action_or_input": "The Student Admin attempts to create a club naming that non-student as coordinator (or co-coordinator) (UC-GYM-001).",
+    "expected_result": "Creation is rejected. No club record is created and the workflow remains at 'Club Not Created'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T22",
+    "source_id": "BW-GYM-03 transition 1 guard: Faculty Councillor is valid faculty (negative)",
+    "purpose": "Verify that club creation fails when the Faculty Councillor is not valid faculty.",
+    "preconditions": "The acting user is the Student Admin. A user who is not faculty (e.g., a student) exists.",
+    "action_or_input": "The Student Admin attempts to create a club naming that non-faculty user as Faculty Councillor (UC-GYM-001).",
+    "expected_result": "Creation is rejected. No club record is created and the workflow remains at 'Club Not Created'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T23",
+    "source_id": "BW-GYM-03 transition 1 guard: category allowed (negative)",
+    "purpose": "Verify that club creation fails when the category is not an allowed category.",
+    "preconditions": "The acting user is the Student Admin. (Ambiguity: the list of allowed categories is not stated in the workflow specification; the test uses a category value that is clearly outside the allowed set.)",
+    "action_or_input": "The Student Admin attempts to create a club with a disallowed category (UC-GYM-001).",
+    "expected_result": "Creation is rejected. No club record is created and the workflow remains at 'Club Not Created'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T24",
+    "source_id": "BW-GYM-03 transition 2 guard: club remains open (negative)",
+    "purpose": "Verify that approval cannot be applied to a club that is not in 'Club Open', using an already confirmed club.",
+    "preconditions": "A club exists in state 'Club Confirmed'. The acting user is the Student Admin.",
+    "action_or_input": "The Student Admin attempts to approve the already confirmed club again (UC-GYM-011).",
+    "expected_result": "The repeat approval is not accepted as a new transition. The club remains 'Club Confirmed'. (Ambiguity: the specification states only that the club must remain open; exact rejection behavior is unspecified.)",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T25",
+    "source_id": "BW-GYM-03 transition 2 guard: Student Admin approves (negative)",
+    "purpose": "Verify that a user who is not the Student Admin cannot approve an open club.",
+    "preconditions": "A club exists in state 'Club Open'. The acting user is not the Student Admin (e.g., an ordinary student).",
+    "action_or_input": "The non-Student-Admin user attempts to approve the club (UC-GYM-011).",
+    "expected_result": "Approval is rejected. The club remains 'Club Open'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-T26",
+    "source_id": "Cross-workflow dependency: BW-GYM-03 outcome Club Confirmed enabling BW-GYM-01 transition 1 guard",
+    "purpose": "Verify the specified relationship that a club established and confirmed via BW-GYM-03 is a club to which a student can then apply under BW-GYM-01. The specification declares no Composite Workflow, so this checks only the stated guard 'Club is confirmed' and not a combined workflow.",
+    "preconditions": "The Student Admin has created a club (Club Open) and then approved it (Club Confirmed). A student has no application to that club.",
+    "action_or_input": "The student applies for membership to the newly confirmed club (UC-GYM-004).",
+    "expected_result": "Submission succeeds and the application is in state 'Membership Application Open'.",
+    "test_type": "positive"
+  }
+]
