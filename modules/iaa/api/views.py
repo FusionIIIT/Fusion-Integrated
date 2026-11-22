@@ -12,7 +12,7 @@ from fusion_auth.permissions import HasModuleGrant
 from modules.iaa.api import serializers as s
 from modules.iaa.models import (
     ApprovalRule, ApprovalStep, DashboardNotification, FinancialRecord,
-    FinancialYearPolicy, RoleAssignment,
+    FinancialYearPolicy, NotificationReceipt,
 )
 from modules.iaa.services import iaa as service
 
@@ -24,8 +24,10 @@ def actor(request):
 
 
 def page(qs, serializer):
+    total = qs.count()
     rows = list(qs[:200])
-    return {"results": serializer(rows, many=True).data, "count": len(rows)}
+    return {"results": serializer(rows, many=True).data,
+            "count": total, "has_more": total > len(rows)}
 
 
 class IAAView(APIView):
@@ -233,7 +235,7 @@ class ObservationListCreateView(IAAView):
     @extend_schema(responses=s.PageSerializer)
     def get(self, request):
         role = service.actor_role(actor(request))
-        permission = "iaa.audit.review" if role in service.AUDIT_ROLES else "iaa.audit.observation.respond"
+        permission = "iaa.audit.review" if role in service.AUDIT_ROLES else "iaa.observation.respond"
         service.require(actor(request), permission, roles=service.AUDIT_ROLES | service.BASIC_ROLES)
         qs = service.visible_observations(actor(request))
         state = request.query_params.get("status")
@@ -288,19 +290,46 @@ class NotificationListView(IAAView):
     @extend_schema(responses=s.PageSerializer)
     def get(self, request):
         service.require(actor(request), "iaa.notification.view")
-        qs = DashboardNotification.objects.filter(recipient_user_id=actor(request).user_id)
-        return Response(page(qs, s.NotificationSerializer))
+        user_id = actor(request).user_id
+        active_role = service.actor_role(actor(request))
+        qs = DashboardNotification.objects.filter(
+            Q(recipient_user_id=user_id)
+            | Q(recipient_user_id__isnull=True, recipient_role=active_role)
+        ).order_by("-created_at")
+        total = qs.count()
+        rows = list(qs[:200])
+        role_ids = [row.pk for row in rows if row.recipient_user_id is None]
+        receipts = {receipt.notification_id: receipt.read_at
+                    for receipt in NotificationReceipt.objects.filter(
+                        notification_id__in=role_ids, recipient_user_id=user_id)}
+        for row in rows:
+            if row.recipient_user_id is None:
+                row.read_at = receipts.get(row.pk)
+        return Response({"results": s.NotificationSerializer(rows, many=True).data,
+                         "count": total, "has_more": total > len(rows)})
 
 
 class NotificationReadView(IAAView):
     @extend_schema(request=None, responses=s.NotificationSerializer)
     def post(self, request, pk):
         service.require(actor(request), "iaa.notification.view")
-        row = DashboardNotification.objects.filter(pk=pk, recipient_user_id=actor(request).user_id).first()
+        user_id = actor(request).user_id
+        active_role = service.actor_role(actor(request))
+        row = DashboardNotification.objects.filter(pk=pk).filter(
+            Q(recipient_user_id=user_id)
+            | Q(recipient_user_id__isnull=True, recipient_role=active_role)
+        ).first()
         if row is None:
             raise NotFoundError("Notification not found.")
-        row.read_at = timezone.now()
-        row.save(update_fields=["read_at"])
+        if row.recipient_user_id is None:
+            receipt, _ = NotificationReceipt.objects.update_or_create(
+                notification=row, recipient_user_id=user_id,
+                defaults={"read_at": timezone.now()},
+            )
+            row.read_at = receipt.read_at
+        else:
+            row.read_at = timezone.now()
+            row.save(update_fields=["read_at"])
         return Response(s.NotificationSerializer(row).data)
 
 
@@ -318,23 +347,6 @@ class ActiveRoleView(IAAView):
         selection = service.switch_active_role(
             actor(request), serializer.validated_data["role"], request.auth)
         return Response({"active_role": selection.role})
-
-
-class RoleAssignmentView(IAAView):
-    @extend_schema(responses=s.PageSerializer)
-    def get(self, request):
-        service.require(actor(request), "iaa.configuration.manage",
-                        roles=service.ADMIN_ROLES, operational=False)
-        return Response(page(RoleAssignment.objects.order_by("user_id"), s.RoleAssignmentSerializer))
-
-    @extend_schema(request=s.RoleAssignmentInputSerializer, responses=s.RoleAssignmentSerializer)
-    def post(self, request):
-        serializer = s.RoleAssignmentInputSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        row = service.assign_role(actor(request), user_id=serializer.validated_data["user_id"],
-                                  role_name=serializer.validated_data["role"],
-                                  active=serializer.validated_data["is_active"])
-        return Response(s.RoleAssignmentSerializer(row).data, status=status.HTTP_201_CREATED)
 
 
 class ApprovalRuleView(IAAView):
