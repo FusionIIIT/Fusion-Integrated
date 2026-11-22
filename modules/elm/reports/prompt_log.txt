@@ -1,0 +1,187 @@
+# ==============================================================================
+# PHASE 0: AUDIT & RELOCATION OF ROOT PROTOTYPE FILES
+# ==============================================================================
+
+/run find . -maxdepth 4 -not -path '*/.*' -not -path './node_modules*' -type d > repo_dirs.txt
+/read repo_dirs.txt ../ELM_Bundle/chunks/doc1_part01.md
+
+# Batch 0A: Backend Services, Controllers, and Routes
+/add elm_leave_controller.js elm_leave_routes.js elm_leave_service.js
+
+Look at repo_dirs.txt and doc1_part01.md to see where existing backend routes, controllers, and services are placed in this codebase.
+1. Move the contents of elm_leave_controller.js, elm_leave_routes.js, and elm_leave_service.js into their proper backend module folders inside modules/elm/ (modules/elm/controllers/, modules/elm/api/routes/, modules/elm/services/).
+2. Update all relative import or require statements between these three files so they point to their new paths.
+
+/drop elm_leave_controller.js elm_leave_routes.js elm_leave_service.js
+/clear
+
+# Batch 0B: Data Models
+/read repo_dirs.txt
+/add elm_leave_balances.js elm_leave_categories.js elm_leave_requests.js
+
+Move the contents of elm_leave_balances.js, elm_leave_categories.js, and elm_leave_requests.js into modules/elm/models/ following this repository's directory structure, and update all relative import or require statements inside them to match their new location.
+
+/drop elm_leave_balances.js elm_leave_categories.js elm_leave_requests.js
+/clear
+
+# Batch 0C: Frontend Views & Root Cleanup
+/read repo_dirs.txt
+/add elm_leave_detail.js elm_leave_form.js elm_leave_list.js
+
+Move the contents of elm_leave_detail.js, elm_leave_form.js, and elm_leave_list.js into modules/elm/views/ and update all relative import statements inside them so they resolve properly.
+
+/drop elm_leave_detail.js elm_leave_form.js elm_leave_list.js
+/run rm -f elm_leave_*.js && git add -A modules/elm elm_leave_*.js && git commit -m "chore(elm): relocate all elm files into modules/elm structure"
+/clear
+
+
+# ==============================================================================
+# PHASE 1: DATA MODELS & BUSINESS RULE CONSTRAINTS
+# ==============================================================================
+
+# Pass 1A: Core Schemas & Business Rules
+/add modules/elm/models/elm_leave_categories.js modules/elm/models/elm_leave_balances.js modules/elm/models/elm_leave_requests.js
+/read ../ELM_Bundle/chunks/doc4_part*.md ../ELM_Bundle/chunks/doc2_part01.md ../ELM_Bundle/chunks/doc2_part02.md
+
+Using all the Business Rules (doc4_part*.md) and Functional Requirements (doc2_part01.md, doc2_part02.md), update modules/elm/models/elm_leave_categories.js, modules/elm/models/elm_leave_balances.js, and modules/elm/models/elm_leave_requests.js:
+1. Complete all schemas, fields, data types, status enums (Draft, Submitted, Pending Approval, Forwarded, Approved, Rejected, Cancelled, Revoked), and default values required for Leave Categories, Employee Leave Balances, and Leave Requests.
+2. Implement all model-level validation helpers and business rule constraints (accrual limits, carry-forward caps, minimum notice period, max consecutive days, mandatory attachment thresholds, half-day/prefix-suffix holiday flags, and overlapping date checks).
+3. Ensure all relative import / require statements inside modules/elm/models/ are valid.
+
+# Pass 1B: Remaining Functional Specifications
+/clear
+/drop ../ELM_Bundle/chunks/*
+/read ../ELM_Bundle/chunks/doc2_part03.md ../ELM_Bundle/chunks/doc2_part04.md ../ELM_Bundle/chunks/doc2_part05.md ../ELM_Bundle/chunks/doc2_part06.md
+
+Review the remaining Functional Requirements in doc2_part03.md through doc2_part06.md and add any missing fields, status values, or validation helpers to elm_leave_categories.js, elm_leave_balances.js, and elm_leave_requests.js.
+
+
+# ==============================================================================
+# PHASE 2: WORKFLOW ENGINE & SERVICE LAYER
+# ==============================================================================
+
+# Pass 2A: State Machine & Balance Operations
+/clear
+/drop
+/add modules/elm/services/elm_leave_service.js
+/read modules/elm/models/elm_leave_categories.js modules/elm/models/elm_leave_balances.js modules/elm/models/elm_leave_requests.js
+/read ../ELM_Bundle/chunks/doc5_part01.md ../ELM_Bundle/chunks/doc5_part02.md ../ELM_Bundle/chunks/doc5_part03.md
+
+Using doc5_part01.md through doc5_part03.md and the read-only models in modules/elm/models/, refactor and complete modules/elm/services/elm_leave_service.js:
+1. Fix the relative import / require paths at the top so they point to ../models/elm_leave_categories.js, ../models/elm_leave_balances.js, and ../models/elm_leave_requests.js.
+2. Implement all leave request lifecycle state transitions (Draft, Submitted, Pending Approval, Forwarded, Approved, Rejected, Cancelled, Revoked) with strict transition guards that reject invalid state changes.
+3. Implement automatic leave balance verification before submission, deduction/reservation upon submission and approval, and automatic balance restoration upon cancellation, rejection, or revocation.
+
+# Pass 2B: Routing, Escalation & Audit Logging
+/clear
+/drop ../ELM_Bundle/chunks/*
+/read ../ELM_Bundle/chunks/doc5_part04.md ../ELM_Bundle/chunks/doc5_part05.md ../ELM_Bundle/chunks/doc5_part06.md
+
+Apply any remaining workflow routing, multi-level supervisor hierarchy resolution, escalation, delegation, or chronological audit logging rules from doc5_part04.md onwards into modules/elm/services/elm_leave_service.js.
+
+
+# ==============================================================================
+# PHASE 3: BACKEND CONTROLLER & API ROUTES
+# ==============================================================================
+
+/clear
+/drop
+/add modules/elm/controllers/elm_leave_controller.js modules/elm/api/routes/elm_leave_routes.js
+/read modules/elm/services/elm_leave_service.js
+/read ../ELM_Bundle/chunks/doc3_part*.md
+
+Using all the Use Case Specifications (doc3_part*.md) and the read-only modules/elm/services/elm_leave_service.js, complete modules/elm/controllers/elm_leave_controller.js and modules/elm/api/routes/elm_leave_routes.js:
+1. Fix relative imports so elm_leave_controller.js imports ../services/elm_leave_service.js and elm_leave_routes.js imports ../../controllers/elm_leave_controller.js.
+2. Implement controller methods for every actor use case:
+   - Employee: save draft, apply/submit leave, view balances by category, list own requests with filters, view request details and workflow history, cancel/withdraw request.
+   - Approver / Sanctioning Authority: view pending approval queue, approve request, reject request (enforcing mandatory rejection remarks), forward/escalate request, revoke approved leave.
+   - Admin / HR: create/update leave categories and policies, credit/adjust employee balances, fetch leave reports.
+3. Wire all routes cleanly in modules/elm/api/routes/elm_leave_routes.js with proper HTTP methods, role-based access control middleware, parameter validation, and HTTP status codes.
+
+
+# ==============================================================================
+# PHASE 4: FRONTEND UI VIEWS (ONE FILE AT A TIME)
+# ==============================================================================
+
+# Pass 4A: Leave Application Form View
+/clear
+/drop
+/add modules/elm/views/elm_leave_form.js
+/read modules/elm/api/routes/elm_leave_routes.js ../ELM_Bundle/chunks/doc3_part01.md ../ELM_Bundle/chunks/doc3_part02.md
+
+Refactor and complete modules/elm/views/elm_leave_form.js:
+1. Fix all relative import statements to match its location inside modules/elm/views/.
+2. Wire form submission and live balance checks to the exact API endpoints defined in modules/elm/api/routes/elm_leave_routes.js.
+3. Implement all leave request form fields: category selector, live available balance display, start/end date pickers, half-day/station-leave toggles, working-days duration calculator, reason input, conditional supporting document upload, client-side validation, and Save Draft vs. Submit actions.
+
+# Pass 4B: Leave List & Approver Queue View
+/clear
+/drop
+/add modules/elm/views/elm_leave_list.js
+/read modules/elm/api/routes/elm_leave_routes.js ../ELM_Bundle/chunks/doc3_part02.md ../ELM_Bundle/chunks/doc3_part03.md
+
+Refactor and complete modules/elm/views/elm_leave_list.js:
+1. Fix all relative import statements to match its location inside modules/elm/views/.
+2. Fetch and render employee leave balance summary cards, a filterable/sortable employee request history table, and an Approver Pending Queue view using the endpoints in modules/elm/api/routes/elm_leave_routes.js.
+3. Include status/category/date filtering and navigation links to the detail and form views.
+
+# Pass 4C: Leave Detail & Workflow Action View
+/clear
+/drop
+/add modules/elm/views/elm_leave_detail.js
+/read modules/elm/api/routes/elm_leave_routes.js ../ELM_Bundle/chunks/doc3_part03.md ../ELM_Bundle/chunks/doc3_part04.md
+
+Refactor and complete modules/elm/views/elm_leave_detail.js:
+1. Fix all relative import statements to match its location inside modules/elm/views/.
+2. Display full leave request metadata, date/balance breakdown, supporting attachments, and a chronological workflow approval timeline.
+3. Render role-based and state-based action buttons (Approve, Reject with mandatory comment input, Forward, Cancel/Withdraw, Revoke) wired directly to the endpoints in modules/elm/api/routes/elm_leave_routes.js.
+
+
+# ==============================================================================
+# PHASE 5: MAIN CODEBASE INTEGRATION & TRACEABILITY MATRIX AUDIT
+# ==============================================================================
+
+/clear
+/drop
+/read repo_dirs.txt modules/elm/api/routes/elm_leave_routes.js ../ELM_Bundle/chunks/doc6_part*.md
+
+Review repo_dirs.txt, modules/elm/api/routes/elm_leave_routes.js, and the Traceability Matrix (doc6_part*.md):
+1. Identify the main application router/entry file(s) in this repository to mount modules/elm/api/routes/elm_leave_routes.js and register the ELM frontend views (modules/elm/views/*).
+2. Audit our ELM endpoints, services, models, and views against every Requirement ID in doc6_part*.md and list any missing requirements or edge cases.
+
+
+# ==============================================================================
+# PHASE 6: UNIT & INTEGRATION TEST SUITE GENERATION
+# ==============================================================================
+
+# Pass 6A: Model & Business Rule Unit Tests
+/clear
+/drop
+/add modules/elm/tests/elm_models.test.js
+/read modules/elm/models/elm_leave_categories.js modules/elm/models/elm_leave_balances.js modules/elm/models/elm_leave_requests.js ../ELM_Bundle/chunks/doc4_part01.md ../ELM_Bundle/chunks/doc4_part02.md
+
+Using doc4_part01.md, doc4_part02.md, and the read-only models in modules/elm/models/, create unit tests in modules/elm/tests/elm_models.test.js:
+1. Test leave category accrual limits, carry-forward caps, minimum notice period checks, and mandatory document attachment thresholds.
+2. Test leave balance calculations (opening, accrued, used, pending, available) and insufficient balance rejection.
+3. Test overlapping leave date range detection, half-day/prefix-suffix holiday handling, and max consecutive days validation.
+
+# Pass 6B: Workflow Engine & Service Unit Tests
+/clear
+/drop
+/add modules/elm/tests/elm_service.test.js
+/read modules/elm/services/elm_leave_service.js ../ELM_Bundle/chunks/doc5_part01.md ../ELM_Bundle/chunks/doc5_part02.md
+
+Using doc5_part01.md, doc5_part02.md, and modules/elm/services/elm_leave_service.js, create unit tests in modules/elm/tests/elm_service.test.js:
+1. Test all valid lifecycle state transitions (Draft -> Submitted -> Pending Approval -> Forwarded -> Approved, Rejected, Cancelled, Revoked) and verify that invalid state transitions throw explicit errors.
+2. Verify that submitting/approving a leave deducts the exact balance and that transitioning to Rejected, Cancelled, or Revoked restores the deducted balance accurately.
+3. Test multi-level approval routing, delegation/forwarding, and audit trail logging.
+
+# Pass 6C: Controller & API Route Integration Tests
+/clear
+/drop
+/add modules/elm/tests/elm_api.test.js
+/read modules/elm/controllers/elm_leave_controller.js modules/elm/api/routes/elm_leave_routes.js ../ELM_Bundle/chunks/doc3_part01.md ../ELM_Bundle/chunks/doc6_part01.md
+
+Using doc3_part01.md, doc6_part01.md, modules/elm/controllers/elm_leave_controller.js, and modules/elm/api/routes/elm_leave_routes.js, create integration tests in modules/elm/tests/elm_api.test.js:
+1. Test Employee, Approver, and Admin endpoints, verifying HTTP status codes (200, 201, 400, 403, 404, 422) and role-based access control guards.
+2. Verify that rejecting a leave request without remarks returns HTTP 400 and annotate test blocks with the corresponding Requirement IDs from 6_Matrix.md.
