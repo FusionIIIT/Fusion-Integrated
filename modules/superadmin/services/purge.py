@@ -23,6 +23,7 @@ from modules.superadmin.domain.exceptions import (
     DomainError as PureDomainError,
 )
 from modules.superadmin.domain.exceptions import (
+    InvalidStateTransitionError,
     SelfApprovalForbiddenError,
 )
 from modules.superadmin.domain.state_machine import PurgeStateMachine
@@ -105,6 +106,8 @@ def decide_purge_request(
         )
     except SelfApprovalForbiddenError as exc:
         raise ConflictError(exc.message, code="self_approval_forbidden") from exc
+    except InvalidStateTransitionError as exc:
+        raise ConflictError(exc.message, code=exc.code) from exc
     except PureDomainError as exc:
         raise DomainError(exc.message, code=exc.code) from exc
 
@@ -155,6 +158,8 @@ def execute_purge(
 
     try:
         next_status = PurgeStateMachine.transition(req.status, "execute_purge", "super_admin")
+    except InvalidStateTransitionError as exc:
+        raise ConflictError(exc.message, code=exc.code) from exc
     except PureDomainError as exc:
         raise DomainError(exc.message, code=exc.code) from exc
 

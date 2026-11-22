@@ -632,3 +632,135 @@ def test_journey_scheduled_tasks_and_outbox(stub_iam):
 
     drained_count = drain_notification_outbox_task()
     assert drained_count >= 0
+
+
+# -- Regression: FR TC-057 — no TypeError when archiving active user with omitted deactivated_at --
+def test_regression_fr_tc_057_archive_active_user_omitted_deactivated_at(stub_iam):
+    """POST /api/v1/superadmin/archival/users/ with is_deactivated=False and no deactivated_at
+    must return HTTP 422 (DomainError) rather than TypeError 500 (FR TC-057)."""
+    client = _http_as(stub_iam, 100, "super_admin")
+    payload = {
+        "user_id": 5700,
+        "institute_id": "2022BCS5700",
+        "username": "u5700",
+        "email": "u5700@iiitdmj.ac.in",
+        "user_kind": "student",
+        "is_deactivated": False,
+        # deactivated_at intentionally omitted
+        "has_pending_transactions": False,
+        "archival_reason": "Test: active user, no deactivated_at.",
+    }
+    resp = client.post("/api/v1/superadmin/archival/users/", payload, format="json")
+    assert resp.status_code == 422, f"Expected 422, got {resp.status_code}: {resp.content}"
+
+
+# -- Regression: FR TC-062 & BR TC-SA-BR-005-03 — 409 when restoring permanently archived records --
+def test_regression_fr_tc_062_restore_permanently_archived_user_returns_409(stub_iam):
+    """Restoring a user in ARCHIVAL_STATUS_FINALIZED_PERMANENT must return HTTP 409 (FR TC-062)."""
+    client = _http_as(stub_iam, 100, "super_admin")
+    rec = ArchivedUserRecord.objects.create(
+        user_id=6200,
+        institute_id="2019BCS6200",
+        username="u6200",
+        email="u6200@iiitdmj.ac.in",
+        user_kind="student",
+        status=ARCHIVAL_STATUS_FINALIZED_PERMANENT,
+        archived_at=timezone.now() - timedelta(days=70),
+        reversible_until=timezone.now() - timedelta(days=40),
+        authorized_by=100,
+        archival_reason="Graduated 2023.",
+        finalized_permanent_at=timezone.now() - timedelta(days=40),
+    )
+    resp = client.post(
+        f"/api/v1/superadmin/archival/users/{rec.user_id}/restore/",
+        {"restoration_reason": "Attempting to restore a finalized-permanent user."},
+        format="json",
+    )
+    assert resp.status_code == 409, f"Expected 409, got {resp.status_code}: {resp.content}"
+
+
+def test_regression_br_005_03_restore_purged_historical_archive_returns_409(stub_iam):
+    """Restoring a purged historical archive must return HTTP 409 (BR TC-SA-BR-005-03)."""
+    client = _http_as(stub_iam, 100, "super_admin")
+    today = date.today()
+    archive = HistoricalDataArchive.objects.create(
+        dataset_category="finance",
+        title="Purged Archive 2010",
+        date_range_start=today - timedelta(days=5000),
+        date_range_end=today - timedelta(days=4500),
+        record_count=200,
+        backup_file_path="/backups/purged_2010.tar.gz",
+        backup_checksum="chk_purged_2010",
+        retention_expires_at=today - timedelta(days=100),
+        archived_by=100,
+        is_purged=True,
+    )
+    resp = client.post(f"/api/v1/superadmin/archival/history/{archive.pk}/restore/", {})
+    assert resp.status_code == 409, f"Expected 409, got {resp.status_code}: {resp.content}"
+
+
+# -- Regression: UC TC-081 — 409 when repeating a decision on an already-decided purge request --
+def test_regression_uc_tc_081_duplicate_purge_decision_returns_409(stub_iam):
+    """Submitting a second decision on an already-approved/rejected PurgeRequest must return
+    HTTP 409 instead of 422 (UC TC-081)."""
+    today = date.today()
+    archive = HistoricalDataArchive.objects.create(
+        dataset_category="general",
+        title="Dataset for Duplicate Decision Test",
+        date_range_start=today - timedelta(days=3000),
+        date_range_end=today - timedelta(days=2500),
+        record_count=50,
+        backup_file_path="/backups/dup_decision.tar.gz",
+        backup_checksum="chk_dup_decision",
+        retention_expires_at=today - timedelta(days=10),
+        archived_by=1,
+    )
+    # Create an already-approved purge request
+    req = PurgeRequest.objects.create(
+        archive=archive,
+        status=PURGE_STATUS_APPROVED,
+        requested_by=101,
+        request_reason="Need purge.",
+        it_head_id=201,
+    )
+
+    # IT Head tries to decide again on an already-approved request → must be 409
+    it_client = _http_as(stub_iam, 201, "it_head", IT_PERMS)
+    resp = it_client.post(
+        f"/api/v1/superadmin/purge/requests/{req.pk}/decision/",
+        {"approve": True, "comments": "Duplicate approval attempt."},
+        format="json",
+    )
+    assert resp.status_code == 409, f"Expected 409, got {resp.status_code}: {resp.content}"
+
+
+def test_regression_uc_tc_081_duplicate_purge_execute_returns_409(stub_iam):
+    """Executing a purge on an already-purged PurgeRequest must return HTTP 409 (UC TC-081)."""
+    today = date.today()
+    archive = HistoricalDataArchive.objects.create(
+        dataset_category="general",
+        title="Dataset for Duplicate Execute Test",
+        date_range_start=today - timedelta(days=3500),
+        date_range_end=today - timedelta(days=3000),
+        record_count=30,
+        backup_file_path="/backups/dup_exec.tar.gz",
+        backup_checksum="chk_dup_exec",
+        retention_expires_at=today - timedelta(days=20),
+        archived_by=1,
+        is_purged=True,
+    )
+    req = PurgeRequest.objects.create(
+        archive=archive,
+        status=PURGE_STATUS_PURGED,
+        requested_by=101,
+        request_reason="Already purged request.",
+        it_head_id=201,
+    )
+
+    sa_client = _http_as(stub_iam, 102, "super_admin")
+    resp = sa_client.post(
+        f"/api/v1/superadmin/purge/requests/{req.pk}/execute/",
+        {"execution_summary": {"records_purged": 30}},
+        format="json",
+    )
+    assert resp.status_code == 409, f"Expected 409, got {resp.status_code}: {resp.content}"
