@@ -336,12 +336,6 @@ class NotificationReceipt(models.Model):
     read_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return (
-            f"Notification receipt {self.notification_id} "
-            f"for user {self.recipient_user_id}"
-        )
-
     class Meta:
         db_table = "iaa_notification_receipt"
         constraints = [
@@ -350,3 +344,9 @@ class NotificationReceipt(models.Model):
                 name="iaa_notification_receipt_user_uniq",
             )
         ]
+
+    def __str__(self):
+        return (
+            f"Notification receipt {self.notification_id} "
+            f"for user {self.recipient_user_id}"
+        )
