@@ -1,0 +1,217 @@
+"""Generate a file-level reference from the PMS M7 implementation map.
+
+This is an index of the map's recorded associations, not a requirement-status
+assessment. The original specifications and the RTM remain authoritative.
+"""
+
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+from pathlib import Path, PurePosixPath
+from xml.etree import ElementTree as ET
+from zipfile import ZipFile
+
+NS = {
+    "main": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
+    "rel": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
+    "pkg": "http://schemas.openxmlformats.org/package/2006/relationships",
+}
+ID_PATTERN = re.compile(r"^(?:PMS-AFR-\d{3}|(?:CFR|UC|BR|BW|CW)-PMS-\d{2,3})$")
+ROOT = Path(__file__).resolve().parents[2]
+WORKBOOK = ROOT / "docs/11-PMS/PMS_Traceability_Matrix_M7.xlsx"
+OUTPUT = ROOT / "docs/11-PMS/PMS_IMPLEMENTATION_REFERENCE.md"
+
+
+def _cell_text(cell: ET.Element, shared_strings: list[str]) -> str:
+    value = cell.find("main:v", NS)
+    if cell.get("t") == "s" and value is not None:
+        return shared_strings[int(value.text or "0")]
+    if cell.get("t") == "inlineStr":
+        return "".join(node.text or "" for node in cell.findall(".//main:t", NS))
+    return value.text if value is not None and value.text else ""
+
+
+def _sheet_path(archive: ZipFile, sheet_name: str) -> str:
+    # Fixed, repository-owned workbook input; no user-controlled XML is parsed.
+    workbook = ET.fromstring(archive.read("xl/workbook.xml"))  # noqa: S314
+    sheet = next(
+        item
+        for item in workbook.findall(".//main:sheet", NS)
+        if item.get("name") == sheet_name
+    )
+    relationship_id = sheet.get(f"{{{NS['rel']}}}id")
+    relationships = ET.fromstring(  # noqa: S314
+        archive.read("xl/_rels/workbook.xml.rels")
+    )
+    target = next(
+        item.get("Target", "")
+        for item in relationships.findall("pkg:Relationship", NS)
+        if item.get("Id") == relationship_id
+    )
+    normalized_target = PurePosixPath(target.lstrip("/"))
+    if normalized_target.parts[0] == "xl":
+        return str(normalized_target)
+    return str(PurePosixPath("xl") / normalized_target)
+
+
+def _linked_paths(value: str) -> list[str]:
+    return [item.strip().strip("`") for item in value.split(";") if item.strip()]
+
+
+def _render_file_links(paths: list[str]) -> str:
+    if not paths:
+        return "—"
+    links = []
+    for path in paths:
+        target = ROOT / path
+        if target.is_file():
+            links.append(f"[`{path}`](../../{path})")
+        else:
+            links.append(f"`{path}` (missing)")
+    return "<br>".join(links)
+
+
+def _current_source_mentions(specification_id: str, *, tests: bool) -> list[str]:
+    if tests:
+        roots = [ROOT / "modules/pms/tests", ROOT / "client/src/modules/pms"]
+        patterns = ("test_*.py", "*.test.ts", "*.test.tsx")
+    else:
+        roots = [ROOT / "modules/pms", ROOT / "client/src/modules/pms"]
+        patterns = ("*.py", "*.ts", "*.tsx")
+
+    matches: set[str] = set()
+    for root in roots:
+        for pattern in patterns:
+            for path in root.rglob(pattern):
+                relative = path.relative_to(ROOT).as_posix()
+                if tests and "tests/" not in relative and ".test." not in path.name:
+                    continue
+                if not tests and ("/tests/" in relative or ".test." in path.name):
+                    continue
+                identifier = rf"(?<![A-Z0-9-]){re.escape(specification_id)}(?![A-Z0-9-])"
+                if re.search(identifier, path.read_text()):
+                    matches.add(relative)
+    return sorted(matches)
+
+
+def render_reference() -> tuple[str, int, list[str]]:
+    with ZipFile(WORKBOOK) as archive:
+        shared_strings: list[str] = []
+        if "xl/sharedStrings.xml" in archive.namelist():
+            strings = ET.fromstring(archive.read("xl/sharedStrings.xml"))  # noqa: S314
+            shared_strings = [
+                "".join(node.text or "" for node in item.findall(".//main:t", NS))
+                for item in strings.findall("main:si", NS)
+            ]
+        sheet = ET.fromstring(  # noqa: S314
+            archive.read(_sheet_path(archive, "Implementation_Map"))
+        )
+
+    rows = sheet.findall(".//main:sheetData/main:row", NS)
+    if not rows:
+        raise ValueError("Implementation_Map has no header row")
+    header = {
+        _cell_text(cell, shared_strings): re.match(r"[A-Z]+", cell.get("r", "")).group()
+        for cell in rows[0].findall("main:c", NS)
+        if re.match(r"[A-Z]+", cell.get("r", ""))
+    }
+    required = {"Specification ID", "Artifact type", "Implementation files", "Available test files"}
+    missing_headers = required - header.keys()
+    if missing_headers:
+        raise ValueError(f"Implementation_Map is missing columns: {sorted(missing_headers)}")
+
+    output = [
+        "# PMS Implementation Reference (generated)",
+        "",
+        (
+            "Generated by `ops/docs/pms_reference.py` from the `Implementation_Map` "
+            "sheet in `PMS_Traceability_Matrix_M7.xlsx`."
+        ),
+        (
+            "This file combines the M7 map's associations with current source/test files "
+            "that cite the exact identifier. A citation is a navigation aid, not proof "
+            "of enforcement, test adequacy, or passing tests. "
+            "The six original PMS specifications remain authoritative."
+        ),
+        "",
+        (
+            "| Specification ID | Type | Implementation files recorded in M7 map | "
+            "Test files recorded in M7 map |"
+        ),
+        "| --- | --- | --- | --- |",
+    ]
+    id_col = header["Specification ID"]
+    type_col = header["Artifact type"]
+    impl_col = header["Implementation files"]
+    tests_col = header["Available test files"]
+    id_count = 0
+    invalid: list[str] = []
+
+    for row in rows[1:]:
+        values = {
+            re.match(r"[A-Z]+", cell.get("r", "")).group(): _cell_text(cell, shared_strings)
+            for cell in row.findall("main:c", NS)
+            if re.match(r"[A-Z]+", cell.get("r", ""))
+        }
+        specification_id = values.get(id_col, "").strip()
+        if not specification_id:
+            continue
+        if not ID_PATTERN.fullmatch(specification_id):
+            invalid.append(specification_id)
+            continue
+        id_count += 1
+        implementation = sorted(
+            set(_linked_paths(values.get(impl_col, "")))
+            | set(_current_source_mentions(specification_id, tests=False))
+        )
+        tests = sorted(
+            set(_linked_paths(values.get(tests_col, "")))
+            | set(_current_source_mentions(specification_id, tests=True))
+        )
+        output.append(
+            f"| `{specification_id}` | {values.get(type_col, '').strip()} | "
+            f"{_render_file_links(implementation)} | {_render_file_links(tests)} |"
+        )
+    if invalid:
+        raise ValueError(f"Invalid specification identifiers in map: {invalid}")
+    output.extend(
+        [
+            "",
+            (
+                f"Mapped identifiers: {id_count} rows. Re-run the generator after "
+                "updating the M7 implementation map; use `--check` to verify the "
+                "committed output is current."
+            ),
+            "",
+        ]
+    )
+    return "\n".join(output), id_count, invalid
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="fail if the reference is stale")
+    args = parser.parse_args()
+    rendered, row_count, _ = render_reference()
+    if args.check:
+        if not OUTPUT.is_file() or OUTPUT.read_text() != rendered:
+            print(
+                f"{OUTPUT.relative_to(ROOT)} is stale; run "
+                ".venv/bin/python ops/docs/pms_reference.py"
+            )
+            return 1
+        print(f"PMS implementation reference is current ({row_count} mapped identifier rows)")
+        return 0
+    OUTPUT.write_text(rendered)
+    print(f"wrote {OUTPUT.relative_to(ROOT)} ({row_count} mapped identifier rows)")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main())
+    except (KeyError, StopIteration, ValueError, OSError) as exc:
+        print(f"PMS reference generation failed: {exc}", file=sys.stderr)
+        raise SystemExit(2) from exc

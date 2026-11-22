@@ -38,3 +38,42 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `pms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `pms.application.create` | Submit a new patent application | `faculty`, `staff`, `student` |
+| `pms.application.view_self` | View one's own patent applications | `faculty`, `staff`, `student` |
+| `pms.application.view` | View patent applications within scope | `Dean Research`, `attorney`, `director`, `pcc_admin` |
+| `pms.application.withdraw` | Withdraw patent application before filing | `faculty`, `staff`, `student` |
+| `pms.application.revise` | Revise and resubmit patent application | `faculty`, `staff`, `student` |
+| `pms.application.assign_director` | Assign patent application to Director | `pcc_admin` |
+| `pms.application.review` | Review patent application and record decision | `Dean Research`, `director` |
+| `pms.application.appeal` | File appeal against application rejection | `faculty`, `staff`, `student` |
+| `pms.application.review_appeal` | Review appeal against rejection | `Dean Research`, `director` |
+| `pms.budget.review` | Review and decide patent budget | `Dean Research`, `director` |
+| `pms.attorney.assign` | Assign attorney to approved application | `pcc_admin` |
+| `pms.attorney.respond_assignment` | Accept or decline attorney assignment | `attorney` |
+| `pms.patentability.assess` | Conduct patentability assessment | `attorney` |
+| `pms.filing.record` | Prepare and record external patent filing | `attorney` |
+| `pms.office_action.record` | Record patent office communication | `attorney` |
+| `pms.office_action.respond` | Respond to office action | `attorney` |
+| `pms.office_action.review` | Review and approve office action response | `faculty`, `staff`, `student` |
+| `pms.maintenance.manage` | Manage post-grant maintenance and fees | `attorney` |
+| `pms.maintenance.decide` | Make maintenance renewal decision | `Dean Research`, `director` |
+| `pms.prior_art.search` | Search and attach prior art references | `attorney`, `faculty`, `staff`, `student` |
+| `pms.document.manage` | Upload and manage document versions | `Dean Research`, `attorney`, `director`, `faculty`, `pcc_admin`, `staff`, `student` |
+| `pms.licensing.submit` | Submit licensing or technology transfer request | `faculty`, `staff`, `student` |
+| `pms.licensing.review` | Review licensing or technology transfer request | `Dean Research`, `director` |
+| `pms.coinventor.manage` | Manage co-inventors and agreements | `faculty`, `staff`, `student` |
+| `pms.workflow.monitor` | Monitor workflow and handle exceptional cases | `pcc_admin` |
+| `pms.workflow.oversight` | View application workflow oversight | `Dean Research`, `director` |
+| `pms.report.view_self` | View own application reports | `faculty`, `staff`, `student` |
+| `pms.report.view` | View PMS reports and analytics | `Dean Research`, `director`, `pcc_admin` |
+| `pms.config.manage` | Manage PMS roles and configuration | `pcc_admin` |
+| `pms.panel.manage` | Maintain attorney panel and expertise mappings | `pcc_admin` |
+| `pms.audit.view` | View audit trail and compliance logs | `Dean Research`, `director`, `pcc_admin` |
+| `pms.advice.record` | Record patent legal advice | `attorney` |
+| `pms.application.auto_expire` | System expiration of overdue revisions | _service only_ |
+| `pms.deadline.escalate` | System deadline monitoring and escalation | _service only_ |
