@@ -1,5 +1,5 @@
 """Pre-registration rules (UC-010)."""
-from datetime import timedelta
+from datetime import UTC, timedelta
 
 import pytest
 from django.utils import timezone
@@ -263,8 +263,7 @@ def test_br_203_same_day_urgent_is_decided_on_the_campus_day_after_local_midnigh
     """BR-203: at 01:00 IST (still the previous day in UTC) a visit at 02:00 IST the same
     campus day is an urgent request for an Admin, not an advance-window rejection."""
     from datetime import datetime
-    from datetime import timezone as dt_tz
-    now_utc = datetime(2026, 11, 22, 19, 30, tzinfo=dt_tz.utc)            # 01:00 IST, 23 Nov
+    now_utc = datetime(2026, 11, 22, 19, 30, tzinfo=UTC)            # 01:00 IST, 23 Nov
     monkeypatch.setattr("modules.vms.services.registration.timezone.now", lambda: now_utc)
     f.make_role_assignment(user_id=4001, role="admin")
     start = (now_utc + timedelta(hours=1)).astimezone(timezone.get_current_timezone())
@@ -277,8 +276,7 @@ def test_br_202_next_campus_day_inside_the_window_is_rejected_not_urgent(
     """BR-202/203: 23:30 IST and a visit at 00:30 IST next day share a UTC date but are not
     the same campus day, so the 2-hour advance rule rejects it."""
     from datetime import datetime
-    from datetime import timezone as dt_tz
-    now_utc = datetime(2026, 11, 23, 18, 0, tzinfo=dt_tz.utc)             # 23:30 IST, 23 Nov
+    now_utc = datetime(2026, 11, 23, 18, 0, tzinfo=UTC)             # 23:30 IST, 23 Nov
     monkeypatch.setattr("modules.vms.services.registration.timezone.now", lambda: now_utc)
     start = (now_utc + timedelta(hours=1)).astimezone(timezone.get_current_timezone())
     with pytest.raises(BadRequestError) as e:
