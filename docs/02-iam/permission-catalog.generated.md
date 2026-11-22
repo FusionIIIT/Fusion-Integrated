@@ -13,6 +13,24 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `gymkhana`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `gymkhana.club.create` | Create new Gymkhana club | `Dean_s`, `studentacadadmin` |
+| `gymkhana.club.approve` | Approve and confirm Gymkhana club | `Dean_s`, `studentacadadmin` |
+| `gymkhana.club.view` | View Gymkhana clubs and details | `Assistant Professor`, `Associate Professor`, `Convener`, `Convenor`, `Counsellor`, `Dean_s`, `Professor`, `co`, `co-ordinator`, `pg_student`, `phd_student`, `student`, `studentacadadmin`, `ug_student` |
+| `gymkhana.leadership.update` | Change club coordinator and co-coordinator | `Convener`, `Convenor`, `co`, `co-ordinator` |
+| `gymkhana.session.book` | Book club session | `Convener`, `Convenor`, `co`, `co-ordinator` |
+| `gymkhana.event.book` | Book club event | `Convener`, `Convenor`, `co`, `co-ordinator` |
+| `gymkhana.membership.apply` | Apply for club membership | `pg_student`, `phd_student`, `student`, `ug_student` |
+| `gymkhana.membership.approve` | Approve club membership application | `Convener`, `Convenor`, `co`, `co-ordinator` |
+| `gymkhana.poll.create` | Create voting poll | `Convener`, `Convenor`, `co`, `co-ordinator` |
+| `gymkhana.poll.vote` | Vote in club poll | `pg_student`, `phd_student`, `student`, `ug_student` |
+| `gymkhana.budget.request` | Submit club budget request | `Convener`, `Convenor`, `co`, `co-ordinator` |
+| `gymkhana.report.submit` | Submit club event report | `Convener`, `Convenor`, `co`, `co-ordinator` |
+| `gymkhana.report.review` | Review assigned club event reports | `Assistant Professor`, `Associate Professor`, `Counsellor`, `Professor` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
