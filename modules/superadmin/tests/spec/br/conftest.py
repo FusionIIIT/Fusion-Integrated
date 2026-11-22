@@ -5,6 +5,7 @@ from datetime import date, timedelta
 import pytest
 from django.utils import timezone
 
+
 def run_br_case(test_id: str, principal, stub_iam) -> None:
     if test_id == "TC-SA-BR-004-01":
         from modules.superadmin.models.archival import ArchivedUserRecord
