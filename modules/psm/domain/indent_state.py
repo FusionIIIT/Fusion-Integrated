@@ -28,6 +28,7 @@ TRANSITION_MATRIX: dict[str, list[str]] = {
     ],
     IndentState.SUBMITTED.value: [
         IndentState.STOCK_CHECKED.value,
+        IndentState.DEPT_REVIEWED.value,  # BW-PSM-07: Re-review of modified indent
         IndentState.REJECTED.value,
         IndentState.WITHDRAWN.value,
     ],
@@ -43,6 +44,7 @@ TRANSITION_MATRIX: dict[str, list[str]] = {
     ],
     IndentState.HEAD_RECOMMENDED.value: [
         IndentState.AWAITING_FINAL_APPROVAL.value,
+        IndentState.APPROVED.value,  # BW-PSM-02: Standard path without high-value escalation
         IndentState.REJECTED.value,
         IndentState.WITHDRAWN.value,
     ],

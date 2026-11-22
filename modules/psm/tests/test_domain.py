@@ -20,6 +20,31 @@ from modules.psm.domain.rules import (
     validate_rejection_justification,
 )
 from modules.psm.domain.three_way_match import perform_three_way_match
+from modules.psm.domain.duplicate_check import is_possible_duplicate as is_possible_dup_check
+
+
+class TestDuplicateCheckDomain(unittest.TestCase):
+    def test_duplicate_check_logic(self):
+        existing = [
+            {"item_name": "Laptop Dell XPS", "estimated_cost": 150000.0, "status": "SUBMITTED"},
+            {"item_name": "Projector", "estimated_cost": 40000.0, "status": "REJECTED"},
+        ]
+        # Match item and cost with active status
+        self.assertTrue(is_possible_dup_check(
+            {"item_name": "  laptop dell xps  ", "estimated_cost": 150000.0},
+            existing
+        ))
+        # Match item and cost with rejected status -> should ignore
+        self.assertFalse(is_possible_dup_check(
+            {"item_name": "Projector", "estimated_cost": 40000.0},
+            existing
+        ))
+        # Non-matching cost
+        self.assertFalse(is_possible_dup_check(
+            {"item_name": "Laptop Dell XPS", "estimated_cost": 180000.0},
+            existing
+        ))
+
 
 
 class TestIndentStateTransitions(unittest.TestCase):

@@ -49,21 +49,29 @@ def issue_internal_stock(*, indent_id: Any, stock_item_id: Any = None) -> Indent
 
     if stock_item_id:
         stock_item = StockItem.objects.select_for_update().filter(id=int(stock_item_id)).first()
-        if stock_item:
-            # Deduct from central stock first, then department stock
-            qty_needed = indent.quantity
-            if stock_item.central_stock >= qty_needed:
-                stock_item.central_stock -= qty_needed
-            else:
-                rem = qty_needed - stock_item.central_stock
-                stock_item.central_stock = 0
-                stock_item.department_stock = max(0, stock_item.department_stock - rem)
+        if not stock_item:
+            raise NotFoundError("Stock item not found.")
 
-            if stock_item.reserved_stock >= qty_needed:
-                stock_item.reserved_stock -= qty_needed
-            else:
-                stock_item.reserved_stock = 0
-            stock_item.save()
+        qty_needed = indent.quantity
+        total_available = stock_item.central_stock + stock_item.department_stock
+        if total_available < qty_needed:
+            raise ValidationError(
+                f"Insufficient physical stock ({total_available}) available to fulfill indent quantity ({qty_needed})."
+            )
+
+        # Deduct from central stock first, then department stock
+        if stock_item.central_stock >= qty_needed:
+            stock_item.central_stock -= qty_needed
+        else:
+            rem = qty_needed - stock_item.central_stock
+            stock_item.central_stock = 0
+            stock_item.department_stock = max(0, stock_item.department_stock - rem)
+
+        if stock_item.reserved_stock >= qty_needed:
+            stock_item.reserved_stock -= qty_needed
+        else:
+            stock_item.reserved_stock = 0
+        stock_item.save()
 
     indent.status = "APPROVED"
     indent.save()

@@ -26,7 +26,7 @@ from modules.psm.services.indents import (
     transition_indent,
     withdraw_indent,
 )
-from modules.psm.services.stock import reserve_stock, initiate_stock_transfer
+from modules.psm.services.stock import reserve_stock, initiate_stock_transfer, issue_internal_stock
 from modules.psm.services.procurement import (
     create_vendor,
     verify_vendor,
@@ -34,6 +34,7 @@ from modules.psm.services.procurement import (
     record_grn,
 )
 from modules.psm.contracts import get_indents, get_vendors, get_stock_items
+from modules.psm import registry
 from core.api.exceptions import BadRequestError as ValidationError, NotFoundError
 
 
@@ -221,9 +222,11 @@ class PSMWorkflowTestCase(TestCase):
                 delivery_schedule="2026-12-31",
             )
 
-        # 3. Verify vendor
+        # 3. Verify vendor and approve indent
         verified_vendor = verify_vendor(vendor_id=vendor.id)
         self.assertTrue(verified_vendor.is_verified)
+        indent.status = "APPROVED"
+        indent.save()
 
         # 4. Now issue PO succeeds
         po = create_purchase_order(
@@ -297,3 +300,56 @@ class PSMWorkflowTestCase(TestCase):
         ven_data = get_vendors([ven.id])
         self.assertEqual(len(ven_data), 1)
         self.assertEqual(ven_data[0]["name"], "Seating World")
+
+        stk = StockItem.objects.create(
+            item_code="MARKER-BLUE",
+            name="Whiteboard Marker Blue",
+            department="CENTRAL_STORE",
+            central_stock=100,
+        )
+        stk_data = get_stock_items([stk.item_code])
+        self.assertEqual(len(stk_data), 1)
+        self.assertEqual(stk_data[0]["item_code"], "MARKER-BLUE")
+
+    def test_issue_internal_stock_success_and_guard(self):
+        stk = StockItem.objects.create(
+            item_code="NOTEBOOK-A5",
+            name="A5 Spiral Notebook",
+            department="CENTRAL_STORE",
+            central_stock=10,
+            department_stock=5,
+            reserved_stock=5,
+        )
+        indent = create_indent(
+            principal=self.user1,
+            item_details="A5 Spiral Notebook",
+            quantity=12,
+            estimated_cost=Decimal("1200.00"),
+            justification="Lab notebooks",
+        )
+        # 12 needed, 15 available (10 central + 5 dept).
+        issued = issue_internal_stock(indent_id=indent.id, stock_item_id=stk.id)
+        self.assertEqual(issued.status, "APPROVED")
+        stk.refresh_from_db()
+        self.assertEqual(stk.central_stock, 0)
+        self.assertEqual(stk.department_stock, 3)
+
+        # Insufficient stock guard check (TC-021)
+        indent_excess = create_indent(
+            principal=self.user1,
+            item_details="A5 Spiral Notebook",
+            quantity=10,
+            estimated_cost=Decimal("1000.00"),
+            justification="More notebooks",
+        )
+        with self.assertRaises(ValidationError):
+            issue_internal_stock(indent_id=indent_excess.id, stock_item_id=stk.id)
+
+    def test_registry_metadata(self):
+        self.assertEqual(registry.MODULE_CODE, "psm")
+        self.assertEqual(registry.MODULE["code"], "psm")
+        self.assertIn("psm.indents", [item["code"] for item in registry.NAV_ITEMS])
+        self.assertIn("psm.indent.view", dict(registry.PERMISSION_CATALOGUE))
+        self.assertIn("store_officer", registry.ROLE_GRANTS)
+        self.assertIn("admin", registry.ROLE_GRANTS)
+

@@ -65,6 +65,11 @@ PERMISSION_CATALOGUE = [
 
 PERMISSIONS = PERMISSION_CATALOGUE
 
+SCOPE_PERMISSIONS = [
+    "psm.indent.view_all",
+]
+
+
 _STANDARD_USER = [
     "psm.indent.view",
     "psm.indent.create",

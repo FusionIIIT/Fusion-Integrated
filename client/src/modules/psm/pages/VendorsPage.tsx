@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  ActionIcon,
   Badge,
   Button,
   Card,
@@ -10,7 +9,6 @@ import {
   Table,
   Text,
   TextInput,
-  Tooltip,
 } from "@mantine/core";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { useVendors, useCreateVendor, useVerifyVendor } from "../api/hooks";
@@ -31,7 +29,7 @@ export default function VendorsPage() {
 
   const { data: vendors = [], isLoading, refetch } = useVendors();
   const createVendorMutation = useCreateVendor();
-  const verifyVendorMutation = useVerifyVendor(0);
+  const verifyVendorMutation = useVerifyVendor();
 
   const handleCreateVendor = async () => {
     setFormError(null);
@@ -75,7 +73,7 @@ export default function VendorsPage() {
 
   const handleVerify = async (vendorId: number) => {
     try {
-      await verifyVendorMutation.mutateAsync();
+      await verifyVendorMutation.mutateAsync(vendorId);
       refetch();
     } catch (e: unknown) {
       alert(errorMessage(e));

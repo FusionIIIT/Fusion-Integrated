@@ -86,6 +86,11 @@ def create_purchase_order(
     if not indent:
         raise NotFoundError("Indent not found.")
 
+    if indent.status != "APPROVED":
+        raise ValidationError(
+            f"Cannot issue Purchase Order for indent '{indent.indent_id}' in status '{indent.status}'. Indent must be APPROVED."
+        )
+
     cost = Decimal(str(total_cost))
     if cost <= Decimal("0.00"):
         raise ValidationError("Total cost must be greater than zero.")

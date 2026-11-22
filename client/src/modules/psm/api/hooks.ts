@@ -4,7 +4,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { http, errorMessage } from "../../../lib/http";
+import { http } from "../../../lib/http";
 import type {
   Indent,
   IndentVersion,
@@ -175,22 +175,27 @@ export function useModifyIndent(indentId: number) {
   });
 }
 
-export function useUpdateIndentStatus(indentId: number) {
+export function useUpdateIndentStatus(defaultIndentId?: number) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: UpdateIndentStatusPayload) => {
-      const res = await http.post<Indent>(`/psm/indents/${indentId}/transition/`, payload);
+    mutationFn: async (args: UpdateIndentStatusPayload & { indentId?: number }) => {
+      const id = args.indentId ?? defaultIndentId;
+      const res = await http.post<Indent>(`/psm/indents/${id}/transition/`, {
+        target_state: args.target_state,
+        justification: args.justification,
+      });
       return res.data;
     },
     onSuccess: () => invalidateAll(qc),
   });
 }
 
-export function useWithdrawIndent(indentId: number) {
+export function useWithdrawIndent(defaultIndentId?: number) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async () => {
-      const res = await http.post<Indent>(`/psm/indents/${indentId}/withdraw/`, {});
+    mutationFn: async (indentId?: number) => {
+      const id = indentId ?? defaultIndentId;
+      const res = await http.post<Indent>(`/psm/indents/${id}/withdraw/`, {});
       return res.data;
     },
     onSuccess: () => invalidateAll(qc),
@@ -208,11 +213,12 @@ export function useCreateVendor() {
   });
 }
 
-export function useVerifyVendor(vendorId: number) {
+export function useVerifyVendor(defaultVendorId?: number) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async () => {
-      const res = await http.patch<Vendor>(`/psm/vendors/${vendorId}/`, { is_verified: true });
+    mutationFn: async (vendorId?: number) => {
+      const id = vendorId ?? defaultVendorId;
+      const res = await http.patch<Vendor>(`/psm/vendors/${id}/`, { is_verified: true });
       return res.data;
     },
     onSuccess: () => invalidateAll(qc),

@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  ActionIcon,
   Badge,
   Button,
   Card,
@@ -11,7 +10,6 @@ import {
   Tabs,
   Text,
   Textarea,
-  TextInput,
   Tooltip,
 } from "@mantine/core";
 import { PageHeader } from "../../../ui/components/PageHeader";
@@ -43,13 +41,13 @@ export default function IndentsPage() {
 
   const { data: versions = [] } = useIndentVersions(selectedIndentForHistory);
 
-  const statusMutation = useUpdateIndentStatus(0);
-  const withdrawMutation = useWithdrawIndent(0);
+  const statusMutation = useUpdateIndentStatus();
+  const withdrawMutation = useWithdrawIndent();
 
   const handleTransition = async (indentId: number, targetState: IndentStatus, justification = "") => {
     try {
-      // Direct call using the hook logic
       await statusMutation.mutateAsync({
+        indentId,
         target_state: targetState,
         justification,
       });
@@ -62,7 +60,7 @@ export default function IndentsPage() {
   const handleWithdraw = async (indentId: number) => {
     if (!window.confirm("Are you sure you want to withdraw this pending indent?")) return;
     try {
-      await withdrawMutation.mutateAsync();
+      await withdrawMutation.mutateAsync(indentId);
       refetch();
     } catch (e: unknown) {
       alert(errorMessage(e));

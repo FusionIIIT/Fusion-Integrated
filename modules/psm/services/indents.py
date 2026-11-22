@@ -132,16 +132,6 @@ def modify_indent(
             f"Indent in status '{indent.status}' cannot be modified. Modification is permitted only in DRAFT or SUBMITTED status."
         )
 
-    # Snapshot current version before mutation
-    IndentVersion.objects.create(
-        indent=indent,
-        version_number=indent.current_version,
-        item_details=indent.item_details,
-        quantity=indent.quantity,
-        estimated_cost=indent.estimated_cost,
-        justification=indent.justification,
-    )
-
     # Apply updates
     if "item_details" in updated_fields:
         indent.item_details = str(updated_fields["item_details"]).strip()
@@ -167,8 +157,37 @@ def modify_indent(
     except ValueError as e:
         raise ValidationError(str(e))
 
+    # Re-evaluate duplicate detection on modification (BR-PSM-015)
+    active_indents = list(
+        Indent.objects.exclude(id=indent.id).exclude(
+            status__in=[
+                IndentState.APPROVED.value,
+                IndentState.REJECTED.value,
+                IndentState.WITHDRAWN.value,
+            ]
+        ).values("id", "indent_id", "item_details", "estimated_cost", "status")
+    )
+    indent.is_duplicate = is_possible_duplicate(
+        {
+            "item_details": indent.item_details,
+            "estimated_cost": indent.estimated_cost,
+        },
+        active_indents,
+    )
+
+    # Increment version and archive the new version state (BR-PSM-021)
     indent.current_version += 1
     indent.save()
+
+    IndentVersion.objects.create(
+        indent=indent,
+        version_number=indent.current_version,
+        item_details=indent.item_details,
+        quantity=indent.quantity,
+        estimated_cost=indent.estimated_cost,
+        justification=indent.justification,
+    )
+
     return indent
 
 
@@ -215,9 +234,19 @@ def withdraw_indent(
     indent_id: Any,
 ) -> Indent:
     """Withdraw a pending indent."""
+    indent = get_indent_by_id(principal, indent_id)
+    if indent is None:
+        raise NotFoundError("Indent not found or access denied.")
+
+    uid = _get_principal_user_id(principal)
+    has_manage = hasattr(principal, "has_permission") and principal.has_permission("psm.indent.manage")
+    if indent.requestor_id != uid and not has_manage and not getattr(principal, "is_superuser", False):
+        raise ValidationError("Only the original requester or an authorized manager may withdraw an indent.")
+
     return transition_indent(
         principal=principal,
         indent_id=indent_id,
         target_state=IndentState.WITHDRAWN.value,
         justification="Withdrawn by requestor.",
     )
+

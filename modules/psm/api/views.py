@@ -10,12 +10,24 @@ from rest_framework.permissions import AllowAny
 
 from core.api.exceptions import NotFoundError, BadRequestError as ValidationError
 from modules.psm.models import PurchaseOrder, GoodsReceiptNote
+from fusion_auth.permissions import (
+    IsAuthenticatedPrincipal,
+    HasModuleGrant,
+    HasPermission,
+)
 
-try:
-    from fusion_auth.permissions import IsAuthenticatedPrincipal, HasModuleGrant
-    _PSM_PERMS = [IsAuthenticatedPrincipal, HasModuleGrant("psm")]
-except Exception:
-    _PSM_PERMS = [AllowAny]
+MODULE = HasModuleGrant("psm")
+
+P_INDENT_VIEW = "psm.indent.view"
+P_INDENT_CREATE = "psm.indent.create"
+P_INDENT_MANAGE = "psm.indent.manage"
+P_INDENT_VIEW_ALL = "psm.indent.view_all"
+P_VENDOR_VIEW = "psm.vendor.view"
+P_VENDOR_MANAGE = "psm.vendor.manage"
+P_PO_VIEW = "psm.po.view"
+P_PO_CREATE = "psm.po.create"
+P_STOCK_VIEW = "psm.stock.view"
+P_STOCK_MANAGE = "psm.stock.manage"
 
 from modules.psm.selectors.indents import (
     list_indents,
@@ -58,7 +70,13 @@ from .serializers import (
 
 
 class IndentListCreateView(APIView):
-    permission_classes = _PSM_PERMS
+    def get_permissions(self):
+        method = self.request.method if self.request else "GET"
+        if method == "POST":
+            perms = [MODULE, HasPermission(P_INDENT_CREATE)]
+        else:
+            perms = [MODULE, HasPermission(P_INDENT_VIEW)]
+        return [p() for p in perms]
 
     def get(self, request):
         status_param = request.query_params.get("status")
@@ -82,7 +100,13 @@ class IndentListCreateView(APIView):
 
 
 class IndentDetailView(APIView):
-    permission_classes = _PSM_PERMS
+    def get_permissions(self):
+        method = self.request.method if self.request else "GET"
+        if method in ("PATCH", "PUT"):
+            perms = [MODULE, HasPermission(P_INDENT_MANAGE)]
+        else:
+            perms = [MODULE, HasPermission(P_INDENT_VIEW)]
+        return [p() for p in perms]
 
     def get(self, request, pk):
         indent = get_indent_by_id(request.principal, pk)
@@ -103,7 +127,7 @@ class IndentDetailView(APIView):
 
 
 class IndentTransitionView(APIView):
-    permission_classes = _PSM_PERMS
+    permission_classes = [MODULE, HasPermission(P_INDENT_MANAGE)]
 
     def post(self, request, pk):
         data = request.data
@@ -123,7 +147,7 @@ class IndentTransitionView(APIView):
 
 
 class IndentWithdrawView(APIView):
-    permission_classes = _PSM_PERMS
+    permission_classes = [MODULE, HasPermission(P_INDENT_CREATE, P_INDENT_MANAGE)]
 
     def post(self, request, pk):
         indent = withdraw_indent(principal=request.principal, indent_id=pk)
@@ -132,7 +156,7 @@ class IndentWithdrawView(APIView):
 
 
 class IndentVersionListView(APIView):
-    permission_classes = _PSM_PERMS
+    permission_classes = [MODULE, HasPermission(P_INDENT_VIEW)]
 
     def get(self, request, pk):
         versions = get_indent_version_history(request.principal, pk)
@@ -143,7 +167,13 @@ class IndentVersionListView(APIView):
 
 
 class VendorListCreateView(APIView):
-    permission_classes = _PSM_PERMS
+    def get_permissions(self):
+        method = self.request.method if self.request else "GET"
+        if method == "POST":
+            perms = [MODULE, HasPermission(P_VENDOR_MANAGE)]
+        else:
+            perms = [MODULE, HasPermission(P_VENDOR_VIEW)]
+        return [p() for p in perms]
 
     def get(self, request):
         verified_param = request.query_params.get("is_verified")
@@ -169,7 +199,13 @@ class VendorListCreateView(APIView):
 
 
 class VendorDetailView(APIView):
-    permission_classes = _PSM_PERMS
+    def get_permissions(self):
+        method = self.request.method if self.request else "GET"
+        if method in ("PATCH", "PUT"):
+            perms = [MODULE, HasPermission(P_VENDOR_MANAGE)]
+        else:
+            perms = [MODULE, HasPermission(P_VENDOR_VIEW)]
+        return [p() for p in perms]
 
     def get(self, request, pk):
         vendor = get_vendor_by_id(pk)
@@ -191,7 +227,13 @@ class VendorDetailView(APIView):
 
 
 class PurchaseOrderListCreateView(APIView):
-    permission_classes = _PSM_PERMS
+    def get_permissions(self):
+        method = self.request.method if self.request else "GET"
+        if method == "POST":
+            perms = [MODULE, HasPermission(P_PO_CREATE)]
+        else:
+            perms = [MODULE, HasPermission(P_PO_VIEW)]
+        return [p() for p in perms]
 
     def get(self, request):
         pos = PurchaseOrder.objects.all().order_by("-created_at")
@@ -212,7 +254,13 @@ class PurchaseOrderListCreateView(APIView):
 
 
 class GoodsReceiptNoteCreateView(APIView):
-    permission_classes = _PSM_PERMS
+    def get_permissions(self):
+        method = self.request.method if self.request else "GET"
+        if method == "POST":
+            perms = [MODULE, HasPermission(P_PO_CREATE)]
+        else:
+            perms = [MODULE, HasPermission(P_PO_VIEW)]
+        return [p() for p in perms]
 
     def get(self, request):
         grns = GoodsReceiptNote.objects.all().order_by("-created_at")
@@ -232,7 +280,7 @@ class GoodsReceiptNoteCreateView(APIView):
 
 
 class StockItemListView(APIView):
-    permission_classes = _PSM_PERMS
+    permission_classes = [MODULE, HasPermission(P_STOCK_VIEW)]
 
     def get(self, request):
         dept = request.query_params.get("department")
@@ -242,7 +290,13 @@ class StockItemListView(APIView):
 
 
 class StockTransferListCreateView(APIView):
-    permission_classes = _PSM_PERMS
+    def get_permissions(self):
+        method = self.request.method if self.request else "GET"
+        if method == "POST":
+            perms = [MODULE, HasPermission(P_STOCK_MANAGE)]
+        else:
+            perms = [MODULE, HasPermission(P_STOCK_VIEW)]
+        return [p() for p in perms]
 
     def get(self, request):
         transfers = list_stock_transfers(request.principal)
@@ -259,3 +313,4 @@ class StockTransferListCreateView(APIView):
         )
         serializer = StockTransferSerializer(transfer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+

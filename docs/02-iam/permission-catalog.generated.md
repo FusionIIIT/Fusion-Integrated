@@ -38,3 +38,18 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `psm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `psm.indent.view` | View accessible purchase indents | `Dean`, `Director`, `admin`, `faculty`, `ps_admin`, `purchase_officer`, `staff`, `store_officer`, `student` |
+| `psm.indent.create` | Create and submit purchase indents | `Dean`, `Director`, `admin`, `faculty`, `ps_admin`, `purchase_officer`, `staff`, `store_officer`, `student` |
+| `psm.indent.manage` | Review, recommend, and approve indents | `Dean`, `Director`, `admin`, `ps_admin`, `purchase_officer`, `store_officer` |
+| `psm.indent.view_all` | View all institute indents across departments | `Dean`, `Director`, `admin`, `ps_admin`, `purchase_officer`, `store_officer` |
+| `psm.vendor.view` | View vendor directory | `Dean`, `Director`, `admin`, `faculty`, `ps_admin`, `purchase_officer`, `staff`, `store_officer`, `student` |
+| `psm.vendor.manage` | Register and verify vendors | `Dean`, `Director`, `admin`, `ps_admin`, `purchase_officer`, `store_officer` |
+| `psm.po.view` | View purchase orders and GRNs | `Dean`, `Director`, `admin`, `ps_admin`, `purchase_officer`, `store_officer` |
+| `psm.po.create` | Issue purchase orders and record GRNs | `Dean`, `Director`, `admin`, `ps_admin`, `purchase_officer`, `store_officer` |
+| `psm.stock.view` | View inventory and stock levels | `Dean`, `Director`, `admin`, `faculty`, `ps_admin`, `purchase_officer`, `staff`, `store_officer`, `student` |
+| `psm.stock.manage` | Manage inventory and initiate transfers | `Dean`, `Director`, `admin`, `ps_admin`, `purchase_officer`, `store_officer` |
