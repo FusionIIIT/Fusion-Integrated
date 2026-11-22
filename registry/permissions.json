@@ -34,6 +34,132 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "employee_leave": {
+      "grants": {
+        "employee": [
+          "employee_leave.balance.view_self",
+          "employee_leave.request.create",
+          "employee_leave.request.respond_substitute",
+          "employee_leave.request.work_queue"
+        ],
+        "establishment": [
+          "employee_leave.request.route",
+          "employee_leave.request.work_queue"
+        ],
+        "leave_administrator": [
+          "employee_leave.balance.manage",
+          "employee_leave.configuration.manage",
+          "employee_leave.record.offline",
+          "employee_leave.request.view_all"
+        ],
+        "sanctioning_authority": [
+          "employee_leave.request.sanction",
+          "employee_leave.request.work_queue"
+        ],
+        "unit_head": [
+          "employee_leave.request.respond_substitute",
+          "employee_leave.request.review_unit",
+          "employee_leave.request.work_queue"
+        ]
+      },
+      "module_grants": [
+        "employee",
+        "establishment",
+        "leave_administrator",
+        "sanctioning_authority",
+        "unit_head"
+      ],
+      "nav": {
+        "base_path": "/leave",
+        "icon": "Calendar",
+        "items": [
+          {
+            "code": "employee_leave.my_requests",
+            "icon": "Calendar",
+            "label": "My Leave",
+            "required_permission": "employee_leave.request.create",
+            "sort_order": 10,
+            "to": "/leave/mine"
+          },
+          {
+            "code": "employee_leave.balances",
+            "icon": "Wallet",
+            "label": "Balances & History",
+            "required_permission": "employee_leave.balance.view_self",
+            "sort_order": 20,
+            "to": "/leave/balances"
+          },
+          {
+            "code": "employee_leave.tasks",
+            "icon": "ClipboardCheck",
+            "label": "Approval Queue",
+            "required_permission": "employee_leave.request.work_queue",
+            "sort_order": 30,
+            "to": "/leave/tasks"
+          },
+          {
+            "code": "employee_leave.admin",
+            "icon": "Settings",
+            "label": "Leave Administration",
+            "required_permission": "employee_leave.configuration.manage",
+            "sort_order": 40,
+            "to": "/leave/admin"
+          }
+        ],
+        "label": "Employee Leave",
+        "nav_section": "People",
+        "sort_order": 30,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "employee_leave.request.create",
+          "label": "Submit and view own leave requests"
+        },
+        {
+          "code": "employee_leave.request.respond_substitute",
+          "label": "Respond to an assigned substitute task"
+        },
+        {
+          "code": "employee_leave.request.work_queue",
+          "label": "Open the role-scoped leave task queue"
+        },
+        {
+          "code": "employee_leave.request.view_all",
+          "label": "View all leave requests"
+        },
+        {
+          "code": "employee_leave.request.review_unit",
+          "label": "Review requests as Unit Head"
+        },
+        {
+          "code": "employee_leave.request.route",
+          "label": "Verify and route higher-sanction requests"
+        },
+        {
+          "code": "employee_leave.request.sanction",
+          "label": "Make final leave decisions"
+        },
+        {
+          "code": "employee_leave.balance.view_self",
+          "label": "View own leave balances and history"
+        },
+        {
+          "code": "employee_leave.balance.manage",
+          "label": "Maintain employee leave balances"
+        },
+        {
+          "code": "employee_leave.record.offline",
+          "label": "Record an already-sanctioned offline leave"
+        },
+        {
+          "code": "employee_leave.configuration.manage",
+          "label": "Manage leave policy and calendars"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
@@ -278,6 +404,88 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "quiz": {
+      "grants": {
+        "professor": [
+          "quiz.evaluate",
+          "quiz.manage",
+          "quiz.question_bank.manage",
+          "quiz.release",
+          "quiz.report.view"
+        ],
+        "student": [
+          "quiz.attempt",
+          "quiz.history.view_own",
+          "quiz.result.view_own"
+        ]
+      },
+      "module_grants": [
+        "professor",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/quiz",
+        "icon": "ClipboardCheck",
+        "items": [
+          {
+            "code": "quiz.manage",
+            "icon": "ClipboardCheck",
+            "label": "Quizzes",
+            "required_permission": "quiz.manage",
+            "sort_order": 10,
+            "to": "/quiz"
+          },
+          {
+            "code": "quiz.attempt",
+            "icon": "Pencil",
+            "label": "My Quizzes",
+            "required_permission": "quiz.attempt",
+            "sort_order": 20,
+            "to": "/quiz/my"
+          }
+        ],
+        "label": "Quiz Management",
+        "nav_section": "Academic",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "quiz.manage",
+          "label": "Create and manage quizzes"
+        },
+        {
+          "code": "quiz.question_bank.manage",
+          "label": "Manage the question bank"
+        },
+        {
+          "code": "quiz.evaluate",
+          "label": "Evaluate quiz submissions"
+        },
+        {
+          "code": "quiz.release",
+          "label": "Release quiz results"
+        },
+        {
+          "code": "quiz.report.view",
+          "label": "View quiz reports"
+        },
+        {
+          "code": "quiz.attempt",
+          "label": "Attempt eligible quizzes"
+        },
+        {
+          "code": "quiz.result.view_own",
+          "label": "View own released results"
+        },
+        {
+          "code": "quiz.history.view_own",
+          "label": "View own quiz history"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
     }
   },
   "publisher": "integrated",

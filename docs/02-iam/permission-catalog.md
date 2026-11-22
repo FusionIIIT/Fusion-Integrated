@@ -154,6 +154,22 @@ No write permissions exist by design. The platform never writes academic data
 | `leave.balance.update` | Adjust a leave balance | ⚠️ |
 | `leave.type.manage` | Configure leave types and entitlement rules | |
 
+## `employee_leave` *(Fusion ELM module)*
+
+| Code | Description | ⚠️ |
+|---|---|---|
+| `employee_leave.request.create` | Submit and view own leave requests | |
+| `employee_leave.request.respond_substitute` | Respond to an assigned substitute task | |
+| `employee_leave.request.work_queue` | Open the role-scoped leave task queue | |
+| `employee_leave.request.view_all` | View all leave requests | ⚠️ |
+| `employee_leave.request.review_unit` | Review requests as Unit Head | |
+| `employee_leave.request.route` | Verify and route higher-sanction requests | |
+| `employee_leave.request.sanction` | Make final leave decisions | ⚠️ |
+| `employee_leave.balance.view_self` | View own leave balances and history | |
+| `employee_leave.balance.manage` | Maintain employee leave balances | ⚠️ |
+| `employee_leave.configuration.manage` | Manage leave policies and calendars | ⚠️ |
+| `employee_leave.record.offline` | Record an already-sanctioned offline leave | ⚠️ |
+
 ## `sysops` *(Phase 7 — absorbed from the console)*
 
 | Code | Description | ⚠️ |

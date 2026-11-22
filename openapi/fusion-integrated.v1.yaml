@@ -63,6 +63,480 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/leave/balances:
+    get:
+      operationId: v1_leave_balances_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveBalanceSummary'
+          description: ''
+  /api/v1/leave/balances/adjust:
+    post:
+      operationId: v1_leave_balances_adjust_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceAdjustment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BalanceAdjustment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BalanceAdjustment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveLedger'
+          description: ''
+  /api/v1/leave/calendar:
+    get:
+      operationId: v1_leave_calendar_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaveHolidayList'
+          description: ''
+    post:
+      operationId: v1_leave_calendar_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveHoliday'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveHoliday'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveHoliday'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveHoliday'
+          description: ''
+  /api/v1/leave/calendar/{id}/publish:
+    post:
+      operationId: v1_leave_calendar_publish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveHoliday'
+          description: ''
+  /api/v1/leave/notices:
+    get:
+      operationId: v1_leave_notices_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveTaskNotice'
+          description: ''
+  /api/v1/leave/notices/{id}/read:
+    post:
+      operationId: v1_leave_notices_read_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveTaskNotice'
+          description: ''
+  /api/v1/leave/policies:
+    get:
+      operationId: v1_leave_policies_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeavePolicyList'
+          description: ''
+    post:
+      operationId: v1_leave_policies_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeavePolicy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeavePolicy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeavePolicy'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeavePolicy'
+          description: ''
+  /api/v1/leave/policies/{id}:
+    get:
+      operationId: v1_leave_policies_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeavePolicy'
+          description: ''
+    put:
+      operationId: v1_leave_policies_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeavePolicy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeavePolicy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeavePolicy'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeavePolicy'
+          description: ''
+    patch:
+      operationId: v1_leave_policies_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLeavePolicy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLeavePolicy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLeavePolicy'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeavePolicy'
+          description: ''
+  /api/v1/leave/requests:
+    get:
+      operationId: v1_leave_requests_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    post:
+      operationId: v1_leave_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/actions:
+    post:
+      operationId: v1_leave_requests_actions_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveAction'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/extensions:
+    post:
+      operationId: v1_leave_requests_extensions_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveExtensionCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeaveExtensionCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeaveExtensionCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/requests/{id}/print:
+    get:
+      operationId: v1_leave_requests_print_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Printable HTML leave request
+  /api/v1/leave/requests/offline:
+    post:
+      operationId: v1_leave_requests_offline_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfflineLeave'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfflineLeave'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfflineLeave'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/tasks:
+    get:
+      operationId: v1_leave_tasks_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/leave/year-end:
+    post:
+      operationId: v1_leave_year_end_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/YearEndProcess'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/YearEndProcess'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/YearEndProcess'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveYearEndRun'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1763,6 +2237,48 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - accept_substitute
+      - decline_substitute
+      - recommend
+      - route_establishment
+      - approve
+      - reject
+      - route_final
+      - return_to_unit_head
+      - withdraw
+      - request_cancellation
+      - nominate_substitute
+      - request_resumption
+      - review
+      - approve_cancellation
+      - reject_cancellation
+      - recommend_cancellation
+      - route_cancellation_establishment
+      - route_cancellation_final
+      - return_cancellation_to_unit_head
+      type: string
+      description: |-
+        * `accept_substitute` - accept_substitute
+        * `decline_substitute` - decline_substitute
+        * `recommend` - recommend
+        * `route_establishment` - route_establishment
+        * `approve` - approve
+        * `reject` - reject
+        * `route_final` - route_final
+        * `return_to_unit_head` - return_to_unit_head
+        * `withdraw` - withdraw
+        * `request_cancellation` - request_cancellation
+        * `nominate_substitute` - nominate_substitute
+        * `request_resumption` - request_resumption
+        * `review` - review
+        * `approve_cancellation` - approve_cancellation
+        * `reject_cancellation` - reject_cancellation
+        * `recommend_cancellation` - recommend_cancellation
+        * `route_cancellation_establishment` - route_cancellation_establishment
+        * `route_cancellation_final` - route_cancellation_final
+        * `return_cancellation_to_unit_head` - return_cancellation_to_unit_head
     AddCandidates:
       type: object
       properties:
@@ -1993,6 +2509,30 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BalanceAdjustment:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        policy_id:
+          type: integer
+          minimum: 1
+        entry_type:
+          $ref: '#/components/schemas/EntryTypeEnum'
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        description:
+          type: string
+          maxLength: 300
+      required:
+      - days
+      - description
+      - entry_type
+      - policy_id
+      - user_id
     BulkOutcome:
       type: object
       properties:
@@ -2407,6 +2947,26 @@ components:
       - season_decision
       - semester
       - standing
+    EntryTypeEnum:
+      enum:
+      - credit
+      - opening
+      type: string
+      description: |-
+        * `credit` - credit
+        * `opening` - opening
+    EventEnum:
+      enum:
+      - assigned
+      - reminder
+      - escalated
+      - decision
+      type: string
+      description: |-
+        * `assigned` - Task assigned
+        * `reminder` - Task reminder
+        * `escalated` - Task escalated
+        * `decision` - Request status changed
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2637,6 +3197,531 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveAction:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        comment:
+          type: string
+          default: ''
+          maxLength: 1000
+        replacement_substitute_id:
+          type: integer
+        actual_resume_date:
+          type: string
+          format: date
+        actual_resume_details:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - action
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        policy:
+          type: integer
+          readOnly: true
+        leave_type:
+          type: string
+          readOnly: true
+        leave_year:
+          type: integer
+          readOnly: true
+        opening_balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+        credited:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+        used:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+        available:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - available
+      - credited
+      - id
+      - leave_type
+      - leave_year
+      - opening_balance
+      - policy
+      - used
+      - user_id
+    LeaveBalanceSummary:
+      type: object
+      properties:
+        balances:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveBalance'
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveLedger'
+      required:
+      - balances
+      - history
+    LeaveDecision:
+      type: object
+      properties:
+        actor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        actor_role:
+          type: string
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        from_status:
+          type: string
+          readOnly: true
+        to_status:
+          type: string
+          readOnly: true
+        comment:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_role
+      - actor_user_id
+      - comment
+      - created_at
+      - from_status
+      - to_status
+    LeaveExtensionCreate:
+      type: object
+      properties:
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+          maxLength: 2000
+        substitute_id:
+          type: integer
+          nullable: true
+      required:
+      - end_date
+      - reason
+      - start_date
+    LeaveHoliday:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_year:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        day:
+          type: string
+          format: date
+        name:
+          type: string
+          maxLength: 120
+        restricted:
+          type: boolean
+        published:
+          type: boolean
+      required:
+      - day
+      - id
+      - leave_year
+      - name
+    LeaveLedger:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        entry_type:
+          type: string
+          readOnly: true
+        days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - days
+      - description
+      - entry_type
+      - id
+      - request_id
+    LeavePolicy:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        leave_year:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        enabled:
+          type: boolean
+        annual_entitlement:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+        carry_forward_limit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+        year_end_treatment:
+          $ref: '#/components/schemas/YearEndTreatmentEnum'
+        conversion_ratio:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,3})?$
+        max_continuous_days:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        requires_substitute:
+          type: boolean
+        requires_higher_sanction:
+          type: boolean
+        faculty_only:
+          type: boolean
+        hierarchy: {}
+        unit_head_sla_hours:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        final_sanction_sla_hours:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        escalation_role:
+          type: string
+          maxLength: 64
+      required:
+      - id
+      - leave_type
+      - leave_year
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        employee_id:
+          type: integer
+          readOnly: true
+        employee_name:
+          type: string
+          readOnly: true
+        policy:
+          type: integer
+          readOnly: true
+        parent:
+          type: integer
+          readOnly: true
+          nullable: true
+        request_kind:
+          allOf:
+          - $ref: '#/components/schemas/RequestKindEnum'
+          readOnly: true
+        leave_type:
+          allOf:
+          - $ref: '#/components/schemas/LeaveTypeEnum'
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          readOnly: true
+        end_date:
+          type: string
+          format: date
+          readOnly: true
+        charged_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        station_leave_details:
+          type: string
+          readOnly: true
+        substitute_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        half_day:
+          type: boolean
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/LeaveRequestStatusEnum'
+          readOnly: true
+        assigned_role:
+          type: string
+          readOnly: true
+        actual_resume_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        actual_resume_details:
+          type: string
+          readOnly: true
+        final_decision:
+          type: string
+          readOnly: true
+        final_decision_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        requires_higher_sanction:
+          type: boolean
+          readOnly: true
+        establishment_required:
+          type: boolean
+          readOnly: true
+        decisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveDecision'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actual_resume_date
+      - actual_resume_details
+      - assigned_role
+      - charged_days
+      - created_at
+      - decisions
+      - employee_id
+      - employee_name
+      - end_date
+      - establishment_required
+      - final_decision
+      - final_decision_at
+      - half_day
+      - id
+      - leave_type
+      - parent
+      - policy
+      - reason
+      - request_kind
+      - requires_higher_sanction
+      - start_date
+      - station_leave_details
+      - status
+      - substitute_id
+    LeaveRequestCreate:
+      type: object
+      properties:
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+          maxLength: 2000
+        leave_year:
+          type: integer
+          maximum: 2200
+          minimum: 2000
+        half_day:
+          type: boolean
+          default: false
+        substitute_id:
+          type: integer
+          nullable: true
+        station_leave_details:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - end_date
+      - leave_type
+      - reason
+      - start_date
+    LeaveRequestStatusEnum:
+      enum:
+      - substitute_pending
+      - substitute_declined
+      - unit_head_pending
+      - establishment_pending
+      - final_pending
+      - approved
+      - rejected
+      - withdrawn
+      - cancellation_unit_head_pending
+      - cancellation_establishment_pending
+      - cancellation_final_pending
+      - cancelled
+      - resumption_pending
+      - resumption_reviewed
+      type: string
+      description: |-
+        * `substitute_pending` - Substitute Pending
+        * `substitute_declined` - Substitute Declined
+        * `unit_head_pending` - Unit Head Pending
+        * `establishment_pending` - Establishment Pending
+        * `final_pending` - Final Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `withdrawn` - Withdrawn
+        * `cancellation_unit_head_pending` - Cancellation Unit Head Pending
+        * `cancellation_establishment_pending` - Cancellation Establishment Pending
+        * `cancellation_final_pending` - Cancellation Final Pending
+        * `cancelled` - Cancelled
+        * `resumption_pending` - Resumption Pending
+        * `resumption_reviewed` - Resumption Reviewed
+    LeaveTaskNotice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        request_id:
+          type: integer
+          readOnly: true
+        event:
+          allOf:
+          - $ref: '#/components/schemas/EventEnum'
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - event
+      - id
+      - message
+      - read_at
+      - request_id
+    LeaveTypeEnum:
+      enum:
+      - CL
+      - RH
+      - SCL
+      - EL
+      - VL
+      - COL
+      type: string
+      description: |-
+        * `CL` - CL
+        * `RH` - RH
+        * `SCL` - SCL
+        * `EL` - EL
+        * `VL` - VL
+        * `COL` - COL
+    LeaveYearEndRun:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        from_year:
+          type: integer
+          readOnly: true
+        to_year:
+          type: integer
+          readOnly: true
+        balances_processed:
+          type: integer
+          readOnly: true
+        annual_credits:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        carried_forward:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        converted_to_el:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        lapsed:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - annual_credits
+      - balances_processed
+      - carried_forward
+      - converted_to_el
+      - created_at
+      - from_year
+      - id
+      - lapsed
+      - to_year
     LiftSanction:
       type: object
       properties:
@@ -2864,6 +3949,37 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfflineLeave:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        leave_year:
+          type: integer
+          maximum: 2200
+          minimum: 2000
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        reason:
+          type: string
+          maxLength: 2000
+        half_day:
+          type: boolean
+          default: false
+      required:
+      - end_date
+      - leave_type
+      - leave_year
+      - reason
+      - start_date
+      - user_id
     Ok:
       type: object
       properties:
@@ -2981,6 +4097,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLeaveHolidayList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaveHoliday'
+    PaginatedLeavePolicyList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeavePolicy'
     PaginatedOfferList:
       type: object
       required:
@@ -3080,6 +4234,57 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedLeavePolicy:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        leave_type:
+          $ref: '#/components/schemas/LeaveTypeEnum'
+        leave_year:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        enabled:
+          type: boolean
+        annual_entitlement:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+        carry_forward_limit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+        year_end_treatment:
+          $ref: '#/components/schemas/YearEndTreatmentEnum'
+        conversion_ratio:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,3})?$
+        max_continuous_days:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        requires_substitute:
+          type: boolean
+        requires_higher_sanction:
+          type: boolean
+        faculty_only:
+          type: boolean
+        hierarchy: {}
+        unit_head_sla_hours:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        final_sanction_sla_hours:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        escalation_role:
+          type: string
+          maxLength: 64
     PatchedRole:
       type: object
       properties:
@@ -3466,6 +4671,18 @@ components:
       - message
       - reason
       - route
+    RequestKindEnum:
+      enum:
+      - new
+      - cancellation
+      - extension
+      - offline
+      type: string
+      description: |-
+        * `new` - New
+        * `cancellation` - Cancellation
+        * `extension` - Extension
+        * `offline` - Offline
     RoundOutcome:
       type: object
       properties:
@@ -3830,6 +5047,25 @@ components:
           maxLength: 300
       required:
       - reason
+    YearEndProcess:
+      type: object
+      properties:
+        from_year:
+          type: integer
+          maximum: 2199
+          minimum: 2000
+      required:
+      - from_year
+    YearEndTreatmentEnum:
+      enum:
+      - lapse
+      - carry_forward
+      - convert_to_el
+      type: string
+      description: |-
+        * `lapse` - Lapse unused balance
+        * `carry_forward` - Carry forward
+        * `convert_to_el` - Convert to Earned Leave
   securitySchemes:
     iamSession:
       type: apiKey
