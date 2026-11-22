@@ -293,6 +293,10 @@ class ArchivalService:
         ip_address: str | None = None,
     ) -> ArchivedHistoricalData:
         """Archive eligible historical system data with backup (UC-SA-016, BR-SA-017)."""
+        if not category or not str(category).strip():
+            msg = "Historical data category must be non-empty and non-whitespace."
+            raise ArchivalError(msg, code="invalid_category")
+
         if date_range_end < date_range_start:
             msg = "End date cannot be earlier than start date."
             raise ArchivalError(msg, code="invalid_date_range")
@@ -509,11 +513,15 @@ class ArchivalService:
             purge_req.purge_executed_at = now
 
             if purge_req.historical_data:
-                purge_req.historical_data.status = "purged"
-                purge_req.historical_data.save()
+                target_hist = purge_req.historical_data
+                purge_req.historical_data = None
+                purge_req.save()
+                target_hist.delete()
             elif purge_req.archived_user:
-                purge_req.archived_user.status = "purged"
-                purge_req.archived_user.save()
+                target_user_archive = purge_req.archived_user
+                purge_req.archived_user = None
+                purge_req.save()
+                target_user_archive.delete()
             else:
                 purge_req.save()
 

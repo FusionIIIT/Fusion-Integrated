@@ -172,8 +172,7 @@ def test_dual_authorization_purge_approved_workflow():
     assert decided.status == "approved"
     assert decided.purge_executed_at is not None
 
-    batch.refresh_from_db()
-    assert batch.status == "purged"
+    assert not ArchivedHistoricalData.objects.filter(id=batch.id).exists()
 
 
 def test_dual_authorization_purge_rejected_workflow():

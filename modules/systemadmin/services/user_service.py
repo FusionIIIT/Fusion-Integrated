@@ -190,7 +190,7 @@ class UserService:
 
         AuditService.log_action(
             actor_username=actor_username,
-            action="USER_CREATE",
+            action="USER_CREATED",
             result="SUCCESS",
             target_user=institute_id,
             ip_address=ip_address,

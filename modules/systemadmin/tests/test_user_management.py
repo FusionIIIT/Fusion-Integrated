@@ -33,7 +33,7 @@ def test_create_valid_student():
 
     # Verify audit log was produced
     audit = SystemAdminAuditLog.objects.filter(
-        target_user="2024CS999", action="USER_CREATE"
+        target_user="2024CS999", action="USER_CREATED"
     ).first()
     assert audit is not None
     assert audit.result == "SUCCESS"

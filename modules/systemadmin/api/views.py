@@ -144,10 +144,17 @@ class UserDetailView(APIView):
         serializer = s.BasicUserProfileDetailSerializer(profile)
         return Response(serializer.data)
 
+    def put(self, request, user_id):
+        return self.patch(request, user_id)
+
     def patch(self, request, user_id):
         principal = getattr(request, "principal", None)
         if principal and not principal.has_permission("systemadmin.user.edit"):
             return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+        if "institute_id" in request.data:
+            # BR-SA-001: Institute ID is strictly immutable and cannot be altered
+            raise BadRequestError("Institute ID is immutable and cannot be modified.")
 
         serializer = s.UserUpdateSerializer(data=request.data)
         if not serializer.is_valid():
@@ -696,6 +703,9 @@ class ConfigListView(APIView):
 
 class ConfigUpdateView(APIView):
     permission_classes = [MODULE, HasPermission("systemadmin.config.manage")]
+
+    def put(self, request, user_id):
+        return self.patch(request, user_id)
 
     def patch(self, request, key):
         serializer = s.ConfigUpdateSerializer(data=request.data)
