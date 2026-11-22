@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 from modules.superadmin.domain.exceptions import ArchivalIneligibleError
 
@@ -22,7 +22,7 @@ def _ensure_aware(dt: datetime, reference: datetime) -> datetime:
     attached to *reference*'s tzinfo (defaulting to UTC).
     """
     if dt.tzinfo is None:
-        return dt.replace(tzinfo=reference.tzinfo or timezone.utc)
+        return dt.replace(tzinfo=reference.tzinfo or UTC)
     return dt
 
 

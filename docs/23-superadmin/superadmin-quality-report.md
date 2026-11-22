@@ -224,7 +224,14 @@ Six Vitest / Testing Library test files cover all pages and hooks (`71 passed` i
 ### Client Check & Build Chunk Budget (`make check-client`)
 - TypeScript typecheck: `tsc --noEmit` passed with 0 errors.
 - Vitest suite: `71 passed` across 6 superadmin unit test suites.
-- Production build: `vite build` completed successfully; the `superadmin` frontend chunk is $\le 150\text{ kB}$ gzip budget per specification.
+- **Frontend Code-Splitting & Bundle Budget (`make check-client`):**
+  - `routes-*.js`: `1.76 kB` (`0.73 kB` gzip)
+  - `DashboardPage-*.js`: `1.84 kB` (`0.75 kB` gzip)
+  - `ArchivalPage-*.js`: `2.71 kB` (`1.30 kB` gzip)
+  - `AuditPage-*.js`: `2.81 kB` (`1.36 kB` gzip)
+  - `PolicyPage-*.js`: `3.32 kB` (`1.57 kB` gzip)
+  - `PurgePage-*.js`: `4.98 kB` (`1.85 kB` gzip)
+  - Total Super Admin lazy module chunks: `17.42 kB` raw / `7.56 kB` gzip (well below the `150 kB` gzip budget; `index-*.js` at `163.06 kB` gzip is the shared React/Mantine shell).
 
 ---
 

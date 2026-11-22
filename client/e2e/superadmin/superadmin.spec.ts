@@ -187,5 +187,14 @@ test.describe("superadmin: interactive user journeys", () => {
     const table = page.getByRole("table");
     await expect(table).toBeVisible();
     await expect(table.getByRole("row").filter({ hasText: "stf00100" }).first()).toBeVisible();
+
+    const exportResponse = page.waitForResponse(
+      (r) => r.url().includes("/api/v1/superadmin/audit/export") && r.status() === 200,
+    );
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByRole("link", { name: "Export CSV" }).click();
+    expect((await exportResponse).ok()).toBe(true);
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toContain("audit");
   });
 });

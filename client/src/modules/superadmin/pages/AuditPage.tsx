@@ -1,8 +1,8 @@
 import { useState } from "react";
 import {
-  Badge, Card, Container, Group, Loader, Select, Stack, Text, TextInput,
+  Badge, Button, Card, Container, Group, Loader, Select, Stack, Text, TextInput,
 } from "@mantine/core";
-import { TbFileText, TbSearch } from "react-icons/tb";
+import { TbDownload, TbFileText, TbSearch } from "react-icons/tb";
 
 import { DataTable, type Column } from "../../../ui/components/DataTable";
 import { ErrorState } from "../../../ui/components/ErrorState";
@@ -71,6 +71,17 @@ export default function AuditPage() {
       <PageHeader
         title="Audit Logs"
         subtitle="Immutable compliance event log — all governance actions recorded permanently"
+        action={(
+          <Button
+            component="a"
+            href={`/api/v1/superadmin/audit/export${search || action ? `?${new URLSearchParams({ ...(search ? { actor_username: search } : {}), ...(action ? { action } : {}) }).toString()}` : ""}`}
+            download="superadmin-audit-logs.csv"
+            leftSection={<TbDownload size={16} />}
+            variant="light"
+          >
+            Export CSV
+          </Button>
+        )}
       />
 
       <Group mb="md" gap="sm">

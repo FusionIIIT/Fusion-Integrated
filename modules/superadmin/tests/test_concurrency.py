@@ -1,7 +1,4 @@
-"""Concurrency tests for dual-auth purge decisions and archival state transitions.
-
-Uses real threads against transaction=True with threading.Barrier to ensure real race conditions.
-"""
+"""Concurrency tests for dual-auth purge decisions and archival state transitions."""
 
 from __future__ import annotations
 
