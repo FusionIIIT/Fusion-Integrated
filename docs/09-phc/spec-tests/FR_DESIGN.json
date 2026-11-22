@@ -1,0 +1,407 @@
+[
+  {
+    "test_id": "FR-TEST-001",
+    "source_id": "AFR-PHC-001",
+    "purpose": "Verify patient can access the static weekly doctor schedule and current-day real-time attendance status",
+    "preconditions": "Doctor schedule exists and is published; attendance for today is recorded",
+    "action_or_input": "Patient requests doctor availability",
+    "expected_result": "Master schedule and current-day live attendance status are returned together",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-002",
+    "source_id": "AFR-PHC-002",
+    "purpose": "Verify PHC Staff can maintain/update an existing static weekly schedule of visiting doctors",
+    "preconditions": "A doctor schedule exists and user has PHC Staff role",
+    "action_or_input": "PHC Staff submits updated schedule details including timing, room, and visiting days",
+    "expected_result": "Schedule is updated and persisted with the new details",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-003",
+    "source_id": "AFR-PHC-003",
+    "purpose": "Verify PHC Staff can mark a visiting doctor as Available in real time",
+    "preconditions": "Doctor is on schedule and user has PHC Staff role",
+    "action_or_input": "PHC Staff marks doctor status as Available",
+    "expected_result": "Doctor real-time attendance status is updated to Available and persisted",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-004",
+    "source_id": "AFR-PHC-003",
+    "purpose": "Verify PHC Staff can mark a visiting doctor as Departed in real time",
+    "preconditions": "Doctor is currently marked Available and user has PHC Staff role",
+    "action_or_input": "PHC Staff marks doctor status as Departed",
+    "expected_result": "Doctor real-time attendance status is updated to Departed",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-005",
+    "source_id": "AFR-PHC-004",
+    "purpose": "Verify PHC Staff can create a doctor schedule",
+    "preconditions": "User has PHC Staff role",
+    "action_or_input": "PHC Staff creates a doctor schedule with doctor name, specialization, visiting days, and time slots",
+    "expected_result": "Doctor schedule is created successfully",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-006",
+    "source_id": "AFR-PHC-005",
+    "purpose": "Verify PHC Staff can publish a doctor schedule for patient visibility",
+    "preconditions": "Doctor schedule has been created and user has PHC Staff role",
+    "action_or_input": "PHC Staff publishes the schedule",
+    "expected_result": "Schedule status becomes published and is visible to patients",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-007",
+    "source_id": "AFR-PHC-006",
+    "purpose": "Verify PHC Staff can search for a patient profile",
+    "preconditions": "Patient profiles exist in the system and user has PHC Staff role",
+    "action_or_input": "PHC Staff searches by patient identifier or name",
+    "expected_result": "Matching patient profile is returned to PHC Staff",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-008",
+    "source_id": "AFR-PHC-007",
+    "purpose": "Verify PHC Staff can create a patient visit record",
+    "preconditions": "Patient profile exists and user has PHC Staff role",
+    "action_or_input": "PHC Staff records a visit with patient identifier, visit date, doctor, symptoms, and diagnosis",
+    "expected_result": "Visit record is created and linked to the patient profile",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-009",
+    "source_id": "AFR-PHC-008",
+    "purpose": "Verify PHC Staff can digitize a physical prescription and link it to patient record",
+    "preconditions": "Patient visit record exists and user has PHC Staff role",
+    "action_or_input": "PHC Staff creates a prescription with medicine details, dosage, and instructions linked to patient record",
+    "expected_result": "Prescription is stored and linked to the corresponding patient record",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-010",
+    "source_id": "AFR-PHC-009",
+    "purpose": "Verify patient has read-only access to their own medical history",
+    "preconditions": "Patient has existing visit records",
+    "action_or_input": "Patient requests their own medical history",
+    "expected_result": "Patient's own medical history is returned in read-only mode",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-011",
+    "source_id": "AFR-PHC-010",
+    "purpose": "Verify patient can access prescriptions associated with their own medical history",
+    "preconditions": "Prescriptions exist for the authenticated patient",
+    "action_or_input": "Patient requests prescriptions linked to their records",
+    "expected_result": "Prescriptions belonging to the patient are returned",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-012",
+    "source_id": "AFR-PHC-011",
+    "purpose": "Verify patient can download PDF copies of their own medical records",
+    "preconditions": "Patient has medical visit/prescription records",
+    "action_or_input": "Patient requests PDF download for their medical record",
+    "expected_result": "A valid PDF document containing the patient's record is generated and returned",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-013",
+    "source_id": "AFR-PHC-012",
+    "purpose": "Verify cross-patient medical data access is prevented",
+    "preconditions": "Patient A and Patient B exist with separate medical records",
+    "action_or_input": "Patient A attempts to access Patient B's medical records or prescriptions",
+    "expected_result": "Access is denied with 403 Forbidden without disclosing Patient B's records",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "FR-TEST-014",
+    "source_id": "AFR-PHC-013",
+    "purpose": "Verify institute employee is permitted to initiate a reimbursement claim",
+    "preconditions": "User is authenticated with Employee role",
+    "action_or_input": "Employee initiates reimbursement claim submission",
+    "expected_result": "Claim submission is allowed to proceed",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-015",
+    "source_id": "AFR-PHC-013",
+    "purpose": "Verify students are excluded from submitting reimbursement claims",
+    "preconditions": "User is authenticated with Student role",
+    "action_or_input": "Student attempts to submit a reimbursement claim",
+    "expected_result": "Reimbursement submission is rejected with an eligibility error or 403 Forbidden",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "FR-TEST-016",
+    "source_id": "AFR-PHC-014",
+    "purpose": "Verify reimbursement claim requires a valid recorded prescription for the claimant",
+    "preconditions": "Employee attempts to submit a claim without linking a valid prescription belonging to claimant",
+    "action_or_input": "Employee submits reimbursement claim with non-existent or invalid prescription ID",
+    "expected_result": "Claim is rejected due to missing or invalid prescription prerequisite",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "FR-TEST-017",
+    "source_id": "AFR-PHC-015",
+    "purpose": "Verify reimbursement claim within configured submission window is accepted",
+    "preconditions": "Employee has valid prescription with expense date within configured submission window",
+    "action_or_input": "Employee submits reimbursement claim for expense within window",
+    "expected_result": "Claim submission window validation succeeds",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-018",
+    "source_id": "AFR-PHC-015",
+    "purpose": "Verify reimbursement claim outside configured submission window is rejected",
+    "preconditions": "Expense date exceeds the configured submission window",
+    "action_or_input": "Employee attempts to submit reimbursement claim for expired expense date",
+    "expected_result": "Claim submission is rejected for exceeding allowable submission window",
+    "test_type": "boundary_negative"
+  },
+  {
+    "test_id": "FR-TEST-019",
+    "source_id": "AFR-PHC-016",
+    "purpose": "Verify eligible employee successfully submits reimbursement claim creating an active claim in initial state",
+    "preconditions": "Employee with valid prescription and expense date within window",
+    "action_or_input": "Employee submits complete reimbursement claim",
+    "expected_result": "Claim is created and enters initial review stage (SUBMITTED)",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-020",
+    "source_id": "AFR-PHC-017",
+    "purpose": "Verify sequential progression of reimbursement workflow across all mandatory stages",
+    "preconditions": "Claim is submitted by eligible employee",
+    "action_or_input": "Claim moves sequentially through PHC Staff review, Accounts & Audit verification, Approving Authority sanction, and Accounts & Audit payment",
+    "expected_result": "Stages transition strictly in order: SUBMITTED -> PHC_REVIEWED -> ACCOUNTS_VERIFIED -> SANCTIONED -> PAID",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-021",
+    "source_id": "AFR-PHC-018",
+    "purpose": "Verify PHC Staff reviews submitted claim and forwards to Accounts & Audit",
+    "preconditions": "Claim is in SUBMITTED state; user has PHC Staff role",
+    "action_or_input": "PHC Staff reviews and approves forward progression",
+    "expected_result": "Claim advances to PHC_REVIEWED stage / forwarded to Accounts & Audit",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-022",
+    "source_id": "AFR-PHC-019",
+    "purpose": "Verify Accounts & Audit verifies financial details and forwards claim for sanction",
+    "preconditions": "Claim is in PHC_REVIEWED state; user has Accounts & Audit role",
+    "action_or_input": "Accounts & Audit records financial verification",
+    "expected_result": "Claim advances to ACCOUNTS_VERIFIED stage / forwarded for sanction",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-023",
+    "source_id": "AFR-PHC-020",
+    "purpose": "Verify Approving Authority approves reimbursement sanction",
+    "preconditions": "Claim is in ACCOUNTS_VERIFIED state; user has Approving Authority role",
+    "action_or_input": "Approving Authority approves sanction",
+    "expected_result": "Claim status updates to SANCTIONED (or APPROVED)",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-024",
+    "source_id": "AFR-PHC-020",
+    "purpose": "Verify Approving Authority rejects reimbursement sanction terminating the claim",
+    "preconditions": "Claim is in ACCOUNTS_VERIFIED state; user has Approving Authority role",
+    "action_or_input": "Approving Authority rejects sanction",
+    "expected_result": "Claim status updates to REJECTED and claim reaches a terminal state",
+    "test_type": "functional_negative"
+  },
+  {
+    "test_id": "FR-TEST-025",
+    "source_id": "AFR-PHC-021",
+    "purpose": "Verify Accounts & Audit processes payment for approved claim closing it as reimbursed",
+    "preconditions": "Claim is in SANCTIONED state; user has Accounts & Audit role",
+    "action_or_input": "Accounts & Audit processes final payment",
+    "expected_result": "Claim status updates to PAID / REIMBURSED and workflow terminates",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-026",
+    "source_id": "AFR-PHC-022",
+    "purpose": "Verify employee can view status and action history of their own reimbursement claims",
+    "preconditions": "Employee has submitted one or more reimbursement claims",
+    "action_or_input": "Employee queries their claim history and status",
+    "expected_result": "Current workflow stage and action history of employee's claims are displayed",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-027",
+    "source_id": "AFR-PHC-023",
+    "purpose": "Verify claimant receives notifications on claim status changes including rejection and payment",
+    "preconditions": "Claim exists for employee",
+    "action_or_input": "Claim transitions status (e.g. rejected or payment processed)",
+    "expected_result": "Notification is generated and delivered to the claimant",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-028",
+    "source_id": "AFR-PHC-024",
+    "purpose": "Verify PHC Staff can add to and deduct from inventory stock levels",
+    "preconditions": "Inventory item exists; user has PHC Staff role",
+    "action_or_input": "PHC Staff adjusts stock (adds quantity, then deducts quantity)",
+    "expected_result": "Stock level reflects the adjustments correctly",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-029",
+    "source_id": "AFR-PHC-025",
+    "purpose": "Verify system compares updated stock level against item reorder threshold",
+    "preconditions": "Item has configured reorder threshold",
+    "action_or_input": "Stock level is updated",
+    "expected_result": "System evaluates remaining stock against threshold",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-030",
+    "source_id": "AFR-PHC-026",
+    "purpose": "Verify low-stock warning is generated for PHC Staff when stock falls below reorder threshold",
+    "preconditions": "Inventory item has reorder threshold of 20 and current stock 25",
+    "action_or_input": "Stock is deducted by 10 resulting in stock 15 (below threshold 20)",
+    "expected_result": "Low-stock warning notification is created for PHC Staff",
+    "test_type": "boundary_negative"
+  },
+  {
+    "test_id": "FR-TEST-031",
+    "source_id": "AFR-PHC-026",
+    "purpose": "Verify no low-stock warning is generated when stock remains at or above reorder threshold",
+    "preconditions": "Inventory item has reorder threshold of 20 and current stock 30",
+    "action_or_input": "Stock is deducted by 5 resulting in stock 25 (above threshold 20)",
+    "expected_result": "No low-stock warning notification is generated",
+    "test_type": "boundary_positive"
+  },
+  {
+    "test_id": "FR-TEST-032",
+    "source_id": "AFR-PHC-027",
+    "purpose": "Verify PHC Staff can create and submit an inventory procurement requisition",
+    "preconditions": "User has PHC Staff role",
+    "action_or_input": "PHC Staff submits requisition with requested items and quantities",
+    "expected_result": "Requisition is created in SUBMITTED / PENDING state",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-033",
+    "source_id": "AFR-PHC-028",
+    "purpose": "Verify submitted inventory requisition is routed to Approving Authority",
+    "preconditions": "Requisition has been submitted by PHC Staff",
+    "action_or_input": "System routes requisition for decision",
+    "expected_result": "Requisition is accessible to Approving Authority for decision",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-034",
+    "source_id": "AFR-PHC-029",
+    "purpose": "Verify Approving Authority approves pending inventory requisition",
+    "preconditions": "Requisition is pending; user has Approving Authority role",
+    "action_or_input": "Approving Authority approves requisition",
+    "expected_result": "Requisition status becomes APPROVED",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-035",
+    "source_id": "AFR-PHC-029",
+    "purpose": "Verify Approving Authority rejects pending inventory requisition",
+    "preconditions": "Requisition is pending; user has Approving Authority role",
+    "action_or_input": "Approving Authority rejects requisition",
+    "expected_result": "Requisition status becomes REJECTED",
+    "test_type": "functional_negative"
+  },
+  {
+    "test_id": "FR-TEST-036",
+    "source_id": "AFR-PHC-030",
+    "purpose": "Verify originator PHC Staff is notified when requisition is approved or rejected",
+    "preconditions": "Requisition submitted by PHC Staff member",
+    "action_or_input": "Approving Authority decides requisition (Approved or Rejected)",
+    "expected_result": "Decision notification is generated for the originating PHC Staff member",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-037",
+    "source_id": "AFR-PHC-031",
+    "purpose": "Verify PHC Staff marks approved requisition as Fulfilled after delivery without auto-altering stock",
+    "preconditions": "Requisition is in APPROVED state; supplies delivered; user has PHC Staff role",
+    "action_or_input": "PHC Staff marks requisition as Fulfilled",
+    "expected_result": "Requisition status is FULFILLED; inventory quantities are unchanged until explicit stock update",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-038",
+    "source_id": "AFR-PHC-032",
+    "purpose": "Verify PHC Staff records ambulance usage with timestamp, patient name, and destination",
+    "preconditions": "User has PHC Staff role",
+    "action_or_input": "PHC Staff submits ambulance log with complete details (timestamp, patient name, destination)",
+    "expected_result": "Ambulance log entry is created and persisted",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-039",
+    "source_id": "AFR-PHC-032",
+    "purpose": "Verify incomplete ambulance usage log is rejected",
+    "preconditions": "User has PHC Staff role",
+    "action_or_input": "PHC Staff submits ambulance log missing required fields (e.g. empty patient name or destination)",
+    "expected_result": "Log creation is rejected with validation error",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "FR-TEST-040",
+    "source_id": "AFR-PHC-033",
+    "purpose": "Verify PHC Staff publishes health advisories visible to all patients on dashboard",
+    "preconditions": "User has PHC Staff role",
+    "action_or_input": "PHC Staff creates and publishes a health advisory",
+    "expected_result": "Advisory is published and retrievable by patients",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-041",
+    "source_id": "AFR-PHC-034",
+    "purpose": "Verify PHC Staff can generate administrative reports across patient demographics, service utilization, and inventory consumption",
+    "preconditions": "PHC data exists; user has PHC Staff role",
+    "action_or_input": "PHC Staff requests demographic, utilization, and inventory reports",
+    "expected_result": "Aggregate report data is returned for all three categories",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-042",
+    "source_id": "AFR-PHC-035",
+    "purpose": "Verify administrative reports anonymize patient data and protect PII",
+    "preconditions": "Patient visits and demographics exist",
+    "action_or_input": "PHC Staff generates administrative reports",
+    "expected_result": "Report output contains no patient names, identifiers, or contact details",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-043",
+    "source_id": "AFR-PHC-036",
+    "purpose": "Verify access control enforces role-based restrictions across PHC functions",
+    "preconditions": "User has Student or unauthorized role",
+    "action_or_input": "Unauthorized user attempts to access staff-only functions (e.g. adjust inventory or create schedule)",
+    "expected_result": "Access is denied with 403 Forbidden",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "FR-TEST-044",
+    "source_id": "AFR-PHC-037",
+    "purpose": "Verify immutable audit trail is recorded for sensitive operations on patient records, inventory, and reimbursement claims",
+    "preconditions": "Authorized user performs action on patient record, inventory level, or claim status",
+    "action_or_input": "A sensitive action successfully executes",
+    "expected_result": "An audit log entry recording the action, actor, timestamp, and target entity is created and cannot be altered",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "FR-TEST-045",
+    "source_id": "AFR-PHC-038",
+    "purpose": "Verify modifying or reopening a submitted or rejected claim is prohibited, requiring a new claim",
+    "preconditions": "A claim has already been submitted or rejected",
+    "action_or_input": "User attempts to edit or reopen the existing claim",
+    "expected_result": "Edit or reopen request is rejected; existing claim remains immutable",
+    "test_type": "functional_negative"
+  }
+]

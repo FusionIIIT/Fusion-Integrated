@@ -1,0 +1,299 @@
+[
+  {
+    "test_id": "UC-TEST-001",
+    "source_id": "PHC-UC-01 Main Flow",
+    "purpose": "Verify patient views static weekly schedule together with live attendance status",
+    "preconditions": "Doctor schedule is published and attendance recorded for today",
+    "action_or_input": "Patient requests doctor availability view",
+    "expected_result": "Weekly schedule and today live attendance status are returned",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-002",
+    "source_id": "PHC-UC-02 Main Flow",
+    "purpose": "Verify patient views own medical history and prescriptions read-only",
+    "preconditions": "Patient has recorded visits and prescriptions",
+    "action_or_input": "Patient opens my medical records",
+    "expected_result": "Patient visit history and prescriptions displayed in read-only form",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-003",
+    "source_id": "PHC-UC-02 Exception E1",
+    "purpose": "Verify access is denied when patient attempts to view another patient records",
+    "preconditions": "Patient A and Patient B exist with separate records",
+    "action_or_input": "Patient A attempts to access Patient B visit record by id",
+    "expected_result": "Access is denied with UnauthorizedRecordAccessError or 403 Forbidden",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "UC-TEST-004",
+    "source_id": "PHC-UC-03 Main Flow",
+    "purpose": "Verify patient downloads PDF copy of own medical records",
+    "preconditions": "Selected records belong to authenticated patient",
+    "action_or_input": "Patient requests PDF download",
+    "expected_result": "A downloadable PDF document containing patient records is returned",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-005",
+    "source_id": "PHC-UC-04 Main Flow",
+    "purpose": "Verify eligible employee applies for medical bill reimbursement successfully",
+    "preconditions": "Employee has valid linked prescription and expense date within window",
+    "action_or_input": "Employee submits complete reimbursement application",
+    "expected_result": "Claim is created in Pending PHC Review state with action history",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-006",
+    "source_id": "PHC-UC-04 Alternative A1",
+    "purpose": "Verify reimbursement submission denied when user is not an employee (e.g. student)",
+    "preconditions": "User is authenticated as student",
+    "action_or_input": "Student submits reimbursement claim",
+    "expected_result": "Submission denied with IneligibleClaimantError",
+    "test_type": "authorization_negative"
+  },
+  {
+    "test_id": "UC-TEST-007",
+    "source_id": "PHC-UC-04 Alternative A2",
+    "purpose": "Verify reimbursement submission denied when prescription is missing or not owned by claimant",
+    "preconditions": "Employee references invalid or another patient prescription",
+    "action_or_input": "Employee attempts to submit claim",
+    "expected_result": "Submission denied with PrescriptionRequiredError",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "UC-TEST-008",
+    "source_id": "PHC-UC-04 Alternative A3",
+    "purpose": "Verify reimbursement submission denied when expense date is outside submission window",
+    "preconditions": "Expense date is older than 90 days",
+    "action_or_input": "Employee attempts to submit claim",
+    "expected_result": "Submission denied with SubmissionWindowExpiredError",
+    "test_type": "boundary_negative"
+  },
+  {
+    "test_id": "UC-TEST-009",
+    "source_id": "PHC-UC-05 Main Flow",
+    "purpose": "Verify employee tracks status and action history of own reimbursement claims",
+    "preconditions": "Employee has submitted claims with progress history",
+    "action_or_input": "Employee views claim tracking",
+    "expected_result": "Current stage and progression history displayed for claimant claims only",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-010",
+    "source_id": "PHC-UC-06 Main Flow",
+    "purpose": "Verify PHC Staff records patient visit and digitizes prescription",
+    "preconditions": "Patient profile exists; user is PHC Staff",
+    "action_or_input": "PHC Staff records consultation and digitized prescription",
+    "expected_result": "Visit and prescription persisted and linked to patient",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-011",
+    "source_id": "PHC-UC-07 Main Flow",
+    "purpose": "Verify PHC Staff maintains doctor master schedule",
+    "preconditions": "Doctor schedule exists; user is PHC Staff",
+    "action_or_input": "PHC Staff updates visiting day, room, and timings",
+    "expected_result": "Schedule updated and saved with new parameters",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-012",
+    "source_id": "PHC-UC-08 Main Flow",
+    "purpose": "Verify PHC Staff marks doctor real-time attendance",
+    "preconditions": "Doctor exists; user is PHC Staff",
+    "action_or_input": "PHC Staff marks status as Available or Departed",
+    "expected_result": "Attendance record updated for current date",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-013",
+    "source_id": "PHC-UC-09 Main Flow",
+    "purpose": "Verify stock deduction below threshold triggers low-stock alert",
+    "preconditions": "Item exists with stock above threshold",
+    "action_or_input": "PHC Staff deducts stock resulting in level below reorder threshold",
+    "expected_result": "Stock level updated and low-stock warning notification created",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-014",
+    "source_id": "PHC-UC-09 Alternative A1",
+    "purpose": "Verify stock adjustment resulting in level at or above threshold generates no alert",
+    "preconditions": "Item exists with stock above threshold",
+    "action_or_input": "PHC Staff adjusts stock keeping level at or above threshold",
+    "expected_result": "Stock level updated; no low-stock alert generated",
+    "test_type": "boundary_positive"
+  },
+  {
+    "test_id": "UC-TEST-015",
+    "source_id": "PHC-UC-09 Exception E1",
+    "purpose": "Verify stock adjustment rejecting deduction exceeding available stock",
+    "preconditions": "Item stock is less than deduction quantity",
+    "action_or_input": "PHC Staff attempts to deduct more than current stock",
+    "expected_result": "Adjustment rejected with InsufficientStockError; stock unchanged",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "UC-TEST-016",
+    "source_id": "PHC-UC-10 Main Flow",
+    "purpose": "Verify PHC Staff submits inventory procurement requisition",
+    "preconditions": "Items and quantities specified; user is PHC Staff",
+    "action_or_input": "PHC Staff creates and submits procurement requisition",
+    "expected_result": "Requisition saved in Pending Approval state and routed",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-017",
+    "source_id": "PHC-UC-11 Main Flow",
+    "purpose": "Verify PHC Staff logs ambulance usage with required details",
+    "preconditions": "User is PHC Staff",
+    "action_or_input": "Staff logs ambulance trip with patient name, destination, driver, departure time",
+    "expected_result": "Ambulance usage entry created and persisted",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-018",
+    "source_id": "PHC-UC-11 Exception E1",
+    "purpose": "Verify ambulance log rejected when required field is missing",
+    "preconditions": "User is PHC Staff",
+    "action_or_input": "Staff submits ambulance log with missing required destination",
+    "expected_result": "Submission rejected by API validation (HTTP 400)",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "UC-TEST-019",
+    "source_id": "PHC-UC-12 Main Flow",
+    "purpose": "Verify PHC Staff broadcasts health announcements to patients",
+    "preconditions": "User is PHC Staff",
+    "action_or_input": "Staff publishes advisory with title, content, priority",
+    "expected_result": "Announcement is active and retrievable by patients",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-020",
+    "source_id": "PHC-UC-13 Main Flow",
+    "purpose": "Verify PHC Staff generates anonymized administrative reports",
+    "preconditions": "PHC records exist; user is PHC Staff",
+    "action_or_input": "Staff requests demographics, utilization, or inventory report",
+    "expected_result": "Aggregated report generated without patient-identifiable data",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-021",
+    "source_id": "PHC-UC-13 Exception E1",
+    "purpose": "Verify report generation with invalid report type parameter is rejected",
+    "preconditions": "User is PHC Staff",
+    "action_or_input": "Staff requests report with invalid type unsupported_type",
+    "expected_result": "System raises ValueError or returns 400 Bad Request",
+    "test_type": "validation_negative"
+  },
+  {
+    "test_id": "UC-TEST-022",
+    "source_id": "PHC-UC-14 Main Flow",
+    "purpose": "Verify PHC Staff marks approved requisition as Fulfilled after delivery",
+    "preconditions": "Requisition is in Approved state; user is PHC Staff",
+    "action_or_input": "Staff records delivery fulfillment",
+    "expected_result": "Requisition status set to Fulfilled; stock quantities not auto-altered",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-023",
+    "source_id": "PHC-UC-14 Exception E1",
+    "purpose": "Verify marking requisition Fulfilled is blocked when requisition is not Approved",
+    "preconditions": "Requisition is in Pending Approval or Rejected state",
+    "action_or_input": "Staff attempts to fulfill non-approved requisition",
+    "expected_result": "Fulfillment blocked with RequisitionNotApprovedError",
+    "test_type": "functional_negative"
+  },
+  {
+    "test_id": "UC-TEST-024",
+    "source_id": "PHC-UC-15 Main Flow",
+    "purpose": "Verify PHC Staff reviews submitted claim and forwards to Accounts",
+    "preconditions": "Claim is in Pending PHC Review state",
+    "action_or_input": "PHC Staff records review forward action",
+    "expected_result": "Claim advances to Pending Accounts Verification",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-025",
+    "source_id": "PHC-UC-16 Alternative A1",
+    "purpose": "Verify Approving Authority approves pending inventory requisition",
+    "preconditions": "Requisition is Pending Approval; user is Approving Authority",
+    "action_or_input": "Approver approves requisition",
+    "expected_result": "Requisition status becomes Approved and originator notified",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-026",
+    "source_id": "PHC-UC-16 Alternative A2",
+    "purpose": "Verify Approving Authority rejects pending inventory requisition",
+    "preconditions": "Requisition is Pending Approval; user is Approving Authority",
+    "action_or_input": "Approver rejects requisition",
+    "expected_result": "Requisition status becomes Rejected and workflow terminates",
+    "test_type": "functional_negative"
+  },
+  {
+    "test_id": "UC-TEST-027",
+    "source_id": "PHC-UC-16 Exception E1",
+    "purpose": "Verify duplicate decision blocked when requisition is no longer Pending Approval",
+    "preconditions": "Requisition is already Approved or Rejected",
+    "action_or_input": "Approver attempts second decision",
+    "expected_result": "Second decision blocked with InvalidStateTransitionError",
+    "test_type": "functional_negative"
+  },
+  {
+    "test_id": "UC-TEST-028",
+    "source_id": "PHC-UC-19 Main Flow",
+    "purpose": "Verify Accounts & Audit verifies financial details of reimbursement claim",
+    "preconditions": "Claim is Pending Accounts Verification",
+    "action_or_input": "Accounts staff records verification and forwards for sanction",
+    "expected_result": "Claim advances to Pending Sanction",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-029",
+    "source_id": "PHC-UC-20 Alternative A1",
+    "purpose": "Verify Approving Authority approves reimbursement sanction",
+    "preconditions": "Claim is Pending Sanction; user is Approving Authority",
+    "action_or_input": "Approver approves sanction",
+    "expected_result": "Claim status becomes Approved for Payment and claimant notified",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-030",
+    "source_id": "PHC-UC-20 Alternative A2",
+    "purpose": "Verify Approving Authority rejects reimbursement sanction terminating the claim",
+    "preconditions": "Claim is Pending Sanction; user is Approving Authority",
+    "action_or_input": "Approver rejects sanction",
+    "expected_result": "Claim status becomes Rejected and claim cannot be reopened",
+    "test_type": "functional_negative"
+  },
+  {
+    "test_id": "UC-TEST-031",
+    "source_id": "PHC-UC-20 Exception E1",
+    "purpose": "Verify duplicate sanction decision blocked when claim is no longer Pending Sanction",
+    "preconditions": "Claim is already Approved for Payment or Rejected",
+    "action_or_input": "Approver attempts second sanction decision",
+    "expected_result": "Duplicate decision blocked with InvalidStateTransitionError",
+    "test_type": "functional_negative"
+  },
+  {
+    "test_id": "UC-TEST-032",
+    "source_id": "PHC-UC-21 Main Flow",
+    "purpose": "Verify Accounts & Audit processes reimbursement payment closing claim",
+    "preconditions": "Claim is Approved for Payment",
+    "action_or_input": "Accounts records payment reference and completion",
+    "expected_result": "Claim status becomes Reimbursed and claimant notified",
+    "test_type": "functional_positive"
+  },
+  {
+    "test_id": "UC-TEST-033",
+    "source_id": "PHC-UC-22 Main Flow",
+    "purpose": "Verify PHC Staff creates and publishes doctor schedule",
+    "preconditions": "User is PHC Staff",
+    "action_or_input": "Staff creates schedule and marks published",
+    "expected_result": "Schedule is saved with is_published=True and visible to patients",
+    "test_type": "functional_positive"
+  }
+]
