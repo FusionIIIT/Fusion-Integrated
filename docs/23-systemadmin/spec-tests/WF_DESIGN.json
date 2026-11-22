@@ -1,0 +1,218 @@
+[
+  {
+    "test_id": "TEST_WF_001",
+    "source_id": "BW-SA-01",
+    "purpose": "Verify complete approved purge basis path: retention expired -> purge request created -> IT Head approves -> permanently purged.",
+    "preconditions": "Archived historical record exists with retention_expiry_date in the past.",
+    "action_or_input": "Super Admin submits purge request; IT Head reviews and approves with comments.",
+    "expected_result": "Purge request status transitions from pending_it_head to approved/completed; target record permanently purged.",
+    "test_type": "workflow_basis_path"
+  },
+  {
+    "test_id": "TEST_WF_002",
+    "source_id": "BW-SA-02",
+    "purpose": "Verify complete rejected purge basis path: retention expired -> purge request created -> IT Head rejects -> data remains archived.",
+    "preconditions": "Archived historical record exists with retention_expiry_date in the past.",
+    "action_or_input": "Super Admin submits purge request; IT Head reviews and rejects with justification comments.",
+    "expected_result": "Purge request status transitions to rejected; target record remains preserved in archive database.",
+    "test_type": "workflow_basis_path"
+  },
+  {
+    "test_id": "TEST_WF_003",
+    "source_id": "CW-SA-01",
+    "purpose": "Verify composite purge lifecycle decision branch 2A (Approve path traversal).",
+    "preconditions": "Archived user or data retention period has elapsed.",
+    "action_or_input": "Super Admin creates purge request, IT Head submits decision='approve'.",
+    "expected_result": "Purge request executed and target data purged.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_004",
+    "source_id": "CW-SA-01",
+    "purpose": "Verify composite purge lifecycle decision branch 2B (Reject path traversal).",
+    "preconditions": "Archived record retention period elapsed.",
+    "action_or_input": "Super Admin creates purge request, IT Head submits decision='reject'.",
+    "expected_result": "Purge request rejected; archived record remains active in archive.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_005",
+    "source_id": "BW-SA-03",
+    "purpose": "Verify immediate time-bound role assignment to automatic expiry path traversal.",
+    "preconditions": "Basic user is active; role is valid and available.",
+    "action_or_input": "Super Admin assigns time-bound role effective immediately (start_date=today); system later executes role expiry on end_date.",
+    "expected_result": "Initial state is active; upon reaching end_date, assignment status transitions automatically to expired.",
+    "test_type": "workflow_basis_path"
+  },
+  {
+    "test_id": "TEST_WF_006",
+    "source_id": "BW-SA-04",
+    "purpose": "Verify future-dated role assignment lifecycle: scheduled -> automatic activation -> automatic expiry.",
+    "preconditions": "Basic user is active; role assignment parameters have future start date.",
+    "action_or_input": "Super Admin assigns role with future start date; system triggers activation on start_date, then expiry on end_date.",
+    "expected_result": "Status transitions from scheduled to active, and finally to expired.",
+    "test_type": "workflow_basis_path"
+  },
+  {
+    "test_id": "TEST_WF_007",
+    "source_id": "BW-SA-05",
+    "purpose": "Verify role validity extension workflow traversal: active -> extended validity -> expiry at new end date.",
+    "preconditions": "Role assignment is in active status nearing scheduled end date.",
+    "action_or_input": "Super Admin submits extension with approval reference and new future end date; system expires role at new end date.",
+    "expected_result": "Assignment status transitions to extended with updated end_date, and expires when new end date passes.",
+    "test_type": "workflow_basis_path"
+  },
+  {
+    "test_id": "TEST_WF_008",
+    "source_id": "CW-SA-02",
+    "purpose": "Verify composite role lifecycle branch A: immediate assignment progression to expiry.",
+    "preconditions": "User active, role available.",
+    "action_or_input": "Assign role with start_date=today, end_date=today+10; run expire_time_bound_roles after end_date.",
+    "expected_result": "Assignment enters active status, then transitions to expired.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_009",
+    "source_id": "CW-SA-02",
+    "purpose": "Verify composite role lifecycle branch B: future-dated assignment activation and expiry progression.",
+    "preconditions": "User active, role available.",
+    "action_or_input": "Assign role with start_date in future; run activate_scheduled_roles, then run expire_time_bound_roles after end_date.",
+    "expected_result": "Assignment transitions from scheduled to active to expired.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_010",
+    "source_id": "CW-SA-02",
+    "purpose": "Verify composite role lifecycle branch C: extension traversal prior to expiry.",
+    "preconditions": "Active role assignment nearing expiry.",
+    "action_or_input": "Super Admin extends role validity with approval reference; system verifies new end date.",
+    "expected_result": "Assignment status set to extended; expiry deferred until new end date.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_011",
+    "source_id": "CW-SA-02",
+    "purpose": "Verify composite role lifecycle branch D: early standard revocation with notice.",
+    "preconditions": "Active role assignment.",
+    "action_or_input": "Super Admin schedules standard revocation with effective_date=today+2 days and task disposition.",
+    "expected_result": "Role assignment status set to revoked, revocation timestamp and reason recorded.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_012",
+    "source_id": "CW-SA-02",
+    "purpose": "Verify composite role lifecycle branch E: emergency revocation immediate traversal.",
+    "preconditions": "Active role assignment.",
+    "action_or_input": "Super Admin executes revocation with is_emergency=True.",
+    "expected_result": "Role revoked immediately; permissions terminated.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_013",
+    "source_id": "CW-SA-02",
+    "purpose": "Verify composite role lifecycle branch F: reassignment with task handover.",
+    "preconditions": "Active role assignment held by User 1; User 2 active and eligible.",
+    "action_or_input": "Super Admin reassigns role to User 2 with pending_task_disposition='transfer'.",
+    "expected_result": "User 1 assignment marked reassigned with audit window; User 2 receives active assignment.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_014",
+    "source_id": "BW-SA-06",
+    "purpose": "Verify deactivated user reactivation basis path: active -> deactivated -> reactivated -> active.",
+    "preconditions": "User is active with baseline access.",
+    "action_or_input": "Super Admin deactivates user account; subsequently Super Admin reactivates account.",
+    "expected_result": "User status transitions from active to deactivated, then back to active with dashboard access restored.",
+    "test_type": "workflow_basis_path"
+  },
+  {
+    "test_id": "TEST_WF_015",
+    "source_id": "BW-SA-07",
+    "purpose": "Verify archived user restoration within reversible window: deactivated -> archived reversible -> restored active.",
+    "preconditions": "User is deactivated and past minimum deactivation interval.",
+    "action_or_input": "Super Admin archives user; later submits restoration within window with authorization reference.",
+    "expected_result": "Archival record created in reversible status; restoration successfully restores user to active status.",
+    "test_type": "workflow_basis_path"
+  },
+  {
+    "test_id": "TEST_WF_016",
+    "source_id": "BW-SA-08",
+    "purpose": "Verify archived user reversibility window expiry path: deactivated -> archived reversible -> window expires -> permanent non-restorable.",
+    "preconditions": "User is deactivated and archived.",
+    "action_or_input": "Archival reversible window passes; system triggers finalize_non_restorable_archived_users.",
+    "expected_result": "ArchivedUser record transitions from reversible to permanent_non_restorable status.",
+    "test_type": "workflow_basis_path"
+  },
+  {
+    "test_id": "TEST_WF_017",
+    "source_id": "CW-SA-03",
+    "purpose": "Verify composite lifecycle branch 1A: deactivated user direct reactivation path.",
+    "preconditions": "User in deactivated status.",
+    "action_or_input": "Super Admin invokes reactivate_user.",
+    "expected_result": "User status becomes active.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_018",
+    "source_id": "CW-SA-03",
+    "purpose": "Verify composite lifecycle branch 1B -> 2A: deactivated user archival followed by valid restoration.",
+    "preconditions": "User in deactivated status.",
+    "action_or_input": "Super Admin archives user, then restores user with authorization reference.",
+    "expected_result": "User restored to active status.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_019",
+    "source_id": "CW-SA-03",
+    "purpose": "Verify composite lifecycle branch 1B -> 2B: deactivated user archival followed by reversibility window expiry.",
+    "preconditions": "User in deactivated status.",
+    "action_or_input": "User archived; reversibility deadline passes; system finalizes non-restorable accounts.",
+    "expected_result": "Record status becomes permanent_non_restorable.",
+    "test_type": "workflow_composite_branch"
+  },
+  {
+    "test_id": "TEST_WF_020",
+    "source_id": "CW-SA-03",
+    "purpose": "Verify composite lifecycle guard condition: premature archival rejected when deactivation interval unelapsed.",
+    "preconditions": "User deactivated recently (unelapsed minimum interval).",
+    "action_or_input": "Super Admin attempts archival without bypass flag.",
+    "expected_result": "Transition rejected; user remains in deactivated state.",
+    "test_type": "workflow_guard_condition"
+  },
+  {
+    "test_id": "TEST_WF_021",
+    "source_id": "CW-SA-03",
+    "purpose": "Verify composite lifecycle guard condition: restoration rejected after reversible period expires.",
+    "preconditions": "Archived user record with expired reversibility deadline.",
+    "action_or_input": "Super Admin attempts restoration.",
+    "expected_result": "Restoration rejected; account remains non-restorable.",
+    "test_type": "workflow_guard_condition"
+  },
+  {
+    "test_id": "TEST_WF_022",
+    "source_id": "BW-SA-09",
+    "purpose": "Verify historical data archive and restore basis path: operational data -> archived with backup -> restored with approval.",
+    "preconditions": "Historical operational data meets retention/completion criteria.",
+    "action_or_input": "Super Admin archives historical data with mandatory backup; later restores historical data with approval reference.",
+    "expected_result": "Data archived successfully with backup reference; subsequent restoration transitions status to restored.",
+    "test_type": "workflow_basis_path"
+  },
+  {
+    "test_id": "TEST_WF_023",
+    "source_id": "BW-SA-09",
+    "purpose": "Verify historical archival guard condition: invalid date range rejects archival transition.",
+    "preconditions": "Date range end is earlier than date range start.",
+    "action_or_input": "Super Admin attempts historical data archival with inverted dates.",
+    "expected_result": "Transition rejected; no archived record created.",
+    "test_type": "workflow_guard_condition"
+  },
+  {
+    "test_id": "TEST_WF_024",
+    "source_id": "BW-SA-09",
+    "purpose": "Verify historical restoration guard condition: missing approval reference rejects restoration transition.",
+    "preconditions": "Historical data is in archived status.",
+    "action_or_input": "Super Admin attempts restoration with empty approval reference.",
+    "expected_result": "Transition rejected; historical record remains in archived status.",
+    "test_type": "workflow_guard_condition"
+  }
+]

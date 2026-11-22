@@ -1,0 +1,1055 @@
+[
+  {
+    "test_id": "TEST_UC_001",
+    "source_id": "UC-SA-001 Main Flow",
+    "purpose": "Verify UC-SA-001 (Create Basic User) main success flow: Create a Student, Faculty, or Staff basic user account with valid institutional identity data and initial access.",
+    "preconditions": "Super Admin is authenticated; required user data is available.",
+    "action_or_input": "Execute UC-SA-001 standard main flow with valid inputs: 1. Super Admin selects the basic user type. 2. Super Admin enters the required personal and institutional data. 3. System validates mandator",
+    "expected_result": "Basic user exists with dashboard access; audit evidence and welcome notification are generated.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_002",
+    "source_id": "UC-SA-001 Alternative A1",
+    "purpose": "Verify UC-SA-001 (Create Basic User) alternative path: Super Admin cancels before submission: no account is created.",
+    "preconditions": "Super Admin is authenticated; required user data is available.",
+    "action_or_input": "Trigger alternative flow: Super Admin cancels before submission: no account is created.",
+    "expected_result": "System handles alternative path safely conforming to: Super Admin cancels before submission: no account is created.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_003",
+    "source_id": "UC-SA-001 Alternative A2",
+    "purpose": "Verify UC-SA-001 (Create Basic User) alternative path: Correctable validation errors: system shows the errors and returns to data entry.",
+    "preconditions": "Super Admin is authenticated; required user data is available.",
+    "action_or_input": "Trigger alternative flow: Correctable validation errors: system shows the errors and returns to data entry.",
+    "expected_result": "System handles alternative path safely conforming to: Correctable validation errors: system shows the errors and returns to data entry.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_004",
+    "source_id": "UC-SA-001 Exception E1",
+    "purpose": "Verify UC-SA-001 (Create Basic User) exception flow: Duplicate Institute ID or duplicate identity: creation is rejected.",
+    "preconditions": "Super Admin is authenticated; required user data is available.",
+    "action_or_input": "Trigger exception condition: Duplicate Institute ID or duplicate identity: creation is rejected.",
+    "expected_result": "Operation rejected or handled safely: No invalid/duplicate account is created; submitted invalid data is not committed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_005",
+    "source_id": "UC-SA-001 Exception E2",
+    "purpose": "Verify UC-SA-001 (Create Basic User) exception flow: Notification failure after account creation: account remains created; delivery failure is logged for retry/attention.",
+    "preconditions": "Super Admin is authenticated; required user data is available.",
+    "action_or_input": "Trigger exception condition: Notification failure after account creation: account remains created; delivery failure is logged for retry/attention.",
+    "expected_result": "Operation rejected or handled safely: No invalid/duplicate account is created; submitted invalid data is not committed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_006",
+    "source_id": "UC-SA-002 Main Flow",
+    "purpose": "Verify UC-SA-002 (View User Profile) main success flow: View the user-profile information that the Super Admin is permitted to access.",
+    "preconditions": "Super Admin is authenticated; target user exists.",
+    "action_or_input": "Execute UC-SA-002 standard main flow with valid inputs: 1. Super Admin searches/selects a user. 2. System retrieves the permitted profile and lifecycle status/history summary. 3. System displays t",
+    "expected_result": "Permitted profile information is displayed.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_007",
+    "source_id": "UC-SA-002 Alternative A1",
+    "purpose": "Verify UC-SA-002 (View User Profile) alternative path: User is archived: system may route to the archived-user view while preserving read-only restrictions.",
+    "preconditions": "Super Admin is authenticated; target user exists.",
+    "action_or_input": "Trigger alternative flow: User is archived: system may route to the archived-user view while preserving read-only restrictions.",
+    "expected_result": "System handles alternative path safely conforming to: User is archived: system may route to the archived-user view while preserving read-only restrictions.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_008",
+    "source_id": "UC-SA-002 Exception E1",
+    "purpose": "Verify UC-SA-002 (View User Profile) exception flow: User not found or access is not permitted: system shows an appropriate message.",
+    "preconditions": "Super Admin is authenticated; target user exists.",
+    "action_or_input": "Trigger exception condition: User not found or access is not permitted: system shows an appropriate message.",
+    "expected_result": "Operation rejected or handled safely: No unauthorized operational content is disclosed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_009",
+    "source_id": "UC-SA-003 Main Flow",
+    "purpose": "Verify UC-SA-003 (Update User Profile) main success flow: Update editable user-profile information while preserving immutable identity fields and audit history.",
+    "preconditions": "Target user exists; Super Admin is authenticated.",
+    "action_or_input": "Execute UC-SA-003 standard main flow with valid inputs: 1. System displays editable profile fields and the non-editable Institute ID. 2. Super Admin changes permitted information and enters the re",
+    "expected_result": "Permitted profile fields are updated and audited.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_010",
+    "source_id": "UC-SA-003 Alternative A1",
+    "purpose": "Verify UC-SA-003 (Update User Profile) alternative path: Super Admin cancels: no changes are saved.",
+    "preconditions": "Target user exists; Super Admin is authenticated.",
+    "action_or_input": "Trigger alternative flow: Super Admin cancels: no changes are saved.",
+    "expected_result": "System handles alternative path safely conforming to: Super Admin cancels: no changes are saved.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_011",
+    "source_id": "UC-SA-003 Exception E1",
+    "purpose": "Verify UC-SA-003 (Update User Profile) exception flow: Attempt to change Institute ID: rejected.",
+    "preconditions": "Target user exists; Super Admin is authenticated.",
+    "action_or_input": "Trigger exception condition: Attempt to change Institute ID: rejected.",
+    "expected_result": "Operation rejected or handled safely: Original profile remains unchanged if validation fails.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_012",
+    "source_id": "UC-SA-003 Exception E2",
+    "purpose": "Verify UC-SA-003 (Update User Profile) exception flow: Invalid institute email/type-specific data: rejected with validation feedback.",
+    "preconditions": "Target user exists; Super Admin is authenticated.",
+    "action_or_input": "Trigger exception condition: Invalid institute email/type-specific data: rejected with validation feedback.",
+    "expected_result": "Operation rejected or handled safely: Original profile remains unchanged if validation fails.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_013",
+    "source_id": "UC-SA-004 Main Flow",
+    "purpose": "Verify UC-SA-004 (Deactivate User) main success flow: Deactivate an active user account and trigger the role/access consequences defined by policy.",
+    "preconditions": "Target user is active; Super Admin is authenticated.",
+    "action_or_input": "Execute UC-SA-004 standard main flow with valid inputs: 1. Super Admin selects an active user and provides the required reason/context. 2. System requests confirmation for the operation where desi",
+    "expected_result": "User is deactivated; effective role access is removed as required; status history and notification are recorded.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_014",
+    "source_id": "UC-SA-004 Alternative A1",
+    "purpose": "Verify UC-SA-004 (Deactivate User) alternative path: Super Admin cancels confirmation: status remains active.",
+    "preconditions": "Target user is active; Super Admin is authenticated.",
+    "action_or_input": "Trigger alternative flow: Super Admin cancels confirmation: status remains active.",
+    "expected_result": "System handles alternative path safely conforming to: Super Admin cancels confirmation: status remains active.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_015",
+    "source_id": "UC-SA-004 Exception E1",
+    "purpose": "Verify UC-SA-004 (Deactivate User) exception flow: Target is not in a deactivatable state: operation is rejected.",
+    "preconditions": "Target user is active; Super Admin is authenticated.",
+    "action_or_input": "Trigger exception condition: Target is not in a deactivatable state: operation is rejected.",
+    "expected_result": "Operation rejected or handled safely: No partial unauthorized status change remains.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_016",
+    "source_id": "UC-SA-005 Main Flow",
+    "purpose": "Verify UC-SA-005 (Reactivate User) main success flow: Return a previously deactivated user account to active status when reactivation is policy-allowed.",
+    "preconditions": "Target user is deactivated but not archived; reactivation is allowed by applicable policy.",
+    "action_or_input": "Execute UC-SA-005 standard main flow with valid inputs: 1. Super Admin selects the deactivated user. 2. System validates reactivation eligibility and current profile data. 3. Super Admin confirms ",
+    "expected_result": "User account is active with valid baseline access and auditable status history.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_017",
+    "source_id": "UC-SA-005 Alternative A1",
+    "purpose": "Verify UC-SA-005 (Reactivate User) alternative path: Profile information requires update before reactivation: system requests correction first.",
+    "preconditions": "Target user is deactivated but not archived; reactivation is allowed by applicable policy.",
+    "action_or_input": "Trigger alternative flow: Profile information requires update before reactivation: system requests correction first.",
+    "expected_result": "System handles alternative path safely conforming to: Profile information requires update before reactivation: system requests correction first.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_018",
+    "source_id": "UC-SA-005 Exception E1",
+    "purpose": "Verify UC-SA-005 (Reactivate User) exception flow: User is already archived or reactivation is outside policy: operation is rejected.",
+    "preconditions": "Target user is deactivated but not archived; reactivation is allowed by applicable policy.",
+    "action_or_input": "Trigger exception condition: User is already archived or reactivation is outside policy: operation is rejected.",
+    "expected_result": "Operation rejected or handled safely: Deactivated state is preserved on failure.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_019",
+    "source_id": "UC-SA-006 Main Flow",
+    "purpose": "Verify UC-SA-006 (Bulk Create Users) main success flow: Create multiple valid basic users from the approved CSV template.",
+    "preconditions": "Super Admin is authenticated; file follows the published template; record count does not exceed the configured hard limit.",
+    "action_or_input": "Execute UC-SA-006 standard main flow with valid inputs: 1. Super Admin uploads the CSV. 2. System validates file structure and record count. 3. System validates each record against user-creation r",
+    "expected_result": "Bulk operation completes with traceable per-record results, summary, and notification.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_020",
+    "source_id": "UC-SA-006 Alternative A1",
+    "purpose": "Verify UC-SA-006 (Bulk Create Users) alternative path: Record-level validation errors: invalid rows are identified before final processing.",
+    "preconditions": "Super Admin is authenticated; file follows the published template; record count does not exceed the configured hard limit.",
+    "action_or_input": "Trigger alternative flow: Record-level validation errors: invalid rows are identified before final processing.",
+    "expected_result": "System handles alternative path safely conforming to: Record-level validation errors: invalid rows are identified before final processing.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_021",
+    "source_id": "UC-SA-006 Alternative A2",
+    "purpose": "Verify UC-SA-006 (Bulk Create Users) alternative path: Super Admin cancels after preview: no confirmed processing occurs.",
+    "preconditions": "Super Admin is authenticated; file follows the published template; record count does not exceed the configured hard limit.",
+    "action_or_input": "Trigger alternative flow: Super Admin cancels after preview: no confirmed processing occurs.",
+    "expected_result": "System handles alternative path safely conforming to: Super Admin cancels after preview: no confirmed processing occurs.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_022",
+    "source_id": "UC-SA-006 Exception E1",
+    "purpose": "Verify UC-SA-006 (Bulk Create Users) exception flow: Invalid template/file: rejected.",
+    "preconditions": "Super Admin is authenticated; file follows the published template; record count does not exceed the configured hard limit.",
+    "action_or_input": "Trigger exception condition: Invalid template/file: rejected.",
+    "expected_result": "Operation rejected or handled safely: No unvalidated record is silently created.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_023",
+    "source_id": "UC-SA-006 Exception E2",
+    "purpose": "Verify UC-SA-006 (Bulk Create Users) exception flow: More than 1000 records: rejected or must be partitioned.",
+    "preconditions": "Super Admin is authenticated; file follows the published template; record count does not exceed the configured hard limit.",
+    "action_or_input": "Trigger exception condition: More than 1000 records: rejected or must be partitioned.",
+    "expected_result": "Operation rejected or handled safely: No unvalidated record is silently created.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_024",
+    "source_id": "UC-SA-006 Exception E3",
+    "purpose": "Verify UC-SA-006 (Bulk Create Users) exception flow: Processing service failure: committed rows and failed rows are reported accurately.",
+    "preconditions": "Super Admin is authenticated; file follows the published template; record count does not exceed the configured hard limit.",
+    "action_or_input": "Trigger exception condition: Processing service failure: committed rows and failed rows are reported accurately.",
+    "expected_result": "Operation rejected or handled safely: No unvalidated record is silently created.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_025",
+    "source_id": "UC-SA-007 Main Flow",
+    "purpose": "Verify UC-SA-007 (Bulk User Status Update) main success flow: Deactivate multiple users or apply another permitted bulk status update.",
+    "preconditions": "Selected users exist; operation is permitted; count does not exceed 1000.",
+    "action_or_input": "Execute UC-SA-007 standard main flow with valid inputs: 1. Super Admin selects the target users and status operation. 2. System validates record count and per-user eligibility. 3. System shows pre",
+    "expected_result": "Eligible status changes are completed and auditable; results are reported.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_026",
+    "source_id": "UC-SA-007 Alternative A1",
+    "purpose": "Verify UC-SA-007 (Bulk User Status Update) alternative path: Some targets are ineligible: system identifies them before execution.",
+    "preconditions": "Selected users exist; operation is permitted; count does not exceed 1000.",
+    "action_or_input": "Trigger alternative flow: Some targets are ineligible: system identifies them before execution.",
+    "expected_result": "System handles alternative path safely conforming to: Some targets are ineligible: system identifies them before execution.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_027",
+    "source_id": "UC-SA-007 Exception E1",
+    "purpose": "Verify UC-SA-007 (Bulk User Status Update) exception flow: Operation exceeds limit or is not a supported bulk status action: rejected.",
+    "preconditions": "Selected users exist; operation is permitted; count does not exceed 1000.",
+    "action_or_input": "Trigger exception condition: Operation exceeds limit or is not a supported bulk status action: rejected.",
+    "expected_result": "Operation rejected or handled safely: Ineligible users are not changed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_028",
+    "source_id": "UC-SA-008 Main Flow",
+    "purpose": "Verify UC-SA-008 (Assign Role) main success flow: Assign an additional role to a basic user subject to role metadata, eligibility, dating, singularity, and conflict rules.",
+    "preconditions": "Target user exists and is eligible to hold roles; role definition is available for assignment.",
+    "action_or_input": "Execute UC-SA-008 standard main flow with valid inputs: 1. Super Admin selects target user and role. 2. System displays role metadata and current availability. 3. Super Admin enters start date, en",
+    "expected_result": "Role assignment is recorded in the correct lifecycle state, with audit/history and notification.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_029",
+    "source_id": "UC-SA-008 Alternative A1",
+    "purpose": "Verify UC-SA-008 (Assign Role) alternative path: Future start date: assignment is recorded as scheduled and activates automatically later.",
+    "preconditions": "Target user exists and is eligible to hold roles; role definition is available for assignment.",
+    "action_or_input": "Trigger alternative flow: Future start date: assignment is recorded as scheduled and activates automatically later.",
+    "expected_result": "System handles alternative path safely conforming to: Future start date: assignment is recorded as scheduled and activates automatically later.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_030",
+    "source_id": "UC-SA-008 Alternative A2",
+    "purpose": "Verify UC-SA-008 (Assign Role) alternative path: Permanent role: end date may be omitted.",
+    "preconditions": "Target user exists and is eligible to hold roles; role definition is available for assignment.",
+    "action_or_input": "Trigger alternative flow: Permanent role: end date may be omitted.",
+    "expected_result": "System handles alternative path safely conforming to: Permanent role: end date may be omitted.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_031",
+    "source_id": "UC-SA-008 Exception E1",
+    "purpose": "Verify UC-SA-008 (Assign Role) exception flow: Ineligible user, occupied singular role, invalid dates, or configured conflict: assignment is rejected with reason.",
+    "preconditions": "Target user exists and is eligible to hold roles; role definition is available for assignment.",
+    "action_or_input": "Trigger exception condition: Ineligible user, occupied singular role, invalid dates, or configured conflict: assignment is rejected with reason.",
+    "expected_result": "Operation rejected or handled safely: Existing assignments remain unchanged on rejection.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_032",
+    "source_id": "UC-SA-009 Main Flow",
+    "purpose": "Verify UC-SA-009 (Reassign Role) main success flow: Transfer an existing role assignment to a new user with effective-date handover.",
+    "preconditions": "Existing assignment exists; new holder satisfies role eligibility and conflict rules.",
+    "action_or_input": "Execute UC-SA-009 standard main flow with valid inputs: 1. Super Admin selects the existing assignment and proposed new holder. 2. Super Admin enters effective date and reason; may choose emergenc",
+    "expected_result": "Role and pending-work ownership move to the new holder without overlapping singular-role authority; history is preserved.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_033",
+    "source_id": "UC-SA-009 Alternative A1",
+    "purpose": "Verify UC-SA-009 (Reassign Role) alternative path: Future-dated reassignment: handover is scheduled.",
+    "preconditions": "Existing assignment exists; new holder satisfies role eligibility and conflict rules.",
+    "action_or_input": "Trigger alternative flow: Future-dated reassignment: handover is scheduled.",
+    "expected_result": "System handles alternative path safely conforming to: Future-dated reassignment: handover is scheduled.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_034",
+    "source_id": "UC-SA-009 Alternative A2",
+    "purpose": "Verify UC-SA-009 (Reassign Role) alternative path: Emergency reassignment: effective date is immediate.",
+    "preconditions": "Existing assignment exists; new holder satisfies role eligibility and conflict rules.",
+    "action_or_input": "Trigger alternative flow: Emergency reassignment: effective date is immediate.",
+    "expected_result": "System handles alternative path safely conforming to: Emergency reassignment: effective date is immediate.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_035",
+    "source_id": "UC-SA-009 Exception E1",
+    "purpose": "Verify UC-SA-009 (Reassign Role) exception flow: New holder is ineligible/conflicting: reassignment is rejected.",
+    "preconditions": "Existing assignment exists; new holder satisfies role eligibility and conflict rules.",
+    "action_or_input": "Trigger exception condition: New holder is ineligible/conflicting: reassignment is rejected.",
+    "expected_result": "Operation rejected or handled safely: Existing assignment remains in force if validation fails.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_036",
+    "source_id": "UC-SA-010 Main Flow",
+    "purpose": "Verify UC-SA-010 (Revoke Role) main success flow: Remove a role before its scheduled end date with controlled effective date, reason, and pending-task handling.",
+    "preconditions": "Role assignment exists and is revocable.",
+    "action_or_input": "Execute UC-SA-010 standard main flow with valid inputs: 1. Super Admin selects the role assignment. 2. Super Admin chooses standard or emergency revocation, specifies effective date, mandatory rea",
+    "expected_result": "Role becomes revoked at the effective time; pending work is handled, history is retained, and notifications are sent.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_037",
+    "source_id": "UC-SA-010 Alternative A1",
+    "purpose": "Verify UC-SA-010 (Revoke Role) alternative path: Future standard revocation: scheduled until effective date.",
+    "preconditions": "Role assignment exists and is revocable.",
+    "action_or_input": "Trigger alternative flow: Future standard revocation: scheduled until effective date.",
+    "expected_result": "System handles alternative path safely conforming to: Future standard revocation: scheduled until effective date.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_038",
+    "source_id": "UC-SA-010 Alternative A2",
+    "purpose": "Verify UC-SA-010 (Revoke Role) alternative path: Emergency revocation: immediate and bypasses the standard notice period.",
+    "preconditions": "Role assignment exists and is revocable.",
+    "action_or_input": "Trigger alternative flow: Emergency revocation: immediate and bypasses the standard notice period.",
+    "expected_result": "System handles alternative path safely conforming to: Emergency revocation: immediate and bypasses the standard notice period.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_039",
+    "source_id": "UC-SA-010 Exception E1",
+    "purpose": "Verify UC-SA-010 (Revoke Role) exception flow: Standard revocation violates minimum notice: rejected or requires a compliant effective date.",
+    "preconditions": "Role assignment exists and is revocable.",
+    "action_or_input": "Trigger exception condition: Standard revocation violates minimum notice: rejected or requires a compliant effective date.",
+    "expected_result": "Operation rejected or handled safely: Role remains unchanged if the request is invalid.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_040",
+    "source_id": "UC-SA-011 Main Flow",
+    "purpose": "Verify UC-SA-011 (Extend Role Validity) main success flow: Extend the validity of a time-bound role before it expires.",
+    "preconditions": "Role is active and has an end date; new end date is later and otherwise valid.",
+    "action_or_input": "Execute UC-SA-011 standard main flow with valid inputs: 1. Super Admin opens the role assignment. 2. System displays current validity and history. 3. Super Admin enters new end date and reason. 4.",
+    "expected_result": "Role remains active through the new valid end date; change is audited and user notified.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_041",
+    "source_id": "UC-SA-011 Alternative A1",
+    "purpose": "Verify UC-SA-011 (Extend Role Validity) alternative path: Super Admin chooses no extension: role expires naturally under lifecycle rules.",
+    "preconditions": "Role is active and has an end date; new end date is later and otherwise valid.",
+    "action_or_input": "Trigger alternative flow: Super Admin chooses no extension: role expires naturally under lifecycle rules.",
+    "expected_result": "System handles alternative path safely conforming to: Super Admin chooses no extension: role expires naturally under lifecycle rules.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_042",
+    "source_id": "UC-SA-011 Exception E1",
+    "purpose": "Verify UC-SA-011 (Extend Role Validity) exception flow: Invalid new end date or conflict caused by extension: rejected.",
+    "preconditions": "Role is active and has an end date; new end date is later and otherwise valid.",
+    "action_or_input": "Trigger exception condition: Invalid new end date or conflict caused by extension: rejected.",
+    "expected_result": "Operation rejected or handled safely: Original end date remains on failure.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_043",
+    "source_id": "UC-SA-012 Main Flow",
+    "purpose": "Verify UC-SA-012 (View Role Metadata and Availability) main success flow: Inspect non-editable role definitions, availability, current assignment status, and role history.",
+    "preconditions": "Super Admin is authenticated.",
+    "action_or_input": "Execute UC-SA-012 standard main flow with valid inputs: 1. System lists role definitions and metadata. 2. Super Admin searches/filters roles including vacant roles. 3. System shows availability st",
+    "expected_result": "Role metadata and availability are displayed read-only.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_044",
+    "source_id": "UC-SA-012 Alternative A1",
+    "purpose": "Verify UC-SA-012 (View Role Metadata and Availability) alternative path: Deprecated or temporarily unavailable role: system displays its status but does not offer normal assignment.",
+    "preconditions": "Super Admin is authenticated.",
+    "action_or_input": "Trigger alternative flow: Deprecated or temporarily unavailable role: system displays its status but does not offer normal assignment.",
+    "expected_result": "System handles alternative path safely conforming to: Deprecated or temporarily unavailable role: system displays its status but does not offer normal assignment.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_045",
+    "source_id": "UC-SA-012 Exception E1",
+    "purpose": "Verify UC-SA-012 (View Role Metadata and Availability) exception flow: Role metadata service unavailable: system reports that the directory cannot be loaded.",
+    "preconditions": "Super Admin is authenticated.",
+    "action_or_input": "Trigger exception condition: Role metadata service unavailable: system reports that the directory cannot be loaded.",
+    "expected_result": "Operation rejected or handled safely: No role definition or permission set is modified.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_046",
+    "source_id": "UC-SA-013 Main Flow",
+    "purpose": "Verify UC-SA-013 (Switch Active Role) main success flow: Select which one of the user's assigned roles is active for the current session.",
+    "preconditions": "User has more than one assigned role; selected role is currently active/valid.",
+    "action_or_input": "Execute UC-SA-013 standard main flow with valid inputs: 1. System displays the user's currently valid assigned roles. 2. User selects a role. 3. System validates that the role remains active for t",
+    "expected_result": "Session active-role context is updated to a valid assigned role.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_047",
+    "source_id": "UC-SA-013 Alternative A1",
+    "purpose": "Verify UC-SA-013 (Switch Active Role) alternative path: User selects the already-active role: no material change is required.",
+    "preconditions": "User has more than one assigned role; selected role is currently active/valid.",
+    "action_or_input": "Trigger alternative flow: User selects the already-active role: no material change is required.",
+    "expected_result": "System handles alternative path safely conforming to: User selects the already-active role: no material change is required.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_048",
+    "source_id": "UC-SA-013 Exception E1",
+    "purpose": "Verify UC-SA-013 (Switch Active Role) exception flow: Selected role has expired/revoked since display: switch is denied and role list is refreshed.",
+    "preconditions": "User has more than one assigned role; selected role is currently active/valid.",
+    "action_or_input": "Trigger exception condition: Selected role has expired/revoked since display: switch is denied and role list is refreshed.",
+    "expected_result": "Operation rejected or handled safely: Existing active-role context remains if the switch fails.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_049",
+    "source_id": "UC-SA-014 Main Flow",
+    "purpose": "Verify UC-SA-014 (Access Module by Active Role) main success flow: Open only modules/resources permitted by the active role.",
+    "preconditions": "User is authenticated and has an active role context.",
+    "action_or_input": "Execute UC-SA-014 standard main flow with valid inputs: 1. User selects a module/resource. 2. System evaluates the active role's permission mapping. 3. If permitted, system opens the module in the",
+    "expected_result": "Authorized module access is granted only within active-role permissions.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_050",
+    "source_id": "UC-SA-014 Alternative A1",
+    "purpose": "Verify UC-SA-014 (Access Module by Active Role) alternative path: User may switch role and retry if another assigned role provides the required permission.",
+    "preconditions": "User is authenticated and has an active role context.",
+    "action_or_input": "Trigger alternative flow: User may switch role and retry if another assigned role provides the required permission.",
+    "expected_result": "System handles alternative path safely conforming to: User may switch role and retry if another assigned role provides the required permission.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_051",
+    "source_id": "UC-SA-014 Exception E1",
+    "purpose": "Verify UC-SA-014 (Access Module by Active Role) exception flow: Role becomes inactive during access check: deny access and refresh role context.",
+    "preconditions": "User is authenticated and has an active role context.",
+    "action_or_input": "Trigger exception condition: Role becomes inactive during access check: deny access and refresh role context.",
+    "expected_result": "Operation rejected or handled safely: Unauthorized module content is not disclosed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_052",
+    "source_id": "UC-SA-015 Main Flow",
+    "purpose": "Verify UC-SA-015 (Archive User) main success flow: Move an eligible deactivated user and allowed retained data into the archive.",
+    "preconditions": "Target user is deactivated; minimum deactivation interval has elapsed; no unresolved pending transaction blocks archival.",
+    "action_or_input": "Execute UC-SA-015 standard main flow with valid inputs: 1. Super Admin selects the user(s), archival date, reason, and allowed retention option. 2. System validates archival eligibility and depend",
+    "expected_result": "User is archived with access disabled and retained information preserved according to policy.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_053",
+    "source_id": "UC-SA-015 Alternative A1",
+    "purpose": "Verify UC-SA-015 (Archive User) alternative path: Multiple individually selected eligible users may be processed when the archive interface supports that selection.",
+    "preconditions": "Target user is deactivated; minimum deactivation interval has elapsed; no unresolved pending transaction blocks archival.",
+    "action_or_input": "Trigger alternative flow: Multiple individually selected eligible users may be processed when the archive interface supports that selection.",
+    "expected_result": "System handles alternative path safely conforming to: Multiple individually selected eligible users may be processed when the archive interface supports that selection.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_054",
+    "source_id": "UC-SA-015 Exception E1",
+    "purpose": "Verify UC-SA-015 (Archive User) exception flow: User is active, deactivation interval has not elapsed, or pending transaction exists: archival is rejected.",
+    "preconditions": "Target user is deactivated; minimum deactivation interval has elapsed; no unresolved pending transaction blocks archival.",
+    "action_or_input": "Trigger exception condition: User is active, deactivation interval has not elapsed, or pending transaction exists: archival is rejected.",
+    "expected_result": "Operation rejected or handled safely: No ineligible user is archived; no unauthorized data is exposed to the Super Admin.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_055",
+    "source_id": "UC-SA-015 Exception E2",
+    "purpose": "Verify UC-SA-015 (Archive User) exception flow: Archive storage failure: original data remains protected and failure is logged.",
+    "preconditions": "Target user is deactivated; minimum deactivation interval has elapsed; no unresolved pending transaction blocks archival.",
+    "action_or_input": "Trigger exception condition: Archive storage failure: original data remains protected and failure is logged.",
+    "expected_result": "Operation rejected or handled safely: No ineligible user is archived; no unauthorized data is exposed to the Super Admin.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_056",
+    "source_id": "UC-SA-016 Main Flow",
+    "purpose": "Verify UC-SA-016 (Archive Historical Data) main success flow: Archive eligible historical system data by category/date range without giving the Super Admin operational-content access.",
+    "preconditions": "Selected category is archive-enabled and retention/dependency metadata is available.",
+    "action_or_input": "Execute UC-SA-016 standard main flow with valid inputs: 1. Super Admin selects data category and date range. 2. System produces an allowed summary and dependency/eligibility assessment. 3. Super A",
+    "expected_result": "Eligible historical data is archived with backup and summary report; audit evidence is preserved.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_057",
+    "source_id": "UC-SA-016 Alternative A1",
+    "purpose": "Verify UC-SA-016 (Archive Historical Data) alternative path: Some records are ineligible: system excludes/identifies them according to archive policy and presents the impact before ",
+    "preconditions": "Selected category is archive-enabled and retention/dependency metadata is available.",
+    "action_or_input": "Trigger alternative flow: Some records are ineligible: system excludes/identifies them according to archive policy and presents the impact before confirmation.",
+    "expected_result": "System handles alternative path safely conforming to: Some records are ineligible: system excludes/identifies them according to archive policy and presents the impact before confirmation.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_058",
+    "source_id": "UC-SA-016 Exception E1",
+    "purpose": "Verify UC-SA-016 (Archive Historical Data) exception flow: Pending actions/dependencies block all selected data: archival does not proceed.",
+    "preconditions": "Selected category is archive-enabled and retention/dependency metadata is available.",
+    "action_or_input": "Trigger exception condition: Pending actions/dependencies block all selected data: archival does not proceed.",
+    "expected_result": "Operation rejected or handled safely: Active data and audit logs that are not eligible remain unchanged.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_059",
+    "source_id": "UC-SA-016 Exception E2",
+    "purpose": "Verify UC-SA-016 (Archive Historical Data) exception flow: Backup failure: archival is aborted.",
+    "preconditions": "Selected category is archive-enabled and retention/dependency metadata is available.",
+    "action_or_input": "Trigger exception condition: Backup failure: archival is aborted.",
+    "expected_result": "Operation rejected or handled safely: Active data and audit logs that are not eligible remain unchanged.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_060",
+    "source_id": "UC-SA-017 Main Flow",
+    "purpose": "Verify UC-SA-017 (Search and View Archived Records) main success flow: Locate and view permitted archived users/records in read-only form.",
+    "preconditions": "Archive query service is available; Super Admin is authenticated.",
+    "action_or_input": "Execute UC-SA-017 standard main flow with valid inputs: 1. Super Admin enters one or more supported criteria. 2. System searches archived records. 3. System returns permitted metadata/results with",
+    "expected_result": "Matching permitted archive records are displayed read-only.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_061",
+    "source_id": "UC-SA-017 Alternative A1",
+    "purpose": "Verify UC-SA-017 (Search and View Archived Records) alternative path: No matches: empty result set is shown.",
+    "preconditions": "Archive query service is available; Super Admin is authenticated.",
+    "action_or_input": "Trigger alternative flow: No matches: empty result set is shown.",
+    "expected_result": "System handles alternative path safely conforming to: No matches: empty result set is shown.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_062",
+    "source_id": "UC-SA-017 Exception E1",
+    "purpose": "Verify UC-SA-017 (Search and View Archived Records) exception flow: Query requests restricted operational content: system does not expose it.",
+    "preconditions": "Archive query service is available; Super Admin is authenticated.",
+    "action_or_input": "Trigger exception condition: Query requests restricted operational content: system does not expose it.",
+    "expected_result": "Operation rejected or handled safely: Archive content remains unmodified and restricted content undisclosed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_063",
+    "source_id": "UC-SA-018 Main Flow",
+    "purpose": "Verify UC-SA-018 (Restore Archived User) main success flow: Restore an archived user only within the policy-defined reversible period when required authorization exists.",
+    "preconditions": "User is within the configured reversible period; required authorization has been obtained/recorded. The reversible period has not expired.",
+    "action_or_input": "Execute UC-SA-018 standard main flow with valid inputs: 1. Super Admin selects the archived user. 2. System checks reversible-window eligibility and authorization evidence. 3. System shows the per",
+    "expected_result": "Eligible user is restored with auditable lifecycle transition.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_064",
+    "source_id": "UC-SA-018 Alternative A1",
+    "purpose": "Verify UC-SA-018 (Restore Archived User) alternative path: Restored account may require profile/status review before normal use.",
+    "preconditions": "User is within the configured reversible period; required authorization has been obtained/recorded. The reversible period has not expired.",
+    "action_or_input": "Trigger alternative flow: Restored account may require profile/status review before normal use.",
+    "expected_result": "System handles alternative path safely conforming to: Restored account may require profile/status review before normal use.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_065",
+    "source_id": "UC-SA-018 Exception E1",
+    "purpose": "Verify UC-SA-018 (Restore Archived User) exception flow: Required authorization is absent: reject.",
+    "preconditions": "User is within the configured reversible period; required authorization has been obtained/recorded. The reversible period has not expired.",
+    "action_or_input": "Trigger exception condition: Required authorization is absent: reject.",
+    "expected_result": "Operation rejected or handled safely: Archived state remains on failure. If the reversible period has elapsed, the account remains permanently archived and cannot be restored.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_066",
+    "source_id": "UC-SA-018 Exception E2",
+    "purpose": "Verify UC-SA-018 (Restore Archived User) exception flow: Reversible period has elapsed: reject restoration; the account remains permanently archived and non-restorable.",
+    "preconditions": "User is within the configured reversible period; required authorization has been obtained/recorded. The reversible period has not expired.",
+    "action_or_input": "Trigger exception condition: Reversible period has elapsed: reject restoration; the account remains permanently archived and non-restorable.",
+    "expected_result": "Operation rejected or handled safely: Archived state remains on failure. If the reversible period has elapsed, the account remains permanently archived and cannot be restored.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_067",
+    "source_id": "UC-SA-019 Main Flow",
+    "purpose": "Verify UC-SA-019 (Restore Archived Historical Data) main success flow: Restore archived historical data to the active system when the required approval exists.",
+    "preconditions": "Target archived data is restorable under policy and required approval is available.",
+    "action_or_input": "Execute UC-SA-019 standard main flow with valid inputs: 1. Super Admin selects the archived data set. 2. System validates retention/restoration rules and approval evidence. 3. System shows depende",
+    "expected_result": "Approved archived data is restored and auditable.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_068",
+    "source_id": "UC-SA-019 Alternative A1",
+    "purpose": "Verify UC-SA-019 (Restore Archived Historical Data) alternative path: Restore may be limited to an approved subset when policy permits.",
+    "preconditions": "Target archived data is restorable under policy and required approval is available.",
+    "action_or_input": "Trigger alternative flow: Restore may be limited to an approved subset when policy permits.",
+    "expected_result": "System handles alternative path safely conforming to: Restore may be limited to an approved subset when policy permits.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_069",
+    "source_id": "UC-SA-019 Exception E1",
+    "purpose": "Verify UC-SA-019 (Restore Archived Historical Data) exception flow: Approval missing or dependencies prevent restoration: operation is rejected.",
+    "preconditions": "Target archived data is restorable under policy and required approval is available.",
+    "action_or_input": "Trigger exception condition: Approval missing or dependencies prevent restoration: operation is rejected.",
+    "expected_result": "Operation rejected or handled safely: Archived data remains unchanged if restoration fails.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_070",
+    "source_id": "UC-SA-020 Main Flow",
+    "purpose": "Verify UC-SA-020 (Generate and Export Archive Report) main success flow: Generate reports from permitted archived data and export archive search/report results.",
+    "preconditions": "Permitted archive result set or report parameters are available.",
+    "action_or_input": "Execute UC-SA-020 standard main flow with valid inputs: 1. Super Admin chooses report/search criteria. 2. System generates a permitted read-only report. 3. Super Admin may export search/report res",
+    "expected_result": "Report/export is produced without altering archived records.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_071",
+    "source_id": "UC-SA-020 Alternative A1",
+    "purpose": "Verify UC-SA-020 (Generate and Export Archive Report) alternative path: Large result set: system applies supported batching/pagination.",
+    "preconditions": "Permitted archive result set or report parameters are available.",
+    "action_or_input": "Trigger alternative flow: Large result set: system applies supported batching/pagination.",
+    "expected_result": "System handles alternative path safely conforming to: Large result set: system applies supported batching/pagination.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_072",
+    "source_id": "UC-SA-020 Exception E1",
+    "purpose": "Verify UC-SA-020 (Generate and Export Archive Report) exception flow: Requested fields violate data-isolation policy: restricted fields are excluded/denied.",
+    "preconditions": "Permitted archive result set or report parameters are available.",
+    "action_or_input": "Trigger exception condition: Requested fields violate data-isolation policy: restricted fields are excluded/denied.",
+    "expected_result": "Operation rejected or handled safely: Archive remains unchanged and restricted content is not disclosed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_073",
+    "source_id": "UC-SA-021 Main Flow",
+    "purpose": "Verify UC-SA-021 (Export Archived Data for External Storage) main success flow: Create an authorized export package of archived data for external storage.",
+    "preconditions": "Target archive data is exportable under retention/access policy.",
+    "action_or_input": "Execute UC-SA-021 standard main flow with valid inputs: 1. Super Admin selects the archive set and export destination/package options allowed by policy. 2. System validates access and export eligi",
+    "expected_result": "Authorized export package is produced and audited.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_074",
+    "source_id": "UC-SA-021 Alternative A1",
+    "purpose": "Verify UC-SA-021 (Export Archived Data for External Storage) alternative path: Export is metadata-only where operational content is not permitted to the Super Admin.",
+    "preconditions": "Target archive data is exportable under retention/access policy.",
+    "action_or_input": "Trigger alternative flow: Export is metadata-only where operational content is not permitted to the Super Admin.",
+    "expected_result": "System handles alternative path safely conforming to: Export is metadata-only where operational content is not permitted to the Super Admin.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_075",
+    "source_id": "UC-SA-021 Exception E1",
+    "purpose": "Verify UC-SA-021 (Export Archived Data for External Storage) exception flow: Policy/access validation fails: export is rejected.",
+    "preconditions": "Target archive data is exportable under retention/access policy.",
+    "action_or_input": "Trigger exception condition: Policy/access validation fails: export is rejected.",
+    "expected_result": "Operation rejected or handled safely: No unauthorized content is exported through the Super Admin interface.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_076",
+    "source_id": "UC-SA-022 Main Flow",
+    "purpose": "Verify UC-SA-022 (Request Permanent Data Purge) main success flow: Request permanent purge of retention-expired archived data, initiating required dual authorization.",
+    "preconditions": "Target data is archived; applicable retention period has elapsed.",
+    "action_or_input": "Execute UC-SA-022 standard main flow with valid inputs: 1. Super Admin selects the archived data set. 2. System validates retention expiry and purge eligibility. 3. System shows the destructive-ac",
+    "expected_result": "A purge request exists pending IT Head decision; data remains archived.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_077",
+    "source_id": "UC-SA-022 Alternative A1",
+    "purpose": "Verify UC-SA-022 (Request Permanent Data Purge) alternative path: Super Admin cancels before submission: no request is created.",
+    "preconditions": "Target data is archived; applicable retention period has elapsed.",
+    "action_or_input": "Trigger alternative flow: Super Admin cancels before submission: no request is created.",
+    "expected_result": "System handles alternative path safely conforming to: Super Admin cancels before submission: no request is created.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_078",
+    "source_id": "UC-SA-022 Exception E1",
+    "purpose": "Verify UC-SA-022 (Request Permanent Data Purge) exception flow: Retention period has not elapsed: request is rejected.",
+    "preconditions": "Target data is archived; applicable retention period has elapsed.",
+    "action_or_input": "Trigger exception condition: Retention period has not elapsed: request is rejected.",
+    "expected_result": "Operation rejected or handled safely: No data is purged without the second authorization.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_079",
+    "source_id": "UC-SA-023 Main Flow",
+    "purpose": "Verify UC-SA-023 (Authorize Permanent Data Purge) main success flow: Approve or reject a pending permanent-purge request as the second required authorizer.",
+    "preconditions": "A valid purge request exists with recorded Super Admin authorization; IT Head is authenticated and authorized for this decision.",
+    "action_or_input": "Execute UC-SA-023 standard main flow with valid inputs: 1. IT Head reviews the purge request metadata and impact summary permitted by policy. 2. IT Head chooses Approve or Reject and records the d",
+    "expected_result": "Approved request results in permanent purge; rejected request leaves data archived; decision is auditable.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_080",
+    "source_id": "UC-SA-023 Alternative A1",
+    "purpose": "Verify UC-SA-023 (Authorize Permanent Data Purge) alternative path: IT Head requests no decision and exits: request remains pending.",
+    "preconditions": "A valid purge request exists with recorded Super Admin authorization; IT Head is authenticated and authorized for this decision.",
+    "action_or_input": "Trigger alternative flow: IT Head requests no decision and exits: request remains pending.",
+    "expected_result": "System handles alternative path safely conforming to: IT Head requests no decision and exits: request remains pending.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_081",
+    "source_id": "UC-SA-023 Exception E1",
+    "purpose": "Verify UC-SA-023 (Authorize Permanent Data Purge) exception flow: Request is no longer eligible or has already been decided: decision is rejected.",
+    "preconditions": "A valid purge request exists with recorded Super Admin authorization; IT Head is authenticated and authorized for this decision.",
+    "action_or_input": "Trigger exception condition: Request is no longer eligible or has already been decided: decision is rejected.",
+    "expected_result": "Operation rejected or handled safely: Archived data is never purged on an invalid/incomplete authorization path.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_082",
+    "source_id": "UC-SA-024 Main Flow",
+    "purpose": "Verify UC-SA-024 (View Audit Log) main success flow: Inspect immutable audit and activity-log entries with filters.",
+    "preconditions": "Super Admin is authenticated.",
+    "action_or_input": "Execute UC-SA-024 standard main flow with valid inputs: 1. System loads audit-log entries accessible to the Super Admin. 2. Super Admin applies supported filters/search criteria. 3. System display",
+    "expected_result": "Audit evidence is displayed read-only.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_083",
+    "source_id": "UC-SA-024 Alternative A1",
+    "purpose": "Verify UC-SA-024 (View Audit Log) alternative path: No matching entries: empty result set is shown.",
+    "preconditions": "Super Admin is authenticated.",
+    "action_or_input": "Trigger alternative flow: No matching entries: empty result set is shown.",
+    "expected_result": "System handles alternative path safely conforming to: No matching entries: empty result set is shown.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_084",
+    "source_id": "UC-SA-024 Exception E1",
+    "purpose": "Verify UC-SA-024 (View Audit Log) exception flow: Log service unavailable: system reports the failure without altering logs.",
+    "preconditions": "Super Admin is authenticated.",
+    "action_or_input": "Trigger exception condition: Log service unavailable: system reports the failure without altering logs.",
+    "expected_result": "Operation rejected or handled safely: No audit record is modified or deleted.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_085",
+    "source_id": "UC-SA-025 Main Flow",
+    "purpose": "Verify UC-SA-025 (Generate Audit Report) main success flow: Analyze permitted audit/activity information and produce configurable reports.",
+    "preconditions": "Audit/report data sources are available.",
+    "action_or_input": "Execute UC-SA-025 standard main flow with valid inputs: 1. Super Admin selects report type, date range, filters, and parameters. 2. System generates tabular and/or graphical results. 3. Super Admi",
+    "expected_result": "Requested permitted report is displayed/exported and audited.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_086",
+    "source_id": "UC-SA-025 Alternative A1",
+    "purpose": "Verify UC-SA-025 (Generate Audit Report) alternative path: No data for parameters: report is generated with no-result indication.",
+    "preconditions": "Audit/report data sources are available.",
+    "action_or_input": "Trigger alternative flow: No data for parameters: report is generated with no-result indication.",
+    "expected_result": "System handles alternative path safely conforming to: No data for parameters: report is generated with no-result indication.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_087",
+    "source_id": "UC-SA-025 Exception E1",
+    "purpose": "Verify UC-SA-025 (Generate Audit Report) exception flow: Requested report would expose prohibited operational content: restricted data is excluded/denied.",
+    "preconditions": "Audit/report data sources are available.",
+    "action_or_input": "Trigger exception condition: Requested report would expose prohibited operational content: restricted data is excluded/denied.",
+    "expected_result": "Operation rejected or handled safely: Audit source remains immutable.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_088",
+    "source_id": "UC-SA-026 Main Flow",
+    "purpose": "Verify UC-SA-026 (View Super Admin Dashboard) main success flow: View the dashboard metrics and near-real-time administrative/security indicators defined for the module.",
+    "preconditions": "Super Admin is authenticated; required metric sources are available.",
+    "action_or_input": "Execute UC-SA-026 standard main flow with valid inputs: 1. System aggregates user, role, expiry, recent operation, archive-volume, system-health, active-session, failed-login, and archive-operatio",
+    "expected_result": "Available dashboard metrics are displayed without operational-content leakage.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_089",
+    "source_id": "UC-SA-026 Alternative A1",
+    "purpose": "Verify UC-SA-026 (View Super Admin Dashboard) alternative path: A metric source is unavailable: system marks that metric unavailable/stale without fabricating a value.",
+    "preconditions": "Super Admin is authenticated; required metric sources are available.",
+    "action_or_input": "Trigger alternative flow: A metric source is unavailable: system marks that metric unavailable/stale without fabricating a value.",
+    "expected_result": "System handles alternative path safely conforming to: A metric source is unavailable: system marks that metric unavailable/stale without fabricating a value.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_090",
+    "source_id": "UC-SA-026 Exception E1",
+    "purpose": "Verify UC-SA-026 (View Super Admin Dashboard) exception flow: Dashboard service failure: system reports the failure.",
+    "preconditions": "Super Admin is authenticated; required metric sources are available.",
+    "action_or_input": "Trigger exception condition: Dashboard service failure: system reports the failure.",
+    "expected_result": "Operation rejected or handled safely: No restricted content is disclosed.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_091",
+    "source_id": "UC-SA-027 Main Flow",
+    "purpose": "Verify UC-SA-027 (Configure Permitted System Parameters) main success flow: Change only the limited system-wide parameters allocated to Super Admin control.",
+    "preconditions": "Super Admin is authenticated; selected parameter is within the permitted configuration set.",
+    "action_or_input": "Execute UC-SA-027 standard main flow with valid inputs: 1. System displays permitted parameters: password policy, session timeout, archival retention periods within policy limits, notification pre",
+    "expected_result": "Only permitted configuration is changed and audited.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_092",
+    "source_id": "UC-SA-027 Alternative A1",
+    "purpose": "Verify UC-SA-027 (Configure Permitted System Parameters) alternative path: Super Admin cancels: no configuration change is made.",
+    "preconditions": "Super Admin is authenticated; selected parameter is within the permitted configuration set.",
+    "action_or_input": "Trigger alternative flow: Super Admin cancels: no configuration change is made.",
+    "expected_result": "System handles alternative path safely conforming to: Super Admin cancels: no configuration change is made.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_093",
+    "source_id": "UC-SA-027 Exception E1",
+    "purpose": "Verify UC-SA-027 (Configure Permitted System Parameters) exception flow: Attempt to modify module-specific configuration, academic calendar/schedule, financial policy, or operational workflow: ",
+    "preconditions": "Super Admin is authenticated; selected parameter is within the permitted configuration set.",
+    "action_or_input": "Trigger exception condition: Attempt to modify module-specific configuration, academic calendar/schedule, financial policy, or operational workflow: denied.",
+    "expected_result": "Operation rejected or handled safely: Forbidden configuration remains unchanged.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_094",
+    "source_id": "UC-SA-027 Exception E2",
+    "purpose": "Verify UC-SA-027 (Configure Permitted System Parameters) exception flow: Value violates policy bounds: rejected.",
+    "preconditions": "Super Admin is authenticated; selected parameter is within the permitted configuration set.",
+    "action_or_input": "Trigger exception condition: Value violates policy bounds: rejected.",
+    "expected_result": "Operation rejected or handled safely: Forbidden configuration remains unchanged.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_095",
+    "source_id": "UC-SA-028 Main Flow",
+    "purpose": "Verify UC-SA-028 (Activate Scheduled Role Assignment) main success flow: Activate a valid future-dated role assignment automatically when its start date is reached.",
+    "preconditions": "A valid role assignment exists in Scheduled state; it has not been superseded by reassignment/revocation and the associated user remains eligible and active.",
+    "action_or_input": "Execute UC-SA-028 standard main flow with valid inputs: 1. The start-date event occurs. 2. System verifies that the scheduled assignment is still valid and not superseded. 3. System changes the as",
+    "expected_result": "Scheduled role becomes active at its start date with effective access and preserved history.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_096",
+    "source_id": "UC-SA-028 Alternative A1",
+    "purpose": "Verify UC-SA-028 (Activate Scheduled Role Assignment) alternative path: Assignment was superseded before the start date: no activation occurs; existing superseding state is preserved.",
+    "preconditions": "A valid role assignment exists in Scheduled state; it has not been superseded by reassignment/revocation and the associated user remains eligible and active.",
+    "action_or_input": "Trigger alternative flow: Assignment was superseded before the start date: no activation occurs; existing superseding state is preserved.",
+    "expected_result": "System handles alternative path safely conforming to: Assignment was superseded before the start date: no activation occurs; existing superseding state is preserved.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_097",
+    "source_id": "UC-SA-028 Exception E1",
+    "purpose": "Verify UC-SA-028 (Activate Scheduled Role Assignment) exception flow: Associated user is no longer eligible/active at activation time: system does not activate the assignment and records the",
+    "preconditions": "A valid role assignment exists in Scheduled state; it has not been superseded by reassignment/revocation and the associated user remains eligible and active.",
+    "action_or_input": "Trigger exception condition: Associated user is no longer eligible/active at activation time: system does not activate the assignment and records the failed transition for administrative attention.",
+    "expected_result": "Operation rejected or handled safely: No invalid or superseded scheduled assignment is activated.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_098",
+    "source_id": "UC-SA-029 Main Flow",
+    "purpose": "Verify UC-SA-029 (Expire Time-Bound Role) main success flow: Expire and inactivate a time-bound role automatically when its effective end date is reached.",
+    "preconditions": "Role assignment is active (including an extended assignment) and has not been superseded by reassignment or revocation.",
+    "action_or_input": "Execute UC-SA-029 standard main flow with valid inputs: 1. The end-date event occurs. 2. System verifies that the assignment is still active and the end date is current. 3. System changes the role",
+    "expected_result": "Time-bound role is inactive after its applicable end date; history and expiry notification are preserved.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_099",
+    "source_id": "UC-SA-029 Alternative A1",
+    "purpose": "Verify UC-SA-029 (Expire Time-Bound Role) alternative path: The role was validly extended before the original end date: system uses the revised end date and does not expire at the ",
+    "preconditions": "Role assignment is active (including an extended assignment) and has not been superseded by reassignment or revocation.",
+    "action_or_input": "Trigger alternative flow: The role was validly extended before the original end date: system uses the revised end date and does not expire at the superseded date.",
+    "expected_result": "System handles alternative path safely conforming to: The role was validly extended before the original end date: system uses the revised end date and does not expire at the superseded date.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_100",
+    "source_id": "UC-SA-029 Exception E1",
+    "purpose": "Verify UC-SA-029 (Expire Time-Bound Role) exception flow: Lifecycle update fails: role state is not silently changed; failure is logged for recovery/attention.",
+    "preconditions": "Role assignment is active (including an extended assignment) and has not been superseded by reassignment or revocation.",
+    "action_or_input": "Trigger exception condition: Lifecycle update fails: role state is not silently changed; failure is logged for recovery/attention.",
+    "expected_result": "Operation rejected or handled safely: No premature expiry occurs and prior history remains intact.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_101",
+    "source_id": "UC-SA-030 Main Flow",
+    "purpose": "Verify UC-SA-030 (Send Role-Expiry Reminder) main success flow: Notify the Super Admin and affected user when a time-bound role approaches expiration at the configured reminder lead time.",
+    "preconditions": "Role has a valid end date and remains active; reminder configuration is available.",
+    "action_or_input": "Execute UC-SA-030 standard main flow with valid inputs: 1. Reminder event is reached. 2. System verifies that the role is still active and approaching its current end date. 3. System sends the exp",
+    "expected_result": "Required recipients receive or have a traceable delivery attempt for the configured expiry reminder.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_102",
+    "source_id": "UC-SA-030 Alternative A1",
+    "purpose": "Verify UC-SA-030 (Send Role-Expiry Reminder) alternative path: End date was extended before reminder dispatch: system evaluates the current end date and suppresses an obsolete reminde",
+    "preconditions": "Role has a valid end date and remains active; reminder configuration is available.",
+    "action_or_input": "Trigger alternative flow: End date was extended before reminder dispatch: system evaluates the current end date and suppresses an obsolete reminder.",
+    "expected_result": "System handles alternative path safely conforming to: End date was extended before reminder dispatch: system evaluates the current end date and suppresses an obsolete reminder.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_103",
+    "source_id": "UC-SA-030 Exception E1",
+    "purpose": "Verify UC-SA-030 (Send Role-Expiry Reminder) exception flow: A delivery channel fails: role state is unchanged; failure is logged for retry/attention according to notification servi",
+    "preconditions": "Role has a valid end date and remains active; reminder configuration is available.",
+    "action_or_input": "Trigger exception condition: A delivery channel fails: role state is unchanged; failure is logged for retry/attention according to notification service behavior.",
+    "expected_result": "Operation rejected or handled safely: No role lifecycle state is changed by reminder failure.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_104",
+    "source_id": "UC-SA-031 Main Flow",
+    "purpose": "Verify UC-SA-031 (Finalize Archived User as Permanently Non-Restorable) main success flow: Apply the accepted archival policy when an archived user reaches the end of the configured reversible period.",
+    "preconditions": "User account is archived and remains within the reversible lifecycle until this event; no valid restoration completed before expiry.",
+    "action_or_input": "Execute UC-SA-031 standard main flow with valid inputs: 1. Reversible-period expiry event occurs. 2. System verifies that the user remains archived and has not been restored. 3. System marks the a",
+    "expected_result": "Archived account is permanently non-restorable after expiry of the reversible period.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_105",
+    "source_id": "UC-SA-031 Alternative A1",
+    "purpose": "Verify UC-SA-031 (Finalize Archived User as Permanently Non-Restorable) alternative path: User was validly restored before expiry: no permanent-archive transition occurs.",
+    "preconditions": "User account is archived and remains within the reversible lifecycle until this event; no valid restoration completed before expiry.",
+    "action_or_input": "Trigger alternative flow: User was validly restored before expiry: no permanent-archive transition occurs.",
+    "expected_result": "System handles alternative path safely conforming to: User was validly restored before expiry: no permanent-archive transition occurs.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_106",
+    "source_id": "UC-SA-031 Exception E1",
+    "purpose": "Verify UC-SA-031 (Finalize Archived User as Permanently Non-Restorable) exception flow: Lifecycle update cannot be committed: current archived state is preserved and failure is logged for recovery; restoratio",
+    "preconditions": "User account is archived and remains within the reversible lifecycle until this event; no valid restoration completed before expiry.",
+    "action_or_input": "Trigger exception condition: Lifecycle update cannot be committed: current archived state is preserved and failure is logged for recovery; restoration must not be enabled merely because the update failed.",
+    "expected_result": "Operation rejected or handled safely: Archived account is not incorrectly restored or made accessible.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_107",
+    "source_id": "UC-SA-032 Main Flow",
+    "purpose": "Verify UC-SA-032 (Process Failed-Login Threshold Alert) main success flow: Log failed Super Admin authentication attempts and trigger the required security alert when five consecutive failures are observed.",
+    "preconditions": "Authentication monitoring and notification channels are available.",
+    "action_or_input": "Execute UC-SA-032 standard main flow with valid inputs: 1. Failed-authentication event occurs. 2. System writes the failed-login audit event. 3. System evaluates the consecutive-failure count. 4. ",
+    "expected_result": "Every failed attempt is logged, and the fifth consecutive failure triggers a traceable security alert.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_108",
+    "source_id": "UC-SA-032 Alternative A1",
+    "purpose": "Verify UC-SA-032 (Process Failed-Login Threshold Alert) alternative path: Consecutive-failure count is below five: attempt is logged but no threshold alert is dispatched.",
+    "preconditions": "Authentication monitoring and notification channels are available.",
+    "action_or_input": "Trigger alternative flow: Consecutive-failure count is below five: attempt is logged but no threshold alert is dispatched.",
+    "expected_result": "System handles alternative path safely conforming to: Consecutive-failure count is below five: attempt is logged but no threshold alert is dispatched.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_109",
+    "source_id": "UC-SA-032 Exception E1",
+    "purpose": "Verify UC-SA-032 (Process Failed-Login Threshold Alert) exception flow: Notification delivery fails: failed-login evidence and alert state remain recorded; delivery failure is logged.",
+    "preconditions": "Authentication monitoring and notification channels are available.",
+    "action_or_input": "Trigger exception condition: Notification delivery fails: failed-login evidence and alert state remain recorded; delivery failure is logged.",
+    "expected_result": "Operation rejected or handled safely: Authentication failures are not silently discarded; no unsupported access is granted.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_110",
+    "source_id": "UC-SA-033 Main Flow",
+    "purpose": "Verify UC-SA-033 (Authenticate Super Admin and Establish Session) main success flow: Authenticate a Super Admin and establish at most one valid administrative session under the configured security controls.",
+    "preconditions": "Super Admin account exists and is eligible to authenticate; authentication services are available.",
+    "action_or_input": "Execute UC-SA-033 standard main flow with valid inputs: 1. Super Admin submits identity credentials. 2. System validates the configured strong-password policy and applies the optional IP-whitelist",
+    "expected_result": "Exactly one valid Super Admin session is established under configured authentication controls and session logging is preserved.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_111",
+    "source_id": "UC-SA-033 Alternative A1",
+    "purpose": "Verify UC-SA-033 (Authenticate Super Admin and Establish Session) alternative path: Password rotation is due: system requires a compliant password change before completing authentication.",
+    "preconditions": "Super Admin account exists and is eligible to authenticate; authentication services are available.",
+    "action_or_input": "Trigger alternative flow: Password rotation is due: system requires a compliant password change before completing authentication.",
+    "expected_result": "System handles alternative path safely conforming to: Password rotation is due: system requires a compliant password change before completing authentication.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_112",
+    "source_id": "UC-SA-033 Alternative A2",
+    "purpose": "Verify UC-SA-033 (Authenticate Super Admin and Establish Session) alternative path: Optional IP whitelist is disabled: no whitelist rejection is applied.",
+    "preconditions": "Super Admin account exists and is eligible to authenticate; authentication services are available.",
+    "action_or_input": "Trigger alternative flow: Optional IP whitelist is disabled: no whitelist rejection is applied.",
+    "expected_result": "System handles alternative path safely conforming to: Optional IP whitelist is disabled: no whitelist rejection is applied.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_113",
+    "source_id": "UC-SA-033 Exception E1",
+    "purpose": "Verify UC-SA-033 (Authenticate Super Admin and Establish Session) exception flow: Credential, IP-whitelist, or 2FA validation fails: no session is established and the failed authentication event is proc",
+    "preconditions": "Super Admin account exists and is eligible to authenticate; authentication services are available.",
+    "action_or_input": "Trigger exception condition: Credential, IP-whitelist, or 2FA validation fails: no session is established and the failed authentication event is processed by UC-SA-032.",
+    "expected_result": "Operation rejected or handled safely: No unauthorized or second concurrent Super Admin session is created; failed authentication evidence is retained.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_114",
+    "source_id": "UC-SA-033 Exception E2",
+    "purpose": "Verify UC-SA-033 (Authenticate Super Admin and Establish Session) exception flow: Another active Super Admin session would cause a second concurrent session: the new session is not established.",
+    "preconditions": "Super Admin account exists and is eligible to authenticate; authentication services are available.",
+    "action_or_input": "Trigger exception condition: Another active Super Admin session would cause a second concurrent session: the new session is not established.",
+    "expected_result": "Operation rejected or handled safely: No unauthorized or second concurrent Super Admin session is created; failed authentication evidence is retained.",
+    "test_type": "exception_flow"
+  },
+  {
+    "test_id": "TEST_UC_115",
+    "source_id": "UC-SA-034 Main Flow",
+    "purpose": "Verify UC-SA-034 (Terminate Inactive Super Admin Session) main success flow: Terminate an active Super Admin session automatically when the configured inactivity timeout is reached.",
+    "preconditions": "A Super Admin session is active and has remained inactive for the configured timeout duration.",
+    "action_or_input": "Execute UC-SA-034 standard main flow with valid inputs: 1. Inactivity-timeout event occurs. 2. System verifies that the session has not become active again and the current configured timeout is sa",
+    "expected_result": "Inactive Super Admin session is terminated at the configured timeout and the termination is auditable.",
+    "test_type": "main_flow"
+  },
+  {
+    "test_id": "TEST_UC_116",
+    "source_id": "UC-SA-034 Alternative A1",
+    "purpose": "Verify UC-SA-034 (Terminate Inactive Super Admin Session) alternative path: Valid activity occurs before timeout evaluation completes: session remains active and the inactivity timer is evaluated ",
+    "preconditions": "A Super Admin session is active and has remained inactive for the configured timeout duration.",
+    "action_or_input": "Trigger alternative flow: Valid activity occurs before timeout evaluation completes: session remains active and the inactivity timer is evaluated from the new activity point.",
+    "expected_result": "System handles alternative path safely conforming to: Valid activity occurs before timeout evaluation completes: session remains active and the inactivity timer is evaluated from the new activity point.",
+    "test_type": "alternative_flow"
+  },
+  {
+    "test_id": "TEST_UC_117",
+    "source_id": "UC-SA-034 Exception E1",
+    "purpose": "Verify UC-SA-034 (Terminate Inactive Super Admin Session) exception flow: Session-termination infrastructure fails: system must not silently treat the session as valid beyond policy; failure is ",
+    "preconditions": "A Super Admin session is active and has remained inactive for the configured timeout duration.",
+    "action_or_input": "Trigger exception condition: Session-termination infrastructure fails: system must not silently treat the session as valid beyond policy; failure is recorded for security recovery/attention.",
+    "expected_result": "Operation rejected or handled safely: No additional administrative access is granted because of timeout-processing failure.",
+    "test_type": "exception_flow"
+  }
+]

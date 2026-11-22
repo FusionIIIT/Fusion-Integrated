@@ -1,0 +1,614 @@
+[
+  {
+    "test_id": "TEST_BR_001",
+    "source_id": "BR-SA-001",
+    "purpose": "Verify creation of a basic user with a unique Institute ID is permitted.",
+    "preconditions": "Institute ID 'BR_USER_001' does not exist in Fusion.",
+    "action_or_input": "Super Admin submits user creation with institute_id='BR_USER_001', email='br_user_001@iiitdmj.ac.in', user_type='student'.",
+    "expected_result": "Account created successfully with unique Institute ID.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_002",
+    "source_id": "BR-SA-001",
+    "purpose": "Verify creation of a user with a duplicate Institute ID is prohibited.",
+    "preconditions": "A user with institute_id='BR_USER_DUP' already exists.",
+    "action_or_input": "Super Admin attempts to create another user with institute_id='BR_USER_DUP'.",
+    "expected_result": "Operation is rejected with duplicate ID error.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_003",
+    "source_id": "BR-SA-001",
+    "purpose": "Verify Institute ID immutability prohibits modification after user creation.",
+    "preconditions": "A user with institute_id='BR_IMMUTABLE_01' exists.",
+    "action_or_input": "Super Admin attempts to update the user's institute_id to 'BR_IMMUTABLE_MOD'.",
+    "expected_result": "Modification rejected or original Institute ID remains unchanged.",
+    "test_type": "security_boundary"
+  },
+  {
+    "test_id": "TEST_BR_004",
+    "source_id": "BR-SA-002",
+    "purpose": "Verify user creation with a valid institute domain email is permitted.",
+    "preconditions": "Email 'br_valid@iiitdmj.ac.in' is not yet registered.",
+    "action_or_input": "Super Admin submits user creation with institute_email='br_valid@iiitdmj.ac.in'.",
+    "expected_result": "Email validated and user account created successfully.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_005",
+    "source_id": "BR-SA-002",
+    "purpose": "Verify user creation with a non-institute domain email is prohibited.",
+    "preconditions": "Institute email validation policy active for @iiitdmj.ac.in.",
+    "action_or_input": "Super Admin submits user creation with institute_email='invalid_user@gmail.com'.",
+    "expected_result": "Operation rejected due to invalid non-institute email domain.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_006",
+    "source_id": "BR-SA-003",
+    "purpose": "Verify student creation with complete required programme and batch data is permitted.",
+    "preconditions": "Valid student parameters provided.",
+    "action_or_input": "Super Admin submits student creation with programme='B.Tech', batch_year=2026, department='CSE'.",
+    "expected_result": "Student account created successfully with required academic data.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_007",
+    "source_id": "BR-SA-003",
+    "purpose": "Verify student creation missing required programme or batch is prohibited.",
+    "preconditions": "Student profile data missing batch_year or programme.",
+    "action_or_input": "Super Admin submits student creation with programme='' or batch_year=None.",
+    "expected_result": "Creation rejected with missing required fields error.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_008",
+    "source_id": "BR-SA-003",
+    "purpose": "Verify faculty/staff creation missing required employee ID or department is prohibited.",
+    "preconditions": "Faculty profile data missing employee_id or department.",
+    "action_or_input": "Super Admin submits faculty creation with user_type='faculty' but employee_id=''.",
+    "expected_result": "Creation rejected with missing employee ID error.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_009",
+    "source_id": "BR-SA-004",
+    "purpose": "Verify archival of deactivated user past minimum deactivation interval is permitted.",
+    "preconditions": "User is deactivated and deactivation interval has elapsed.",
+    "action_or_input": "Super Admin initiates archival for the eligible deactivated user.",
+    "expected_result": "Archival succeeds, user status becomes archived.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_010",
+    "source_id": "BR-SA-004",
+    "purpose": "Verify archival of an active user is prohibited.",
+    "preconditions": "User has status='active'.",
+    "action_or_input": "Super Admin attempts to archive the active user.",
+    "expected_result": "Archival rejected because user is not deactivated.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_011",
+    "source_id": "BR-SA-004",
+    "purpose": "Verify archival of deactivated user before minimum interval has elapsed is prohibited.",
+    "preconditions": "User deactivated recently (less than configured minimum interval days).",
+    "action_or_input": "Super Admin attempts archival without bypass flag.",
+    "expected_result": "Archival rejected due to unelapsed minimum interval.",
+    "test_type": "boundary_condition"
+  },
+  {
+    "test_id": "TEST_BR_012",
+    "source_id": "BR-SA-005",
+    "purpose": "Verify restoration of archived user within reversible window with authorization is permitted.",
+    "preconditions": "Archived user record is in 'reversible' status within deadline.",
+    "action_or_input": "Super Admin submits restore with valid authorization reference.",
+    "expected_result": "User restored to active status with dashboard access restored.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_013",
+    "source_id": "BR-SA-005",
+    "purpose": "Verify restoration of archived user without authorization reference is prohibited.",
+    "preconditions": "Archived user record in 'reversible' status.",
+    "action_or_input": "Super Admin submits restore request with empty authorization reference.",
+    "expected_result": "Restoration rejected due to missing authorization reference.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_014",
+    "source_id": "BR-SA-005",
+    "purpose": "Verify restoration of archived user after reversibility deadline is prohibited (permanent).",
+    "preconditions": "Archived user whose reversibility deadline has passed.",
+    "action_or_input": "Super Admin attempts to restore expired archived user.",
+    "expected_result": "Restoration rejected; record marked permanent_non_restorable.",
+    "test_type": "boundary_condition"
+  },
+  {
+    "test_id": "TEST_BR_015",
+    "source_id": "BR-SA-006",
+    "purpose": "Verify a user can hold multiple compatible additional roles simultaneously.",
+    "preconditions": "User already holds an active non-singular role.",
+    "action_or_input": "Super Admin assigns a second non-singular, non-conflicting role to the same user.",
+    "expected_result": "Second role assigned successfully; user has two concurrent active roles.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_016",
+    "source_id": "BR-SA-007",
+    "purpose": "Verify singular role assignment is permitted when the role is vacant in that scope.",
+    "preconditions": "Singular role (e.g. Dean R&C) has no active holder.",
+    "action_or_input": "Super Admin assigns the singular role to an eligible faculty member.",
+    "expected_result": "Assignment succeeds; role becomes occupied.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_017",
+    "source_id": "BR-SA-007",
+    "purpose": "Verify singular role assignment is prohibited when already occupied by another user in same scope.",
+    "preconditions": "Singular role is currently actively held by User A in scope 'Institute'.",
+    "action_or_input": "Super Admin attempts to assign the same singular role to User B in scope 'Institute'.",
+    "expected_result": "Assignment rejected due to singular role occupancy conflict.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_018",
+    "source_id": "BR-SA-008",
+    "purpose": "Verify role assignment with valid start date and future end date is permitted.",
+    "preconditions": "Role parameters have start_date <= end_date.",
+    "action_or_input": "Super Admin assigns role with start_date=today, end_date=today+180 days.",
+    "expected_result": "Assignment created successfully.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_019",
+    "source_id": "BR-SA-008",
+    "purpose": "Verify role assignment with end date earlier than start date is prohibited.",
+    "preconditions": "Role parameters have end_date < start_date.",
+    "action_or_input": "Super Admin submits assignment with start_date=2026-06-01, end_date=2026-05-01.",
+    "expected_result": "Assignment rejected with invalid date range error.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_020",
+    "source_id": "BR-SA-009",
+    "purpose": "Verify scheduled role assignment automatically activates when start date is reached.",
+    "preconditions": "Assignment created in 'scheduled' status with start_date <= today.",
+    "action_or_input": "System runs activation check (RoleService.activate_scheduled_roles).",
+    "expected_result": "Assignment status transitions from 'scheduled' to 'active'.",
+    "test_type": "lifecycle_transition"
+  },
+  {
+    "test_id": "TEST_BR_021",
+    "source_id": "BR-SA-009",
+    "purpose": "Verify active role automatically expires when configured end date has passed.",
+    "preconditions": "Assignment has end_date in the past and status='active'.",
+    "action_or_input": "System runs expiry check (RoleService.expire_ended_roles).",
+    "expected_result": "Assignment status transitions to 'expired'.",
+    "test_type": "lifecycle_transition"
+  },
+  {
+    "test_id": "TEST_BR_022",
+    "source_id": "BR-SA-010",
+    "purpose": "Verify role assignment to an allowed user type is permitted.",
+    "preconditions": "Role allowed_user_types includes 'faculty'; user is faculty.",
+    "action_or_input": "Super Admin assigns the role to the faculty member.",
+    "expected_result": "Role assigned successfully without eligibility error.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_023",
+    "source_id": "BR-SA-010",
+    "purpose": "Verify role assignment to a prohibited user type is rejected.",
+    "preconditions": "Role allowed_user_types is ['faculty']; user is 'student'.",
+    "action_or_input": "Super Admin attempts to assign the faculty role to the student.",
+    "expected_result": "Assignment rejected due to user-type eligibility policy.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_024",
+    "source_id": "BR-SA-011",
+    "purpose": "Verify assignment of mutually compatible non-conflicting roles is permitted.",
+    "preconditions": "No conflict rule exists between Role A and Role B.",
+    "action_or_input": "Super Admin assigns Role B to a user already holding Role A.",
+    "expected_result": "Assignment succeeds.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_025",
+    "source_id": "BR-SA-011",
+    "purpose": "Verify assignment of mutually conflicting roles is prohibited.",
+    "preconditions": "RoleConflict configured between Role X and Role Y.",
+    "action_or_input": "Super Admin attempts to assign Role Y to a user actively holding Role X.",
+    "expected_result": "Assignment rejected due to separation-of-duties role conflict.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_026",
+    "source_id": "BR-SA-012",
+    "purpose": "Verify active role reassignment transfers tasks and updates previous and new holder statuses.",
+    "preconditions": "Role is actively held by User A; User B is eligible.",
+    "action_or_input": "Super Admin reassigns role to User B with disposition='transfer'.",
+    "expected_result": "New assignment created for User B; User A assignment marked reassigned.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_027",
+    "source_id": "BR-SA-012",
+    "purpose": "Verify reassigning an inactive or expired role assignment is prohibited.",
+    "preconditions": "Assignment has status='revoked' or 'expired'.",
+    "action_or_input": "Super Admin attempts to reassign the revoked assignment.",
+    "expected_result": "Reassignment rejected because assignment is not active.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_028",
+    "source_id": "BR-SA-013",
+    "purpose": "Verify previous holder retains read-only audit access during configured audit window.",
+    "preconditions": "Assignment was reassigned; audit_until date is in the future.",
+    "action_or_input": "System queries previous holder audit access window.",
+    "expected_result": "Audit access period is active until configured deadline.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_029",
+    "source_id": "BR-SA-013",
+    "purpose": "Verify previous holder audit access is terminated once configured audit period elapses.",
+    "preconditions": "Assignment previous_holder_audit_until date is in the past.",
+    "action_or_input": "System evaluates audit access eligibility for past holder.",
+    "expected_result": "Audit access is expired and no longer granted.",
+    "test_type": "boundary_condition"
+  },
+  {
+    "test_id": "TEST_BR_030",
+    "source_id": "BR-SA-014",
+    "purpose": "Verify standard role revocation with at least one day notice is permitted.",
+    "preconditions": "Role assignment is active.",
+    "action_or_input": "Super Admin schedules revocation with effective_date = today + 2 days and reason.",
+    "expected_result": "Revocation accepted and recorded with effective date.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_031",
+    "source_id": "BR-SA-014",
+    "purpose": "Verify emergency role revocation takes immediate effect without advance notice.",
+    "preconditions": "Role assignment is active.",
+    "action_or_input": "Super Admin submits revocation with is_emergency=True, effective_date=today.",
+    "expected_result": "Revocation takes immediate effect; assignment status set to revoked.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_032",
+    "source_id": "BR-SA-014",
+    "purpose": "Verify standard revocation with insufficient notice (< 1 day) is prohibited.",
+    "preconditions": "Role assignment is active; is_emergency=False.",
+    "action_or_input": "Super Admin submits standard revocation with effective_date <= today.",
+    "expected_result": "Revocation rejected due to insufficient notice period.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_033",
+    "source_id": "BR-SA-015",
+    "purpose": "Verify deactivation of a basic user automatically revokes all associated active roles.",
+    "preconditions": "User holds one or more active role assignments.",
+    "action_or_input": "Super Admin deactivates the user account.",
+    "expected_result": "User status becomes deactivated and all active role assignments are revoked.",
+    "test_type": "lifecycle_transition"
+  },
+  {
+    "test_id": "TEST_BR_034",
+    "source_id": "BR-SA-016",
+    "purpose": "Verify expiry reminders are sent when role expiry approaches within configured lead time.",
+    "preconditions": "Active role assignment has end_date within reminder threshold (e.g. 15 days).",
+    "action_or_input": "System executes send_expiry_reminders.",
+    "expected_result": "Notification created and sent to role holder.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_035",
+    "source_id": "BR-SA-016",
+    "purpose": "Verify role validity extension with valid approval reference and future end date is permitted.",
+    "preconditions": "Assignment is active and nearing expiry.",
+    "action_or_input": "Super Admin submits extension with new_end_date > current_end_date and approval_ref.",
+    "expected_result": "Role end date extended and history recorded.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_036",
+    "source_id": "BR-SA-016",
+    "purpose": "Verify role extension without approval reference or with non-future date is prohibited.",
+    "preconditions": "Assignment is active.",
+    "action_or_input": "Super Admin submits extension with empty approval_ref or new_end_date <= current_end_date.",
+    "expected_result": "Extension rejected with validation error.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_037",
+    "source_id": "BR-SA-017",
+    "purpose": "Verify archival of historical operational data satisfying retention-age criterion is permitted.",
+    "preconditions": "Data category exists and date range represents completed academic/operational periods.",
+    "action_or_input": "Super Admin archives historical data with valid date range and backup ref.",
+    "expected_result": "ArchivedHistoricalData record created in 'archived' status.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_038",
+    "source_id": "BR-SA-017",
+    "purpose": "Verify historical data archival with invalid reversed date range is prohibited.",
+    "preconditions": "Start date is after end date.",
+    "action_or_input": "Super Admin submits archival with date_range_end < date_range_start.",
+    "expected_result": "Archival rejected due to invalid date range.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_039",
+    "source_id": "BR-SA-018",
+    "purpose": "Verify a verified backup reference is created and associated prior to archival.",
+    "preconditions": "Historical data archival request submitted.",
+    "action_or_input": "Archival process completes successfully.",
+    "expected_result": "Archived data record has non-empty backup_reference and backup metadata.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_040",
+    "source_id": "BR-SA-019",
+    "purpose": "Verify retention expiry date is calculated and enforced based on retention policy years.",
+    "preconditions": "Archival request specifies retention_years=5.",
+    "action_or_input": "System creates ArchivedHistoricalData record.",
+    "expected_result": "retention_expiry_date is set to date_range_end + 5 years.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_041",
+    "source_id": "BR-SA-020",
+    "purpose": "Verify Super Admin can perform read-only searches and queries on archived records.",
+    "preconditions": "Archived records exist in the system.",
+    "action_or_input": "Super Admin executes search/filter on archival records endpoint.",
+    "expected_result": "Matching archived records returned in read-only format.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_042",
+    "source_id": "BR-SA-020",
+    "purpose": "Verify direct write modification on archived user records is prohibited.",
+    "preconditions": "Archived user record exists.",
+    "action_or_input": "System verifies archived records cannot be directly edited via standard user edit APIs.",
+    "expected_result": "User edit API rejects updating archived basic users.",
+    "test_type": "security_boundary"
+  },
+  {
+    "test_id": "TEST_BR_043",
+    "source_id": "BR-SA-021",
+    "purpose": "Verify permanent purge request is permitted after retention period has expired.",
+    "preconditions": "Archived record retention_expiry_date has passed.",
+    "action_or_input": "Super Admin submits purge request with regulatory authorization ref.",
+    "expected_result": "Purge request created in 'pending_authorization' status.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_044",
+    "source_id": "BR-SA-021",
+    "purpose": "Verify permanent purge request is prohibited before retention period has elapsed.",
+    "preconditions": "Archived record retention_expiry_date is in the future.",
+    "action_or_input": "Super Admin attempts to request permanent purge.",
+    "expected_result": "Purge request rejected because retention period has not expired.",
+    "test_type": "boundary_condition"
+  },
+  {
+    "test_id": "TEST_BR_045",
+    "source_id": "BR-SA-022",
+    "purpose": "Verify permanent purge execution is permitted upon valid administrative authorization.",
+    "preconditions": "Purge request is pending authorization.",
+    "action_or_input": "Authorized administrator submits approval decision with comments.",
+    "expected_result": "Purge request authorized and marked approved/completed.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_046",
+    "source_id": "BR-SA-022",
+    "purpose": "Verify permanent purge execution without authorization is prohibited.",
+    "preconditions": "Purge request has status='rejected' or is unauthorized.",
+    "action_or_input": "System attempts to execute purge on unauthorized request.",
+    "expected_result": "Execution rejected; target record is not deleted.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_047",
+    "source_id": "BR-SA-023",
+    "purpose": "Verify role assignment or revocation dispatches notification within specified timing policy.",
+    "preconditions": "Role assignment or revocation operation executed.",
+    "action_or_input": "System processes role lifecycle event.",
+    "expected_result": "Notification record created immediately in AdminNotification store.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_048",
+    "source_id": "BR-SA-024",
+    "purpose": "Verify failed login attempts are logged in SessionLog.",
+    "preconditions": "User submits incorrect password.",
+    "action_or_input": "SecurityService logs failed authentication event.",
+    "expected_result": "SessionLog entry created with is_successful=False.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_049",
+    "source_id": "BR-SA-024",
+    "purpose": "Verify five consecutive failed login attempts trigger high-severity security alert.",
+    "preconditions": "4 failed login attempts already recorded for user.",
+    "action_or_input": "5th consecutive failed login attempt is recorded.",
+    "expected_result": "SecurityAlert generated with alert_type='BRUTE_FORCE' / high severity.",
+    "test_type": "boundary_condition"
+  },
+  {
+    "test_id": "TEST_BR_050",
+    "source_id": "BR-SA-025",
+    "purpose": "Verify all Super Admin administrative actions generate permanent audit records.",
+    "preconditions": "Super Admin executes an auditable action.",
+    "action_or_input": "AuditService.log_action is executed.",
+    "expected_result": "SystemAdminAuditLog record persisted with action, actor, timestamp.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_051",
+    "source_id": "BR-SA-025",
+    "purpose": "Verify audit log records cannot be modified or deleted via administrative APIs.",
+    "preconditions": "Audit log records exist.",
+    "action_or_input": "System checks that no update/delete endpoint is exposed for audit logs.",
+    "expected_result": "Audit logs remain immutable and permanently retained.",
+    "test_type": "security_boundary"
+  },
+  {
+    "test_id": "TEST_BR_052",
+    "source_id": "BR-SA-026",
+    "purpose": "Verify Super Admin accesses administrative metadata without exposing isolated module payloads.",
+    "preconditions": "Super Admin queries administrative views.",
+    "action_or_input": "Super Admin fetches user profiles, role definitions, and system metrics.",
+    "expected_result": "Administrative metadata returned correctly without unauthorized cross-module data.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_053",
+    "source_id": "BR-SA-026",
+    "purpose": "Verify Super Admin role does not automatically grant unrestricted access to departmental academic data.",
+    "preconditions": "System Admin module permissions configured.",
+    "action_or_input": "Super Admin attempts to query unauthorized operational endpoints without module role.",
+    "expected_result": "Access governed strictly by explicit permissions in session.",
+    "test_type": "security_boundary"
+  },
+  {
+    "test_id": "TEST_BR_054",
+    "source_id": "BR-SA-027",
+    "purpose": "Verify valid Super Admin session creation and termination upon logout.",
+    "preconditions": "Super Admin credentials valid.",
+    "action_or_input": "Session started, then terminated via logout.",
+    "expected_result": "SessionLog updated with logout_time and status.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_055",
+    "source_id": "BR-SA-027",
+    "purpose": "Verify concurrent session control policy terminates or rejects conflicting active sessions.",
+    "preconditions": "Active session already exists for Super Admin.",
+    "action_or_input": "SecurityService checks single active session policy.",
+    "expected_result": "Single active session constraint enforced or prior session invalidated.",
+    "test_type": "security_boundary"
+  },
+  {
+    "test_id": "TEST_BR_056",
+    "source_id": "BR-SA-028",
+    "purpose": "Verify Super Admin attempting to revoke or modify own Super Admin status is prohibited.",
+    "preconditions": "Super Admin is logged in as 'superadmin'.",
+    "action_or_input": "Super Admin attempts to revoke or de-escalate own Super Admin role assignment.",
+    "expected_result": "Self-modification rejected with prohibited action error.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_057",
+    "source_id": "BR-SA-029",
+    "purpose": "Verify critical operation executes successfully when valid reauthentication token is provided.",
+    "preconditions": "Critical operation requires confirmation token; valid token provided.",
+    "action_or_input": "Super Admin invokes critical operation with valid confirmation_token.",
+    "expected_result": "Reauthentication verified; critical operation proceeds.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_058",
+    "source_id": "BR-SA-029",
+    "purpose": "Verify critical operation is rejected when reauthentication token is invalid or missing.",
+    "preconditions": "Critical operation requires confirmation token.",
+    "action_or_input": "Super Admin invokes critical operation with invalid confirmation_token='bad_token'.",
+    "expected_result": "Operation rejected due to reauthentication failure.",
+    "test_type": "negative_functional"
+  },
+  {
+    "test_id": "TEST_BR_059",
+    "source_id": "BR-SA-030",
+    "purpose": "Verify bulk user operation within maximum threshold (<= 1000 records) is permitted.",
+    "preconditions": "List of 5 user records submitted for bulk creation.",
+    "action_or_input": "Super Admin submits bulk user creation with count <= 1000.",
+    "expected_result": "Bulk creation accepted and processed.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_060",
+    "source_id": "BR-SA-030",
+    "purpose": "Verify bulk operation exceeding maximum threshold (> 1000 records) is prohibited.",
+    "preconditions": "Bulk payload containing 1001 user records.",
+    "action_or_input": "Super Admin submits bulk operation exceeding 1000 limit.",
+    "expected_result": "Bulk operation rejected with limit exceeded error.",
+    "test_type": "boundary_condition"
+  },
+  {
+    "test_id": "TEST_BR_061",
+    "source_id": "BR-SA-031",
+    "purpose": "Verify password within configured rotation period permits normal authentication.",
+    "preconditions": "Super Admin password set 10 days ago (rotation interval is 90 days).",
+    "action_or_input": "System evaluates password age.",
+    "expected_result": "Password recognized as valid and not expired.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_062",
+    "source_id": "BR-SA-031",
+    "purpose": "Verify password exceeding rotation period requires password change.",
+    "preconditions": "Super Admin password age exceeds configured max_rotation_days.",
+    "action_or_input": "System checks password expiration policy.",
+    "expected_result": "Password flagged as expired; rotation required.",
+    "test_type": "boundary_condition"
+  },
+  {
+    "test_id": "TEST_BR_063",
+    "source_id": "BR-SA-032",
+    "purpose": "Verify in-system and email notifications are dispatched for supported administrative events.",
+    "preconditions": "User lifecycle or role event triggered.",
+    "action_or_input": "NotificationService.send_notification called with channel='in_system'.",
+    "expected_result": "Notification saved with correct channel and recipient.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_064",
+    "source_id": "BR-SA-033",
+    "purpose": "Verify audit log entries capture mandatory schema fields (timestamp, actor, action, result).",
+    "preconditions": "Administrative operation performed.",
+    "action_or_input": "System queries logged audit record.",
+    "expected_result": "Audit log entry contains non-empty timestamp, actor_username, action, and result.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_065",
+    "source_id": "BR-SA-034",
+    "purpose": "Verify selecting an active assigned role enforces associated module permissions.",
+    "preconditions": "User holds active role with 'systemadmin.user.view' permission.",
+    "action_or_input": "User accesses user view endpoint with active role session.",
+    "expected_result": "Access granted with HTTP 200.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_066",
+    "source_id": "BR-SA-034",
+    "purpose": "Verify selecting an inactive or revoked role denies module access.",
+    "preconditions": "User role is in 'revoked' or 'expired' status without valid active permissions.",
+    "action_or_input": "User attempts to perform administrative action.",
+    "expected_result": "Access denied with HTTP 403 Forbidden.",
+    "test_type": "security_boundary"
+  },
+  {
+    "test_id": "TEST_BR_067",
+    "source_id": "BR-SA-035",
+    "purpose": "Verify updating permitted administrative configuration keys is allowed.",
+    "preconditions": "Key is in permitted set (e.g. session_timeout_minutes, archival_reversible_window_days).",
+    "action_or_input": "Super Admin updates 'session_timeout_minutes' with valid value within policy bounds.",
+    "expected_result": "Configuration updated successfully and logged.",
+    "test_type": "positive_functional"
+  },
+  {
+    "test_id": "TEST_BR_068",
+    "source_id": "BR-SA-035",
+    "purpose": "Verify attempting to modify disallowed operational or academic configuration is prohibited.",
+    "preconditions": "Configuration key is outside permitted administrative boundary (e.g. academic_grading_scale).",
+    "action_or_input": "Super Admin attempts to set an unauthorized configuration parameter.",
+    "expected_result": "Update rejected as outside permitted configuration boundary.",
+    "test_type": "negative_functional"
+  }
+]

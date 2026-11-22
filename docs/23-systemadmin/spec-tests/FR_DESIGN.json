@@ -1,0 +1,1028 @@
+[
+  {
+    "test_id": "TEST_FR_001",
+    "source_id": "AFR-SA-001",
+    "purpose": "Verify authenticated Super Admin can create basic user account of type Student, Faculty, and Staff",
+    "preconditions": "Super Admin is authenticated with valid administrative session",
+    "action_or_input": "Submit user creation requests for each user type (Student, Faculty, Staff) with valid institutional details",
+    "expected_result": "Basic user account is created successfully for each user type with active status and baseline role",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_002",
+    "source_id": "AFR-SA-002",
+    "purpose": "Verify system captures all required profile data: user type, name, institute email, contact number, Institute ID, department/program, date of joining, and expected completion/retirement date",
+    "preconditions": "Super Admin is authenticated",
+    "action_or_input": "Create user providing all mandatory personal and institutional profile fields",
+    "expected_result": "User record is persisted with all profile attributes accurately captured",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_003",
+    "source_id": "AFR-SA-003A-valid",
+    "purpose": "Verify system validates Institute ID uniqueness across Fusion on creation with a new unique ID",
+    "preconditions": "Institute ID 'STUD001' does not exist in Fusion",
+    "action_or_input": "Create user with Institute ID 'STUD001'",
+    "expected_result": "User account created successfully with unique Institute ID",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_004",
+    "source_id": "AFR-SA-003A-duplicate",
+    "purpose": "Verify system rejects user creation or update when Institute ID is already in use (uniqueness violation)",
+    "preconditions": "User with Institute ID 'STUD001' already exists in the system",
+    "action_or_input": "Attempt to create a second user with the same Institute ID 'STUD001'",
+    "expected_result": "Creation rejected with uniqueness validation error",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST_FR_005",
+    "source_id": "AFR-SA-003B",
+    "purpose": "Verify system prevents Institute ID from being modified after account creation",
+    "preconditions": "User exists with Institute ID 'FAC001'",
+    "action_or_input": "Submit update request attempting to change Institute ID from 'FAC001' to 'FAC002'",
+    "expected_result": "Update rejected or immutable field ignored; Institute ID remains unchanged as 'FAC001'",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST_FR_006",
+    "source_id": "AFR-SA-004-valid",
+    "purpose": "Verify system accepts valid institute email address format for user account",
+    "preconditions": "Super Admin is authenticated",
+    "action_or_input": "Create user with institute domain email 'testuser@iiitdmj.ac.in'",
+    "expected_result": "Account successfully created with valid institute email",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_007",
+    "source_id": "AFR-SA-004-invalid",
+    "purpose": "Verify system rejects non-institute email domain for user account",
+    "preconditions": "Super Admin is authenticated",
+    "action_or_input": "Attempt to create user with external domain email 'user@gmail.com'",
+    "expected_result": "Creation rejected with email validation error",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST_FR_008",
+    "source_id": "AFR-SA-005",
+    "purpose": "Verify system prevents duplicate user creation through identity validation checks",
+    "preconditions": "User with identical institute email or identity attributes already exists",
+    "action_or_input": "Submit user creation with identical identity data",
+    "expected_result": "Creation rejected due to duplicate identity validation",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST_FR_009",
+    "source_id": "AFR-SA-006",
+    "purpose": "Verify unique internal user ID is automatically generated upon user creation",
+    "preconditions": "Super Admin creates two new distinct users",
+    "action_or_input": "Create User A and User B successfully",
+    "expected_result": "Both users are assigned distinct, non-null internal identifiers (primary keys / UUIDs)",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_010",
+    "source_id": "AFR-SA-007",
+    "purpose": "Verify initial login credentials are generated securely upon successful user creation",
+    "preconditions": "Super Admin creates new user",
+    "action_or_input": "Execute user creation service",
+    "expected_result": "Initial credentials are created, password is stored hashed, and temporary credential flag is set",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_011",
+    "source_id": "AFR-SA-008",
+    "purpose": "Verify baseline dashboard access is enabled for newly created basic user",
+    "preconditions": "User is created successfully",
+    "action_or_input": "Inspect user access state and default dashboard permission",
+    "expected_result": "Basic user is enabled with baseline dashboard access permissions",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_012",
+    "source_id": "AFR-SA-009",
+    "purpose": "Verify welcome notification is triggered with credential instructions and links",
+    "preconditions": "Notification service is active",
+    "action_or_input": "Create new basic user",
+    "expected_result": "Welcome notification record is generated with login instructions and credential reference",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_013",
+    "source_id": "AFR-SA-010",
+    "purpose": "Verify Super Admin can view permitted complete profile of a basic user",
+    "preconditions": "Basic user exists with profile data populated",
+    "action_or_input": "Super Admin queries basic user profile by ID",
+    "expected_result": "Full permitted profile fields (name, email, phone, user type, department, dates) are returned",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_014",
+    "source_id": "AFR-SA-011",
+    "purpose": "Verify Super Admin can update editable profile fields other than Institute ID",
+    "preconditions": "Basic user exists",
+    "action_or_input": "Super Admin updates user's contact number and department/program",
+    "expected_result": "Editable fields are updated successfully in database",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_015",
+    "source_id": "AFR-SA-012",
+    "purpose": "Verify Super Admin can deactivate an active user account",
+    "preconditions": "User account is currently active",
+    "action_or_input": "Super Admin executes user deactivation with a mandatory reason",
+    "expected_result": "User status transitions to deactivated; user cannot log in",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_016",
+    "source_id": "AFR-SA-013",
+    "purpose": "Verify Super Admin can reactivate a previously deactivated user account when policy permits",
+    "preconditions": "User account is deactivated and not archived",
+    "action_or_input": "Super Admin executes user reactivation with reason",
+    "expected_result": "User status transitions back to active; login access is restored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_017",
+    "source_id": "AFR-SA-014",
+    "purpose": "Verify audit trail of user profile and status changes is recorded with timestamp, context, and actor",
+    "preconditions": "User profile or status is modified by Super Admin",
+    "action_or_input": "Execute profile update and status transition",
+    "expected_result": "Audit log entries exist detailing the actor, target user, action, timestamp, and field diff",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_018",
+    "source_id": "AFR-SA-015",
+    "purpose": "Verify Super Admin can create multiple users in bulk from predefined CSV template",
+    "preconditions": "Valid CSV payload containing multiple unique user records",
+    "action_or_input": "Submit bulk user creation request with valid CSV rows",
+    "expected_result": "All valid users in CSV are created and accounts activated",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_019",
+    "source_id": "AFR-SA-016",
+    "purpose": "Verify Super Admin can deactivate multiple users in one bulk operation",
+    "preconditions": "Multiple active users exist",
+    "action_or_input": "Submit bulk deactivation request with list of user IDs and reason",
+    "expected_result": "All specified users transition to deactivated status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_020",
+    "source_id": "AFR-SA-017",
+    "purpose": "Verify Super Admin can perform permitted bulk status updates across multiple users",
+    "preconditions": "Multiple deactivated users exist",
+    "action_or_input": "Submit bulk reactivation request for specified deactivated users",
+    "expected_result": "Eligible users in the batch have their status updated",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_021",
+    "source_id": "AFR-SA-018A",
+    "purpose": "Verify system validates template format/structure before processing bulk operation",
+    "preconditions": "Malformed CSV file or missing required headers submitted",
+    "action_or_input": "Submit malformed bulk payload",
+    "expected_result": "Bulk operation rejected at validation stage before database modification",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST_FR_022",
+    "source_id": "AFR-SA-018B",
+    "purpose": "Verify system validates individual records in bulk batch and identifies invalid entries",
+    "preconditions": "Bulk batch contains mix of valid rows and one row with duplicate email",
+    "action_or_input": "Submit bulk operation with mixed valid/invalid rows",
+    "expected_result": "Invalid record is flagged with error reason; batch reports per-row validation outcome",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST_FR_023",
+    "source_id": "AFR-SA-019A",
+    "purpose": "Verify bulk user operation produces an accurate success/failure summary count",
+    "preconditions": "Batch processed with 2 valid and 1 invalid record",
+    "action_or_input": "Execute bulk operation and inspect response summary",
+    "expected_result": "Summary accurately states total=3, success=2, failure=1",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_024",
+    "source_id": "AFR-SA-019B",
+    "purpose": "Verify bulk user operation generates a detailed processing log with per-record results",
+    "preconditions": "Bulk operation executed",
+    "action_or_input": "Inspect generated bulk processing log",
+    "expected_result": "Log contains line-by-line item status, error messages for failures, and target identifiers",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_025",
+    "source_id": "AFR-SA-020",
+    "purpose": "Verify Super Admin is notified upon completion of bulk user operation",
+    "preconditions": "Super Admin submits bulk job",
+    "action_or_input": "Process bulk operation to completion",
+    "expected_result": "Notification generated for Super Admin with batch summary metrics",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_026",
+    "source_id": "AFR-SA-078",
+    "purpose": "Verify bulk operation enforces maximum boundary limit of 1000 records",
+    "preconditions": "Super Admin submits batch exceeding 1000 records",
+    "action_or_input": "Submit bulk operation with 1001 user records",
+    "expected_result": "Operation rejected because batch size exceeds the 1000 records boundary limit",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST_FR_027",
+    "source_id": "AFR-SA-021",
+    "purpose": "Verify Super Admin has read-only access to available role definitions and assignment metadata",
+    "preconditions": "System roles are defined with metadata (eligibility, singularity, validity, permissions)",
+    "action_or_input": "Query role definition catalog",
+    "expected_result": "Role definitions returned with all required metadata; modification endpoints denied",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_028",
+    "source_id": "AFR-SA-067",
+    "purpose": "Verify Super Admin can view role availability, vacant singular roles, and current/past holders",
+    "preconditions": "Singular role defined with or without active assignment",
+    "action_or_input": "Query role availability and holder history",
+    "expected_result": "System returns current availability status, vacant role indicators, and holder history",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_029",
+    "source_id": "AFR-SA-022",
+    "purpose": "Verify Super Admin can assign additional role to eligible user with role, target, dates, scope, reason",
+    "preconditions": "Eligible active user and valid role exist",
+    "action_or_input": "Submit role assignment specifying role code, user ID, start date, scope, and reason",
+    "expected_result": "Role assignment is created with specified parameters and active status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_030",
+    "source_id": "AFR-SA-023",
+    "purpose": "Verify system supports basic user holding multiple non-conflicting roles simultaneously",
+    "preconditions": "User already holds Role A",
+    "action_or_input": "Assign non-conflicting Role B to the same user",
+    "expected_result": "Both Role A and Role B are actively held by the user concurrently",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_031",
+    "source_id": "AFR-SA-024-success",
+    "purpose": "Verify singular role can be assigned when there is no current active holder for that scope",
+    "preconditions": "Singular role (e.g. HOD_CSE) has no active holder",
+    "action_or_input": "Assign singular role to eligible faculty member",
+    "expected_result": "Singular role is successfully assigned to the user",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_032",
+    "source_id": "AFR-SA-024-conflict",
+    "purpose": "Verify system prevents assigning singular role if an active holder already exists for same scope and time",
+    "preconditions": "User 1 is currently the active holder of singular role HOD_CSE",
+    "action_or_input": "Attempt to assign HOD_CSE to User 2 for overlapping time period",
+    "expected_result": "Assignment rejected due to singularity constraint violation",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST_FR_033",
+    "source_id": "AFR-SA-025-invalid",
+    "purpose": "Verify system rejects role assignment when target user type is incompatible with role eligibility",
+    "preconditions": "Role requiring Faculty eligibility exists (e.g., Dean Academic)",
+    "action_or_input": "Attempt to assign Faculty-only role to a Student user",
+    "expected_result": "Assignment rejected with eligibility/compatibility error",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST_FR_034",
+    "source_id": "AFR-SA-026-conflict",
+    "purpose": "Verify system checks and rejects configured role conflicts (incompatible concurrent roles)",
+    "preconditions": "User holds Role X, which is configured as conflicting with Role Y (e.g., conflicting administrative oversight)",
+    "action_or_input": "Attempt to assign conflicting Role Y to the user",
+    "expected_result": "Assignment rejected due to configured role conflict rule",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST_FR_035",
+    "source_id": "AFR-SA-027",
+    "purpose": "Verify future-dated role assignment is created in pending status and activates on start date",
+    "preconditions": "Role assignment created with future start date (e.g. tomorrow)",
+    "action_or_input": "Inspect initial status, then trigger start date activation process",
+    "expected_result": "Initial status is scheduled/pending; transitions to active when start date is reached",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_036",
+    "source_id": "AFR-SA-029",
+    "purpose": "Verify notification is sent to affected user upon role assignment within policy timeframe",
+    "preconditions": "Role assigned successfully to user",
+    "action_or_input": "Execute role assignment",
+    "expected_result": "Assignment notification record created for the target user",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_037",
+    "source_id": "AFR-SA-031",
+    "purpose": "Verify each role assignment is recorded in audit trail and assignment history",
+    "preconditions": "Role is assigned to user",
+    "action_or_input": "Query audit logs and assignment history table for user and role",
+    "expected_result": "Assignment event is recorded with timestamp, assigner, role, scope, and dates",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_038",
+    "source_id": "AFR-SA-032",
+    "purpose": "Verify Super Admin can reassign existing role to a new eligible user with effective date and reason",
+    "preconditions": "User 1 holds Role R; User 2 is eligible for Role R",
+    "action_or_input": "Submit role reassignment request designating User 2 as new holder with effective date and reason",
+    "expected_result": "Reassignment is recorded and scheduled/executed according to effective date",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_039",
+    "source_id": "AFR-SA-033",
+    "purpose": "Verify on effective date of reassignment, previous holder's access is removed and new holder's access granted",
+    "preconditions": "Reassignment effective date is reached",
+    "action_or_input": "Trigger reassignment execution",
+    "expected_result": "Previous holder's assignment becomes inactive; new holder's assignment becomes active",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_040",
+    "source_id": "AFR-SA-034",
+    "purpose": "Verify on role reassignment pending tasks/requests are transferred to new holder without exposing operational content",
+    "preconditions": "Previous holder has pending role-associated items",
+    "action_or_input": "Execute role reassignment workflow",
+    "expected_result": "Pending task transfer event is logged/routed to new holder without exposing operational content to Super Admin",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_041",
+    "source_id": "AFR-SA-035A",
+    "purpose": "Verify reassignment triggers notifications to both previous and new role holders",
+    "preconditions": "Role reassignment executed",
+    "action_or_input": "Trigger role reassignment",
+    "expected_result": "Notifications generated for both previous holder and incoming holder",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_042",
+    "source_id": "AFR-SA-035B",
+    "purpose": "Verify system maintains complete role reassignment history",
+    "preconditions": "Role reassignment completed",
+    "action_or_input": "Query role assignment historical records",
+    "expected_result": "History reflects previous holder tenure, reassignment event, handover timestamp, and new holder",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_043",
+    "source_id": "AFR-SA-036",
+    "purpose": "Verify previous role holder retains read-only access to their own prior actions for configured audit period",
+    "preconditions": "Role has been reassigned to new user",
+    "action_or_input": "Check access permissions for previous holder regarding past actions during audit period",
+    "expected_result": "Read-only access to previous actions is permitted; active administrative execution is denied",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_044",
+    "source_id": "AFR-SA-037",
+    "purpose": "Verify system supports emergency reassignment with immediate effective date",
+    "preconditions": "Active role assignment exists",
+    "action_or_input": "Super Admin submits emergency reassignment with immediate effect and emergency reason",
+    "expected_result": "Old access revoked immediately and new access activated immediately without advance delay",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_045",
+    "source_id": "AFR-SA-038",
+    "purpose": "Verify Super Admin can revoke a role before scheduled end date with reason and task handling disposition",
+    "preconditions": "Active role assignment exists",
+    "action_or_input": "Super Admin submits role revocation with mandatory reason and disposition ('close' or 'transfer')",
+    "expected_result": "Revocation is accepted and processed with the specified pending task disposition",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_046",
+    "source_id": "AFR-SA-039A",
+    "purpose": "Verify role access is removed on the effective revocation date",
+    "preconditions": "Role assignment is marked revoked on effective date",
+    "action_or_input": "Check assignment status and effective user permissions",
+    "expected_result": "Role assignment status is revoked/inactive; user no longer possesses role privileges",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_047",
+    "source_id": "AFR-SA-039B",
+    "purpose": "Verify pending tasks are disposed according to specified transfer-or-close disposition upon revocation",
+    "preconditions": "Revocation submitted with task disposition specified",
+    "action_or_input": "Execute role revocation workflow",
+    "expected_result": "Task disposition action is triggered according to policy (tasks closed or transferred)",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_048",
+    "source_id": "AFR-SA-039C",
+    "purpose": "Verify revocation triggers notification to affected user and relevant module administrators",
+    "preconditions": "Role assignment revoked",
+    "action_or_input": "Execute revocation",
+    "expected_result": "Notification records created for the affected user and module administrator",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_049",
+    "source_id": "AFR-SA-039D",
+    "purpose": "Verify role revocation is recorded in audit trail with actor, reason, and timestamp",
+    "preconditions": "Role revocation executed",
+    "action_or_input": "Query audit logs for revocation event",
+    "expected_result": "Audit log entry contains revocation action, reason, actor, and affected user/role",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_050",
+    "source_id": "AFR-SA-040B",
+    "purpose": "Verify system automatically revokes/inactivates all assigned roles when user account is deactivated",
+    "preconditions": "User holds one or more active role assignments",
+    "action_or_input": "Super Admin deactivates the user account",
+    "expected_result": "All active role assignments held by the user are automatically marked inactive/revoked",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_051",
+    "source_id": "AFR-SA-028",
+    "purpose": "Verify system automatically inactivates time-bound role when end date is reached",
+    "preconditions": "Role assignment end date is today or in the past",
+    "action_or_input": "Execute expiry processing job",
+    "expected_result": "Assignment status transitions from active to expired/inactive",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_052",
+    "source_id": "AFR-SA-040A",
+    "purpose": "Verify system automatically revokes or inactivates time-bound role on reaching scheduled end date",
+    "preconditions": "Role assignment with reached end date",
+    "action_or_input": "Process time-bound role lifecycle transitions",
+    "expected_result": "Role access disabled and assignment status marked expired",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_053",
+    "source_id": "AFR-SA-041",
+    "purpose": "Verify system tracks role validity periods and identifies roles approaching expiration",
+    "preconditions": "Role assignment with end date within configured lead time (e.g., 7 days)",
+    "action_or_input": "Query roles expiring soon / upcoming expiry selector",
+    "expected_result": "Expiring role is included in upcoming expiry list",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_054",
+    "source_id": "AFR-SA-042",
+    "purpose": "Verify system sends expiry reminders to Super Admin and affected user at configured reminder lead time",
+    "preconditions": "Role is within reminder lead time window",
+    "action_or_input": "Execute role expiry reminder task",
+    "expected_result": "Expiry reminders generated for both user and Super Admin",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_055",
+    "source_id": "AFR-SA-043",
+    "purpose": "Verify Super Admin can extend time-bound role end date before expiration by providing new end date and reason",
+    "preconditions": "Role is active and nearing expiration",
+    "action_or_input": "Super Admin submits extension request with future end date and mandatory reason",
+    "expected_result": "Role assignment end date is updated and status remains active",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_056",
+    "source_id": "AFR-SA-044A",
+    "purpose": "Verify affected user is notified when role validity is extended",
+    "preconditions": "Role extension successfully executed",
+    "action_or_input": "Trigger role validity extension",
+    "expected_result": "Notification sent to user informing them of the new extended end date",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_057",
+    "source_id": "AFR-SA-044B",
+    "purpose": "Verify affected user is notified when time-bound role expires",
+    "preconditions": "Role assignment expires",
+    "action_or_input": "Process role expiration",
+    "expected_result": "Expiry notification generated for the affected user",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_058",
+    "source_id": "AFR-SA-081D",
+    "purpose": "Verify role-assignment history is permanently retained after role expiry",
+    "preconditions": "Role has expired and is inactive",
+    "action_or_input": "Query historical role assignments for the user",
+    "expected_result": "Expired assignment record remains retrievable in history",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_059",
+    "source_id": "AFR-SA-030",
+    "purpose": "Verify assigned roles are exposed on user dashboard for active role selection",
+    "preconditions": "User holds multiple active roles",
+    "action_or_input": "User accesses dashboard role selector endpoint",
+    "expected_result": "List of active assigned roles is returned to the user",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_060",
+    "source_id": "AFR-SA-045",
+    "purpose": "Verify logged-in user with multiple roles can switch active role for current session",
+    "preconditions": "User is authenticated and holds Role A and Role B",
+    "action_or_input": "User submits switch active role request to Role B",
+    "expected_result": "Active role for the session changes to Role B",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_061",
+    "source_id": "AFR-SA-046",
+    "purpose": "Verify system enforces module access according to permissions of active role only",
+    "preconditions": "User has active role switched to Role B (which has no access to Module M)",
+    "action_or_input": "User attempts to access protected endpoint of Module M",
+    "expected_result": "Access denied (403 Forbidden) based on active role permissions",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_062",
+    "source_id": "AFR-SA-047",
+    "purpose": "Verify Super Admin can archive eligible inactive user specifying archival date, reason, and retention option",
+    "preconditions": "User is deactivated and satisfies minimum deactivation interval",
+    "action_or_input": "Super Admin submits user archival request with reason and retention option",
+    "expected_result": "User account is moved to archive state with archival metadata captured",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_063",
+    "source_id": "AFR-SA-048-active",
+    "purpose": "Verify system rejects archival of an active user account",
+    "preconditions": "User is in active status",
+    "action_or_input": "Super Admin attempts to archive the active user",
+    "expected_result": "Archival rejected; user must be deactivated prior to archival",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST_FR_064",
+    "source_id": "AFR-SA-048-interval",
+    "purpose": "Verify system rejects archival if user has not met minimum deactivation-to-archival interval",
+    "preconditions": "User was deactivated immediately prior (less than configured deactivation-to-archive interval)",
+    "action_or_input": "Attempt to archive freshly deactivated user",
+    "expected_result": "Archival rejected due to unelapsed deactivation interval requirement",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST_FR_065",
+    "source_id": "AFR-SA-049A",
+    "purpose": "Verify on user archival, login credentials and system access are disabled and assigned roles revoked",
+    "preconditions": "User account is archived",
+    "action_or_input": "Attempt login with user credentials and inspect role assignments",
+    "expected_result": "Authentication fails; all assigned roles are revoked/disabled",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_066",
+    "source_id": "AFR-SA-049B",
+    "purpose": "Verify archived user is moved to archive and listed under Archived Users view",
+    "preconditions": "User is successfully archived",
+    "action_or_input": "Query Archived Users list",
+    "expected_result": "Archived user appears in Archived Users query results and is removed from active users",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_067",
+    "source_id": "AFR-SA-050",
+    "purpose": "Verify archive retains required user profile, role history, module participation, and activity audit",
+    "preconditions": "User is archived",
+    "action_or_input": "Inspect archived record and linked historical records",
+    "expected_result": "Profile, role history, and audit records remain preserved in archive storage",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_068",
+    "source_id": "AFR-SA-051A",
+    "purpose": "Verify Super Admin can restore archived user during configured reversible period with required authorization",
+    "preconditions": "User is archived within reversible window; valid authorization present",
+    "action_or_input": "Super Admin submits user restore request with reason",
+    "expected_result": "User account restored to inactive/deactivated or active state according to policy",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_069",
+    "source_id": "AFR-SA-051B",
+    "purpose": "Verify system keeps archived user permanently non-restorable after reversible period expires and rejects restoration",
+    "preconditions": "User archival date exceeds the configured reversible window",
+    "action_or_input": "Super Admin attempts to restore expired archived user",
+    "expected_result": "Restoration rejected; account is permanently non-restorable (ISS-SA-004)",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST_FR_070",
+    "source_id": "AFR-SA-052",
+    "purpose": "Verify Super Admin can initiate historical data archival by selecting category and date range",
+    "preconditions": "Eligible completed historical records exist for category and date range",
+    "action_or_input": "Submit historical archival job with data category and date range",
+    "expected_result": "Archival batch created and processing initiated",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_071",
+    "source_id": "AFR-SA-053-valid",
+    "purpose": "Verify system validates retention age, completion/no-pending-action, and dependencies before historical archival",
+    "preconditions": "Data records meet retention age and have no pending workflows",
+    "action_or_input": "Execute eligibility check on target batch",
+    "expected_result": "Batch verified as eligible for historical archival",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_072",
+    "source_id": "AFR-SA-053-ineligible",
+    "purpose": "Verify system rejects historical archival if data has pending actions or fails retention age",
+    "preconditions": "Target records have active/pending transactions",
+    "action_or_input": "Attempt historical archival on records with active pending transactions",
+    "expected_result": "Archival rejected due to active dependencies/pending action constraints",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST_FR_073",
+    "source_id": "AFR-SA-054A",
+    "purpose": "Verify historical data archival requires authenticated confirmation immediately before execution",
+    "preconditions": "Archival batch prepared",
+    "action_or_input": "Submit execution request without authentication confirmation / password re-entry",
+    "expected_result": "Execution blocked pending authenticated confirmation",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_074",
+    "source_id": "AFR-SA-054B",
+    "purpose": "Verify backup verification/creation occurs before moving historical data to archive",
+    "preconditions": "Authenticated archival confirmed",
+    "action_or_input": "Trigger archival execution process",
+    "expected_result": "Backup verification step executes and backup reference is recorded",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_075",
+    "source_id": "AFR-SA-055A",
+    "purpose": "Verify eligible historical data is moved to archive storage after successful processing",
+    "preconditions": "Archival processing succeeds",
+    "action_or_input": "Inspect active vs archive tables",
+    "expected_result": "Eligible records are archived and no longer in active transactional tables",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_076",
+    "source_id": "AFR-SA-055B",
+    "purpose": "Verify archival summary report is generated upon completion of historical archival",
+    "preconditions": "Historical archival completes",
+    "action_or_input": "Check archival job output summary",
+    "expected_result": "Summary report generated with record counts, category, date range, and status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_077",
+    "source_id": "AFR-SA-056",
+    "purpose": "Verify system provides read-only searchable access to permitted archived records subject to data isolation",
+    "preconditions": "Archived records exist",
+    "action_or_input": "Query archived records search endpoint",
+    "expected_result": "Permitted metadata returned read-only; modification endpoints unavailable",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_078",
+    "source_id": "AFR-SA-058",
+    "purpose": "Verify Super Admin can view, search, and filter archived records by criteria (ID, name, dates, type, dept, role)",
+    "preconditions": "Archived users and batches exist across departments and user types",
+    "action_or_input": "Search archived records filtering by department and date range",
+    "expected_result": "Filtered search results return matching archived records",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_079",
+    "source_id": "AFR-SA-059A",
+    "purpose": "Verify Super Admin can generate archive reports from permitted archived data",
+    "preconditions": "Archived records exist",
+    "action_or_input": "Request archive summary report generation for date range",
+    "expected_result": "Report generated containing aggregated archive statistics and record details",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_080",
+    "source_id": "AFR-SA-059B",
+    "purpose": "Verify Super Admin can export archive search or report results to CSV or PDF",
+    "preconditions": "Archive report or search result exists",
+    "action_or_input": "Request export in CSV or PDF format",
+    "expected_result": "Export payload generated in requested format (CSV/PDF) with correct content headers",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_081",
+    "source_id": "AFR-SA-060",
+    "purpose": "Verify Super Admin can export authorized archive packages for external storage",
+    "preconditions": "Authorized archival batch completed",
+    "action_or_input": "Submit archive package export request",
+    "expected_result": "Authorized export package generated subject to access policy",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_082",
+    "source_id": "AFR-SA-057",
+    "purpose": "Verify archived historical data can be restored to active system when required approval exists",
+    "preconditions": "Archived historical batch exists with required approval present",
+    "action_or_input": "Submit historical data restore request with approval reference",
+    "expected_result": "Data is restored to active system and restore operation is audited",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_083",
+    "source_id": "AFR-SA-061A-before",
+    "purpose": "Verify system rejects permanent-purge request if retention period has not elapsed",
+    "preconditions": "Archived records with retention period still active",
+    "action_or_input": "Submit permanent-purge request for unexpired records",
+    "expected_result": "Purge request rejected; retention period must elapse before permanent purge",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST_FR_084",
+    "source_id": "AFR-SA-061B-single",
+    "purpose": "Verify system prevents permanent purge execution with only Super Admin authorization (lacking IT Head dual auth)",
+    "preconditions": "Archived records with expired retention; authorized only by Super Admin",
+    "action_or_input": "Attempt purge execution without second IT Head authorization",
+    "expected_result": "Purge blocked pending mandatory IT Head dual authorization",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_085",
+    "source_id": "AFR-SA-061B-dual",
+    "purpose": "Verify permanent purge executes when retention expired and dual authorization (Super Admin + IT Head) exists",
+    "preconditions": "Retention expired; authorizations provided by both Super Admin and IT Head",
+    "action_or_input": "Execute dual-authorized permanent purge",
+    "expected_result": "Data purged permanently and immutable purge audit record created",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_086",
+    "source_id": "AFR-SA-062",
+    "purpose": "Verify system maintains comprehensive logs for user, role, authentication, archival, and config actions",
+    "preconditions": "Administrative actions executed across modules",
+    "action_or_input": "Inspect audit event log categories",
+    "expected_result": "Logs exist capturing user operations, role operations, logins, archival, and configurations",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_087",
+    "source_id": "AFR-SA-063",
+    "purpose": "Verify each audit log entry records timestamp, actor, action, target, IP, result, and context/reason",
+    "preconditions": "Administrative action performed",
+    "action_or_input": "Inspect individual audit log entry fields",
+    "expected_result": "Entry contains timestamp, actor_id, action_type, target_id, ip_address, status, and reason",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_088",
+    "source_id": "AFR-SA-081A",
+    "purpose": "Verify all Super Admin administrative actions are logged automatically",
+    "preconditions": "Super Admin performs action (e.g. user update)",
+    "action_or_input": "Execute administrative action",
+    "expected_result": "System automatically records audit log without manual prompt",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_089",
+    "source_id": "AFR-SA-081B",
+    "purpose": "Verify Super Admin audit logs are immutable and cannot be updated or deleted",
+    "preconditions": "Audit log entries exist",
+    "action_or_input": "Attempt to update or delete audit log record via API or service",
+    "expected_result": "Update or delete operation is prohibited/rejected",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_090",
+    "source_id": "AFR-SA-081C",
+    "purpose": "Verify Super Admin audit logs are retained permanently and not subject to purge",
+    "preconditions": "Historical audit logs exist",
+    "action_or_input": "Verify audit log retention policy constraints",
+    "expected_result": "Audit log table is excluded from routine archival deletion / marked permanently retained",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_091",
+    "source_id": "AFR-SA-064",
+    "purpose": "Verify Super Admin can view and filter audit logs without modifying them",
+    "preconditions": "Audit records exist in system",
+    "action_or_input": "Super Admin queries audit logs filtering by action type, date range, or actor",
+    "expected_result": "Filtered audit records returned in read-only format",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_092",
+    "source_id": "AFR-SA-065A",
+    "purpose": "Verify Super Admin can generate audit reports with selectable parameters and date ranges",
+    "preconditions": "Audit records exist",
+    "action_or_input": "Request audit report generation for specified date range and event types",
+    "expected_result": "Report generated with sorted/filtered tabular data",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_093",
+    "source_id": "AFR-SA-065B",
+    "purpose": "Verify system provides graphical/aggregated views for supported audit reports",
+    "preconditions": "Audit data exists across multiple event categories",
+    "action_or_input": "Query audit report aggregation/graphical metrics endpoint",
+    "expected_result": "Aggregated summary metrics suitable for visual charts are returned",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_094",
+    "source_id": "AFR-SA-065C",
+    "purpose": "Verify audit reports can be exported to PDF or Excel formats",
+    "preconditions": "Audit report dataset generated",
+    "action_or_input": "Request export to PDF and Excel/CSV",
+    "expected_result": "Export file generated with appropriate content type and data payload",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_095",
+    "source_id": "AFR-SA-066",
+    "purpose": "Verify Super Admin dashboard displays required metrics (users, roles, expiry, health, archival, logins)",
+    "preconditions": "System operational with users, roles, and logs",
+    "action_or_input": "Super Admin requests dashboard metrics",
+    "expected_result": "Dashboard returns counts for active/inactive users, roles, expiring roles, and system indicators",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_096",
+    "source_id": "AFR-SA-068",
+    "purpose": "Verify basic users receive notifications for account creation, role changes, deactivation, and archival",
+    "preconditions": "Lifecycle events occur for user",
+    "action_or_input": "Trigger lifecycle events (role assignment, deactivation)",
+    "expected_result": "User notification records created with correct message content",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_097",
+    "source_id": "AFR-SA-069",
+    "purpose": "Verify Super Admin receives notifications for bulk completion, role expiries, security alerts, and archival",
+    "preconditions": "Administrative event completes (e.g. bulk user operation)",
+    "action_or_input": "Trigger administrative event",
+    "expected_result": "Admin notification record created for Super Admin",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_098",
+    "source_id": "AFR-SA-070",
+    "purpose": "Verify module administrators receive notifications when a role in their module is assigned, reassigned, or revoked",
+    "preconditions": "Role associated with module M is assigned or revoked",
+    "action_or_input": "Assign role associated with module M",
+    "expected_result": "Notification record created for module administrator of module M",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_099",
+    "source_id": "AFR-SA-071A",
+    "purpose": "Verify notification subsystem supports email and in-system notification delivery channels",
+    "preconditions": "Notification triggered",
+    "action_or_input": "Inspect notification delivery mechanisms",
+    "expected_result": "In-system notification stored and email dispatch invoked/logged",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_100",
+    "source_id": "AFR-SA-071B",
+    "purpose": "Verify SMS is supported as optional channel for critical security alerts",
+    "preconditions": "Critical security alert triggered with SMS preference enabled",
+    "action_or_input": "Trigger security alert event",
+    "expected_result": "SMS channel handler is invoked for critical security notification",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_101",
+    "source_id": "AFR-SA-072",
+    "purpose": "Verify Super Admin is prevented from accessing module-specific operational content",
+    "preconditions": "Super Admin is authenticated",
+    "action_or_input": "Attempt to query operational module endpoints (e.g., student grades, financial transactions)",
+    "expected_result": "Access is denied; operational content is outside Super Admin administrative boundary",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_102",
+    "source_id": "AFR-SA-075",
+    "purpose": "Verify system prevents Super Admin from self-assigning or modifying their own Super Admin status",
+    "preconditions": "Super Admin is authenticated",
+    "action_or_input": "Super Admin attempts to assign or modify Super Admin role to their own user account",
+    "expected_result": "Operation rejected; self-assignment of Super Admin privilege is strictly prohibited",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_103",
+    "source_id": "AFR-SA-073A-weak",
+    "purpose": "Verify system enforces configured strong-password policy and rejects weak passwords",
+    "preconditions": "Super Admin password policy requires minimum 8 chars, mixed case, numbers, symbols",
+    "action_or_input": "Attempt to set password to simple string 'pass'",
+    "expected_result": "Password rejected with policy validation error",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST_FR_104",
+    "source_id": "AFR-SA-073B",
+    "purpose": "Verify Super Admin login requires two-factor authentication (2FA)",
+    "preconditions": "Super Admin enters valid username and password",
+    "action_or_input": "Submit primary credentials without 2FA code",
+    "expected_result": "Session not fully authorized; 2FA verification prompt required",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_105",
+    "source_id": "AFR-SA-073C",
+    "purpose": "Verify IP-whitelist check is enforced when optional IP-whitelist control is enabled",
+    "preconditions": "IP-whitelist control enabled with allowed IP '10.0.0.1'",
+    "action_or_input": "Super Admin attempts login from non-whitelisted IP '192.168.1.50'",
+    "expected_result": "Authentication rejected due to IP-whitelist enforcement",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_106",
+    "source_id": "AFR-SA-074A",
+    "purpose": "Verify system permits only one active Super Admin session at a time",
+    "preconditions": "Super Admin is logged in on Session 1",
+    "action_or_input": "Super Admin logs in from Session 2",
+    "expected_result": "Previous session is invalidated or concurrent session is blocked",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_107",
+    "source_id": "AFR-SA-074B",
+    "purpose": "Verify system enforces configured Super Admin session inactivity timeout",
+    "preconditions": "Session has been inactive beyond configured timeout limit",
+    "action_or_input": "Submit authenticated request on timed-out session",
+    "expected_result": "Request rejected; session expired due to inactivity",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_108",
+    "source_id": "AFR-SA-074C",
+    "purpose": "Verify system maintains auditable Super Admin session logs",
+    "preconditions": "Super Admin logs in and logs out",
+    "action_or_input": "Query session logs",
+    "expected_result": "Session records exist with login time, logout time, IP address, and session ID",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_109",
+    "source_id": "AFR-SA-080A",
+    "purpose": "Verify system logs failed Super Admin login attempts",
+    "preconditions": "User enters invalid password for Super Admin account",
+    "action_or_input": "Submit failed login attempt",
+    "expected_result": "Failed login attempt recorded in security log with IP and timestamp",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_110",
+    "source_id": "AFR-SA-080B",
+    "purpose": "Verify system triggers security alert after five consecutive failed Super Admin login attempts",
+    "preconditions": "Super Admin account has 4 consecutive failed attempts",
+    "action_or_input": "Submit 5th consecutive failed login attempt",
+    "expected_result": "Security alert is triggered and notification/alert record generated",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST_FR_111",
+    "source_id": "AFR-SA-082",
+    "purpose": "Verify system enforces password change when configured password-rotation interval expires",
+    "preconditions": "User password age exceeds configured password-rotation interval",
+    "action_or_input": "User authenticates with expired password",
+    "expected_result": "System mandates immediate password update before granting access",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_112",
+    "source_id": "AFR-SA-079",
+    "purpose": "Verify system requires authenticated confirmation before executing operations designated critical",
+    "preconditions": "Critical operation initiated (e.g. permanent purge or historical archive)",
+    "action_or_input": "Attempt execution without providing re-authentication confirmation credential",
+    "expected_result": "Execution blocked pending valid authenticated confirmation",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST_FR_113",
+    "source_id": "AFR-SA-076",
+    "purpose": "Verify Super Admin can configure permitted system parameters: password policy, session timeout, archival retention, notifications, bulk limits",
+    "preconditions": "Super Admin is authenticated",
+    "action_or_input": "Update permitted parameter (e.g. session inactivity timeout to 15 minutes)",
+    "expected_result": "Parameter updated successfully and change audited",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST_FR_114",
+    "source_id": "AFR-SA-077",
+    "purpose": "Verify system prevents Super Admin from modifying module-specific configurations, academic calendars, or financial policies",
+    "preconditions": "Super Admin attempts to modify configuration",
+    "action_or_input": "Submit update request targeting academic calendar or financial fee policy parameter",
+    "expected_result": "Modification rejected; prohibited configuration parameters cannot be changed by Super Admin",
+    "test_type": "security"
+  }
+]
