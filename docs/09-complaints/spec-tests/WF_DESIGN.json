@@ -1,0 +1,101 @@
+[
+  {
+    "test_id": "WF-CMS-001",
+    "source_id": "BW-CMS-01 documented workflow path and decision outcomes",
+    "purpose": "Validate Complaint Intake to Resolved",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "Create a valid complaint (Submitted); as Handler perform manual assignment, categorization and Low/Medium/High priority; optionally record one progress update; resolve with resolution details.",
+    "expected_result": "Complaint accepted as Submitted with an identifier; handling setup and optional progress history recorded without assuming an unspecified transition to In Progress; final outcome Resolved with resolution details.",
+    "test_type": "workflow path"
+  },
+  {
+    "test_id": "WF-CMS-002",
+    "source_id": "BW-CMS-02 documented workflow path and decision outcomes",
+    "purpose": "Validate Complaint Intake to User-Verified Closure",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "Follow complaint intake, handling setup and resolution; where user verification is required, perform successful closure verification as the complainant.",
+    "expected_result": "Resolved complaint is recorded Closed after successful required complainant verification; closure recorded.",
+    "test_type": "workflow path"
+  },
+  {
+    "test_id": "WF-CMS-003",
+    "source_id": "BW-CMS-03 documented workflow path and decision outcomes",
+    "purpose": "Validate Complaint Intake to Supervisor-Verified Closure",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "Follow complaint intake, handling setup and resolution; where supervisor verification is required, perform successful closure verification as Complaint Supervisor.",
+    "expected_result": "Resolved complaint is recorded Closed after successful required supervisor verification; closure recorded.",
+    "test_type": "workflow path"
+  },
+  {
+    "test_id": "WF-CMS-004",
+    "source_id": "BW-CMS-04 documented workflow path and decision outcomes",
+    "purpose": "Validate Complaint Intake to Rejection",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "Create and set up a complaint; as Complaint Handler reject it while recording rejection details/reason.",
+    "expected_result": "Complaint moves to Rejected with required reason recorded; do not add a closure transition.",
+    "test_type": "workflow path"
+  },
+  {
+    "test_id": "WF-CMS-005",
+    "source_id": "BW-CMS-05 documented workflow path and decision outcomes",
+    "purpose": "Validate Reopening Request Denied",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "Starting from a Closed complaint, submit a dissatisfaction-based reopening request as complainant; as Supervisor deny the request.",
+    "expected_result": "Request decision recorded as denied and complaint remains Closed.",
+    "test_type": "workflow path"
+  },
+  {
+    "test_id": "WF-CMS-006",
+    "source_id": "BW-CMS-06 documented workflow path and decision outcomes",
+    "purpose": "Validate Reopening Request Approved",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "Starting from a Closed complaint, submit a dissatisfaction-based reopening request as complainant; as Supervisor approve the request.",
+    "expected_result": "Approval decision recorded; complaint marked reopened; exact resulting lifecycle state is not fixed by the specification (ISS-CMS-008).",
+    "test_type": "workflow path"
+  },
+  {
+    "test_id": "WF-CMS-007",
+    "source_id": "BW-CMS-07 documented workflow path and decision outcomes",
+    "purpose": "Validate Manual Escalation of Unresolved Complaint",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "As Complaint Handler, manually escalate an active unresolved complaint requiring escalation; inspect escalation status.",
+    "expected_result": "Escalation recorded and complaint tracked as escalated for supervisory monitoring; do not assume closure or resolution.",
+    "test_type": "workflow path"
+  },
+  {
+    "test_id": "WF-CMS-008",
+    "source_id": "BW-CMS-08 documented workflow path and decision outcomes",
+    "purpose": "Validate Automatic SLA Escalation",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "Configure an applicable SLA for an unresolved non-escalated complaint; trigger the SLA-breached system event.",
+    "expected_result": "System automatically changes escalation status to escalated; use configured SLA values, not invented baseline durations.",
+    "test_type": "workflow path"
+  },
+  {
+    "test_id": "WF-CMS-009",
+    "source_id": "CW-CMS-01 documented workflow path and decision outcomes",
+    "purpose": "Validate Complaint Intake-to-Outcome Lifecycle",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "Test supported intake-to-outcome branches individually: Resolved without forced closure; Resolved then User-verified closure; Resolved then Supervisor-verified closure; Rejected with reason.",
+    "expected_result": "Each branch has its specified terminal outcome: Resolved, Closed after the applicable successful verification, or Rejected with reason; no invented transitions.",
+    "test_type": "workflow path"
+  },
+  {
+    "test_id": "WF-CMS-010",
+    "source_id": "CW-CMS-02 documented workflow path and decision outcomes",
+    "purpose": "Validate Complaint Reopening Decision",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "Starting from a Closed complaint, request reopening; separately have Supervisor deny and approve reopening requests.",
+    "expected_result": "Denied branch stays Closed and records decision; approved branch records reopening without assuming an exact unspecified lifecycle state.",
+    "test_type": "workflow path"
+  },
+  {
+    "test_id": "WF-CMS-011",
+    "source_id": "CW-CMS-03 documented workflow path and decision outcomes",
+    "purpose": "Validate Complaint Escalation Paths",
+    "preconditions": "Required participant identities, valid complaint state and applicable configured guards from the workflow STT.",
+    "action_or_input": "Independently test manual escalation of an unresolved complaint and automatic escalation after configured SLA breach.",
+    "expected_result": "Manual and automatic escalations are recorded and made visible for supervisory monitoring under their distinct documented triggers.",
+    "test_type": "workflow path"
+  }
+]

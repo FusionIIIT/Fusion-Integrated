@@ -1,5 +1,171 @@
 {
   "modules": {
+    "complaints": {
+      "grants": {
+        "Complaint Handler": [
+          "complaints.announcement.publish",
+          "complaints.announcement.view",
+          "complaints.complaint.assign",
+          "complaints.complaint.update",
+          "complaints.complaint.view",
+          "complaints.feedback.review",
+          "complaints.report.view"
+        ],
+        "Complaint Supervisor": [
+          "complaints.announcement.publish",
+          "complaints.announcement.view",
+          "complaints.complaint.approve",
+          "complaints.complaint.view",
+          "complaints.escalation.view",
+          "complaints.feedback.review",
+          "complaints.report.view"
+        ],
+        "System Admin": [
+          "complaints.announcement.view",
+          "complaints.report.view"
+        ],
+        "faculty": [
+          "complaints.announcement.view",
+          "complaints.complaint.create",
+          "complaints.complaint.view",
+          "complaints.feedback.create"
+        ],
+        "staff": [
+          "complaints.announcement.view",
+          "complaints.complaint.create",
+          "complaints.complaint.view",
+          "complaints.feedback.create"
+        ],
+        "student": [
+          "complaints.announcement.view",
+          "complaints.complaint.create",
+          "complaints.complaint.view",
+          "complaints.feedback.create"
+        ]
+      },
+      "module_grants": [
+        "Complaint Handler",
+        "Complaint Supervisor",
+        "System Admin",
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/complaints",
+        "icon": "ChatCircleDots",
+        "items": [
+          {
+            "code": "complaints.mine",
+            "icon": "ChatCircleDots",
+            "label": "My Complaints",
+            "required_permission": "complaints.complaint.view",
+            "sort_order": 10,
+            "to": "/complaints/mine"
+          },
+          {
+            "code": "complaints.announcements",
+            "icon": "Megaphone",
+            "label": "Announcements",
+            "required_permission": "complaints.announcement.view",
+            "sort_order": 20,
+            "to": "/complaints/announcements"
+          },
+          {
+            "code": "complaints.feedback",
+            "icon": "ChatText",
+            "label": "Feedback Review",
+            "required_permission": "complaints.feedback.review",
+            "sort_order": 30,
+            "to": "/complaints/feedback"
+          },
+          {
+            "code": "complaints.work-queue",
+            "icon": "ClipboardText",
+            "label": "Handler Work Queue",
+            "required_permission": "complaints.complaint.update",
+            "sort_order": 35,
+            "to": "/complaints/work-queue"
+          },
+          {
+            "code": "complaints.assignment-queue",
+            "icon": "UserSwitch",
+            "label": "Complaint Assignment",
+            "required_permission": "complaints.complaint.assign",
+            "sort_order": 38,
+            "to": "/complaints/assignment-queue"
+          },
+          {
+            "code": "complaints.supervision",
+            "icon": "ShieldCheck",
+            "label": "Supervisor Queue",
+            "required_permission": "complaints.complaint.approve",
+            "sort_order": 40,
+            "to": "/complaints/supervision"
+          },
+          {
+            "code": "complaints.reports",
+            "icon": "ChartBar",
+            "label": "Reports",
+            "required_permission": "complaints.report.view",
+            "sort_order": 50,
+            "to": "/complaints/reports"
+          }
+        ],
+        "label": "Complaints",
+        "nav_section": "Campus",
+        "sort_order": 25,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "complaints.complaint.create",
+          "label": "Submit a complaint"
+        },
+        {
+          "code": "complaints.complaint.view",
+          "label": "View complaints within assigned scope"
+        },
+        {
+          "code": "complaints.complaint.assign",
+          "label": "Assign active complaints to handlers"
+        },
+        {
+          "code": "complaints.complaint.update",
+          "label": "Record handler progress and outcomes"
+        },
+        {
+          "code": "complaints.complaint.approve",
+          "label": "Verify closure and decide reopening requests"
+        },
+        {
+          "code": "complaints.feedback.create",
+          "label": "Submit complaint feedback"
+        },
+        {
+          "code": "complaints.feedback.review",
+          "label": "Review complaint feedback"
+        },
+        {
+          "code": "complaints.announcement.view",
+          "label": "View complaint announcements"
+        },
+        {
+          "code": "complaints.announcement.publish",
+          "label": "Publish complaint announcements"
+        },
+        {
+          "code": "complaints.escalation.view",
+          "label": "Monitor escalated complaints"
+        },
+        {
+          "code": "complaints.report.view",
+          "label": "View complaint reports and summaries"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "directory": {
       "grants": {
         "Dean Academic": [

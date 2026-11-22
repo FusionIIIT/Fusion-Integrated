@@ -1,0 +1,371 @@
+[
+  {
+    "test_id": "BR-CMS-001",
+    "source_id": "BR-CMS-001 rule outcome",
+    "purpose": "Verify Complaint Submission Availability",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As an authorized User / Complainant, submit a complaint with required category/type and description; verify that submission is not restricted to a particular time.",
+    "expected_result": "CMS permits User / Complainant complaint submission at any time.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-002",
+    "source_id": "BR-CMS-002 rule outcome",
+    "purpose": "Verify Mandatory Complaint Fields",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Attempt to submit a complaint missing required category/type, then one missing description; inspect whether either is accepted.",
+    "expected_result": "CMS shall not accept a complaint submission unless mandatory complaint fields, including complaint category/type and description, are present.",
+    "test_type": "business rule positive and negative outcome"
+  },
+  {
+    "test_id": "BR-CMS-003",
+    "source_id": "BR-CMS-003 rule outcome",
+    "purpose": "Verify Submission Timestamp Recording",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Submit a valid complaint; retrieve it and inspect the stored submission date/time.",
+    "expected_result": "CMS records submission date/time for each accepted complaint submission.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-004",
+    "source_id": "BR-CMS-004 rule outcome",
+    "purpose": "Verify Attachment Acceptance Constraint",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Supply an attachment violating a configured accepted constraint and attempt attachment acceptance.",
+    "expected_result": "CMS validates accepted attachment constraints before accepting submitted attachments.",
+    "test_type": "business rule positive and negative outcome"
+  },
+  {
+    "test_id": "BR-CMS-005",
+    "source_id": "BR-CMS-005 rule outcome",
+    "purpose": "Verify Attachment Constraint Boundary",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Change the available attachment constraint configuration and verify that acceptance follows configured, not invented fixed, limits.",
+    "expected_result": "Exact file-type, file-size, and format limits are configurable or institutional constraints outside the frozen problem-statement details.",
+    "test_type": "business rule scope boundary"
+  },
+  {
+    "test_id": "BR-CMS-006",
+    "source_id": "BR-CMS-006 rule outcome",
+    "purpose": "Verify Unique Complaint Identifier",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Submit two separate valid complaints and compare their generated complaint identifiers.",
+    "expected_result": "Each accepted complaint submission shall receive a unique complaint identifier.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-007",
+    "source_id": "BR-CMS-007 rule outcome",
+    "purpose": "Verify Manual Assignment Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As Complaint Handler, manually assign a Submitted complaint; do not assume an automatic initial assignment.",
+    "expected_result": "Submitted complaints are manually assigned by Complaint Handler for operational handling; automatic initial assignment is outside the baseline.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-008",
+    "source_id": "BR-CMS-008 rule outcome",
+    "purpose": "Verify Complaint Category/Type Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As Complaint Handler, set complaint category/type and inspect the recorded categorization.",
+    "expected_result": "Complaints are categorized by complaint category/type.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-009",
+    "source_id": "BR-CMS-009 rule outcome",
+    "purpose": "Verify Priority Value Set",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As Complaint Handler, set Low, Medium and High priorities and then attempt a value outside that specified set; verify accepted value restriction.",
+    "expected_result": "Complaint priority shall be assigned only as Low, Medium, or High.",
+    "test_type": "business rule positive and negative outcome"
+  },
+  {
+    "test_id": "BR-CMS-010",
+    "source_id": "BR-CMS-010 rule outcome",
+    "purpose": "Verify Assignment and Priority Downstream Use",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Assign a handler and priority and inspect both persisted fields for downstream use.",
+    "expected_result": "CMS records assignment and priority information for downstream complaint handling, reminders, and escalation.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-011",
+    "source_id": "BR-CMS-011 rule outcome",
+    "purpose": "Verify Complaint Status and Progress History",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Create a complaint, perform a permitted status change and add progress; inspect both histories.",
+    "expected_result": "CMS maintains complaint status history and complaint progress history throughout the lifecycle of each complaint.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-012",
+    "source_id": "BR-CMS-012 rule outcome",
+    "purpose": "Verify Complaint Lifecycle State Set",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Inspect the defined lifecycle state values, including Submitted, In Progress, Resolved, Rejected and Closed; do not assume unspecified transitions.",
+    "expected_result": "CMS recognizes Submitted, In Progress, Resolved, Rejected, and Closed as complaint lifecycle states.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-013",
+    "source_id": "BR-CMS-013 rule outcome",
+    "purpose": "Verify Resolution Details Required",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Try to mark a complaint Resolved without resolution details; then supply details and resolve successfully.",
+    "expected_result": "CMS records complaint resolution details for resolved complaints; a complaint shall not be represented as resolved without recorded resolution details.",
+    "test_type": "business rule positive and negative outcome"
+  },
+  {
+    "test_id": "BR-CMS-014",
+    "source_id": "BR-CMS-014 rule outcome",
+    "purpose": "Verify Rejection Details Required",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Reject a complaint while recording required rejection reason or details; inspect persisted rejection information.",
+    "expected_result": "CMS records rejection details or rejection reason information for rejected complaints.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-015",
+    "source_id": "BR-CMS-015 rule outcome",
+    "purpose": "Verify Outcome and Status Notification Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Perform a status update and outcome action; inspect corresponding user notification triggers.",
+    "expected_result": "CMS notifies Users / Complainants of complaint outcome and status updates.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-016",
+    "source_id": "BR-CMS-016 rule outcome",
+    "purpose": "Verify Closure Verification Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "For a resolved complaint requiring user or supervisor verification, attempt closure before and after successful required verification.",
+    "expected_result": "When the applicable closure process requires verification, CMS supports verification by the User / Complainant or Complaint Supervisor before closure.",
+    "test_type": "business rule positive and negative outcome"
+  },
+  {
+    "test_id": "BR-CMS-017",
+    "source_id": "BR-CMS-017 rule outcome",
+    "purpose": "Verify Closure Recording Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Complete a required closure verification successfully; inspect the recorded closure and resulting status.",
+    "expected_result": "CMS records complaint closure after successful verification when verification is required.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-018",
+    "source_id": "BR-CMS-018 rule outcome",
+    "purpose": "Verify Reopening Eligibility Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As complainant, request reopening for a Closed complaint with dissatisfaction; also attempt the request for a not-Closed complaint.",
+    "expected_result": "Users / Complainants may request reopening only for a closed complaint where dissatisfaction remains after closure.",
+    "test_type": "business rule positive and negative outcome"
+  },
+  {
+    "test_id": "BR-CMS-019",
+    "source_id": "BR-CMS-019 rule outcome",
+    "purpose": "Verify Reopening Review Ownership",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As Complaint Supervisor, retrieve and review a filed reopening request.",
+    "expected_result": "Complaint Supervisor reviews complaint reopening requests.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-020",
+    "source_id": "BR-CMS-020 rule outcome",
+    "purpose": "Verify Approved Reopening Status Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As Complaint Supervisor, approve a reopening request and inspect whether the complaint is recorded as reopened.",
+    "expected_result": "If a reopening request is approved, CMS reopens the complaint and updates its status accordingly.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-021",
+    "source_id": "BR-CMS-021 rule outcome",
+    "purpose": "Verify Reopening Outcome Recording",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Submit a reopening request and record the supervisor decision; inspect that the outcome is persisted.",
+    "expected_result": "CMS records the outcome of each complaint reopening request.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-022",
+    "source_id": "BR-CMS-022 rule outcome",
+    "purpose": "Verify Feedback Eligibility Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Submit feedback for a Resolved complaint and a Closed complaint; try submitting it before either state.",
+    "expected_result": "Users / Complainants may submit feedback after complaint resolution or closure.",
+    "test_type": "business rule positive and negative outcome"
+  },
+  {
+    "test_id": "BR-CMS-023",
+    "source_id": "BR-CMS-023 rule outcome",
+    "purpose": "Verify Feedback Review Access Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As Complaint Handler and Complaint Supervisor, retrieve submitted feedback in separate role sessions.",
+    "expected_result": "Complaint Handlers and Complaint Supervisors can review submitted feedback.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-024",
+    "source_id": "BR-CMS-024 rule outcome",
+    "purpose": "Verify Manual Escalation Eligibility",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Manually escalate an unresolved complaint; also inspect behavior of an already resolved complaint.",
+    "expected_result": "Complaints that remain unresolved may be escalated manually. Field Content",
+    "test_type": "business rule positive and negative outcome"
+  },
+  {
+    "test_id": "BR-CMS-025",
+    "source_id": "BR-CMS-025 rule outcome",
+    "purpose": "Verify Escalation Status Tracking",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Escalate a complaint through a specified path and retrieve escalation status.",
+    "expected_result": "CMS tracks escalation status.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-026",
+    "source_id": "BR-CMS-026 rule outcome",
+    "purpose": "Verify Priority-SLA Association",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Configure applicable SLA timelines for complaint priorities and inspect their associations.",
+    "expected_result": "Complaint priority is associated with applicable SLA timelines.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-027",
+    "source_id": "BR-CMS-027 rule outcome",
+    "purpose": "Verify SLA Duration Boundary",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Inspect baseline SLA configuration; ensure no exact unsupported SLA durations are fixed by the module specification.",
+    "expected_result": "CMS shall not specify exact SLA duration values in the module baseline.",
+    "test_type": "business rule scope boundary"
+  },
+  {
+    "test_id": "BR-CMS-028",
+    "source_id": "BR-CMS-028 rule outcome",
+    "purpose": "Verify Pre-Breach Reminder Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "For an unresolved complaint approaching a configured applicable SLA breach, trigger the reminder event and inspect notification triggering.",
+    "expected_result": "CMS sends reminder notifications when a complaint approaches the applicable SLA breach condition.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-029",
+    "source_id": "BR-CMS-029 rule outcome",
+    "purpose": "Verify Automatic SLA Escalation Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "For an unresolved complaint past a configured applicable SLA breach, trigger the scheduled evaluation and inspect automatic escalation.",
+    "expected_result": "CMS automatically escalates a complaint if it is not resolved within the applicable SLA timeline.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-030",
+    "source_id": "BR-CMS-030 rule outcome",
+    "purpose": "Verify Announcement Publishing Authority",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As Handler and Supervisor, publish announcements; attempt to publish as a plain complainant.",
+    "expected_result": "Only Complaint Handlers and Complaint Supervisors may publish complaint-related announcements.",
+    "test_type": "business rule positive and negative outcome"
+  },
+  {
+    "test_id": "BR-CMS-031",
+    "source_id": "BR-CMS-031 rule outcome",
+    "purpose": "Verify Announcement Notification Configuration",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Enable announcement notifications, publish an announcement, and inspect the notification trigger.",
+    "expected_result": "CMS sends announcement-related notifications to Users / Complainants where CMS is configured to notify them about such announcements.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-032",
+    "source_id": "BR-CMS-032 rule outcome",
+    "purpose": "Verify Reporting and Analytics Access Rule",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Request role-specific complaint report, escalation summary and analytics as Handler, Supervisor and System Admin; inspect role scope.",
+    "expected_result": "Complaint Handler, Complaint Supervisor, and System Admin receive only the report/summary/analytics visibility specified for their roles.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-033",
+    "source_id": "BR-CMS-033 rule outcome",
+    "purpose": "Verify Analytics Scope Boundary",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Inspect CMS analytics and reporting features and ensure they do not claim unsupported cross-module analytics.",
+    "expected_result": "CMS analytics scope is limited to complaint reports, complaint summaries, escalation summaries, and analytics visibility explicitly available within CMS.",
+    "test_type": "business rule scope boundary"
+  },
+  {
+    "test_id": "BR-CMS-034",
+    "source_id": "BR-CMS-034 rule outcome",
+    "purpose": "Verify Notification Triggering Boundary",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Inspect CMS notification behavior: assert the module triggers events without requiring it to implement external central email delivery.",
+    "expected_result": "CMS responsibility is limited to notification triggering, not central email delivery infrastructure or platform-level notification infrastructure, unless explicitly represented as CMS notification records or events.",
+    "test_type": "business rule scope boundary"
+  },
+  {
+    "test_id": "BR-CMS-035",
+    "source_id": "BR-CMS-035 rule outcome",
+    "purpose": "Verify Time-Bound CMS Role Assignment",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As System Admin, assign time-bounded Handler and Supervisor roles to existing users.",
+    "expected_result": "System Admin may assign Complaint Handler and Complaint Supervisor roles to existing institutional users for a specified duration.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-036",
+    "source_id": "BR-CMS-036 rule outcome",
+    "purpose": "Verify Mid-Cycle Role Reassignment",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "As System Admin, reassign a current Handler or Supervisor role during an active term and inspect the new role holder.",
+    "expected_result": "System Admin may reassign Complaint Handler and Complaint Supervisor roles mid-cycle.",
+    "test_type": "business rule"
+  },
+  {
+    "test_id": "BR-CMS-037",
+    "source_id": "BR-CMS-037 rule outcome",
+    "purpose": "Verify Active Role Cardinality",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Attempt overlapping active appointments for each CMS role; verify exactly one active holder per role.",
+    "expected_result": "CMS enforces exactly one active Complaint Handler role-holder and exactly one active Complaint Supervisor role-holder at a time within CMS.",
+    "test_type": "business rule positive and negative outcome"
+  },
+  {
+    "test_id": "BR-CMS-038",
+    "source_id": "BR-CMS-038 rule outcome",
+    "purpose": "Verify CMS Role Scope Boundary",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Inspect CMS role management for absence of HR, payroll, employment records and platform account administration operations.",
+    "expected_result": "CMS role assignment is limited to CMS-specific operational and supervisory roles and excludes HR master-data management, payroll, employment records, and platform-wide user-account administration.",
+    "test_type": "business rule scope boundary"
+  },
+  {
+    "test_id": "BR-CMS-039",
+    "source_id": "BR-CMS-039 rule outcome",
+    "purpose": "Verify Excluded Cross-Module Functions",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Inspect the module features for absence of payment, accounting, procurement, inventory and physical maintenance execution.",
+    "expected_result": "CMS shall not perform payment, accounting, payroll, procurement, inventory, physical maintenance execution, or platform-level security administration.",
+    "test_type": "business rule scope boundary"
+  },
+  {
+    "test_id": "BR-CMS-040",
+    "source_id": "BR-CMS-040 rule outcome",
+    "purpose": "Verify External Service/Department Complaint Boundary",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Create a complaint referring to an external department and track it solely through the documented CMS records and status changes.",
+    "expected_result": "CMS limits complaints involving external services or departments to recording, assigning, tracking, escalating, resolving or rejecting, closing, reopening, notifying, reporting, and reviewing complaint-handling information.",
+    "test_type": "business rule scope boundary"
+  },
+  {
+    "test_id": "BR-CMS-041",
+    "source_id": "BR-CMS-041 rule outcome",
+    "purpose": "Verify External Policy Boundary",
+    "preconditions": "Create the CMS actors, complaint states, and configuration explicitly required by this rule.",
+    "action_or_input": "Inspect behavior for external policies or manuals; do not assume additional checks or restrictions beyond explicitly documented CMS rules.",
+    "expected_result": "External institutional policies, manuals, guidelines, and departmental processes are outside CMS scope unless CMS explicitly validates, restricts, routes, records, notifies, escalates, or reports based on them. Field Content",
+    "test_type": "business rule scope boundary"
+  }
+]

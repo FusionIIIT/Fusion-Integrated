@@ -1,0 +1,659 @@
+[
+  {
+    "test_id": "FR-CMS-001",
+    "source_id": "AFR-CMS-001 atomic requirement",
+    "purpose": "Verify allow a User / Complainant to submit a complaint at any time",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As an authorized User / Complainant, submit a complaint with required category/type and description; verify that submission is not restricted to a particular time.",
+    "expected_result": "CMS shall allow a User / Complainant to submit a complaint at any time.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-002",
+    "source_id": "AFR-CMS-002 atomic requirement",
+    "purpose": "Verify record the complaint category for each submitted complaint",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Submit a complaint specifying a category/type; retrieve the accepted complaint and inspect its recorded category/type.",
+    "expected_result": "CMS shall record the complaint category for each submitted complaint.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-003",
+    "source_id": "AFR-CMS-003 atomic requirement",
+    "purpose": "Verify record the complaint description for each submitted complaint",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Submit a complaint with a description; retrieve the accepted complaint and inspect its recorded description.",
+    "expected_result": "CMS shall record the complaint description for each submitted complaint.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-004",
+    "source_id": "AFR-CMS-004 atomic requirement",
+    "purpose": "Verify record the submission date/time for each submitted complaint",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Submit a valid complaint; retrieve it and inspect the stored submission date/time.",
+    "expected_result": "CMS shall record the submission date/time for each submitted complaint.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-005",
+    "source_id": "AFR-CMS-005 atomic requirement",
+    "purpose": "Verify allow complaint submissions to include supporting attachments",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Submit a valid complaint with an allowed supporting attachment and inspect its association with the complaint.",
+    "expected_result": "CMS shall allow complaint submissions to include supporting attachments.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-006",
+    "source_id": "AFR-CMS-006 atomic requirement",
+    "purpose": "Verify validate mandatory complaint fields before accepting a complaint submission",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Attempt to submit a complaint missing required category/type, then one missing description; inspect whether either is accepted.",
+    "expected_result": "CMS shall validate mandatory complaint fields before accepting a complaint submission.",
+    "test_type": "functional negative/validation"
+  },
+  {
+    "test_id": "FR-CMS-007",
+    "source_id": "AFR-CMS-007 atomic requirement",
+    "purpose": "Verify validate accepted attachment constraints before accepting submitted attachments",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Supply an attachment violating a configured accepted constraint and attempt attachment acceptance.",
+    "expected_result": "CMS shall validate accepted attachment constraints before accepting submitted attachments.",
+    "test_type": "functional negative/validation"
+  },
+  {
+    "test_id": "FR-CMS-008",
+    "source_id": "AFR-CMS-008 atomic requirement",
+    "purpose": "Verify treat the exact attachment file-type, file-size, and format limits as configurable or institutional constraints outside the frozen problem-statement details",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Change the available attachment constraint configuration and verify that acceptance follows configured, not invented fixed, limits.",
+    "expected_result": "CMS shall treat the exact attachment file-type, file-size, and format limits as configurable or institutional constraints outside the frozen problem-statement details.",
+    "test_type": "scope/configuration boundary"
+  },
+  {
+    "test_id": "FR-CMS-009",
+    "source_id": "AFR-CMS-009 atomic requirement",
+    "purpose": "Verify generate a unique complaint identifier for each submitted complaint",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Submit two separate valid complaints and compare their generated complaint identifiers.",
+    "expected_result": "CMS shall generate a unique complaint identifier for each submitted complaint.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-010",
+    "source_id": "AFR-CMS-010 atomic requirement",
+    "purpose": "Verify provide complaint submission confirmation or notification to the User / Complainant",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Submit a valid complaint and observe its acceptance confirmation or complaint-submission notification event.",
+    "expected_result": "CMS shall provide complaint submission confirmation or notification to the User / Complainant.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-011",
+    "source_id": "AFR-CMS-011 atomic requirement",
+    "purpose": "Verify allow the Complaint Handler to manually assign submitted complaints for operational handling",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, manually assign a submitted complaint for handling and inspect its assignment.",
+    "expected_result": "CMS shall allow the Complaint Handler to manually assign submitted complaints for operational handling.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-012",
+    "source_id": "AFR-CMS-012 atomic requirement",
+    "purpose": "Verify allow the Complaint Handler to categorize complaints by complaint category/type",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, set complaint category/type and inspect the recorded categorization.",
+    "expected_result": "CMS shall allow the Complaint Handler to categorize complaints by complaint category/type.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-013",
+    "source_id": "AFR-CMS-013 atomic requirement",
+    "purpose": "Verify allow the Complaint Handler to assign complaint priority as Low, Medium, or High",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, assign priorities Low, Medium and High to test complaints and inspect the stored values.",
+    "expected_result": "CMS shall allow the Complaint Handler to assign complaint priority as Low, Medium, or High.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-014",
+    "source_id": "AFR-CMS-014 atomic requirement",
+    "purpose": "Verify record assignment information for downstream complaint handling, reminders, and escalation",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "After manual assignment, inspect recorded assignment information used for subsequent handling.",
+    "expected_result": "CMS shall record assignment information for downstream complaint handling, reminders, and escalation.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-015",
+    "source_id": "AFR-CMS-015 atomic requirement",
+    "purpose": "Verify record priority information for downstream complaint handling, reminders, and escalation",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "After priority assignment, inspect recorded priority information used for subsequent reminders or escalation.",
+    "expected_result": "CMS shall record priority information for downstream complaint handling, reminders, and escalation.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-016",
+    "source_id": "AFR-CMS-016 atomic requirement",
+    "purpose": "Verify allow a User / Complainant to track the status of the User /",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As the complainant, retrieve the status of a complaint previously submitted by that complainant.",
+    "expected_result": "CMS shall allow a User / Complainant to track the status of the User /",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-017",
+    "source_id": "AFR-CMS-017 atomic requirement",
+    "purpose": "Verify allow a User / Complainant to track the history of the User / Complainant's submitted complaints",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As the complainant, retrieve the history of a complaint previously submitted by that complainant.",
+    "expected_result": "CMS shall allow a User / Complainant to track the history of the User / Complainant's submitted complaints.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-018",
+    "source_id": "AFR-CMS-018 atomic requirement",
+    "purpose": "Verify allow Complaint Handlers to review complaints assigned for handling",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, retrieve the complaints assigned for handling.",
+    "expected_result": "CMS shall allow Complaint Handlers to review complaints assigned for handling.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-019",
+    "source_id": "AFR-CMS-019 atomic requirement",
+    "purpose": "Verify allow Complaint Handlers to update complaint progress during processing",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, add a progress update to a complaint under handling and retrieve that progress.",
+    "expected_result": "CMS shall allow Complaint Handlers to update complaint progress during processing.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-020",
+    "source_id": "AFR-CMS-020 atomic requirement",
+    "purpose": "Verify maintain complaint status history throughout the lifecycle of each complaint",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Change a complaint status through a specified lifecycle action and retrieve its status history.",
+    "expected_result": "CMS shall maintain complaint status history throughout the lifecycle of each complaint.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-021",
+    "source_id": "AFR-CMS-021 atomic requirement",
+    "purpose": "Verify maintain complaint progress history throughout the lifecycle of each complaint",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Add a complaint progress update and retrieve its chronological progress history.",
+    "expected_result": "CMS shall maintain complaint progress history throughout the lifecycle of each complaint.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-022",
+    "source_id": "AFR-CMS-022 atomic requirement",
+    "purpose": "Verify recognize Submitted, In Progress, Resolved, Rejected, and Closed as complaint lifecycle states",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Inspect the defined lifecycle state values, including Submitted, In Progress, Resolved, Rejected and Closed; do not assume unspecified transitions.",
+    "expected_result": "CMS shall recognize Submitted, In Progress, Resolved, Rejected, and Closed as complaint lifecycle states.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-023",
+    "source_id": "AFR-CMS-023 atomic requirement",
+    "purpose": "Verify record complaint resolution details for resolved complaints",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, resolve a complaint with resolution details and inspect the persisted details.",
+    "expected_result": "CMS shall record complaint resolution details for resolved complaints.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-024",
+    "source_id": "AFR-CMS-024 atomic requirement",
+    "purpose": "Verify record rejection details or rejection reason information for rejected complaints",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, reject a complaint with a reason and inspect the persisted rejection information.",
+    "expected_result": "CMS shall record rejection details or rejection reason information for rejected complaints.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-025",
+    "source_id": "AFR-CMS-025 atomic requirement",
+    "purpose": "Verify notify Users / Complainants of complaint outcome updates",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Perform a documented complaint outcome change and observe its notification trigger.",
+    "expected_result": "CMS shall notify Users / Complainants of complaint outcome updates.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-026",
+    "source_id": "AFR-CMS-026 atomic requirement",
+    "purpose": "Verify notify Users / Complainants of complaint status updates",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Perform a documented status update and observe the associated notification trigger.",
+    "expected_result": "CMS shall notify Users / Complainants of complaint status updates.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-027",
+    "source_id": "AFR-CMS-027 atomic requirement",
+    "purpose": "Verify support User / Complainant verification of a resolved complaint when the applicable closure process requires such verification",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "For a resolved complaint on the complainant-verification closure path, perform the required complainant verification before closure.",
+    "expected_result": "CMS shall support User / Complainant verification of a resolved complaint when the applicable closure process requires such verification.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-028",
+    "source_id": "AFR-CMS-028 atomic requirement",
+    "purpose": "Verify support Complaint Supervisor verification of a resolved complaint when the applicable closure process requires such verification",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "For a resolved complaint on the supervisor-verification closure path, perform the required supervisor verification before closure.",
+    "expected_result": "CMS shall support Complaint Supervisor verification of a resolved complaint when the applicable closure process requires such verification.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-029",
+    "source_id": "AFR-CMS-029 atomic requirement",
+    "purpose": "Verify record complaint closure after successful verification when verification is required",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Complete a required closure verification successfully; inspect the recorded closure and resulting status.",
+    "expected_result": "CMS shall record complaint closure after successful verification when verification is required.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-030",
+    "source_id": "AFR-CMS-030 atomic requirement",
+    "purpose": "Verify allow Users / Complainants to request reopening of a closed complaint where dissatisfaction remains after closure",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As a dissatisfied complainant, request reopening of an already Closed complaint and inspect the request record.",
+    "expected_result": "CMS shall allow Users / Complainants to request reopening of a closed complaint where dissatisfaction remains after closure.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-031",
+    "source_id": "AFR-CMS-031 atomic requirement",
+    "purpose": "Verify allow the Complaint Supervisor to review complaint reopening requests",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Supervisor, retrieve and review a filed reopening request.",
+    "expected_result": "CMS shall allow the Complaint Supervisor to review complaint reopening requests.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-032",
+    "source_id": "AFR-CMS-032 atomic requirement",
+    "purpose": "Verify reopen the complaint when a reopening request is approved",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Supervisor, approve a reopening request and inspect whether the complaint is recorded as reopened.",
+    "expected_result": "CMS shall reopen the complaint when a reopening request is approved.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-033",
+    "source_id": "AFR-CMS-033 atomic requirement",
+    "purpose": "Verify update the complaint status accordingly when reopening is approved",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Approve a closed complaint reopening request and inspect the resulting status; do not impose an exact unspecified lifecycle state.",
+    "expected_result": "CMS shall update the complaint status accordingly when reopening is approved.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-034",
+    "source_id": "AFR-CMS-034 atomic requirement",
+    "purpose": "Verify record the outcome of the complaint reopening request",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Submit a reopening request and record the supervisor decision; inspect that the outcome is persisted.",
+    "expected_result": "CMS shall record the outcome of the complaint reopening request.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-035",
+    "source_id": "AFR-CMS-035 atomic requirement",
+    "purpose": "Verify allow Users / Complainants to submit feedback after complaint resolution or closure",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As a complainant, submit feedback on a Resolved or Closed complaint.",
+    "expected_result": "CMS shall allow Users / Complainants to submit feedback after complaint resolution or closure.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-036",
+    "source_id": "AFR-CMS-036 atomic requirement",
+    "purpose": "Verify allow Complaint Handlers to review submitted feedback",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, review feedback already submitted for a complaint.",
+    "expected_result": "CMS shall allow Complaint Handlers to review submitted feedback.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-037",
+    "source_id": "AFR-CMS-037 atomic requirement",
+    "purpose": "Verify allow Complaint Supervisors to review submitted feedback",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Supervisor, review feedback already submitted for a complaint.",
+    "expected_result": "CMS shall allow Complaint Supervisors to review submitted feedback.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-038",
+    "source_id": "AFR-CMS-038 atomic requirement",
+    "purpose": "Verify allow unresolved complaints to be escalated manually",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, manually escalate an unresolved complaint.",
+    "expected_result": "CMS shall allow unresolved complaints to be escalated manually.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-039",
+    "source_id": "AFR-CMS-039 atomic requirement",
+    "purpose": "Verify track escalation status",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Escalate a complaint through a specified path and retrieve escalation status.",
+    "expected_result": "CMS shall track escalation status.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-040",
+    "source_id": "AFR-CMS-040 atomic requirement",
+    "purpose": "Verify allow Complaint Supervisors to monitor escalated complaints",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Supervisor, list or review escalated complaints.",
+    "expected_result": "CMS shall allow Complaint Supervisors to monitor escalated complaints.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-041",
+    "source_id": "AFR-CMS-041 atomic requirement",
+    "purpose": "Verify associate complaint priority with applicable SLA timelines",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Configure applicable SLA timelines for complaint priorities and inspect their associations.",
+    "expected_result": "CMS shall associate complaint priority with applicable SLA timelines.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-042",
+    "source_id": "AFR-CMS-042 atomic requirement",
+    "purpose": "Verify not specify exact SLA duration values in the module baseline",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Inspect baseline SLA configuration; ensure no exact unsupported SLA durations are fixed by the module specification.",
+    "expected_result": "CMS shall not specify exact SLA duration values in the module baseline.",
+    "test_type": "scope/configuration boundary"
+  },
+  {
+    "test_id": "FR-CMS-043",
+    "source_id": "AFR-CMS-043 atomic requirement",
+    "purpose": "Verify send reminder notifications when a complaint approaches the applicable SLA breach condition",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "For an unresolved complaint approaching a configured applicable SLA breach, trigger the reminder event and inspect notification triggering.",
+    "expected_result": "CMS shall send reminder notifications when a complaint approaches the applicable SLA breach condition.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-044",
+    "source_id": "AFR-CMS-044 atomic requirement",
+    "purpose": "Verify automatically escalate a complaint if it is not resolved within the applicable SLA timeline",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "For an unresolved complaint past a configured applicable SLA breach, trigger the scheduled evaluation and inspect automatic escalation.",
+    "expected_result": "CMS shall automatically escalate a complaint if it is not resolved within the applicable SLA timeline.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-045",
+    "source_id": "AFR-CMS-045 atomic requirement",
+    "purpose": "Verify allow Complaint Handlers to publish complaint-related announcements",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, publish a complaint-related announcement.",
+    "expected_result": "CMS shall allow Complaint Handlers to publish complaint-related announcements.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-046",
+    "source_id": "AFR-CMS-046 atomic requirement",
+    "purpose": "Verify allow Complaint Supervisors to publish complaint-related announcements",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Supervisor, publish a complaint-related announcement.",
+    "expected_result": "CMS shall allow Complaint Supervisors to publish complaint-related announcements.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-047",
+    "source_id": "AFR-CMS-047 atomic requirement",
+    "purpose": "Verify allow Users / Complainants to view complaint-related announcements",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As User / Complainant, retrieve a published complaint-related announcement.",
+    "expected_result": "CMS shall allow Users / Complainants to view complaint-related announcements.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-048",
+    "source_id": "AFR-CMS-048 atomic requirement",
+    "purpose": "Verify send announcement-related notifications to Users / Complainants where CMS is configured to notify them about such announcements",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Enable announcement notifications, publish an announcement, and inspect the notification trigger.",
+    "expected_result": "CMS shall send announcement-related notifications to Users / Complainants where CMS is configured to notify them about such announcements.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-049",
+    "source_id": "AFR-CMS-049 atomic requirement",
+    "purpose": "Verify allow Complaint Handlers to generate operational complaint reports",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Handler, request the supported operational complaint report.",
+    "expected_result": "CMS shall allow Complaint Handlers to generate operational complaint reports.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-050",
+    "source_id": "AFR-CMS-050 atomic requirement",
+    "purpose": "Verify allow Complaint Supervisors to view complaint summaries",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Supervisor, request the complaint summary.",
+    "expected_result": "CMS shall allow Complaint Supervisors to view complaint summaries.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-051",
+    "source_id": "AFR-CMS-051 atomic requirement",
+    "purpose": "Verify allow Complaint Supervisors to view escalation summaries",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As Complaint Supervisor, request the escalation summary.",
+    "expected_result": "CMS shall allow Complaint Supervisors to view escalation summaries.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-052",
+    "source_id": "AFR-CMS-052 atomic requirement",
+    "purpose": "Verify allow System Admin to view complaint reports available within CMS",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As System Admin, request the complaint reports available within CMS.",
+    "expected_result": "CMS shall allow System Admin to view complaint reports available within CMS.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-053",
+    "source_id": "AFR-CMS-053 atomic requirement",
+    "purpose": "Verify allow System Admin to view analytics available within CMS",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As System Admin, view the analytics actually available within CMS.",
+    "expected_result": "CMS shall allow System Admin to view analytics available within CMS.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-054",
+    "source_id": "AFR-CMS-054 atomic requirement",
+    "purpose": "Verify limit analytics scope to complaint reports, complaint summaries, escalation summaries, and analytics visibility explicitly available within CMS",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Inspect CMS analytics and reporting features and ensure they do not claim unsupported cross-module analytics.",
+    "expected_result": "CMS shall limit analytics scope to complaint reports, complaint summaries, escalation summaries, and analytics visibility explicitly available within CMS.",
+    "test_type": "scope/configuration boundary"
+  },
+  {
+    "test_id": "FR-CMS-055",
+    "source_id": "AFR-CMS-055 atomic requirement",
+    "purpose": "Verify trigger email notifications for complaint submission events",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Submit an accepted complaint and inspect the email-notification trigger event.",
+    "expected_result": "CMS shall trigger email notifications for complaint submission events.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-056",
+    "source_id": "AFR-CMS-056 atomic requirement",
+    "purpose": "Verify trigger email notifications for complaint status update events",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Update the complaint status and inspect the email-notification trigger event.",
+    "expected_result": "CMS shall trigger email notifications for complaint status update events.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-057",
+    "source_id": "AFR-CMS-057 atomic requirement",
+    "purpose": "Verify trigger email notifications for complaint resolution events",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Resolve a complaint and inspect the email-notification trigger event.",
+    "expected_result": "CMS shall trigger email notifications for complaint resolution events.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-058",
+    "source_id": "AFR-CMS-058 atomic requirement",
+    "purpose": "Verify trigger email notifications for complaint rejection events",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Reject a complaint and inspect the email-notification trigger event.",
+    "expected_result": "CMS shall trigger email notifications for complaint rejection events.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-059",
+    "source_id": "AFR-CMS-059 atomic requirement",
+    "purpose": "Verify trigger email notifications for complaint escalation events",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Escalate a complaint and inspect the email-notification trigger event.",
+    "expected_result": "CMS shall trigger email notifications for complaint escalation events.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-060",
+    "source_id": "AFR-CMS-060 atomic requirement",
+    "purpose": "Verify trigger email notifications for complaint reopening outcome events where applicable",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Record an applicable reopening outcome and inspect the email-notification trigger event.",
+    "expected_result": "CMS shall trigger email notifications for complaint reopening outcome events where applicable.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-061",
+    "source_id": "AFR-CMS-061 atomic requirement",
+    "purpose": "Verify trigger email notifications for feedback-related events where applicable",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Perform an applicable feedback-related event and inspect the email-notification trigger.",
+    "expected_result": "CMS shall trigger email notifications for feedback-related events where applicable.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-062",
+    "source_id": "AFR-CMS-062 atomic requirement",
+    "purpose": "Verify trigger email notifications for complaint-related announcement events",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Publish a complaint-related announcement and inspect the email-notification trigger.",
+    "expected_result": "CMS shall trigger email notifications for complaint-related announcement events.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-063",
+    "source_id": "AFR-CMS-063 atomic requirement",
+    "purpose": "Verify limit module responsibility to notification triggering, not central email delivery infrastructure or platform-level notification infrastructure, unless explicitly represented as CMS notification records or events",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Inspect CMS notification behavior: assert the module triggers events without requiring it to implement external central email delivery.",
+    "expected_result": "CMS shall limit module responsibility to notification triggering, not central email delivery infrastructure or platform-level notification infrastructure, unless explicitly represented as CMS notification records or events.",
+    "test_type": "scope/configuration boundary"
+  },
+  {
+    "test_id": "FR-CMS-064",
+    "source_id": "AFR-CMS-064 atomic requirement",
+    "purpose": "Verify allow System Admin to assign the",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As System Admin, assign Complaint Handler role to an existing institutional user with a specified duration.",
+    "expected_result": "CMS shall allow System Admin to assign the",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-065",
+    "source_id": "AFR-CMS-065 atomic requirement",
+    "purpose": "Verify allow System Admin to assign the Complaint Supervisor role to an existing institutional user for a specified duration",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As System Admin, assign Complaint Supervisor role to an existing institutional user with a specified duration.",
+    "expected_result": "CMS shall allow System Admin to assign the Complaint Supervisor role to an existing institutional user for a specified duration.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-066",
+    "source_id": "AFR-CMS-066 atomic requirement",
+    "purpose": "Verify allow System Admin to reassign Complaint Handler and Complaint Supervisor roles mid-cycle",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "As System Admin, reassign a current Handler or Supervisor role during an active term and inspect the new role holder.",
+    "expected_result": "CMS shall allow System Admin to reassign Complaint Handler and Complaint Supervisor roles mid-cycle.",
+    "test_type": "functional specification"
+  },
+  {
+    "test_id": "FR-CMS-067",
+    "source_id": "AFR-CMS-067 atomic requirement",
+    "purpose": "Verify enforce exactly one active Complaint Handler role-holder at a time within CMS",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Try establishing two simultaneously active Complaint Handler holders and inspect enforcement of the single-active-holder invariant.",
+    "expected_result": "CMS shall enforce exactly one active Complaint Handler role-holder at a time within CMS.",
+    "test_type": "functional negative/validation"
+  },
+  {
+    "test_id": "FR-CMS-068",
+    "source_id": "AFR-CMS-068 atomic requirement",
+    "purpose": "Verify enforce exactly one active Complaint Supervisor role-holder at a time within CMS",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Try establishing two simultaneously active Complaint Supervisor holders and inspect enforcement of the single-active-holder invariant.",
+    "expected_result": "CMS shall enforce exactly one active Complaint Supervisor role-holder at a time within CMS.",
+    "test_type": "functional negative/validation"
+  },
+  {
+    "test_id": "FR-CMS-069",
+    "source_id": "AFR-CMS-069 atomic requirement",
+    "purpose": "Verify ssignment shall be limited to CMS-specific operational and supervisory roles",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Assign a CMS Handler or Supervisor role and inspect that the operation is limited to CMS roles.",
+    "expected_result": "CMS role assignment shall be limited to CMS-specific operational and supervisory roles.",
+    "test_type": "scope/configuration boundary"
+  },
+  {
+    "test_id": "FR-CMS-070",
+    "source_id": "AFR-CMS-070 atomic requirement",
+    "purpose": "Verify exclude HR master-data management, payroll, employment records, and platform-wide user-account administration from CMS role-management scope",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Inspect CMS role management for absence of HR, payroll, employment records and platform account administration operations.",
+    "expected_result": "CMS shall exclude HR master-data management, payroll, employment records, and platform-wide user-account administration from CMS role-management scope.",
+    "test_type": "scope/configuration boundary"
+  },
+  {
+    "test_id": "FR-CMS-071",
+    "source_id": "AFR-CMS-071 atomic requirement",
+    "purpose": "Verify not perform payment, accounting, payroll, procurement, inventory, physical maintenance execution, or platform-level security administration",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Inspect the module features for absence of payment, accounting, procurement, inventory and physical maintenance execution.",
+    "expected_result": "CMS shall not perform payment, accounting, payroll, procurement, inventory, physical maintenance execution, or platform-level security administration.",
+    "test_type": "scope/configuration boundary"
+  },
+  {
+    "test_id": "FR-CMS-072",
+    "source_id": "AFR-CMS-072 atomic requirement",
+    "purpose": "Verify limit complaints involving external services or departments to recording, assigning, tracking, escalating, resolving or rejecting, closing, reopening, notifying, reporting, and reviewing complaint-handling information",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Create a complaint referring to an external department and track it solely through the documented CMS records and status changes.",
+    "expected_result": "CMS shall limit complaints involving external services or departments to recording, assigning, tracking, escalating, resolving or rejecting, closing, reopening, notifying, reporting, and reviewing complaint-handling information.",
+    "test_type": "scope/configuration boundary"
+  },
+  {
+    "test_id": "FR-CMS-073",
+    "source_id": "AFR-CMS-073 atomic requirement",
+    "purpose": "Verify treat external institutional policies, manuals, guidelines, and departmental processes as outside CMS scope unless CMS explicitly validates, restricts, routes, records, notifies, escalates, or reports based on them",
+    "preconditions": "Valid CMS role and test data for the described action; provide any configured constraints or SLA values when the rule references them.",
+    "action_or_input": "Inspect behavior for external policies or manuals; do not assume additional checks or restrictions beyond explicitly documented CMS rules.",
+    "expected_result": "CMS shall treat external institutional policies, manuals, guidelines, and departmental processes as outside CMS scope unless CMS explicitly validates, restricts, routes, records, notifies, escalates, or reports based on them.",
+    "test_type": "scope/configuration boundary"
+  }
+]
