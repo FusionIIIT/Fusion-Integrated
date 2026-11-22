@@ -7,7 +7,7 @@
 | **Docs Folder** | `docs/19-complaints` |
 | **Author** | Student 1 (`24BCS134`, kushagra-005) |
 | **Reviewer / Approver** | Student 2 (`24BCS038`, Ashish Kumar Meena) |
-| **Status** | APPROVED — 10/10 Scorecard (Round Q2 Final) |
+| **Status** | APPROVED — 10/10 Scorecard (Round Q2 Final at 73d3d36) |
 | **Date** | 2026-11-22 |
 
 ---
