@@ -82,3 +82,14 @@ def get_active_mess_roles(role_names: Sequence[str]) -> dict[str, dict | None]:
             "assigned_by_id": a.assigned_by_id,
         }
     return result
+
+
+def is_student_registered(student_id: int) -> bool:
+    """Check if a single student is actively registered for mess."""
+    from modules.mms.models import MessRegistration, RegistrationStatus
+
+    return MessRegistration.objects.filter(
+        student_id=student_id,
+        status=RegistrationStatus.REGISTERED.value,
+    ).exists()
+

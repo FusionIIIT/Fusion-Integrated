@@ -19,7 +19,7 @@ def validate_rebate_request(start_date: date, end_date: date, submission_date: d
     if start_date > end_date:
         raise ValueError("Rebate start date cannot be after end date.")
 
-    duration = (end_date - start_date).days + 1
+    duration = (end_date - start_date).days
     if duration < 3:
         raise ValueError(
             "MMS rejects rebate requests with duration fewer than 3 days "

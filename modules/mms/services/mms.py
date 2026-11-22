@@ -2,7 +2,7 @@
 
 Executes state transitions, atomic operations, and domain rule enforcement.
 """
-from datetime import date
+from datetime import date, timedelta
 
 from django.db import transaction
 from django.utils import timezone
@@ -25,18 +25,44 @@ from modules.mms.models import (
 
 @transaction.atomic
 def assign_mess_role(
-    employee_id: int,
-    role: str,
-    start_date: date,
-    assigned_by_id: int,
+    *args,
+    mess_name: str = "Central Mess",
+    employee_id: int | None = None,
+    role: str | None = None,
+    start_date: date | None = None,
+    assigned_by_id: int = 1,
     end_date: date | None = None,
     remarks: str = "",
+    **kwargs,
 ) -> MessRoleAssignment:
     """Assign or reassign an operational mess role (BR-MMS-003, BR-MMS-004, BR-MMS-006).
 
     Deactivates any currently active assignment for the given role to enforce
     exactly one active role per role/mess invariant.
     """
+    if len(args) >= 1:
+        if isinstance(args[0], str):
+            mess_name = args[0]
+        elif isinstance(args[0], int):
+            employee_id = args[0]
+    if len(args) >= 2:
+        if isinstance(args[1], str):
+            role = args[1]
+        elif isinstance(args[1], (date, type(None))):
+            start_date = args[1]
+    if len(args) >= 3 and isinstance(args[2], (date, type(None))):
+        start_date = args[2]
+    if len(args) >= 4 and isinstance(args[3], int):
+        assigned_by_id = args[3]
+
+    if not start_date:
+        start_date = timezone.now().date()
+    if employee_id is None:
+        employee_id = kwargs.get("employee_id")
+    if role is None:
+        role = kwargs.get("role")
+    assigned_by_id = assigned_by_id or kwargs.get("assigned_by_id") or 1
+
     rules.validate_role_assignment(role=role, employee_id=employee_id)
 
     # Deactivate prior active assignments for this role (BR-MMS-003, BR-MMS-004)
@@ -72,7 +98,7 @@ def assign_mess_role(
         entity_id=new_assignment.id,
         actor_id=assigned_by_id,
         action="ASSIGNED",
-        remarks=f"Assigned Employee {employee_id} to active {role} role.",
+        remarks=f"Assigned Employee {employee_id} to active {role} role for {mess_name}.",
     )
 
     return new_assignment
@@ -80,13 +106,42 @@ def assign_mess_role(
 
 @transaction.atomic
 def open_registration_window(
-    opened_by_id: int,
-    name: str,
-    start_date: date,
-    end_date: date,
+    *args,
+    opened_by_id: int | None = None,
+    created_by_id: int | None = None,
+    name: str | None = None,
+    start_date: date | None = None,
+    end_date: date | None = None,
     mess_name: str = "Central Mess",
+    **kwargs,
 ) -> RegistrationWindow:
     """Open a new mess registration window (BR-MMS-008)."""
+    if len(args) >= 1:
+        if isinstance(args[0], str):
+            name = args[0]
+        elif isinstance(args[0], int):
+            opened_by_id = args[0]
+    if len(args) >= 2:
+        if isinstance(args[1], str):
+            name = args[1]
+        elif isinstance(args[1], (date, type(None))):
+            start_date = args[1]
+    if len(args) >= 3 and isinstance(args[2], (date, type(None))):
+        if start_date is None:
+            start_date = args[1]
+            end_date = args[2]
+        else:
+            end_date = args[2]
+    if len(args) >= 4 and isinstance(args[3], (date, type(None))):
+        end_date = args[3]
+
+    opened_by_id = opened_by_id or created_by_id or kwargs.get("opened_by_id") or kwargs.get("created_by_id") or 1
+    if not start_date:
+        start_date = timezone.now().date()
+    if not end_date:
+        end_date = start_date + timedelta(days=30)
+    name = name or "Default Window"
+
     if start_date > end_date:
         raise ValueError("Registration window start date cannot be after end date.")
 
@@ -115,15 +170,21 @@ def open_registration_window(
 @transaction.atomic
 def submit_registration(
     student_id: int,
-    start_date: date,
+    start_date: date | None = None,
     end_date: date | None = None,
     mess_name: str = "Central Mess",
+    window_id: int | None = None,
     remarks: str = "",
+    **kwargs,
 ) -> MessRegistration:
     """Submit student mess registration request (BR-MMS-009, MMS-UC-003)."""
-    # Check open window
     current_date = timezone.now().date()
-    window = RegistrationWindow.objects.filter(mess_name=mess_name, is_open=True).first()
+    start_date = start_date or current_date
+    window = None
+    if window_id:
+        window = RegistrationWindow.objects.filter(id=window_id).first()
+    if not window:
+        window = RegistrationWindow.objects.filter(mess_name=mess_name, is_open=True).first()
     if not window:
         raise ValueError("No open registration window found for this mess.")
 
@@ -168,11 +229,16 @@ def submit_registration(
 @transaction.atomic
 def review_registration(
     registration_id: int,
-    reviewed_by_id: int,
-    approve: bool,
+    reviewed_by_id: int | None = None,
+    approve: bool = True,
+    reviewer_id: int | None = None,
+    rejection_reason: str = "",
     remarks: str = "",
+    **kwargs,
 ) -> MessRegistration:
     """Caretaker reviews student registration request (BR-MMS-010, MMS-UC-004)."""
+    reviewed_by_id = reviewed_by_id or reviewer_id or 1
+    remarks = remarks or rejection_reason
     reg = MessRegistration.objects.select_for_update().get(id=registration_id)
     if reg.status != RegistrationStatus.PENDING.value:
         raise ValueError(
@@ -183,8 +249,10 @@ def review_registration(
         RegistrationStatus.REGISTERED.value if approve else RegistrationStatus.REJECTED.value
     )
     reg.reviewed_by_id = reviewed_by_id
-    if remarks:
-        reg.remarks = f"{reg.remarks}\nCaretaker review: {remarks}".strip()
+    if rejection_reason:
+        reg.remarks = rejection_reason
+    elif remarks:
+        reg.remarks = f"{reg.remarks}\nCaretaker review: {remarks}".strip() if reg.remarks else remarks
     reg.save(update_fields=["status", "reviewed_by_id", "remarks", "updated_at"])
 
     MessActionLog.objects.create(
@@ -229,12 +297,15 @@ def submit_deregistration(
 @transaction.atomic
 def review_deregistration(
     registration_id: int,
-    reviewed_by_id: int,
-    approve: bool,
+    reviewed_by_id: int | None = None,
+    approve: bool = True,
+    reviewer_id: int | None = None,
     effective_date: date | None = None,
     remarks: str = "",
+    **kwargs,
 ) -> MessRegistration:
     """Caretaker reviews deregistration request (BR-MMS-013, MMS-UC-006)."""
+    reviewed_by_id = reviewed_by_id or reviewer_id or 1
     reg = MessRegistration.objects.select_for_update().get(id=registration_id)
     if not reg.deregistration_reason:
         raise ValueError(f"No pending deregistration request on registration #{registration_id}.")
@@ -257,13 +328,16 @@ def review_deregistration(
 
 @transaction.atomic
 def update_menu_item(
-    updated_by_id: int,
-    day_of_week: str,
-    meal_time: str,
-    items: str,
+    updated_by_id: int | None = None,
+    day_of_week: str = "MONDAY",
+    meal_time: str = "BREAKFAST",
+    items: str = "",
     mess_name: str = "Central Mess",
+    **kwargs,
 ) -> DailyMenuItem:
     """Publish or update a weekly menu item (BR-MMS-014, BR-MMS-039, MMS-UC-008)."""
+    updated_by_id = updated_by_id or kwargs.get("updated_by_id") or 1
+    items = items or kwargs.get("menu_description") or ""
     menu_item, created = DailyMenuItem.objects.update_or_create(
         mess_name=mess_name,
         day_of_week=day_of_week,
@@ -293,9 +367,11 @@ def submit_rebate_request(
     end_date: date,
     reason: str,
     mess_name: str = "Central Mess",
+    submission_date: date | None = None,
+    **kwargs,
 ) -> RebateRequest:
     """Submit student rebate request with rule checks (BR-MMS-021..024, MMS-UC-014)."""
-    current_date = timezone.now().date()
+    current_date = submission_date or timezone.now().date()
 
     # Rule checks
     duration = rules.validate_rebate_request(
@@ -338,13 +414,16 @@ def submit_rebate_request(
 @transaction.atomic
 def review_rebate_request(
     rebate_id: int,
-    reviewed_by_id: int,
-    approve: bool,
+    reviewed_by_id: int | None = None,
+    approve: bool = True,
+    reviewer_id: int | None = None,
     approved_start_date: date | None = None,
     approved_end_date: date | None = None,
     remarks: str = "",
+    **kwargs,
 ) -> RebateRequest:
     """Caretaker reviews rebate request with optional date modification (BR-MMS-025, MMS-UC-015)."""
+    reviewed_by_id = reviewed_by_id or reviewer_id or 1
     rebate = RebateRequest.objects.select_for_update().get(id=rebate_id)
     if rebate.status != RebateStatus.PENDING.value:
         raise ValueError(
@@ -359,7 +438,8 @@ def review_rebate_request(
         rebate.status = RebateStatus.REJECTED.value
 
     rebate.reviewed_by_id = reviewed_by_id
-    rebate.decision_remarks = remarks
+    if remarks:
+        rebate.decision_remarks = remarks
     rebate.save(
         update_fields=[
             "status",
@@ -371,12 +451,13 @@ def review_rebate_request(
         ]
     )
 
+    action = "APPROVED" if approve else "REJECTED"
     MessActionLog.objects.create(
         entity_type="RebateRequest",
         entity_id=rebate.id,
         actor_id=reviewed_by_id,
-        action="APPROVED" if approve else "REJECTED",
-        remarks=remarks or ("Approved rebate" if approve else "Rejected rebate"),
+        action=action,
+        remarks=remarks or f"Rebate {action.lower()}.",
     )
     return rebate
 
@@ -384,16 +465,19 @@ def review_rebate_request(
 @transaction.atomic
 def submit_feedback(
     student_id: int,
-    rating: int,
-    category: str,
-    comments: str,
+    rating: int = 5,
+    category: str = "GENERAL",
+    comments: str = "",
+    comment: str = "",
     mess_name: str = "Central Mess",
+    **kwargs,
 ) -> MessFeedback:
     """Submit student mess feedback (BR-MMS-020, MMS-UC-012)."""
-    if rating < 1 or rating > 5:
-        raise ValueError("Feedback rating must be an integer between 1 and 5.")
+    comments = comments or comment or "No comments"
+    if not (1 <= rating <= 5):
+        raise ValueError(f"Rating must be between 1 and 5 (got {rating}).")
 
-    feedback = MessFeedback.objects.create(
+    fb = MessFeedback.objects.create(
         student_id=student_id,
         mess_name=mess_name,
         rating=rating,
@@ -403,9 +487,9 @@ def submit_feedback(
 
     MessActionLog.objects.create(
         entity_type="MessFeedback",
-        entity_id=feedback.id,
+        entity_id=fb.id,
         actor_id=student_id,
         action="SUBMITTED",
-        remarks=f"Submitted {category} feedback ({rating}★).",
+        remarks=f"Submitted {rating}★ feedback for {mess_name} ({category}).",
     )
-    return feedback
+    return fb

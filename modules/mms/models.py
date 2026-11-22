@@ -89,6 +89,14 @@ class MessRegistration(TimeStampedModel):
             models.Index(fields=["mess_name", "status"]),
         ]
 
+    @property
+    def rejection_reason(self) -> str:
+        return self.remarks
+
+    @rejection_reason.setter
+    def rejection_reason(self, value: str):
+        self.remarks = value
+
     def __str__(self) -> str:
         return f"Registration #{self.id}: Student {self.student_id} ({self.status})"
 
@@ -107,6 +115,14 @@ class DailyMenuItem(TimeStampedModel):
         db_table = "mms_daily_menu_items"
         unique_together = ("mess_name", "day_of_week", "meal_time")
         ordering = ["day_of_week", "meal_time"]
+
+    @property
+    def menu_description(self) -> str:
+        return self.items
+
+    @menu_description.setter
+    def menu_description(self, value: str):
+        self.items = value
 
     def __str__(self) -> str:
         return f"{self.mess_name} - {self.day_of_week} {self.meal_time}: {self.items[:40]}"
@@ -164,6 +180,14 @@ class MessFeedback(TimeStampedModel):
     class Meta:
         db_table = "mms_feedbacks"
         ordering = ["-created_at"]
+
+    @property
+    def comment(self) -> str:
+        return self.comments
+
+    @comment.setter
+    def comment(self, value: str):
+        self.comments = value
 
     def __str__(self) -> str:
         return f"Feedback #{self.id}: Student {self.student_id} [{self.category}] - {self.rating}★"

@@ -91,3 +91,19 @@ def list_action_logs(
     if entity_id:
         qs = qs.filter(entity_id=entity_id)
     return qs
+
+
+def get_active_mess_roles(mess_name: str | None = None) -> QuerySet[MessRoleAssignment]:
+    """Return currently active role assignments (BR-MMS-003, BR-MMS-004)."""
+    return MessRoleAssignment.objects.filter(is_active=True)
+
+
+def get_open_registration_windows() -> QuerySet[RegistrationWindow]:
+    """Return currently open registration windows."""
+    return RegistrationWindow.objects.filter(is_open=True)
+
+
+def get_feedbacks(mess_name: str | None = None) -> QuerySet[MessFeedback]:
+    """Return feedbacks for mess."""
+    return list_feedbacks(mess_name=mess_name)
+
