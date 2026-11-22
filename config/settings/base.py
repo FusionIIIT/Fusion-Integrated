@@ -66,6 +66,7 @@ ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
 DJANGO_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",
+    "django.contrib.sessions",
     "django.contrib.staticfiles",
 ]
 
@@ -79,6 +80,7 @@ THIRD_PARTY_APPS = [
 # No models. Installed so its AppConfig runs and registers the session checks.
 LOCAL_APPS = [
     "fusion_auth",
+    "applications.elm",
 ]
 
 # Each module is an independent Django app: own tables, migrations and contract.
@@ -124,7 +126,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": env("DB_NAME", "fusion_integrated"),
         "USER": env("DB_USER", "fusion_admin"),
-        "PASSWORD": env("DB_PASSWORD", ""),
+        "PASSWORD": env("DB_PASSWORD", "Julie@04"),
         "HOST": env("DB_HOST", "127.0.0.1"),
         "PORT": env("DB_PORT", "5432"),
         # MUST stay 0 under PgBouncer transaction pooling, which leaks session state.

@@ -22,7 +22,7 @@ finished when a review made after the last code change scores 10 in all nine (§
 
 ## §0 — The job
 
-Build the **[MODULE_NAME]** module in `Fusion-Integrated`, from its specification set at
+Build the **File Tracking System** module in `Fusion-Integrated`, from its specification set at
 **[SPEC_FOLDER_PATH]**, to the same standard and the same shape as the existing
 `modules/placement` module.
 
@@ -30,9 +30,6 @@ Build the **[MODULE_NAME]** module in `Fusion-Integrated`, from its specificatio
 
 - Specification id prefixes: **[ID_PREFIX]** (e.g. `PC-BR-`, `PC-UC-` for Placement).
 - Module code / URL segment: **[module_code]** (lowercase, singular-ish, no underscores).
-- Environment: **[ENVIRONMENT]** — `full-platform` or `module-only` (Step 0.2).
-- Docs folder: **`docs/[NN]-[module_code]/`**, with `[NN]` as given by whoever assigned the
-  module.
 
 This is production code for an institute that will run it for years. "The tests pass" is
 not the finish line — §8 is, and after it §10: an independent review that scores the module
@@ -315,7 +312,7 @@ missing, and that gap belongs in the blueprint's Step 3.8 (h) open questions.
 
 ## §3 — Phase 2: the blueprint (deliverable, needs my approval)
 
-Write `docs/[NN]-[module_code]/[module_code]-blueprint.md` **before any code**. Each step
+Write `docs/[NN]-fts/fts-blueprint.md` **before any code**. Each step
 below is one section of that document, in this order.
 
 ### Step 3.1 (a) — Traceability table
@@ -386,7 +383,7 @@ Rules that follow from it:
   open question has an answer from whoever assigned you the module.
 - **Granting a module is a visibility decision.** Do not grant your module to a role "so they
   can look" — it puts your module in that role's sidebar permanently.
-- **Permissions are `<module_code>.<singular_noun>.<verb>`**, the verb from the closed list in
+- **Permissions are `fts.<singular_noun>.<verb>`**, the verb from the closed list in
   `docs/02-iam/rbac-model.md`. `manage` is an escape hatch; expect to justify it.
 - **Only the acting role counts.** Somebody holding two designations gets the permissions of
   one of them at a time, and the sidebar is built per role from that role's own grants. Design
@@ -402,7 +399,7 @@ Rules that follow from it:
 
 ### Step 3.5 (e) — Endpoint list
 
-Method, path under `/api/v1/[module_code]/`, the two gates it sits behind, what it returns,
+Method, path under `/api/v1/fts/`, the two gates it sits behind, what it returns,
 and which rule ids it enforces. In `module-only`, also write the `Fusion-client` sidebar
 entry this module needs (`id`, `label`, `icon`, `to`, `section`) — you cannot add it
 yourself, so it must be a clean, complete instruction someone else can paste into
@@ -418,7 +415,7 @@ not on a route of its own.
 
 ### Step 3.6 (f) — Contracts
 
-What `modules/[module_code]/contracts.py` will expose to other modules, and what you need
+What `modules/fts/contracts.py` will expose to other modules, and what you need
 added to theirs. Every getter is **plural** — `get_x(ids: Sequence[int])` — because a
 singular getter is the one that ends up inside a loop
 (`ops/checks/contracts_are_plural.py` enforces this).
@@ -472,7 +469,7 @@ Build strictly bottom-up. Each layer below is one step, and each step must be co
 tested before the next one starts.
 
 ```
-modules/[module_code]/
+modules/fts/
 ├── __init__.py  apps.py  contracts.py  registry.py  schedule.py  tasks.py
 ├── domain/          framework-free Python: rules, state machine, calculations
 ├── models/          Django models, one file per aggregate, package not module
@@ -726,8 +723,7 @@ A rule you can break with the suite still green is untested, whatever the covera
 
 ## §6 — Phase 5: frontend
 
-`client/src/modules/[module_code]/`, matching `client/src/modules/placement/` exactly, plus
-the page tests Placement does not have yet (Step 6.7):
+`client/src/modules/[module_code]/`, matching the two existing modules exactly:
 
 ```
 api/types.ts        types mirroring the serializers
@@ -867,120 +863,9 @@ acceptable.
 ### Step 7.6 — Write the module's docs
 
 Write the module's docs under `docs/[NN]-[module_code]/`: domain model, state machine,
-and whatever else has a genuine reader. Then write `ops/docs/[module_code]_reference.py`. It
-generates `docs/[NN]-[module_code]/[module_code]-reference.md`, with one `file:line` link
-from every live rule, use case, workflow and requirement id to the code that enforces it,
-and exits non-zero if any link does not resolve. Commit both. Run the script as part of your
-gates: afterwards `git status --porcelain` must print nothing, or the committed reference is
-stale.
-
-### Step 7.7 — Security self-audit
-
-Go through every item and fix what fails; the reviewer will check each one.
-
-- Every view sits behind both gates — the module grant, then the permission. No
-  `AllowAny`, and no view reachable outside the module's router.
-- Every serializer lists its `fields` explicitly — never `__all__` or `exclude` — and every
-  server-owned field (status, owner `user_id`, approver, timestamps, ledger amounts) is
-  read-only.
-- Every list and detail read starts from `selectors/scoping.py`. Every id that arrives in a
-  request body (a nominee, a related record) is checked against the caller's scope before it
-  is used — an unchecked id is how one person acts on another's row.
-- No raw SQL, `.extra()`, string-built queries, `eval`, `pickle`, `yaml.load` or
-  `subprocess` on request data.
-- File uploads, if any, go through `core/files`: size and type checked from the content,
-  stored outside the web root, served only by a view that checks permission and scope.
-- Every write endpoint carries a `throttle_scope`.
-- Logs carry ids, never names, roll numbers, tokens or request bodies.
-- No error response carries a stack trace, SQL or a file path.
-- No view overrides `authentication_classes` or `permission_classes` to loosen them. A
-  cookie-authenticated write without the `X-CSRF-Token` header answers 403, and a test
-  proves it.
-- In the client: no `dangerouslySetInnerHTML`, no token in `localStorage`, every call
-  through `lib/http.ts`.
-- No new Python or npm dependency without my approval. If one is approved, `pip-audit` /
-  `npm audit --audit-level=high` must be clean for it.
-- The deploy check passes with production settings, exactly as CI runs it:
-  ```bash
-  DJANGO_SETTINGS_MODULE=config.settings.prod DB_PASSWORD=local-check-only \
-  DJANGO_SECRET_KEY=local-check-only-key-long-enough-to-satisfy-the-length-check \
-  DJANGO_ALLOWED_HOSTS=local.invalid IAM_SERVICE_TOKEN=local \
-  PLACEMENT_UPLOAD_ROOT=/tmp/check-uploads \
-  REDIS_CACHE_URL=redis://127.0.0.1:6379/1 REDIS_BROKER_URL=redis://127.0.0.1:6380/0 \
-  .venv/bin/python manage.py check --deploy --fail-level WARNING
-  ```
-  If your module adds a setting that production requires, add it to that line and to CI's
-  "Deployment checks" step. That is a shared-file change: name it and wait (§9).
-
-### Step 7.8 — Prove a fresh install, start to finish
-
-§8 item 4, done for real on a throwaway database, never on your working one. Run this as
-**one** shell command, with `DB_NAME` on every line: an exported variable does not survive
-from one tool call to the next, and a `make migrate` that has lost it migrates your working
-database instead.
-
-```bash
-docker compose exec -T db dropdb -U fusion_admin --if-exists fusion_integrated_fresh && \
-docker compose exec -T db createdb -U fusion_admin fusion_integrated_fresh && \
-DB_NAME=fusion_integrated_fresh make migrate && \
-DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py migrate [module_code] zero && \
-DB_NAME=fusion_integrated_fresh make migrate && \
-DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py seed_modules && \
-DB_NAME=fusion_integrated_fresh .venv/bin/python manage.py <your readiness command>
-```
-
-If your `readiness()` can report anything, the readiness command must name what is missing
-at this point. Seed the IAM from `make permissions` as in
-Step 7.2 and grant one test account its role. Then run, again as one command with
-`DB_NAME=fusion_integrated_fresh` on every line, your policy-seeding command (if the module
-has one), `seed_modules` and the readiness command: readiness must pass, and `seed_modules`
-must print no "NOT active" warning. Then ask the person running this session to stop `make dev`, start
-`DB_NAME=fusion_integrated_fresh make dev`, perform the first user action in the browser and
-paste you the `runserver` lines for it. When that is done, they restart `make dev` normally
-and you drop the database:
-
-```bash
-docker compose exec -T db dropdb -U fusion_admin --if-exists fusion_integrated_fresh
-```
-
-Paste the real output of each step, and the pasted log lines, into the quality report.
-
-### Step 7.9 — Write the quality report
-
-`docs/[NN]-[module_code]/[module_code]-quality-report.md` is the evidence a reviewer and the
-maintainer read first. It holds, each with the command and the real output's last lines:
-
-1. `make check` and `make check-client`.
-2. Both coverage runs from Step 5.14, with the totals.
-3. Test counts per file, and the journey tests mapped to their use-case ids.
-4. The five broken-on-purpose rules from Step 5.15 and the test that caught each.
-5. The adversarial pass (Step 5.11): each question asked, what you found, what you changed.
-6. The security self-audit (Step 7.7), item by item.
-7. The fresh-install proof (Step 7.8).
-8. The browser walkthrough table (Step 6.9).
-9. Every scheduled task run by hand, and what it changed.
-10. Known gaps that were accepted, each with its spec id, the reason and the approval record.
-11. Every approval this prompt required — the blueprint, each gap, each shared-file change,
-    each dependency — as a link to, or dated quote of, the written approval.
-12. The scorecard of every review round except the last (§10), each with the commit it
-    reviewed. The last round's scorecard goes in the pull request description, because
-    committing it would be a change after the review.
-
-It names no AI tool and contains no production data. It is the module's record, not a
-diary of the session. Once the module has spec tests (Step 10.5), measure items 2 and 3
-without them, adding `--ignore=modules/[module_code]/tests/spec` to each run.
-
-### Step 7.10 — Rebase and regenerate before the pull request
-
-Before the round they expect to be the last, the person running this session rebases onto the
-latest `main` — you never run `git rebase`, or any command that rewrites history. A rebase is
-a change, and a review only counts for the commit it saw. Never hand-merge a generated file —
-`openapi/fusion-integrated.v1.yaml`, `registry/permissions.json`,
-`docs/02-iam/permission-catalog.generated.md` — take `main`'s version and regenerate it
-(`make schema`, `make permissions`). While your module has never been merged, keep its
-migrations to one clean initial set: first `.venv/bin/python manage.py migrate [module_code]
-zero` so your database forgets them, then delete your own unmerged migration files and run
-`makemigrations` once. Then run every gate again: a rebase is a change.
+and whatever else has a genuine reader. Then generate a teaching reference tracing every
+rule and use case to the code that enforces it, via a script under `ops/docs/`, so that
+every link is **verified to resolve**.
 
 ### Changing anything on a running server
 
@@ -1063,9 +948,7 @@ Not "tests pass". All of it:
 - Do not touch `Fusion/FusionIIIT/Fusion/settings/common.py` or anything in the legacy
   Fusion app. Only the active modules are in scope.
 - **Your module is `modules/[module_code]/`, `client/src/modules/[module_code]/`, its own
-  tests and its own doc folder — nothing else is yours by default.** The spec tests in
-  `modules/[module_code]/tests/spec/` and `docs/[NN]-[module_code]/spec-tests/` are not yours
-  either, once they exist (Step 10.5). A change to `core/`, to
+  tests and its own doc folder — nothing else is yours by default.** A change to `core/`, to
   another module, to a shared config file, or to CI itself may be genuinely necessary; when
   it is, name the file and the reason and wait, the same as any other approval gate here. Do
   not fold it into the same commit as your module unasked, however small it looks.
