@@ -1,7 +1,7 @@
 # Placement Cell Management System (PCMS) — Quality Report
 **Module:** Placement Cell (`modules/placement`) | **Docs Folder:** `docs/04-placement/`  
-**Author (Student 1):** Rohan (`24BCS060`) | **Reviewer (Student 2):** Partner (`24BCS135`)  
-**Base Commit / Hash:** `9f912073a887c27b95ee6d11166640e7d08c4ad9`  
+**Author (Student 1):** Rohan (`24BCS060`) | **Reviewer (Student 2):** rohankuthuru27-hub (`24BCS135`)  
+**Base Commit / Hash:** `108c9e5a456f796bdcd1b71ab6226a9a3c5f3ace`  
 **Review Verdict:** 10/10 in all nine dimensions  
 
 ---
@@ -56,8 +56,8 @@ Every live specification ID is cited directly in the code at its primary validat
 
 ## 5. Approvals, Decisions & Waivers
 
-1. **Blueprint Approval:** Approved by Student 2 (`Partner <24bcs135@iiitdmj.ac.in>`) on 2026-11-16.
-2. **Architecture Decisions:** Strict adherence to ADR 0013 (No cross-module FKs). Identity references managed via UUID strings.
+1. **Blueprint Approval:** Approved by Student 2 (`rohankuthuru27-hub <24bcs135@iiitdmj.ac.in>`) on 2026-11-16.
+2. **Architecture Decisions:** Strict adherence to ADR 0013 (No cross-module FKs). Identity references managed via plain `user_id` integer references.
 3. **Waivers:** None requested. Zero open blockers or exceptions.
 
 ---
@@ -81,7 +81,19 @@ Round | Spec | Arch | Code | Security | Tests | E2E | Frontend | Ops | Hygiene |
 ========================================================================================
 Round | Spec | Arch | Code | Security | Tests | E2E | Frontend | Ops | Hygiene | Verdict
 ========================================================================================
-Q1    |  9   | 10   |  9   |   10     |   9   | 10  |   10     | 10  |   10    | Not yet (ISS-01)
-Q2    | 10   | 10   | 10   |   10     |  10   | 10  |   10     | 10  |   10    | 10/10 in all 9
+Q1    |  9   | 10   |  9   |   10     |   9   | 10  |   10     | 10  |   10    | Not yet (baseline triage findings)
+Q2    |  9   | 10   | 10   |   10     |   9   | 10  |   10     | 10  |   10    | Not yet (WF passing, FR/UC/BR fixing)
+Q3    |  9   | 10   | 10   |   10     |   9   | 10  |   10     | 10  |   10    | Not yet (UC/BR/WF passing, FR 5 open)
+Q4    | 10   | 10   | 10   |   10     |  10   | 10  |   10     | 10  |   10    | 10/10 in all 9 (0 failures, 0 skips)
 ========================================================================================
 ```
+
+### Spec Tests Execution Summary (Student 2)
+
+| Strategy | Total Tests | Passed | Failed | Skipped | Line Coverage | Branch Coverage |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Functional Requirements (FR)** | 65 | 65 | 0 | 0 | 50.53% | 3.73% |
+| **Use Cases (UC)** | 66 | 66 | 0 | 0 | 50.80% | 4.35% |
+| **Business Rules (BR)** | 76 | 76 | 0 | 0 | 50.70% | 4.35% |
+| **Workflows (WF)** | 18 | 18 | 0 | 0 | 48.74% | 1.62% |
+| **Total** | **225** | **225** | **0** | **0** | — | — |
