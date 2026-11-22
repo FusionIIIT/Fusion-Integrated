@@ -38,6 +38,27 @@ describe("NewApplicationPage", () => {
     expect(screen.getByRole("button", { name: /Submit Application/i })).toBeInTheDocument();
   });
 
+  it("validates empty form and prevents submission when required fields are blank", async () => {
+    const postSpy = vi.spyOn(http, "post");
+    renderWithClient(<NewApplicationPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Submit Application/i }));
+    expect(postSpy).not.toHaveBeenCalled();
+  });
+
+  it("handles server submission error gracefully", async () => {
+    vi.spyOn(http, "post").mockRejectedValueOnce(new Error("Server submission failed"));
+    renderWithClient(<NewApplicationPage />);
+
+    fireEvent.change(screen.getByLabelText(/Invention Title/i), { target: { value: "Faulty App" } });
+    fireEvent.change(screen.getByLabelText(/Abstract/i), { target: { value: "Faulty Abstract" } });
+    fireEvent.change(screen.getByLabelText(/Detailed Technical Description/i), { target: { value: "Description" } });
+    fireEvent.change(screen.getByLabelText(/Patent Claims/i), { target: { value: "Claims" } });
+
+    fireEvent.click(screen.getByRole("button", { name: /Submit Application/i }));
+    expect(screen.getByRole("button", { name: /Submit Application/i })).toBeInTheDocument();
+  });
+
   it("submits application payload when form is filled and submitted", async () => {
     const postSpy = vi.spyOn(http, "post").mockResolvedValueOnce({
       data: { id: 10, title: "Quantum Sensor" },

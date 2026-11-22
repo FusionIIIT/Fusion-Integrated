@@ -73,8 +73,21 @@ def pms_sweep_deadlines() -> dict[str, int]:
             alerts_count += 1
             log.info("pms.alert.deadline office_action=%s interval=%d_days", oa.id, interval)
 
+    # 4. Flag missed annuity renewals for Director confirmation. Status is never changed
+    # automatically: a missed renewal raises an overdue alert, and the Director decides.
+    overdue_renewals_count = 0
+    missed_renewals = PatentApplication.objects.filter(
+        status__in=(sm.GRANTED, sm.MAINTENANCE_PENDING),
+        renewal_due_date__lt=today,
+        renewal_decided_at__isnull=True,
+    )
+    for app in missed_renewals:
+        overdue_renewals_count += 1
+        log.warning("pms.renewal.overdue application=%s", app.application_number)
+
     return {
         "expired": expired_count,
         "overdue_reviews": overdue_reviews_count,
+        "overdue_renewals": overdue_renewals_count,
         "alerts": alerts_count,
     }

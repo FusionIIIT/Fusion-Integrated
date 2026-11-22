@@ -10,7 +10,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.api.exceptions import NotFoundError
+from core.api.exceptions import NotFoundError, PermissionDeniedError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.patents.api import serializers as s
 from modules.patents.domain import permissions as p
@@ -39,6 +39,12 @@ class ApplicationListView(generics.ListCreateAPIView):
         HasPermission(p.P_APPLICATION_VIEW_SELF, p.P_APPLICATION_VIEW, p.P_APPLICATION_CREATE),
     ]
 
+    @property
+    def throttle_scope(self):
+        if self.request and self.request.method == "POST":
+            return "patent_submit"
+        return None
+
     def get_serializer_class(self):
         if self.request.method == "POST":
             return s.CreateApplicationSerializer
@@ -56,10 +62,13 @@ class ApplicationListView(generics.ListCreateAPIView):
         responses={201: s.PatentApplicationDetailSerializer},
     )
     def post(self, request, *args, **kwargs):
+        actor = _actor(request)
+        if not getattr(actor, "has_permission", lambda _: False)(p.P_APPLICATION_CREATE):
+            raise PermissionDeniedError("Permission patents.application.create required.")
         payload = s.CreateApplicationSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         app = app_service.create_application(
-            actor=_actor(request),
+            actor=actor,
             **payload.validated_data,
         )
         return Response(
@@ -78,6 +87,12 @@ class ApplicationDetailView(generics.RetrieveUpdateAPIView):
         HasPermission(p.P_APPLICATION_VIEW_SELF, p.P_APPLICATION_VIEW, p.P_APPLICATION_UPDATE),
     ]
     serializer_class = s.PatentApplicationDetailSerializer
+
+    @property
+    def throttle_scope(self):
+        if self.request and self.request.method in ("PUT", "PATCH", "DELETE"):
+            return "patent_mutate"
+        return None
 
     def get_queryset(self):
         return scoping.applications_for(_actor(self.request))
@@ -99,6 +114,7 @@ class ApplicationDetailView(generics.RetrieveUpdateAPIView):
 class ApplicationWithdrawView(APIView):
     """POST /api/v1/patents/applications/<pk>/withdraw"""
     permission_classes = [MODULE, HasPermission(p.P_APPLICATION_WITHDRAW)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.PatentWithdrawSerializer(data=request.data)
@@ -116,6 +132,7 @@ class ApplicationWithdrawView(APIView):
 class ApplicationDocumentUploadView(APIView):
     """POST /api/v1/patents/applications/<pk>/documents"""
     permission_classes = [MODULE, HasPermission(p.P_APPLICATION_UPDATE)]
+    throttle_scope = "upload"
 
     def post(self, request, pk):
         file_obj = request.FILES.get("file")
@@ -142,6 +159,7 @@ class ApplicationDocumentUploadView(APIView):
 class ApplicationConsentView(APIView):
     """POST /api/v1/patents/applications/<pk>/consent"""
     permission_classes = [MODULE, HasPermission(p.P_APPLICATION_VIEW_SELF)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         success = app_service.record_coinventor_consent(_actor(request), pk)
@@ -152,6 +170,7 @@ class ApplicationConsentView(APIView):
 class ApplicationAssignDirectorView(APIView):
     """POST /api/v1/patents/applications/<pk>/assign-director"""
     permission_classes = [MODULE, HasPermission(p.P_APPLICATION_ASSIGN_DIRECTOR)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.AssignDirectorSerializer(data=request.data)
@@ -169,6 +188,7 @@ class ApplicationAssignDirectorView(APIView):
 class ApplicationReviewDecisionView(APIView):
     """POST /api/v1/patents/applications/<pk>/review-decision"""
     permission_classes = [MODULE, HasPermission(p.P_APPLICATION_REVIEW)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.ReviewDecisionInputSerializer(data=request.data)
@@ -187,6 +207,7 @@ class ApplicationReviewDecisionView(APIView):
 class ApplicationAppealView(APIView):
     """POST /api/v1/patents/applications/<pk>/appeal"""
     permission_classes = [MODULE, HasPermission(p.P_APPLICATION_APPEAL)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.AppealInputSerializer(data=request.data)
@@ -205,6 +226,7 @@ class ApplicationAppealView(APIView):
 class ApplicationAppealDecisionView(APIView):
     """POST /api/v1/patents/applications/<pk>/appeal-decision"""
     permission_classes = [MODULE, HasPermission(p.P_APPLICATION_DECIDE_APPEAL)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.AppealDecisionInputSerializer(data=request.data)
@@ -223,6 +245,7 @@ class ApplicationAppealDecisionView(APIView):
 class ApplicationAssignAttorneyView(APIView):
     """POST /api/v1/patents/applications/<pk>/assign-attorney"""
     permission_classes = [MODULE, HasPermission(p.P_ATTORNEY_ASSIGN)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.AssignAttorneySerializer(data=request.data)
@@ -243,6 +266,7 @@ class ApplicationAssignAttorneyView(APIView):
 class ApplicationRespondAssignmentView(APIView):
     """POST /api/v1/patents/applications/<pk>/respond-assignment"""
     permission_classes = [MODULE, HasPermission(p.P_ATTORNEY_RESPOND_ASSIGNMENT)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         action = request.data.get("action", "accept")
@@ -259,6 +283,7 @@ class ApplicationRespondAssignmentView(APIView):
 class ApplicationAssessmentView(APIView):
     """POST /api/v1/patents/applications/<pk>/assessment"""
     permission_classes = [MODULE, HasPermission(p.P_ASSESSMENT_PERFORM)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         action = request.data.get("action", "start")
@@ -276,6 +301,7 @@ class ApplicationAssessmentView(APIView):
 class ApplicationBudgetDecisionView(APIView):
     """POST /api/v1/patents/applications/<pk>/budget-decision"""
     permission_classes = [MODULE, HasPermission(p.P_BUDGET_APPROVE)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.BudgetDecisionInputSerializer(data=request.data)
@@ -304,6 +330,7 @@ class ApplicationBudgetDecisionView(APIView):
 class ApplicationFilingView(APIView):
     """POST /api/v1/patents/applications/<pk>/filing"""
     permission_classes = [MODULE, HasPermission(p.P_FILING_RECORD)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.FilingInputSerializer(data=request.data)
@@ -321,6 +348,7 @@ class ApplicationFilingView(APIView):
 class ApplicationOfficeActionsView(APIView):
     """POST /api/v1/patents/applications/<pk>/office-actions"""
     permission_classes = [MODULE, HasPermission(p.P_OFFICE_ACTION_RECORD)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.OfficeActionInputSerializer(data=request.data)
@@ -340,6 +368,7 @@ class ApplicationOfficeActionsView(APIView):
 class OfficeActionResponseView(APIView):
     """POST /api/v1/patents/office-actions/<pk>/response"""
     permission_classes = [MODULE, HasPermission(p.P_OFFICE_ACTION_RESPOND)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.OfficeActionResponseInputSerializer(data=request.data)
@@ -356,6 +385,7 @@ class OfficeActionResponseView(APIView):
 class OfficeActionApproveView(APIView):
     """POST /api/v1/patents/office-actions/<pk>/approve"""
     permission_classes = [MODULE, HasPermission(p.P_OFFICE_ACTION_APPROVE)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         oa = oa_service.applicant_approve_response(
@@ -372,6 +402,7 @@ class OfficeActionApproveView(APIView):
 class ApplicationRenewalDecisionView(APIView):
     """POST /api/v1/patents/applications/<pk>/renewal-decision"""
     permission_classes = [MODULE, HasPermission(p.P_MAINTENANCE_DECIDE, p.P_MAINTENANCE_TRACK)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request, pk):
         payload = s.RenewalDecisionInputSerializer(data=request.data)
@@ -401,6 +432,7 @@ class AttorneyPanelListView(generics.ListAPIView):
 class TechTransferCreateView(APIView):
     """POST /api/v1/patents/tech-transfer"""
     permission_classes = [MODULE, HasPermission(p.P_TECH_TRANSFER_CREATE)]
+    throttle_scope = "patent_mutate"
 
     def post(self, request):
         payload = s.TechTransferInputSerializer(data=request.data)
@@ -447,3 +479,39 @@ class AuditLogsView(APIView):
 
     def get(self, request):
         return Response({"audit_logs": []})
+
+
+@extend_schema(request=None, responses=s.ConsentTokenIssuedSerializer)
+class CoInventorConsentTokenView(APIView):
+    """POST /api/v1/patents/applications/<pk>/co-inventors/<ci_pk>/consent-token
+
+    Emails a one-time consent link to an external co-inventor. The applicant never sees it.
+    """
+    permission_classes = [MODULE, HasPermission(p.P_APPLICATION_VIEW_SELF)]
+    throttle_scope = "patent_mutate"
+
+    def post(self, request, pk, ci_pk):
+        from modules.patents.services import consent as consent_service
+
+        consent_service.issue_consent_token(_actor(request), pk, ci_pk)
+        return Response({"sent": True})
+
+
+@extend_schema(request=s.ConsentConfirmSerializer, responses=s.ConsentResponseSerializer)
+class ConsentConfirmView(APIView):
+    """POST /api/v1/patents/consent/confirm
+
+    Records a co-inventor's consent with the one-time token from their email. No login is
+    needed, because an external co-inventor has no institute account.
+    """
+    authentication_classes = []
+    permission_classes = []
+    throttle_scope = "patent_mutate"
+
+    def post(self, request):
+        from modules.patents.services import consent as consent_service
+
+        payload = s.ConsentConfirmSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        consent_service.confirm_consent_token(payload.validated_data["token"])
+        return Response({"consent_recorded": True})

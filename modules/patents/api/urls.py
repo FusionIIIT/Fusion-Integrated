@@ -26,6 +26,16 @@ urlpatterns = [
         v.ApplicationConsentView.as_view(),
         name="patents-application-consent",
     ),
+    path(
+        "applications/<int:pk>/co-inventors/<int:ci_pk>/consent-token",
+        v.CoInventorConsentTokenView.as_view(),
+        name="patents-coinventor-consent-token",
+    ),
+    path(
+        "consent/confirm",
+        v.ConsentConfirmView.as_view(),
+        name="patents-consent-confirm",
+    ),
 
     # Director actions
     path(

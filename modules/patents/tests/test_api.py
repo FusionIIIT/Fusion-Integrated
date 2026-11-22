@@ -42,6 +42,23 @@ def test_permission_gate_denies_unauthorized_action(stub_iam):
     assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
+def test_unauthorized_create_fails_with_403(stub_iam):
+    # R1-02: User with only view permission cannot create an application
+    client = make_client(stub_iam, user_id=101, permissions=(p.P_APPLICATION_VIEW_SELF,))
+    resp = client.post(
+        "/api/v1/patents/applications",
+        {
+            "title": "Unauthorized Title",
+            "abstract": "Abstract",
+            "description": "Description",
+            "claims": "Claims",
+            "co_inventors": [],
+        },
+        format="json",
+    )
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
 def test_create_and_list_applications(stub_iam):
     client = make_client(
         stub_iam,
@@ -162,3 +179,50 @@ def test_withdraw_application(stub_iam):
     )
     assert resp.status_code == status.HTTP_200_OK
     assert resp.data["status"] == sm.WITHDRAWN
+
+
+def test_cookie_csrf_rejection_and_acceptance(stub_iam, settings):
+    # R1-10: Cookie session without X-CSRF-Token is rejected with 403 Forbidden
+    stub_iam(
+        make_session(
+            user_id=101,
+            kind="student",
+            roles=("student",),
+            active_role="student",
+            modules=("patents",),
+            permissions=(p.P_APPLICATION_VIEW_SELF, p.P_APPLICATION_CREATE),
+        )
+    )
+    client = APIClient()
+    session_cookie = "mock-cookie-session-token"
+    client.cookies[settings.IAM_AUTH_COOKIE_NAME] = session_cookie
+
+    resp = client.post(
+        "/api/v1/patents/applications",
+        {
+            "title": "Quantum CSRF Test Device",
+            "abstract": "Abstract",
+            "description": "Description",
+            "claims": "Claims",
+            "co_inventors": [],
+        },
+        format="json",
+    )
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+    from core.api import csrf
+    valid_csrf = csrf.token_for(session_cookie)
+    client.credentials(HTTP_X_CSRF_TOKEN=valid_csrf)
+    resp2 = client.post(
+        "/api/v1/patents/applications",
+        {
+            "title": "Quantum CSRF Test Device Valid",
+            "abstract": "Abstract",
+            "description": "Description",
+            "claims": "Claims",
+            "co_inventors": [],
+        },
+        format="json",
+    )
+    assert resp2.status_code == status.HTTP_201_CREATED
+

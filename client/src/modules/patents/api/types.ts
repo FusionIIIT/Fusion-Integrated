@@ -31,11 +31,13 @@ export type PatentApplicationStatus =
   | "EXPIRED";
 
 export interface CoInventor {
-  id?: number;
-  user_id: number;
-  role: string;
-  contribution_percent: string | number;
-  consent_status?: "PENDING" | "GRANTED" | "REFUSED";
+  id: number;
+  user_id?: number | null;
+  name: string;
+  email: string;
+  share_percentage: string;
+  consent_granted: boolean;
+  consent_timestamp: string | null;
 }
 
 export interface ApplicationDocument {

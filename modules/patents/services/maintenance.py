@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from django.db import transaction
+from django.utils import timezone
 
 from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from modules.patents.domain import state_machine as sm
@@ -27,7 +28,8 @@ def record_renewal_decision(
         if app.status != sm.GRANTED:
             raise ConflictError("Maintenance renewals are only applicable to GRANTED patents.")
 
-        # Note renewal status in description/version
+        # The decision time closes the renewal alert; the record itself is kept by version.
+        app.renewal_decided_at = timezone.now()
         app.version += 1
         app.save()
 

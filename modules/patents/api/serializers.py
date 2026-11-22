@@ -315,3 +315,11 @@ class ReportsResponseSerializer(serializers.Serializer):
 
 class AuditLogsResponseSerializer(serializers.Serializer):
     audit_logs = serializers.ListField(child=serializers.CharField())
+
+
+class ConsentConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=200)
+
+
+class ConsentTokenIssuedSerializer(serializers.Serializer):
+    sent = serializers.BooleanField()

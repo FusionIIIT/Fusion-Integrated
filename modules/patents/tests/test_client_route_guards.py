@@ -10,16 +10,7 @@ from modules.patents.registry import MODULE, NAV_ITEMS, PERMISSIONS
 
 ROUTES = (Path(__file__).resolve().parents[3]
           / "client" / "src" / "modules" / "patents" / "routes.tsx")
-OFFICE_PAGES = {
-    "reviews",
-    "budget-approvals",
-    "maintenance-decisions",
-    "docket",
-    "office-actions",
-    "all",
-    "attorney-panel",
-    "reports",
-}
+ALL_PAGES = {item["to"].split("/")[-1] for item in NAV_ITEMS}
 
 
 def guarded_routes() -> dict[str, str]:
@@ -35,8 +26,8 @@ def nav_permission(path: str) -> str | None:
     return None
 
 
-def test_every_office_page_is_guarded():
-    assert set(guarded_routes()) >= OFFICE_PAGES
+def test_every_page_is_guarded():
+    assert set(guarded_routes()) == ALL_PAGES
 
 
 def test_each_guard_is_its_nav_items_own_permission():

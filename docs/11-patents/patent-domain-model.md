@@ -44,12 +44,19 @@ Singleton configuration governing institutional patent timelines, thresholds, an
 * `withdrawal_eligible_states`: Configurable tuple of states eligible for pre-filing withdrawal (BR-PMS-068).
 
 ### 2.4 PatentBudgetLedger
-Subordinate ledger tracking financial allocations and expenditures (BW-PMS-08..10):
+Append-only ledger of financial requests, decisions and reversals (BW-PMS-08..10, R1-08). A row is never updated or deleted. A request is one `REQUEST` row. A decision is a new `APPROVAL` or `ESCALATION` row whose `replaces_entry` points at the request. A correction is a new `REVERSAL` row whose `replaces_entry` points at the approval. Approved spend is derived as approvals minus reversals.
 * `application`: ForeignKey to `PatentApplication`.
+* `entry_kind`: `REQUEST`, `APPROVAL`, `ESCALATION`, `REVERSAL`, `DISBURSEMENT`.
+* `replaces_entry`: nullable self-reference to the request, approval or entry being decided or reversed.
 * `entry_type`: Stage category (`FILING`, `PROSECUTION`, `MAINTENANCE`, `LEGAL`).
 * `amount`, `currency`: Monetary value.
-* `status`: `REQUESTED`, `APPROVED`, `REJECTED`, `EXPENDED`.
+* `status`: outcome of the row (`PENDING`, `APPROVED`, `REJECTED`, `ESCALATED`, `REVERSED`).
 * `authorized_by_user_id`: Authorizing Director ID.
+
+### 2.6 Policy superseding and consent tokens
+* `PatentPolicy` is effective-dated. A change ends the current row (`effective_to`, `is_active=False`, `superseded_by` set to the new row) and inserts a new active row. Policy content is never edited in place.
+* `CoInventorConsentToken` holds the SHA-256 hash of a one-time consent token for an external co-inventor with no institute account. The applicant requests the token, the system emails it to the co-inventor, and the co-inventor confirms it once within 14 days. The applicant never sees the token.
+* Email is sent through Django's configured mail backend. The module does not run its own mail queue.
 
 ### 2.5 OfficeActionRecord
 Subordinate lifecycle tracking official patent office examination reports (BW-PMS-12..13):

@@ -217,6 +217,8 @@ REST_FRAMEWORK = {
         "export": "5/hour",
         "upload": "20/hour",
         "directory_search": "120/hour",
+        "patent_submit": "30/hour",
+        "patent_mutate": "120/hour",
     },
 }
 

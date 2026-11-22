@@ -440,6 +440,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/PatentBudgetLedger'
           description: ''
+  /api/v1/patents/applications/{id}/co-inventors/{ci_pk}/consent-token:
+    post:
+      operationId: v1_patents_applications_co_inventors_consent_token_create
+      description: |-
+        POST /api/v1/patents/applications/<pk>/co-inventors/<ci_pk>/consent-token
+
+        Emails a one-time consent link to an external co-inventor. The applicant never sees it.
+      parameters:
+      - in: path
+        name: ci_pk
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentTokenIssued'
+          description: ''
   /api/v1/patents/applications/{id}/consent:
     post:
       operationId: v1_patents_applications_consent_create
@@ -731,6 +760,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuditLogsResponse'
+          description: ''
+  /api/v1/patents/consent/confirm:
+    post:
+      operationId: v1_patents_consent_confirm_create
+      description: |-
+        POST /api/v1/patents/consent/confirm
+
+        Records a co-inventor's consent with the one-time token from their email. No login is
+        needed, because an external co-inventor has no institute account.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConsentConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConsentConfirm'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentResponse'
           description: ''
   /api/v1/patents/office-actions/{id}/approve:
     post:
@@ -3301,6 +3359,14 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    ConsentConfirm:
+      type: object
+      properties:
+        token:
+          type: string
+          maxLength: 200
+      required:
+      - token
     ConsentResponse:
       type: object
       properties:
@@ -3308,6 +3374,13 @@ components:
           type: boolean
       required:
       - consent_recorded
+    ConsentTokenIssued:
+      type: object
+      properties:
+        sent:
+          type: boolean
+      required:
+      - sent
     CreateApplication:
       type: object
       properties:

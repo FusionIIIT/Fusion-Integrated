@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 from modules.patents.domain import deadlines as dl
 from modules.patents.domain import state_machine as sm
 from modules.patents.models import PatentPolicy
+from modules.patents.services.policy import supersede_policy
 
 
 class Command(BaseCommand):
@@ -53,16 +54,12 @@ class Command(BaseCommand):
             sm.ASSESSMENT_IN_PROGRESS,
         ]
 
-        if options["force"] and active:
-            active.is_active = False
-            active.save()
-
-        policy = PatentPolicy.objects.create(
+        # --force supersedes the active row (effective-dated history); nothing is edited in place.
+        policy = supersede_policy(
             director_review_days=dl.DEFAULT_REVIEW_DAYS,
             revision_resubmission_days=dl.DEFAULT_REVISION_DAYS,
             cost_escalation_threshold=threshold,
             max_attorney_workload=max_workload,
             withdrawal_eligible_states=withdrawal_states,
-            is_active=True,
         )
         self.stdout.write(self.style.SUCCESS(f"Created active PatentPolicy (id={policy.id})."))

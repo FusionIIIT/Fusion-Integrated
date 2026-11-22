@@ -65,4 +65,65 @@ describe("AttorneyDocketPage", () => {
     expect(screen.getByRole("button", { name: "Accept assignment for Optical Waveguide" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Decline assignment for Optical Waveguide" })).toBeInTheDocument();
   });
+
+  it("renders error state when api fails", async () => {
+    vi.spyOn(http, "get").mockRejectedValueOnce(new Error("Database connection failed"));
+    renderWithClient(<AttorneyDocketPage />);
+    await waitFor(() => {
+      expect(screen.getByText(/Could not load this/i)).toBeInTheDocument();
+    });
+  });
+
+  it("hides accept and decline controls when status is PENDING_REVIEW", async () => {
+    vi.spyOn(http, "get").mockResolvedValueOnce({
+      data: {
+        results: [
+          {
+            id: 15,
+            application_number: "PMS-2026-015",
+            title: "Pending Docket App",
+            status: "PENDING_REVIEW",
+          },
+        ],
+        next: null,
+        previous: null,
+      },
+    });
+
+    renderWithClient(<AttorneyDocketPage />);
+    await waitFor(() => {
+      expect(screen.getByText("Pending Docket App")).toBeInTheDocument();
+    });
+    expect(screen.queryByRole("button", { name: /Accept assignment/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Decline assignment/i })).not.toBeInTheDocument();
+  });
+
+  it("executes accept assignment action successfully", async () => {
+    vi.spyOn(http, "get").mockResolvedValueOnce({
+      data: {
+        results: [
+          {
+            id: 16,
+            application_number: "PMS-2026-016",
+            title: "Semiconductor Device",
+            status: "ATTORNEY_ASSIGNED",
+          },
+        ],
+        next: null,
+        previous: null,
+      },
+    });
+    const postSpy = vi.spyOn(http, "post").mockResolvedValueOnce({ data: { status: "ATTORNEY_ASSIGNED" } });
+
+    renderWithClient(<AttorneyDocketPage />);
+    await waitFor(() => {
+      expect(screen.getByText("Semiconductor Device")).toBeInTheDocument();
+    });
+
+    const acceptBtn = screen.getByRole("button", { name: "Accept assignment for Semiconductor Device" });
+    acceptBtn.click();
+    await waitFor(() => {
+      expect(postSpy).toHaveBeenCalledWith("/patents/applications/16/respond-assignment", { action: "accept" });
+    });
+  });
 });

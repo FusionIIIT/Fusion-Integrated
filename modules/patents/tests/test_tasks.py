@@ -66,3 +66,17 @@ def test_pms_sweep_deadlines_expires_applications():
 
     assert app_expired.status == sm.EXPIRED
     assert app_active.status == sm.NEEDS_REVISION
+
+    # R1-11: Second run proves scheduled task idempotence
+    summary2 = pms_sweep_deadlines()
+    assert summary2["expired"] == 0
+    app_expired.refresh_from_db()
+    assert app_expired.status == sm.EXPIRED
+
+
+def test_schedule_declarations():
+    # R1-01 & R1-11: Verify task routes and beat schedule
+    from modules.patents import schedule
+    assert "patents.pms_sweep_deadlines" in schedule.TASK_ROUTES
+    assert "patents.pms-sweep-deadlines" in schedule.BEAT_SCHEDULE
+

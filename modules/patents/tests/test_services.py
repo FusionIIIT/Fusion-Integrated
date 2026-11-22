@@ -199,10 +199,9 @@ def test_state_transitions_happy_path():
     assert app.status == sm.ASSESSMENT_IN_PROGRESS
 
     # Record approved budget entry
-    record_budget_entry(adm_actor, app.id, "APPROVAL", "50000.00", "filing")
-    b_entry = PatentBudgetLedger.objects.get(application=app)
-    b_entry.status = "APPROVED"
-    b_entry.save()
+    budget_request = record_budget_entry(adm_actor, app.id, "APPROVAL", "50000.00", "filing")
+    decide_budget(adm_actor, budget_request.id, "APPROVE")
+    assert PatentBudgetLedger.objects.filter(application=app, status="APPROVED").exists()
 
     # 7. File external
     app = transition_application(

@@ -89,7 +89,9 @@ def extract_blueprint_items() -> list[dict[str, str]]:
             seen.add(item_id)
 
     # Also capture all other IDs mentioned in blueprint
-    all_ids = sorted(set(re.findall(r"\b(BR-PMS-\d+|UC-PMS-\d+|BW-PMS-\d+|PMS-AFR-\d+)\b", text)))
+    # Revision-log rows name retired IDs only to say they were removed; they are not live citations.
+    body = "\n".join(line for line in text.splitlines() if not re.match(r"^\|\s*\*\*[A-Z]", line))
+    all_ids = sorted(set(re.findall(r"\b(BR-PMS-\d+|UC-PMS-\d+|BW-PMS-\d+|PMS-AFR-\d+)\b", body)))
     for item_id in all_ids:
         if item_id not in seen:
             kind = "Business Rule" if item_id.startswith("BR") else (

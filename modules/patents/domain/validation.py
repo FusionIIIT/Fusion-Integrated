@@ -16,6 +16,9 @@ VALID_APPEAL_OUTCOMES = frozenset({
     "Uphold Rejection",
     "Remand for Amendment",
     "Modify Decision",
+    "UPHOLD",
+    "REMAND",
+    "MODIFY",
 })
 
 VALID_REVIEW_DECISIONS = frozenset({

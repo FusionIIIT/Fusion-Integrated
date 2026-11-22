@@ -246,3 +246,32 @@ def test_policy_spec_withdrawal_default_and_configured():
     assert pol.is_cost_escalation_triggered(Decimal("50000.00")) is False
     assert pol.is_cost_escalation_triggered(Decimal("100000.00")) is False
     assert pol.is_cost_escalation_triggered(Decimal("100000.01")) is True
+    # BR-PMS-048: Unconfigured cost escalation returns False
+    assert default_pol.is_cost_escalation_triggered(Decimal("50000.00")) is False
+    # BR-PMS-043: Unset max workload returns False
+    assert default_pol.is_attorney_workload_exceeded(10) is False
+    pol_workload = policy.PolicySpec(max_attorney_workload=5)
+    assert pol_workload.is_attorney_workload_exceeded(4) is False
+    assert pol_workload.is_attorney_workload_exceeded(5) is True
+
+
+def test_domain_filing_budget_and_guard_and_validation():
+    # BR-PMS-128: Filing blocked if budget not approved
+    res = filing.evaluate_filing_clearance(
+        has_inventor_agreements=True,
+        has_budget_approval=False,
+        has_format_compliance=True,
+    )
+    assert res.cleared is False
+    assert "budget" in res.message.lower()
+
+    # GuardFailed default message test
+    g_err = sm.GuardFailed("check_status")
+    assert "check_status" in str(g_err)
+
+    # BR-PMS-003: Validation of application description and claims
+    with pytest.raises(validation.IncompleteApplicationError, match="description"):
+        validation.validate_application_fields("Title", "Abstract", "", "Claims")
+    with pytest.raises(validation.IncompleteApplicationError, match="claims"):
+        validation.validate_application_fields("Title", "Abstract", "Desc", "")
+

@@ -264,6 +264,8 @@ def transition_application(
                 raise ConflictError("; ".join(clearance.reasons))
         elif event == "grant":
             to_status = sm.GRANTED
+        elif event in {"reject", "reject_assessment"}:
+            to_status = sm.REJECTED
         elif event == "withdraw":
             to_status = sm.WITHDRAWN
             reason = payload.get("reason", "")
@@ -287,8 +289,11 @@ def transition_application(
             val.validate_appeal_outcome(outcome)
             to_status = {
                 "REMAND": sm.REMANDED,
+                "Remand for Amendment": sm.REMANDED,
                 "UPHOLD": sm.REJECTION_UPHELD,
+                "Uphold Rejection": sm.REJECTION_UPHELD,
                 "MODIFY": sm.DECISION_MODIFIED,
+                "Modify Decision": sm.DECISION_MODIFIED,
             }[outcome]
         elif event == "resubmit":
             to_status = sm.RESUBMITTED
@@ -327,7 +332,11 @@ def transition_application(
             )
             if decision in ("REJECT", "NEEDS_REVISION"):
                 app.decision_date = timezone.now()
+            if decision == "REJECT" and had_active_attorney:
+                _decrement_attorney_workload(app.assigned_attorney_id)
         elif event == "assign_attorney":
+            if had_active_attorney and app.assigned_attorney_id != payload["attorney_id"]:
+                _decrement_attorney_workload(app.assigned_attorney_id)
             app.assigned_attorney_id = payload["attorney_id"]
         elif event == "accept_assignment":
             if app.assigned_attorney_id:
@@ -363,8 +372,19 @@ def transition_application(
             app.filing_date = timezone.now().date()
         elif event == "grant":
             app.grant_date = timezone.now().date()
+            due = payload.get("renewal_due_date")
+            if due:
+                app.renewal_due_date = (
+                    due if isinstance(due, datetime.date) else datetime.date.fromisoformat(str(due))
+                )
             if had_active_attorney:
                 _decrement_attorney_workload(app.assigned_attorney_id)
+
+        if (
+            to_status in {sm.REJECTED, sm.EXPIRED, sm.LAPSED, sm.REJECTION_UPHELD}
+            and had_active_attorney
+        ):
+            _decrement_attorney_workload(app.assigned_attorney_id)
 
         app.status = to_status
         app.version += 1

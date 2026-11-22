@@ -85,7 +85,7 @@ def attorney_actor(user_id: int = 301):
 
 @pytest.mark.django_db
 def test_conflict_of_interest_guard():
-    # BR-PMS-021: COI prevents an author or co-inventor from reviewing their own application.
+    # BR-PMS-025 / BR-PMS-026: COI check prevents inventor from reviewing own application.
     app = PatentApplication.objects.create(
         user_id=101,
         application_number="PMS-2026-COI-01",
@@ -153,7 +153,7 @@ def test_scoping_director():
 
 @pytest.mark.django_db
 def test_budget_model():
-    # BR-PMS-050..054: Budget ledger records currency, categories, and policy escalation thresholds.
+    # BR-PMS-048..053: Budget ledger records currency, categories, and policy escalation thresholds.
     app = PatentApplication.objects.create(
         user_id=101,
         application_number="PMS-2026-BUD-01",

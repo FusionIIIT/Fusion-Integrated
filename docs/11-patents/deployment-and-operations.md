@@ -86,3 +86,22 @@ REDIS_CACHE_URL=redis://127.0.0.1:6379/1 REDIS_BROKER_URL=redis://127.0.0.1:6380
 * **Data Access Hooks (`client/src/modules/patents/api/hooks.ts`)**: Implemented with TanStack Query. Every mutation invalidates its associated queries automatically to ensure cache consistency without manual cache surgery.
 * **Wire Types (`client/src/modules/patents/api/types.ts`)**: Wire types mirror backend Django REST framework serializers and OpenAPI schemas; monetary and decimal figures are handled as strings to preserve numerical precision without JavaScript floating point issues.
 
+---
+
+## 5. Fusion-client Sidebar Entry
+
+Add this entry to `INTEGRATED_MODULES` in `Fusion-client/src/ui/nav/navigation.js` to frame the Patent Management module inside the production portal sidebar:
+
+```javascript
+{
+  id: "patents",
+  label: "Patent Management",
+  icon: "Lightbulb",
+  to: "/patents",
+  section: "Academics & Research",
+}
+```
+
+*Note: The icon name `Lightbulb` is an authentic Phosphor icon rendered by `Fusion-client`. The sidebar is role-filtered automatically based on the IAM module grants seeded in Step 4.*
+
+

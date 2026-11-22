@@ -23,9 +23,9 @@ function office(permission: string, page: ReactNode) {
 
 export const routes: RouteObject[] = [
   { index: true, element: <Navigate to="mine" replace /> },
-  { path: "mine", element: <MyApplicationsPage /> },
-  { path: "new", element: <NewApplicationPage /> },
-  { path: "prior-art", element: <PriorArtPage /> },
+  { path: "mine", element: office("patents.application.view_self", <MyApplicationsPage />) },
+  { path: "new", element: office("patents.application.create", <NewApplicationPage />) },
+  { path: "prior-art", element: office("patents.prior_art.search", <PriorArtPage />) },
   { path: "reviews", element: office("patents.application.review", <ReviewsPage />) },
   { path: "budget-approvals", element: office("patents.budget.approve", <BudgetApprovalsPage />) },
   { path: "maintenance-decisions", element: office("patents.maintenance.decide", <MaintenanceDecisionsPage />) },

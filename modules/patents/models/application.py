@@ -17,6 +17,8 @@ class PatentApplication(TimeStampedModel, UserScopedModel):
     external_filing_id = models.CharField(max_length=100, blank=True, default="")
     filing_date = models.DateField(null=True, blank=True)
     grant_date = models.DateField(null=True, blank=True)
+    renewal_due_date = models.DateField(null=True, blank=True)
+    renewal_decided_at = models.DateTimeField(null=True, blank=True)
     jurisdiction = models.CharField(max_length=50, default="IN")
     decision_date = models.DateTimeField(null=True, blank=True)
     version = models.PositiveIntegerField(default=1)
