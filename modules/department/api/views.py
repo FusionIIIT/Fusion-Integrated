@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import status
@@ -39,6 +41,7 @@ class DenyAll(BasePermission):
 
 
 SAFE = frozenset({"GET", "HEAD", "OPTIONS"})
+DEPT_CODE = re.compile(r"[A-Za-z]{1,12}")
 
 
 def _ex(name: str, value: dict, *, request: bool = False) -> OpenApiExample:
@@ -122,8 +125,15 @@ class DepartmentListView(DepartmentView):
 class DepartmentDetailView(DepartmentView):
     perms = {"GET": "department.department.view", "PATCH": "department.department.update"}
 
+    @staticmethod
+    def _code(code):
+        """R4-01: a code the column could never hold is a 404 before it reaches the database."""
+        if not DEPT_CODE.fullmatch(code):
+            raise NotFoundError("That department does not exist or is not yours.")
+        return code
+
     def _dept(self, code):
-        dept = scoping.departments_for(self.ctx).filter(code=code).first()
+        dept = scoping.departments_for(self.ctx).filter(code=self._code(code)).first()
         if dept is None:
             raise NotFoundError("That department does not exist or is not yours.")
         return dept
@@ -161,7 +171,7 @@ class DepartmentDetailView(DepartmentView):
         payload = s.DeptGeneralUpdateSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         return self._render(
-            department_service.update_general(self.ctx, code, **payload.validated_data)
+            department_service.update_general(self.ctx, self._code(code), **payload.validated_data)
         )
 
 

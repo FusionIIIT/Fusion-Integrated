@@ -69,10 +69,12 @@ def user_refs() -> dict[int, UserRef]:
     }
 
 
-def session_for(name: str, *, permissions=None, modules=("department",), active_role=None):
+def session_for(
+    name: str, *, permissions=None, modules=("department",), active_role=None, also_holds=()
+):
     p = PEOPLE[name]
     role = active_role or p.designation
-    roles = tuple(dict.fromkeys((p.kind, p.designation)))
+    roles = tuple(dict.fromkeys((p.kind, p.designation, *also_holds)))
     # As the IAM builds /me: the permissions of every role held, not only the acting one.
     held = {c for r in roles for c in ROLE_GRANTS.get(r, [])}
     perms = held if permissions is None else permissions

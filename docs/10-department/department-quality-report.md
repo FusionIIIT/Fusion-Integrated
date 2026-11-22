@@ -1,7 +1,7 @@
 # Department: quality report
 
 Branch `module/department`, cut from `main` at `5595be6`. Every number below came from runs made
-after the last code change (round 3 fixes included). Spec: `06-DEPT` v1.2.
+after the last code change (round 4 fixes included). Spec: `06-DEPT` v1.2.
 
 ## 1. Gates
 
@@ -15,13 +15,13 @@ all contract getters are plural
 nav items and client routes agree
 permission manifest matches the registries
 openapi schema matches the code
-938 passed, 27 subtests passed          (whole repository, .venv/bin/python -m pytest)
+954 passed, 27 subtests passed          (whole repository, .venv/bin/python -m pytest)
 ```
 
 `make check-client`, exit 0: `tsc --noEmit` (app and e2e) clean; `Test Files 15 passed (15)`,
-`Tests 97 passed (97)`; `✓ built in 2.16s`. Every department chunk is under 2 kB gzip.
+`Tests 97 passed (97)`; `✓ built in 2.09s`. Every department chunk is under 2 kB gzip.
 
-`make e2e`, exit 0: `28 passed (21.7s)`, with no 5xx and no 403 in the server log. This is 20 department specs and the 8 existing ones, with
+`make e2e`, exit 0: `28 passed (21.7s)`, with no 5xx and no 403 in the server log (run on the round 3 code; round 4 changed only a comment in `roles.spec.ts` on the client side, and the round 4 reviewer's own run also gave `28 passed`). This is 20 department specs and the 8 existing ones, with
 `E2E_IAM_DIR` set and the grants in §8.
 
 Deploy check, with the production settings exactly as Step 7.7 gives them:
@@ -33,7 +33,7 @@ Deploy check, with the production settings exactly as Step 7.7 gives them:
 
 ```text
 pytest modules/department --cov=modules/department --cov-branch --cov-fail-under=90
-TOTAL  1790 stmts  23 miss  266 branches  17 partial  98%   Total coverage: 98.05%
+TOTAL  1806 stmts  23 miss  268 branches  17 partial  98%   Total coverage: 98.07%
 
 pytest modules/department --cov=modules/department/domain --cov-branch --cov-fail-under=95
 TOTAL   209 stmts   0 miss   72 branches   0 partial  100%  Total coverage: 100.00%
@@ -43,7 +43,7 @@ TOTAL   209 stmts   0 miss   72 branches   0 partial  100%  Total coverage: 100.
 
 ## 3. Tests
 
-513 department backend tests:
+529 department backend tests:
 
 | File | Tests | What it covers |
 |---|---|---|
@@ -51,8 +51,8 @@ TOTAL   209 stmts   0 miss   72 branches   0 partial  100%  Total coverage: 100.
 | `test_acting_role.py` | 65 | Only the acting role counts. For all 21 office write endpoints: the HOD, Dept_Admin and central holder acting in a plain role are refused, and nothing in any table changes. An outgoing HOD or Dept_Admin is refused every write in their office role and in a plain one (BR-DEPT-024). The negative twin succeeds in the office role. `context` reports the acting role. |
 | `test_journeys.py` | 33 | Every live UC through HTTP only (below). |
 | `test_privilege_escalation.py` | 262 | For each of the 41 endpoints, each view asks for exactly the permission its endpoint needs, and: module grant without the permission is 403; permission without the module grant is 403; no session is 401; a plain staff user gets nothing; a student is refused office endpoints. Also `HEAD` and `OPTIONS` need the read permission, an unmapped method is refused, the role switch, per-office verbs, central-only assignment, designation without tenure, CSRF, and that permission codes match the registry. |
-| `test_scoping_isolation.py` | 7 | Another department's rows are absent from lists and 404 by id. Feedback is confidential. A status filter cannot widen scope. Students never see alumni or inactive profiles. Vacancy warnings follow the viewer's departments. |
-| `test_edge_cases.py` | 39 | 400 for bad filters, out-of-range numbers and ids, and over-long strings (every string the write serializers accept, announcements, official changes and tenures included, is checked against its column, and a notice subject fits even with the longest department prefix), 409 for conflicts, 422 for rule refusals, 429 throttling, the ledger's immutability, and every adversarial question below. |
+| `test_scoping_isolation.py` | 16 | Another department's rows are absent from lists and 404 by id. A principal holding student, faculty and both office designations, acting as a student or as faculty, gets an empty list from every office-only list (R4-02). Feedback is confidential. A status filter cannot widen scope. Students never see alumni or inactive profiles. Vacancy warnings follow the viewer's departments. |
+| `test_edge_cases.py` | 46 | 404 for a department code the column could never hold (a NUL byte, a space, 13 letters), 400 for bad filters (a NUL byte included), out-of-range numbers and ids, and over-long strings (every string the write serializers accept, announcements, official changes and tenures included, is checked against its column, and a notice subject fits even with the longest department prefix), 409 for conflicts, 422 for rule refusals, 429 throttling, the ledger's immutability, and every adversarial question below. |
 | `test_concurrency.py` | 8 | Real threads on a `Barrier`, with `transaction=True`: issue race, double issue, double decision, overlapping tenures, transitions twice, delivery twice. The database triggers refuse an overlapping tenure written around the service (raced) and a clashing slot written directly. |
 | `test_query_budgets.py` | 12 | The same query count with 2 rows and with 20, for all 11 list endpoints, plus prefetched notes. |
 | `test_schedule.py` | 14 | Beat entries merged and routed; each task twice in a row; readiness, seeding and command output; vacant and ending roles named (Q1); the headship contract. |
@@ -99,6 +99,14 @@ back. All six ran in one run, which ended `after restore: 512 passed`.
 | Limit check (BR-DEPT-015) | `requested > available + 1000` | `test_uc_dept_004_alternate_insufficient_stock_is_not_advanced`, `test_br_dept_015_refusals[6-5-insufficient_stock]` |
 | State transition (BR-DEPT-007) | Table gains `pending_hod → issued` | `test_a_pending_request_cannot_be_issued_before_the_hod_decides`, `test_cw_dept_01_stock_lifecycle_table` |
 | Uniqueness (BR-DEPT-022) | `overlapping()` returns nothing | `test_uc_dept_020_alternate_cardinality_violation_is_blocked`, `test_two_overlapping_tenures_recorded_at_once_leave_one`, `test_ended_tenure_cannot_be_changed_and_extension_cannot_overlap` |
+
+Round 4 breaks, each run against the whole module and copied back:
+
+| Rule broken | Change | Caught by |
+|---|---|---|
+| Acting-role scoping (R4-02) | `inventory_items_for` drops its role check | `test_r4_02_a_dual_designation_principal_lists_only_the_acting_roles_rows[student-inventory-items]` |
+| Acting-role scoping | the same for stock movements, official changes, tenures and labs, one at a time | the same test, for that list |
+| Path input (R4-01) | `_dept` stops checking the code | `test_r4_01_a_hostile_department_code_is_404_not_500[C%00SE]` |
 
 ## 5. Adversarial pass
 
@@ -606,6 +614,13 @@ This covers:
   `docs/02-iam/permission-catalog.generated.md`; the new entries in `client/e2e/accounts.ts`;
   and `ops/docs/department_reference.py`.
 
+Also from Student 2, on WhatsApp, 2026-11-23 03:26 IST:
+
+> "I agree with all six proposed answers: (1) HOD sees all department announcements, (2) Faculty relevance by role only, (3) notes visible to the submitter, (4) notes allowed after closure, (5) no notice to the outgoing holder, (6) ready with vacancy warnings." [roll number omitted]
+
+This answers the six questions raised in review rounds 1–3 (blueprint, "Questions raised in
+review"). Each answer keeps the current behaviour, so no code changed for them.
+
 No dependency was added.
 
 ## 12. Review rounds
@@ -615,6 +630,7 @@ No dependency was added.
 | 1 | `db12b6a` | 7 | 7 | 8 | 4 | 10 | 1 | 6 | 8 | 5 | 16 (9 Major, 7 Minor) |
 | 2 | `b32b996` | 3 | 9 | 9 | 3 | 7 | 6 | 6 | 8 | 10 | 13 (3 Blocker, 4 Major, 6 Minor) |
 | 3 | `916b6b0` | 7 | 10 | 10 | 3 | 4 | 10 | 7 | 10 | 10 | 6 (2 Blocker, 4 Major) |
+| 4 | `6b52d64` | 10 | 10 | 8 | 7 | 7 | 10 | 10 | 10 | 10 | 4 (2 Major, 2 Minor) |
 
 What round 1 found, and what changed:
 
@@ -666,7 +682,15 @@ What round 3 found, and what changed:
 | R3-06 | Every page has a test where the owning office lacks the permission; the reviewer's break (Add lab ungated) now fails it. |
 | Round 3 question 2 | The Overview page requests official changes only when the panel can show. |
 
-The approver questions from rounds 1, 2 and 3 (HOD announcement view, Faculty relevance, notes to the
-submitter, notes on closed feedback, notice to the outgoing holder, readiness while roles are vacant)
-are with Student 2. Any answer that changes behaviour
-will be recorded here with its approval.
+What round 4 found, and what changed:
+
+| Finding | Change |
+|---|---|
+| R4-01 | A department code in the path that is not 1–12 letters is a 404 with the platform envelope before it reaches the database, for `GET` and `PATCH`. It is the only string path parameter; status filters are checked against their allowed values. Tests added. |
+| R4-02 | A test reads every office-only list as a principal holding every office designation while acting as a student, and as faculty; removing any list's role check fails it. |
+| R4-03 | `assign` is split into `_locked_department`, `_check_dates_and_holder`, `_refuse_gap` and `_hand_over`; no function in the module is over 50 lines. |
+| R4-04 | The comment above `successorWindow` is one line. |
+| Disclosure | The reviewer's probe left inventory item 5 ("a") in the working database; it is not part of the repository. |
+
+The six approver questions from rounds 1, 2 and 3 were answered by Student 2 on 2026-11-23 (§11);
+every answer keeps the current behaviour.

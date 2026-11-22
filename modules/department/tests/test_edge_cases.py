@@ -648,3 +648,16 @@ def test_r3_02_every_notice_subject_fits_for_the_longest_department_code(world):
     )
     subject = DepartmentNotification.objects.get(dedupe_key="announcement.published:long:1").subject
     assert len(subject) == 200 and subject.startswith("[Design] TTT")
+
+
+@pytest.mark.parametrize("code", ["%00", "CSE%00", "C%00SE", "CSE%20", "x" * 13, "C-E"])
+def test_r4_01_a_hostile_department_code_is_404_not_500(world, act, code):
+    for method in ("get", "patch"):
+        r = getattr(act("admin"), method)(f"{API}/departments/{code}", {}, format="json")
+        assert r.status_code == 404 and r.json()["error"]["code"]
+
+
+def test_r4_01_a_nul_byte_in_a_filter_or_cursor_is_not_500(world, act):
+    for path in ("stock-requests?status=%00", "feedback?status=a%00"):
+        assert act("admin").get(f"{API}/{path}").status_code == 400
+    assert act("admin").get(f"{API}/inventory-items?cursor=%00").status_code < 500

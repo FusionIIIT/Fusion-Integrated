@@ -3,8 +3,7 @@ import { type Page } from "@playwright/test";
 import { expect, signedInAs, test } from "../support/test";
 import { ADMIN_ID, ensureTenure, HOD_ID, local, openDept } from "./helpers";
 
-// A one-minute successor starting exactly when the latest ECE Dept_Admin tenure ends, so every run
-// records one and none overlaps or leaves a gap (BR-DEPT-022).
+// A one-minute ECE Dept_Admin successor starting when the latest tenure ends (BR-DEPT-022).
 async function successorWindow(page: Page): Promise<{ from: Date; to: Date }> {
   let url: string | null = "/api/v1/department/role-assignments?limit=100";
   let latest = 0;

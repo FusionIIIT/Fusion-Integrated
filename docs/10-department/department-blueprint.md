@@ -652,6 +652,20 @@ No new dependency is planned.
 | Blueprint (§1–§7) | Student 2 | 2026-11-22, 19:41 IST | WhatsApp message to Student 1 (shown as edited): "I approve the Department blueprint and Q1-Q14 as proposed, including the changes outside the module's folders." [name and roll number omitted] |
 | Q1..Q14 rulings: every proposal as written | Student 2 | 2026-11-22, 19:41 IST | same message |
 | Changes outside module folders (§8 list) | Student 2 | 2026-11-22, 19:41 IST | same message |
+| Six questions raised in review rounds 1–3 (below): every proposal as written | Student 2 | 2026-11-23, 03:26 IST | WhatsApp message to Student 1: "I agree with all six proposed answers: (1) HOD sees all department announcements, (2) Faculty relevance by role only, (3) notes visible to the submitter, (4) notes allowed after closure, (5) no notice to the outgoing holder, (6) ready with vacancy warnings." [roll number omitted] |
+
+## Questions raised in review (rounds 1–3), answered
+
+Each answer keeps what the code already does, so none changes behaviour.
+
+| # | Question | Answer (approved 2026-11-23) |
+|---|---|---|
+| R-Q1 | Which announcements does the HOD see? | Every announcement of the department, whatever its audience. |
+| R-Q2 | How is an announcement relevant to Faculty? | By audience role only (`faculty` or `all`); no course or batch filter. |
+| R-Q3 | Who sees internal feedback notes? | The submitter sees the notes on their own feedback. |
+| R-Q4 | May a note be added after feedback is closed? | Yes; notes stay allowed after resolution or closure. |
+| R-Q5 | Is the outgoing HOD or Dept_Admin notified at a switch-over? | No; only the incoming holder is notified. |
+| R-Q6 | Is the module ready while a role is vacant? | Yes; readiness passes and names each vacancy as a warning. |
 
 ## Changes after approval (review round 1)
 

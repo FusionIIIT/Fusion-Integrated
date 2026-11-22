@@ -212,3 +212,39 @@ def test_vacancies_are_scoped_to_the_viewers_departments(world, act):
     assert hod_view == []
     central_view = act("central").get(f"{API}/role-assignments/vacancies").json()
     assert {w["department"] for w in central_view} == {"Design", "LA", "ME", "NS", "SM"}
+
+
+def _office_rows(act):
+    item = (
+        act("admin")
+        .post(f"{API}/inventory-items", {"name": "Dual", "quantity": 3}, format="json")
+        .json()["id"]
+    )
+    act("faculty").post(f"{API}/stock-requests", {"item": item, "quantity": 1}, format="json")
+    act("admin").post(f"{API}/lab-resources", {"name": "Dual Lab"}, format="json")
+    act("admin").post(f"{API}/official-changes", {"field": "name", "value": "CS&E"}, format="json")
+
+
+OFFICE_HELD = ("faculty", "HOD (CSE)", "deptadmin_cse")
+OFFICE_ONLY = {
+    "student": (
+        "official-changes",
+        "inventory-items",
+        "stock-movements",
+        "stock-requests",
+        "lab-resources",
+        "role-assignments",
+    ),
+    "faculty": ("official-changes", "stock-movements", "role-assignments"),
+}
+
+
+@pytest.mark.parametrize(
+    "who,path", [(who, path) for who, paths in OFFICE_ONLY.items() for path in paths]
+)
+def test_r4_02_a_dual_designation_principal_lists_only_the_acting_roles_rows(world, act, who, path):
+    # The session holds every office permission; only the acting role may decide what is listed.
+    _office_rows(act)
+    assert act("admin").get(f"{API}/{path}").json()["results"], "the office must see rows here"
+    res = act(who, also_holds=OFFICE_HELD).get(f"{API}/{path}")
+    assert res.status_code == 200 and res.json()["results"] == []
