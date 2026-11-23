@@ -278,6 +278,185 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "spacs": {
+      "grants": {
+        "accounts_admin": [
+          "spacs.award.create",
+          "spacs.award.export",
+          "spacs.award.view",
+          "spacs.scheme.view"
+        ],
+        "award_evaluation_committee": [
+          "spacs.application.review",
+          "spacs.application.view",
+          "spacs.award.view",
+          "spacs.cycle.view",
+          "spacs.scheme.view"
+        ],
+        "spacs_assistant": [
+          "spacs.application.review",
+          "spacs.application.view",
+          "spacs.cycle.view",
+          "spacs.scheme.view"
+        ],
+        "spacs_auditor": [
+          "spacs.audit.view"
+        ],
+        "spacs_convener": [
+          "spacs.application.approve",
+          "spacs.application.review",
+          "spacs.application.view",
+          "spacs.audit.view",
+          "spacs.award.create",
+          "spacs.award.export",
+          "spacs.award.publish",
+          "spacs.award.view",
+          "spacs.cycle.create",
+          "spacs.cycle.publish",
+          "spacs.cycle.view",
+          "spacs.scheme.create",
+          "spacs.scheme.update",
+          "spacs.scheme.view"
+        ],
+        "student": [
+          "spacs.application.create",
+          "spacs.application.update",
+          "spacs.application.view",
+          "spacs.award.view",
+          "spacs.cycle.view",
+          "spacs.scheme.view"
+        ]
+      },
+      "module_grants": [
+        "accounts_admin",
+        "award_evaluation_committee",
+        "spacs_assistant",
+        "spacs_auditor",
+        "spacs_convener",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/spacs",
+        "icon": "Trophy",
+        "items": [
+          {
+            "code": "spacs.catalogue",
+            "icon": "Trophy",
+            "label": "Opportunities",
+            "required_permission": "spacs.scheme.view",
+            "sort_order": 10,
+            "to": "/spacs/catalogue"
+          },
+          {
+            "code": "spacs.mine",
+            "icon": "UserCheck",
+            "label": "My Applications",
+            "required_permission": "spacs.application.view",
+            "sort_order": 20,
+            "to": "/spacs/mine"
+          },
+          {
+            "code": "spacs.verification",
+            "icon": "Inbox",
+            "label": "Verification Queue",
+            "required_permission": "spacs.application.review",
+            "sort_order": 30,
+            "to": "/spacs/verification"
+          },
+          {
+            "code": "spacs.decisions",
+            "icon": "ClipboardCheck",
+            "label": "Scholarship Decisions",
+            "required_permission": "spacs.application.approve",
+            "sort_order": 40,
+            "to": "/spacs/decisions"
+          },
+          {
+            "code": "spacs.awards",
+            "icon": "Award",
+            "label": "Convocation Awards",
+            "required_permission": "spacs.award.publish",
+            "sort_order": 50,
+            "to": "/spacs/awards"
+          }
+        ],
+        "label": "Awards and Scholarships",
+        "nav_section": "Campus",
+        "sort_order": 350,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "spacs.scheme.view",
+          "label": "Browse scholarship and award catalogue schemes"
+        },
+        {
+          "code": "spacs.scheme.create",
+          "label": "Create scholarship and award catalogue schemes"
+        },
+        {
+          "code": "spacs.scheme.update",
+          "label": "Update scholarship and award catalogue schemes"
+        },
+        {
+          "code": "spacs.cycle.view",
+          "label": "View award cycle details and deadlines"
+        },
+        {
+          "code": "spacs.cycle.create",
+          "label": "Create and announce award cycles"
+        },
+        {
+          "code": "spacs.cycle.publish",
+          "label": "Publish award cycle announcements and outcomes"
+        },
+        {
+          "code": "spacs.application.create",
+          "label": "Submit scholarship or renewal applications"
+        },
+        {
+          "code": "spacs.application.view",
+          "label": "View visible scholarship applications"
+        },
+        {
+          "code": "spacs.application.update",
+          "label": "Amend or withdraw pending applications"
+        },
+        {
+          "code": "spacs.application.review",
+          "label": "Verify and evaluate scholarship applications"
+        },
+        {
+          "code": "spacs.application.approve",
+          "label": "Sanction or reject scholarship applications"
+        },
+        {
+          "code": "spacs.award.view",
+          "label": "View convocation and scholarship awards"
+        },
+        {
+          "code": "spacs.award.create",
+          "label": "Create award disbursement and ledger records"
+        },
+        {
+          "code": "spacs.award.publish",
+          "label": "Publish approved convocation award lists"
+        },
+        {
+          "code": "spacs.award.export",
+          "label": "Export awards and financial disbursement data"
+        },
+        {
+          "code": "spacs.audit.view",
+          "label": "View SPACS module audit trail"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "spacs.reminder.send",
+        "spacs.sla.escalate"
+      ]
     }
   },
   "publisher": "integrated",
