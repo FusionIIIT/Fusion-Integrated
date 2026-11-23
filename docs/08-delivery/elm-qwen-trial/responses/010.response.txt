@@ -1,0 +1,5 @@
+{
+  "files": {
+    "modules/leave_elm/services/queries.py": "from django.db.models import Q\nimport fusion_auth.principal\nfrom .models import LeaveApplication, LeaveBalance, LeaveTask\n\ndef list_applications(actor):\n    if not actor.has_permission('leave_elm.application.view_self'):\n        raise fusion_auth.client.exceptions.PermissionDeniedError()\n    return LeaveApplication.objects.filter(user_id=actor.user_id)\n\n\ndef own_balances(actor):\n    if not actor.has_permission('leave_elm.configuration.manage'):\n        raise fusion_auth.client.exceptions.PermissionDeniedError()\n    return LeaveBalance.objects.filter(user_id=actor.user_id)\n\n\ndef assigned_tasks(actor):\n    if not actor.has_permission('leave_elm.task.view'):\n        raise fusion_auth.client.exceptions.PermissionDeniedError()\n    return LeaveTask.objects.filter(leave_application__user_id=actor.user_id)"
+  }
+}

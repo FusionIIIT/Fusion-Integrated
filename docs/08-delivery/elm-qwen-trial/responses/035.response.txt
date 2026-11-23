@@ -1,0 +1,60 @@
+# Leave Management System (ELM)
+
+## Overview
+
+This repository contains an implementation of a leave management system using Django as the backend framework and React for the frontend. The system is designed to handle employee leave applications, task scheduling, and configuration settings.
+
+## File Structure
+
+- **modules/leave_elm**: Contains the main application logic.
+  - `apps.py`: Configures the Django app.
+  - `models.py`: Defines the database models used by the application.
+  - `services`: Directory containing services for handling various functionalities like leaving, tasks, and configurations.
+    - `actions.py`, `applications.py`, `configuration.py`, `events.py`, `queries.py`
+  - `registry.py`: Manages navigation items, permissions, role grants, and system permissions.
+  - `api**: Directory containing views and serializers for API endpoints.
+    - `urls.py`: URL routing configuration.
+    - `views.py`, `serializers.py`
+  - `types.ts`: TypeScript type definitions for frontend interfaces.
+  - `routes.tsx`: React route registration.
+- **client/src/modules/leave_elm**: Contains the frontend components and routes.
+  - `pages`: Directory with individual page components.
+    - `MyLeavePage.tsx`, `LeaveTasksPage.tsx`, `LeaveAdminPage.tsx`
+  - `components`: Directory with reusable UI components.
+  - `api.ts`: Client-side API interactions using Axios or similar library.
+  - `types.ts`: TypeScript type definitions for frontend interfaces.
+
+## Mechanical Integration Setup
+
+1. **Django Backend**:
+   - The backend is configured to use a SQLite database initially. It includes models such as `Application`, `Task`, `Configuration`, etc., which are defined in `models.py`.
+   - Django migrations (`manage.py makemigrations`) are used to create tables based on these models.
+   - The application uses Django's admin interface for initial setup but also provides RESTful APIs through Django Rest Framework (DRF) for integration with the frontend.
+   - Permissions are managed using Django's built-in authentication system, leveraging role-based access control (RBAC).
+
+2. **React Frontend**:
+   - The frontend is set up using Create React App. It interacts with the backend via Axios or Fetch API calls to handle CRUD operations and other functionalities.
+   - Components like `MyLeavePage`, `LeaveTasksPage`, and `LeaveAdminPage` manage state and render data fetched from the backend.
+   - Navigation is handled by React Router, ensuring smooth routing between different pages of the application.
+
+3. **Integration Commands**:
+   - To run the development server: `npm start`
+   - To build the production version: `npm run build`
+
+4. **Database Migration Verification**:
+   - After running `python manage.py migrate`, the database schema should match the models defined in `models.py`. This ensures that all necessary tables are created and relationships are correctly established.
+
+5. **Module Registration**:
+   - The module registration process involves setting up permissions, roles, and navigation items in the `registry.py` file. This ensures that users have the appropriate access levels and can navigate through the application effectively.
+
+## Workflow Correctness Unverified
+
+- No functional, BR, security, missing-requirement, maintainability, or optimization review has been performed on this implementation.
+- Bugs may remain due to incomplete code, incorrect logic, or integration issues not verified during testing.
+- The system does not claim to be fully operational; it is a work-in-progress with potential bugs and improvements needed.
+
+For detailed logs and exact check commands, refer to the evidence directory at `../../docs/08-delivery/elm-qwen-trial`.
+
+---
+
+This README provides an overview of the project structure, integration setup, and workflow correctness unverified for the Leave Management System (ELM).

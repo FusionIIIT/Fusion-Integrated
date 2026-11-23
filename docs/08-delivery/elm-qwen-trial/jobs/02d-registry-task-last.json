@@ -1,0 +1,13 @@
+{
+  "label": "Retry registry with current task after references",
+  "instruction": "Mechanical integration correction only. The previous registry.py incorrectly contains Django urlpatterns and imports a nonexistent .views module. Replace it with the REQUIRED Fusion registry interface shown in modules/placement/registry.py: MODULE plain dictionary, NAV_ITEMS list of dictionaries, PERMISSIONS list of (code,label), ROLE_GRANTS dict of designation strings to permission strings, SYSTEM_PERMISSIONS list. This file must not import views, django.urls, Django, or services. MODULE code leave_elm, label Employee Leave Management, base_path /leave, nav_section Employee, icon CalendarBlank, status active, sort_order 30. Exactly three NAV_ITEMS to /leave/mine, /leave/queue, /leave/admin, each with its own matching permission. Use leave_elm prefixed permission codes, and include application.view_self, application.create, application.review, application.approve, substitute.respond, task.view, configuration.manage and record.manage under the leave_elm prefix. Declare employee role grants for faculty/staff/Employee, reviewer/authority grants for Unit Head/Deputy Registrar (Estt.)/Dean/Registrar/Director and admin grants for Leave Administrator, as named by the original problem statement. Every declared permission must have a holder. No URLs or view classes belong in registry.py. Do not modify any other file or business logic. Maximum 100 lines. Your output must begin with a MODULE dictionary and contain NAV_ITEMS, PERMISSIONS, ROLE_GRANTS, SYSTEM_PERMISSIONS assignments. It must NOT contain urlpatterns, path(), imports of views, or any view class. Those are a different interface. Generate the requested registry definitions now.",
+  "allowed_paths": [
+    "modules/leave_elm/registry.py"
+  ],
+  "include_specs": false,
+  "context_files": [
+    "modules/placement/registry.py",
+    "docs/08-delivery/elm-qwen-trial/problem-statement-context.md"
+  ],
+  "num_predict": 2500
+}

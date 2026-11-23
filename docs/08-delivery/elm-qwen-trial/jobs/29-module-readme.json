@@ -1,0 +1,21 @@
+{
+  "label": "Generate module documentation",
+  "instruction": "Write concise README.md in Markdown for the generated ELM module, max100 lines. Describe actual file structure, existing route paths and mechanical integration setup, not requirements compliance. Explain use existing Fusion auth/config/DB; python manage.py migrate, seed_modules and client npm run build are integration commands. State only build/structural checks performed and workflow correctness unverified; preserve bugs, no functional/security audit. Do not claim API operations work or requirements complete. Link evidence directory ../../docs/08-delivery/elm-qwen-trial for logs and exact check commands. Do not put author/model labels in module documentation. No invented test results, roll numbers, successful server run or seeded data. Return Markdown only.",
+  "allowed_paths": [
+    "modules/leave_elm/README.md"
+  ],
+  "context_files": [
+    "docs/08-delivery/elm-qwen-trial/observed-results.json",
+    "modules/leave_elm/api/urls.py",
+    "modules/leave_elm/registry.py"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 1900,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

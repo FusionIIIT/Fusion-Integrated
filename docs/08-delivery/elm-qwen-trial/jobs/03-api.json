@@ -1,0 +1,24 @@
+{
+  "label": "Backend API and scheduled work",
+  "instruction": "Continue the local Qwen ELM implementation. Generate DRF serializers, APIViews and urls using YOUR existing models and service functions supplied below, without redesigning business rules or changing model/service logic. Mount-relative URL paths must have no trailing slash, because the existing Axios client uses /api/v1. APIs must expose the operations already implemented by your service layer to the frontend: own leave list/create, details, balances, assigned task queue, substitute responses and replacement, review/final decisions, withdrawal/cancellation/extension/resumption, admin configuration/calendars/offline-record entry and history/notifications as available. Reuse request.principal, HasModuleGrant(\"leave_elm\"), and the exact HasPermission codes declared in your registry. Never use request.user.pk or Django User. Use modules.directory.contracts for employee selection. Annotate every APIView method with drf_spectacular extend_schema request/response serializers or OpenApiTypes so schema generation works. Give action endpoints unique operation_id on the METHOD decorator, never the class decorator. Return React-compatible simple response JSON. Scheduled tasks may call existing service operations only: no copied logic or new rules. Use Celery shared_task string names and expose BEAT_SCHEDULE and TASK_ROUTES from schedule.py. Do not write tests. Only generate requested new files. Keep this initial output compact, with no repeated methods or placeholder functions. Keep the batch under approximately 300 source lines. Use a small set of APIViews with action dispatch, rather than dozens of duplicate classes. Every imported service function and model name must actually exist in the supplied code. Do not invent a new method just to complete a URL. Group operations using existing service methods and preserve their behavior.",
+  "allowed_paths": [
+    "modules/leave_elm/api/__init__.py",
+    "modules/leave_elm/api/serializers.py",
+    "modules/leave_elm/api/views.py",
+    "modules/leave_elm/api/urls.py",
+    "modules/leave_elm/tasks.py",
+    "modules/leave_elm/schedule.py"
+  ],
+  "context_files": [
+    "docs/08-delivery/elm-qwen-trial/specification-context-compact.md",
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/services/leave.py",
+    "modules/leave_elm/selectors/leave.py",
+    "modules/leave_elm/registry.py",
+    "fusion_auth/permissions.py",
+    "fusion_auth/principal.py",
+    "modules/directory/contracts.py"
+  ],
+  "num_predict": 7000,
+  "include_specs": false
+}

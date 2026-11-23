@@ -1,0 +1,20 @@
+{
+  "label": "Compiler interface repair LeaveTasksPage",
+  "instruction": "Fix only TypeScript/import/library interface errors in the existing file, returning its complete raw source. Correct http import to ../../../lib/http; add imports listTasks from ../api and named PageHeader. useMutation returns an object, not tuple: use {mutate:approveTask} = useMutation({mutationFn:(data:{id:number}) => http.post(...)}) for all four operations, keeping URL/payload exactly as they are. Stack spacing must be gap. tasks may be undefined: use tasks!.map preserving existing loading/error guard. Do not change task.id, task.title or task.description assumptions, actions, payloads or authorization. Remove unused imports required by noUnusedLocals. Do not rewrite or add features. No workflow/business fixes. Close all JSX.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx"
+  ],
+  "context_files": [
+    "client/src/modules/leave_elm/pages/LeaveTasksPage.tsx",
+    "client/src/modules/leave_elm/api.ts"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3500,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

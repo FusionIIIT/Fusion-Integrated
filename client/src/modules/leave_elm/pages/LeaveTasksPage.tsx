@@ -1,0 +1,60 @@
+import { useEffect } from 'react';
+import { Group, Stack, Text, Title, Button, LoadingOverlay, Alert, Container } from '@mantine/core';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { http } from '../../../lib/http';
+import { listTasks } from '../api';
+import { PageHeader } from '../../../ui/components/PageHeader';
+
+export const LeaveTasksPage = () => {
+  const { mutate: approveTask } = useMutation({ mutationFn: (data: { id: number }) =>
+    http.post(`/leave/applications/${data.id}/action`, { action: 'approve', data })
+  });
+  const { mutate: rejectTask } = useMutation({ mutationFn: (data: { id: number }) =>
+    http.post(`/leave/applications/${data.id}/action`, { action: 'reject', data })
+  });
+  const { mutate: recommendTask } = useMutation({ mutationFn: (data: { id: number }) =>
+    http.post(`/leave/applications/${data.id}/action`, { action: 'recommend', data })
+  });
+  const { mutate: substituteTask } = useMutation({ mutationFn: (data: { id: number }) =>
+    http.post(`/leave/applications/${data.id}/action`, { action: 'substitute', data })
+  });
+
+  const { isLoading, isError, error, data: tasks } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: listTasks,
+  });
+
+  useEffect(() => {
+    if (isError && error instanceof Error) {
+      console.error('Error fetching leave tasks:', error.message);
+    }
+  }, [isError, error]);
+
+  return (
+    <Container>
+      <LoadingOverlay visible={isLoading} />
+      {isError && (
+        <Alert title="Error" color="red">
+          {error?.message}
+        </Alert>
+      )}
+      <PageHeader title="Leave Tasks" subtitle="Manage pending leave applications" />
+
+      <Stack gap="lg">
+        {!isLoading && !isError && tasks!.map((task) => (
+          <Group key={task.id}>
+            <Title order={3}>{task.title}</Title>
+            <Text c="dimmed">{task.description}</Text>
+
+            <Button onClick={() => approveTask({ id: task.id })}>Approve</Button>
+            <Button onClick={() => rejectTask({ id: task.id })}>Reject</Button>
+            <Button onClick={() => recommendTask({ id: task.id })}>Recommend</Button>
+            <Button onClick={() => substituteTask({ id: task.id })}>Substitute</Button>
+          </Group>
+        ))}
+      </Stack>
+    </Container>
+  );
+};
+
+export default LeaveTasksPage;

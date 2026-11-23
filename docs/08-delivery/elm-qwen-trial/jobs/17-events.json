@@ -1,0 +1,19 @@
+{
+  "label": "Initial scheduled ELM events",
+  "instruction": "Generate a concise services/events.py module (maximum 55 lines) with year_end_rollover() and process_task_sla() implementations using existing LeaveBalance/LeavePolicy/LeaveTask/LeaveNotification models. Year-end balances and pending task reminder/escalation in-app notifications are the two ELM scheduled events from the specifications. No Celery decorators in services. Use only existing model fields. Do not change model schema, audit business rules, or systematically test functionality.",
+  "allowed_paths": [
+    "modules/leave_elm/services/events.py"
+  ],
+  "context_files": [
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "include_specs": false,
+  "num_predict": 2000,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

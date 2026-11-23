@@ -1,0 +1,172 @@
+```typescript
+import { useEffect } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Button, Group, Stack, Text, Title, TextInput, TextArea, LoadingOverlay, Alert, Container, Paper, Table, Thead, Tbody, Tr, Th, Td, Pagination, Center } from "@mantine/core";
+import { useRouter } from "next/router";
+
+// Import necessary types and functions
+import type { LeaveApplication, LeaveBalance, LeaveTask, LeaveHistory, LeaveNotification } from "./types";
+import { listApplications, listBalances, listTasks, submitApplication, applicationAction, getRecords } from './api';
+
+interface Configuration {
+  policy?: Record<string, unknown>[];
+  calendar?: Record<string, unknown>[];
+}
+
+type NewApplication = {
+  leave_type: number;
+  start_date: string;
+  end_date: string;
+  purpose: string;
+};
+
+const PageHeader = ({ title, subtitle }: { title: string; subtitle: string }) => (
+  <Group position="center">
+    <Title order={2}>{title}</Title>
+    <Text size="sm" color="dimmed">{subtitle}</Text>
+  </Group>
+);
+
+const errorMessage = (error: any): string => {
+  if (typeof error === 'string') return error;
+  if ('message' in error) return error.message;
+  return JSON.stringify(error);
+};
+
+export const LeaveAdminPage = () => {
+  const router = useRouter();
+  const [policyJSON, setPolicyJSON] = useState<Record<string, any>>({});
+  const [calendarJSON, setCalendarJSON] = useState<Record<string, any>>({});
+
+  // Fetch configuration data initially
+  const { isLoading, isError, error, data } = useQuery(['configuration'], async () => {
+    return await getConfiguration();
+  });
+
+  useEffect(() => {
+    if (data) {
+      setPolicyJSON(data.policy || {});
+      setCalendarJSON(data.calendar || {});
+    }
+  }, [data]);
+
+  const saveConfigurationMutation = useMutation({
+    mutationFn: async (newData: Configuration) => {
+      return await saveConfiguration(newData);
+    },
+    onSuccess: () => {
+      alert('Configuration saved successfully!');
+    },
+    onError: (error) => {
+      console.error(error);
+      alert('Failed to save configuration.');
+    },
+  });
+
+  const handleSavePolicyClick = () => {
+    try {
+      saveConfigurationMutation.mutate({ policy: policyJSON });
+    } catch (e) {
+      alert('Invalid JSON format for policy');
+    }
+  };
+
+  const handleSaveCalendarClick = () => {
+    try {
+      saveConfigurationMutation.mutate({ calendar: calendarJSON });
+    } catch (e) {
+      alert('Invalid JSON format for calendar');
+    }
+  };
+
+  // Fetch records
+  const { isLoadingRecords, isErrorRecords, errorRecords, dataRecords } = useQuery(['records'], async () => {
+    return await getRecords();
+  });
+
+  useEffect(() => {
+    if (dataRecords && dataRecords.history) {
+      setHistory(dataRecords.history.map((record) => ({ ...record, date: new Date(record.date).toISOString() })));
+    }
+
+    if (dataRecords && dataRecords.notifications) {
+      setNotifications(dataRecords.notifications.map((notification) => ({ ...notification, title: notification.title || '', description: notification.description || '', status: notification.status || '' })));
+    }
+  }, [dataRecords]);
+
+  const history = useState<LeaveHistory[]>([]);
+  const notifications = useState<LeaveNotification[]>([]);
+
+  return (
+    <Container size="lg" mt={40}>
+      <PageHeader title="Leave Admin" subtitle="Manage leave policies and configurations." />
+
+      {/* Policy Editor */}
+      <Paper shadow="sm" p="md">
+        <Title order={3}>Policy</Title>
+        <Textarea value={JSON.stringify(policyJSON, null, 2)} onChange={(event) => setPolicyJSON(JSON.parse(event.target.value))} rows={15} />
+        <Group position="right" mt="xs">
+          <Button onClick={handleSavePolicyClick} color="blue">Save Policy</Button>
+        </Group>
+      </Paper>
+
+      {/* Calendar Editor */}
+      <Paper shadow="sm" p="md" mt={20}>
+        <Title order={3}>Calendar</Title>
+        <Textarea value={JSON.stringify(calendarJSON, null, 2)} onChange={(event) => setCalendarJSON(JSON.parse(event.target.value))} rows={15} />
+        <Group position="right" mt="xs">
+          <Button onClick={handleSaveCalendarClick} color="green">Save Calendar</Button>
+        </Group>
+      </Paper>
+
+      {isLoading || isLoadingRecords ? (
+        <LoadingOverlay visible={true} overlayBlur={2} />
+      ) : isError || isErrorRecords ? (
+        <Alert severity="error">{errorMessage(error)}</Alert>
+      ) : (
+        <>
+          <Title order={4} mt={20}>History</Title>
+          <Table striped highlightRowOnHover>
+            <Thead>
+              <Tr>
+                <Th>Date</Th>
+                <Th>Details</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {history.map((record, index) => (
+                <Tr key={index}>
+                  <Td>{new Date(record.date).toLocaleDateString()}</Td>
+                  <Td>{record.details}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+
+          <Title order={4} mt={20}>Notifications</Title>
+          <Table striped highlightRowOnHover>
+            <Thead>
+              <Tr>
+                <Th>Title</Th>
+                <Th>Description</Th>
+                <Th>Status</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {notifications.map((notification, index) => (
+                <Tr key={index}>
+                  <Td>{notification.title}</Td>
+                  <Td>{notification.description}</Td>
+                  <Td>{notification.status}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </>
+      )}
+    </Container>
+  );
+};
+
+export default LeaveAdminPage;
+```

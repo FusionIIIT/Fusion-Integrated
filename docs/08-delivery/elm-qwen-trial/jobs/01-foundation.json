@@ -1,0 +1,20 @@
+{
+  "label": "Backend foundation",
+  "instruction": "Implement the Employee Leave Management module inside the supplied Fusion ERP base. This is the first implementation stage, not a code review. Use the provided specification context to generate backend data models, the pure-Python domain definitions/calculations, app configuration, module permissions/navigation/role grants and batched public contracts. Reuse Fusion identity; employee references must be integer IAM user IDs, not Django user foreign keys. Models must contain all data needed by the provided leave workflows, policy/calendar/hierarchy configuration, balances, audit, notifications, SLA and year-end processing. Code package is modules.leave_elm, module code is leave_elm, frontend base is /leave and backend prefix is /api/v1/leave/. Plan three nav paths /leave/mine, /leave/queue, /leave/admin. registry.py is plain MODULE dictionary, NAV_ITEMS dictionaries, PERMISSIONS list of (code,label), ROLE_GRANTS dict of role names to permission-code lists, SYSTEM_PERMISSIONS list. Use names from the supplied actor registry. Include faculty and staff grants for employee actions. Do not create login/user models or tests. Return only the foundational files requested; later stages will implement services/API/UI against your definitions. Use only installed Django/standard-library dependencies. Domain must not import Django/DRF/Celery. contracts.py getters must accept sequences. AppConfig name modules.leave_elm, label leave_elm, default_auto_field django.db.models.BigAutoField. All fields should be syntactically valid Django fields. Keep the output compact enough to return all files.",
+  "allowed_paths": [
+    "modules/leave_elm/__init__.py",
+    "modules/leave_elm/apps.py",
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/domain/__init__.py",
+    "modules/leave_elm/domain/policy.py",
+    "modules/leave_elm/registry.py",
+    "modules/leave_elm/contracts.py"
+  ],
+  "context_files": [
+    "fusion_auth/principal.py",
+    "modules/directory/contracts.py",
+    "core/db/mixins.py",
+    "modules/placement/registry.py"
+  ],
+  "num_predict": 8192
+}

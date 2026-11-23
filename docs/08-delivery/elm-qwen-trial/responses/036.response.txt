@@ -1,0 +1,117 @@
+# TRIAL_RECORD.md
+
+## Configuration
+
+**Model Details:**  
+- **Name:** qwen2.5-coder:3b  
+- **Format:** gguf  
+- **Family:** qwen2  
+- **Parameter Size:** 3.1B  
+- **Quantization Level:** Q4_K_M  
+
+**Hardware:**  
+- **Machine Model:** Mac16,12  
+- **Chip Type:** Apple M4  
+- **Number of Processors:** proc 10:0:4:6  
+- **Physical Memory:** 16 GB  
+
+**OS:**  
+- **ProductName:** macOS  
+- **ProductVersion:** 27.0.1  
+- **BuildVersion:** 26A434  
+
+**Official Fusion Base SHA:** Not provided in the reference material.  
+
+**API Python Runner:** Ollama v0.40.3 with streamed prompts and periodic output checks.  
+
+**Token Limit/Repetition Failures:**  
+- Token limit reached in `prompt 003` (contracts.py) due to large string length; response truncated.
+
+**Raw Source Format Switch:**  
+- No mention of format switch in the reference material.
+
+## Method
+
+The trial involved generating code snippets for a leave management system using the Qwen model. The user chose one candidate from the available options.
+
+## Observed Generation Results
+
+### Requests
+1. **Prompt 001**: Backend foundation - Failed after exceeding token limit.
+2. **Prompt 002**: Retry foundation: compact models only - Succeeded but required manual recovery.
+3. **Prompt 003**: App, domain, registry and contracts - Partially succeeded; incomplete file strings were decoded and written unchanged.
+4. **Prompt 004**: Small contracts file after truncated output - Succeeded without any changes.
+5. **Prompt 005**: Backend services and selectors - Succeeded without any changes.
+6. **Prompt 006**: Correct Fusion registry interface - Succeeded without any changes.
+7. **Prompt 007**: Focused initial leave service - Succeeded without any changes.
+8. **Prompt 008**: Retry registry with current task after references - Succeeded without any changes.
+9. **Prompt 009**: Focused initial leave service with current task last - Succeeded without any changes.
+10. **Prompt 010**: Small leave query service with repetition control - Succeeded without any changes.
+11. **Prompt 011**: Correct pure domain module placement - Succeeded without any changes.
+12. **Prompt 012**: Initial application creation service - Succeeded without any changes.
+13. **Prompt 013**: Initial application actions service - Succeeded without any changes.
+14. **Prompt 014**: Initial API serializer interfaces - Succeeded without any changes.
+15. **Prompt 015**: Initial employee and action API views - Succeeded without any changes.
+16. **Prompt 016**: Initial configuration API views - Succeeded without any changes.
+17. **Prompt 017**: API URL interface registration - Succeeded without any changes.
+18. **Prompt 018**: Repair configuration syntax and Fusion permission interfaces - Succeeded without any changes.
+19. **Prompt 019**: Initial scheduled ELM events - Succeeded without any changes.
+20. **Prompt 020**: Scheduled task and worker registration - Succeeded without any changes.
+21. **Prompt 021**: Missing record serializer interface definitions - Succeeded without any changes.
+22. **Prompt 022**: Repair incomplete Celery schedule configuration - Succeeded without any changes.
+23. **Prompt 023**: Initial typed frontend API client - Succeeded without any changes.
+24. **Prompt 024**: Initial employee leave page - Succeeded without any changes.
+25. **Prompt 025**: Initial leave work queue page - Succeeded without any changes.
+26. **Prompt 027**: Repair incomplete employee page React interfaces raw source - Succeeded without any changes.
+27. **Prompt 028**: Initial leave work queue page raw source - Succeeded without any changes.
+28. **Prompt 029**: Initial leave configuration page raw source - Succeeded without any changes.
+29. **Prompt 030**: Frontend route registration - Succeeded without any changes.
+30. **Prompt 031**: Frontend response type interfaces - Succeeded without any changes.
+31. **Prompt 032**: Compiler interface repair LeaveTasksPage - Succeeded without any changes.
+32. **Prompt 033**: Compiler interface repair LeaveAdminPage - Succeeded without any changes.
+33. **Prompt 034**: Compiler interface repair MyLeavePage - Succeeded without any changes.
+
+### Generation Failures
+- **Prompt 001** failed after exceeding token limit.
+- **Prompt 003** partially succeeded; incomplete file strings were decoded and written unchanged.
+
+## Build Checks
+
+### Checks
+1. **Foundation Python compilation:** Success (wall_seconds: 0.12).
+2. **Foundation Python compilation after batch recovery:** Success (wall_seconds: 0.06).
+3. **Django foundation import and registration:** Failure (returncode: 1, wall_seconds: 0.45).
+4. **Django registration after mixin inheritance correction:** Failure (returncode: 1, wall_seconds: 0.59).
+5. **Generate schema migration from Qwen models:** Failure (returncode: 1, wall_seconds: 0.27).
+6. **Django model registration after related-name correction:** Success (returncode: 0, wall_seconds: 0.63).
+7. **Generate schema migration from registered Qwen models:** Success (returncode: 0, wall_seconds: 0.43).
+8. **backend-import-registration:** Failure (returncode: 1, wall_seconds: 0.53).
+9. **backend-api-imports:** Failure (returncode: 1, wall_seconds: 0.38).
+10. **backend-api-imports-corrected:** Success (returncode: 0, wall_seconds: 0.3).
+11. **backend-python-compilation:** Success (wall_seconds: 0.03).
+12. **isolated-elm-schema-install:** Success (wall_seconds: 0.39).
+13. **schema-model-drift:** Success (wall_seconds: 0.34).
+14. **full-baseline-schema-install:** Failure (returncode: 1, wall_seconds: 0.96).
+15. **isolated-module-registration:** Success (wall_seconds: 0.25).
+16. **cross-module-schema-boundaries:** Success (wall_seconds: 0.15).
+17. **registered-import-boundaries:** Success (wall_seconds: 0.16).
+18. **frontend-first-typecheck:** Failure (returncode: 2, wall_seconds: 1.49).
+19. **frontend-after-interface-retries:** Failure (returncode: 2, wall_seconds: 1.33).
+20. **frontend-current-typecheck:** Failure (returncode: 2, wall_seconds: 1.26).
+21. **frontend-final-typecheck:** Success (returncode: 0, wall_seconds: 1.18).
+22. **navigation-route-registration:** Success (wall_seconds: 0.17).
+23. **frontend-production-build:** Success (wall_seconds: 3.56).
+
+## Limits
+
+- Token limit reached in `prompt 003` due to large string length; response truncated.
+
+## Reproduce
+
+To reproduce the trial, use the following command:
+
+```bash
+python devtools/qwen_elm_trial.py generate docs/08-delivery/elm-qwen-trial/jobs/02h-queries-small.json
+```
+
+This will append a new log and rewrite the generated file (`docs/08-delivery/elm-qwen-trial/jobs/02h-queries-small.json`). The exact per-call payloads/options/statistics/checks are not provided here but can be found in the reference materials for each prompt.

@@ -1,0 +1,20 @@
+{
+  "label": "App, domain, registry and contracts",
+  "instruction": "Generate the remaining foundation files for the ELM implementation using YOUR actual models.py definitions supplied below. Use compact complete implementations and do not rename model fields. domain/policy.py must be pure Python, with the leave categories, basic entitlement/counting and workflow state definitions needed by your later service code. registry.py is a plain MODULE dictionary, NAV_ITEMS list of dictionaries, PERMISSIONS list of (code,label), ROLE_GRANTS mapping role names to permission-code lists, SYSTEM_PERMISSIONS list. Module code leave_elm, UI base_path /leave. Exactly three nav routes: /leave/mine (employee), /leave/queue (assigned tasks), /leave/admin (administrative configuration). Grant employee actions to faculty/staff/Employee and the named domain roles in the specification; use only leave_elm.*.* permission strings. AppConfig name modules.leave_elm, label leave_elm, default_auto_field django.db.models.BigAutoField. contracts.py public getters must accept sequences of user IDs and use your actual models. __init__.py files may be empty. Do not create login or tests. Keep the TOTAL response under about 220 lines. Return all requested files in the required JSON shape.",
+  "allowed_paths": [
+    "modules/leave_elm/__init__.py",
+    "modules/leave_elm/apps.py",
+    "modules/leave_elm/domain/__init__.py",
+    "modules/leave_elm/domain/policy.py",
+    "modules/leave_elm/registry.py",
+    "modules/leave_elm/contracts.py"
+  ],
+  "include_specs": false,
+  "context_files": [
+    "docs/08-delivery/elm-qwen-trial/specification-context-compact.md",
+    "modules/leave_elm/models.py",
+    "fusion_auth/principal.py",
+    "modules/placement/registry.py"
+  ],
+  "num_predict": 6000
+}

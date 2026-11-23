@@ -1,0 +1,19 @@
+{
+  "label": "Correct pure domain module placement",
+  "instruction": "Mechanical Fusion layer correction only: domain/policy.py currently duplicates the Django model definitions already present in models.py. Domain modules must not import Django, DRF, ORM models or Celery, and must not declare Django model classes. Replace the duplicated model definitions in this file with a compact PURE-PYTHON constants module, maximum 35 lines. Export the six leave category names and the leave-policy entitlement defaults already present in the supplied LeavePolicy model. Do not add workflow algorithms, validate requirements, change any default value, modify any model file, or introduce new rules. These are only constant names for the existing definitions, not a business-rule repair. Return only this pure constants file.",
+  "allowed_paths": [
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "include_specs": false,
+  "context_files": [
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/domain/policy.py"
+  ],
+  "num_predict": 1200,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

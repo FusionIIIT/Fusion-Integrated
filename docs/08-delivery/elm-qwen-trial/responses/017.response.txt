@@ -1,0 +1,5 @@
+{
+  "files": {
+    "modules/leave_elm/api/urls.py": "\nfrom django.urls import path\nfrom leave_elm.views.application_views import ApplicationListView\nfrom leave_elm.views.balance_views import BalanceListView\nfrom leave_elm.views.task_views import TaskListView\nfrom leave_elm.views.action_views import ApplicationActionView\nfrom leave_elm.configuration_view import ConfigurationView\nfrom leave_elm.views.record_views import RecordListView\n\nurlpatterns = [\n    path('applications/', ApplicationListView.as_view(), name='application-list'),\n    path('balances/', BalanceListView.as_view(), name='balance-list'),\n    path('tasks/', TaskListView.as_view(), name='task-list'),\n    path('applications/<int:pk>/action', ApplicationActionView.as_view(), name='application-action'),\n    path('configuration/', ConfigurationView.as_view(), name='configuration-view'),\n    path('records/', RecordListView.as_view(), name='record-list'),\n]\n"
+  }
+}

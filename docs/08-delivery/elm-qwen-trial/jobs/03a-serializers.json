@@ -1,0 +1,14 @@
+{
+  "label": "Focused API serializers",
+  "instruction": "INITIAL GENERATION of serializers for the supplied actual ELM models. Produce only api/serializers.py, at most 120 source lines. Define compact DRF ModelSerializer classes for the model types needed by the request list/create/decision, balance, task, substitute, extension, resumption, policy/calendar/configuration, notification and history API. Match actual model names and field names, not guessed names. Include model IDs and user_id in response serializers; derive owner identity from the Fusion principal in views rather than accepting a new login/user object. The next API stage will use these class names exactly. Do not redefine models or services, and do not add new business validation or tests. Return a complete serializer file; no placeholder functions, reference-file copying or commentary.",
+  "allowed_paths": [
+    "modules/leave_elm/api/serializers.py"
+  ],
+  "include_specs": false,
+  "context_files": [
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/services/leave.py",
+    "modules/leave_elm/services/actions.py"
+  ],
+  "num_predict": 3000
+}

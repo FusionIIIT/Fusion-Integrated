@@ -1,0 +1,20 @@
+{
+  "label": "Compiler interface repair LeaveAdminPage",
+  "instruction": "Fix only TypeScript/import/library interface errors in the existing file, returning its complete raw source. Remove unused Next router import/variable and unused http import. Add useState, named PageHeader, errorMessage and getConfiguration/saveConfiguration/getRecords plus type Configuration imports from existing paths. Mantine7 uses Textarea, Table.Thead/Table.Tbody/Table.Tr/Table.Th/Table.Td, Group justify, LoadingOverlay overlayProps={{blur:2}}, Alert color=\"red\", Table highlightOnHover. ReactQuery5 useQuery({queryKey:[...],queryFn:existing_callback}); map result property names with aliases isLoading:isLoadingRecords etc. Annotate mutationFn(newData:Configuration). Adapt missing state setters to typed useState<Record<string,any>[]>([]) for history and notifications, removing existing const arrays. Preserve payloads, HTTP calls, field assumptions (record.date/details, notification.title/description/status), dialogs and effects; do not correct business logic or audit requirements. Remove unused imports required by noUnusedLocals. Do not rewrite or add features. No workflow/business fixes. Close all JSX.",
+  "allowed_paths": [
+    "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx"
+  ],
+  "context_files": [
+    "client/src/modules/leave_elm/pages/LeaveAdminPage.tsx",
+    "client/src/modules/leave_elm/api.ts"
+  ],
+  "include_specs": false,
+  "plain_one_file": true,
+  "num_predict": 3500,
+  "options": {
+    "temperature": 0.2,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "label": "Repair incomplete Celery schedule configuration",
+  "instruction": "Return only complete schedule.py, maximum25 lines. Import crontab from celery.schedules. BEAT_SCHEDULE dict has two entries: elm-year-end-rollover task modules.leave_elm.tasks.elm_year_end_rollover schedule crontab(month_of_year=1,day_of_month=1,hour=0,minute=0); elm-task-sla task modules.leave_elm.tasks.elm_task_sla schedule crontab(minute=\"*/15\"). TASK_ROUTES={\"modules.leave_elm.tasks.*\":{\"queue\":\"default\"}}. Close every string, bracket and dictionary. This is worker configuration only.",
+  "allowed_paths": [
+    "modules/leave_elm/schedule.py"
+  ],
+  "context_files": [],
+  "include_specs": false,
+  "num_predict": 1000,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

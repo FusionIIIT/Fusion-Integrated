@@ -1,0 +1,17 @@
+{
+  "label": "Focused initial leave service",
+  "instruction": "INITIAL GENERATION of a compact ELM service file; the earlier broad service response was incomplete and was never applied. Produce ONLY modules/leave_elm/services/leave.py, maximum about 140 lines, with exactly five MODULE-LEVEL public functions (not a class): submit_application(actor,data), list_applications(actor), own_balances(actor), decide_application(actor,application_id,action,comment=\"\"), withdraw_application(actor,application_id). Use YOUR actual models and domain helpers supplied below, with actual field names and Fusion Principal.user_id / .has_permission. Initial request and decision behavior should follow the supplied problem statement. Use existing leave_elm permission codes from registry.py. Reuse Django ORM/configuration and core.api.exceptions, without DRF in services. Keep all operations compact. Do not add getters for every field, repeated process_* functions, can_* methods, dataclasses, dummy pass functions or unrelated workflows to this file. Later small files will hold follow-up requests/admin/year-end/SLA. Do not change model fields or existing helper logic. Return one complete file and stop.",
+  "allowed_paths": [
+    "modules/leave_elm/services/leave.py"
+  ],
+  "include_specs": false,
+  "context_files": [
+    "docs/08-delivery/elm-qwen-trial/problem-statement-context.md",
+    "modules/leave_elm/models.py",
+    "modules/leave_elm/domain/policy.py",
+    "modules/leave_elm/registry.py",
+    "fusion_auth/principal.py",
+    "core/api/exceptions.py"
+  ],
+  "num_predict": 3500
+}

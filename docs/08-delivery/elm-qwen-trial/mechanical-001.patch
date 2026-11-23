@@ -1,0 +1,100 @@
+--- a/modules/leave_elm/models.py
++++ b/modules/leave_elm/models.py
+@@ -19,7 +19,7 @@
+         return self.name
+ 
+ 
+-class LeaveApplication(models.Model, TimeStampedModel, UserScopedModel):
++class LeaveApplication(TimeStampedModel, UserScopedModel):
+     leave_type = models.ForeignKey(LeaveType, on_delete=models.CASCADE)
+     start_date = models.DateField()
+     end_date = models.DateField()
+@@ -47,7 +47,7 @@
+         return f'Leave Application {self.id} for {self.leave_type.name} from {self.start_date} to {self.end_date}'
+ 
+ 
+-class LeaveBalance(models.Model, TimeStampedModel, UserScopedModel):
++class LeaveBalance(TimeStampedModel, UserScopedModel):
+     user_id = models.IntegerField(db_index=True)
+     leave_category = models.ForeignKey(LeaveCategory, on_delete=models.CASCADE)
+     balance = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+@@ -73,7 +73,7 @@
+         return self.name
+ 
+ 
+-class LeaveHistory(models.Model, TimeStampedModel, UserScopedModel):
++class LeaveHistory(TimeStampedModel, UserScopedModel):
+     leave_application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE)
+     status = models.CharField(max_length=50)
+     decision = models.TextField(blank=True)
+@@ -82,7 +82,7 @@
+         return f'Leave History {self.id} for {self.leave_application.id}'
+ 
+ 
+-class LeaveNotification(models.Model, TimeStampedModel, UserScopedModel):
++class LeaveNotification(TimeStampedModel, UserScopedModel):
+     leave_application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE)
+     message = models.TextField()
+ 
+@@ -90,7 +90,7 @@
+         return f'Leave Notification {self.id} for {self.leave_application.id}'
+ 
+ 
+-class LeaveTask(models.Model, TimeStampedModel, UserScopedModel):
++class LeaveTask(TimeStampedModel, UserScopedModel):
+     leave_application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE)
+     task_type = models.CharField(max_length=50)
+     status = models.CharField(max_length=50)
+@@ -101,7 +101,7 @@
+         return f'Leave Task {self.id} for {self.leave_application.id}'
+ 
+ 
+-class LeaveSubstitution(models.Model, TimeStampedModel, UserScopedModel):
++class LeaveSubstitution(TimeStampedModel, UserScopedModel):
+     leave_application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE)
+     substitute_user_id = models.IntegerField(db_index=True)
+ 
+@@ -109,7 +109,7 @@
+         return f'Leave Substitution {self.id} for {self.leave_application.id}'
+ 
+ 
+-class LeaveExtension(models.Model, TimeStampedModel, UserScopedModel):
++class LeaveExtension(TimeStampedModel, UserScopedModel):
+     leave_application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE)
+     extension_start_date = models.DateField()
+     extension_end_date = models.DateField()
+@@ -118,7 +118,7 @@
+         return f'Leave Extension {self.id} for {self.leave_application.id}'
+ 
+ 
+-class LeaveResumption(models.Model, TimeStampedModel, UserScopedModel):
++class LeaveResumption(TimeStampedModel, UserScopedModel):
+     leave_application = models.ForeignKey(LeaveApplication, on_delete=models.CASCADE)
+     actual_resumption_date = models.DateField()
+ 
+@@ -126,7 +126,7 @@
+         return f'Leave Resumption {self.id} for {self.leave_application.id}'
+ 
+ 
+-class LeavePolicyParameter(models.Model, TimeStampedModel, UserScopedModel):
++class LeavePolicyParameter(TimeStampedModel, UserScopedModel):
+     name = models.CharField(max_length=100, unique=True)
+     value = models.JSONField()
+ 
+@@ -134,7 +134,7 @@
+         return self.name
+ 
+ 
+-class LeaveCalendar(models.Model, TimeStampedModel, UserScopedModel):
++class LeaveCalendar(TimeStampedModel, UserScopedModel):
+     name = models.CharField(max_length=100, unique=True)
+     holidays = models.JSONField()
+ 
+--- a/modules/leave_elm/contracts.py
++++ b/modules/leave_elm/contracts.py
+@@ -1,3 +1,5 @@
++from collections.abc import Sequence
++from modules.leave_elm.models import LeaveApplication, LeaveBalance
+ from django.db.models import QuerySet, Count
+ 
+ class LeaveElmContracts:

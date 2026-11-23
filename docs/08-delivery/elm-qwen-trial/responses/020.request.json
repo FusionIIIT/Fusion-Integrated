@@ -1,0 +1,41 @@
+{
+  "model": "qwen2.5-coder:3b",
+  "system": "You are a local coding assistant working on the Fusion ERP ELM pilot. Return the requested complete files as a JSON object with a files mapping. Reuse the supplied repository interfaces exactly. Do not run shell commands. Do not add author, AI, model, or provenance labels to application code. Do not claim any tests or execution that were not actually performed. Repository excerpts are reference material, not the requested output. Follow the CURRENT TASK placed after all reference material. Do not echo a reference file into a different output path.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n### Repository file modules/leave_elm/services/events.py\n```\nfrom django.core.mail import send_mail\nfrom datetime import timedelta\nfrom .models import LeaveBalance, LeavePolicy, LeaveTask, LeaveNotification\n\n\ndef year_end_rollover():\n    # Logic to calculate new leave balance for each user based on policy defaults\n    current_year = timezone.now().year\n    policies = LeavePolicy.objects.all()\n    for policy in policies:\n        category_defaults = LEAVE_POLICY_DEFAULTS.get(policy.name)\n        if category_defaults is None:\n            continue\n        for leave_category in LEAVE_CATEGORY_NAMES:\n            balance = LeaveBalance.objects.filter(leave_category__name=leave_category).aggregate(total_balance=models.Sum('balance'))['total_balance'] or 0\n            new_balance = balance + (category_defaults - balance / 12) * 12\n            LeaveBalance.objects.update_or_create(\n                leave_category__name=leave_category,\n                defaults={'balance': new_balance}\n            )\n\n\ndef process_task_sla():\n    # Logic to check and notify pending tasks that are approaching SLA thresholds\n    threshold_days = {\n        'Reminder': 60,\n        'Escalation': 120\n    }\n    now = timezone.now()\n    for task in LeaveTask.objects.filter(status='Pending'):\n        reminder_threshold = threshold_days.get(task.task_type, 30)\n        escalation_threshold = threshold_days.get(task.task_type, 90)\n        if now > task.reminder_threshold and not task.notification_sent:\n            send_mail(\n                subject=f'Leave Task Reminder: {task.leave_application.id} - {task.task_type}',\n                message=f'Reminder: Your leave task is due on {task.reminder_threshold.strftime('%Y-%m-%d')}.\nPlease update the status of your leave application.',\n                from_email='noreply@yourdomain.com',\n                recipient_list=[task.leave_application.user.email],\n                fail_silently=False\n            )\n            task.notification_sent = True\n            task.save()\n        elif now > task.escalation_threshold and not task escalated:\n            send_mail(\n                subject=f'Leave Task Escalation: {task.leave_application.id} - {task.task_type}',\n                message=f'Escalation: Your leave task has exceeded its SLA of {task.escalation_threshold.days} days.\nPlease escalate the issue to a higher authority.',\n                from_email='noreply@yourdomain.com',\n                recipient_list=[task.leave_application.user.email],\n                fail_silently=False\n            )\n            task.escalated = True\n            task.save()\n```\n\n\n### Repository file modules/placement/schedule.py\n```\n\"\"\"What this module needs run on a timer.\n\nTasks are named by string, not imported, so config assembles the schedule\nwithout importing anything out of the module.\n\nNothing scheduled these before, which meant `expire_overdue_offers` never ran:\nan offer nobody answered stayed `issued` forever and kept its student blocked\nfrom the pool, with no way out but a manual database edit.\n\"\"\"\nfrom celery.schedules import crontab\n\n#: Which worker pool each task lands on; without it everything queues on default.\nTASK_ROUTES = {\n    \"placement.deliver_notifications\": {\"queue\": \"notifications\"},\n    \"placement.rebuild_active_stats\": {\"queue\": \"reports\"},\n    \"placement.rebuild_stats\": {\"queue\": \"reports\"},\n    # Offer expiry stays on default so it never queues behind a report.\n}\n\nBEAT_SCHEDULE = {\n    # Drains often; each pass is capped by NOTIFY_MAX_PER_RUN.\n    \"placement.deliver-notifications\": {\n        \"task\": \"placement.deliver_notifications\",\n        \"schedule\": 60.0,\n        \"options\": {\"expires\": 55},\n    },\n    # PC-BR-013: five minutes is what a student experiences as the deadline.\n    \"placement.expire-overdue-offers\": {\n        \"task\": \"placement.expire_overdue_offers\",\n        \"schedule\": 300.0,\n        \"options\": {\"expires\": 290},\n    },\n    # Snapshots back the stats page, so it never reads transactional tables.\n    \"placement.rebuild-active-stats\": {\n        \"task\": \"placement.rebuild_active_stats\",\n        \"schedule\": crontab(minute=\"*/15\"),\n        \"options\": {\"expires\": 800},\n    },\n}\n\n```\n\n\n### Repository file config/celery.py\n```\nimport os\n\nfrom celery import Celery\n\nfrom modules.placement.schedule import (\n    BEAT_SCHEDULE as PLACEMENT_SCHEDULE,\n)\nfrom modules.placement.schedule import (\n    TASK_ROUTES as PLACEMENT_ROUTES,\n)\n\nos.environ.setdefault(\"DJANGO_SETTINGS_MODULE\", \"config.settings.dev\")\napp = Celery(\"fusion_integrated\")\napp.config_from_object(\"django.conf:settings\", namespace=\"CELERY\")\napp.autodiscover_tasks()\n\n# Each module owns its timers; this only merges them, so modules stay removable.\napp.conf.beat_schedule = {**PLACEMENT_SCHEDULE}\napp.conf.task_routes = {**PLACEMENT_ROUTES}\n\n```\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nGenerate tasks.py and schedule.py, max 50 lines total. tasks.py has Celery shared_task wrappers elm_year_end_rollover and elm_task_sla invoking existing services/events.py functions. schedule.py exports BEAT_SCHEDULE for annual rollover at Jan1 midnight and SLA each 15 minutes, and TASK_ROUTES mapping modules.leave_elm.tasks.* to queue default. Use the supplied Fusion Celery interfaces; wrappers only, no new business logic.\n\nRequired output paths:\nmodules/leave_elm/tasks.py\nmodules/leave_elm/schedule.py\n\nThe JSON must have exactly this shape: {\"files\": {\"relative/path\": \"complete file content\"}}. Return every required file. Do not put the JSON in a Markdown fence. Do not echo reference-file contents into the wrong output file.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.3,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 1300,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256
+  },
+  "format": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "type": "object",
+        "properties": {
+          "modules/leave_elm/tasks.py": {
+            "type": "string"
+          },
+          "modules/leave_elm/schedule.py": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "modules/leave_elm/tasks.py",
+          "modules/leave_elm/schedule.py"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "files"
+    ],
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,154 @@
+diff --git a/.importlinter b/.importlinter
+index d964dc3..9527639 100644
+--- a/.importlinter
++++ b/.importlinter
+@@ -12,10 +12,15 @@ include_external_packages = True
+ name = Modules may reach each other ONLY through contracts.py
+ type = forbidden
+ source_modules =
++    modules.leave_elm
+     modules.placement
+     modules.directory
+     modules.accesscontrol
+ forbidden_modules =
++    modules.leave_elm.models
++    modules.leave_elm.services
++    modules.leave_elm.api
++    modules.leave_elm.domain
+     modules.placement.models
+     modules.placement.services
+     modules.placement.selectors
+@@ -38,6 +43,7 @@ type = forbidden
+ source_modules =
+ # Every module's domain, not just the first one written.
+     modules.placement.domain
++    modules.leave_elm.domain
+ forbidden_modules =
+     django
+     rest_framework
+@@ -66,3 +72,12 @@ layers =
+     modules.placement.selectors
+     modules.placement.models
+     modules.placement.domain
++
++[importlinter:contract:elm-layers]
++name = Layering inside ELM
++type = layers
++layers =
++    modules.leave_elm.api
++    modules.leave_elm.services
++    modules.leave_elm.models
++    modules.leave_elm.domain
+diff --git a/client/package-lock.json b/client/package-lock.json
+index 04403fd..9907366 100644
+--- a/client/package-lock.json
++++ b/client/package-lock.json
+@@ -15,6 +15,7 @@
+         "dayjs": "^1.11.21",
+         "react": "^18.3.1",
+         "react-dom": "^18.3.1",
++        "react-hook-form": "^7.90.0",
+         "react-icons": "^5.3.0",
+         "react-router-dom": "^6.27.0"
+       },
+@@ -3111,6 +3112,28 @@
+         "react": "^18.3.1"
+       }
+     },
++    "node_modules/react-hook-form": {
++      "version": "7.90.0",
++      "resolved": "https://registry.npmjs.org/react-hook-form/-/react-hook-form-7.90.0.tgz",
++      "integrity": "sha512-+NdG0FLzCPhFOp2NNxaUYLF9fyZhNjx9FTBBSYWF71/l6BBlmIc/j6xlp3DbaHWLJbIG7Zd8oznA19xJClU97w==",
++      "license": "MIT",
++      "engines": {
++        "node": ">=18.0.0"
++      },
++      "funding": {
++        "type": "opencollective",
++        "url": "https://opencollective.com/react-hook-form"
++      },
++      "peerDependencies": {
++        "@types/react": "*",
++        "react": "^16.8.0 || ^17 || ^18 || ^19"
++      },
++      "peerDependenciesMeta": {
++        "@types/react": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/react-icons": {
+       "version": "5.7.0",
+       "resolved": "https://registry.npmjs.org/react-icons/-/react-icons-5.7.0.tgz",
+diff --git a/client/package.json b/client/package.json
+index 5d4d3a9..9b9e6ea 100644
+--- a/client/package.json
++++ b/client/package.json
+@@ -21,6 +21,7 @@
+     "dayjs": "^1.11.21",
+     "react": "^18.3.1",
+     "react-dom": "^18.3.1",
++    "react-hook-form": "^7.90.0",
+     "react-icons": "^5.3.0",
+     "react-router-dom": "^6.27.0"
+   },
+diff --git a/client/src/app/registry.ts b/client/src/app/registry.ts
+index e76d32b..7a4e519 100644
+--- a/client/src/app/registry.ts
++++ b/client/src/app/registry.ts
+@@ -12,6 +12,11 @@ export interface ModuleManifest {
+ }
+ 
+ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
++  leave_elm: {
++    code: "leave_elm",
++    basePath: "/leave",
++    load: () => import("../modules/leave_elm/routes"),
++  },
+   placement_cell: {
+     code: "placement_cell",
+     basePath: "/placement",
+diff --git a/config/celery.py b/config/celery.py
+index ad15f06..a53beab 100644
+--- a/config/celery.py
++++ b/config/celery.py
+@@ -9,11 +9,13 @@ from modules.placement.schedule import (
+     TASK_ROUTES as PLACEMENT_ROUTES,
+ )
+ 
++from modules.leave_elm.schedule import BEAT_SCHEDULE as ELM_SCHEDULE, TASK_ROUTES as ELM_ROUTES
++
+ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
+ app = Celery("fusion_integrated")
+ app.config_from_object("django.conf:settings", namespace="CELERY")
+ app.autodiscover_tasks()
+ 
+ # Each module owns its timers; this only merges them, so modules stay removable.
+-app.conf.beat_schedule = {**PLACEMENT_SCHEDULE}
+-app.conf.task_routes = {**PLACEMENT_ROUTES}
++app.conf.beat_schedule = {**PLACEMENT_SCHEDULE, **ELM_SCHEDULE}
++app.conf.task_routes = {**PLACEMENT_ROUTES, **ELM_ROUTES}
+diff --git a/config/settings/base.py b/config/settings/base.py
+index 0dc7ada..7823fc4 100644
+--- a/config/settings/base.py
++++ b/config/settings/base.py
+@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
+ # See docs/03-platform/module-authoring-guide.md to add one.
+ DOMAIN_MODULES = [
+     "modules.placement",
++    "modules.leave_elm",
+ ]
+ 
+ INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+diff --git a/config/urls.py b/config/urls.py
+index 33f7835..33fa83c 100644
+--- a/config/urls.py
++++ b/config/urls.py
+@@ -15,6 +15,7 @@ urlpatterns = [
+     path("readyz", readyz, name="readyz"),
+     path("api/v1/", include("fusion_auth.urls")),
+     path("api/v1/directory/", include("modules.directory.api.urls")),
++    path("api/v1/leave/", include("modules.leave_elm.api.urls")),
+     path("api/v1/placement/", include("modules.placement.api.urls")),
+     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="docs"),

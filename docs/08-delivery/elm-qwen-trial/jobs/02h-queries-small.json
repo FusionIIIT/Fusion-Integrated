@@ -1,0 +1,20 @@
+{
+  "label": "Small leave query service with repetition control",
+  "instruction": "Create ONE short Python file, services/queries.py. It must contain exactly three MODULE-LEVEL functions and no classes: list_applications(actor), own_balances(actor), assigned_tasks(actor). Return Django QuerySets from LeaveApplication, LeaveBalance and LeaveTask, filtered to actor.user_id using actual user_id fields. Reuse Fusion actor.has_permission with application.view_self or task.view permission codes as appropriate; raise core.api.exceptions.PermissionDeniedError if access is not granted. Use only existing registered model classes and fields shown in reference. No business workflow decisions, validation, getters per field, declarations of models, placeholder pass functions, repeated if blocks or other public functions. Maximum 45 source lines. Return the complete file in JSON and then stop.",
+  "allowed_paths": [
+    "modules/leave_elm/services/queries.py"
+  ],
+  "include_specs": false,
+  "context_files": [
+    "modules/leave_elm/models.py",
+    "fusion_auth/principal.py",
+    "modules/leave_elm/registry.py"
+  ],
+  "num_predict": 1800,
+  "options": {
+    "temperature": 0.3,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256,
+    "num_ctx": 8192
+  }
+}

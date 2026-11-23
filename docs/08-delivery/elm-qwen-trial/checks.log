@@ -1,0 +1,797 @@
+
+## Foundation Python compilation
+2026-10-12T13:32:40.003023+00:00
+Command: .venv/bin/python -m compileall -q modules/leave_elm
+
+Exit code: 0; 0.12 seconds
+
+## Foundation Python compilation after batch recovery
+2026-10-12T13:40:16.084231+00:00
+Command: .venv/bin/python -m compileall -q modules/leave_elm
+
+Exit code: 0; 0.06 seconds
+
+## Django foundation import and registration
+2026-10-12T13:40:16.557948+00:00
+Command: .venv/bin/python manage.py check
+Traceback (most recent call last):
+  File "C:/Users/sachg/Fusion-Integrated/manage.py", line 9, in <module>
+    execute_from_command_line(sys.argv)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 416, in execute
+    django.setup()
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/apps/registry.py", line 116, in populate
+    app_config.import_models()
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/apps/config.py", line 269, in import_models
+    self.models_module = import_module(models_module_name)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "C:/Users/sachg/Fusion-Integrated/modules/leave_elm/models.py", line 22, in <module>
+    class LeaveApplication(models.Model, TimeStampedModel, UserScopedModel):
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/models/base.py", line 122, in __new__
+    new_class = super_new(cls, name, bases, new_attrs, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Cannot create a consistent method resolution
+order (MRO) for bases Model, TimeStampedModel, UserScopedModel
+
+Exit code: 1; 0.45 seconds
+
+## Django registration after mixin inheritance correction
+2026-10-12T13:41:38.806803+00:00
+Command: .venv/bin/python manage.py check
+SystemCheckError: System check identified some issues:
+
+ERRORS:
+leave_elm.LeaveApplication.approved_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.approved_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.cancelled_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.approved_by' or 'leave_elm.LeaveApplication.cancelled_by'.
+leave_elm.LeaveApplication.approved_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.approved_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.extension_approved_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.approved_by' or 'leave_elm.LeaveApplication.extension_approved_by'.
+leave_elm.LeaveApplication.cancelled_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.cancelled_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.approved_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.cancelled_by' or 'leave_elm.LeaveApplication.approved_by'.
+leave_elm.LeaveApplication.cancelled_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.cancelled_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.extension_approved_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.cancelled_by' or 'leave_elm.LeaveApplication.extension_approved_by'.
+leave_elm.LeaveApplication.extension_approved_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.extension_approved_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.approved_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.extension_approved_by' or 'leave_elm.LeaveApplication.approved_by'.
+leave_elm.LeaveApplication.extension_approved_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.extension_approved_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.cancelled_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.extension_approved_by' or 'leave_elm.LeaveApplication.cancelled_by'.
+
+System check identified 6 issues (0 silenced).
+
+Exit code: 1; 0.59 seconds
+
+## Generate schema migration from Qwen models
+2026-10-12T13:41:39.100715+00:00
+Command: .venv/bin/python manage.py makemigrations leave_elm --noinput
+SystemCheckError: System check identified some issues:
+
+ERRORS:
+leave_elm.LeaveApplication.approved_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.approved_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.cancelled_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.approved_by' or 'leave_elm.LeaveApplication.cancelled_by'.
+leave_elm.LeaveApplication.approved_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.approved_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.extension_approved_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.approved_by' or 'leave_elm.LeaveApplication.extension_approved_by'.
+leave_elm.LeaveApplication.cancelled_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.cancelled_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.approved_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.cancelled_by' or 'leave_elm.LeaveApplication.approved_by'.
+leave_elm.LeaveApplication.cancelled_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.cancelled_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.extension_approved_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.cancelled_by' or 'leave_elm.LeaveApplication.extension_approved_by'.
+leave_elm.LeaveApplication.extension_approved_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.extension_approved_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.approved_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.extension_approved_by' or 'leave_elm.LeaveApplication.approved_by'.
+leave_elm.LeaveApplication.extension_approved_by: (fields.E304) Reverse accessor 'LeaveApplication.leaveapplication_set' for 'leave_elm.LeaveApplication.extension_approved_by' clashes with reverse accessor for 'leave_elm.LeaveApplication.cancelled_by'.
+	HINT: Add or change a related_name argument to the definition for 'leave_elm.LeaveApplication.extension_approved_by' or 'leave_elm.LeaveApplication.cancelled_by'.
+
+Exit code: 1; 0.27 seconds
+
+## Django model registration after related-name correction
+2026-10-12T13:43:43.255530+00:00
+Command: .venv/bin/python manage.py check
+System check identified no issues (0 silenced).
+
+Exit code: 0; 0.63 seconds
+
+## Generate schema migration from registered Qwen models
+2026-10-12T13:43:43.710892+00:00
+Command: .venv/bin/python manage.py makemigrations leave_elm --noinput
+Migrations for 'leave_elm':
+  modules/leave_elm/migrations/0001_initial.py
+    + Create model LeaveCalendar
+    + Create model LeaveCategory
+    + Create model LeavePolicy
+    + Create model LeavePolicyParameter
+    + Create model LeaveApplication
+    + Create model LeaveBalance
+    + Create model LeaveExtension
+    + Create model LeaveHistory
+    + Create model LeaveNotification
+    + Create model LeaveResumption
+    + Create model LeaveSubstitution
+    + Create model LeaveTask
+    + Create model LeaveType
+    + Add field leave_type to leaveapplication
+
+Exit code: 0; 0.43 seconds
+
+## backend-import-registration
+2026-10-12T14:09:31.288923+00:00
+Command: .venv/bin/python manage.py check
+Traceback (most recent call last):
+  File "C:/Users/sachg/Fusion-Integrated/manage.py", line 9, in <module>
+    execute_from_command_line(sys.argv)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/commands/check.py", line 81, in handle
+    self.check(
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 496, in check
+    all_issues = checks.run_checks(
+                 ^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/registry.py", line 89, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/urls.py", line 16, in check_url_config
+    return check_resolver(resolver)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/urls.py", line 26, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 531, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 718, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 711, in urlconf_module
+    return import_module(self.urlconf_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "C:/Users/sachg/Fusion-Integrated/config/urls.py", line 18, in <module>
+    path("api/v1/leave/", include("modules.leave_elm.api.urls")),
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/conf.py", line 39, in include
+    urlconf_module = import_module(urlconf_module)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "C:/Users/sachg/Fusion-Integrated/modules/leave_elm/api/urls.py", line 3, in <module>
+    from leave_elm.views.application_views import ApplicationListView
+ModuleNotFoundError: No module named 'leave_elm'
+
+Exit code: 1; 0.53 seconds
+
+## backend-api-imports
+2026-10-12T14:11:03.678881+00:00
+Command: .venv/bin/python manage.py check
+Traceback (most recent call last):
+  File "C:/Users/sachg/Fusion-Integrated/manage.py", line 9, in <module>
+    execute_from_command_line(sys.argv)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/commands/check.py", line 81, in handle
+    self.check(
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 496, in check
+    all_issues = checks.run_checks(
+                 ^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/registry.py", line 89, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/urls.py", line 16, in check_url_config
+    return check_resolver(resolver)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/checks/urls.py", line 26, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 531, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 718, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/resolvers.py", line 711, in urlconf_module
+    return import_module(self.urlconf_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "C:/Users/sachg/Fusion-Integrated/config/urls.py", line 18, in <module>
+    path("api/v1/leave/", include("modules.leave_elm.api.urls")),
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/urls/conf.py", line 39, in include
+    urlconf_module = import_module(urlconf_module)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "C:/Users/sachg/Fusion-Integrated/modules/leave_elm/api/urls.py", line 4, in <module>
+    from .configuration import ConfigurationView, RecordListView
+  File "C:/Users/sachg/Fusion-Integrated/modules/leave_elm/api/configuration.py", line 5, in <module>
+    from .record_serializers import LeaveHistorySerializer, LeaveNotificationSerializer
+  File "C:/Users/sachg/Fusion-Integrated/modules/leave_elm/api/record_serializers.py", line 2, in <module>
+    from .models import LeaveHistory, LeaveNotification
+ModuleNotFoundError: No module named 'modules.leave_elm.api.models'
+
+Exit code: 1; 0.38 seconds
+
+## backend-api-imports-corrected
+2026-10-12T14:11:12.779593+00:00
+Command: .venv/bin/python manage.py check
+System check identified no issues (0 silenced).
+
+Exit code: 0; 0.3 seconds
+
+## backend-python-compilation
+2026-10-12T14:11:30.982820+00:00
+Command: .venv/bin/python -m compileall -q modules/leave_elm
+
+Exit code: 0; 0.03 seconds
+
+## isolated-elm-schema-install
+2026-10-12T14:11:31.438564+00:00
+Command: .venv/bin/python manage.py migrate --noinput
+Operations to perform:
+  Apply all migrations: accesscontrol, auth, contenttypes, directory, leave_elm
+Running migrations:
+  Applying accesscontrol.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying directory.0001_initial... OK
+  Applying directory.0002_userref_profile_completed_userref_resume_link... OK
+  Applying leave_elm.0001_initial... OK
+
+Exit code: 0; 0.39 seconds
+
+## schema-model-drift
+2026-10-12T14:12:02.698920+00:00
+Command: .venv/bin/python manage.py makemigrations --check --dry-run
+No changes detected
+
+Exit code: 0; 0.34 seconds
+
+## full-baseline-schema-install
+2026-10-12T14:12:22.341211+00:00
+Command: .venv/bin/python manage.py migrate --noinput
+Operations to perform:
+  Apply all migrations: accesscontrol, auth, contenttypes, directory, leave_elm, placement
+Running migrations:
+  Applying accesscontrol.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying directory.0001_initial... OK
+  Applying directory.0002_userref_profile_completed_userref_resume_link... OK
+  Applying leave_elm.0001_initial... OK
+  Applying placement.0001_initial... OK
+  Applying placement.0002_announcement_companycontact_interviewround_and_more... OK
+  Applying placement.0003_remove_placementpolicy_dream_threshold_lpa_and_more... OK
+  Applying placement.0004_document_drive_link... OK
+  Applying placement.0005_outbox_claim... OK
+  Applying placement.0006_conduct_incidents... OK
+  Applying placement.0007_registration_flow... OK
+  Applying placement.0008_post_offer_obligations... OK
+  Applying placement.0009_remove_profiledocument_profile_and_more...Traceback (most recent call last):
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such index: document_profile_idx
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:/Users/sachg/Fusion-Integrated/manage.py", line 9, in <module>
+    execute_from_command_line(sys.argv)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/base.py", line 111, in wrapper
+    res = handle_func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/core/management/commands/migrate.py", line 353, in handle
+    post_migrate_state = executor.migrate(
+                         ^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/migrations/executor.py", line 135, in migrate
+    state = self._migrate_all_forwards(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/migrations/executor.py", line 167, in _migrate_all_forwards
+    state = self.apply_migration(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/migrations/executor.py", line 255, in apply_migration
+    state = migration.apply(state, schema_editor)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/migrations/migration.py", line 132, in apply
+    operation.database_forwards(
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/migrations/operations/models.py", line 1015, in database_forwards
+    schema_editor.remove_index(model, index)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/base/schema.py", line 578, in remove_index
+    self.execute(index.remove_sql(model, self))
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/base/schema.py", line 204, in execute
+    cursor.execute(sql, params)
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:/Users/sachg/Fusion-Integrated/.venv/lib/python3.12/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such index: document_profile_idx
+
+Exit code: 1; 0.96 seconds
+
+## isolated-module-registration
+2026-10-12T14:13:18.731706+00:00
+Command: .venv/bin/python manage.py seed_modules
+  registered leave_elm (active)
+1 module(s) registered
+
+Exit code: 0; 0.25 seconds
+
+## cross-module-schema-boundaries
+2026-10-12T14:14:43.473547+00:00
+Command: .venv/bin/python ops/checks/no_cross_module_fk.py
+no cross-module foreign keys
+
+Exit code: 0; 0.15 seconds
+
+## registered-import-boundaries
+2026-10-12T14:14:56.776176+00:00
+Command: .venv/bin/lint-imports
+
+╔══╗─────────▶╔╗ ╔╗      ╔╗◀───┐
+╚╣╠╝◀─────┐  ╔╝╚╗║║────▶╔╝╚╗   │
+ ║║   ╔══╦══╦╩╗╔╝║║  ╔╦═╩╗╔╝╔═╦══╗
+ ║║╔══╣╔╗║╔╗║╔╣║ ║║ ╔╬╣╔╗║║ ║│║╔═╝
+╔╣╠╣║║║╚╝║╚╝║║║╚╗║╚═╝║║║║║╚╗║═╣║
+╚══╩╩╩╣╔═╩══╩╝╚═╝╚═══╩╩╝╚╩═╩╩═╩╝
+  └──▶║║                    ▲ 
+      ╚╝────────────────────┘
+
+
+---------
+Contracts
+---------
+
+Analyzed 224 files, 646 dependencies.
+-------------------------------------
+
+Modules may reach each other ONLY through contracts.py KEPT
+domain/ must not import Django, DRF or Celery KEPT
+core/ must not import any module KEPT
+Layering inside placement KEPT
+Layering inside ELM KEPT
+
+Contracts: 5 kept, 0 broken.
+
+Exit code: 0; 0.16 seconds
+
+## frontend-first-typecheck
+2026-10-12T14:16:20.067646+00:00
+Command: C:/Users/sachg/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit
+src/modules/leave_elm/api.ts(63,57): error TS2304: Cannot find name 'LeaveHistory'.
+src/modules/leave_elm/api.ts(63,89): error TS2304: Cannot find name 'LeaveNotification'.
+src/modules/leave_elm/api.ts(65,39): error TS2304: Cannot find name 'LeaveHistory'.
+src/modules/leave_elm/api.ts(65,71): error TS2304: Cannot find name 'LeaveNotification'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,25): error TS6133: 'Stack' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,32): error TS6133: 'Text' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,45): error TS6133: 'TextInput' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,56): error TS2724: '"@mantine/core"' has no exported member named 'TextArea'. Did you mean 'Textarea'?
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,114): error TS2305: Module '"@mantine/core"' has no exported member 'Thead'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,121): error TS2305: Module '"@mantine/core"' has no exported member 'Tbody'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,128): error TS2305: Module '"@mantine/core"' has no exported member 'Tr'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,132): error TS2305: Module '"@mantine/core"' has no exported member 'Th'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,136): error TS2305: Module '"@mantine/core"' has no exported member 'Td'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,140): error TS6133: 'Pagination' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,152): error TS6133: 'Center' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(4,27): error TS2307: Cannot find module 'next/router' or its corresponding type declarations.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(5,1): error TS6133: 'http' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(5,22): error TS2307: Cannot find module '../../lib/http' or its corresponding type declarations.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(8,9): error TS6133: 'router' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(9,39): error TS2304: Cannot find name 'useState'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(10,43): error TS2304: Cannot find name 'useState'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(13,56): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(options: DefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): DefinedUseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'DefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'Omit<UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, "queryFn">'.
+  Overload 2 of 3, '(options: UndefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): UseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'UndefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+  Overload 3 of 3, '(options: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): UseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(14,18): error TS2304: Cannot find name 'getConfiguration'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(19,41): error TS2339: Property 'policy' does not exist on type '{}'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(20,43): error TS2339: Property 'calendar' does not exist on type '{}'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(26,20): error TS2304: Cannot find name 'saveConfiguration'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(40,40): error TS2345: Argument of type '{ policy: any; }' is not assignable to parameter of type 'void'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(49,40): error TS2345: Argument of type '{ calendar: any; }' is not assignable to parameter of type 'void'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(56,11): error TS2339: Property 'isLoadingRecords' does not exist on type 'DefinedUseQueryResult<unknown, Error>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(56,29): error TS2339: Property 'isErrorRecords' does not exist on type 'DefinedUseQueryResult<unknown, Error>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(56,45): error TS2339: Property 'errorRecords' does not exist on type 'DefinedUseQueryResult<unknown, Error>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(56,45): error TS6133: 'errorRecords' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(56,59): error TS2339: Property 'dataRecords' does not exist on type 'DefinedUseQueryResult<unknown, Error>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(56,84): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(options: DefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): DefinedUseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'DefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'Omit<UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, "queryFn">'.
+  Overload 2 of 3, '(options: UndefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): UseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'UndefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+  Overload 3 of 3, '(options: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): UseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(57,18): error TS2304: Cannot find name 'getRecords'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(62,7): error TS2552: Cannot find name 'setHistory'. Did you mean 'history'?
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(66,7): error TS2552: Cannot find name 'setNotifications'. Did you mean 'notifications'?
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(70,9): error TS7034: Variable 'history' implicitly has type 'any[]' in some locations where its type cannot be determined.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(71,9): error TS7034: Variable 'notifications' implicitly has type 'any[]' in some locations where its type cannot be determined.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(75,8): error TS2304: Cannot find name 'PageHeader'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(80,49): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(81,16): error TS2322: Type '{ children: Element; position: string; mt: "xs"; }' is not assignable to type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'position' does not exist on type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(89,51): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(90,16): error TS2322: Type '{ children: Element; position: string; mt: "xs"; }' is not assignable to type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'position' does not exist on type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(96,40): error TS2322: Type '{ visible: true; overlayBlur: number; }' is not assignable to type 'IntrinsicAttributes & LoadingOverlayProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'overlayBlur' does not exist on type 'IntrinsicAttributes & LoadingOverlayProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(98,16): error TS2322: Type '{ children: any; severity: string; }' is not assignable to type 'IntrinsicAttributes & AlertProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'severity' does not exist on type 'IntrinsicAttributes & AlertProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(98,34): error TS2304: Cannot find name 'errorMessage'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(102,26): error TS2322: Type '{ children: Element[]; striped: true; highlightRowOnHover: true; }' is not assignable to type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'highlightRowOnHover' does not exist on type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'. Did you mean 'highlightOnHover'?
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(110,16): error TS7005: Variable 'history' implicitly has an 'any[]' type.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(120,26): error TS2322: Type '{ children: Element[]; striped: true; highlightRowOnHover: true; }' is not assignable to type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'highlightRowOnHover' does not exist on type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'. Did you mean 'highlightOnHover'?
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(129,16): error TS7005: Variable 'notifications' implicitly has an 'any[]' type.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(4,22): error TS2307: Cannot find module '../../lib/http' or its corresponding type declarations.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(7,9): error TS2488: Type 'UseMutationResult<unknown, Error, void, unknown>' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(7,37): error TS2560: Value of type '(data: any) => any' has no properties in common with type 'UseMutationOptions<unknown, Error, void, unknown>'. Did you mean to call it?
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(7,38): error TS7006: Parameter 'data' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(10,36): error TS2560: Value of type '(data: any) => any' has no properties in common with type 'UseMutationOptions<unknown, Error, void, unknown>'. Did you mean to call it?
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(10,37): error TS7006: Parameter 'data' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(13,39): error TS2560: Value of type '(data: any) => any' has no properties in common with type 'UseMutationOptions<unknown, Error, void, unknown>'. Did you mean to call it?
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(13,40): error TS7006: Parameter 'data' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(16,40): error TS2560: Value of type '(data: any) => any' has no properties in common with type 'UseMutationOptions<unknown, Error, void, unknown>'. Did you mean to call it?
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(16,41): error TS7006: Parameter 'data' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(22,14): error TS2304: Cannot find name 'listTasks'.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(39,8): error TS2304: Cannot find name 'PageHeader'.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(41,14): error TS2322: Type '{ children: any; spacing: string; }' is not assignable to type 'IntrinsicAttributes & StackProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'spacing' does not exist on type 'IntrinsicAttributes & StackProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(42,36): error TS18046: 'tasks' is of type 'unknown'.
+src/modules/leave_elm/pages/LeaveTasksPage.tsx(42,47): error TS7006: Parameter 'task' implicitly has an 'any' type.
+src/modules/leave_elm/pages/MyLeavePage.tsx(4,56): error TS6133: 'Tooltip' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(5,25): error TS2307: Cannot find module 'react-hook-form' or its corresponding type declarations.
+src/modules/leave_elm/pages/MyLeavePage.tsx(6,10): error TS6133: 'useQuery' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(6,42): error TS2307: Cannot find module 'react-query' or its corresponding type declarations.
+src/modules/leave_elm/pages/MyLeavePage.tsx(8,10): error TS2724: '"../api"' has no exported member named 'ListApplicationsResponse'. Did you mean 'listApplications'?
+src/modules/leave_elm/pages/MyLeavePage.tsx(8,36): error TS2724: '"../api"' has no exported member named 'SubmitApplicationRequest'. Did you mean 'submitApplication'?
+src/modules/leave_elm/pages/MyLeavePage.tsx(12,10): error TS6133: 'applicationData' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(12,27): error TS6133: 'setApplicationData' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(24,36): error TS2304: Cannot find name 'listApplications'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(43,25): error TS2304: Cannot find name 'handleSubmit'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(43,39): error TS7006: Parameter 'data' implicitly has an 'any' type.
+src/modules/leave_elm/pages/MyLeavePage.tsx(43,48): error TS2304: Cannot find name 'submitApplication'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(47,17): error TS2304: Cannot find name 'register'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(53,17): error TS2304: Cannot find name 'register'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(64,17): error TS2304: Cannot find name 'register'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(69,17): error TS2304: Cannot find name 'register'.
+src/modules/leave_elm/routes.tsx(1,10): error TS1484: 'RouteObject' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/modules/leave_elm/routes.tsx(2,18): error TS2307: Cannot find module './pages/Mine' or its corresponding type declarations.
+
+Exit code: 2; 1.49 seconds
+
+## frontend-after-interface-retries
+2026-10-12T14:19:04.822173+00:00
+Command: C:/Users/sachg/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,25): error TS6133: 'Stack' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,45): error TS6133: 'TextInput' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,56): error TS2724: '"@mantine/core"' has no exported member named 'TextArea'. Did you mean 'Textarea'?
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,56): error TS6133: 'TextArea' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,114): error TS2305: Module '"@mantine/core"' has no exported member 'Thead'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,121): error TS2305: Module '"@mantine/core"' has no exported member 'Tbody'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,128): error TS2305: Module '"@mantine/core"' has no exported member 'Tr'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,132): error TS2305: Module '"@mantine/core"' has no exported member 'Th'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,136): error TS2305: Module '"@mantine/core"' has no exported member 'Td'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,140): error TS6133: 'Pagination' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(3,152): error TS6133: 'Center' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(4,27): error TS2307: Cannot find module 'next/router' or its corresponding type declarations.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(7,15): error TS6196: 'LeaveApplication' is declared but never used.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(7,33): error TS6196: 'LeaveBalance' is declared but never used.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(7,47): error TS6196: 'LeaveTask' is declared but never used.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(7,97): error TS2307: Cannot find module './types' or its corresponding type declarations.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(8,10): error TS6133: 'listApplications' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(8,28): error TS6133: 'listBalances' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(8,42): error TS6133: 'listTasks' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(8,53): error TS6133: 'submitApplication' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(8,72): error TS6133: 'applicationAction' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(8,109): error TS2307: Cannot find module './api' or its corresponding type declarations.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(15,6): error TS6196: 'NewApplication' is declared but never used.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(23,10): error TS2322: Type '{ children: Element[]; position: string; }' is not assignable to type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'position' does not exist on type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(36,9): error TS6133: 'router' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(37,39): error TS2304: Cannot find name 'useState'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(38,43): error TS2304: Cannot find name 'useState'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(41,56): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(options: DefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): DefinedUseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'DefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'Omit<UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, "queryFn">'.
+  Overload 2 of 3, '(options: UndefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): UseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'UndefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+  Overload 3 of 3, '(options: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): UseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(42,18): error TS2304: Cannot find name 'getConfiguration'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(47,26): error TS2339: Property 'policy' does not exist on type '{}'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(48,28): error TS2339: Property 'calendar' does not exist on type '{}'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(54,20): error TS2304: Cannot find name 'saveConfiguration'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(82,11): error TS2339: Property 'isLoadingRecords' does not exist on type 'DefinedUseQueryResult<unknown, Error>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(82,29): error TS2339: Property 'isErrorRecords' does not exist on type 'DefinedUseQueryResult<unknown, Error>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(82,45): error TS2339: Property 'errorRecords' does not exist on type 'DefinedUseQueryResult<unknown, Error>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(82,45): error TS6133: 'errorRecords' is declared but its value is never read.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(82,59): error TS2339: Property 'dataRecords' does not exist on type 'DefinedUseQueryResult<unknown, Error>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(82,84): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(options: DefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): DefinedUseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'DefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'Omit<UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, "queryFn">'.
+  Overload 2 of 3, '(options: UndefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): UseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'UndefinedInitialDataOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+  Overload 3 of 3, '(options: UseQueryOptions<unknown, Error, unknown, readonly unknown[]>, queryClient?: QueryClient | undefined): UseQueryResult<unknown, Error>', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+      Property 'queryKey' is missing in type 'string[]' but required in type 'UseQueryOptions<unknown, Error, unknown, readonly unknown[]>'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(88,7): error TS2304: Cannot find name 'setHistory'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(88,43): error TS7006: Parameter 'record' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(92,7): error TS2304: Cannot find name 'setNotifications'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(92,55): error TS7006: Parameter 'notification' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(96,19): error TS2304: Cannot find name 'useState'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(97,25): error TS2304: Cannot find name 'useState'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(106,10): error TS2304: Cannot find name 'Textarea'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(106,74): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(107,16): error TS2322: Type '{ children: Element; position: string; mt: "xs"; }' is not assignable to type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'position' does not exist on type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(115,10): error TS2304: Cannot find name 'Textarea'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(115,76): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(116,16): error TS2322: Type '{ children: Element; position: string; mt: "xs"; }' is not assignable to type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'position' does not exist on type 'IntrinsicAttributes & GroupProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(122,40): error TS2322: Type '{ visible: true; overlayBlur: number; }' is not assignable to type 'IntrinsicAttributes & LoadingOverlayProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'overlayBlur' does not exist on type 'IntrinsicAttributes & LoadingOverlayProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(124,16): error TS2322: Type '{ children: string; severity: string; }' is not assignable to type 'IntrinsicAttributes & AlertProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+  Property 'severity' does not exist on type 'IntrinsicAttributes & AlertProps & RefAttributes<HTMLDivElement> & { component?: any; renderRoot?: ((props: Record<string, any>) => ReactNode) | undefined; }'.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(128,26): error TS2322: Type '{ children: Element[]; striped: true; highlightRowOnHover: true; }' is not assignable to type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'highlightRowOnHover' does not exist on type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'. Did you mean 'highlightOnHover'?
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(136,29): error TS7006: Parameter 'record' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(136,37): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(146,26): error TS2322: Type '{ children: Element[]; striped: true; highlightRowOnHover: true; }' is not assignable to type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'.
+  Property 'highlightRowOnHover' does not exist on type 'IntrinsicAttributes & TableProps & RefAttributes<HTMLTableElement> & { component?: any; renderRoot?: ((props: Record<...>) => ReactNode) | undefined; }'. Did you mean 'highlightOnHover'?
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(155,35): error TS7006: Parameter 'notification' implicitly has an 'any' type.
+src/modules/leave_elm/pages/LeaveAdminPage.tsx(155,49): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/modules/leave_elm/pages/MyLeavePage.tsx(4,56): error TS6133: 'Tooltip' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(6,10): error TS6133: 'useQuery' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(6,42): error TS2307: Cannot find module 'react-query' or its corresponding type declarations.
+src/modules/leave_elm/pages/MyLeavePage.tsx(8,10): error TS2724: '"../api"' has no exported member named 'ListApplicationsResponse'. Did you mean 'listApplications'?
+src/modules/leave_elm/pages/MyLeavePage.tsx(8,36): error TS2724: '"../api"' has no exported member named 'SubmitApplicationRequest'. Did you mean 'submitApplication'?
+src/modules/leave_elm/pages/MyLeavePage.tsx(12,9): error TS2488: Type 'UseFormReturn<SubmitApplicationRequest, any, SubmitApplicationRequest>' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/modules/leave_elm/pages/MyLeavePage.tsx(12,10): error TS6133: 'applicationData' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(12,27): error TS6133: 'setApplicationData' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(24,36): error TS2552: Cannot find name 'listApplications'. Did you mean 'applications'?
+src/modules/leave_elm/pages/MyLeavePage.tsx(43,25): error TS2304: Cannot find name 'handleSubmit'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(43,39): error TS7006: Parameter 'data' implicitly has an 'any' type.
+src/modules/leave_elm/pages/MyLeavePage.tsx(43,48): error TS2304: Cannot find name 'submitApplication'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(47,17): error TS2304: Cannot find name 'register'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(53,17): error TS2304: Cannot find name 'register'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(64,17): error TS2304: Cannot find name 'register'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(69,17): error TS2304: Cannot find name 'register'.
+
+Exit code: 2; 1.33 seconds
+
+## frontend-current-typecheck
+2026-10-12T14:19:50.923667+00:00
+Command: C:/Users/sachg/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit
+src/modules/leave_elm/pages/MyLeavePage.tsx(6,10): error TS2724: '"../api"' has no exported member named 'ListApplicationsResponse'. Did you mean 'listApplications'?
+src/modules/leave_elm/pages/MyLeavePage.tsx(6,36): error TS2724: '"../api"' has no exported member named 'SubmitApplicationRequest'. Did you mean 'submitApplication'?
+src/modules/leave_elm/pages/MyLeavePage.tsx(6,62): error TS1484: 'LeaveApplication' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/modules/leave_elm/pages/MyLeavePage.tsx(6,62): error TS6133: 'LeaveApplication' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(10,9): error TS2488: Type 'UseFormReturn<SubmitApplicationRequest, any, SubmitApplicationRequest>' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/modules/leave_elm/pages/MyLeavePage.tsx(10,10): error TS6133: 'applicationData' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(10,27): error TS6133: 'setApplicationData' is declared but its value is never read.
+src/modules/leave_elm/pages/MyLeavePage.tsx(22,36): error TS2552: Cannot find name 'listApplications'. Did you mean 'applications'?
+src/modules/leave_elm/pages/MyLeavePage.tsx(41,25): error TS2304: Cannot find name 'handleSubmit'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(41,39): error TS7006: Parameter 'data' implicitly has an 'any' type.
+src/modules/leave_elm/pages/MyLeavePage.tsx(41,48): error TS2304: Cannot find name 'submitApplication'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(45,17): error TS2304: Cannot find name 'register'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(51,17): error TS2304: Cannot find name 'register'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(62,34): error TS2304: Cannot find name 'setValue'.
+src/modules/leave_elm/pages/MyLeavePage.tsx(67,17): error TS2304: Cannot find name 'register'.
+
+Exit code: 2; 1.26 seconds
+
+## frontend-final-typecheck
+2026-10-12T14:20:11.771921+00:00
+Command: C:/Users/sachg/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/typescript/bin/tsc --noEmit
+
+Exit code: 0; 1.18 seconds
+
+## navigation-route-registration
+2026-10-12T14:20:24.025799+00:00
+Command: .venv/bin/python ops/checks/nav_matches_routes.py
+nav items and client routes agree
+
+Exit code: 0; 0.17 seconds
+
+## frontend-production-build
+2026-10-12T14:20:26.265724+00:00
+Command: npm run build
+
+> build
+> tsc -b && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 1011 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                      0.53 kB │ gzip:   0.33 kB
+dist/assets/iiitdmj_logo-v9-ebxtE.png               30.89 kB
+dist/assets/IIITJ_logo-BnzEnV7U.webp                64.62 kB
+dist/assets/index-B68ekXUP.css                     210.03 kB │ gzip:  31.37 kB
+dist/assets/create-event-handler-C3eq9ghx.js         0.07 kB │ gzip:   0.08 kB │ map:     0.67 kB
+dist/assets/PageHeader-CahMC4Z_.js                   0.32 kB │ gzip:   0.24 kB │ map:     1.18 kB
+dist/assets/ErrorState-BI9WNCAw.js                   0.35 kB │ gzip:   0.26 kB │ map:     1.26 kB
+dist/assets/StatusBadge-DEP-P7vc.js                  0.42 kB │ gzip:   0.30 kB │ map:     1.18 kB
+dist/assets/Paper-DOWDT_Ui.js                        0.65 kB │ gzip:   0.41 kB │ map:     3.57 kB
+dist/assets/CheckIcon-z1ZbKoTU.js                    0.70 kB │ gzip:   0.41 kB │ map:     2.78 kB
+dist/assets/CpiBadge-C6RkwU3S.js                     0.89 kB │ gzip:   0.52 kB │ map:     2.85 kB
+dist/assets/Overlay-Bg-gbqnm.js                      0.92 kB │ gzip:   0.55 kB │ map:     4.48 kB
+dist/assets/RecruiterLoginPage-EthZ97_Y.js           0.98 kB │ gzip:   0.61 kB │ map:     3.54 kB
+dist/assets/Card-BamrjQGO.js                         1.26 kB │ gzip:   0.67 kB │ map:     7.44 kB
+dist/assets/FormSection-Deduz2Uk.js                  1.29 kB │ gzip:   0.69 kB │ map:     6.13 kB
+dist/assets/List-B2v7_cXT.js                         1.49 kB │ gzip:   0.72 kB │ map:     8.17 kB
+dist/assets/Progress-4j4_WUmA.js                     2.32 kB │ gzip:   0.98 kB │ map:    13.61 kB
+dist/assets/MyApplicationsPage-BIC6VhYu.js           2.60 kB │ gzip:   1.30 kB │ map:     7.15 kB
+dist/assets/RegistrationApprovalsPage-7CSGmnja.js    2.71 kB │ gzip:   1.37 kB │ map:     7.68 kB
+dist/assets/Switch-CVvkSTVz.js                       2.76 kB │ gzip:   1.32 kB │ map:    12.59 kB
+dist/assets/AcceptInvitePage-BfGZIAqx.js             3.01 kB │ gzip:   1.44 kB │ map:     9.43 kB
+dist/assets/routes-DW-Q18bk.js                       3.37 kB │ gzip:   1.19 kB │ map:     3.55 kB
+dist/assets/Grid-CwwCGMvo.js                         3.59 kB │ gzip:   1.44 kB │ map:    19.64 kB
+dist/assets/Textarea-B86pgKc-.js                     3.62 kB │ gzip:   1.66 kB │ map:    17.08 kB
+dist/assets/HistoryDrawer-BCmnpDZt.js                3.73 kB │ gzip:   1.69 kB │ map:    16.39 kB
+dist/assets/FocusTrap-BEzomTBo.js                    3.84 kB │ gzip:   1.63 kB │ map:    17.67 kB
+dist/assets/Table-CdN_t0Um.js                        4.01 kB │ gzip:   1.57 kB │ map:    18.14 kB
+dist/assets/InterviewsPage-ByA5_ICj.js               4.10 kB │ gzip:   1.87 kB │ map:    11.69 kB
+dist/assets/Drawer-IcuAhgJ5.js                       4.17 kB │ gzip:   1.42 kB │ map:    25.32 kB
+dist/assets/AnnouncementsPage-QE0sacOR.js            4.24 kB │ gzip:   1.86 kB │ map:    12.08 kB
+dist/assets/NativeScrollArea-B6J6H0kM.js             4.63 kB │ gzip:   1.82 kB │ map:    23.72 kB
+dist/assets/FormModal-DU8oMXW_.js                    5.10 kB │ gzip:   1.84 kB │ map:    28.64 kB
+dist/assets/RecruiterInterviewsPage-DtzrAIqV.js      5.41 kB │ gzip:   2.32 kB │ map:    16.32 kB
+dist/assets/RegistrationPage-C26dYCes.js             5.79 kB │ gzip:   2.35 kB │ map:    15.82 kB
+dist/assets/RecruiterApplicantsPage-DjZGIBC4.js      5.81 kB │ gzip:   2.52 kB │ map:    16.69 kB
+dist/assets/RecruiterPostingsPage-CZubT-Bw.js        5.88 kB │ gzip:   2.40 kB │ map:    17.44 kB
+dist/assets/CompaniesPage-BBiChZdh.js                6.55 kB │ gzip:   2.66 kB │ map:    20.69 kB
+dist/assets/hooks-CENcfEH2.js                        6.93 kB │ gzip:   1.77 kB │ map:    31.46 kB
+dist/assets/ReportsPage-BkXFkcYU.js                  7.81 kB │ gzip:   2.81 kB │ map:    27.60 kB
+dist/assets/Menu-CnbtW4iw.js                         7.84 kB │ gzip:   2.95 kB │ map:    36.52 kB
+dist/assets/ApplicationsPage-CwLUNJtC.js             8.01 kB │ gzip:   3.35 kB │ map:    24.85 kB
+dist/assets/DataTable-hM64Us1j.js                    8.50 kB │ gzip:   3.15 kB │ map:    42.32 kB
+dist/assets/OffersPage-BuFVhNh0.js                   8.75 kB │ gzip:   3.19 kB │ map:    25.35 kB
+dist/assets/TagsInput-t5xjVy4E.js                    8.83 kB │ gzip:   3.34 kB │ map:    42.85 kB
+dist/assets/StudentCpiPage-Bp0nkXjE.js              11.26 kB │ gzip:   4.39 kB │ map:    43.42 kB
+dist/assets/PostingsPage-O6uvlT37.js                12.06 kB │ gzip:   4.60 kB │ map:    36.26 kB
+dist/assets/NumberInput-DHmL4F69.js                 21.17 kB │ gzip:   8.12 kB │ map:   118.41 kB
+dist/assets/Select-DCJppAGq.js                      27.54 kB │ gzip:   8.92 kB │ map:   116.87 kB
+dist/assets/routes-Cm-49qhg.js                      39.62 kB │ gzip:  14.19 kB │ map:   240.54 kB
+dist/assets/DateTimePicker-BwY0pcwP.js              52.39 kB │ gzip:  15.39 kB │ map:   188.95 kB
+dist/assets/index-DrgLaBRa.js                      502.70 kB │ gzip: 162.43 kB │ map: 3,674.46 kB
+✓ built in 1.62s
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+Exit code: 0; 3.56 seconds
+
+## final-harness-compilation
+2026-10-12T14:25:15.941792+00:00
+Command: .venv/bin/python -m py_compile devtools/qwen_elm_trial.py devtools/elm_trial_check.py
+
+Exit code: 0; 0.03 seconds

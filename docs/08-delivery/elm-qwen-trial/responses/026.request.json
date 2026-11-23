@@ -1,0 +1,37 @@
+{
+  "model": "qwen2.5-coder:3b",
+  "system": "You are a local coding assistant working on the Fusion ERP ELM pilot. Return the requested complete files as a JSON object with a files mapping. Reuse the supplied repository interfaces exactly. Do not run shell commands. Do not add author, AI, model, or provenance labels to application code. Do not claim any tests or execution that were not actually performed. Repository excerpts are reference material, not the requested output. Follow the CURRENT TASK placed after all reference material. Do not echo a reference file into a different output path.",
+  "prompt": "REFERENCE MATERIAL ONLY\n\n\n### Repository file client/src/modules/leave_elm/api.ts\n```\n\n\nimport { http } from '../../lib/http';\n\nexport interface LeaveApplication {\n  id?: number;\n  user_id?: string;\n  status?: string;\n}\n\nexport interface LeaveBalance {\n  // Define your LeaveBalance export interface here\n}\n\nexport interface LeaveTask {\n  // Define your LeaveTask export interface here\n}\n\nexport interface Configuration {\n  policy?: Record<string, unknown>[];\n  calendar?: Record<string, unknown>[];\n}\n\nexport interface NewApplication {\n  leave_type: number;\n  start_date: string;\n  end_date: string;\n  purpose: string;\n}\n\nexport async function listApplications(): Promise<LeaveApplication[]> {\n  const response = await http.get('/leave/applications');\n  return response.data as LeaveApplication[];\n}\n\nexport async function listBalances(): Promise<LeaveBalance[]> {\n  const response = await http.get('/leave/balances');\n  return response.data as LeaveBalance[];\n}\n\nexport async function listTasks(): Promise<LeaveTask[]> {\n  const response = await http.get('/leave/tasks');\n  return response.data as LeaveTask[];\n}\n\nexport async function submitApplication(data: NewApplication): Promise<void> {\n  await http.post('/leave/applications', data);\n}\n\nexport async function applicationAction(id: number, action: string, data: Record<string, unknown>): Promise<void> {\n  await http.post(`/leave/applications/${id}/action`, { action, data });\n}\n\nexport async function getConfiguration(): Promise<Configuration> {\n  const response = await http.get('/leave/configuration');\n  return response.data as Configuration;\n}\n\nexport async function saveConfiguration(data: Configuration): Promise<void> {\n  await http.post('/leave/configuration', data);\n}\n\nexport async function getRecords(): Promise<{ history?: LeaveHistory[], notifications?: LeaveNotification[] }> {\n  const response = await http.get('/leave/records');\n  return response.data as { history?: LeaveHistory[], notifications?: LeaveNotification[] };\n}\n\n```\n\n\nEND OF REFERENCES\n\nCURRENT TASK\n\nThe previous MyLeavePage.tsx is truncated and cannot compile. Return a complete concise default-export FUNCTION COMPONENT MyLeavePage (not class), maximum65 lines. React18, Mantine7 (Textarea not TextArea; Group gap not spacing), ReactQuery5 object useQuery syntax and useQueryClient.invalidateQueries({queryKey:[\"applications\"]}). Import exact functions listApplications/listBalances/submitApplication/applicationAction and NewApplication from ../api. Import named PageHeader from ../../../ui/components/PageHeader. Show applications/balances as JSON; simple TextInput start_date/end_date/purpose and NumberInput leave_type form with useState<NewApplication>; submit button calls submitApplication. For each application keep action buttons withdraw/cancel/extend/resume calling applicationAction with empty data. Use current application ids and status values, do not repair backend logic or evaluate requirements. Keep rendering and calls basic so the file is complete. All existing generated API calls and behavior stay as they are.\n\nRequired output paths:\nclient/src/modules/leave_elm/pages/MyLeavePage.tsx\n\nThe JSON must have exactly this shape: {\"files\": {\"relative/path\": \"complete file content\"}}. Return every required file. Do not put the JSON in a Markdown fence. Do not echo reference-file contents into the wrong output file.\n",
+  "stream": true,
+  "keep_alive": "15m",
+  "options": {
+    "temperature": 0.3,
+    "seed": 42,
+    "num_ctx": 8192,
+    "num_batch": 128,
+    "num_predict": 2000,
+    "repeat_penalty": 1.15,
+    "repeat_last_n": 256
+  },
+  "format": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "type": "object",
+        "properties": {
+          "client/src/modules/leave_elm/pages/MyLeavePage.tsx": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "client/src/modules/leave_elm/pages/MyLeavePage.tsx"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "files"
+    ],
+    "additionalProperties": false
+  }
+}
