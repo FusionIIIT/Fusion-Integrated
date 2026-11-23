@@ -41,6 +41,7 @@ For the intended taxonomy of modules not yet built, see
 | `patents.tech_transfer.review` | Review technology transfer agreements | `Director` |
 | `patents.prior_art.search` | Search and attach prior-art references | `attorney`, `faculty`, `staff`, `student` |
 | `patents.panel.manage` | Manage attorney panel roster and expertise mappings | `pcc_admin` |
+| `patents.workflow.handle_exceptions` | Handle and route escalated and exceptional cases | `pcc_admin` |
 | `patents.audit.view` | View audit trail and compliance logs | `pcc_admin` |
 | `patents.report.view` | Generate and view reports and analytics | `Director`, `pcc_admin` |
 | `patents.application.expire` | System revision expiration | _service only_ |
