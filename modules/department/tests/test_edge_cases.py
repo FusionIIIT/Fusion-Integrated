@@ -661,3 +661,67 @@ def test_r4_01_a_nul_byte_in_a_filter_or_cursor_is_not_500(world, act):
     for path in ("stock-requests?status=%00", "feedback?status=a%00"):
         assert act("admin").get(f"{API}/{path}").status_code == 400
     assert act("admin").get(f"{API}/inventory-items?cursor=%00").status_code < 500
+
+
+def test_r5_01_a_tenure_inside_the_incumbents_cannot_cut_it_short(world, act):
+    # BR-DEPT-022: the incumbent's remaining time would have no holder
+    now = timezone.now()
+    body = {
+        "department": "CSE",
+        "role": "hod",
+        "user_id": uid("next_hod"),
+        "valid_from": (now + timedelta(days=30)).isoformat(),
+        "valid_to": (now + timedelta(days=60)).isoformat(),
+    }
+    before = list(RoleTenure.objects.values_list("pk", "valid_to").order_by("pk"))
+    r = act("central").post(f"{API}/role-assignments", body, format="json")
+    assert r.status_code == 422 and r.json()["error"]["code"] == "would_cut_short"
+    assert list(RoleTenure.objects.values_list("pk", "valid_to").order_by("pk")) == before
+    body["valid_to"] = (now + timedelta(days=400)).isoformat()
+    assert act("central").post(f"{API}/role-assignments", body, format="json").status_code == 201
+    warnings = act("central").get(f"{API}/role-assignments/vacancies").json()
+    assert not [w for w in warnings if w["department"] == "CSE" and w["role"] == "hod"]
+
+
+def test_r5_03_an_ended_tenure_that_overlaps_nothing_cannot_be_revived(world, act):
+    now = timezone.now()
+    ended = RoleTenure.objects.create(
+        department=world["CSE"],
+        role="hod",
+        user_id=uid("next_hod"),
+        valid_from=now - timedelta(days=30),
+        valid_to=now - timedelta(days=20),
+        assigned_by=uid("central"),
+        transition_applied_at=now - timedelta(days=30),
+    )
+    RoleTenure.objects.filter(department=world["CSE"], role="hod").exclude(pk=ended.pk).update(
+        valid_from=now - timedelta(days=2)
+    )
+    r = act("central").patch(
+        f"{API}/role-assignments/{ended.pk}",
+        {"valid_to": (now - timedelta(days=10)).isoformat()},
+        format="json",
+    )
+    assert r.status_code == 409 and r.json()["error"]["code"] == "tenure_ended"
+    ended.refresh_from_db()
+    assert ended.valid_to == now - timedelta(days=20)
+
+
+def test_r5_05_an_oversized_timetable_batch_is_400_and_saves_nothing(world, act):
+    from modules.department.api.serializers import MAX_SLOTS_PER_UPLOAD
+    from modules.department.models import TimetableSlot
+
+    def slot(i):
+        return {
+            "kind": "class",
+            "course_code": f"C{i}",
+            "day_of_week": i % 7,
+            "starts_at": f"{8 + i // 7 % 10:02d}:00",
+            "ends_at": f"{9 + i // 7 % 10:02d}:00",
+            "room": f"R{i}",
+        }
+
+    too_many = [slot(i) for i in range(MAX_SLOTS_PER_UPLOAD + 1)]
+    r = act("admin").post(f"{API}/timetable-slots", {"slots": too_many}, format="json")
+    assert r.status_code == 400 and "at most" in str(r.json()["error"])
+    assert not TimetableSlot.objects.exists()

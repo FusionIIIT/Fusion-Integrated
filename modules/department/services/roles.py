@@ -71,6 +71,14 @@ def _hand_over(dept: Department, role: str, candidate: rules.Tenure) -> None:
     )
     outgoing = [t for t in existing if t.valid_from < candidate.valid_from < t.valid_to]
     for t in outgoing:
+        if candidate.valid_to < t.valid_to:
+            # BR-DEPT-022 (R5-01): cutting the incumbent short would leave the rest of it empty.
+            raise DomainError(
+                f"The current {rules.ROLE_LABELS[role]} tenure runs until "
+                f"{timezone.localtime(t.valid_to):%Y-%m-%d %H:%M}. End the new tenure then or "
+                "later, or shorten the current tenure first, so the role is never left empty.",
+                code="would_cut_short",
+            )
         t.valid_to = candidate.valid_from
         t.save(update_fields=["valid_to", "updated_at"])
     remaining = [_as_tenure(t) for t in existing if t not in outgoing]

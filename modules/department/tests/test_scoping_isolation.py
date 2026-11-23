@@ -9,75 +9,34 @@ pytestmark = pytest.mark.django_db
 API = "/api/v1/department"
 
 
+def _new(act, who, path, body):
+    data = act(who).post(f"{API}/{path}", body, format="json").json()
+    return data[0]["id"] if isinstance(data, list) else data["id"]
+
+
+ECE_SLOT = {
+    "kind": "lab",
+    "course_code": "EC1",
+    "day_of_week": 1,
+    "starts_at": "09:00",
+    "ends_at": "10:00",
+}
+
+
 def _ece_world(act):
-    item = (
-        act("ece_admin")
-        .post(f"{API}/inventory-items", {"name": "Scope", "quantity": 4}, format="json")
-        .json()["id"]
-    )
-    req = (
-        act("ece_faculty")
-        .post(f"{API}/stock-requests", {"item": item, "quantity": 1}, format="json")
-        .json()["id"]
-    )
-    fb = (
-        act("ece_student")
-        .post(f"{API}/feedback", {"subject": "s", "body": "b"}, format="json")
-        .json()["id"]
-    )
+    item = _new(act, "ece_admin", "inventory-items", {"name": "Scope", "quantity": 4})
+    fb = _new(act, "ece_student", "feedback", {"subject": "s", "body": "b"})
     act("ece_admin").post(f"{API}/feedback/{fb}/review", {}, format="json")
-    ann = (
-        act("ece_faculty")
-        .post(
-            f"{API}/announcements",
-            {"title": "ECE only", "body": "b", "audience_role": "all"},
-            format="json",
-        )
-        .json()["id"]
-    )
-    lab = (
-        act("ece_admin")
-        .post(f"{API}/lab-resources", {"name": "RF Lab"}, format="json")
-        .json()["id"]
-    )
-    slot = (
-        act("ece_admin")
-        .post(
-            f"{API}/timetable-slots",
-            {
-                "slots": [
-                    {
-                        "kind": "lab",
-                        "course_code": "EC1",
-                        "day_of_week": 1,
-                        "starts_at": "09:00",
-                        "ends_at": "10:00",
-                    }
-                ]
-            },
-            format="json",
-        )
-        .json()[0]["id"]
-    )
-    prof = (
-        act("ece_admin")
-        .post(f"{API}/profiles", {"kind": "alumni", "display_name": "E. Alum"}, format="json")
-        .json()["id"]
-    )
-    chg = (
-        act("ece_admin")
-        .post(f"{API}/official-changes", {"field": "name", "value": "ECE!"}, format="json")
-        .json()["id"]
-    )
+    ann_body = {"title": "ECE only", "body": "b", "audience_role": "all"}
     return {
         "item": item,
-        "req": req,
+        "req": _new(act, "ece_faculty", "stock-requests", {"item": item, "quantity": 1}),
         "fb": fb,
-        "ann": ann,
-        "lab": lab,
-        "slot": slot,
-        "prof": prof,
-        "chg": chg,
+        "ann": _new(act, "ece_faculty", "announcements", ann_body),
+        "lab": _new(act, "ece_admin", "lab-resources", {"name": "RF Lab"}),
+        "slot": _new(act, "ece_admin", "timetable-slots", {"slots": [ECE_SLOT]}),
+        "prof": _new(act, "ece_admin", "profiles", {"kind": "alumni", "display_name": "E. Alum"}),
+        "chg": _new(act, "ece_admin", "official-changes", {"field": "name", "value": "ECE!"}),
     }
 
 
@@ -105,61 +64,21 @@ def test_another_departments_office_sees_none_of_its_lists(world, act):
 
 def test_another_departments_rows_are_404_by_id(world, act):
     ids = _ece_world(act)
-    assert (
-        act("hod")
-        .post(f"{API}/stock-requests/{ids['req']}/decide", {"approve": True}, format="json")
-        .status_code
-        == 404
-    )
-    assert (
-        act("hod")
-        .post(f"{API}/official-changes/{ids['chg']}/decide", {"approve": True}, format="json")
-        .status_code
-        == 404
-    )
-    assert (
-        act("hod")
-        .patch(f"{API}/announcements/{ids['ann']}", {"title": "x"}, format="json")
-        .status_code
-        == 404
-    )
-    assert act("hod").get(f"{API}/feedback/{ids['fb']}").status_code == 404
-    assert (
-        act("admin")
-        .post(f"{API}/inventory-items/{ids['item']}/receipts", {"quantity": 1}, format="json")
-        .status_code
-        == 404
-    )
-    assert (
-        act("admin")
-        .patch(f"{API}/lab-resources/{ids['lab']}", {"name": "x"}, format="json")
-        .status_code
-        == 404
-    )
-    assert (
-        act("admin")
-        .patch(f"{API}/timetable-slots/{ids['slot']}", {"room": "x"}, format="json")
-        .status_code
-        == 404
-    )
-    assert (
-        act("admin")
-        .patch(f"{API}/profiles/{ids['prof']}", {"office": "x"}, format="json")
-        .status_code
-        == 404
-    )
-    assert (
-        act("admin")
-        .patch(f"{API}/departments/ECE", {"description": "x"}, format="json")
-        .status_code
-        == 404
-    )
-    assert (
-        act("faculty")
-        .post(f"{API}/stock-requests", {"item": ids["item"], "quantity": 1}, format="json")
-        .status_code
-        == 404
-    )
+    probes = [
+        ("hod", "post", f"stock-requests/{ids['req']}/decide", {"approve": True}),
+        ("hod", "post", f"official-changes/{ids['chg']}/decide", {"approve": True}),
+        ("hod", "patch", f"announcements/{ids['ann']}", {"title": "x"}),
+        ("hod", "get", f"feedback/{ids['fb']}", None),
+        ("admin", "post", f"inventory-items/{ids['item']}/receipts", {"quantity": 1}),
+        ("admin", "patch", f"lab-resources/{ids['lab']}", {"name": "x"}),
+        ("admin", "patch", f"timetable-slots/{ids['slot']}", {"room": "x"}),
+        ("admin", "patch", f"profiles/{ids['prof']}", {"office": "x"}),
+        ("admin", "patch", "departments/ECE", {"description": "x"}),
+        ("faculty", "post", "stock-requests", {"item": ids["item"], "quantity": 1}),
+    ]
+    for who, method, path, body in probes:
+        r = getattr(act(who), method)(f"{API}/{path}", body, format="json")
+        assert r.status_code == 404, (who, method, path)
 
 
 def test_feedback_is_visible_only_to_its_submitter_and_the_handling_office(world, act):

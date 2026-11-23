@@ -1,10 +1,11 @@
 """The same query count with 2 rows and with 20, per list endpoint (Step 5.8)."""
 
-from datetime import time
+from datetime import time, timedelta
 
 import pytest
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
+from django.utils import timezone
 
 from modules.department.models import (
     Announcement,
@@ -25,69 +26,74 @@ pytestmark = pytest.mark.django_db
 API = "/api/v1/department"
 
 
+def _item(dept, name):
+    return InventoryItem.objects.create(department=dept, name=name, current_quantity=5)
+
+
+def _tenure(dept, i):
+    base = timezone.now() + timedelta(days=1000 + 10 * i)
+    RoleTenure.objects.create(
+        department=dept,
+        role="hod",
+        user_id=1,
+        valid_from=base,
+        valid_to=base + timedelta(days=5),
+        assigned_by=1,
+    )
+
+
+#: One row of each list's kind, numbered i so names never clash.
+MAKERS = {
+    "announcements": lambda dept, i: Announcement.objects.create(
+        department=dept,
+        title=f"t{i}",
+        body="b",
+        audience_role="all",
+        author_id=1,
+        published_at=timezone.now(),
+    ),
+    "inventory-items": lambda dept, i: _item(dept, f"i{i}"),
+    "stock-requests": lambda dept, i: StockRequest.objects.create(
+        department=dept, item=_item(dept, f"r{i}"), requester_id=1, quantity=1
+    ),
+    "stock-movements": lambda dept, i: StockMovement.objects.create(
+        item=_item(dept, f"m{i}"), kind="receipt", quantity=5, actor_id=1
+    ),
+    "feedback": lambda dept, i: Feedback.objects.create(
+        department=dept, submitter_id=1, submitter_kind="student", subject="s", body="b"
+    ),
+    "lab-resources": lambda dept, i: LabResource.objects.create(
+        department=dept, name=f"l{i}", updated_by=1
+    ),
+    "timetable-slots": lambda dept, i: TimetableSlot.objects.create(
+        department=dept,
+        kind="class",
+        course_code=f"c{i}",
+        day_of_week=i % 7,
+        starts_at=time(8),
+        ends_at=time(9),
+        room=f"R{i}",
+        updated_by=1,
+    ),
+    "profiles": lambda dept, i: ProfileRecord.objects.create(
+        department=dept, kind="alumni", display_name=f"a{i}", updated_by=1
+    ),
+    "official-changes": lambda dept, i: OfficialChange.objects.create(
+        department=dept,
+        field="name",
+        proposed_value=f"n{i}",
+        proposed_by=1,
+        status="rejected",
+        decided_by=2,
+    ),
+    "role-assignments": _tenure,
+    "departments": lambda dept, i: None,
+}
+
+
 def _fill(kind, dept, start, n):
-    from django.utils import timezone
-
     for i in range(start, start + n):
-        if kind == "announcements":
-            Announcement.objects.create(
-                department=dept,
-                title=f"t{i}",
-                body="b",
-                audience_role="all",
-                author_id=1,
-                published_at=timezone.now(),
-            )
-        elif kind == "inventory-items":
-            InventoryItem.objects.create(department=dept, name=f"i{i}", current_quantity=5)
-        elif kind == "stock-requests":
-            item = InventoryItem.objects.create(department=dept, name=f"r{i}", current_quantity=5)
-            StockRequest.objects.create(department=dept, item=item, requester_id=1, quantity=1)
-        elif kind == "stock-movements":
-            item = InventoryItem.objects.create(department=dept, name=f"m{i}", current_quantity=5)
-            StockMovement.objects.create(item=item, kind="receipt", quantity=5, actor_id=1)
-        elif kind == "feedback":
-            Feedback.objects.create(
-                department=dept, submitter_id=1, submitter_kind="student", subject="s", body="b"
-            )
-        elif kind == "lab-resources":
-            LabResource.objects.create(department=dept, name=f"l{i}", updated_by=1)
-        elif kind == "timetable-slots":
-            TimetableSlot.objects.create(
-                department=dept,
-                kind="class",
-                course_code=f"c{i}",
-                day_of_week=i % 7,
-                starts_at=time(8),
-                ends_at=time(9),
-                room=f"R{i}",
-                updated_by=1,
-            )
-        elif kind == "profiles":
-            ProfileRecord.objects.create(
-                department=dept, kind="alumni", display_name=f"a{i}", updated_by=1
-            )
-        elif kind == "official-changes":
-            OfficialChange.objects.create(
-                department=dept,
-                field="name",
-                proposed_value=f"n{i}",
-                proposed_by=1,
-                status="rejected",
-                decided_by=2,
-            )
-        elif kind == "role-assignments":
-            from datetime import timedelta
-
-            base = timezone.now() + timedelta(days=1000 + 10 * i)
-            RoleTenure.objects.create(
-                department=dept,
-                role="hod",
-                user_id=1,
-                valid_from=base,
-                valid_to=base + timedelta(days=5),
-                assigned_by=1,
-            )
+        MAKERS[kind](dept, i)
 
 
 CASES = [

@@ -25,6 +25,8 @@ from modules.department.models import (
 # Column limits: a larger number is a 400, never a database error (500).
 MAX_ID = 2_147_483_647
 MAX_QUANTITY = 1_000_000
+#: R5-05: a full week for one department; the clash check grows with the square of the batch.
+MAX_SLOTS_PER_UPLOAD = 500
 
 
 def _one_of(values, **kwargs):
@@ -300,6 +302,14 @@ class DeptTimetableSlotWriteSerializer(serializers.Serializer):
 
 class DeptTimetableUploadSerializer(serializers.Serializer):
     slots = DeptTimetableSlotWriteSerializer(many=True, allow_empty=False)
+
+    def validate_slots(self, slots):
+        if len(slots) > MAX_SLOTS_PER_UPLOAD:
+            raise serializers.ValidationError(
+                f"Upload at most {MAX_SLOTS_PER_UPLOAD} slots at a time; split the timetable "
+                "into smaller batches."
+            )
+        return slots
 
 
 class DeptTimetableSlotEditSerializer(serializers.Serializer):

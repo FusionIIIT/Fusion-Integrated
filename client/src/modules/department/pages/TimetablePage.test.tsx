@@ -60,4 +60,12 @@ describe("TimetablePage", () => {
     expect(screen.queryByRole("button", { name: "Edit" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Remove" })).toBeNull();
   });
+
+  it("shows the server's refusal when removing a slot fails", async () => {
+    setup(["department.timetable.view", "department.timetable.update"], { "/timetable-slots": [SLOT] }, "dept_admin");
+    api.delete.mockRejectedValueOnce(serverError("That slot was already removed.", 404));
+    renderPage(<TimetablePage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Remove" }));
+    expect(await screen.findByText("That slot was already removed.")).toBeInTheDocument();
+  });
 });

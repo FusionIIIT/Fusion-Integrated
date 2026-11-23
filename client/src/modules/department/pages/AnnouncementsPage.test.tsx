@@ -85,4 +85,21 @@ describe("AnnouncementsPage", () => {
     expect(screen.queryByRole("button", { name: "Hide" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
   });
+
+  it("shows the server's refusal when hiding fails", async () => {
+    setup(["department.announcement.view", "department.announcement.update", "department.announcement.delete"],
+      { "/announcements": page([ANN]) }, "hod");
+    api.post.mockRejectedValueOnce(serverError("That announcement is already hidden.", 409));
+    renderPage(<AnnouncementsPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Hide" }));
+    expect(await screen.findByText("That announcement is already hidden.")).toBeInTheDocument();
+  });
+
+  it("shows the server's refusal when deleting fails", async () => {
+    setup(["department.announcement.view", "department.announcement.delete"], { "/announcements": page([ANN]) }, "hod");
+    api.delete.mockRejectedValueOnce(serverError("That announcement was already deleted.", 409));
+    renderPage(<AnnouncementsPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Delete" }));
+    expect(await screen.findByText("That announcement was already deleted.")).toBeInTheDocument();
+  });
 });

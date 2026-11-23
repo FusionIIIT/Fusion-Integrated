@@ -22,7 +22,7 @@ Written by `ops/docs/department_reference.py`; do not edit by hand.
 | BR-DEPT-017 | [modules/department/selectors/scoping.py:85](../../modules/department/selectors/scoping.py#L85) | confidential feedback scope |
 | BR-DEPT-018 | [modules/department/domain/state_machine.py:55](../../modules/department/domain/state_machine.py#L55) | Dept_Admin initial review first |
 | BR-DEPT-019 | [modules/department/domain/rules.py:211](../../modules/department/domain/rules.py#L211) | profile visibility matrix |
-| BR-DEPT-021 | [modules/department/services/roles.py:85](../../modules/department/services/roles.py#L85) | central authority records tenures |
+| BR-DEPT-021 | [modules/department/services/roles.py:93](../../modules/department/services/roles.py#L93) | central authority records tenures |
 | BR-DEPT-022 | [modules/department/domain/rules.py:182](../../modules/department/domain/rules.py#L182) | never two holders at once |
 | BR-DEPT-023 | [modules/department/models/roles.py:27](../../modules/department/models/roles.py#L27) | validity interval required |
 | BR-DEPT-024 | [modules/department/selectors/actors.py:20](../../modules/department/selectors/actors.py#L20) | access follows the tenure in effect now |
@@ -44,8 +44,8 @@ Written by `ops/docs/department_reference.py`; do not edit by hand.
 | UC-DEPT-017 | [modules/department/services/resources.py:103](../../modules/department/services/resources.py#L103) | manage lab profiles |
 | UC-DEPT-018 | [modules/department/selectors/scoping.py:97](../../modules/department/selectors/scoping.py#L97) | student timetable and programme view |
 | UC-DEPT-019 | [modules/department/services/inventory.py:25](../../modules/department/services/inventory.py#L25) | manage inventory records |
-| UC-DEPT-020 | [modules/department/services/roles.py:85](../../modules/department/services/roles.py#L85) | maintain role assignments |
-| UC-DEPT-022 | [modules/department/services/roles.py:155](../../modules/department/services/roles.py#L155) | apply effective transition |
+| UC-DEPT-020 | [modules/department/services/roles.py:93](../../modules/department/services/roles.py#L93) | maintain role assignments |
+| UC-DEPT-022 | [modules/department/services/roles.py:163](../../modules/department/services/roles.py#L163) | apply effective transition |
 | BW-DEPT-01 | [modules/department/domain/state_machine.py:43](../../modules/department/domain/state_machine.py#L43) | approved and issued path |
 | BW-DEPT-02 | [modules/department/domain/state_machine.py:46](../../modules/department/domain/state_machine.py#L46) | rejected path |
 | BW-DEPT-03 | [modules/department/domain/state_machine.py:52](../../modules/department/domain/state_machine.py#L52) | Dept_Admin disposition path |
@@ -57,7 +57,7 @@ Written by `ops/docs/department_reference.py`; do not edit by hand.
 | CW-DEPT-01 | [modules/department/domain/state_machine.py:43](../../modules/department/domain/state_machine.py#L43) | stock lifecycle table |
 | CW-DEPT-02 | [modules/department/domain/state_machine.py:52](../../modules/department/domain/state_machine.py#L52) | feedback lifecycle table |
 | CW-DEPT-03 | [modules/department/domain/state_machine.py:71](../../modules/department/domain/state_machine.py#L71) | official change lifecycle table |
-| CW-DEPT-04 | [modules/department/services/roles.py:155](../../modules/department/services/roles.py#L155) | reassignment lifecycle takes effect |
+| CW-DEPT-04 | [modules/department/services/roles.py:163](../../modules/department/services/roles.py#L163) | reassignment lifecycle takes effect |
 | CFR-DEPT-001 | [modules/department/services/announcements.py:18](../../modules/department/services/announcements.py#L18) | publish and notify |
 | CFR-DEPT-002 | [modules/department/selectors/scoping.py:51](../../modules/department/selectors/scoping.py#L51) | relevant announcements |
 | CFR-DEPT-003 | [modules/department/services/announcements.py:65](../../modules/department/services/announcements.py#L65) | HOD maintains active announcements, through the table |
@@ -73,7 +73,7 @@ Written by `ops/docs/department_reference.py`; do not edit by hand.
 | CFR-DEPT-013 | [modules/department/selectors/scoping.py:97](../../modules/department/selectors/scoping.py#L97) | student academic information |
 | CFR-DEPT-014 | [modules/department/domain/rules.py:147](../../modules/department/domain/rules.py#L147) | general information only |
 | CFR-DEPT-015 | [modules/department/domain/rules.py:132](../../modules/department/domain/rules.py#L132) | official changes controlled |
-| CFR-DEPT-016 | [modules/department/services/roles.py:116](../../modules/department/services/roles.py#L116) | role assignments and effective access |
+| CFR-DEPT-016 | [modules/department/services/roles.py:124](../../modules/department/services/roles.py#L124) | role assignments and effective access |
 | AFR-DEPT-001 | [modules/department/services/announcements.py:18](../../modules/department/services/announcements.py#L18) | create and publish |
 | AFR-DEPT-002 | [modules/department/selectors/scoping.py:58](../../modules/department/selectors/scoping.py#L58) | role, programme, year filter |
 | AFR-DEPT-003 | [modules/department/api/views.py:234](../../modules/department/api/views.py#L234) | authenticated users view |
@@ -122,6 +122,6 @@ Written by `ops/docs/department_reference.py`; do not edit by hand.
 | AFR-DEPT-048 | [modules/department/models/roles.py:19](../../modules/department/models/roles.py#L19) | time-bounded validity |
 | AFR-DEPT-049 | [modules/department/selectors/actors.py:28](../../modules/department/selectors/actors.py#L28) | outgoing access ends at valid_to |
 | AFR-DEPT-050 | [modules/department/selectors/actors.py:27](../../modules/department/selectors/actors.py#L27) | incoming access starts at valid_from |
-| AFR-DEPT-051 | [modules/department/services/roles.py:80](../../modules/department/services/roles.py#L80) | one HOD in effect |
-| AFR-DEPT-052 | [modules/department/services/roles.py:80](../../modules/department/services/roles.py#L80) | one Dept_Admin in effect |
+| AFR-DEPT-051 | [modules/department/services/roles.py:88](../../modules/department/services/roles.py#L88) | one HOD in effect |
+| AFR-DEPT-052 | [modules/department/services/roles.py:88](../../modules/department/services/roles.py#L88) | one Dept_Admin in effect |
 | AFR-DEPT-053 | [modules/department/selectors/profiles.py:47](../../modules/department/selectors/profiles.py#L47) | headship derived from the HOD tenure |

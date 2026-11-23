@@ -57,4 +57,13 @@ describe("ProfilesPage", () => {
     expect(screen.queryByRole("button", { name: "Add profile" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Deactivate" })).toBeNull();
   });
+
+  it("shows the server's refusal when deactivating fails", async () => {
+    setup(["department.profile.view", "department.profile.update"],
+      { "/profiles": page([{ ...BASIC, tier: "full", is_active: true }]) }, "dept_admin");
+    api.patch.mockRejectedValueOnce(serverError("That profile is not in your department.", 404));
+    renderPage(<ProfilesPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Deactivate" }));
+    expect(await screen.findByText("That profile is not in your department.")).toBeInTheDocument();
+  });
 });

@@ -84,4 +84,29 @@ describe("InventoryPage", () => {
     expect(screen.queryByRole("button", { name: "Record receipt" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Issue" })).toBeNull();
   });
+
+  it("shows the server's refusal when a decision or an issue fails", async () => {
+    setup(["department.inventory_item.view", "department.stock_request.view", "department.stock_request.approve"],
+      { "/inventory-items": page([ITEM]), "/stock-requests": page([REQ]) }, "hod");
+    api.post.mockRejectedValueOnce(serverError("This request was already decided.", 409));
+    renderPage(<InventoryPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Approve" }));
+    expect(await screen.findByText("This request was already decided.")).toBeInTheDocument();
+  });
+
+  it("shows the server's refusal when issuing fails", async () => {
+    setup(["department.inventory_item.view", "department.stock_request.view", "department.stock_issue.create"],
+      { "/inventory-items": page([ITEM]), "/stock-requests": page([{ ...REQ, status: "approved" }]) }, "dept_admin");
+    api.post.mockRejectedValueOnce(serverError("Only 2 board in stock; receive more first.", 422));
+    renderPage(<InventoryPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Issue" }));
+    expect(await screen.findByText("Only 2 board in stock; receive more first.")).toBeInTheDocument();
+  });
+
+  it("shows the server's message when the request list fails", async () => {
+    setup(FACULTY, { "/inventory-items": page([ITEM]), "/stock-requests": serverError("Requests are unavailable.", 503) },
+      "faculty");
+    renderPage(<InventoryPage />);
+    expect(await screen.findByText("Requests are unavailable.")).toBeInTheDocument();
+  });
 });

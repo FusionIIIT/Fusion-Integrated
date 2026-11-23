@@ -136,8 +136,8 @@ Layers: `domain` = pure rule/state table · `models` = DB constraint · `selecto
 | UC-DEPT-010 | Update general details; official → pending | services | `PATCH /departments/{code}`, `POST /official-changes` | |
 | UC-DEPT-011 | Faculty view lab resource profiles and relevant issued-stock history | selectors | `GET /lab-resources`, `GET /stock-requests?status=issued` | Q12 |
 | UC-DEPT-012 | HOD approve/reject official change | services | `POST /official-changes/{id}/decide` | |
-| UC-DEPT-014 | HOD oversight and resolution after initial review | services | `POST /feedback/{id}/dispose` (HOD), `POST /feedback/{id}/note` | |
-| UC-DEPT-015 | View profiles at permitted tier | selectors | `GET /profiles`, `GET /profiles/{user_id}` | |
+| UC-DEPT-014 | HOD oversight and resolution after initial review | services | `POST /feedback/{id}/dispose` (HOD), `POST /feedback/{id}/notes` | |
+| UC-DEPT-015 | View profiles at permitted tier | selectors | `GET /profiles` (each row at its tier; `PATCH /profiles/{id}` takes the profile record id) | |
 | UC-DEPT-016 | Dept_Admin manage Faculty/Student/Alumni profile records | services | `POST/PATCH /profiles` | Scope of "manage" → Q8 |
 | UC-DEPT-017 | Dept_Admin update lab profiles | services | `POST/PATCH /lab-resources` | |
 | UC-DEPT-018 | Student view programme info + timetable | selectors | `GET /departments/{code}`, `GET /timetable-slots` | Programme source → Q9 |
@@ -693,3 +693,11 @@ These enforce what was approved; none changes a ruling.
 - A department name proposal is limited to the 120 characters its column holds. `website` and
   `contact_email` are limited to their columns.
 - The timetable list is returned whole (see the endpoint table).
+
+## Changes after approval (review round 5)
+
+These enforce what was approved; none changes a ruling.
+
+- **A successor never cuts the incumbent short.** A tenure that starts inside the current one and
+  ends before it is refused (`would_cut_short`), so BR-DEPT-022 holds for the rest of the term.
+- A timetable upload takes at most 500 slots.

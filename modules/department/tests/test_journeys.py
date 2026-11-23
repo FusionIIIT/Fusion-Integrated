@@ -359,6 +359,18 @@ def test_uc_dept_018_student_sees_programme_info_and_own_timetable(world, act):
     assert detail["code"] == "CSE" and "programmes" in detail
 
 
+def test_uc_dept_018_student_never_sees_another_programmes_slots(world, act):
+    # AFR-DEPT-037 (R5-02): same department and batch, another programme, is not listed
+    others = [
+        {**SLOT, "programme": "M.Tech", "room": "L-300"},
+        {**SLOT, "programme": "", "room": "L-400"},
+    ]
+    act("admin").post(f"{API}/timetable-slots", {"slots": [SLOT, *others]}, format="json")
+    rows = act("student").get(f"{API}/timetable-slots").json()
+    assert sorted(s["programme"] for s in rows) == ["", "B.Tech"]
+    assert len(act("faculty").get(f"{API}/timetable-slots").json()) == 3
+
+
 def test_uc_dept_018_alternate_nothing_published_gives_empty(world, act):
     # UC-DEPT-018 alternate flow
     assert act("student").get(f"{API}/timetable-slots").json() == []
@@ -561,14 +573,14 @@ def test_uc_dept_020_dept_admin_reassignment_bw_dept_08(world, act):
             "role": "dept_admin",
             "user_id": uid("central"),
             "valid_from": start.isoformat(),
-            "valid_to": (start + timedelta(days=30)).isoformat(),
+            "valid_to": (start + timedelta(days=400)).isoformat(),
         },
         format="json",
     )
     assert r.status_code == 201
     extend = act("central").patch(
         f"{API}/role-assignments/{r.json()['id']}",
-        {"valid_to": (start + timedelta(days=60)).isoformat()},
+        {"valid_to": (start + timedelta(days=430)).isoformat()},
         format="json",
     )
     assert extend.status_code == 200
@@ -587,7 +599,7 @@ def test_uc_dept_020_alternate_cardinality_violation_is_blocked(world, act):
         "role": "hod",
         "user_id": uid("faculty2"),
         "valid_from": start.isoformat(),
-        "valid_to": (start + timedelta(days=30)).isoformat(),
+        "valid_to": (start + timedelta(days=400)).isoformat(),
     }
     assert act("central").post(f"{API}/role-assignments", body, format="json").status_code == 201
     inside = {

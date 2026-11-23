@@ -1,7 +1,7 @@
 # Department: quality report
 
 Branch `module/department`, cut from `main` at `5595be6`. Every number below came from runs made
-after the last code change (round 4 fixes included). Spec: `06-DEPT` v1.2.
+after the last code change (round 5 fixes included). Spec: `06-DEPT` v1.2.
 
 ## 1. Gates
 
@@ -15,13 +15,13 @@ all contract getters are plural
 nav items and client routes agree
 permission manifest matches the registries
 openapi schema matches the code
-954 passed, 27 subtests passed          (whole repository, .venv/bin/python -m pytest)
+958 passed, 27 subtests passed          (whole repository, .venv/bin/python -m pytest)
 ```
 
 `make check-client`, exit 0: `tsc --noEmit` (app and e2e) clean; `Test Files 15 passed (15)`,
-`Tests 97 passed (97)`; `✓ built in 2.09s`. Every department chunk is under 2 kB gzip.
+`Tests 105 passed (105)`; `✓ built in 1.41s`. The largest department chunk is `InventoryPage`, 2.00 kB gzip.
 
-`make e2e`, exit 0: `28 passed (21.7s)`, with no 5xx and no 403 in the server log (run on the round 3 code; round 4 changed only a comment in `roles.spec.ts` on the client side, and the round 4 reviewer's own run also gave `28 passed`). This is 20 department specs and the 8 existing ones, with
+`make e2e`, exit 0: `28 passed (14.7s)`, run on the final code, with no 5xx and no 403 in the `runserver` log of that run (`grep -c '" 403 '` printed 0). This is 19 department tests and the 9 existing ones, with
 `E2E_IAM_DIR` set and the grants in §8.
 
 Deploy check, with the production settings exactly as Step 7.7 gives them:
@@ -33,7 +33,7 @@ Deploy check, with the production settings exactly as Step 7.7 gives them:
 
 ```text
 pytest modules/department --cov=modules/department --cov-branch --cov-fail-under=90
-TOTAL  1806 stmts  23 miss  268 branches  17 partial  98%   Total coverage: 98.07%
+TOTAL  1813 stmts  23 miss  272 branches  17 partial  98%   Total coverage: 98.08%
 
 pytest modules/department --cov=modules/department/domain --cov-branch --cov-fail-under=95
 TOTAL   209 stmts   0 miss   72 branches   0 partial  100%  Total coverage: 100.00%
@@ -43,16 +43,16 @@ TOTAL   209 stmts   0 miss   72 branches   0 partial  100%  Total coverage: 100.
 
 ## 3. Tests
 
-529 department backend tests:
+533 department backend tests:
 
 | File | Tests | What it covers |
 |---|---|---|
 | `test_domain.py` | 71 | Every rule branch, with no database. Every illegal transition is generated from the tables. |
 | `test_acting_role.py` | 65 | Only the acting role counts. For all 21 office write endpoints: the HOD, Dept_Admin and central holder acting in a plain role are refused, and nothing in any table changes. An outgoing HOD or Dept_Admin is refused every write in their office role and in a plain one (BR-DEPT-024). The negative twin succeeds in the office role. `context` reports the acting role. |
-| `test_journeys.py` | 33 | Every live UC through HTTP only (below). |
+| `test_journeys.py` | 34 | Every live UC through HTTP only (below). A student never sees another programme's slots (R5-02). |
 | `test_privilege_escalation.py` | 262 | For each of the 41 endpoints, each view asks for exactly the permission its endpoint needs, and: module grant without the permission is 403; permission without the module grant is 403; no session is 401; a plain staff user gets nothing; a student is refused office endpoints. Also `HEAD` and `OPTIONS` need the read permission, an unmapped method is refused, the role switch, per-office verbs, central-only assignment, designation without tenure, CSRF, and that permission codes match the registry. |
 | `test_scoping_isolation.py` | 16 | Another department's rows are absent from lists and 404 by id. A principal holding student, faculty and both office designations, acting as a student or as faculty, gets an empty list from every office-only list (R4-02). Feedback is confidential. A status filter cannot widen scope. Students never see alumni or inactive profiles. Vacancy warnings follow the viewer's departments. |
-| `test_edge_cases.py` | 46 | 404 for a department code the column could never hold (a NUL byte, a space, 13 letters), 400 for bad filters (a NUL byte included), out-of-range numbers and ids, and over-long strings (every string the write serializers accept, announcements, official changes and tenures included, is checked against its column, and a notice subject fits even with the longest department prefix), 409 for conflicts, 422 for rule refusals, 429 throttling, the ledger's immutability, and every adversarial question below. |
+| `test_edge_cases.py` | 49 | A tenure that would cut the incumbent short is refused and saves nothing (R5-01); an ended tenure that overlaps nothing cannot be revived (R5-03); a timetable batch over 500 slots is 400 (R5-05). 404 for a department code the column could never hold (a NUL byte, a space, 13 letters), 400 for bad filters (a NUL byte included), out-of-range numbers and ids, and over-long strings (every string the write serializers accept, announcements, official changes and tenures included, is checked against its column, and a notice subject fits even with the longest department prefix), 409 for conflicts, 422 for rule refusals, 429 throttling, the ledger's immutability, and every adversarial question below. |
 | `test_concurrency.py` | 8 | Real threads on a `Barrier`, with `transaction=True`: issue race, double issue, double decision, overlapping tenures, transitions twice, delivery twice. The database triggers refuse an overlapping tenure written around the service (raced) and a clashing slot written directly. |
 | `test_query_budgets.py` | 12 | The same query count with 2 rows and with 20, for all 11 list endpoints, plus prefetched notes. |
 | `test_schedule.py` | 14 | Beat entries merged and routed; each task twice in a row; readiness, seeding and command output; vacant and ending roles named (Q1); the headship contract. |
@@ -107,6 +107,16 @@ Round 4 breaks, each run against the whole module and copied back:
 | Acting-role scoping (R4-02) | `inventory_items_for` drops its role check | `test_r4_02_a_dual_designation_principal_lists_only_the_acting_roles_rows[student-inventory-items]` |
 | Acting-role scoping | the same for stock movements, official changes, tenures and labs, one at a time | the same test, for that list |
 | Path input (R4-01) | `_dept` stops checking the code | `test_r4_01_a_hostile_department_code_is_404_not_500[C%00SE]` |
+
+Round 5 breaks, each run against the whole module or page and copied back:
+
+| Rule broken | Change | Caught by |
+|---|---|---|
+| Cardinality (R5-01) | the cut-short refusal in `_hand_over` never fires | `test_r5_01_a_tenure_inside_the_incumbents_cannot_cut_it_short` |
+| Timetable scope (R5-02) | the student programme filter also matches `programme__gt=""` | `test_uc_dept_018_student_never_sees_another_programmes_slots` |
+| Ended tenure (R5-03) | `if tenure.valid_to <= now:` becomes `if False:` | `test_r5_03_an_ended_tenure_that_overlaps_nothing_cannot_be_revived` |
+| Row-action refusals (R5-04) | each of `hide`, `remove` (Announcements), `decide`, `issue`, request list (Inventory), `decide` (Overview), `update` (Profiles) and `remove` (Timetable) dropped from its `ActionError`, one at a time | one page test each, for example "shows the server's refusal when issuing fails" |
+| Client gates | Labs "Edit", Inventory "Issue", Feedback "Review" and Roles "Change end" ungated, after the page split | 1–2 page tests each |
 
 ## 5. Adversarial pass
 
@@ -194,7 +204,7 @@ The database was then dropped.
 Synthetic `fusion-dev.dump` accounts. Each row is a Playwright journey, run on its own against
 `make dev` on 8002 with `npx playwright test e2e/department/<spec> --workers=1`. Each passed, and each
 fails on any console error, uncaught error or 5xx. Under each row is **every** `/api/v1/` line
-`runserver` logged during that run, reads and writes alike. None is a 5xx.
+`runserver` logged during that run, reads and writes alike, on the final code. None is a 5xx or a 403.
 
 **Accounts and grants `make e2e` needs.** Global setup grants them when `E2E_IAM_DIR` points at the
 `Fusion_System_Administrator` checkout. To grant them by hand, from `Fusion_System_Administrator/Backend/backend`:
@@ -216,45 +226,33 @@ later drops those grants. Grant them again before each run, or set `E2E_IAM_DIR`
 | Institute Admin `acadadmin` (stf00002) | UC-DEPT-020, UC-DEPT-022 | `roles.spec.ts` | pass |
 
 ```text
-[23/Nov/2026 03:10:01] "GET /api/v1/me HTTP/1.1" 401 161
-[23/Nov/2026 03:10:03] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:03] "GET /api/v1/me HTTP/1.1" 200 1962
-[23/Nov/2026 03:10:03] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:03] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:03] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:03] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:03] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:04] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:05] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:05] "GET /api/v1/department/role-assignments HTTP/1.1" 200 42
-[23/Nov/2026 03:10:05] "GET /api/v1/department/departments HTTP/1.1" 200 1352
-[23/Nov/2026 03:10:05] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 2025
-[23/Nov/2026 03:10:05] "GET /api/v1/department/role-assignments?limit=100 HTTP/1.1" 200 42
-[23/Nov/2026 03:10:05] "POST /api/v1/department/role-assignments HTTP/1.1" 201 208
-[23/Nov/2026 03:10:05] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:05] "GET /api/v1/department/departments HTTP/1.1" 200 1352
-[23/Nov/2026 03:10:05] "GET /api/v1/department/role-assignments HTTP/1.1" 200 250
-[23/Nov/2026 03:10:05] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 2025
-[23/Nov/2026 03:10:06] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:06] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:06] "GET /api/v1/department/role-assignments HTTP/1.1" 200 250
-[23/Nov/2026 03:10:06] "GET /api/v1/department/departments HTTP/1.1" 200 1352
-[23/Nov/2026 03:10:06] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 2025
-[23/Nov/2026 03:10:07] "POST /api/v1/department/role-assignments HTTP/1.1" 201 200
-[23/Nov/2026 03:10:07] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:07] "GET /api/v1/department/role-assignments HTTP/1.1" 200 451
-[23/Nov/2026 03:10:07] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1888
-[23/Nov/2026 03:10:07] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:07] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:07] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:07] "GET /api/v1/department/role-assignments HTTP/1.1" 200 451
-[23/Nov/2026 03:10:07] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1888
-[23/Nov/2026 03:10:07] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:08] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:08] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:08] "GET /api/v1/department/official-changes HTTP/1.1" 403 166
-[23/Nov/2026 03:10:08] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:08] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 280
+[23/Nov/2026 04:38:47] "GET /api/v1/me HTTP/1.1" 401 161
+[23/Nov/2026 04:38:48] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:38:48] "GET /api/v1/me HTTP/1.1" 200 1962
+[23/Nov/2026 04:38:48] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:38:48] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:38:48] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:38:48] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:38:48] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:38:48] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:38:49] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:38:49] "GET /api/v1/department/role-assignments HTTP/1.1" 200 1913
+[23/Nov/2026 04:38:49] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:38:49] "GET /api/v1/department/role-assignments?limit=100 HTTP/1.1" 200 1913
+[23/Nov/2026 04:38:49] "GET /api/v1/department/departments HTTP/1.1" 200 1424
+[23/Nov/2026 04:38:49] "POST /api/v1/department/role-assignments HTTP/1.1" 201 209
+[23/Nov/2026 04:38:49] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:38:49] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:38:49] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2123
+[23/Nov/2026 04:38:49] "GET /api/v1/department/departments HTTP/1.1" 200 1424
+[23/Nov/2026 04:38:50] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:38:50] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:38:50] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2123
+[23/Nov/2026 04:38:50] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:38:50] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:38:51] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:38:51] "GET /api/v1/department/departments HTTP/1.1" 200 1424
+[23/Nov/2026 04:38:51] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 308
 ```
 
 | Role (account) | Use cases | Spec | Result |
@@ -262,34 +260,33 @@ later drops those grants. Grant them again before each run, or set `E2E_IAM_DIR`
 | Faculty `Assistant Professor` (fac00002), Student `ug_student` (stu00002), HOD `HOD (CSE)` (fac00049) | UC-DEPT-002, UC-DEPT-001, UC-DEPT-003 | `announcements.spec.ts` | pass |
 
 ```text
-[23/Nov/2026 03:10:10] "GET /api/v1/me HTTP/1.1" 401 161
-[23/Nov/2026 03:10:11] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:11] "GET /api/v1/me HTTP/1.1" 200 1962
-[23/Nov/2026 03:10:11] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:11] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:11] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:11] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:11] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:12] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:12] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:12] "GET /api/v1/department/announcements HTTP/1.1" 200 42
-[23/Nov/2026 03:10:13] "POST /api/v1/department/announcements HTTP/1.1" 201 260
-[23/Nov/2026 03:10:13] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:13] "GET /api/v1/department/announcements HTTP/1.1" 200 302
-[23/Nov/2026 03:10:13] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:13] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:13] "GET /api/v1/department/announcements HTTP/1.1" 200 302
-[23/Nov/2026 03:10:14] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:14] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:14] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1888
-[23/Nov/2026 03:10:14] "GET /api/v1/department/role-assignments HTTP/1.1" 200 451
-[23/Nov/2026 03:10:14] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:15] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:15] "GET /api/v1/department/context HTTP/1.1" 200 33
-[23/Nov/2026 03:10:15] "GET /api/v1/department/announcements HTTP/1.1" 200 302
-[23/Nov/2026 03:10:15] "POST /api/v1/department/announcements/1/hide HTTP/1.1" 200 290
-[23/Nov/2026 03:10:15] "GET /api/v1/department/context HTTP/1.1" 200 33
-[23/Nov/2026 03:10:15] "GET /api/v1/department/announcements HTTP/1.1" 200 332
+[23/Nov/2026 04:39:12] "GET /api/v1/me HTTP/1.1" 401 161
+[23/Nov/2026 04:39:13] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:39:13] "GET /api/v1/me HTTP/1.1" 200 1962
+[23/Nov/2026 04:39:13] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:39:13] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:39:13] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:39:13] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:39:13] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:39:13] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:39:14] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:39:14] "GET /api/v1/department/announcements HTTP/1.1" 200 42
+[23/Nov/2026 04:39:14] "POST /api/v1/department/announcements HTTP/1.1" 201 260
+[23/Nov/2026 04:39:14] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:39:14] "GET /api/v1/department/announcements HTTP/1.1" 200 302
+[23/Nov/2026 04:39:14] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:39:15] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:39:15] "GET /api/v1/department/announcements HTTP/1.1" 200 302
+[23/Nov/2026 04:39:15] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:39:15] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:39:15] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:39:15] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2123
+[23/Nov/2026 04:39:15] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:39:16] "GET /api/v1/department/context HTTP/1.1" 200 33
+[23/Nov/2026 04:39:16] "GET /api/v1/department/announcements HTTP/1.1" 200 2339
+[23/Nov/2026 04:39:16] "POST /api/v1/department/announcements/8/hide HTTP/1.1" 200 290
+[23/Nov/2026 04:39:16] "GET /api/v1/department/context HTTP/1.1" 200 33
+[23/Nov/2026 04:39:16] "GET /api/v1/department/announcements HTTP/1.1" 200 2369
 ```
 
 | Role (account) | Use cases | Spec | Result |
@@ -297,76 +294,64 @@ later drops those grants. Grant them again before each run, or set `E2E_IAM_DIR`
 | Dept_Admin `deptadmin_cse` (stf00019), Faculty (fac00002), HOD (fac00049) | UC-DEPT-019, UC-DEPT-004, UC-DEPT-005, UC-DEPT-006, UC-DEPT-011 | `stock.spec.ts` | pass |
 
 ```text
-[23/Nov/2026 03:10:17] "GET /api/v1/me HTTP/1.1" 401 161
-[23/Nov/2026 03:10:18] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:18] "GET /api/v1/me HTTP/1.1" 200 1962
-[23/Nov/2026 03:10:18] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:18] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:18] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:18] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:18] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:19] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:19] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:19] "GET /api/v1/department/role-assignments HTTP/1.1" 200 451
-[23/Nov/2026 03:10:19] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1888
-[23/Nov/2026 03:10:19] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:20] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:20] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:20] "GET /api/v1/department/role-assignments HTTP/1.1" 200 451
-[23/Nov/2026 03:10:20] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1888
-[23/Nov/2026 03:10:20] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:21] "POST /api/v1/department/role-assignments HTTP/1.1" 201 207
-[23/Nov/2026 03:10:21] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:21] "GET /api/v1/department/role-assignments HTTP/1.1" 200 659
-[23/Nov/2026 03:10:21] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
-[23/Nov/2026 03:10:21] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:21] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:21] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:21] "GET /api/v1/department/role-assignments HTTP/1.1" 200 659
-[23/Nov/2026 03:10:21] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
-[23/Nov/2026 03:10:21] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:21] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:22] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:22] "GET /api/v1/department/inventory-items HTTP/1.1" 200 42
-[23/Nov/2026 03:10:22] "GET /api/v1/department/stock-requests HTTP/1.1" 200 42
-[23/Nov/2026 03:10:22] "GET /api/v1/department/stock-movements HTTP/1.1" 200 42
-[23/Nov/2026 03:10:22] "POST /api/v1/department/inventory-items HTTP/1.1" 201 127
-[23/Nov/2026 03:10:22] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:22] "GET /api/v1/department/inventory-items HTTP/1.1" 200 169
-[23/Nov/2026 03:10:22] "GET /api/v1/department/stock-requests HTTP/1.1" 200 42
-[23/Nov/2026 03:10:22] "GET /api/v1/department/stock-movements HTTP/1.1" 200 225
-[23/Nov/2026 03:10:22] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:23] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:23] "GET /api/v1/department/stock-requests HTTP/1.1" 200 42
-[23/Nov/2026 03:10:23] "GET /api/v1/department/inventory-items HTTP/1.1" 200 169
-[23/Nov/2026 03:10:23] "POST /api/v1/department/stock-requests HTTP/1.1" 201 270
-[23/Nov/2026 03:10:23] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:23] "GET /api/v1/department/inventory-items HTTP/1.1" 200 169
-[23/Nov/2026 03:10:23] "GET /api/v1/department/stock-requests HTTP/1.1" 200 312
-[23/Nov/2026 03:10:24] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:24] "GET /api/v1/department/context HTTP/1.1" 200 33
-[23/Nov/2026 03:10:24] "GET /api/v1/department/inventory-items HTTP/1.1" 200 169
-[23/Nov/2026 03:10:24] "GET /api/v1/department/stock-requests HTTP/1.1" 200 312
-[23/Nov/2026 03:10:24] "GET /api/v1/department/stock-movements HTTP/1.1" 200 225
-[23/Nov/2026 03:10:24] "POST /api/v1/department/stock-requests/1/decide HTTP/1.1" 200 297
-[23/Nov/2026 03:10:24] "GET /api/v1/department/context HTTP/1.1" 200 33
-[23/Nov/2026 03:10:24] "GET /api/v1/department/inventory-items HTTP/1.1" 200 169
-[23/Nov/2026 03:10:24] "GET /api/v1/department/stock-requests HTTP/1.1" 200 339
-[23/Nov/2026 03:10:24] "GET /api/v1/department/stock-movements HTTP/1.1" 200 225
-[23/Nov/2026 03:10:25] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:25] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:25] "GET /api/v1/department/stock-requests HTTP/1.1" 200 339
-[23/Nov/2026 03:10:25] "GET /api/v1/department/inventory-items HTTP/1.1" 200 169
-[23/Nov/2026 03:10:25] "GET /api/v1/department/stock-movements HTTP/1.1" 200 225
-[23/Nov/2026 03:10:25] "POST /api/v1/department/stock-requests/1/issue HTTP/1.1" 200 325
-[23/Nov/2026 03:10:25] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:25] "GET /api/v1/department/inventory-items HTTP/1.1" 200 168
-[23/Nov/2026 03:10:25] "GET /api/v1/department/stock-requests HTTP/1.1" 200 367
-[23/Nov/2026 03:10:25] "GET /api/v1/department/stock-movements HTTP/1.1" 200 403
-[23/Nov/2026 03:10:25] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:25] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:25] "GET /api/v1/department/inventory-items HTTP/1.1" 200 168
-[23/Nov/2026 03:10:25] "GET /api/v1/department/stock-requests HTTP/1.1" 200 367
+[23/Nov/2026 04:39:37] "GET /api/v1/me HTTP/1.1" 401 161
+[23/Nov/2026 04:39:38] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:39:38] "GET /api/v1/me HTTP/1.1" 200 1962
+[23/Nov/2026 04:39:38] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:39:38] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:39:38] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:39:38] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:39:38] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:39:38] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:39:39] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:39:39] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2123
+[23/Nov/2026 04:39:39] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:39:39] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:39:39] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:39:39] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2123
+[23/Nov/2026 04:39:39] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:39:39] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:39:40] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:39:40] "GET /api/v1/department/inventory-items HTTP/1.1" 200 1030
+[23/Nov/2026 04:39:40] "GET /api/v1/department/stock-requests HTTP/1.1" 200 2323
+[23/Nov/2026 04:39:40] "GET /api/v1/department/stock-movements HTTP/1.1" 200 2740
+[23/Nov/2026 04:39:40] "POST /api/v1/department/inventory-items HTTP/1.1" 201 127
+[23/Nov/2026 04:39:40] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:39:40] "GET /api/v1/department/inventory-items HTTP/1.1" 200 1158
+[23/Nov/2026 04:39:40] "GET /api/v1/department/stock-requests HTTP/1.1" 200 2323
+[23/Nov/2026 04:39:40] "GET /api/v1/department/stock-movements HTTP/1.1" 200 2925
+[23/Nov/2026 04:39:40] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:39:41] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:39:41] "GET /api/v1/department/inventory-items HTTP/1.1" 200 1158
+[23/Nov/2026 04:39:41] "GET /api/v1/department/stock-requests HTTP/1.1" 200 2323
+[23/Nov/2026 04:39:41] "POST /api/v1/department/stock-requests HTTP/1.1" 201 270
+[23/Nov/2026 04:39:41] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:39:41] "GET /api/v1/department/inventory-items HTTP/1.1" 200 1158
+[23/Nov/2026 04:39:41] "GET /api/v1/department/stock-requests HTTP/1.1" 200 2594
+[23/Nov/2026 04:39:42] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:39:42] "GET /api/v1/department/inventory-items HTTP/1.1" 200 1158
+[23/Nov/2026 04:39:42] "GET /api/v1/department/context HTTP/1.1" 200 33
+[23/Nov/2026 04:39:42] "GET /api/v1/department/stock-requests HTTP/1.1" 200 2594
+[23/Nov/2026 04:39:42] "GET /api/v1/department/stock-movements HTTP/1.1" 200 2925
+[23/Nov/2026 04:39:42] "POST /api/v1/department/stock-requests/8/decide HTTP/1.1" 200 297
+[23/Nov/2026 04:39:42] "GET /api/v1/department/context HTTP/1.1" 200 33
+[23/Nov/2026 04:39:42] "GET /api/v1/department/stock-movements HTTP/1.1" 200 2925
+[23/Nov/2026 04:39:42] "GET /api/v1/department/stock-requests HTTP/1.1" 200 2621
+[23/Nov/2026 04:39:42] "GET /api/v1/department/inventory-items HTTP/1.1" 200 1158
+[23/Nov/2026 04:39:42] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:39:42] "GET /api/v1/department/inventory-items HTTP/1.1" 200 1158
+[23/Nov/2026 04:39:42] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:39:42] "GET /api/v1/department/stock-requests HTTP/1.1" 200 2621
+[23/Nov/2026 04:39:42] "GET /api/v1/department/stock-movements HTTP/1.1" 200 2925
+[23/Nov/2026 04:39:42] "POST /api/v1/department/stock-requests/8/issue HTTP/1.1" 200 325
+[23/Nov/2026 04:39:42] "GET /api/v1/department/inventory-items HTTP/1.1" 200 1157
+[23/Nov/2026 04:39:42] "GET /api/v1/department/stock-movements HTTP/1.1" 200 3104
+[23/Nov/2026 04:39:42] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:39:42] "GET /api/v1/department/stock-requests HTTP/1.1" 200 2649
+[23/Nov/2026 04:39:42] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:39:42] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:39:42] "GET /api/v1/department/inventory-items HTTP/1.1" 200 1157
+[23/Nov/2026 04:39:42] "GET /api/v1/department/stock-requests HTTP/1.1" 200 2649
 ```
 
 | Role (account) | Use cases | Spec | Result |
@@ -374,45 +359,43 @@ later drops those grants. Grant them again before each run, or set `E2E_IAM_DIR`
 | Student (stu00002), Dept_Admin (stf00019), HOD (fac00049) | UC-DEPT-007, UC-DEPT-008, UC-DEPT-014 | `feedback.spec.ts` | pass |
 
 ```text
-[23/Nov/2026 03:10:26] "GET /api/v1/me HTTP/1.1" 401 161
-[23/Nov/2026 03:10:28] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:28] "GET /api/v1/me HTTP/1.1" 200 1962
-[23/Nov/2026 03:10:28] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:28] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:28] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:28] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:28] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:28] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:29] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:29] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
-[23/Nov/2026 03:10:29] "GET /api/v1/department/role-assignments HTTP/1.1" 200 659
-[23/Nov/2026 03:10:29] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:29] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:30] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:30] "GET /api/v1/department/role-assignments HTTP/1.1" 200 659
-[23/Nov/2026 03:10:30] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
-[23/Nov/2026 03:10:30] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:30] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:31] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:31] "GET /api/v1/department/feedback HTTP/1.1" 200 42
-[23/Nov/2026 03:10:31] "POST /api/v1/department/feedback HTTP/1.1" 201 287
-[23/Nov/2026 03:10:31] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:31] "GET /api/v1/department/feedback HTTP/1.1" 200 329
-[23/Nov/2026 03:10:31] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:32] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:32] "GET /api/v1/department/feedback HTTP/1.1" 200 329
-[23/Nov/2026 03:10:32] "POST /api/v1/department/feedback/1/review HTTP/1.1" 200 326
-[23/Nov/2026 03:10:32] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:32] "GET /api/v1/department/feedback HTTP/1.1" 200 368
-[23/Nov/2026 03:10:33] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:33] "GET /api/v1/department/context HTTP/1.1" 200 33
-[23/Nov/2026 03:10:33] "GET /api/v1/department/feedback HTTP/1.1" 200 368
-[23/Nov/2026 03:10:34] "POST /api/v1/department/feedback/1/dispose HTTP/1.1" 200 375
-[23/Nov/2026 03:10:34] "GET /api/v1/department/context HTTP/1.1" 200 33
-[23/Nov/2026 03:10:34] "GET /api/v1/department/feedback HTTP/1.1" 200 417
-[23/Nov/2026 03:10:34] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:34] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:34] "GET /api/v1/department/feedback HTTP/1.1" 200 417
+[23/Nov/2026 04:40:04] "GET /api/v1/me HTTP/1.1" 401 161
+[23/Nov/2026 04:40:04] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:40:04] "GET /api/v1/me HTTP/1.1" 200 1962
+[23/Nov/2026 04:40:04] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:40:04] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:40:04] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:40:04] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:40:04] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:40:05] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:40:05] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:40:05] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2123
+[23/Nov/2026 04:40:05] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:40:05] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:40:06] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:40:06] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2123
+[23/Nov/2026 04:40:06] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:40:06] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:40:06] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:40:06] "GET /api/v1/department/feedback HTTP/1.1" 200 4659
+[23/Nov/2026 04:40:07] "POST /api/v1/department/feedback HTTP/1.1" 201 288
+[23/Nov/2026 04:40:07] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:40:07] "GET /api/v1/department/feedback HTTP/1.1" 200 4948
+[23/Nov/2026 04:40:07] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:40:07] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:40:07] "GET /api/v1/department/feedback HTTP/1.1" 200 4948
+[23/Nov/2026 04:40:07] "POST /api/v1/department/feedback/15/review HTTP/1.1" 200 327
+[23/Nov/2026 04:40:07] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:40:07] "GET /api/v1/department/feedback HTTP/1.1" 200 4987
+[23/Nov/2026 04:40:08] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:40:08] "GET /api/v1/department/context HTTP/1.1" 200 33
+[23/Nov/2026 04:40:08] "GET /api/v1/department/feedback HTTP/1.1" 200 3003
+[23/Nov/2026 04:40:09] "POST /api/v1/department/feedback/15/dispose HTTP/1.1" 200 376
+[23/Nov/2026 04:40:09] "GET /api/v1/department/context HTTP/1.1" 200 33
+[23/Nov/2026 04:40:09] "GET /api/v1/department/feedback HTTP/1.1" 200 3052
+[23/Nov/2026 04:40:09] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:40:09] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:40:09] "GET /api/v1/department/feedback HTTP/1.1" 200 5036
 ```
 
 | Role (account) | Use cases | Spec | Result |
@@ -420,61 +403,57 @@ later drops those grants. Grant them again before each run, or set `E2E_IAM_DIR`
 | Dept_Admin (stf00019), Student (stu00002), Faculty (fac00002) | UC-DEPT-009, UC-DEPT-018, UC-DEPT-017, UC-DEPT-016, UC-DEPT-015 | `resources.spec.ts` | pass |
 
 ```text
-[23/Nov/2026 03:10:35] "GET /api/v1/me HTTP/1.1" 401 161
-[23/Nov/2026 03:10:37] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:37] "GET /api/v1/me HTTP/1.1" 200 1962
-[23/Nov/2026 03:10:37] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:37] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:37] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:37] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:37] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:38] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:38] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:38] "GET /api/v1/department/role-assignments HTTP/1.1" 200 659
-[23/Nov/2026 03:10:38] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
-[23/Nov/2026 03:10:38] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:38] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:39] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:39] "GET /api/v1/department/timetable-slots HTTP/1.1" 200 2
-[23/Nov/2026 03:10:39] "POST /api/v1/department/timetable-slots HTTP/1.1" 201 213
-[23/Nov/2026 03:10:39] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:39] "GET /api/v1/department/timetable-slots HTTP/1.1" 200 213
-[23/Nov/2026 03:10:40] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:40] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:40] "GET /api/v1/department/timetable-slots HTTP/1.1" 200 213
-[23/Nov/2026 03:10:40] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:40] "GET /api/v1/department/official-changes HTTP/1.1" 403 166
-[23/Nov/2026 03:10:40] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:40] "GET /api/v1/department/departments HTTP/1.1" 200 249
-[23/Nov/2026 03:10:41] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 280
-[23/Nov/2026 03:10:41] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:41] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:41] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
-[23/Nov/2026 03:10:41] "GET /api/v1/department/role-assignments HTTP/1.1" 200 659
-[23/Nov/2026 03:10:41] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:42] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:42] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:42] "GET /api/v1/department/lab-resources HTTP/1.1" 200 42
-[23/Nov/2026 03:10:43] "POST /api/v1/department/lab-resources HTTP/1.1" 201 157
-[23/Nov/2026 03:10:43] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:43] "GET /api/v1/department/lab-resources HTTP/1.1" 200 199
-[23/Nov/2026 03:10:43] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:44] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:44] "GET /api/v1/department/lab-resources HTTP/1.1" 200 199
-[23/Nov/2026 03:10:44] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:44] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:44] "GET /api/v1/department/role-assignments HTTP/1.1" 200 659
-[23/Nov/2026 03:10:44] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
-[23/Nov/2026 03:10:44] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:45] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:45] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:45] "GET /api/v1/department/profiles HTTP/1.1" 200 42
-[23/Nov/2026 03:10:46] "POST /api/v1/department/profiles HTTP/1.1" 201 305
-[23/Nov/2026 03:10:46] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:46] "GET /api/v1/department/profiles HTTP/1.1" 200 347
-[23/Nov/2026 03:10:46] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:47] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:47] "GET /api/v1/department/profiles HTTP/1.1" 200 238
+[23/Nov/2026 04:40:30] "GET /api/v1/me HTTP/1.1" 401 161
+[23/Nov/2026 04:40:31] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:40:31] "GET /api/v1/me HTTP/1.1" 200 1962
+[23/Nov/2026 04:40:31] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:40:31] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:40:31] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:40:31] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:40:31] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:40:32] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:40:32] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:40:32] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2123
+[23/Nov/2026 04:40:32] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:40:32] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:40:32] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:40:32] "GET /api/v1/department/timetable-slots HTTP/1.1" 200 1485
+[23/Nov/2026 04:40:33] "POST /api/v1/department/timetable-slots HTTP/1.1" 201 213
+[23/Nov/2026 04:40:33] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:40:33] "GET /api/v1/department/timetable-slots HTTP/1.1" 200 1697
+[23/Nov/2026 04:40:33] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:40:33] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:40:33] "GET /api/v1/department/timetable-slots HTTP/1.1" 200 1697
+[23/Nov/2026 04:40:34] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:40:34] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:40:34] "GET /api/v1/department/departments HTTP/1.1" 200 277
+[23/Nov/2026 04:40:34] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 308
+[23/Nov/2026 04:40:34] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:40:34] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:40:34] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2123
+[23/Nov/2026 04:40:34] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:40:35] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:40:35] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:40:35] "GET /api/v1/department/lab-resources HTTP/1.1" 200 1147
+[23/Nov/2026 04:40:35] "POST /api/v1/department/lab-resources HTTP/1.1" 201 157
+[23/Nov/2026 04:40:35] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:40:35] "GET /api/v1/department/lab-resources HTTP/1.1" 200 1305
+[23/Nov/2026 04:40:36] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:40:36] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:40:36] "GET /api/v1/department/lab-resources HTTP/1.1" 200 1305
+[23/Nov/2026 04:40:36] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:40:37] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:40:37] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2123
+[23/Nov/2026 04:40:37] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
+[23/Nov/2026 04:40:37] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:40:37] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:40:37] "GET /api/v1/department/profiles HTTP/1.1" 200 2183
+[23/Nov/2026 04:40:38] "POST /api/v1/department/profiles HTTP/1.1" 201 305
+[23/Nov/2026 04:40:38] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:40:38] "GET /api/v1/department/profiles HTTP/1.1" 200 2489
+[23/Nov/2026 04:40:38] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:40:38] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:40:38] "GET /api/v1/department/profiles HTTP/1.1" 200 1617
 ```
 
 | Role (account) | Use cases | Spec | Result |
@@ -482,44 +461,42 @@ later drops those grants. Grant them again before each run, or set `E2E_IAM_DIR`
 | Dept_Admin (stf00019), HOD (fac00049) | UC-DEPT-010, UC-DEPT-012 | `details.spec.ts` | pass |
 
 ```text
-[23/Nov/2026 03:10:48] "GET /api/v1/me HTTP/1.1" 401 161
-[23/Nov/2026 03:10:49] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:49] "GET /api/v1/me HTTP/1.1" 200 1962
-[23/Nov/2026 03:10:49] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:49] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:49] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:49] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:49] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:50] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:50] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:50] "GET /api/v1/department/role-assignments HTTP/1.1" 200 659
-[23/Nov/2026 03:10:50] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
-[23/Nov/2026 03:10:50] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:51] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:51] "GET /api/v1/department/context HTTP/1.1" 200 36
-[23/Nov/2026 03:10:51] "GET /api/v1/department/role-assignments HTTP/1.1" 200 659
-[23/Nov/2026 03:10:51] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1737
-[23/Nov/2026 03:10:51] "GET /api/v1/department/departments HTTP/1.1" 200 1396
-[23/Nov/2026 03:10:52] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:52] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:52] "GET /api/v1/department/official-changes HTTP/1.1" 200 42
-[23/Nov/2026 03:10:52] "GET /api/v1/department/departments HTTP/1.1" 200 249
-[23/Nov/2026 03:10:52] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 280
-[23/Nov/2026 03:10:53] "POST /api/v1/department/official-changes HTTP/1.1" 201 253
-[23/Nov/2026 03:10:53] "GET /api/v1/department/context HTTP/1.1" 200 40
-[23/Nov/2026 03:10:53] "GET /api/v1/department/official-changes HTTP/1.1" 200 295
-[23/Nov/2026 03:10:53] "GET /api/v1/department/departments HTTP/1.1" 200 249
-[23/Nov/2026 03:10:53] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 280
-[23/Nov/2026 03:10:53] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:53] "GET /api/v1/department/context HTTP/1.1" 200 33
-[23/Nov/2026 03:10:53] "GET /api/v1/department/official-changes HTTP/1.1" 200 295
-[23/Nov/2026 03:10:53] "GET /api/v1/department/departments HTTP/1.1" 200 249
-[23/Nov/2026 03:10:53] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 280
-[23/Nov/2026 03:10:54] "POST /api/v1/department/official-changes/1/decide HTTP/1.1" 200 284
-[23/Nov/2026 03:10:54] "GET /api/v1/department/context HTTP/1.1" 200 33
-[23/Nov/2026 03:10:54] "GET /api/v1/department/official-changes HTTP/1.1" 200 326
-[23/Nov/2026 03:10:54] "GET /api/v1/department/departments HTTP/1.1" 200 277
-[23/Nov/2026 03:10:54] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 308
+[23/Nov/2026 04:40:59] "GET /api/v1/me HTTP/1.1" 401 161
+[23/Nov/2026 04:41:00] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:41:00] "GET /api/v1/me HTTP/1.1" 200 1962
+[23/Nov/2026 04:41:00] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:41:00] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:41:00] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:41:00] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:41:00] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:00] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:01] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:41:01] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2122
+[23/Nov/2026 04:41:01] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1586
+[23/Nov/2026 04:41:01] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:02] "GET /api/v1/department/context HTTP/1.1" 200 36
+[23/Nov/2026 04:41:02] "GET /api/v1/department/role-assignments HTTP/1.1" 200 2122
+[23/Nov/2026 04:41:02] "GET /api/v1/department/role-assignments/vacancies HTTP/1.1" 200 1586
+[23/Nov/2026 04:41:02] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:41:02] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:41:02] "GET /api/v1/department/departments HTTP/1.1" 200 277
+[23/Nov/2026 04:41:02] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 308
+[23/Nov/2026 04:41:02] "GET /api/v1/department/official-changes HTTP/1.1" 200 2204
+[23/Nov/2026 04:41:03] "POST /api/v1/department/official-changes HTTP/1.1" 201 281
+[23/Nov/2026 04:41:03] "GET /api/v1/department/official-changes HTTP/1.1" 200 2486
+[23/Nov/2026 04:41:03] "GET /api/v1/department/context HTTP/1.1" 200 40
+[23/Nov/2026 04:41:03] "GET /api/v1/department/departments HTTP/1.1" 200 277
+[23/Nov/2026 04:41:03] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 308
+[23/Nov/2026 04:41:03] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:41:03] "GET /api/v1/department/context HTTP/1.1" 200 33
+[23/Nov/2026 04:41:03] "GET /api/v1/department/departments HTTP/1.1" 200 277
+[23/Nov/2026 04:41:03] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 308
+[23/Nov/2026 04:41:03] "GET /api/v1/department/official-changes HTTP/1.1" 200 2486
+[23/Nov/2026 04:41:03] "POST /api/v1/department/official-changes/8/decide HTTP/1.1" 200 312
+[23/Nov/2026 04:41:03] "GET /api/v1/department/context HTTP/1.1" 200 33
+[23/Nov/2026 04:41:03] "GET /api/v1/department/official-changes HTTP/1.1" 200 2517
+[23/Nov/2026 04:41:03] "GET /api/v1/department/departments HTTP/1.1" 200 277
+[23/Nov/2026 04:41:03] "GET /api/v1/department/departments/CSE HTTP/1.1" 200 308
 ```
 
 | Role (account) | Use cases | Spec | Result |
@@ -527,20 +504,20 @@ later drops those grants. Grant them again before each run, or set `E2E_IAM_DIR`
 | Student (stu00002), **keyboard only** | UC-DEPT-007 | `keyboard.spec.ts` | pass |
 
 ```text
-[23/Nov/2026 03:10:55] "GET /api/v1/me HTTP/1.1" 401 161
-[23/Nov/2026 03:10:56] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:56] "GET /api/v1/me HTTP/1.1" 200 1962
-[23/Nov/2026 03:10:56] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:56] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:10:56] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:10:56] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:10:56] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:10:57] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:10:57] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:57] "GET /api/v1/department/feedback HTTP/1.1" 200 417
-[23/Nov/2026 03:10:58] "POST /api/v1/department/feedback HTTP/1.1" 201 282
-[23/Nov/2026 03:10:58] "GET /api/v1/department/context HTTP/1.1" 200 37
-[23/Nov/2026 03:10:58] "GET /api/v1/department/feedback HTTP/1.1" 200 700
+[23/Nov/2026 04:41:25] "GET /api/v1/me HTTP/1.1" 401 161
+[23/Nov/2026 04:41:25] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:41:25] "GET /api/v1/me HTTP/1.1" 200 1962
+[23/Nov/2026 04:41:25] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:41:25] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:41:25] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:41:25] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:41:25] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:26] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:41:26] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:41:26] "GET /api/v1/department/feedback HTTP/1.1" 200 5036
+[23/Nov/2026 04:41:26] "POST /api/v1/department/feedback HTTP/1.1" 201 283
+[23/Nov/2026 04:41:26] "GET /api/v1/department/context HTTP/1.1" 200 37
+[23/Nov/2026 04:41:26] "GET /api/v1/department/feedback HTTP/1.1" 200 5320
 ```
 
 | Role (account) | Use cases | Spec | Result |
@@ -548,23 +525,23 @@ later drops those grants. Grant them again before each run, or set `E2E_IAM_DIR`
 | Student (stu00002), Institute Admin (stf00002) | Guarded routes (9) | `guarded-pages.spec.ts` | pass |
 
 ```text
-[23/Nov/2026 03:10:59] "GET /api/v1/me HTTP/1.1" 401 161
-[23/Nov/2026 03:11:01] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:11:01] "GET /api/v1/me HTTP/1.1" 200 1962
-[23/Nov/2026 03:11:01] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:11:01] "GET /api/v1/me HTTP/1.1" 200 1633
-[23/Nov/2026 03:11:01] "GET /api/v1/me HTTP/1.1" 200 2042
-[23/Nov/2026 03:11:01] "GET /api/v1/me HTTP/1.1" 200 2107
-[23/Nov/2026 03:11:01] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:11:01] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:11:02] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:11:02] "GET /api/v1/me HTTP/1.1" 200 2056
-[23/Nov/2026 03:11:02] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:11:03] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:11:03] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:11:03] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:11:04] "GET /api/v1/me HTTP/1.1" 200 829
-[23/Nov/2026 03:11:04] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:48] "GET /api/v1/me HTTP/1.1" 401 161
+[23/Nov/2026 04:41:49] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:41:49] "GET /api/v1/me HTTP/1.1" 200 1962
+[23/Nov/2026 04:41:49] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:41:49] "GET /api/v1/me HTTP/1.1" 200 1633
+[23/Nov/2026 04:41:49] "GET /api/v1/me HTTP/1.1" 200 2042
+[23/Nov/2026 04:41:49] "GET /api/v1/me HTTP/1.1" 200 2107
+[23/Nov/2026 04:41:49] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:49] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:41:49] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:41:50] "GET /api/v1/me HTTP/1.1" 200 2056
+[23/Nov/2026 04:41:50] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:50] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:50] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:51] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:51] "GET /api/v1/me HTTP/1.1" 200 829
+[23/Nov/2026 04:41:51] "GET /api/v1/me HTTP/1.1" 200 829
 ```
 
 The guarded-pages row has only `/api/v1/me` and sign-in lines: a guarded page shows `NotPermitted`
@@ -631,6 +608,7 @@ No dependency was added.
 | 2 | `b32b996` | 3 | 9 | 9 | 3 | 7 | 6 | 6 | 8 | 10 | 13 (3 Blocker, 4 Major, 6 Minor) |
 | 3 | `916b6b0` | 7 | 10 | 10 | 3 | 4 | 10 | 7 | 10 | 10 | 6 (2 Blocker, 4 Major) |
 | 4 | `6b52d64` | 10 | 10 | 8 | 7 | 7 | 10 | 10 | 10 | 10 | 4 (2 Major, 2 Minor) |
+| 5 | `ad7558e` | 7 | 10 | 9 | 9 | 4 | 10 | 7 | 8 | 10 | 8 (4 Major, 4 Minor) |
 
 What round 1 found, and what changed:
 
@@ -688,9 +666,24 @@ What round 4 found, and what changed:
 |---|---|
 | R4-01 | A department code in the path that is not 1–12 letters is a 404 with the platform envelope before it reaches the database, for `GET` and `PATCH`. It is the only string path parameter; status filters are checked against their allowed values. Tests added. |
 | R4-02 | A test reads every office-only list as a principal holding every office designation while acting as a student, and as faculty; removing any list's role check fails it. |
-| R4-03 | `assign` is split into `_locked_department`, `_check_dates_and_holder`, `_refuse_gap` and `_hand_over`; no function in the module is over 50 lines. |
+| R4-03 | `assign` is split into `_locked_department`, `_check_dates_and_holder`, `_refuse_gap` and `_hand_over`; no function in the module's services is over 50 lines (round 5 found three test helpers that were; see R5-06). |
 | R4-04 | The comment above `successorWindow` is one line. |
 | Disclosure | The reviewer's probe left inventory item 5 ("a") in the working database; it is not part of the repository. |
+
+What round 5 found, and what changed:
+
+| Finding | Change |
+|---|---|
+| R5-01 | A tenure that starts inside the incumbent's and ends before it is refused (422 `would_cut_short`, saying to end it later or shorten the current tenure first), so the module never leaves the rest of a tenure without a holder. Two journey tests that recorded such a successor now record one that covers the rest of the term. |
+| R5-02 | A test publishes slots for another programme in the same department and batch; the student never sees them. |
+| R5-03 | A test revives an ended tenure that overlaps nothing and gets 409 `tenure_ended`, with the row unchanged. |
+| R5-04 | Each of the five pages has a test where the row action's refusal reaches the screen as sent. |
+| R5-05 | A timetable upload takes at most 500 slots; a larger one is 400 with a sentence, and saves nothing. |
+| R5-06 | The three test helpers are split. Every function in the module, Python and TypeScript, tests included, is 50 lines or fewer; each page is split into its dialog, fields and table. |
+| R5-07 | The traceability rows name `feedback/{id}/notes` and the profile record id. |
+| R5-08 | §8 pastes the per-spec logs of runs on the final code, and §1 and §8 agree: no 403 and no 5xx. |
+| Question 1 | Answered by R5-01: the incumbent's remaining time is kept; such a tenure is refused. |
+| Question 2 | The central authority does not see official changes; BR-DEPT-011 and BR-DEPT-013 name only Dept_Admin and HOD, as approved in the blueprint. |
 
 The six approver questions from rounds 1, 2 and 3 were answered by Student 2 on 2026-11-23 (§11);
 every answer keeps the current behaviour.

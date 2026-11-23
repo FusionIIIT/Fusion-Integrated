@@ -79,4 +79,13 @@ describe("OverviewPage", () => {
     expect(await screen.findByText("Dr. Head")).toBeInTheDocument();
     expect(api.get.mock.calls.some(([url]) => String(url).endsWith("/official-changes"))).toBe(false);
   });
+
+  it("shows the server's refusal when a decision fails", async () => {
+    setup(["department.department.view", "department.official_change.view", "department.official_change.approve"],
+      { "/departments": [DEPT], "/departments/CSE": DEPT, "/official-changes": page([CHANGE]) }, "hod");
+    api.post.mockRejectedValueOnce(serverError("This change was already decided.", 409));
+    renderPage(<OverviewPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Reject" }));
+    expect(await screen.findByText("This change was already decided.")).toBeInTheDocument();
+  });
 });
