@@ -57,21 +57,24 @@ def test_claimant_cannot_move_own_claim(stub_iam):
     assert ReimbursementClaim.objects.get(pk=mine.pk).status == "pending_phc_review"
 
 
-def test_processing_office_never_sees_its_own_claim_in_the_queue(stub_iam):
+def test_processing_office_sees_its_own_claim_but_cannot_move_it(stub_iam):
     own = _claim(PHC_STAFF_ID)
     other = _claim(EMPLOYEE_ID)
-    staff = client_as(stub_iam, "PHC Staff", PHC_STAFF_ID)
-    assert [c["id"] for c in staff.get("/api/v1/phc/claims").data["results"]] == [other.pk]
+    staff = client_as(stub_iam, "PHC Staff", PHC_STAFF_ID, extra=("phc.claim.create",))
+    rows = {c["id"]: c for c in staff.get("/api/v1/phc/claims").data["results"]}
+    assert set(rows) == {own.pk, other.pk}
+    assert rows[own.pk]["allowed_events"] == []
+    assert rows[other.pk]["allowed_events"] == ["forward"]
     r = staff.post(f"/api/v1/phc/claims/{own.pk}/transition", {"event": "forward"})
-    assert r.status_code == 404
+    assert (r.status_code, r.data["error"]["code"]) == (403, "own_claim")
     assert ReimbursementClaim.objects.get(pk=own.pk).status == "pending_phc_review"
 
 
-def test_staff_cannot_see_or_record_their_own_clinical_record(stub_iam, user_ref):
+def test_staff_read_their_own_record_but_cannot_record_one_for_themselves(stub_iam, user_ref):
     own = visit_for(PHC_STAFF_ID, recorded_by=OTHER_STAFF_ID)
     staff = client_as(stub_iam, "PHC Staff", PHC_STAFF_ID,
                       users={PHC_STAFF_ID: user_ref(PHC_STAFF_ID, kind="staff")})
-    assert staff.get(f"/api/v1/phc/records/{own.pk}").status_code == 404
+    assert staff.get(f"/api/v1/phc/records/{own.pk}").status_code == 200
     r = staff.post("/api/v1/phc/records", {
         "patient_user_id": PHC_STAFF_ID, "visit_date": str(timezone.localdate()),
         "complaint": "x", "prescriptions": [{"medicine": "m", "dosage": "d"}]}, format="json")

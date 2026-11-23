@@ -14,7 +14,7 @@ export async function openPhc(page: Page, key: AccountKey, link: string, heading
 
 // Pick an option from a Mantine Select by its label.
 export async function choose(page: Page, label: string, option: string | RegExp) {
-  await page.getByRole("textbox", { name: label }).click();
+  await page.getByRole("textbox", { name: label, exact: true }).click();
   await page.getByRole("option", { name: option }).first().click();
 }
 

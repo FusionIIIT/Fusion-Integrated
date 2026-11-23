@@ -137,10 +137,18 @@ They change the IAM's database and need a person at the browser.
 
 ## 8. Browser walkthrough and Playwright (Step 6.9)
 
-NOT RUN. `client/e2e/phc/` has the student journeys (`patient-pages.spec.ts`) and the deep-link check
-for every guarded office page (`office-pages.spec.ts`); both typecheck. The office-role journeys still
-need `client/e2e/accounts.ts` entries, whose role names must be read from the IAM. Running `make e2e`
-needs the IAM on port 8001, a seeded IAM and `make dev`.
+`npx playwright test e2e/phc`, run on 2026-11-23 against the seeded local IAM (with a service
+token) and the dev server: `13 passed`, `1 failed`. The failing spec is the records-and-reimbursement
+journey (`claims.spec.ts`): the visit is recorded and the patient is found through the IAM, but
+switching the claimant account `fac00050` to its `faculty` role does not take, so the claim steps
+never run.
+
+Passing specs cover PHC-UC-01, 07, 08, 22 (schedule), 09, 10, 14, 16 (inventory and requisitions),
+11, 12, 13 (ambulance, advisories, reports), the student's patient pages, and the deep link for every
+route a student is refused. The four routes every role holds through its basic kind (schedule,
+advisories, records, notifications) have no account that lacks them, so they have no deep-link spec.
+
+The written browser walkthrough table and the keyboard-only flow were not done.
 
 ## 9. Scheduled tasks
 
@@ -163,6 +171,8 @@ None accepted yet. Open questions are in the blueprint's Step 3.8.
 - Dependencies: none.
 
 ## 12. Review rounds
+
+Round 3 was not run before submission.
 
 | Round | Commit reviewed | Spec | Arch | Code | Security | Tests | E2E | Frontend | Ops | Hygiene | Verdict |
 |---|---|---|---|---|---|---|---|---|---|---|---|

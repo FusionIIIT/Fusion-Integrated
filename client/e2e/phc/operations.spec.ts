@@ -41,8 +41,8 @@ test.describe("phc: ambulance, advisories and reports", () => {
   test("PHC staff generate an anonymised utilization report", async ({ page }) => {
     await openPhc(page, "phcStaff", "Reports", "Reports");
     await choose(page, "Report", "Service utilization");
-    await page.getByLabel("From").fill("2026-01-01");
-    await page.getByLabel("To").fill("2026-12-31");
+    await page.getByRole("textbox", { name: "From", exact: true }).fill("2026-01-01");
+    await page.getByRole("textbox", { name: "To", exact: true }).fill("2026-12-31");
     const report = page.waitForResponse((r) => r.url().includes("/api/v1/phc/reports"));
     await page.getByRole("button", { name: "Generate" }).click();
     expect((await report).status()).toBe(200);

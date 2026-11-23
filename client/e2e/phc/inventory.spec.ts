@@ -39,9 +39,9 @@ test.describe("phc: inventory and requisitions", () => {
     await form.getByRole("button", { name: "Submit" }).click();
     const req = await (await raised).json() as { id: number };
 
-    const authorityCtx = await browser.newContext(signedInAs("phcRequisitionAuthority"));
+    const authorityCtx = await browser.newContext(signedInAs("phcAuthority"));
     const authority = await authorityCtx.newPage();
-    await openPhc(authority, "phcRequisitionAuthority", "Requisitions", "Procurement requisitions");
+    await openPhc(authority, "phcAuthority", "Requisitions", "Procurement requisitions");
     const pending = authority.locator(".mantine-Card-root").filter({ hasText: `#${req.id}` });
     const decided = waitForWrite(authority, `requisitions/${req.id}/transition`);
     await pending.getByRole("button", { name: "Approve" }).click();

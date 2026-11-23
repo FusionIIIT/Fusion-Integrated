@@ -49,13 +49,13 @@ def schedules_for(actor, *, today) -> QuerySet[DoctorSchedule]:
 
 
 def visits_for(actor) -> QuerySet[PatientVisit]:
-    # PHC-BR-02: PHC Staff manage every record except their own; a patient reads only theirs.
+    # PHC-BR-02: PHC Staff manage every record; a patient reads only their own.
     uid = _uid(actor)
     if uid is None:
         return PatientVisit.objects.none()
     qs = PatientVisit.objects.prefetch_related("prescriptions")
     if _has(actor, P_RECORD_CREATE):
-        return qs.exclude(patient_user_id=uid).order_by("-visit_date", "-id")
+        return qs.order_by("-visit_date", "-id")
     return qs.filter(patient_user_id=uid).order_by("-visit_date", "-id")
 
 
@@ -67,7 +67,8 @@ def own_prescriptions(actor) -> QuerySet[Prescription]:
 
 
 def claims_for(actor) -> QuerySet[ReimbursementClaim]:
-    # A processing office never sees its own claim, so it can never appear in its own queue.
+    # Every session holds its basic kind too, so an office also sees its own claims (PHC-UC-05);
+    # transition_claim refuses any move on them.
     uid = _uid(actor)
     if uid is None:
         return ReimbursementClaim.objects.none()
@@ -75,7 +76,7 @@ def claims_for(actor) -> QuerySet[ReimbursementClaim]:
     qs = qs.prefetch_related(Prefetch("actions", queryset=ClaimAction.objects.order_by(
         "created_at", "id")))
     if _has(actor, *CLAIM_PROCESSOR_PERMISSIONS):
-        return qs.exclude(user_id=uid).order_by("-submitted_at", "-id")
+        return qs.order_by("-submitted_at", "-id")
     if _has(actor, P_CLAIM_CREATE):
         return qs.filter(user_id=uid).order_by("-submitted_at", "-id")
     return ReimbursementClaim.objects.none()
