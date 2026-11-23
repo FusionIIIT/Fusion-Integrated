@@ -1,0 +1,353 @@
+[
+  {
+    "test_id": "FR-001",
+    "source_id": "CFR-GYM-001 / AFR-GYM-001 — create club happy path",
+    "purpose": "Student Admin can create a new club by supplying all required fields; the club is recorded with open status.",
+    "preconditions": "Student Admin is authenticated. Valid student IDs for coordinator and co-coordinator exist. Valid faculty ID for councillor exists.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/ with name, category='technical', coordinator_id, co_coordinator_id, faculty_councillor_id, description.",
+    "expected_result": "HTTP 201. Response body includes status='open'. Club record created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-002",
+    "source_id": "CFR-GYM-001 / AFR-GYM-002 — invalid coordinator rejected",
+    "purpose": "Club creation is rejected when the coordinator ID does not refer to a valid student.",
+    "preconditions": "Student Admin is authenticated. coordinator_id refers to a non-existent or non-student user.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/ with invalid coordinator_id.",
+    "expected_result": "HTTP 400. Club is not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-003",
+    "source_id": "CFR-GYM-001 / AFR-GYM-003 — invalid faculty councillor rejected",
+    "purpose": "Club creation is rejected when the faculty_councillor_id does not refer to a valid faculty member.",
+    "preconditions": "Student Admin is authenticated. faculty_councillor_id refers to a non-faculty user.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/ with invalid faculty_councillor_id.",
+    "expected_result": "HTTP 400. Club is not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-004",
+    "source_id": "CFR-GYM-001 / AFR-GYM-004 — disallowed category rejected",
+    "purpose": "Club creation is rejected when category is not one of technical, sports, or cultural.",
+    "preconditions": "Student Admin is authenticated. All other fields valid.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/ with category='arts'.",
+    "expected_result": "HTTP 400. Club is not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-005",
+    "source_id": "CFR-GYM-001 / AFR-GYM-005 — new club recorded as open",
+    "purpose": "A newly created club has status 'open' by default.",
+    "preconditions": "Student Admin is authenticated. All fields valid.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/ with valid data.",
+    "expected_result": "Response body contains status='open'. Database record confirms status='open'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-006",
+    "source_id": "CFR-GYM-001 / AFR-GYM-006 — Student Admin confirms open club",
+    "purpose": "Student Admin can approve an open club and change its status to confirmed.",
+    "preconditions": "An open club exists. Student Admin is authenticated.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/{id}/confirm/",
+    "expected_result": "HTTP 200. Club status changes to 'confirmed'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-007",
+    "source_id": "CFR-GYM-002 / AFR-GYM-007 — Club Head changes leadership",
+    "purpose": "The applicable Club Head can replace the club coordinator and co-coordinator.",
+    "preconditions": "A confirmed club exists. The authenticated user is the current coordinator or co-coordinator. New coordinator and co-coordinator IDs are valid students.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/{id}/leadership/ with new coordinator_id and co_coordinator_id.",
+    "expected_result": "HTTP 200. Club record reflects the new coordinator and co-coordinator.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-008",
+    "source_id": "CFR-GYM-002 / AFR-GYM-008 — invalid replacement leader rejected",
+    "purpose": "Leadership change is rejected when either proposed replacement is not a valid student.",
+    "preconditions": "Club exists. Authenticated user is current Club Head. New coordinator_id refers to a non-student user.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/{id}/leadership/ with invalid coordinator_id.",
+    "expected_result": "HTTP 400. Leadership not changed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-009",
+    "source_id": "CFR-GYM-002 / AFR-GYM-009 — only current leadership retained",
+    "purpose": "After a leadership change, the club references only the new coordinator and co-coordinator; previous assignments are superseded.",
+    "preconditions": "Club exists with original coordinator A and co-coordinator B. Club Head initiates change to C and D.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/{id}/leadership/ with valid new leader IDs.",
+    "expected_result": "Club record shows coordinator=C and co_coordinator=D. A and B are no longer active leaders.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-010",
+    "source_id": "CFR-GYM-003 / AFR-GYM-010 — Club Head books session",
+    "purpose": "Club Head can book a club session providing venue, date, start_time, end_time, description, and optional poster.",
+    "preconditions": "A confirmed club exists. Authenticated user is the Club Head. Venue is in the configured list. No conflicting booking exists.",
+    "action_or_input": "POST /api/v1/gymkhana/bookings/session/ with valid venue, booking_date, start_time, end_time, description.",
+    "expected_result": "HTTP 201. Session booking is created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-011",
+    "source_id": "CFR-GYM-003 / AFR-GYM-011 — invalid time range rejected",
+    "purpose": "A session booking is rejected when start_time is not before end_time.",
+    "preconditions": "Club Head is authenticated with a confirmed club.",
+    "action_or_input": "POST /api/v1/gymkhana/bookings/session/ with start_time >= end_time.",
+    "expected_result": "HTTP 400. Booking not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-012",
+    "source_id": "CFR-GYM-003 / AFR-GYM-012 — overlapping booking rejected",
+    "purpose": "A session booking that overlaps an existing session in the same venue on the same date is rejected.",
+    "preconditions": "An existing session booking occupies venue V on date D, 10:00-12:00. Club Head authenticated.",
+    "action_or_input": "POST /api/v1/gymkhana/bookings/session/ for venue V, date D, 11:00-13:00.",
+    "expected_result": "HTTP 409 or HTTP 400. Booking not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-013",
+    "source_id": "CFR-GYM-003 / AFR-GYM-012 — session-event cross-type overlap rejected",
+    "purpose": "A session booking that overlaps an existing EVENT in the same venue on the same date is rejected.",
+    "preconditions": "An existing event booking occupies venue V on date D, 10:00-12:00. Club Head authenticated.",
+    "action_or_input": "POST /api/v1/gymkhana/bookings/session/ for venue V, date D, 11:00-13:00.",
+    "expected_result": "HTTP 409 or HTTP 400. Session not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-014",
+    "source_id": "CFR-GYM-003 / AFR-GYM-013 — notification triggered after session booking",
+    "purpose": "After a successful session booking, a notification task is dispatched to the intended student recipients.",
+    "preconditions": "Club Head authenticated. Valid confirmed club and venue. No conflict.",
+    "action_or_input": "POST /api/v1/gymkhana/bookings/session/ with valid data.",
+    "expected_result": "HTTP 201. A notification task is enqueued (outbox record or Celery task created).",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-015",
+    "source_id": "CFR-GYM-003 / AFR-GYM-014 — Club Head books event with faculty councillor",
+    "purpose": "Club Head can book a club event providing event details, faculty_councillor_id, venue, date, times, poster, and description.",
+    "preconditions": "Confirmed club exists. Club Head is authenticated. Faculty councillor ID is valid. No conflicting booking.",
+    "action_or_input": "POST /api/v1/gymkhana/bookings/event/ with valid event fields including faculty_councillor_id.",
+    "expected_result": "HTTP 201. Event booking created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-016",
+    "source_id": "CFR-GYM-003 / AFR-GYM-015 — notification triggered after event booking",
+    "purpose": "After a successful event booking, a notification task is dispatched to the intended student recipients.",
+    "preconditions": "Club Head authenticated. Valid event data. No conflict.",
+    "action_or_input": "POST /api/v1/gymkhana/bookings/event/ with valid data.",
+    "expected_result": "HTTP 201. A notification task is enqueued.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-017",
+    "source_id": "CFR-GYM-004 / AFR-GYM-016 — student applies for membership in confirmed club",
+    "purpose": "A student can apply for membership in a confirmed club by providing a description.",
+    "preconditions": "Student is authenticated. A confirmed club exists. Student has not previously applied to this club.",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/apply/ with club id and description.",
+    "expected_result": "HTTP 201. Membership application created with status='open'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-018",
+    "source_id": "CFR-GYM-004 / AFR-GYM-016 — student cannot apply to open (unconfirmed) club",
+    "purpose": "Membership application is rejected if the target club is not confirmed.",
+    "preconditions": "Student authenticated. Club exists with status='open'.",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/apply/ targeting the open club.",
+    "expected_result": "HTTP 400. Application not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-019",
+    "source_id": "CFR-GYM-004 / AFR-GYM-017 — student may apply to multiple different clubs",
+    "purpose": "A student with an existing application to Club A can submit a new application to Club B.",
+    "preconditions": "Student authenticated. Applications to Club A already exist. Club B is confirmed and distinct.",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/apply/ targeting Club B.",
+    "expected_result": "HTTP 201. Second application to Club B is created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-020",
+    "source_id": "CFR-GYM-004 / AFR-GYM-018 — duplicate same-club application rejected",
+    "purpose": "A student cannot submit a second membership application to the same club.",
+    "preconditions": "Student authenticated. An existing application to Club A exists.",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/apply/ targeting Club A again.",
+    "expected_result": "HTTP 400. Duplicate application not created. Existing application unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-021",
+    "source_id": "CFR-GYM-004 / AFR-GYM-019 — new membership application has open status",
+    "purpose": "A newly submitted membership application is recorded with status='open'.",
+    "preconditions": "Student authenticated. Confirmed club exists. No prior application from this student.",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/apply/ with valid data.",
+    "expected_result": "Response and database record show status='open'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-022",
+    "source_id": "CFR-GYM-004 / AFR-GYM-020 — Club Head views pending applications",
+    "purpose": "Club Head can access the list of pending (open) membership applications for their club.",
+    "preconditions": "Club Head authenticated. One or more open applications exist for the club.",
+    "action_or_input": "GET /api/v1/gymkhana/memberships/ (filtered or scoped to the club).",
+    "expected_result": "HTTP 200. Response includes the open applications for the authenticated Club Head's club.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-023",
+    "source_id": "CFR-GYM-004 / AFR-GYM-021 — Club Head approves membership with optional remarks",
+    "purpose": "Club Head can approve an open membership application and optionally record remarks.",
+    "preconditions": "Club Head authenticated. An open membership application exists for their club.",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/{id}/approve/ with optional remarks.",
+    "expected_result": "HTTP 200. Application status changes to 'confirmed'. Remarks stored.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-024",
+    "source_id": "CFR-GYM-004 / AFR-GYM-022 — approved membership transitions to confirmed",
+    "purpose": "After approval, the membership application status is 'confirmed'.",
+    "preconditions": "An open membership application exists. Club Head authenticated and authorized.",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/{id}/approve/.",
+    "expected_result": "Database record shows status='confirmed'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-025",
+    "source_id": "CFR-GYM-005 / AFR-GYM-023 — Club Head creates voting poll",
+    "purpose": "Club Head can create a voting poll with title, description, expiration date, at least two choices, and batch/branch target groups.",
+    "preconditions": "Club Head authenticated. Confirmed club exists.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/ with title, description, expires_at, two choices, and target_groups [{batch, branch}].",
+    "expected_result": "HTTP 201. Poll created with status='active'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-026",
+    "source_id": "CFR-GYM-005 / AFR-GYM-024 — poll with fewer than two choices rejected",
+    "purpose": "Poll creation is rejected when fewer than two choices are supplied.",
+    "preconditions": "Club Head authenticated.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/ with only one choice.",
+    "expected_result": "HTTP 400. Poll not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-027",
+    "source_id": "CFR-GYM-005 / AFR-GYM-025 — notification sent to target groups on poll creation",
+    "purpose": "When a poll is created, a notification task is dispatched to the students in the selected target groups.",
+    "preconditions": "Club Head authenticated. Valid target groups provided.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/ with valid data.",
+    "expected_result": "HTTP 201. Notification task is enqueued for the target audience.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-028",
+    "source_id": "CFR-GYM-005 / AFR-GYM-026 — eligible student accesses active poll",
+    "purpose": "An eligible targeted student can access an active poll and its choices.",
+    "preconditions": "An active poll exists. Student is authenticated and belongs to the target batch/branch. Poll has not expired.",
+    "action_or_input": "GET /api/v1/gymkhana/polls/{id}/.",
+    "expected_result": "HTTP 200. Poll detail including choices is returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-029",
+    "source_id": "CFR-GYM-005 / AFR-GYM-027 — eligible student casts one vote",
+    "purpose": "An eligible targeted student can cast one vote in an active poll.",
+    "preconditions": "Active poll exists. Student is eligible and has not voted. Poll not expired.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/{id}/vote/ with a valid choice_id.",
+    "expected_result": "HTTP 200 or 201. Vote recorded. Tally incremented for the selected choice.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-030",
+    "source_id": "CFR-GYM-005 / AFR-GYM-028 — duplicate vote rejected",
+    "purpose": "A student who has already voted cannot cast a second vote in the same poll.",
+    "preconditions": "Active poll exists. Student has already cast a vote.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/{id}/vote/ with any choice_id.",
+    "expected_result": "HTTP 400 or 409. Second vote not recorded. Tally unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-031",
+    "source_id": "CFR-GYM-005 / AFR-GYM-028 — tally atomically incremented on accepted vote",
+    "purpose": "When a vote is accepted, the choice's vote_count is incremented by exactly 1.",
+    "preconditions": "Active poll. Student eligible and not yet voted. Choice has vote_count=0.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/{id}/vote/ selecting choice C.",
+    "expected_result": "Choice C's vote_count becomes 1. Other choices unchanged.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-032",
+    "source_id": "CFR-GYM-006 / AFR-GYM-029 — Club Head submits budget request",
+    "purpose": "Club Head can submit a club budget request with amount, purpose, description, and supporting file.",
+    "preconditions": "Club Head authenticated. Confirmed club exists. Valid non-negative amount and file provided.",
+    "action_or_input": "POST /api/v1/gymkhana/budgets/ with amount>=0, purpose, description, supporting_file.",
+    "expected_result": "HTTP 201. Budget request created with status='open'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-033",
+    "source_id": "CFR-GYM-006 / AFR-GYM-030 — negative budget amount rejected",
+    "purpose": "Budget request is rejected when the amount is negative.",
+    "preconditions": "Club Head authenticated.",
+    "action_or_input": "POST /api/v1/gymkhana/budgets/ with amount=-1.",
+    "expected_result": "HTTP 400. Budget request not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-034",
+    "source_id": "CFR-GYM-006 / AFR-GYM-030 — missing supporting file rejected",
+    "purpose": "Budget request is rejected when the required supporting file is not provided.",
+    "preconditions": "Club Head authenticated. Amount is non-negative.",
+    "action_or_input": "POST /api/v1/gymkhana/budgets/ without a supporting_file.",
+    "expected_result": "HTTP 400. Budget request not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-035",
+    "source_id": "CFR-GYM-006 / AFR-GYM-031 — budget request stored as open with no approval flow",
+    "purpose": "Submitted budget requests are stored with status='open'; no approval/rejection endpoint or transition exists.",
+    "preconditions": "Valid budget request submitted.",
+    "action_or_input": "POST /api/v1/gymkhana/budgets/ with valid data, then GET /api/v1/gymkhana/budgets/{id}/.",
+    "expected_result": "Status field is 'open'. No PATCH/PUT endpoint exists that changes status to approved/rejected.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-036",
+    "source_id": "CFR-GYM-007 / AFR-GYM-032 — Club Head submits event report",
+    "purpose": "Club Head can submit a club event report with club, student_incharge, event_name, event_date, description, and report_file.",
+    "preconditions": "Club Head authenticated. Confirmed club exists. All required fields including report_file provided.",
+    "action_or_input": "POST /api/v1/gymkhana/reports/ with all required fields.",
+    "expected_result": "HTTP 201. Event report created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-037",
+    "source_id": "CFR-GYM-007 / AFR-GYM-033 — missing report file rejected",
+    "purpose": "Event report submission is rejected when the required report/details file is missing.",
+    "preconditions": "Club Head authenticated.",
+    "action_or_input": "POST /api/v1/gymkhana/reports/ without report_file.",
+    "expected_result": "HTTP 400. Report not created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-038",
+    "source_id": "CFR-GYM-007 / AFR-GYM-034 — assigned faculty councillor accesses reports",
+    "purpose": "The assigned Club Faculty Councillor can access and review submitted event reports for their assigned club.",
+    "preconditions": "Faculty Councillor is authenticated and assigned to Club X. At least one event report exists for Club X.",
+    "action_or_input": "GET /api/v1/gymkhana/reports/.",
+    "expected_result": "HTTP 200. Response contains reports for Club X.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-039",
+    "source_id": "CFR-GYM-007 / AFR-GYM-034 — unassigned faculty cannot access reports",
+    "purpose": "A faculty member not assigned as councillor to Club X cannot access Club X's event reports.",
+    "preconditions": "Faculty member authenticated but assigned to Club Y, not Club X. Reports exist for Club X.",
+    "action_or_input": "GET /api/v1/gymkhana/reports/ (or GET /api/v1/gymkhana/reports/{id}/ for a Club X report).",
+    "expected_result": "HTTP 404 or empty list. No Club X report content is exposed.",
+    "test_type": "negative"
+  }
+]
