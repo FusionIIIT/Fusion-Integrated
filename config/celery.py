@@ -2,6 +2,12 @@ import os
 
 from celery import Celery
 
+from modules.filetracking.schedule import (
+    BEAT_SCHEDULE as FILETRACKING_SCHEDULE,
+)
+from modules.filetracking.schedule import (
+    TASK_ROUTES as FILETRACKING_ROUTES,
+)
 from modules.placement.schedule import (
     BEAT_SCHEDULE as PLACEMENT_SCHEDULE,
 )
@@ -15,5 +21,5 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 # Each module owns its timers; this only merges them, so modules stay removable.
-app.conf.beat_schedule = {**PLACEMENT_SCHEDULE}
-app.conf.task_routes = {**PLACEMENT_ROUTES}
+app.conf.beat_schedule = {**PLACEMENT_SCHEDULE, **FILETRACKING_SCHEDULE}
+app.conf.task_routes = {**PLACEMENT_ROUTES, **FILETRACKING_ROUTES}

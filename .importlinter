@@ -15,12 +15,18 @@ source_modules =
     modules.placement
     modules.directory
     modules.accesscontrol
+    modules.filetracking
 forbidden_modules =
     modules.placement.models
     modules.placement.services
     modules.placement.selectors
     modules.placement.api
     modules.placement.domain
+    modules.filetracking.models
+    modules.filetracking.services
+    modules.filetracking.selectors
+    modules.filetracking.api
+    modules.filetracking.domain
     modules.directory.models
     modules.directory.services
     modules.directory.api
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.filetracking.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +73,14 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:filetracking-layers]
+name = Layering inside filetracking
+type = layers
+layers =
+    modules.filetracking.api
+    modules.filetracking.services
+    modules.filetracking.selectors
+    modules.filetracking.models
+    modules.filetracking.domain
+

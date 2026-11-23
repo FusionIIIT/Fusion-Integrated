@@ -13,6 +13,19 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `filetracking`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `filetracking.file.create` | Create and draft institutional files | `Dean Academic`, `acadadmin`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff` |
+| `filetracking.file.view` | View associated files and tracking history | `Dean Academic`, `acadadmin`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff` |
+| `filetracking.file.forward` | Send or forward files to employees | `Dean Academic`, `acadadmin`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff` |
+| `filetracking.file.return` | Return received files to previous sender | `Dean Academic`, `acadadmin`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff` |
+| `filetracking.file.archive` | Archive completed circulated files | `Dean Academic`, `acadadmin`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff` |
+| `filetracking.governance.view` | View FTS governance usage and audit logs | `admin`, `system_admin` |
+| `filetracking.governance.manage` | Administer FTS access and role context | `admin`, `system_admin` |
+| `filetracking.api.integrate` | Invoke FTS workflow-support APIs | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
