@@ -1,0 +1,1343 @@
+[
+  {
+    "test_id": "T001",
+    "source_id": "AFR-HM-001",
+    "purpose": "Verify Super Admin can create a hostel record",
+    "preconditions": "Authenticated as Super Admin with hm.hostel.create permission",
+    "action_or_input": "POST /api/v1/hm/hostels with valid hostel data",
+    "expected_result": "HTTP 201 Created and hostel record persisted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T002",
+    "source_id": "AFR-HM-002",
+    "purpose": "Verify Super Admin can activate a hostel record",
+    "preconditions": "Existing inactive hostel, authenticated as Super Admin with hm.hostel.update permission",
+    "action_or_input": "PATCH /api/v1/hm/hostels/{id} setting active=true",
+    "expected_result": "HTTP 200 OK and hostel becomes active",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T003",
+    "source_id": "AFR-HM-003",
+    "purpose": "Verify Super Admin can assign a Warden role binding",
+    "preconditions": "Authenticated as Super Admin with hm.hostel_role_binding.assign permission",
+    "action_or_input": "POST /api/v1/hm/hostels/{id}/role-bindings with role=warden and user_id",
+    "expected_result": "HTTP 201 Created and binding recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T004",
+    "source_id": "AFR-HM-004",
+    "purpose": "Verify Super Admin can assign a Caretaker role binding",
+    "preconditions": "Authenticated as Super Admin with hm.hostel_role_binding.assign permission",
+    "action_or_input": "POST /api/v1/hm/hostels/{id}/role-bindings with role=caretaker and user_id",
+    "expected_result": "HTTP 201 Created and binding recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T005",
+    "source_id": "AFR-HM-005",
+    "purpose": "Verify role binding history is retained after changes",
+    "preconditions": "Existing binding, authenticated as Super Admin",
+    "action_or_input": "PATCH /api/v1/hm/role-bindings/{binding_id} to deactivate",
+    "expected_result": "Binding status updated and previous version remains in audit log",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T006",
+    "source_id": "AFR-HM-006",
+    "purpose": "Verify Student can submit an accommodation request",
+    "preconditions": "Authenticated as Student with hm.accommodation_request.create permission",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests with request details",
+    "expected_result": "HTTP 201 Created and request status = Submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T007",
+    "source_id": "AFR-HM-007",
+    "purpose": "Verify accommodation request details are recorded",
+    "preconditions": "Successful request from T006",
+    "action_or_input": "GET /api/v1/hm/accommodation-requests/{id}",
+    "expected_result": "Response includes submitted details and status",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T008",
+    "source_id": "AFR-HM-008",
+    "purpose": "Verify Super Admin can record initial allotment decisions in batch",
+    "preconditions": "Authenticated as Super Admin with hm.room_assignment.assign permission, pending requests exist",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests/{id}/allot",
+    "expected_result": "Room assigned, occupancy updated, response 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T009",
+    "source_id": "AFR-HM-009",
+    "purpose": "Verify Super Admin can manage central re‑allotments",
+    "preconditions": "Existing room assignment, authenticated as Super Admin",
+    "action_or_input": "POST /api/v1/hm/room-assignments/{id}/exchange with target room",
+    "expected_result": "Assignment swapped, occupancy constraints respected, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T010",
+    "source_id": "AFR-HM-010",
+    "purpose": "Verify allotment decisions update room assignment without enforcing a specific algorithm",
+    "preconditions": "Authenticated as Super Admin, request submitted",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests/{id}/allot",
+    "expected_result": "Assignment recorded, no algorithmic rule violation errors",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T011",
+    "source_id": "AFR-HM-011",
+    "purpose": "Verify room assignment history is retained",
+    "preconditions": "Completed assignment from T008",
+    "action_or_input": "GET /api/v1/hm/room-assignments?room={room_id}",
+    "expected_result": "History list includes the new assignment entry",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T012",
+    "source_id": "AFR-HM-012",
+    "purpose": "Verify Student can view own current and historical room allocation",
+    "preconditions": "Authenticated as Student with hm.room_assignment.view permission",
+    "action_or_input": "GET /api/v1/hm/room-assignments?student={student_id}",
+    "expected_result": "Response includes current assignment and past records",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T013",
+    "source_id": "AFR-HM-013",
+    "purpose": "Verify Caretaker can maintain room availability and occupancy",
+    "preconditions": "Authenticated as Caretaker with hm.room.update permission",
+    "action_or_input": "PATCH /api/v1/hm/rooms/{id} updating capacity or status",
+    "expected_result": "Room record updated, occupancy recomputed",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T014",
+    "source_id": "AFR-HM-014",
+    "purpose": "Verify occupancy is prevented from exceeding room capacity",
+    "preconditions": "Room capacity = 2, two occupants already assigned",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests/{id}/allot assigning third student",
+    "expected_result": "HTTP 400 Bad Request with capacity exceeded error",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T015",
+    "source_id": "AFR-HM-015",
+    "purpose": "Verify Caretaker can record individual room exchange",
+    "preconditions": "Authenticated as Caretaker, two students assigned to different rooms",
+    "action_or_input": "POST /api/v1/hm/room-assignments/{id}/exchange with target student",
+    "expected_result": "Assignments swapped, occupancy unchanged, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T016",
+    "source_id": "AFR-HM-016",
+    "purpose": "Verify capacity guard is enforced during exchange",
+    "preconditions": "Room A capacity=1 occupied by Student X, Room B capacity=1 occupied by Student Y",
+    "action_or_input": "POST /api/v1/hm/room-assignments/{id}/exchange attempting to move both into Room A",
+    "expected_result": "HTTP 400 Bad Request with capacity violation",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T017",
+    "source_id": "AFR-HM-017",
+    "purpose": "Verify occupancy records update after exchange",
+    "preconditions": "Successful exchange from T015",
+    "action_or_input": "GET /api/v1/hm/rooms/{id}",
+    "expected_result": "Occupied count reflects swapped students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T018",
+    "source_id": "AFR-HM-018",
+    "purpose": "Verify Warden can view room assignments and occupancy patterns",
+    "preconditions": "Authenticated as Warden with hm.room_assignment.view permission",
+    "action_or_input": "GET /api/v1/hm/room-assignments?hostel={hostel_id}",
+    "expected_result": "List of assignments with occupancy statistics",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T019",
+    "source_id": "AFR-HM-019",
+    "purpose": "Verify up‑to‑date room status information is available",
+    "preconditions": "Any role with hm.room.view permission",
+    "action_or_input": "GET /api/v1/hm/rooms/{id}",
+    "expected_result": "Response includes current occupancy and availability",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T020",
+    "source_id": "AFR-HM-020",
+    "purpose": "Verify Caretaker can record student attendance",
+    "preconditions": "Authenticated as Caretaker with hm.attendance.create permission",
+    "action_or_input": "POST /api/v1/hm/attendance with student_id and attendance value",
+    "expected_result": "Attendance record created, 201 Created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T021",
+    "source_id": "AFR-HM-021",
+    "purpose": "Verify attendance information is available for leave review",
+    "preconditions": "Authenticated as Caretaker with hm.attendance.view permission",
+    "action_or_input": "GET /api/v1/hm/attendance?student={student_id}",
+    "expected_result": "Attendance records returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T022",
+    "source_id": "AFR-HM-022",
+    "purpose": "Verify Warden can view attendance summaries",
+    "preconditions": "Authenticated as Warden with hm.attendance.view permission",
+    "action_or_input": "GET /api/v1/hm/attendance/summary?hostel={hostel_id}",
+    "expected_result": "Summary includes trends and exceptions",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T023",
+    "source_id": "AFR-HM-023",
+    "purpose": "Verify attendance records are retained for reporting",
+    "preconditions": "Existing attendance records",
+    "action_or_input": "GET /api/v1/hm/attendance?date_range=last_year",
+    "expected_result": "All historic records within range are returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T024",
+    "source_id": "AFR-HM-024",
+    "purpose": "Verify Student can view own attendance status",
+    "preconditions": "Authenticated as Student with hm.attendance.view permission",
+    "action_or_input": "GET /api/v1/hm/attendance?student={self}",
+    "expected_result": "Only own records are returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T025",
+    "source_id": "AFR-HM-025",
+    "purpose": "Confirm attendance‑taking procedure is out of scope (no test required)",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T026",
+    "source_id": "AFR-HM-026",
+    "purpose": "Verify Student can submit a leave request",
+    "preconditions": "Authenticated as Student with hm.leave_request.create permission",
+    "action_or_input": "POST /api/v1/hm/leave-requests with leave details",
+    "expected_result": "Leave request created with status Submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T027",
+    "source_id": "AFR-HM-027",
+    "purpose": "Verify optional supporting fields are accepted on leave request",
+    "preconditions": "Authenticated as Student, leave form includes optional attachment",
+    "action_or_input": "POST /api/v1/hm/leave-requests with attachment data",
+    "expected_result": "Request created and attachment stored",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T028",
+    "source_id": "AFR-HM-028",
+    "purpose": "Verify Caretaker can approve a leave request",
+    "preconditions": "Leave request in Submitted state, authenticated as Caretaker with hm.leave_request.approve permission",
+    "action_or_input": "POST /api/v1/hm/leave-requests/{id}/decision approve",
+    "expected_result": "Leave status changes to Approved, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T029",
+    "source_id": "AFR-HM-028",
+    "purpose": "Verify Caretaker can reject a leave request",
+    "preconditions": "Leave request in Submitted state, authenticated as Caretaker",
+    "action_or_input": "POST /api/v1/hm/leave-requests/{id}/decision reject",
+    "expected_result": "Leave status changes to Rejected, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T030",
+    "source_id": "AFR-HM-029",
+    "purpose": "Verify Student receives status update after leave decision",
+    "preconditions": "Leave request approved via T028",
+    "action_or_input": "GET /api/v1/hm/leave-requests/{id}",
+    "expected_result": "Status field shows Approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T031",
+    "source_id": "AFR-HM-030",
+    "purpose": "Verify leave records are available for supervisory review",
+    "preconditions": "Authenticated as Warden with hm.leave_request.view permission",
+    "action_or_input": "GET /api/v1/hm/leave-requests?hostel={hostel_id}",
+    "expected_result": "All leave records for hostel returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T032",
+    "source_id": "AFR-HM-031",
+    "purpose": "Verify leave history is retained",
+    "preconditions": "Multiple leave requests exist",
+    "action_or_input": "GET /api/v1/hm/leave-requests?student={student_id}",
+    "expected_result": "Chronological list includes all past requests",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T033",
+    "source_id": "AFR-HM-032",
+    "purpose": "Verify Student can view own leave history",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "GET /api/v1/hm/leave-requests?student={self}",
+    "expected_result": "Only the student's own leave records are returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T034",
+    "source_id": "AFR-HM-033",
+    "purpose": "Verify Warden can view leave summaries for oversight",
+    "preconditions": "Authenticated as Warden",
+    "action_or_input": "GET /api/v1/hm/leave-requests/summary?hostel={hostel_id}",
+    "expected_result": "Aggregate summary of leave statuses",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T035",
+    "source_id": "AFR-HM-034",
+    "purpose": "Confirm external leave policy is out of scope (no test required)",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T036",
+    "source_id": "AFR-HM-035",
+    "purpose": "Verify Student can submit a hostel complaint",
+    "preconditions": "Authenticated as Student with hm.complaint.create permission",
+    "action_or_input": "POST /api/v1/hm/complaints with category and description",
+    "expected_result": "Complaint created with status Submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T037",
+    "source_id": "AFR-HM-036",
+    "purpose": "Verify optional attachment is accepted on complaint submission",
+    "preconditions": "Authenticated as Student, form permits attachment",
+    "action_or_input": "POST /api/v1/hm/complaints with attached file",
+    "expected_result": "Complaint created and attachment stored",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T038",
+    "source_id": "AFR-HM-037",
+    "purpose": "Verify Caretaker can resolve a complaint",
+    "preconditions": "Complaint in Submitted state, authenticated as Caretaker with hm.complaint.update permission",
+    "action_or_input": "POST /api/v1/hm/complaints/{id}/events with event=resolve",
+    "expected_result": "Complaint status changes to Resolved, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T039",
+    "source_id": "AFR-HM-037",
+    "purpose": "Verify Caretaker can escalate a complaint to Warden",
+    "preconditions": "Complaint in Submitted or Updated state, Caretaker has permission",
+    "action_or_input": "POST /api/v1/hm/complaints/{id}/events with event=escalate",
+    "expected_result": "Complaint status changes to Escalated, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T040",
+    "source_id": "AFR-HM-038",
+    "purpose": "Verify Warden can monitor escalated complaints",
+    "preconditions": "Authenticated as Warden with hm.complaint.view permission",
+    "action_or_input": "GET /api/v1/hm/complaints?status=Escalated",
+    "expected_result": "List of escalated complaints returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T041",
+    "source_id": "AFR-HM-039",
+    "purpose": "Verify complaint history is tracked",
+    "preconditions": "Complaint with multiple events",
+    "action_or_input": "GET /api/v1/hm/complaints/{id}",
+    "expected_result": "Response includes full event timeline",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T042",
+    "source_id": "AFR-HM-040",
+    "purpose": "Assert only hostel‑related complaints are accepted (out‑of‑scope types rejected)",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/complaints with non‑hostel category",
+    "expected_result": "HTTP 400 Bad Request indicating invalid category",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T043",
+    "source_id": "AFR-HM-043",
+    "purpose": "Verify Student can submit a guest‑room booking request",
+    "preconditions": "Authenticated as Student with hm.guest_booking.create permission",
+    "action_or_input": "POST /api/v1/hm/guest-bookings with desired dates",
+    "expected_result": "Booking request created with status Submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T044",
+    "source_id": "AFR-HM-044",
+    "purpose": "Verify system provides availability information for guest booking decisions",
+    "preconditions": "Authenticated as Caretaker with hm.guest_booking.approve permission",
+    "action_or_input": "GET /api/v1/hm/guest-bookings?date={desired_range}",
+    "expected_result": "Response indicates room availability",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T045",
+    "source_id": "AFR-HM-045",
+    "purpose": "Verify Caretaker can approve a guest‑room booking",
+    "preconditions": "Booking request in Submitted state, Caretaker authenticated",
+    "action_or_input": "POST /api/v1/hm/guest-bookings/{id}/decision approve",
+    "expected_result": "Status changes to Approved, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T046",
+    "source_id": "AFR-HM-045",
+    "purpose": "Verify Caretaker can reject a guest‑room booking",
+    "preconditions": "Booking request in Submitted state, Caretaker authenticated",
+    "action_or_input": "POST /api/v1/hm/guest-bookings/{id}/decision reject",
+    "expected_result": "Status changes to Rejected, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T047",
+    "source_id": "AFR-HM-046",
+    "purpose": "Verify booking history is retained",
+    "preconditions": "Approved or rejected booking exists",
+    "action_or_input": "GET /api/v1/hm/guest-bookings?student={student_id}",
+    "expected_result": "History includes the booking with its final status",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T048",
+    "source_id": "AFR-HM-049",
+    "purpose": "Verify Student can submit an extended‑stay request",
+    "preconditions": "Authenticated as Student with hm.extended_stay_request.create permission",
+    "action_or_input": "POST /api/v1/hm/extended-stays with period details",
+    "expected_result": "Request created with status Submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T049",
+    "source_id": "AFR-HM-050",
+    "purpose": "Verify request records period and decision status",
+    "preconditions": "Extended‑stay request created",
+    "action_or_input": "GET /api/v1/hm/extended-stays/{id}",
+    "expected_result": "Response includes requested period and current status",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T050",
+    "source_id": "AFR-HM-051",
+    "purpose": "Verify charge amount is recorded when applicable",
+    "preconditions": "Extended‑stay request with charge applicable, Warden permission",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision approve with charge=100",
+    "expected_result": "Charge amount stored, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T051",
+    "source_id": "AFR-HM-052",
+    "purpose": "Verify payment deadline and compliance status are recorded",
+    "preconditions": "Extended‑stay request, Warden decision includes deadline",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision approve with deadline='2027‑01‑01'",
+    "expected_result": "Deadline saved, compliance field defaulted, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T052",
+    "source_id": "AFR-HM-053",
+    "purpose": "Verify Warden can approve an extended‑stay request",
+    "preconditions": "Submitted request, authenticated as Warden",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision approve",
+    "expected_result": "Status changes to Approved, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T053",
+    "source_id": "AFR-HM-053",
+    "purpose": "Verify Warden can reject an extended‑stay request",
+    "preconditions": "Submitted request, authenticated as Warden",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision reject",
+    "expected_result": "Status changes to Rejected, 200 OK",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T054",
+    "source_id": "AFR-HM-054",
+    "purpose": "Verify extended‑stay details are visible to Warden",
+    "preconditions": "Authenticated as Warden with view permission",
+    "action_or_input": "GET /api/v1/hm/extended-stays/{id}",
+    "expected_result": "All request fields, including charge and deadline if present, are returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T055",
+    "source_id": "AFR-HM-058",
+    "purpose": "Verify Caretaker can record a fine",
+    "preconditions": "Authenticated as Caretaker with hm.fine.create permission",
+    "action_or_input": "POST /api/v1/hm/fines with reason, amount, date, student_id",
+    "expected_result": "Fine record created, 201 Created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T056",
+    "source_id": "AFR-HM-059",
+    "purpose": "Verify fine record includes mandatory fields",
+    "preconditions": "Fine created via T055",
+    "action_or_input": "GET /api/v1/hm/fines/{id}",
+    "expected_result": "Response contains reason, amount, date, student reference",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T057",
+    "source_id": "AFR-HM-060",
+    "purpose": "Verify Student can view own fine records",
+    "preconditions": "Authenticated as Student with hm.fine.view permission",
+    "action_or_input": "GET /api/v1/hm/fines?student={self}",
+    "expected_result": "List of fines for the student returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T058",
+    "source_id": "AFR-HM-061",
+    "purpose": "Verify Warden can view fine summaries",
+    "preconditions": "Authenticated as Warden with hm.fine.view permission",
+    "action_or_input": "GET /api/v1/hm/fines/summary?hostel={hostel_id}",
+    "expected_result": "Aggregated fine statistics returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T059",
+    "source_id": "AFR-HM-064",
+    "purpose": "Verify Caretaker can maintain inventory records",
+    "preconditions": "Authenticated as Caretaker with hm.inventory_item.create permission",
+    "action_or_input": "POST /api/v1/hm/inventory with item details",
+    "expected_result": "Inventory item created, 201 Created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T060",
+    "source_id": "AFR-HM-065",
+    "purpose": "Verify authorized hostel role can view staff coordination info",
+    "preconditions": "Authenticated as Caretaker or Warden with view permission",
+    "action_or_input": "GET /api/v1/hm/staff-coordination?hostel={hostel_id}",
+    "expected_result": "Staff coordination records returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T061",
+    "source_id": "AFR-HM-066",
+    "purpose": "Verify Warden and Super Admin can review staff assignments",
+    "preconditions": "Authenticated as Warden or Super Admin",
+    "action_or_input": "GET /api/v1/hm/staff-coordination?hostel={hostel_id}",
+    "expected_result": "Complete list of staff assignments returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T062",
+    "source_id": "AFR-HM-067",
+    "purpose": "Verify inventory updates are logged",
+    "preconditions": "Existing inventory item, authenticated as Caretaker",
+    "action_or_input": "PATCH /api/v1/hm/inventory/{id} with updated quantity",
+    "expected_result": "Item updated and audit event recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T063",
+    "source_id": "AFR-HM-070",
+    "purpose": "Verify Warden can create guard shift schedule",
+    "preconditions": "Authenticated as Warden with hm.guard_shift.create permission",
+    "action_or_input": "POST /api/v1/hm/guard-shifts with shift details",
+    "expected_result": "Guard shift record created, 201 Created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T064",
+    "source_id": "AFR-HM-071",
+    "purpose": "Verify guard shift schedule is readable for monitoring",
+    "preconditions": "Authenticated as Warden or authorized role",
+    "action_or_input": "GET /api/v1/hm/guard-shifts?hostel={hostel_id}",
+    "expected_result": "List of guard shifts returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T065",
+    "source_id": "AFR-HM-073",
+    "purpose": "Verify Caretaker can publish a notice",
+    "preconditions": "Authenticated as Caretaker with hm.notice.create permission",
+    "action_or_input": "POST /api/v1/hm/notices with content and audience",
+    "expected_result": "Notice draft created, 201 Created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T066",
+    "source_id": "AFR-HM-074",
+    "purpose": "Verify Student can view published notices",
+    "preconditions": "Authenticated as Student with hm.notice.view permission",
+    "action_or_input": "GET /api/v1/hm/notices",
+    "expected_result": "List of notices visible to the student's hostel",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T067",
+    "source_id": "AFR-HM-075",
+    "purpose": "Verify notice history is retained",
+    "preconditions": "Published notice exists",
+    "action_or_input": "GET /api/v1/hm/notices/{id}",
+    "expected_result": "Response includes creation and any update timestamps",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T068",
+    "source_id": "AFR-HM-076",
+    "purpose": "Verify notice board endpoint returns active notices",
+    "preconditions": "Authenticated with hm.notice.view permission",
+    "action_or_input": "GET /api/v1/hm/notices",
+    "expected_result": "Only non‑withdrawn notices are listed",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T069",
+    "source_id": "AFR-HM-077",
+    "purpose": "Verify predefined occupancy report can be generated",
+    "preconditions": "Authenticated as Super Admin with hm.report.view permission",
+    "action_or_input": "GET /api/v1/hm/reports/occupancy",
+    "expected_result": "Report payload with room utilization statistics",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T070",
+    "source_id": "AFR-HM-078",
+    "purpose": "Verify attendance report can be generated",
+    "preconditions": "Authenticated as Warden",
+    "action_or_input": "GET /api/v1/hm/reports/attendance",
+    "expected_result": "Attendance summary report returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T071",
+    "source_id": "AFR-HM-079",
+    "purpose": "Verify leave summary report can be generated",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "GET /api/v1/hm/reports/leave",
+    "expected_result": "Leave statistics report returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T072",
+    "source_id": "AFR-HM-080",
+    "purpose": "Verify fine summary report can be generated",
+    "preconditions": "Authenticated as Warden",
+    "action_or_input": "GET /api/v1/hm/reports/fines",
+    "expected_result": "Fine summary report returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T073",
+    "source_id": "AFR-HM-081",
+    "purpose": "Verify complaint statistics report can be generated",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "GET /api/v1/hm/reports/complaints",
+    "expected_result": "Report with counts of resolved, escalated, pending complaints",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T074",
+    "source_id": "AFR-HM-082",
+    "purpose": "Verify extended‑stay summary report can be generated",
+    "preconditions": "Authenticated as Warden",
+    "action_or_input": "GET /api/v1/hm/reports/extended-stays",
+    "expected_result": "Report showing approved/rejected counts",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T075",
+    "source_id": "AFR-HM-083",
+    "purpose": "Verify caretaker operational report can be generated",
+    "preconditions": "Authenticated as Caretaker",
+    "action_or_input": "GET /api/v1/hm/reports/caretaker",
+    "expected_result": "Report covering room maintenance, inventory updates, etc.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T076",
+    "source_id": "AFR-HM-084",
+    "purpose": "Verify supervisory report for Wardens can be generated",
+    "preconditions": "Authenticated as Warden",
+    "action_or_input": "GET /api/v1/hm/reports/warden",
+    "expected_result": "Aggregated overview of hostel operations",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T077",
+    "source_id": "AFR-HM-085",
+    "purpose": "Verify institution‑level cross‑hostel report can be generated",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "GET /api/v1/hm/reports/institution",
+    "expected_result": "Report spanning all hostels",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T078",
+    "source_id": "AFR-HM-087",
+    "purpose": "Confirm notification service is blocked pending contract (no test executed)",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T079",
+    "source_id": "AFR-HM-088",
+    "purpose": "Confirm room allocation notification is out of scope until contract approved",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T080",
+    "source_id": "AFR-HM-089",
+    "purpose": "Confirm leave request notification is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T081",
+    "source_id": "AFR-HM-090",
+    "purpose": "Confirm complaint notification is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T082",
+    "source_id": "AFR-HM-091",
+    "purpose": "Confirm guest‑room booking notification is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T083",
+    "source_id": "AFR-HM-092",
+    "purpose": "Confirm extended‑stay status notification is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T084",
+    "source_id": "AFR-HM-093",
+    "purpose": "Confirm payment/deadline alert notification is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T085",
+    "source_id": "AFR-HM-094",
+    "purpose": "Confirm fine imposition notification is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T086",
+    "source_id": "AFR-HM-095",
+    "purpose": "Confirm notice publication notification is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T087",
+    "source_id": "AFR-HM-096",
+    "purpose": "Verify Caretaker operations are limited to assigned hostel and shift",
+    "preconditions": "Caretaker assigned to Hostel A, shift X",
+    "action_or_input": "POST /api/v1/hm/rooms/{id}/update (room belonging to Hostel B)",
+    "expected_result": "HTTP 404 Not Found due to out‑of‑scope hostel",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T088",
+    "source_id": "AFR-HM-097",
+    "purpose": "Verify role bindings are maintained per hostel",
+    "preconditions": "Super Admin creates Warden binding for Hostel A",
+    "action_or_input": "GET /api/v1/hm/hostels/{id}/role-bindings",
+    "expected_result": "Binding list includes the newly created entry",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T089",
+    "source_id": "AFR-HM-098",
+    "purpose": "Verify Student access is limited to allocated hostel data",
+    "preconditions": "Student allocated to Hostel A",
+    "action_or_input": "GET /api/v1/hm/rooms?hostel=HostelB",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T090",
+    "source_id": "AFR-HM-099",
+    "purpose": "Verify Super Admin has institution‑level access",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "GET /api/v1/hm/hostels",
+    "expected_result": "List of all hostels returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T091",
+    "source_id": "AFR-HM-100",
+    "purpose": "Verify activation/deactivation status is recorded for role bindings",
+    "preconditions": "Existing binding, Super Admin updates active flag",
+    "action_or_input": "PATCH /api/v1/hm/role-bindings/{id} set active=false",
+    "expected_result": "Status changes and audit entry created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T092",
+    "source_id": "AFR-HM-102",
+    "purpose": "Verify role changes take effect immediately after recording",
+    "preconditions": "Super Admin deactivates a caretaker binding",
+    "action_or_input": "GET /api/v1/hm/hostels/{hostel_id}/role-bindings",
+    "expected_result": "Deactivated binding no longer grants permissions",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T093",
+    "source_id": "AFR-HM-103",
+    "purpose": "Verify newly assigned Warden can view pending records for their hostel",
+    "preconditions": "Pending complaints exist for Hostel A, Warden role reassigned to user X",
+    "action_or_input": "GET /api/v1/hm/complaints?hostel=HostelA",
+    "expected_result": "User X receives list of pending complaints",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T094",
+    "source_id": "AFR-HM-105",
+    "purpose": "Verify RBAC restricts data access to authorized hostel and role",
+    "preconditions": "Student from Hostel A attempts to access Hostel B data",
+    "action_or_input": "GET /api/v1/hm/rooms?hostel=HostelB",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T095",
+    "source_id": "CFR-HM-001",
+    "purpose": "Validate Super Admin can create and manage hostel master records",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "POST /api/v1/hm/hostels then PATCH to deactivate",
+    "expected_result": "Hostel created and later deactivated successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T096",
+    "source_id": "CFR-HM-002",
+    "purpose": "Validate Super Admin can manage Warden and Caretaker role bindings",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "POST /api/v1/hm/hostels/{id}/role-bindings for both roles",
+    "expected_result": "Both bindings persisted with audit history",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T097",
+    "source_id": "CFR-HM-003",
+    "purpose": "Validate Student can submit accommodation requests and system records details",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests",
+    "expected_result": "Request stored with correct details and status",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T098",
+    "source_id": "CFR-HM-004",
+    "purpose": "Validate room assignment lifecycle including capacity enforcement",
+    "preconditions": "Two occupants assigned to a room of capacity 2",
+    "action_or_input": "Attempt third assignment via POST /api/v1/hm/accommodation-requests/{id}/allot",
+    "expected_result": "HTTP 400 Bad Request due to capacity limit",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T099",
+    "source_id": "CFR-HM-005",
+    "purpose": "Validate Student can view own room allocation history",
+    "preconditions": "Student has prior assignments",
+    "action_or_input": "GET /api/v1/hm/room-assignments?student={self}",
+    "expected_result": "History list returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T100",
+    "source_id": "CFR-HM-006",
+    "purpose": "Validate Caretaker can maintain room availability and occupancy",
+    "preconditions": "Authenticated as Caretaker",
+    "action_or_input": "PATCH /api/v1/hm/rooms/{id} change capacity",
+    "expected_result": "Room record updated, occupancy recomputed",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T101",
+    "source_id": "CFR-HM-007",
+    "purpose": "Validate individual room exchange operation",
+    "preconditions": "Two students each occupying different rooms",
+    "action_or_input": "POST /api/v1/hm/room-assignments/{id}/exchange",
+    "expected_result": "Assignments swapped without violating capacity",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T102",
+    "source_id": "CFR-HM-008",
+    "purpose": "Validate Warden can review room assignments for oversight",
+    "preconditions": "Authenticated as Warden",
+    "action_or_input": "GET /api/v1/hm/room-assignments?hostel={hostel_id}",
+    "expected_result": "Complete assignment list returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T103",
+    "source_id": "CFR-HM-009",
+    "purpose": "Validate Caretaker can record student attendance",
+    "preconditions": "Authenticated as Caretaker",
+    "action_or_input": "POST /api/v1/hm/attendance",
+    "expected_result": "Attendance entry created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T104",
+    "source_id": "CFR-HM-010",
+    "purpose": "Validate attendance information is viewable by Student and Warden",
+    "preconditions": "Attendance records exist",
+    "action_or_input": "GET /api/v1/hm/attendance?student={self}",
+    "expected_result": "Student sees own records; Warden sees aggregated view",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T105",
+    "source_id": "CFR-HM-011",
+    "purpose": "Validate attendance procedure remains out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T106",
+    "source_id": "CFR-HM-012",
+    "purpose": "Validate Student can submit leave requests",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/leave-requests",
+    "expected_result": "Leave request created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T107",
+    "source_id": "CFR-HM-013",
+    "purpose": "Validate Caretaker can approve or reject leave requests",
+    "preconditions": "Leave request pending",
+    "action_or_input": "POST /api/v1/hm/leave-requests/{id}/decision approve",
+    "expected_result": "Leave approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T108",
+    "source_id": "CFR-HM-014",
+    "purpose": "Validate leave records are retained and viewable",
+    "preconditions": "Approved and rejected leaves exist",
+    "action_or_input": "GET /api/v1/hm/leave-requests?student={self}",
+    "expected_result": "Full history returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T109",
+    "source_id": "CFR-HM-015",
+    "purpose": "Validate external leave policy is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T110",
+    "source_id": "CFR-HM-016",
+    "purpose": "Validate Student can submit complaints",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/complaints",
+    "expected_result": "Complaint created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T111",
+    "source_id": "CFR-HM-017",
+    "purpose": "Validate Caretaker can resolve and optionally escalate complaints",
+    "preconditions": "Complaint in Submitted state",
+    "action_or_input": "POST /api/v1/hm/complaints/{id}/events event=resolve",
+    "expected_result": "Complaint resolved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T112",
+    "source_id": "CFR-HM-018",
+    "purpose": "Validate complaint handling is limited to hostel‑related cases",
+    "preconditions": "Student submits non‑hostel complaint",
+    "action_or_input": "POST /api/v1/hm/complaints with invalid category",
+    "expected_result": "HTTP 400 Bad Request",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T113",
+    "source_id": "CFR-HM-019",
+    "purpose": "Validate Guest‑Room booking request submission",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/guest-bookings",
+    "expected_result": "Booking request created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T114",
+    "source_id": "CFR-HM-020",
+    "purpose": "Validate Caretaker can approve or reject guest‑room bookings",
+    "preconditions": "Booking request pending",
+    "action_or_input": "POST /api/v1/hm/guest-bookings/{id}/decision approve",
+    "expected_result": "Booking approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T115",
+    "source_id": "CFR-HM-021",
+    "purpose": "Validate Guest‑Room booking history is retained",
+    "preconditions": "Approved booking exists",
+    "action_or_input": "GET /api/v1/hm/guest-bookings?student={self}",
+    "expected_result": "History entry present",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T116",
+    "source_id": "CFR-HM-022",
+    "purpose": "Validate Student can submit extended‑stay requests",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/extended-stays",
+    "expected_result": "Request created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T117",
+    "source_id": "CFR-HM-023",
+    "purpose": "Validate Warden can approve or reject extended‑stay requests",
+    "preconditions": "Pending request exists",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision reject",
+    "expected_result": "Request rejected",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T118",
+    "source_id": "CFR-HM-024",
+    "purpose": "Validate fine recording by Caretaker",
+    "preconditions": "Authenticated as Caretaker",
+    "action_or_input": "POST /api/v1/hm/fines",
+    "expected_result": "Fine record created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T119",
+    "source_id": "CFR-HM-025",
+    "purpose": "Validate fine payment processing is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T120",
+    "source_id": "CFR-HM-026",
+    "purpose": "Validate inventory maintenance by Caretaker",
+    "preconditions": "Authenticated as Caretaker",
+    "action_or_input": "POST /api/v1/hm/inventory",
+    "expected_result": "Inventory item created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T121",
+    "source_id": "CFR-HM-028",
+    "purpose": "Validate Warden can maintain guard shift schedules",
+    "preconditions": "Authenticated as Warden",
+    "action_or_input": "POST /api/v1/hm/guard-shifts",
+    "expected_result": "Shift record created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T122",
+    "source_id": "CFR-HM-030",
+    "purpose": "Validate Caretaker and Warden can publish hostel notices",
+    "preconditions": "Authenticated as Caretaker",
+    "action_or_input": "POST /api/v1/hm/notices",
+    "expected_result": "Notice draft created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T123",
+    "source_id": "CFR-HM-031",
+    "purpose": "Validate predefined operational reports are generated",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "GET /api/v1/hm/reports/occupancy",
+    "expected_result": "Occupancy report returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T124",
+    "source_id": "CFR-HM-032",
+    "purpose": "Validate advanced analytics are out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T125",
+    "source_id": "CFR-HM-033",
+    "purpose": "Validate notification service is conditional and currently blocked",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T126",
+    "source_id": "CFR-HM-034",
+    "purpose": "Validate Caretaker operations respect assigned hostel and shift context",
+    "preconditions": "Caretaker assigned to Hostel A, shift 1",
+    "action_or_input": "POST /api/v1/hm/rooms/{id}/update for a room in Hostel B",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T127",
+    "source_id": "CFR-HM-035",
+    "purpose": "Validate student access is limited by hostel allocation",
+    "preconditions": "Student allocated to Hostel A",
+    "action_or_input": "GET /api/v1/hm/rooms?hostel=HostelB",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T128",
+    "source_id": "CFR-HM-036",
+    "purpose": "Validate Super Admin has institution‑level access",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "GET /api/v1/hm/hostels",
+    "expected_result": "All hostels listed",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T129",
+    "source_id": "CFR-HM-037",
+    "purpose": "Validate time‑bound role validity is enforced only when configured",
+    "preconditions": "Role with start/end dates configured",
+    "action_or_input": "Attempt action with role outside its validity period",
+    "expected_result": "Action denied (403) due to inactive role",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T130",
+    "source_id": "CFR-HM-038",
+    "purpose": "Validate role reassignment allows new holder to view pending records",
+    "preconditions": "Pending records exist, role reassigned to new user",
+    "action_or_input": "GET pending endpoint as new user",
+    "expected_result": "Records visible",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T131",
+    "source_id": "CFR-HM-039",
+    "purpose": "Validate RBAC restricts access to unrelated hostels",
+    "preconditions": "User with mismatched hostel attempts access",
+    "action_or_input": "GET /api/v1/hm/rooms?hostel=OtherHostel",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T132",
+    "source_id": "CFR-HM-040",
+    "purpose": "Validate fine payment processing is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T133",
+    "source_id": "CFR-HM-041",
+    "purpose": "Validate central complaint integration is out of scope without contract",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T134",
+    "source_id": "CFR-HM-042",
+    "purpose": "Validate non‑hostel complaints are ignored by HM",
+    "preconditions": "Student submits non‑hostel complaint",
+    "action_or_input": "POST /api/v1/hm/complaints with invalid category",
+    "expected_result": "HTTP 400 Bad Request",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T135",
+    "source_id": "CFR-HM-043",
+    "purpose": "Validate Guest‑Room booking request creation",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/guest-bookings",
+    "expected_result": "Booking request created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T136",
+    "source_id": "CFR-HM-044",
+    "purpose": "Validate Guest‑Room booking request approval workflow",
+    "preconditions": "Pending booking request",
+    "action_or_input": "POST /api/v1/hm/guest-bookings/{id}/decision approve",
+    "expected_result": "Booking approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T137",
+    "source_id": "CFR-HM-045",
+    "purpose": "Validate Guest‑Room booking request rejection workflow",
+    "preconditions": "Pending booking request",
+    "action_or_input": "POST /api/v1/hm/guest-bookings/{id}/decision reject",
+    "expected_result": "Booking rejected",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T138",
+    "source_id": "CFR-HM-046",
+    "purpose": "Validate booking history retention",
+    "preconditions": "Approved booking exists",
+    "action_or_input": "GET /api/v1/hm/guest-bookings?student={self}",
+    "expected_result": "History entry present",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T139",
+    "source_id": "CFR-HM-047",
+    "purpose": "Validate guest‑room management is limited to request handling",
+    "preconditions": "Attempt to record guest check‑in",
+    "action_or_input": "POST /api/v1/hm/guest-checkin (non‑existent endpoint)",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "T140",
+    "source_id": "CFR-HM-048",
+    "purpose": "Validate guest‑room charge collection is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T141",
+    "source_id": "CFR-HM-049",
+    "purpose": "Validate extended‑stay request submission",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/extended-stays",
+    "expected_result": "Request created",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T142",
+    "source_id": "CFR-HM-050",
+    "purpose": "Validate extended‑stay request records period and status",
+    "preconditions": "Request created",
+    "action_or_input": "GET /api/v1/hm/extended-stays/{id}",
+    "expected_result": "Period and status fields present",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T143",
+    "source_id": "CFR-HM-051",
+    "purpose": "Validate charge amount recording when applicable",
+    "preconditions": "Warden approves request with charge",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision approve with charge=200",
+    "expected_result": "Charge stored",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T144",
+    "source_id": "CFR-HM-052",
+    "purpose": "Validate payment deadline recording when applicable",
+    "preconditions": "Warden approves request with deadline",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision approve with deadline='2027‑01‑01'",
+    "expected_result": "Deadline stored",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T145",
+    "source_id": "CFR-HM-053",
+    "purpose": "Validate Warden can approve extended‑stay request",
+    "preconditions": "Pending request exists",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision approve",
+    "expected_result": "Request approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T146",
+    "source_id": "CFR-HM-054",
+    "purpose": "Validate extended‑stay details visible to Warden",
+    "preconditions": "Authenticated as Warden",
+    "action_or_input": "GET /api/v1/hm/extended-stays/{id}",
+    "expected_result": "All request details returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "T147",
+    "source_id": "CFR-HM-055",
+    "purpose": "Validate application‑window enforcement is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T148",
+    "source_id": "CFR-HM-056",
+    "purpose": "Validate extended‑stay payment processing is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  },
+  {
+    "test_id": "T149",
+    "source_id": "CFR-HM-057",
+    "purpose": "Validate extended‑stay appeal handling is out of scope",
+    "preconditions": "",
+    "action_or_input": "",
+    "expected_result": "",
+    "test_type": "note"
+  }
+]

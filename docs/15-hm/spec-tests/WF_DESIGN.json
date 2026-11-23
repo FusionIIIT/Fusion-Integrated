@@ -1,0 +1,434 @@
+[
+  {
+    "test_id": "TC001",
+    "source_id": "HM-UC-001 Main Flow",
+    "purpose": "Verify Super Admin can create a new hostel record",
+    "preconditions": "Authenticated as Super Admin; no existing hostel with the same code",
+    "action_or_input": "POST /api/v1/hm/hostels with valid hostel data",
+    "expected_result": "201 Created and hostel record persisted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC002",
+    "source_id": "HM-UC-002 Main Flow",
+    "purpose": "Verify Super Admin can activate a hostel",
+    "preconditions": "Authenticated as Super Admin; existing inactive hostel",
+    "action_or_input": "PATCH /api/v1/hm/hostels/{id} setting active flag to true",
+    "expected_result": "200 OK and hostel becomes active",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC003",
+    "source_id": "HM-UC-003 Main Flow",
+    "purpose": "Create a Warden role binding for a hostel",
+    "preconditions": "Authenticated as Super Admin; existing hostel; user_id of caretaker exists",
+    "action_or_input": "POST /api/v1/hm/hostels/{hostel_id}/role-bindings with role=warden and user_id",
+    "expected_result": "201 Created and binding stored with active status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC004",
+    "source_id": "HM-UC-004 Main Flow",
+    "purpose": "Create a Caretaker role binding for a hostel",
+    "preconditions": "Authenticated as Super Admin; existing hostel; user_id of caretaker exists",
+    "action_or_input": "POST /api/v1/hm/hostels/{hostel_id}/role-bindings with role=caretaker and user_id",
+    "expected_result": "201 Created and binding stored with active status",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC005",
+    "source_id": "HM-UC-005 Main Flow",
+    "purpose": "Student submits an accommodation request",
+    "preconditions": "Authenticated as Student; student has no active request for the hostel",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests with request details",
+    "expected_result": "201 Created and request status = Submitted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC006",
+    "source_id": "HM-UC-006 Main Flow",
+    "purpose": "Super Admin records initial room allotment",
+    "preconditions": "Authenticated as Super Admin; existing accommodation request in Submitted state; target room has capacity",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests/{id}/allot with room_id",
+    "expected_result": "200 OK, request status = Allotted, room occupancy incremented",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC007",
+    "source_id": "HM-UC-007 Main Flow",
+    "purpose": "Super Admin records a central re-allotment or formal vacation update",
+    "preconditions": "Authenticated as Super Admin; existing room assignment eligible for change",
+    "action_or_input": "POST /api/v1/hm/room-assignments/{id}/vacate or /exchange with new room_id",
+    "expected_result": "200 OK, assignment status updated, occupancy adjusted accordingly",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC008",
+    "source_id": "HM-UC-008 Main Flow",
+    "purpose": "Student views own room allocation information",
+    "preconditions": "Authenticated as Student; student has at least one assignment",
+    "action_or_input": "GET /api/v1/hm/room-assignments?student_id={self}",
+    "expected_result": "200 OK with list of current and historical assignments",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC009",
+    "source_id": "HM-UC-009 Main Flow",
+    "purpose": "Caretaker updates room availability and occupancy",
+    "preconditions": "Authenticated as Caretaker assigned to the hostel; room exists",
+    "action_or_input": "PATCH /api/v1/hm/rooms/{id} with updated capacity or status",
+    "expected_result": "200 OK and room data persisted; occupancy derived automatically",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC010",
+    "source_id": "HM-UC-010 Main Flow",
+    "purpose": "Caretaker records an individual room exchange",
+    "preconditions": "Authenticated as Caretaker; two students have assignable rooms; both rooms have capacity for exchange",
+    "action_or_input": "POST /api/v1/hm/room-assignments/{id}/exchange with target_student_id",
+    "expected_result": "200 OK, assignments swapped, occupancy remains within limits",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC011",
+    "source_id": "HM-UC-011 Main Flow",
+    "purpose": "Warden reviews room assignments and occupancy",
+    "preconditions": "Authenticated as Warden assigned to the hostel",
+    "action_or_input": "GET /api/v1/hm/room-assignments?hostel_id={hostel}",
+    "expected_result": "200 OK with assignment list and occupancy stats",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC012",
+    "source_id": "HM-UC-012 Main Flow",
+    "purpose": "Caretaker records a student attendance entry",
+    "preconditions": "Authenticated as Caretaker; student belongs to the hostel; valid attendance timestamp",
+    "action_or_input": "POST /api/v1/hm/attendance with student_id and attendance value",
+    "expected_result": "201 Created and attendance record stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC013",
+    "source_id": "HM-UC-013 Main Flow",
+    "purpose": "Student views own attendance record",
+    "preconditions": "Authenticated as Student; attendance records exist for the student",
+    "action_or_input": "GET /api/v1/hm/attendance?student_id={self}",
+    "expected_result": "200 OK with list of attendance entries",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC014",
+    "source_id": "HM-UC-014 Main Flow",
+    "purpose": "Student submits a leave request",
+    "preconditions": "Authenticated as Student; no active leave request",
+    "action_or_input": "POST /api/v1/hm/leave-requests with leave details",
+    "expected_result": "201 Created and request status = Submitted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC015",
+    "source_id": "HM-UC-015 Approve Path",
+    "purpose": "Caretaker approves a leave request",
+    "preconditions": "Authenticated as Caretaker; leave request in Submitted state",
+    "action_or_input": "POST /api/v1/hm/leave-requests/{id}/decision with decision=approve",
+    "expected_result": "200 OK, request status = Approved, student notified",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC016",
+    "source_id": "HM-UC-015 Reject Path",
+    "purpose": "Caretaker rejects a leave request",
+    "preconditions": "Authenticated as Caretaker; leave request in Submitted state",
+    "action_or_input": "POST /api/v1/hm/leave-requests/{id}/decision with decision=reject",
+    "expected_result": "200 OK, request status = Rejected, student notified",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC017",
+    "source_id": "HM-UC-016 Main Flow",
+    "purpose": "Student views own leave status and history",
+    "preconditions": "Authenticated as Student; at least one leave request exists",
+    "action_or_input": "GET /api/v1/hm/leave-requests?student_id={self}",
+    "expected_result": "200 OK with list of leave requests and their statuses",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC018",
+    "source_id": "HM-UC-017 Main Flow",
+    "purpose": "Student submits a hostel-related complaint",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/complaints with category and description",
+    "expected_result": "201 Created and complaint status = Submitted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC019",
+    "source_id": "HM-UC-018 Resolve Path",
+    "purpose": "Caretaker resolves a complaint without escalation",
+    "preconditions": "Authenticated as Caretaker; complaint in Submitted state",
+    "action_or_input": "POST /api/v1/hm/complaints/{id}/events with action=resolve",
+    "expected_result": "200 OK, complaint status = Resolved",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC020",
+    "source_id": "HM-UC-018 Update Path",
+    "purpose": "Caretaker updates a complaint without resolution",
+    "preconditions": "Authenticated as Caretaker; complaint in Submitted state",
+    "action_or_input": "POST /api/v1/hm/complaints/{id}/events with action=update and notes",
+    "expected_result": "200 OK, complaint status = Updated (Unresolved)",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC021",
+    "source_id": "HM-UC-018 Escalate Path",
+    "purpose": "Caretaker escalates a complaint to a Warden",
+    "preconditions": "Authenticated as Caretaker; complaint in Submitted or Updated state; escalation supported",
+    "action_or_input": "POST /api/v1/hm/complaints/{id}/events with action=escalate",
+    "expected_result": "200 OK, complaint status = Escalated, visible to Warden",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC022",
+    "source_id": "HM-UC-019 Main Flow",
+    "purpose": "Warden monitors complaint status and history",
+    "preconditions": "Authenticated as Warden assigned to the hostel",
+    "action_or_input": "GET /api/v1/hm/complaints?hostel_id={hostel}",
+    "expected_result": "200 OK with list of complaints and their current states",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC023",
+    "source_id": "HM-UC-020 Main Flow",
+    "purpose": "Student submits a guest-room booking request",
+    "preconditions": "Authenticated as Student; no active guest-room request",
+    "action_or_input": "POST /api/v1/hm/guest-bookings with booking details",
+    "expected_result": "201 Created and request status = Submitted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC024",
+    "source_id": "HM-UC-021 Approve Path",
+    "purpose": "Caretaker approves a guest-room booking request",
+    "preconditions": "Authenticated as Caretaker; booking request in Submitted state; room available",
+    "action_or_input": "POST /api/v1/hm/guest-bookings/{id}/decision with decision=approve",
+    "expected_result": "200 OK, booking status = Approved",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC025",
+    "source_id": "HM-UC-021 Reject Path",
+    "purpose": "Caretaker rejects a guest-room booking request",
+    "preconditions": "Authenticated as Caretaker; booking request in Submitted state",
+    "action_or_input": "POST /api/v1/hm/guest-bookings/{id}/decision with decision=reject",
+    "expected_result": "200 OK, booking status = Rejected",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC026",
+    "source_id": "HM-UC-022 Main Flow",
+    "purpose": "Student views own guest-room booking status",
+    "preconditions": "Authenticated as Student; at least one booking exists",
+    "action_or_input": "GET /api/v1/hm/guest-bookings?student_id={self}",
+    "expected_result": "200 OK with list of bookings and their statuses",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC027",
+    "source_id": "HM-UC-023 Main Flow",
+    "purpose": "Student submits an extended-stay request",
+    "preconditions": "Authenticated as Student; no active extended-stay request",
+    "action_or_input": "POST /api/v1/hm/extended-stays with request period",
+    "expected_result": "201 Created and request status = Submitted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC028",
+    "source_id": "HM-UC-024 Approve Path",
+    "purpose": "Warden approves an extended-stay request",
+    "preconditions": "Authenticated as Warden; extended-stay request in Submitted state",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision with decision=approve",
+    "expected_result": "200 OK, request status = Approved",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC029",
+    "source_id": "HM-UC-024 Reject Path",
+    "purpose": "Warden rejects an extended-stay request",
+    "preconditions": "Authenticated as Warden; extended-stay request in Submitted state",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision with decision=reject",
+    "expected_result": "200 OK, request status = Rejected",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC030",
+    "source_id": "HM-UC-026 Main Flow",
+    "purpose": "Caretaker records a hostel fine",
+    "preconditions": "Authenticated as Caretaker; student_id valid",
+    "action_or_input": "POST /api/v1/hm/fines with reason, amount, date, student_id",
+    "expected_result": "201 Created and fine record stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC031",
+    "source_id": "HM-UC-027 Main Flow",
+    "purpose": "Student views own fine records",
+    "preconditions": "Authenticated as Student; fine records exist",
+    "action_or_input": "GET /api/v1/hm/fines?student_id={self}",
+    "expected_result": "200 OK with list of fine records",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC032",
+    "source_id": "HM-UC-028 Main Flow",
+    "purpose": "Caretaker adds an operational inventory item",
+    "preconditions": "Authenticated as Caretaker; hostel context established",
+    "action_or_input": "POST /api/v1/hm/inventory with item details",
+    "expected_result": "201 Created and inventory item persisted",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC033",
+    "source_id": "HM-UC-030 Main Flow",
+    "purpose": "Warden creates a guard shift schedule",
+    "preconditions": "Authenticated as Warden; valid shift dates/times",
+    "action_or_input": "POST /api/v1/hm/guard-shifts with shift details",
+    "expected_result": "201 Created and shift record stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC034",
+    "source_id": "HM-UC-031 Main Flow",
+    "purpose": "Caretaker publishes a hostel notice",
+    "preconditions": "Authenticated as Caretaker; hostel assignment valid",
+    "action_or_input": "POST /api/v1/hm/notices with notice content",
+    "expected_result": "201 Created and notice draft saved",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC035",
+    "source_id": "HM-UC-031 Publish Path",
+    "purpose": "Publish a drafted hostel notice",
+    "preconditions": "Authenticated as Caretaker; notice in draft state",
+    "action_or_input": "POST /api/v1/hm/notices/{id}/publish",
+    "expected_result": "200 OK, notice status = Published and visible to audience",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC036",
+    "source_id": "HM-UC-032 Main Flow",
+    "purpose": "Student views published hostel notices",
+    "preconditions": "Authenticated as Student; at least one published notice exists for the hostel",
+    "action_or_input": "GET /api/v1/hm/notices",
+    "expected_result": "200 OK with list of visible notices",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC037",
+    "source_id": "HM-UC-033 Main Flow",
+    "purpose": "Generate an occupancy report",
+    "preconditions": "Authenticated as Super Admin or authorized role; report code for occupancy exists",
+    "action_or_input": "GET /api/v1/hm/reports/occupancy",
+    "expected_result": "200 OK with aggregated occupancy data",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC038",
+    "source_id": "HM-UC-036 Main Flow",
+    "purpose": "Warden reviews attendance summary",
+    "preconditions": "Authenticated as Warden; attendance records exist for the hostel",
+    "action_or_input": "GET /api/v1/hm/attendance/summary",
+    "expected_result": "200 OK with attendance trends and exceptions",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC039",
+    "source_id": "HM-UC-037 Main Flow",
+    "purpose": "Warden reviews leave information summary",
+    "preconditions": "Authenticated as Warden; leave records exist for the hostel",
+    "action_or_input": "GET /api/v1/hm/leave-requests/summary",
+    "expected_result": "200 OK with leave statistics",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC040",
+    "source_id": "HM-UC-038 Main Flow",
+    "purpose": "Warden reviews fine summary",
+    "preconditions": "Authenticated as Warden; fine records exist for the hostel",
+    "action_or_input": "GET /api/v1/hm/fines/summary",
+    "expected_result": "200 OK with disciplinary fine aggregates",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC041",
+    "source_id": "HM-UC-039 Main Flow",
+    "purpose": "Warden views staff coordination records",
+    "preconditions": "Authenticated as Warden; staff coordination entries exist",
+    "action_or_input": "GET /api/v1/hm/staff-coordination",
+    "expected_result": "200 OK with list of staff coordination records scoped to the hostel",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC042",
+    "source_id": "HM-UC-001 Permission Denied",
+    "purpose": "Ensure a Student cannot create a hostel",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/hostels with valid data",
+    "expected_result": "403 Forbidden due to missing hm.hostel.create permission",
+    "test_type": "permission"
+  },
+  {
+    "test_id": "TC043",
+    "source_id": "HM-UC-005 Permission Denied",
+    "purpose": "Prevent a Caretaker from submitting an accommodation request",
+    "preconditions": "Authenticated as Caretaker",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests",
+    "expected_result": "403 Forbidden because only hm.accommodation_request.create is granted to Students",
+    "test_type": "permission"
+  },
+  {
+    "test_id": "TC044",
+    "source_id": "HM-UC-009 Capacity Guard",
+    "purpose": "Reject room update that would reduce capacity below current occupancy",
+    "preconditions": "Authenticated as Caretaker; room has occupancy = 3; current capacity = 5",
+    "action_or_input": "PATCH /api/v1/hm/rooms/{id} with capacity=2",
+    "expected_result": "400 Bad Request with error about capacity constraint (BR-HM-010)",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC045",
+    "source_id": "HM-UC-006 Capacity Guard",
+    "purpose": "Reject initial allotment when target room is at full capacity",
+    "preconditions": "Authenticated as Super Admin; target room occupancy = capacity",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests/{id}/allot with that room_id",
+    "expected_result": "400 Bad Request indicating room capacity violation",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC046",
+    "source_id": "HM-UC-021 Permission Denied",
+    "purpose": "Ensure a Student cannot approve a guest-room booking",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/guest-bookings/{id}/decision with decision=approve",
+    "expected_result": "403 Forbidden because hm.guest_booking.approve is not granted to Students",
+    "test_type": "permission"
+  },
+  {
+    "test_id": "TC047",
+    "source_id": "HM-UC-024 Permission Denied",
+    "purpose": "Prevent a Student from deciding on an extended-stay request",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "POST /api/v1/hm/extended-stays/{id}/decision with decision=approve",
+    "expected_result": "403 Forbidden; only hm.extended_stay_request.approve granted to Wardens",
+    "test_type": "permission"
+  },
+  {
+    "test_id": "TC048",
+    "source_id": "HM-UC-034 Blocked Endpoint",
+    "purpose": "Confirm /api/v1/hm/notifications is inaccessible",
+    "preconditions": "Authenticated as any role",
+    "action_or_input": "GET /api/v1/hm/notifications",
+    "expected_result": "404 Not Found or 403 Forbidden as the endpoint is blocked",
+    "test_type": "negative"
+  }
+]
