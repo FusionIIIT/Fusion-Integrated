@@ -1,0 +1,335 @@
+[
+  {
+    "test_id": "TEST-BR-001",
+    "source_id": "BR-FTS-001 condition-permitted",
+    "purpose": "Verify BR-FTS-001 permitted condition: Only Institute Employee users (Faculty/Staff operating under assigned roles) may perform operational file-processing act",
+    "preconditions": "Valid environment and trigger condition: Whenever an operational file action is requested.",
+    "action_or_input": "Perform action under permitted condition for Institute Employee Operational Access Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Allow operational processing only for authorized Institute Employees; System Admin remains outside r",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-002",
+    "source_id": "BR-FTS-001 condition-prohibited",
+    "purpose": "Verify BR-FTS-001 prohibited / boundary condition: Only Institute Employee users (Faculty/Staff operating under assigned roles) may perform operational file-processing act",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Institute Employee Operational Access Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-001",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-003",
+    "source_id": "BR-FTS-001 stated-exception",
+    "purpose": "Verify BR-FTS-001 stated exception: System Admin governance actions are permitted only within the separate governance scope.",
+    "preconditions": "Environment with exception scenario",
+    "action_or_input": "Exercise stated exception: System Admin governance actions are permitted only within the separate governanc",
+    "expected_result": "System handles stated exception per specification",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-004",
+    "source_id": "BR-FTS-002 condition-permitted",
+    "purpose": "Verify BR-FTS-002 permitted condition: Switching assigned role context shall not change existing file ownership or previously recorded audit history.",
+    "preconditions": "Valid environment and trigger condition: An Institute Employee selects another assigned role context.",
+    "action_or_input": "Perform action under permitted condition for Role Switching Preservation Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Apply the selected role to authorization while preserving ownership and historical audit identity.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-005",
+    "source_id": "BR-FTS-002 condition-prohibited",
+    "purpose": "Verify BR-FTS-002 prohibited / boundary condition: Switching assigned role context shall not change existing file ownership or previously recorded audit history.",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Role Switching Preservation Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-002",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-006",
+    "source_id": "BR-FTS-003 condition-permitted",
+    "purpose": "Verify BR-FTS-003 permitted condition: An FTS file is a persistent composite object containing mandatory user comments at creation/movement stages and optional",
+    "preconditions": "Valid environment and trigger condition: File creation or movement adds content to a file.",
+    "action_or_input": "Perform action under permitted condition for Persistent Composite File Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Persist the file and accumulated contents after circulation; do not delete circulated contents throu",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-007",
+    "source_id": "BR-FTS-003 condition-prohibited",
+    "purpose": "Verify BR-FTS-003 prohibited / boundary condition: An FTS file is a persistent composite object containing mandatory user comments at creation/movement stages and optional",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Persistent Composite File Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-003",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-008",
+    "source_id": "BR-FTS-003 stated-exception",
+    "purpose": "Verify BR-FTS-003 stated exception: A pre-submission draft may be discarded under BR-FTS-005.",
+    "preconditions": "Environment with exception scenario",
+    "action_or_input": "Exercise stated exception: A pre-submission draft may be discarded under BR-FTS-005.",
+    "expected_result": "System handles stated exception per specification",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-009",
+    "source_id": "BR-FTS-004 condition-permitted",
+    "purpose": "Verify BR-FTS-004 permitted condition: A new FTS file requires an initial mandatory user comment.",
+    "preconditions": "Valid environment and trigger condition: Employee attempts to create/save a new file.",
+    "action_or_input": "Perform action under permitted condition for Initial Comment Requirement",
+    "expected_result": "Action is allowed and required outcome is enforced: Block acceptance of file creation until the initial comment is present.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-010",
+    "source_id": "BR-FTS-004 condition-prohibited",
+    "purpose": "Verify BR-FTS-004 prohibited / boundary condition: A new FTS file requires an initial mandatory user comment.",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Initial Comment Requirement",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-004",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-011",
+    "source_id": "BR-FTS-005 condition-permitted",
+    "purpose": "Verify BR-FTS-005 permitted condition: Draft save/edit/discard behavior is permitted only before submission/circulation; a circulated file is not deleted as a ",
+    "preconditions": "Valid environment and trigger condition: Draft management or first circulation is attempted.",
+    "action_or_input": "Perform action under permitted condition for Draft Boundary Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Permit draft operations only in pre-circulation state and prevent draft deletion after circulation.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-012",
+    "source_id": "BR-FTS-005 condition-prohibited",
+    "purpose": "Verify BR-FTS-005 prohibited / boundary condition: Draft save/edit/discard behavior is permitted only before submission/circulation; a circulated file is not deleted as a ",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Draft Boundary Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-005",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-013",
+    "source_id": "BR-FTS-006 condition-permitted",
+    "purpose": "Verify BR-FTS-006 permitted condition: Every file-movement action requires a mandatory comment from the acting user.",
+    "preconditions": "Valid environment and trigger condition: Employee attempts to forward or return a file.",
+    "action_or_input": "Perform action under permitted condition for File-Movement Comment Requirement",
+    "expected_result": "Action is allowed and required outcome is enforced: Block the movement until the mandatory movement comment is supplied.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-014",
+    "source_id": "BR-FTS-006 condition-prohibited",
+    "purpose": "Verify BR-FTS-006 prohibited / boundary condition: Every file-movement action requires a mandatory comment from the acting user.",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of File-Movement Comment Requirement",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-006",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-015",
+    "source_id": "BR-FTS-007 condition-permitted",
+    "purpose": "Verify BR-FTS-007 permitted condition: A file may be sent to another Institute Employee regardless of the receiver\u2019s role, and a received file may be returned ",
+    "preconditions": "Valid environment and trigger condition: A recipient is selected or Return is requested.",
+    "action_or_input": "Perform action under permitted condition for Receiver and Return Eligibility Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Accept only a valid Institute Employee recipient for send/forward; route return to the sender of the",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-016",
+    "source_id": "BR-FTS-007 condition-prohibited",
+    "purpose": "Verify BR-FTS-007 prohibited / boundary condition: A file may be sent to another Institute Employee regardless of the receiver\u2019s role, and a received file may be returned ",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Receiver and Return Eligibility Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-007",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-017",
+    "source_id": "BR-FTS-007 stated-exception",
+    "purpose": "Verify BR-FTS-007 stated exception: The baseline does not further define every role/state permission case.",
+    "preconditions": "Environment with exception scenario",
+    "action_or_input": "Exercise stated exception: The baseline does not further define every role/state permission case.",
+    "expected_result": "System handles stated exception per specification",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-018",
+    "source_id": "BR-FTS-008 condition-permitted",
+    "purpose": "Verify BR-FTS-008 permitted condition: FTS shall record forwarding and return events chronologically with sender, receiver, timestamp, movement comment, and mo",
+    "preconditions": "Valid environment and trigger condition: A forward or return movement succeeds.",
+    "action_or_input": "Perform action under permitted condition for Chronological Movement Record Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Append the movement event and its stated details to chronological history; update holder/pending-rec",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-019",
+    "source_id": "BR-FTS-008 condition-prohibited",
+    "purpose": "Verify BR-FTS-008 prohibited / boundary condition: FTS shall record forwarding and return events chronologically with sender, receiver, timestamp, movement comment, and mo",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Chronological Movement Record Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-008",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-020",
+    "source_id": "BR-FTS-009 condition-permitted",
+    "purpose": "Verify BR-FTS-009 permitted condition: FTS shall expose file contents/history only to users authorized and associated with the file, including Inbox/Outbox acc",
+    "preconditions": "Valid environment and trigger condition: A user requests file or history access.",
+    "action_or_input": "Perform action under permitted condition for Associated File Access Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Show/open only authorized associated files and retain authorized read access after archival.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-021",
+    "source_id": "BR-FTS-009 condition-prohibited",
+    "purpose": "Verify BR-FTS-009 prohibited / boundary condition: FTS shall expose file contents/history only to users authorized and associated with the file, including Inbox/Outbox acc",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Associated File Access Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-009",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-022",
+    "source_id": "BR-FTS-009 stated-exception",
+    "purpose": "Verify BR-FTS-009 stated exception: Unauthorized files/history are not exposed.",
+    "preconditions": "Environment with exception scenario",
+    "action_or_input": "Exercise stated exception: Unauthorized files/history are not exposed.",
+    "expected_result": "System handles stated exception per specification",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-023",
+    "source_id": "BR-FTS-010 condition-permitted",
+    "purpose": "Verify BR-FTS-010 permitted condition: FTS shall enforce RBAC, assigned-role restrictions, file association, and file-state authorization for FTS actions, incl",
+    "preconditions": "Valid environment and trigger condition: Any protected FTS action is requested.",
+    "action_or_input": "Perform action under permitted condition for Role-Based Access and Sensitive Action Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Permit only actions authorized by role/context/file association/file state; reject unauthorized sens",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-024",
+    "source_id": "BR-FTS-010 condition-prohibited",
+    "purpose": "Verify BR-FTS-010 prohibited / boundary condition: FTS shall enforce RBAC, assigned-role restrictions, file association, and file-state authorization for FTS actions, incl",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Role-Based Access and Sensitive Action Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-010",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-025",
+    "source_id": "BR-FTS-010 stated-exception",
+    "purpose": "Verify BR-FTS-010 stated exception: Platform-wide RBAC administration remains outside FTS except for FTS-relevant governance/context.",
+    "preconditions": "Environment with exception scenario",
+    "action_or_input": "Exercise stated exception: Platform-wide RBAC administration remains outside FTS except for FTS-relevant go",
+    "expected_result": "System handles stated exception per specification",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-026",
+    "source_id": "BR-FTS-011 condition-permitted",
+    "purpose": "Verify BR-FTS-011 permitted condition: FTS shall maintain audit records for creation, comments, attachments, forwarding, return, archival, and integration acti",
+    "preconditions": "Valid environment and trigger condition: An auditable FTS action occurs.",
+    "action_or_input": "Perform action under permitted condition for Audit Log and Chronological Versioning Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Append the applicable audit/version record without rewriting prior chronological history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-027",
+    "source_id": "BR-FTS-011 condition-prohibited",
+    "purpose": "Verify BR-FTS-011 prohibited / boundary condition: FTS shall maintain audit records for creation, comments, attachments, forwarding, return, archival, and integration acti",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Audit Log and Chronological Versioning Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-011",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-028",
+    "source_id": "BR-FTS-011 stated-exception",
+    "purpose": "Verify BR-FTS-011 stated exception: Backup implementation is outside this rule and outside the FTS functional scope.",
+    "preconditions": "Environment with exception scenario",
+    "action_or_input": "Exercise stated exception: Backup implementation is outside this rule and outside the FTS functional scope.",
+    "expected_result": "System handles stated exception per specification",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-029",
+    "source_id": "BR-FTS-012 condition-permitted",
+    "purpose": "Verify BR-FTS-012 permitted condition: Only the file owner may archive a completed circulated file; archived files remain permanently stored/readable to author",
+    "preconditions": "Valid environment and trigger condition: Archive is requested or an action is attempted on an archived file.",
+    "action_or_input": "Perform action under permitted condition for Archival Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Allow archival only for the owner after collaborative completion; enforce archived read-only/no-forw",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-030",
+    "source_id": "BR-FTS-012 condition-prohibited",
+    "purpose": "Verify BR-FTS-012 prohibited / boundary condition: Only the file owner may archive a completed circulated file; archived files remain permanently stored/readable to author",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Archival Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-012",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-031",
+    "source_id": "BR-FTS-012 stated-exception",
+    "purpose": "Verify BR-FTS-012 stated exception: The baseline does not define a formal system criterion for determining \u201cobjective complete.\u201d",
+    "preconditions": "Environment with exception scenario",
+    "action_or_input": "Exercise stated exception: The baseline does not define a formal system criterion for determining \u201cobjectiv",
+    "expected_result": "System handles stated exception per specification",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-032",
+    "source_id": "BR-FTS-013 condition-permitted",
+    "purpose": "Verify BR-FTS-013 permitted condition: FTS shall trigger notifications for file received, file forwarded, file returned, file archived, and relevant role assig",
+    "preconditions": "Valid environment and trigger condition: A source-listed FTS event occurs.",
+    "action_or_input": "Perform action under permitted condition for Notification Trigger and Delivery Boundary Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Create/trigger the required notification event and hand it to the Fusion notification mechanism.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-033",
+    "source_id": "BR-FTS-013 condition-prohibited",
+    "purpose": "Verify BR-FTS-013 prohibited / boundary condition: FTS shall trigger notifications for file received, file forwarded, file returned, file archived, and relevant role assig",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of Notification Trigger and Delivery Boundary Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-013",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-034",
+    "source_id": "BR-FTS-013 stated-exception",
+    "purpose": "Verify BR-FTS-013 stated exception: Central notification infrastructure and exact recipient semantics are outside/not fully specified by",
+    "preconditions": "Environment with exception scenario",
+    "action_or_input": "Exercise stated exception: Central notification infrastructure and exact recipient semantics are outside/no",
+    "expected_result": "System handles stated exception per specification",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-BR-035",
+    "source_id": "BR-FTS-014 condition-permitted",
+    "purpose": "Verify BR-FTS-014 permitted condition: FTS may provide file/workflow tracking APIs, approval-chain support, and file-based request tracking to other Fusion mod",
+    "preconditions": "Valid environment and trigger condition: A consuming Fusion module invokes an FTS service.",
+    "action_or_input": "Perform action under permitted condition for FTS Integration Boundary Rule",
+    "expected_result": "Action is allowed and required outcome is enforced: Provide only authorized FTS capabilities under FTS RBAC/audit rules; do not assume ownership of cons",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-036",
+    "source_id": "BR-FTS-014 condition-prohibited",
+    "purpose": "Verify BR-FTS-014 prohibited / boundary condition: FTS may provide file/workflow tracking APIs, approval-chain support, and file-based request tracking to other Fusion mod",
+    "preconditions": "Environment configured with boundary or prohibited state",
+    "action_or_input": "Attempt action violating constraint of FTS Integration Boundary Rule",
+    "expected_result": "Action is refused or constrained as specified by BR-FTS-014",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-037",
+    "source_id": "BR-FTS-014 stated-exception",
+    "purpose": "Verify BR-FTS-014 stated exception: Consuming module retains domain-specific approval rules and semantics.",
+    "preconditions": "Environment with exception scenario",
+    "action_or_input": "Exercise stated exception: Consuming module retains domain-specific approval rules and semantics.",
+    "expected_result": "System handles stated exception per specification",
+    "test_type": "boundary"
+  }
+]

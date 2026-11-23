@@ -1,0 +1,92 @@
+[
+  {
+    "test_id": "TEST-WF-001",
+    "source_id": "BW-FTS-01 canonical-path",
+    "purpose": "Verify BW-FTS-01 (Forward File to Recipient \u2014 Zero Onward Traversal): One valid send/forward transition from the current sender to another Institute Employee, with no further onward-forward ",
+    "preconditions": "Workflow trigger condition: Authorized current holder chooses Send/Forward.",
+    "action_or_input": "Execute complete state progression for Forward File to Recipient \u2014 Zero Onward Traversal",
+    "expected_result": "Workflow transitions through specified states and reaches terminal state successfully",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-002",
+    "source_id": "BW-FTS-02 canonical-path",
+    "purpose": "Verify BW-FTS-02 (Onward Forwarding \u2014 One Loop Traversal): Represent exactly one traversal of the meaningful onward-forward loop after an employee has received an active circulate",
+    "preconditions": "Workflow trigger condition: Current recipient chooses to forward the received file onward.",
+    "action_or_input": "Execute complete state progression for Onward Forwarding \u2014 One Loop Traversal",
+    "expected_result": "Workflow transitions through specified states and reaches terminal state successfully",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-003",
+    "source_id": "BW-FTS-03 canonical-path",
+    "purpose": "Verify BW-FTS-03 (Return File to Previous Sender): One valid return transition from the current recipient back to the sender of the received movement.",
+    "preconditions": "Workflow trigger condition: Current recipient chooses Return.",
+    "action_or_input": "Execute complete state progression for Return File to Previous Sender",
+    "expected_result": "Workflow transitions through specified states and reaches terminal state successfully",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-004",
+    "source_id": "BW-FTS-04 canonical-path",
+    "purpose": "Verify BW-FTS-04 (Archive Completed Circulated File): Represent the lifecycle-closing archival transition after the intended collaborative objective is complete.",
+    "preconditions": "Workflow trigger condition: File owner selects Archive.",
+    "action_or_input": "Execute complete state progression for Archive Completed Circulated File",
+    "expected_result": "Workflow transitions through specified states and reaches terminal state successfully",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-005",
+    "source_id": "BW-FTS-05 canonical-path",
+    "purpose": "Verify BW-FTS-05 (Prepare and Circulate New File \u2014 Zero Draft-Edit Traversal): Represent creation followed by initial circulation with zero draft-edit traversal.",
+    "preconditions": "Workflow trigger condition: Authorized Institute Employee creates a new file and proceeds to initial circula",
+    "action_or_input": "Execute complete state progression for Prepare and Circulate New File \u2014 Zero Draft-Edit Traversal",
+    "expected_result": "Workflow transitions through specified states and reaches terminal state successfully",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-006",
+    "source_id": "BW-FTS-06 canonical-path",
+    "purpose": "Verify BW-FTS-06 (Prepare and Circulate New File \u2014 One Draft-Edit Traversal): Represent creation, exactly one draft-edit traversal, and initial circulation.",
+    "preconditions": "Workflow trigger condition: Authorized Institute Employee creates a new file, edits the saved draft once, th",
+    "action_or_input": "Execute complete state progression for Prepare and Circulate New File \u2014 One Draft-Edit Traversal",
+    "expected_result": "Workflow transitions through specified states and reaches terminal state successfully",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-007",
+    "source_id": "BW-FTS-07 canonical-path",
+    "purpose": "Verify BW-FTS-07 (Create and Discard Draft \u2014 Zero Draft-Edit Traversal): Represent creation followed by draft discard with zero draft-edit traversal.",
+    "preconditions": "Workflow trigger condition: Authorized Institute Employee creates a draft and chooses Discard before submiss",
+    "action_or_input": "Execute complete state progression for Create and Discard Draft \u2014 Zero Draft-Edit Traversal",
+    "expected_result": "Workflow transitions through specified states and reaches terminal state successfully",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-008",
+    "source_id": "BW-FTS-08 canonical-path",
+    "purpose": "Verify BW-FTS-08 (Edit Once and Discard Draft \u2014 One Draft-Edit Traversal): Represent creation, exactly one draft-edit traversal, and subsequent draft discard before circulation.",
+    "preconditions": "Workflow trigger condition: Authorized Institute Employee creates a draft, edits it once, and later chooses ",
+    "action_or_input": "Execute complete state progression for Edit Once and Discard Draft \u2014 One Draft-Edit Traversal",
+    "expected_result": "Workflow transitions through specified states and reaches terminal state successfully",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-009",
+    "source_id": "CW-FTS-01 canonical-path",
+    "purpose": "Verify CW-FTS-01 (Collaborative File Circulation and Completion): Combine initial/ongoing forwarding, optional one-time onward-forward traversal, return, return after one onward traversa",
+    "preconditions": "Workflow trigger condition: A valid prepared/active file is ready for collaborative circulation.",
+    "action_or_input": "Execute complete state progression for Collaborative File Circulation and Completion",
+    "expected_result": "Workflow transitions through specified states and reaches terminal state successfully",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-010",
+    "source_id": "CW-FTS-02 canonical-path",
+    "purpose": "Verify CW-FTS-02 (New File Preparation and Initial Outcome): Integrate new-file creation, optional one draft-edit traversal, draft discard, or initial circulation without forcing dr",
+    "preconditions": "Workflow trigger condition: Authorized Institute Employee begins creation of a new institutional file.",
+    "action_or_input": "Execute complete state progression for New File Preparation and Initial Outcome",
+    "expected_result": "Workflow transitions through specified states and reaches terminal state successfully",
+    "test_type": "workflow"
+  }
+]
