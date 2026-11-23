@@ -3,11 +3,11 @@
 Derived strictly from BR_DESIGN.json.
 """
 
-import io
 from datetime import timedelta
 from decimal import Decimal
 
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -164,11 +164,10 @@ def test_br_014_scheduled_material_released_after_time(world):
 
     with freeze_time(fut + timedelta(seconds=10)):
         release_due_materials()
-
-    mat = Material.objects.get(pk=item["id"])
-    assert mat.state == "PUBLISHED"
-    res = world.actor("student").get(f"{BASE}/materials/{item['id']}/")
-    assert res.status_code == 200
+        mat = Material.objects.get(pk=item["id"])
+        assert mat.state == "PUBLISHED"
+        res = world.actor("student").get(f"{BASE}/materials/{item['id']}/")
+        assert res.status_code == 200
 
 
 def test_br_015_faculty_announcement_allowed(world):
@@ -325,8 +324,7 @@ def test_br_027_assignment_released_accessible_to_students(world):
 def test_br_028_submission_conforms_to_file_type(world):
     """TEST-BR-028 | BR-LMS-012 condition-true-file."""
     row = available(world, submission_type="FILE")
-    f = io.BytesIO(b"file content")
-    f.name = "solution.pdf"
+    f = SimpleUploadedFile("solution.pdf", b"%PDF-1.7\n%%EOF", content_type="application/pdf")
     res = world.actor("student").post(
         f"{BASE}/assignments/{row['id']}/submissions/",
         {"kind": "FILE", "file": f},
@@ -437,12 +435,20 @@ def test_br_037_unauthorized_user_cannot_grade(world):
 def test_br_038_conflict_of_interest_self_grading_rejected(world):
     """TEST-BR-038 | BR-LMS-015 condition-false-self-grading."""
     row = available(world)
-    # TA submits as student with user_id=3
-    sub = world.actor("student", uid=3).post(
+    # TA user_id=3 also enrolled as student in fixture
+    world.fake.course_associations.append({
+        "user_id": 3,
+        "offering_key": world.workspace.external_offering_key,
+        "course_role": "STUDENT",
+        "source_origin": "fusion_registration",
+    })
+    sub_res = world.actor("student", uid=3).post(
         f"{BASE}/assignments/{row['id']}/submissions/",
         {"kind": "TEXT", "text": "TA student submission"},
         format="json",
-    ).json()
+    )
+    assert sub_res.status_code == 201
+    sub = sub_res.json()
 
     # TA attempts to grade own submission -> Refused
     res = world.actor("lms_ta", uid=3).post(

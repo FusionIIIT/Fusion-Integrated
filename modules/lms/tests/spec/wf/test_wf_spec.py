@@ -64,14 +64,14 @@ def test_wf_002_bw_lms_01_step_2_system_releases_scheduled_material(world):
         released_count = release_due_materials()
         assert released_count >= 1
 
-    mat = Material.objects.get(pk=mat_id)
-    assert mat.state == "PUBLISHED"
+        mat = Material.objects.get(pk=mat_id)
+        assert mat.state == "PUBLISHED"
 
-    # Now accessible to students
-    student = world.actor("student")
-    res = student.get(f"{BASE}/materials/{mat_id}/")
-    assert res.status_code == 200
-    assert res.json()["text"] == "Soon to release material"
+        # Now accessible to students
+        student = world.actor("student")
+        res = student.get(f"{BASE}/materials/{mat_id}/")
+        assert res.status_code == 200
+        assert res.json()["text"] == "Soon to release material"
 
 
 def test_wf_003_bw_lms_02_step_1_faculty_creates_assignment_draft(world):
@@ -148,10 +148,10 @@ def test_wf_008_bw_lms_03_step_3_system_transitions_scheduled_to_available(world
         count = release_due_assignments()
         assert count >= 1
 
-    student = world.actor("student")
-    res = student.get(f"{BASE}/assignments/{row['id']}/")
-    assert res.status_code == 200
-    assert res.json()["state"] == "AVAILABLE"
+        student = world.actor("student")
+        res = student.get(f"{BASE}/assignments/{row['id']}/")
+        assert res.status_code == 200
+        assert res.json()["state"] == "AVAILABLE"
 
 
 def test_wf_009_bw_lms_03_step_4_student_submits_to_released_assignment_on_time(world):

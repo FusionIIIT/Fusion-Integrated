@@ -457,11 +457,19 @@ def test_uc_037_unauthorized_user_grading_rejected(world):
 def test_uc_038_self_grading_conflict_rejected(world):
     """TEST-UC-038 | UC-LMS-012 Exception Flow Conflict."""
     row = available(world)
-    sub = world.actor("student", uid=3).post(
+    world.fake.course_associations.append({
+        "user_id": 3,
+        "offering_key": world.workspace.external_offering_key,
+        "course_role": "STUDENT",
+        "source_origin": "fusion_registration",
+    })
+    sub_res = world.actor("student", uid=3).post(
         f"{BASE}/assignments/{row['id']}/submissions/",
         {"kind": "TEXT", "text": "TA submitted work"},
         format="json",
-    ).json()
+    )
+    assert sub_res.status_code == 201
+    sub = sub_res.json()
 
     res = world.actor("lms_ta", uid=3).post(
         f"{BASE}/submissions/{sub['id']}/grade/",
@@ -552,10 +560,9 @@ def test_uc_045_process_scheduled_assignment_release(world):
 
     with freeze_time(rel_time + timedelta(seconds=10)):
         release_due_assignments()
-
-    res = world.actor("student").get(f"{BASE}/assignments/{row['id']}/")
-    assert res.status_code == 200
-    assert res.json()["state"] == "AVAILABLE"
+        res = world.actor("student").get(f"{BASE}/assignments/{row['id']}/")
+        assert res.status_code == 200
+        assert res.json()["state"] == "AVAILABLE"
 
 
 def test_uc_046_withdrawn_scheduled_content_not_released(world):
@@ -568,8 +575,8 @@ def test_uc_046_withdrawn_scheduled_content_not_released(world):
     rel_time = timezone.now() + timedelta(hours=1)
     world.actor("faculty").post(f"{BASE}/materials/{item['id']}/publish/", {"release_at": rel_time.isoformat()}, format="json")
 
-    # Faculty deletes/withdraws material before release time
-    world.actor("faculty").delete(f"{BASE}/materials/{item['id']}/")
+    # Faculty withdraws material before release time
+    world.actor("faculty").post(f"{BASE}/materials/{item['id']}/withdraw/", {}, format="json")
 
     with freeze_time(rel_time + timedelta(seconds=10)):
         release_due_materials()

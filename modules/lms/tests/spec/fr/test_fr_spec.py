@@ -32,9 +32,10 @@ def test_fr_002_display_syllabus_schedule_staff(world, user_ref):
         {"syllabus": "Intro Syllabus", "schedule": "Tuesday 2PM"},
         format="json",
     )
+    client = world.actor("student")
     world.fake.users = {1: user_ref(1, kind="faculty"), 3: user_ref(3)}
 
-    res = world.actor("student").get(f"{BASE}/courses/")
+    res = client.get(f"{BASE}/courses/")
     course = res.json()["results"][0]
     assert course["syllabus"] == "Intro Syllabus"
     assert course["schedule"] == "Tuesday 2PM"
