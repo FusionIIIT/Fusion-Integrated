@@ -33,8 +33,7 @@ def _actor(stub_iam, *, uid: int, role: str):
 
 
 def test_journey_bw_psm_01_internal_stock_fulfilment(stub_iam):
-    # BW-PSM-01, CW-PSM-01, PSM-UC-001, PSM-UC-007, PSM-UC-011, PSM-UC-009, PSM-UC-028, PSM-UC-002
-    # CFR-PSM-001, CFR-PSM-003, CFR-PSM-004, AFR-PSM-001..007, AFR-PSM-013..021, BR-PSM-003, BR-PSM-013, BR-PSM-026
+    # BW-PSM-01, CW-PSM-01, PSM-UC-001, PSM-UC-007, PSM-UC-011, PSM-UC-009, PSM-UC-028, PSM-UC-002, CFR-PSM-001, CFR-PSM-003, CFR-PSM-004, BR-PSM-003, BR-PSM-013, BR-PSM-026
     seed_default_policy()
     ps = _actor(stub_iam, uid=9001, role="ps_admin")
     item_id = ps.post(
@@ -62,6 +61,7 @@ def test_journey_bw_psm_01_internal_stock_fulfilment(stub_iam):
         == 201
     )
 
+    # AFR-PSM-001, AFR-PSM-002, AFR-PSM-003, AFR-PSM-005: employee creates and submits complete indent with unique number.
     emp = _actor(stub_iam, uid=9002, role="faculty")
     r_ind = emp.post(
         "/api/v1/psm/indents",
@@ -92,6 +92,7 @@ def test_journey_bw_psm_01_internal_stock_fulfilment(stub_iam):
     )
     assert r_dup.status_code == 201 and r_dup.data["is_duplicate_flagged"] is True
 
+    # AFR-PSM-013, AFR-PSM-015, AFR-PSM-016: check stock, reserve available stock, and exclude reservations from allocable stock.
     da = _actor(stub_iam, uid=9003, role="deptadmin_cse")
     r_chk = da.post(f"/api/v1/psm/indents/{ind_id}/stock-check", {}, format="json")
     assert r_chk.status_code == 200 and r_chk.data["status"] == "stock_reserved"
@@ -103,6 +104,7 @@ def test_journey_bw_psm_01_internal_stock_fulfilment(stub_iam):
     )
     assert r_rev.status_code == 200 and r_rev.data["status"] == "internal_approved"
 
+    # AFR-PSM-017, AFR-PSM-018: schedule picking and record dispatch for approved internal stock issue.
     issues = da.get("/api/v1/psm/internal-issues").data["results"]
     issue_id = issues[0]["id"]
     assert (
@@ -116,6 +118,7 @@ def test_journey_bw_psm_01_internal_stock_fulfilment(stub_iam):
         == 200
     )
 
+    # AFR-PSM-019, AFR-PSM-020, AFR-PSM-021: requestor records GRN, confirms receipt of internally issued goods, and posts stock.
     emp = _actor(stub_iam, uid=9002, role="faculty")
     r_grn = emp.post(
         "/api/v1/psm/grns",
@@ -138,10 +141,9 @@ def test_journey_bw_psm_01_internal_stock_fulfilment(stub_iam):
 
 
 def test_journey_bw_psm_02_04_direct_procurement_to_payment_and_partial(stub_iam):
-    # BW-PSM-02, BW-PSM-04, CW-PSM-01, CW-PSM-02, PSM-UC-016, PSM-UC-017, PSM-UC-019, PSM-UC-025..029, PSM-UC-013
-    # CFR-PSM-005, CFR-PSM-006, CFR-PSM-008..010, CFR-PSM-013, CFR-PSM-014
-    # AFR-PSM-022..031, AFR-PSM-037..047, AFR-PSM-056..066, BR-PSM-004, 008, 012, 017, 018, 022, 025
+    # BW-PSM-02, BW-PSM-04, CW-PSM-01, CW-PSM-02, PSM-UC-016, PSM-UC-017, PSM-UC-019, PSM-UC-025, PSM-UC-026, PSM-UC-027, PSM-UC-028, PSM-UC-029, PSM-UC-013, CFR-PSM-005, CFR-PSM-006, CFR-PSM-008, CFR-PSM-009, CFR-PSM-010, CFR-PSM-013, CFR-PSM-014, BR-PSM-004, BR-PSM-008, BR-PSM-012, BR-PSM-017, BR-PSM-018, BR-PSM-022, BR-PSM-025
     seed_default_policy()
+    # AFR-PSM-060, AFR-PSM-061, AFR-PSM-062, AFR-PSM-065, AFR-PSM-066: onboard, update, verify vendor, and retain version history.
     ps = _actor(stub_iam, uid=9101, role="ps_admin")
     v_id = ps.post(
         "/api/v1/psm/vendors",
@@ -179,6 +181,7 @@ def test_journey_bw_psm_02_04_direct_procurement_to_payment_and_partial(stub_iam
         format="json",
     ).data["id"]
 
+    # AFR-PSM-022, AFR-PSM-030: route indent with insufficient stock to external procurement and through approval hierarchy.
     da = _actor(stub_iam, uid=9103, role="deptadmin_cse")
     assert (
         da.post(f"/api/v1/psm/indents/{ind_id}/stock-check", {}, format="json").data["status"]
@@ -203,6 +206,7 @@ def test_journey_bw_psm_02_04_direct_procurement_to_payment_and_partial(stub_iam
         == "hod_recommended"
     )
 
+    # AFR-PSM-031, AFR-PSM-037, AFR-PSM-038, AFR-PSM-039, AFR-PSM-040: select direct method and issue PO linked to indent and verified vendor.
     ps = _actor(stub_iam, uid=9101, role="ps_admin")
     r_pr = ps.post(
         f"/api/v1/psm/indents/{ind_id}/procurement-review", {"notes": "Direct buy"}, format="json"
@@ -231,7 +235,7 @@ def test_journey_bw_psm_02_04_direct_procurement_to_payment_and_partial(stub_iam
         == 200
     )
 
-    # Partial GRN (2 of 4 units) + confirmation
+    # AFR-PSM-043, AFR-PSM-044, AFR-PSM-045, AFR-PSM-047: record partial GRN (2 of 4 units) and confirm receipt before stock posting.
     emp = _actor(stub_iam, uid=9102, role="faculty")
     grn1 = emp.post(
         "/api/v1/psm/grns",
@@ -240,7 +244,7 @@ def test_journey_bw_psm_02_04_direct_procurement_to_payment_and_partial(stub_iam
     ).data["id"]
     assert emp.post(f"/api/v1/psm/grns/{grn1}/confirm", {}, format="json").status_code == 200
 
-    # Accounts: mismatched invoice goes on hold (BR-PSM-018), matching partial invoice pays partially (BR-PSM-022)
+    # AFR-PSM-056, AFR-PSM-057, AFR-PSM-058, AFR-PSM-059, AFR-PSM-063, AFR-PSM-064: three-way match, hold on mismatch, and partial payment release.
     acc = _actor(stub_iam, uid=9105, role="Accounts Admin")
     inv_bad = acc.post(
         "/api/v1/psm/invoices",
@@ -274,7 +278,7 @@ def test_journey_bw_psm_02_04_direct_procurement_to_payment_and_partial(stub_iam
 
 
 def test_journey_bw_psm_03_05_high_value_final_approval_and_tender(stub_iam):
-    # BW-PSM-03, BW-PSM-05, PSM-UC-012, PSM-UC-022, CFR-PSM-007, AFR-PSM-032..036, BR-PSM-010, BR-PSM-023
+    # BW-PSM-03, BW-PSM-05, PSM-UC-012, PSM-UC-022, CFR-PSM-007, BR-PSM-010, BR-PSM-023
     seed_default_policy()
     ps = _actor(stub_iam, uid=9201, role="ps_admin")
     v_id = ps.post(
@@ -322,6 +326,7 @@ def test_journey_bw_psm_03_05_high_value_final_approval_and_tender(stub_iam):
     )
     assert r_fin.status_code == 200 and r_fin.data["status"] == "procurement_authorized"
 
+    # AFR-PSM-032, AFR-PSM-033, AFR-PSM-034, AFR-PSM-035, AFR-PSM-036: publish tender, record bid, evaluate against criteria, and award with committee metadata.
     ps = _actor(stub_iam, uid=9201, role="ps_admin")
     t_id = ps.post(
         "/api/v1/psm/tenders",
@@ -380,8 +385,7 @@ def test_journey_bw_psm_03_05_high_value_final_approval_and_tender(stub_iam):
 
 
 def test_journey_bw_psm_06_07_08_10_discrepancy_modify_transfer_and_audit(stub_iam):
-    # BW-PSM-06, BW-PSM-07, BW-PSM-08, BW-PSM-10, PSM-UC-008, 010, 014, 015, 020, 021, 023, 030..035
-    # CFR-PSM-011, CFR-PSM-012, CFR-PSM-015..020, AFR-PSM-048..055, AFR-PSM-067..092, BR-PSM-019, 021, 024, 027
+    # BW-PSM-06, BW-PSM-07, BW-PSM-08, BW-PSM-10, PSM-UC-008, PSM-UC-010, PSM-UC-014, PSM-UC-015, PSM-UC-020, PSM-UC-021, PSM-UC-023, PSM-UC-030, PSM-UC-031, PSM-UC-032, PSM-UC-033, PSM-UC-034, PSM-UC-035, CFR-PSM-011, CFR-PSM-012, CFR-PSM-015, CFR-PSM-016, CFR-PSM-017, CFR-PSM-018, CFR-PSM-019, CFR-PSM-020, BR-PSM-019, BR-PSM-021, BR-PSM-024, BR-PSM-027
     seed_default_policy()
     ps = _actor(stub_iam, uid=9301, role="ps_admin")
     v_id = ps.post(
@@ -422,7 +426,7 @@ def test_journey_bw_psm_06_07_08_10_discrepancy_modify_transfer_and_audit(stub_i
         format="json",
     )
 
-    # BW-PSM-08: inter-departmental stock transfer (PSM-UC-021 -> 033 -> 034)
+    # BW-PSM-08, AFR-PSM-067, AFR-PSM-068, AFR-PSM-069, AFR-PSM-070, AFR-PSM-071, AFR-PSM-072, AFR-PSM-073: inter-departmental stock transfer request, reserve, dispatch, confirm, and dual ledger.
     da = _actor(stub_iam, uid=9302, role="deptadmin_cse")
     trf_id = da.post(
         "/api/v1/psm/transfers",
@@ -495,7 +499,7 @@ def test_journey_bw_psm_06_07_08_10_discrepancy_modify_transfer_and_audit(stub_i
         format="json",
     ).data["id"]
 
-    # BW-PSM-06 & BW-PSM-10: discrepancy with evidence, comms, and replacement GRN
+    # BW-PSM-06, BW-PSM-10, AFR-PSM-048, AFR-PSM-049, AFR-PSM-051, AFR-PSM-052, AFR-PSM-053: discrepancy with evidence, comms, and replacement GRN.
     emp = _actor(stub_iam, uid=9303, role="faculty")
     grn_id = emp.post(
         "/api/v1/psm/grns",
@@ -555,7 +559,7 @@ def test_journey_bw_psm_06_07_08_10_discrepancy_modify_transfer_and_audit(stub_i
     assert emp.post(f"/api/v1/psm/grns/{rep_grn}/confirm", {}, format="json").status_code == 200
     assert emp.post(f"/api/v1/psm/grns/{grn_id}/confirm", {}, format="json").status_code == 200
 
-    # PSM-UC-010, PSM-UC-014, PSM-UC-015, PSM-UC-030, PSM-UC-031: reports, financial reports, audit, policy
+    # PSM-UC-010, PSM-UC-014, PSM-UC-015, PSM-UC-030, AFR-PSM-074..089: reports, financial reports, audit, and dashboard.
     aud = _actor(stub_iam, uid=9305, role="Auditor")
     assert aud.get("/api/v1/psm/audit").status_code == 200
     assert (
@@ -592,7 +596,7 @@ def test_journey_remaining_live_ucs_and_alternate_flows(stub_iam):
 
     seed_default_policy()
     emp = _actor(stub_iam, uid=9401, role="faculty")
-    # PSM-UC-001 -> PSM-UC-023 (modify) -> PSM-UC-003 (repeat) -> PSM-UC-005 (withdraw)
+    # PSM-UC-001 -> PSM-UC-023 (modify) -> PSM-UC-024 (AFR-PSM-011 repeat) -> PSM-UC-005 (withdraw)
     r_ind = emp.post(
         "/api/v1/psm/indents",
         {
@@ -614,6 +618,7 @@ def test_journey_remaining_live_ucs_and_alternate_flows(stub_iam):
         ).status_code
         == 200
     )
+    # AFR-PSM-011: repeat a previous indent as a new editable draft.
     r_rep = emp.post(f"/api/v1/psm/indents/{ind_id}/repeat", {}, format="json")
     assert r_rep.status_code == 201
     rep_id = r_rep.data["id"]

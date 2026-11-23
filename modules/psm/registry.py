@@ -172,6 +172,14 @@ _EMPLOYEE = [
     "psm.grn.approve",
 ]
 
+_STAFF_EMPLOYEE = [
+    "psm.dashboard.view",
+    "psm.indent.view",
+    "psm.indent.create",
+    "psm.indent.update",
+    "psm.indent.delete",
+]
+
 _DEPT_ADMIN = [
     *_EMPLOYEE,
     "psm.indent.review",
@@ -270,7 +278,7 @@ _AUDITOR = [
 # Keyed by exact designation names in globals_designation plus basic roles.
 ROLE_GRANTS = {
     "faculty": _EMPLOYEE,
-    "staff": _EMPLOYEE,
+    "staff": _STAFF_EMPLOYEE,
     "dept_admin": _DEPT_ADMIN,
     "deptadmin_cse": _DEPT_ADMIN,
     "deptadmin_design": _DEPT_ADMIN,

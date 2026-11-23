@@ -497,6 +497,14 @@ _EMPLOYEE = [
     "psm.grn.approve",
 ]
 
+_STAFF_EMPLOYEE = [
+    "psm.dashboard.view",
+    "psm.indent.view",
+    "psm.indent.create",
+    "psm.indent.update",
+    "psm.indent.delete",
+]
+
 _DEPT_ADMIN = [
     *_EMPLOYEE,
     "psm.indent.review",
@@ -594,7 +602,7 @@ _AUDITOR = [
 
 ROLE_GRANTS = {
     "faculty": _EMPLOYEE,
-    "staff": _EMPLOYEE,
+    "staff": _STAFF_EMPLOYEE,
     "dept_admin": _DEPT_ADMIN,
     "deptadmin_cse": _DEPT_ADMIN,
     "deptadmin_design": _DEPT_ADMIN,
@@ -692,7 +700,7 @@ All endpoints sit behind `[HasModuleGrant("psm"), HasPermission(...)]` (never `A
 
 ### Client Routes (`client/src/modules/psm/routes.tsx`) & Guards
 
-Every route matches `NAV_ITEMS` 1:1 (`nav_matches_routes.py`). Record details and creation forms open in modals/drawers on their list page.
+Every route matches `NAV_ITEMS` 1:1 (`nav_matches_routes.py`). All ten non-indent operational and office routes use `RequirePermission(permission)` (`office(permission, element)` in `routes.tsx`). Record details and creation forms open in modals/drawers on their list page.
 
 | Path | Component | Route Guard (`RequirePermission`) | Shared / Restricted |
 |---|---|---|---|
@@ -703,7 +711,7 @@ Every route matches `NAV_ITEMS` 1:1 (`nav_matches_routes.py`). Record details an
 | `vendors` | `VendorsPage` | `RequirePermission("psm.vendor.view")` | PS Admin, Accounts, Auditor |
 | `tenders` | `TendersPage` | `RequirePermission("psm.tender.view")` | PS Admin, Auditor |
 | `purchase-orders` | `PurchaseOrdersPage` | `RequirePermission("psm.purchase_order.view")` | PS Admin, Director/Registrar, Accounts, Auditor |
-| `receipts` | `ReceiptsPage` | Open to all roles with `psm.grn.view` (controls gated via `can()`) | Shared; controls gated per permission |
+| `receipts` | `ReceiptsPage` | `RequirePermission("psm.grn.view")` | Faculty Requester, Dept Admin, HOD, PS Admin, Accounts, Auditor |
 | `invoices` | `InvoicesPage` | `RequirePermission("psm.invoice.view")` | Accounts, PS Admin, Auditor |
 | `reports` | `ReportsPage` | `RequirePermission("psm.report.view")` | Dept Admin, HOD, PS Admin, Director/Registrar, Accounts, Auditor |
 | `audit` | `AuditPage` | `RequirePermission("psm.audit.view")` | Accounts, Auditor |

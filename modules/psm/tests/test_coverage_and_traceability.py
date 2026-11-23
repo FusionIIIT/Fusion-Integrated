@@ -75,16 +75,12 @@ def _setup_actors():
 
 
 def test_http_endpoints_invoices_reports_schedules_audit_notifications_policy(stub_iam):
-    # CFR-PSM-009, CFR-PSM-010, CFR-PSM-016, CFR-PSM-018, CFR-PSM-019, CFR-PSM-020
-    # AFR-PSM-057, AFR-PSM-058, AFR-PSM-059, AFR-PSM-060, AFR-PSM-061, AFR-PSM-065, AFR-PSM-066
-    # AFR-PSM-068, AFR-PSM-069, AFR-PSM-070, AFR-PSM-071, AFR-PSM-072, AFR-PSM-073, AFR-PSM-074
-    # AFR-PSM-075, AFR-PSM-076, AFR-PSM-077, AFR-PSM-078, AFR-PSM-081, AFR-PSM-087, AFR-PSM-088
-    # AFR-PSM-089, AFR-PSM-091, AFR-PSM-092, PSM-UC-029
+    # CFR-PSM-009, CFR-PSM-010, CFR-PSM-016, CFR-PSM-018, CFR-PSM-019, CFR-PSM-020, AFR-PSM-057, AFR-PSM-058, AFR-PSM-059, AFR-PSM-074, AFR-PSM-075, AFR-PSM-076, AFR-PSM-077, AFR-PSM-078, AFR-PSM-081, AFR-PSM-087, AFR-PSM-088, AFR-PSM-089, AFR-PSM-091, AFR-PSM-092, PSM-UC-029
     p_emp, p_dept, p_hod, p_ps, _p_dir, _p_acc, _p_aud = _setup_actors()
     policy.seed_default_policy()
     c_dir = _client(stub_iam, uid=9105, role="Director")
 
-    # Policy GET + POST (CFR-PSM-019, AFR-PSM-087, AFR-PSM-088, AFR-PSM-089)
+    # Policy GET + POST (CFR-PSM-019, AFR-PSM-087, AFR-PSM-088, AFR-PSM-089, AFR-PSM-091, AFR-PSM-092)
     r_pol_get = c_dir.get("/api/v1/psm/policy")
     assert r_pol_get.status_code == 200
     assert len(r_pol_get.json()["results"]) >= 1
@@ -161,7 +157,7 @@ def test_http_endpoints_invoices_reports_schedules_audit_notifications_policy(st
     )
     receipts.confirm_receipt(actor=p_emp, grn_id=grn.pk)
 
-    # Invoice list + create + hold + verify + pay via HTTP (AFR-PSM-057..061, PSM-UC-029)
+    # Invoice list + create + hold + verify + pay via HTTP (AFR-PSM-057, AFR-PSM-058, AFR-PSM-059, PSM-UC-029)
     c_acc = _client(stub_iam, uid=9106, role="Accounts Admin")
     r_inv_create = c_acc.post(
         "/api/v1/psm/invoices",
@@ -191,7 +187,7 @@ def test_http_endpoints_invoices_reports_schedules_audit_notifications_policy(st
     )
     assert r_pay.status_code == 201
 
-    # Report schedules list + create + patch via HTTP (AFR-PSM-065..078, AFR-PSM-081)
+    # Report schedules list + create + patch via HTTP (AFR-PSM-080, AFR-PSM-081, PSM-UC-031)
     c_ps = _client(stub_iam, uid=9104, role="ps_admin")
     r_sched = c_ps.post(
         "/api/v1/psm/reports/schedules",
@@ -235,8 +231,7 @@ def test_http_endpoints_invoices_reports_schedules_audit_notifications_policy(st
 
 
 def test_discrepancy_resolution_return_replacement_and_communication():
-    # AFR-PSM-046, AFR-PSM-049, AFR-PSM-050, AFR-PSM-051, AFR-PSM-052, AFR-PSM-053
-    # AFR-PSM-054, AFR-PSM-055, BR-PSM-025, BW-PSM-06, BW-PSM-10
+    # AFR-PSM-046, AFR-PSM-049, AFR-PSM-050, AFR-PSM-051, AFR-PSM-052, AFR-PSM-053, AFR-PSM-054, AFR-PSM-055, BR-PSM-025, BW-PSM-06, BW-PSM-10
     p_emp, p_dept, p_hod, p_ps, _p_dir, _p_acc, _p_aud = _setup_actors()
     policy.seed_default_policy()
     v = vendors.onboard_vendor(
@@ -293,6 +288,24 @@ def test_discrepancy_resolution_return_replacement_and_communication():
             requested_resolution="replacement",
             evidence_url="http://evil.example.com/bad.exe",
         )
+
+    # AFR-PSM-050: initiate and resolve a return discrepancy case when required by policy.
+    return_case = discrepancies.report_discrepancy(
+        actor=p_emp,
+        grn_id=grn.pk,
+        discrepancy_type="damage",
+        affected_quantity=1,
+        description="Damaged port — initiate vendor return",
+        requested_resolution="return",
+    )
+    assert return_case.requested_resolution == "return"
+    return_resolved = discrepancies.resolve_case(
+        actor=p_ps,
+        case_id=return_case.pk,
+        resolution_action="resolve",
+        resolution_notes="Returned 1 damaged unit to vendor",
+    )
+    assert return_resolved.status == "resolved"
 
     case = discrepancies.report_discrepancy(
         actor=p_emp,
@@ -358,11 +371,7 @@ def test_discrepancy_resolution_return_replacement_and_communication():
 
 
 def test_transfers_cancel_stock_adjustments_vendor_updates_and_approvals():
-    # AFR-PSM-005, AFR-PSM-006, AFR-PSM-007, AFR-PSM-010, AFR-PSM-011, AFR-PSM-014
-    # AFR-PSM-017, AFR-PSM-018, AFR-PSM-019, AFR-PSM-023, AFR-PSM-024, AFR-PSM-025, AFR-PSM-026
-    # AFR-PSM-029, AFR-PSM-030, AFR-PSM-031, AFR-PSM-033, AFR-PSM-034, AFR-PSM-035, AFR-PSM-036
-    # AFR-PSM-038, AFR-PSM-039, AFR-PSM-041, AFR-PSM-042, AFR-PSM-043, AFR-PSM-044
-    # BR-PSM-021, BR-PSM-027, PSM-UC-020, PSM-UC-026, PSM-UC-027, PSM-UC-032, PSM-UC-033, PSM-UC-034
+    # AFR-PSM-005, AFR-PSM-006, AFR-PSM-007, AFR-PSM-010, AFR-PSM-014, AFR-PSM-023, AFR-PSM-024, AFR-PSM-025, AFR-PSM-026, AFR-PSM-029, AFR-PSM-030, AFR-PSM-031, AFR-PSM-038, AFR-PSM-039, AFR-PSM-041, AFR-PSM-042, AFR-PSM-043, AFR-PSM-044, AFR-PSM-060, AFR-PSM-061, AFR-PSM-065, AFR-PSM-066, AFR-PSM-067, AFR-PSM-068, AFR-PSM-069, AFR-PSM-070, AFR-PSM-071, AFR-PSM-072, AFR-PSM-073, BR-PSM-021, BR-PSM-027, PSM-UC-008, PSM-UC-019, PSM-UC-021, PSM-UC-033, PSM-UC-034
     p_emp, p_dept, p_hod, p_ps, _p_dir, _p_acc, _p_aud = _setup_actors()
     policy.seed_default_policy()
 
@@ -515,7 +524,7 @@ def test_transfers_cancel_stock_adjustments_vendor_updates_and_approvals():
 
 
 def test_reports_all_types_filters_scoping_and_throttle_429(stub_iam, monkeypatch):
-    # AFR-PSM-070..078, CFR-PSM-016
+    # AFR-PSM-074, AFR-PSM-075, AFR-PSM-076, AFR-PSM-077, AFR-PSM-078, AFR-PSM-079, AFR-PSM-082, CFR-PSM-016
     from core.api.throttling import PrincipalScopedThrottle
 
     p_emp, _p_dept, _p_hod, p_ps, _p_dir, p_acc, _p_aud = _setup_actors()
@@ -692,7 +701,7 @@ def test_r1_04_discrepancy_resolve_atomic_inventory_and_accounting_adjustments()
 
 
 def test_r1_07_r1_09_po_state_machine_and_direct_spec_assertions():
-    # R1-07, R1-09: CFR-PSM-009, AFR-PSM-042, AFR-PSM-068..073, PSM-UC-031 direct assertions
+    # R1-07, R1-09: CFR-PSM-009, AFR-PSM-041, AFR-PSM-042, AFR-PSM-080, AFR-PSM-082, PSM-UC-031, PSM-UC-035 direct assertions
     from modules.psm.models import PsmNotification, ReportGenerationLog
 
     p_emp, p_dept, p_hod, p_ps, _p_dir, _p_acc, _p_aud = _setup_actors()
@@ -745,7 +754,7 @@ def test_r1_07_r1_09_po_state_machine_and_direct_spec_assertions():
     assert po.status == "closed"
     with pytest.raises(ConflictError):
         procurement.update_po_schedule(actor=p_ps, po_id=po.pk, delivery_notes="Late note")
-    # Scheduled report creation, update, and execution log (PSM-UC-031, AFR-PSM-071..073)
+    # Scheduled report creation, update, and execution log (PSM-UC-031, PSM-UC-035, AFR-PSM-080, AFR-PSM-082)
     sched = reports.create_schedule(
         actor=p_ps, name="Daily Ops", report_type="operational", cadence="daily", filters={}
     )

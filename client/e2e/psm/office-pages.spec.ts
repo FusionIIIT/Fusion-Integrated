@@ -66,3 +66,21 @@ test.describe("psm: guarded office pages", () => {
     });
   }
 });
+
+test.describe("psm: receipts guard", () => {
+  test.use(signedInAs("psmDirector"));
+
+  test.beforeAll(async ({ browser }) => {
+    await ensureActiveRole(browser, "psmDirector");
+  });
+
+  test("a director without psm.grn.view opening /psm/receipts is told it is not for them", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await actAs(page, "psmDirector");
+    await page.goto("/psm/receipts");
+    await expect(page.getByText("Not available to your role")).toBeVisible();
+    await expect(page.getByRole("main").getByRole("button")).toHaveCount(0);
+  });
+});

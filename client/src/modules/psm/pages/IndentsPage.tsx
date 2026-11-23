@@ -11,19 +11,21 @@ import { DataTable } from "../../../ui/components/DataTable";
 import { ErrorState } from "../../../ui/components/ErrorState";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { useCreateIndent, useIndentAction, useIndentDetail, useIndents } from "../api/hooks";
+import { useCreateIndent, useIndentAction, useIndentDetail, useIndents, useModifyIndent } from "../api/hooks";
 import type { Indent } from "../api/types";
 
 export default function IndentsPage() {
   const { can, session } = useAuth();
   const { data, isPending, error } = useIndents();
   const createIndent = useCreateIndent();
+  const modifyIndent = useModifyIndent();
   const act = useIndentAction();
   const [creating, setCreating] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const detail = useIndentDetail(selectedId);
 
   const [department, setDepartment] = useState("CSE");
+  const [itemId, setItemId] = useState<number | string>("");
   const [itemDesc, setItemDesc] = useState("");
   const [quantity, setQuantity] = useState<number | string>(1);
   const [estimatedCost, setEstimatedCost] = useState("1000.00");
@@ -35,6 +37,7 @@ export default function IndentsPage() {
     createIndent.mutate(
       {
         department,
+        ...(itemId !== "" && Number(itemId) > 0 ? { item_id: Number(itemId) } : {}),
         item_description: itemDesc,
         quantity: Number(quantity),
         estimated_cost: estimatedCost,
@@ -44,6 +47,7 @@ export default function IndentsPage() {
       {
         onSuccess: () => {
           setCreating(false);
+          setItemId("");
           setItemDesc("");
           setJustification("");
           notifications.show({ color: "green", title: "Indent submitted", message: "Your indent has entered review." });
@@ -126,6 +130,26 @@ export default function IndentsPage() {
                   {can("psm.procurement.approve") && r.status === "awaiting_final_approval" && (
                     <Button size="xs" onClick={() => runAction(r.id, "final-decision", { decision: "approve" })}>Final approve</Button>
                   )}
+                  {can("psm.indent.create") && r.user_id === session?.user.id && (
+                    <Button size="xs" variant="subtle" onClick={() => runAction(r.id, "repeat")}>Repeat</Button>
+                  )}
+                  {can("psm.indent.update") && r.user_id === session?.user.id && (r.status === "draft" || r.status === "submitted" || r.status === "changes_requested") && (
+                    <Button
+                      size="xs"
+                      variant="subtle"
+                      onClick={() =>
+                        modifyIndent.mutate(
+                          { id: r.id, body: { quantity: r.quantity + 1 } },
+                          {
+                            onSuccess: () => notifications.show({ color: "green", title: "Modified", message: "Indent quantity updated." }),
+                            onError: (e) => notifications.show({ color: "red", title: "Modify refused", message: errorMessage(e) }),
+                          },
+                        )
+                      }
+                    >
+                      Modify
+                    </Button>
+                  )}
                   {can("psm.indent.delete") && r.user_id === session?.user.id && r.status === "submitted" && (
                     <Button size="xs" variant="subtle" color="red" onClick={() => runAction(r.id, "withdraw", { reason: "Withdrawn" })}>
                       Withdraw
@@ -154,6 +178,7 @@ export default function IndentsPage() {
             onChange={(v) => setDepartment(v ?? "CSE")}
           />
           <TextInput label="Item description" value={itemDesc} onChange={(e) => setItemDesc(e.currentTarget.value)} required />
+          <NumberInput label="Stock item ID (optional)" min={1} value={itemId} onChange={setItemId} />
           <NumberInput label="Quantity" min={1} value={quantity} onChange={setQuantity} required />
           <TextInput label="Estimated cost" value={estimatedCost} onChange={(e) => setEstimatedCost(e.currentTarget.value)} required />
           <Textarea label="Justification" value={justification} onChange={(e) => setJustification(e.currentTarget.value)} required />
