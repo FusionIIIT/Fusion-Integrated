@@ -1,7 +1,7 @@
 # Department: quality report
 
 Branch `module/department`, cut from `main` at `5595be6`. Every number below came from runs made
-after the last code change (round 5 fixes included). Spec: `06-DEPT` v1.2.
+after the last code change (round 6 fixes included). Spec: `06-DEPT` v1.2.
 
 ## 1. Gates
 
@@ -15,13 +15,13 @@ all contract getters are plural
 nav items and client routes agree
 permission manifest matches the registries
 openapi schema matches the code
-958 passed, 27 subtests passed          (whole repository, .venv/bin/python -m pytest)
+987 passed, 27 subtests passed          (whole repository, .venv/bin/python -m pytest)
 ```
 
 `make check-client`, exit 0: `tsc --noEmit` (app and e2e) clean; `Test Files 15 passed (15)`,
-`Tests 105 passed (105)`; `✓ built in 1.41s`. The largest department chunk is `InventoryPage`, 2.00 kB gzip.
+`Tests 105 passed (105)`; `✓ built in 2.13s`. The largest department chunk is `InventoryPage`, 2.00 kB gzip.
 
-`make e2e`, exit 0: `28 passed (14.7s)`, run on the final code, with no 5xx and no 403 in the `runserver` log of that run (`grep -c '" 403 '` printed 0). This is 19 department tests and the 9 existing ones, with
+`make e2e`, exit 0: `28 passed (1.4m)`, run on the final code, with no 5xx and no 403 in the `runserver` log of that run (`grep -c '" 403 '` printed 0). This is 19 department tests and the 9 existing ones, with
 `E2E_IAM_DIR` set and the grants in §8.
 
 Deploy check, with the production settings exactly as Step 7.7 gives them:
@@ -33,7 +33,7 @@ Deploy check, with the production settings exactly as Step 7.7 gives them:
 
 ```text
 pytest modules/department --cov=modules/department --cov-branch --cov-fail-under=90
-TOTAL  1813 stmts  23 miss  272 branches  17 partial  98%   Total coverage: 98.08%
+TOTAL  1817 stmts  23 miss  272 branches  17 partial  98%   Total coverage: 98.09%
 
 pytest modules/department --cov=modules/department/domain --cov-branch --cov-fail-under=95
 TOTAL   209 stmts   0 miss   72 branches   0 partial  100%  Total coverage: 100.00%
@@ -43,19 +43,19 @@ TOTAL   209 stmts   0 miss   72 branches   0 partial  100%  Total coverage: 100.
 
 ## 3. Tests
 
-533 department backend tests:
+562 department backend tests:
 
 | File | Tests | What it covers |
 |---|---|---|
 | `test_domain.py` | 71 | Every rule branch, with no database. Every illegal transition is generated from the tables. |
 | `test_acting_role.py` | 65 | Only the acting role counts. For all 21 office write endpoints: the HOD, Dept_Admin and central holder acting in a plain role are refused, and nothing in any table changes. An outgoing HOD or Dept_Admin is refused every write in their office role and in a plain one (BR-DEPT-024). The negative twin succeeds in the office role. `context` reports the acting role. |
 | `test_journeys.py` | 34 | Every live UC through HTTP only (below). A student never sees another programme's slots (R5-02). |
-| `test_privilege_escalation.py` | 262 | For each of the 41 endpoints, each view asks for exactly the permission its endpoint needs, and: module grant without the permission is 403; permission without the module grant is 403; no session is 401; a plain staff user gets nothing; a student is refused office endpoints. Also `HEAD` and `OPTIONS` need the read permission, an unmapped method is refused, the role switch, per-office verbs, central-only assignment, designation without tenure, CSRF, and that permission codes match the registry. |
-| `test_scoping_isolation.py` | 16 | Another department's rows are absent from lists and 404 by id. A principal holding student, faculty and both office designations, acting as a student or as faculty, gets an empty list from every office-only list (R4-02). Feedback is confidential. A status filter cannot widen scope. Students never see alumni or inactive profiles. Vacancy warnings follow the viewer's departments. |
+| `test_privilege_escalation.py` | 287 | Every one of the 25 write endpoints answers 429 on the repeat at a one-per-minute rate (R6-01). For each of the 41 endpoints, each view asks for exactly the permission its endpoint needs, and: module grant without the permission is 403; permission without the module grant is 403; no session is 401; a plain staff user gets nothing; a student is refused office endpoints. Also `HEAD` and `OPTIONS` need the read permission, an unmapped method is refused, the role switch, per-office verbs, central-only assignment, designation without tenure, CSRF, and that permission codes match the registry. |
+| `test_scoping_isolation.py` | 18 | A deleted announcement is gone from the HOD's list and detail, and faculty never see a deactivated profile (R6-02). Another department's rows are absent from lists and 404 by id. A principal holding student, faculty and both office designations, acting as a student or as faculty, gets an empty list from every office-only list (R4-02). Feedback is confidential. A status filter cannot widen scope. Students never see alumni or inactive profiles. Vacancy warnings follow the viewer's departments. |
 | `test_edge_cases.py` | 49 | A tenure that would cut the incumbent short is refused and saves nothing (R5-01); an ended tenure that overlaps nothing cannot be revived (R5-03); a timetable batch over 500 slots is 400 (R5-05). 404 for a department code the column could never hold (a NUL byte, a space, 13 letters), 400 for bad filters (a NUL byte included), out-of-range numbers and ids, and over-long strings (every string the write serializers accept, announcements, official changes and tenures included, is checked against its column, and a notice subject fits even with the longest department prefix), 409 for conflicts, 422 for rule refusals, 429 throttling, the ledger's immutability, and every adversarial question below. |
 | `test_concurrency.py` | 8 | Real threads on a `Barrier`, with `transaction=True`: issue race, double issue, double decision, overlapping tenures, transitions twice, delivery twice. The database triggers refuse an overlapping tenure written around the service (raced) and a clashing slot written directly. |
 | `test_query_budgets.py` | 12 | The same query count with 2 rows and with 20, for all 11 list endpoints, plus prefetched notes. |
-| `test_schedule.py` | 14 | Beat entries merged and routed; each task twice in a row; readiness, seeding and command output; vacant and ending roles named (Q1); the headship contract. |
+| `test_schedule.py` | 16 | The same notice queued twice is stored once, and a failed send never stores an address (R6-05). Beat entries merged and routed; each task twice in a row; readiness, seeding and command output; vacant and ending roles named (Q1); the headship contract. |
 | `test_client_route_guards.py` | 2 | Every client route is guarded with its own nav item's permission. |
 
 Client: 59 department vitest tests. Each of the 8 pages tests loading, empty, a 500 error, a
@@ -117,6 +117,15 @@ Round 5 breaks, each run against the whole module or page and copied back:
 | Ended tenure (R5-03) | `if tenure.valid_to <= now:` becomes `if False:` | `test_r5_03_an_ended_tenure_that_overlaps_nothing_cannot_be_revived` |
 | Row-action refusals (R5-04) | each of `hide`, `remove` (Announcements), `decide`, `issue`, request list (Inventory), `decide` (Overview), `update` (Profiles) and `remove` (Timetable) dropped from its `ActionError`, one at a time | one page test each, for example "shows the server's refusal when issuing fails" |
 | Client gates | Labs "Edit", Inventory "Issue", Feedback "Review" and Roles "Change end" ungated, after the page split | 1–2 page tests each |
+
+Round 6 breaks, each run against the whole module and copied back:
+
+| Rule broken | Change | Caught by |
+|---|---|---|
+| Write throttle (R6-01) | `throttle_scope = None` on `StockRequestDecideView` | `test_r6_01_every_write_endpoint_is_throttled[post-stock-requests/1/decide-…]` |
+| Deleted announcements (R6-02) | the HOD branch of `announcements_for` returns `qs` | `test_r6_02_a_deleted_announcement_is_gone_from_the_hods_list_and_detail` |
+| Inactive profiles (R6-02) | the faculty branch of `profiles_for` returns `qs` | `test_r6_02_faculty_never_see_a_deactivated_profile` |
+| Outbox dedupe (R6-05) | `ignore_conflicts=False` | `test_r6_05_the_same_notice_queued_twice_is_stored_once` |
 
 ## 5. Adversarial pass
 
@@ -609,6 +618,7 @@ No dependency was added.
 | 3 | `916b6b0` | 7 | 10 | 10 | 3 | 4 | 10 | 7 | 10 | 10 | 6 (2 Blocker, 4 Major) |
 | 4 | `6b52d64` | 10 | 10 | 8 | 7 | 7 | 10 | 10 | 10 | 10 | 4 (2 Major, 2 Minor) |
 | 5 | `ad7558e` | 7 | 10 | 9 | 9 | 4 | 10 | 7 | 8 | 10 | 8 (4 Major, 4 Minor) |
+| 6 | `c04569e` | 10 | 10 | 10 | 10 | 3 | 10 | 9 | 9 | 10 | 5 (2 Major, 3 Minor) |
 
 What round 1 found, and what changed:
 
@@ -684,6 +694,27 @@ What round 5 found, and what changed:
 | R5-08 | §8 pastes the per-spec logs of runs on the final code, and §1 and §8 agree: no 403 and no 5xx. |
 | Question 1 | Answered by R5-01: the incumbent's remaining time is kept; such a tenure is refused. |
 | Question 2 | The central authority does not see official changes; BR-DEPT-011 and BR-DEPT-013 name only Dept_Admin and HOD, as approved in the blueprint. |
+
+What round 6 found, and what changed:
+
+| Finding | Change |
+|---|---|
+| R6-01 | A test sends every write endpoint twice at one write a minute and gets 429 on the repeat. |
+| R6-02 | Tests show a deleted announcement is gone from the HOD's list and detail, and faculty never see a deactivated profile. |
+| R6-03 | The two response shapes mark every field required (they are always sent), and `types.ts` marks optional exactly what the write schemas leave optional, `bio` included. A script compared every interface with its schema: no mismatch. |
+| R6-04 | The endpoint table has `GET feedback/{id}`. |
+| R6-05 | A test queues the same notice twice and finds one row. |
+| Round 6 question 3 | Proposed and built: a failed send stores its error with every address replaced by `[address]`; tested. |
+
+**After round 6: fix or waive.** Student 1 proposes fixing every round 6 finding (done above) and
+waiving none. The round 6 questions have these proposed answers. **They await Student 2's written
+decision**, which will be recorded in §11 before round 7:
+
+| Question | Proposed answer |
+|---|---|
+| 1. May an HOD decide a stock request they made while acting as faculty? | Keep Q14 as approved: no self-decision guard; the request and the decision are both in the audit trail. |
+| 2. Does the 50-line limit apply to a test file's `describe(...)` block? | No: it groups short tests and is not itself a function; every `it` and every function is 50 lines or fewer. |
+| 3. Should `last_error` keep a recipient address? | No; built as above, and reverted if Student 2 decides otherwise. |
 
 The six approver questions from rounds 1, 2 and 3 were answered by Student 2 on 2026-11-23 (§11);
 every answer keeps the current behaviour.

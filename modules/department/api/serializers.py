@@ -284,7 +284,8 @@ class DeptTimetableSlotSerializer(serializers.ModelSerializer):
             "room",
             "updated_at",
         ]
-        read_only_fields = ["id", "updated_at"]
+        # A response shape only: every field is always sent, so the schema marks each required.
+        read_only_fields = fields
 
 
 class DeptTimetableSlotWriteSerializer(serializers.Serializer):
@@ -329,7 +330,8 @@ class DeptLabResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = LabResource
         fields = ["id", "name", "location", "equipment", "capacity", "status", "updated_at"]
-        read_only_fields = ["id", "updated_at"]
+        # A response shape only: every field is always sent, so the schema marks each required.
+        read_only_fields = fields
 
 
 class DeptLabResourceEditSerializer(serializers.Serializer):

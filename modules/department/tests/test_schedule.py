@@ -184,3 +184,25 @@ def test_readiness_command_prints_each_vacancy_but_stays_ready(world):
     text = out.getvalue()
     assert "SM has no HOD in effect" in text and "Department module is ready." in text
     assert "CSE has no HOD" not in text
+
+
+@pytest.mark.django_db
+def test_r6_05_the_same_notice_queued_twice_is_stored_once(world):
+    args = {"topic": "feedback.created", "recipients": [9], "key": "7", "subject": "s", "body": "b"}
+    assert notifications.enqueue(**args) == 1
+    notifications.enqueue(**args)
+    assert DepartmentNotification.objects.filter(dedupe_key="feedback.created:7:9").count() == 1
+
+
+@pytest.mark.django_db
+def test_r6_q3_a_failed_send_never_stores_the_recipients_address(world, stub_iam, monkeypatch):
+    stub_iam(None, users={})
+
+    def refuse(row, address):
+        raise RuntimeError("550 mailbox <p.rao@example.test> refused; cc q@example.test")
+
+    monkeypatch.setattr(notifications, "_send", refuse)
+    notifications.enqueue(topic="feedback.created", recipients=[9], key="1", subject="s", body="b")
+    notifications.deliver_pending()
+    error = DepartmentNotification.objects.get().last_error
+    assert "@" not in error and error.startswith("550 mailbox <[address]> refused")

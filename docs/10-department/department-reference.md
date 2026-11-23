@@ -117,7 +117,7 @@ Written by `ops/docs/department_reference.py`; do not edit by hand.
 | AFR-DEPT-043 | [modules/department/services/inventory.py:152](../../modules/department/services/inventory.py#L152) | notify Faculty on Issued (and on Rejected in decide) |
 | AFR-DEPT-044 | [modules/department/services/feedback.py:45](../../modules/department/services/feedback.py#L45) | notify Dept_Admin of new feedback |
 | AFR-DEPT-045 | [modules/department/services/feedback.py:60](../../modules/department/services/feedback.py#L60) | notify the submitter |
-| AFR-DEPT-046 | [modules/department/services/notifications.py:67](../../modules/department/services/notifications.py#L67) | notify the announcement's audience |
+| AFR-DEPT-046 | [modules/department/services/notifications.py:76](../../modules/department/services/notifications.py#L76) | notify the announcement's audience |
 | AFR-DEPT-047 | [modules/department/services/roles.py:37](../../modules/department/services/roles.py#L37) | assign to institute employees |
 | AFR-DEPT-048 | [modules/department/models/roles.py:19](../../modules/department/models/roles.py#L19) | time-bounded validity |
 | AFR-DEPT-049 | [modules/department/selectors/actors.py:28](../../modules/department/selectors/actors.py#L28) | outgoing access ends at valid_to |

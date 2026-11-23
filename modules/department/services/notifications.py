@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
 from datetime import timedelta
 
@@ -43,6 +44,14 @@ _DISCIPLINE = {
 
 CLAIM_TIMEOUT = timedelta(minutes=10)
 SUBJECT_MAX = DepartmentNotification._meta.get_field("subject").max_length
+
+
+_ADDRESS = re.compile(r"[^\s<>'\"(),;]+@[^\s<>'\"(),;]+")
+
+
+def _without_addresses(text: str) -> str:
+    """A mail error can name the recipient; the stored error never keeps an address."""
+    return _ADDRESS.sub("[address]", text)
 
 
 def enqueue(*, topic: str, recipients, key: str, subject: str, body: str) -> int:
@@ -137,7 +146,7 @@ def deliver_pending(*, limit: int | None = None, now=None) -> DeliveryReport:
                     else DepartmentNotification.PENDING
                 ),
                 attempts=attempts,
-                last_error=str(exc)[:300],
+                last_error=_without_addresses(str(exc))[:300],
                 claimed_at=None,
             )
             log.warning("department.notify.failed id=%s attempts=%s", row.pk, attempts)

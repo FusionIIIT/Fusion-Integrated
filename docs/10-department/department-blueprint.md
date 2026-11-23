@@ -443,6 +443,7 @@ rule refusal gives 422 (`api-conventions.md`).
 | POST | `stock-requests/{id}/issue` | `stock_issue.create` | issued | BR-007/016 |
 | GET | `feedback` | `feedback.view` | in scope | BR-017 |
 | POST | `feedback` | `feedback.create` | 201 new | BR-008 |
+| GET | `feedback/{id}` | `feedback.view` | one feedback, with its notes, in the viewer's scope (404 otherwise) | BR-017, BR-018 |
 | POST | `feedback/{id}/review` | `feedback.review` | under_review (or closed) | BR-018, AFR-021 |
 | POST | `feedback/{id}/dispose` | `feedback_resolution.create` | resolved/closed | BR-009 |
 | POST | `feedback/{id}/notes` | `feedback_resolution.create` | 201 note | UC-014 |

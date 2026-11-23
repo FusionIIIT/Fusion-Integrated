@@ -242,3 +242,21 @@ def test_each_view_asks_for_exactly_the_permission_its_endpoint_needs(method, pa
 
     view = resolve(f"{API}/{path}").func.view_class
     assert view.perms.get(method.upper()) == code, (path, method, view.perms)
+
+
+WRITES = [e for e in ENDPOINTS if e[0] != "get"]
+
+
+@pytest.mark.parametrize(("method", "path", "code"), WRITES)
+def test_r6_01_every_write_endpoint_is_throttled(world, stub_iam, monkeypatch, method, path, code):
+    # Step 7.7: one write passes the throttle, the repeat is 429, whatever the first one answered
+    from django.core.cache import cache
+    from rest_framework.throttling import SimpleRateThrottle
+
+    rates = {**SimpleRateThrottle.THROTTLE_RATES, "department_write": "1/min"}
+    monkeypatch.setattr(SimpleRateThrottle, "THROTTLE_RATES", rates)
+    cache.clear()
+    c = _client(stub_iam, session_for("admin", permissions=DECLARED))
+    first = getattr(c, method)(f"{API}/{path}", {}, format="json")
+    second = getattr(c, method)(f"{API}/{path}", {}, format="json")
+    assert first.status_code != 429 and second.status_code == 429, (path, first.status_code)

@@ -167,3 +167,32 @@ def test_r4_02_a_dual_designation_principal_lists_only_the_acting_roles_rows(wor
     assert act("admin").get(f"{API}/{path}").json()["results"], "the office must see rows here"
     res = act(who, also_holds=OFFICE_HELD).get(f"{API}/{path}")
     assert res.status_code == 200 and res.json()["results"] == []
+
+
+def test_r6_02_a_deleted_announcement_is_gone_from_the_hods_list_and_detail(world, act):
+    # AFR-DEPT-006 with Q7: kept for audit, gone from every view
+    ann = _new(
+        act, "faculty", "announcements", {"title": "Gone", "body": "b", "audience_role": "all"}
+    )
+    hidden = _new(
+        act, "faculty", "announcements", {"title": "Hid", "body": "b", "audience_role": "all"}
+    )
+    hod = act("hod")
+    assert hod.delete(f"{API}/announcements/{ann}").status_code == 204
+    assert hod.post(f"{API}/announcements/{hidden}/hide").status_code == 200
+    assert [a["title"] for a in hod.get(f"{API}/announcements").json()["results"]] == ["Hid"]
+    assert hod.patch(f"{API}/announcements/{ann}", {"title": "x"}, format="json").status_code == 404
+
+
+def test_r6_02_faculty_never_see_a_deactivated_profile(world, act):
+    # Q8: a record is deactivated, never deleted; only the office still sees it
+    prof = _new(act, "admin", "profiles", {"kind": "alumni", "display_name": "Old Alum"})
+    assert (
+        act("admin")
+        .patch(f"{API}/profiles/{prof}", {"is_active": False}, format="json")
+        .status_code
+        == 200
+    )
+    assert act("faculty").get(f"{API}/profiles").json()["results"] == []
+    assert act("faculty").get(f"{API}/profiles/{prof}").status_code == 404
+    assert [p["id"] for p in act("admin").get(f"{API}/profiles").json()["results"]] == [prof]

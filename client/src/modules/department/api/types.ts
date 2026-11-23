@@ -61,8 +61,8 @@ export interface AnnouncementInput {
   title: string;
   body: string;
   audience_role: AudienceRole;
-  programme: string;
-  batch_year: number | null;
+  programme?: string;
+  batch_year?: number | null;
 }
 
 export interface InventoryItem {
@@ -135,16 +135,16 @@ export interface Feedback {
 
 export interface TimetableSlotInput {
   kind: "class" | "lab";
-  programme: string;
-  batch_year: number | null;
+  programme?: string;
+  batch_year?: number | null;
   course_code: string;
   day_of_week: number;
   starts_at: string;
   ends_at: string;
-  room: string;
+  room?: string;
 }
 
-export interface TimetableSlot extends TimetableSlotInput {
+export interface TimetableSlot extends Required<TimetableSlotInput> {
   id: number;
   updated_at: string;
 }
@@ -183,12 +183,13 @@ export interface Profile {
 
 export interface ProfileInput {
   kind: Profile["kind"];
-  user_id: number | null;
-  display_name: string;
-  office: string;
-  research_interests: string;
-  current_position: string;
-  graduation_year: number | null;
+  user_id?: number | null;
+  display_name?: string;
+  office?: string;
+  research_interests?: string;
+  bio?: string;
+  current_position?: string;
+  graduation_year?: number | null;
 }
 
 export interface Tenure {

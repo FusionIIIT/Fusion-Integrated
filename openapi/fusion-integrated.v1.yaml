@@ -4179,26 +4179,32 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 120
+          readOnly: true
         location:
           type: string
-          maxLength: 120
+          readOnly: true
         equipment:
           type: string
+          readOnly: true
         capacity:
           type: integer
-          maximum: 2147483647
-          minimum: 0
+          readOnly: true
           nullable: true
         status:
-          $ref: '#/components/schemas/DeptLabResourceStatusEnum'
+          allOf:
+          - $ref: '#/components/schemas/DeptLabResourceStatusEnum'
+          readOnly: true
         updated_at:
           type: string
           format: date-time
           readOnly: true
       required:
+      - capacity
+      - equipment
       - id
+      - location
       - name
+      - status
       - updated_at
     DeptLabResourceEdit:
       type: object
@@ -4670,38 +4676,41 @@ components:
           readOnly: true
         programme:
           type: string
-          maxLength: 40
+          readOnly: true
         batch_year:
           type: integer
-          maximum: 32767
-          minimum: 0
+          readOnly: true
           nullable: true
         course_code:
           type: string
-          maxLength: 20
+          readOnly: true
         day_of_week:
           type: integer
-          maximum: 32767
-          minimum: 0
+          readOnly: true
         starts_at:
           type: string
           format: time
+          readOnly: true
         ends_at:
           type: string
           format: time
+          readOnly: true
         room:
           type: string
-          maxLength: 40
+          readOnly: true
         updated_at:
           type: string
           format: date-time
           readOnly: true
       required:
+      - batch_year
       - course_code
       - day_of_week
       - ends_at
       - id
       - kind
+      - programme
+      - room
       - starts_at
       - updated_at
     DeptTimetableSlotWrite:
