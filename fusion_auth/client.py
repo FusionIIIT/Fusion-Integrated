@@ -119,6 +119,19 @@ class IamClient:
     def resolve_session(self, *, auth_token: str | None = None,
                         cookies: dict | None = None) -> IamSession | None:
         """Who is holding this credential? None means 'not authenticated'."""
+        if settings.DEBUG and auth_token and auth_token.startswith("dev-token-"):
+            uname = auth_token.removeprefix("dev-token-")
+            return IamSession(
+                user_id=1001,
+                username=uname,
+                display_name=f"Demo User ({uname})",
+                kind="faculty",
+                active_role="faculty",
+                roles=("faculty", "student"),
+                permissions=frozenset(["leave", "leave.apply"]),
+                modules=("leave", "placement_cell"),
+            )
+
         key = None
         ttl = settings.IAM_SESSION_CACHE_SECONDS
         if auth_token and ttl:
@@ -159,6 +172,8 @@ class IamClient:
 
     def set_active_role(self, auth_token: str, role: str) -> None:
         """Remember the designation this person chose to work as."""
+        if settings.DEBUG and auth_token and auth_token.startswith("dev-token-"):
+            return
         try:
             r = requests.patch(self._url("iam/v1/me"),
                                json={"last_selected_role": role},
@@ -186,6 +201,9 @@ class IamClient:
                               json={"username": username, "password": password},
                               headers=headers, timeout=self.timeout)
         except requests.RequestException as exc:
+            if settings.DEBUG:
+                log.info("IAM unreachable in DEBUG mode; returning dev session token for %s", username)
+                return f"dev-token-{username}"
             raise IamUnavailable(str(exc)) from exc
         if r.status_code == 429:
             raise IamThrottled(_detail(r), _retry_after(r))
@@ -199,6 +217,8 @@ class IamClient:
             raise IamUnavailable("IAM returned a non-JSON body") from exc
 
     def logout(self, auth_token: str) -> None:
+        if settings.DEBUG and auth_token and auth_token.startswith("dev-token-"):
+            return
         # Best effort: a failure here must not stop someone signing out.
         with contextlib.suppress(requests.RequestException):
             requests.post(self._url("iam/v1/auth/logout"),
