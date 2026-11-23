@@ -37,7 +37,7 @@ class CourseSerializer(serializers.Serializer):
     syllabus = serializers.CharField()
     schedule = serializers.CharField()
     details_published_at = serializers.DateTimeField(allow_null=True)
-    acting_course_role = serializers.CharField()
+    acting_course_role = serializers.ChoiceField(choices=("STUDENT", "FACULTY", "TA", "OBSERVER"))
     can_post_announcements = serializers.BooleanField()
     staff = StaffSerializer(many=True)
     sections = SectionSerializer(many=True)
@@ -49,6 +49,9 @@ class CourseInput(serializers.Serializer):
 
 
 class PolicySerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True, allow_null=True)
+    effective_from = serializers.DateTimeField(read_only=True, allow_null=True)
+
     class Meta:
         model = CoursePolicyVersion
         fields = (
@@ -81,7 +84,7 @@ class FileSerializer(serializers.ModelSerializer):
 
 
 class MaterialSerializer(serializers.ModelSerializer):
-    file = FileSerializer(source="stored_file", read_only=True)
+    file = FileSerializer(source="stored_file", read_only=True, allow_null=True)
 
     class Meta:
         model = Material
@@ -179,7 +182,7 @@ class GradeSerializer(serializers.ModelSerializer):
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
-    file = FileSerializer(source="stored_file", read_only=True)
+    file = FileSerializer(source="stored_file", read_only=True, allow_null=True)
 
     class Meta:
         model = Submission

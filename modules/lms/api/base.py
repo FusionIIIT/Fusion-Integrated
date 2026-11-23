@@ -1,4 +1,6 @@
-from rest_framework.exceptions import APIException
+from collections.abc import Mapping
+
+from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
@@ -44,7 +46,12 @@ class LmsView(GenericAPIView):
         return super().get_throttles()
 
     def inputs(self, serializer, *, partial=False):
+        if not isinstance(self.request.data, Mapping):
+            raise ValidationError({"body": "Send an object containing the declared fields."})
         data = serializer(data=self.request.data, partial=partial)
+        unknown = set(self.request.data) - set(data.fields)
+        if unknown:
+            raise ValidationError(dict.fromkeys(sorted(unknown), "Remove this unknown field."))
         data.is_valid(raise_exception=True)
         return data.validated_data
 

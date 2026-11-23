@@ -6,7 +6,7 @@ import { afterEach, expect, it, vi } from "vitest";
 
 import * as downloads from "../../../lib/download";
 import { errorMessage, http } from "../../../lib/http";
-import { useLmsDownload, useLmsList } from "./hooks";
+import { useDownloadMaterial, useCourses, useGrades } from "./hooks";
 import { AuthProvider } from "../../../auth/AuthProvider";
 import type { Session } from "../../../auth/types";
 
@@ -23,7 +23,7 @@ afterEach(() => vi.restoreAllMocks());
 it("loads later cursor pages without dropping earlier courses", async () => {
   vi.spyOn(http, "get").mockResolvedValueOnce({ data: { results: [{ id: 1 }], next: "http://localhost:8002/api/v1/lms/courses/?cursor=next" } })
     .mockResolvedValueOnce({ data: { results: [{ id: 2 }], next: null } });
-  const { result } = renderHook(() => useLmsList<{ id: number }>("/lms/courses/"), { wrapper });
+  const { result } = renderHook(() => useCourses(), { wrapper });
   await waitFor(() => expect(result.current.items).toEqual([{ id: 1 }]));
   await act(async () => { await result.current.fetchNextPage(); });
   await waitFor(() => expect(result.current.items).toEqual([{ id: 1 }, { id: 2 }]));
@@ -34,17 +34,17 @@ it("downloads bytes through the shared client and uses the server filename", asy
   const blob = new Blob(["work"]);
   vi.spyOn(http, "get").mockResolvedValue({ data: blob, headers: { "content-disposition": "attachment; filename=work.txt" } });
   vi.spyOn(downloads, "saveBlob").mockImplementation(() => undefined);
-  const { result } = renderHook(() => useLmsDownload(), { wrapper });
-  await act(async () => { await result.current.mutateAsync({ path: "/lms/materials/1/download/", fallback: "material" }); });
+  const { result } = renderHook(() => useDownloadMaterial(), { wrapper });
+  await act(async () => { await result.current.mutateAsync({ id: 1, fallback: "material" }); });
   expect(downloads.saveBlob).toHaveBeenCalledWith(blob, "work.txt");
 });
 
 it("decodes a download refusal instead of saving the error as a file", async () => {
   vi.spyOn(http, "get").mockRejectedValue({ response: { data: new Blob([JSON.stringify({ error: { message: "Not permitted" } })]) } });
   vi.spyOn(downloads, "saveBlob").mockImplementation(() => undefined);
-  const { result } = renderHook(() => useLmsDownload(), { wrapper });
+  const { result } = renderHook(() => useDownloadMaterial(), { wrapper });
   await act(async () => {
-    await expect(result.current.mutateAsync({ path: "/lms/materials/1/download/", fallback: "material" })).rejects.toBeDefined();
+    await expect(result.current.mutateAsync({ id: 1, fallback: "material" })).rejects.toBeDefined();
   });
   await waitFor(() => expect(errorMessage(result.current.error)).toBe("Not permitted"));
   expect(downloads.saveBlob).not.toHaveBeenCalled();
@@ -58,7 +58,7 @@ it("does not reuse a faculty grade cache while switching to student", async () =
   function scopedWrapper({ children }: { children: ReactNode }) {
     return <MemoryRouter><QueryClientProvider client={client}><AuthProvider>{children}</AuthProvider></QueryClientProvider></MemoryRouter>;
   }
-  const { result } = renderHook(() => useLmsList<{ secret: string }>("/lms/courses/1/grades/"), { wrapper: scopedWrapper });
+  const { result } = renderHook(() => useGrades(1), { wrapper: scopedWrapper });
   await waitFor(() => expect(result.current.items).toEqual([{ secret: "draft" }]));
   act(() => { client.setQueryData(["session"], session); });
   await waitFor(() => expect(result.current.items).toEqual([]));

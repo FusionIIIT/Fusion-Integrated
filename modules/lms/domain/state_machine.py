@@ -28,15 +28,18 @@ GRADE_TRANSITIONS = MappingProxyType(
 def transition(table, state, event, role, *, now=None, release_at=None):
     target = table.get((state, event, role))
     if target is None:
-        raise RuleViolation("The current state does not allow this action.", "LMS_STATE_CONFLICT")
+        raise RuleViolation(
+            "Refresh this item and choose an action allowed in its current state.",
+            "LMS_STATE_CONFLICT",
+        )
     if event == "schedule" and (
         release_at is None or release_at.utcoffset() is None or release_at <= now
     ):
-        raise RuleViolation("Scheduled release must be in the future.")
+        raise RuleViolation("Choose a future scheduled release time.")
     if (
         event == "release"
         and table is CONTENT_TRANSITIONS
         and (release_at is None or release_at > now)
     ):
-        raise RuleViolation("Scheduled content is not due for release.")
+        raise RuleViolation("Wait until the scheduled release time before retrying.")
     return target

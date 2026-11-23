@@ -3,7 +3,9 @@ import { useState } from "react";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { useCourse, useCoursePolicy, useLmsList, useLmsWrite } from "../api/hooks";
+import { useCourse, useCoursePolicy, useUpdateCourse, useCreatePolicyVersion, useCreateSection,
+  useUpdateSection, useMaterials, useCreateMaterial, useUpdateMaterial, useAssignments,
+  useCreateAssignment, useUpdateAssignment } from "../api/hooks";
 import type { Assignment, Course, Material, Section } from "../api/types";
 import { CoursePicker, Feedback, ListState, localValue, Pending, utcValue } from "../components/Common";
 import { ReleaseControls } from "../components/ReleaseControls";
@@ -26,15 +28,15 @@ function TeachingWorkspace({ id }: { id: number }) {
 }
 
 function Details({ course }: { course: Course }) {
-  const write = useLmsWrite();
-  const policy = useLmsWrite();
+  const write = useUpdateCourse(course.id);
+  const policy = useCreatePolicyVersion(course.id);
   const { can } = useAuth();
   const [syllabus, setSyllabus] = useState(course.syllabus);
   const [schedule, setSchedule] = useState(course.schedule);
   // Faculty's posting capability is unconditional; the versioned TA flag is read separately below.
   return <Card withBorder><Title order={2}>Course details</Title>
     {can("lms.course.update") && <form onSubmit={(event) => { event.preventDefault(); write.mutate({
-      path: `/lms/courses/${course.id}/`, method: "patch", data: { syllabus, schedule },
+      syllabus, schedule,
     }); }}><Stack>
       <Textarea label="Syllabus" value={syllabus} onChange={(event) => setSyllabus(event.currentTarget.value)} />
       <Textarea label="Schedule" value={schedule} onChange={(event) => setSchedule(event.currentTarget.value)} />
@@ -45,17 +47,17 @@ function Details({ course }: { course: Course }) {
   </Card>;
 }
 
-function PolicyForm({ id, write }: { id: number; write: ReturnType<typeof useLmsWrite> }) {
+function PolicyForm({ id, write }: { id: number; write: ReturnType<typeof useCreatePolicyVersion> }) {
   const query = useCoursePolicy(id);
   if (query.error) return <Feedback error={query.error} />;
   if (query.isPending) return <Pending />;
-  return <PolicyEditor key={query.data.version} id={id} write={write} initial={query.data.can_ta_post_announcements} />;
+  return <PolicyEditor key={query.data.version} write={write} initial={query.data.can_ta_post_announcements} />;
 }
 
-function PolicyEditor({ id, write, initial }: { id: number; write: ReturnType<typeof useLmsWrite>; initial: boolean }) {
+function PolicyEditor({ write, initial }: { write: ReturnType<typeof useCreatePolicyVersion>; initial: boolean }) {
   const [allowed, allow] = useState(initial);
   return <form onSubmit={(event) => { event.preventDefault(); write.mutate({
-    path: `/lms/courses/${id}/policy-versions/`, data: { can_ta_post_announcements: allowed },
+    can_ta_post_announcements: allowed,
   }); }}><Stack mt="md">
     <Checkbox label="Allow assigned TAs to post announcements" checked={allowed}
       onChange={(event) => allow(event.currentTarget.checked)} />
@@ -80,12 +82,13 @@ function Sections({ course }: { course: Course }) {
 
 function SectionForm({ courseId, row, done }: { courseId: number; row: Section | null; done: () => void }) {
   const [label, setLabel] = useState(row?.label ?? "");
-  const [kind, setKind] = useState(row?.kind ?? "MODULE");
+  const [kind, setKind] = useState<Section["kind"]>(row?.kind ?? "MODULE");
   const [order, setOrder] = useState(row?.order ?? 0);
-  const write = useLmsWrite();
+  const create = useCreateSection(courseId);
+  const update = useUpdateSection(row?.id ?? 0);
+  const write = row ? update : create;
   return <form onSubmit={(event) => { event.preventDefault(); write.mutate({
-    path: row ? `/lms/sections/${row.id}/` : `/lms/courses/${courseId}/sections/`,
-    method: row ? "patch" : "post", data: { label, kind, order },
+    label, kind, order,
   }, { onSuccess: () => { setLabel(""); done(); } }); }}><Stack mt="md">
     <TextInput label="Section label" required value={label} onChange={(event) => setLabel(event.currentTarget.value)} />
     <NativeSelect label="Section kind" data={["MODULE", "WEEK"]} value={kind}
@@ -99,7 +102,7 @@ function SectionForm({ courseId, row, done }: { courseId: number; row: Section |
 }
 
 function MaterialManager({ course }: { course: Course }) {
-  const query = useLmsList<Material>(`/lms/courses/${course.id}/materials/`);
+  const query = useMaterials(course.id);
   const { can } = useAuth();
   const [editing, edit] = useState<Material | null>(null);
   return <section aria-label="Manage materials"><Title order={2}>Manage materials</Title>
@@ -123,15 +126,16 @@ function MaterialForm({ course, row, done }: { course: Course; row: Material | n
   const [file, setFile] = useState<File | null>(null);
   const [section, setSection] = useState(row?.section_id ? String(row.section_id) : "");
   const [order, setOrder] = useState(row?.order ?? 0);
-  const write = useLmsWrite();
+  const create = useCreateMaterial(course.id);
+  const update = useUpdateMaterial(row?.id ?? 0);
+  const write = row ? update : create;
   return <Card withBorder mt="md"><Title order={3}>{row ? "Edit material" : "New material"}</Title>
     <form onSubmit={(event) => { event.preventDefault();
       const data = new FormData(); data.set("title", title); data.set("kind", kind);
       data.set("text", kind === "NOTE" ? text : ""); data.set("url", kind === "LINK" ? url : "");
       data.set("order", String(order)); data.set("section_id", section);
       if (kind === "FILE" && file) data.set("file", file);
-      write.mutate({ path: row ? `/lms/materials/${row.id}/` : `/lms/courses/${course.id}/materials/`,
-        method: row ? "patch" : "post", data }, { onSuccess: () => { setTitle(""); setText(""); done(); } });
+      write.mutate(data, { onSuccess: () => { setTitle(""); setText(""); done(); } });
     }}><Stack>
       <TextInput label="Material title" value={title} onChange={(event) => setTitle(event.currentTarget.value)} />
       <NativeSelect label="Material kind" data={["NOTE", "FILE", "LINK"]} value={kind}
@@ -152,7 +156,7 @@ function MaterialForm({ course, row, done }: { course: Course; row: Material | n
 }
 
 function AssignmentManager({ id }: { id: number }) {
-  const query = useLmsList<Assignment>(`/lms/courses/${id}/assignments/`);
+  const query = useAssignments(id);
   const { can } = useAuth();
   const [editing, edit] = useState<Assignment | null>(null);
   return <section aria-label="Manage assignments"><Title order={2}>Manage assignments</Title>
@@ -174,11 +178,12 @@ function AssignmentForm({ courseId, row, done }: { courseId: number; row: Assign
   const [due, setDue] = useState(row ? localValue(row.due_at) : "");
   const [kind, setKind] = useState(row?.submission_type ?? "TEXT");
   const [points, setPoints] = useState(row?.points_possible ?? "0");
-  const write = useLmsWrite();
+  const create = useCreateAssignment(courseId);
+  const update = useUpdateAssignment(row?.id ?? 0);
+  const write = row ? update : create;
   return <Card withBorder mt="md"><Title order={3}>{row ? "Edit assignment" : "New assignment"}</Title>
     <form onSubmit={(event) => { event.preventDefault(); write.mutate({
-      path: row ? `/lms/assignments/${row.id}/` : `/lms/courses/${courseId}/assignments/`,
-      method: row ? "patch" : "post", data: { title, instructions, due_at: utcValue(due), submission_type: kind, points_possible: points },
+      title, instructions, due_at: utcValue(due), submission_type: kind, points_possible: points,
     }, { onSuccess: () => { setTitle(""); setInstructions(""); done(); } }); }}><Stack>
       <TextInput label="Assignment title (optional)" value={title} onChange={(event) => setTitle(event.currentTarget.value)} />
       <Textarea label="Assignment instructions" required value={instructions} onChange={(event) => setInstructions(event.currentTarget.value)} />

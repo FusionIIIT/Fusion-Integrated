@@ -3,8 +3,9 @@ import { useState } from "react";
 
 import { useAuth } from "../../../auth/AuthProvider";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { useCourse, useLmsDownload, useLmsList, useLmsWrite } from "../api/hooks";
-import type { Announcement, Assignment, Grade, Material, Submission } from "../api/types";
+import { useCourse, useMaterials, useDownloadMaterial, useAnnouncements, useCreateAnnouncement,
+  useAssignments, useSubmissions, useDownloadAssignment, useDownloadSubmission, useCreateSubmission, useGrades } from "../api/hooks";
+import type { Assignment } from "../api/types";
 import { CoursePicker, Feedback, ListState, Pending } from "../components/Common";
 
 export default function CoursesPage() {
@@ -38,8 +39,8 @@ function Workspace({ id }: { id: number }) {
 }
 
 function PublishedMaterials({ id, sections }: { id: number; sections: { id: number; label: string }[] }) {
-  const query = useLmsList<Material>(`/lms/courses/${id}/materials/`);
-  const download = useLmsDownload();
+  const query = useMaterials(id);
+  const download = useDownloadMaterial();
   return <section aria-label="Course materials"><Title order={2}>Materials</Title>
     <Feedback error={download.error} />
     <ListState pending={query.isPending} error={query.error} empty={!query.items.length}
@@ -50,19 +51,19 @@ function PublishedMaterials({ id, sections }: { id: number; sections: { id: numb
         {item.kind === "NOTE" && <Text style={{ whiteSpace: "pre-wrap" }}>{item.text}</Text>}
         {item.kind === "LINK" && <a href={item.url} target="_blank" rel="noopener noreferrer">Open material link</a>}
         {item.kind === "FILE" && <Button loading={download.isPending} onClick={() => download.mutate({
-          path: `/lms/materials/${item.id}/download/`, fallback: item.file?.name ?? "material",
+          id: item.id, fallback: item.file?.name ?? "material",
         })}>Download {item.file?.name ?? "material"}</Button>}
       </Card>)}
     </ListState></section>;
 }
 
 function Announcements({ id, allowed }: { id: number; allowed: boolean }) {
-  const query = useLmsList<Announcement>(`/lms/courses/${id}/announcements/`);
-  const write = useLmsWrite();
+  const query = useAnnouncements(id);
+  const write = useCreateAnnouncement(id);
   const [content, setContent] = useState("");
   return <section aria-label="Course announcements"><Title order={2}>Announcements</Title>
     {allowed && <form onSubmit={(event) => { event.preventDefault(); write.mutate({
-      path: `/lms/courses/${id}/announcements/`, data: { content },
+      content,
     }, { onSuccess: () => setContent("") }); }}><Stack>
       <Textarea label="Announcement content" required value={content} onChange={(event) => setContent(event.currentTarget.value)} />
       <Button type="submit" loading={write.isPending}>Post announcement</Button>
@@ -76,7 +77,7 @@ function Announcements({ id, allowed }: { id: number; allowed: boolean }) {
 }
 
 function StudentAssignments({ id }: { id: number }) {
-  const query = useLmsList<Assignment>(`/lms/courses/${id}/assignments/`);
+  const query = useAssignments(id);
   const [opened, open] = useState<number | null>(null);
   return <section aria-label="Course assignments"><Title order={2}>Assignments</Title>
     <ListState pending={query.isPending} error={query.error} empty={!query.items.length}
@@ -92,18 +93,19 @@ function StudentAssignments({ id }: { id: number }) {
 
 function AssignmentWork({ row }: { row: Assignment }) {
   const { can } = useAuth();
-  const history = useLmsList<Submission>(can("lms.submission.view") ? `/lms/assignments/${row.id}/submissions/` : null);
-  const download = useLmsDownload();
-  const write = useLmsWrite();
+  const history = useSubmissions(can("lms.submission.view") ? row.id : null);
+  const download = useDownloadAssignment();
+  const submissionDownload = useDownloadSubmission();
+  const write = useCreateSubmission(row.id);
   const [value, setValue] = useState("");
   const [file, setFile] = useState<File | null>(null);
   return <Stack>
     <Text style={{ whiteSpace: "pre-wrap" }}>{row.instructions}</Text>
     <Text>Submission type: {row.submission_type} · Points possible: {row.points_possible}</Text>
     <Button loading={download.isPending} onClick={() => download.mutate({
-      path: `/lms/assignments/${row.id}/download/`, fallback: `assignment-${row.id}.txt`,
+      id: row.id, fallback: `assignment-${row.id}.txt`,
     })}>Download assignment</Button>
-    <Feedback error={download.error} />
+    <Feedback error={download.error || submissionDownload.error} />
     {can("lms.submission.create") && <>
       <Title order={4}>My submission</Title>
       <ListState pending={history.isPending} error={history.error} empty={false}>
@@ -111,7 +113,7 @@ function AssignmentWork({ row }: { row: Assignment }) {
         {history.items.map((item) => <Stack key={item.id}><Text>Submission status: Submitted · {new Date(item.submitted_at).toLocaleString()}</Text>
           {item.kind === "TEXT" && <Text>{item.text}</Text>}
           {item.kind === "LINK" && <a href={item.url} rel="noopener noreferrer" target="_blank">Submitted link</a>}
-          {item.file && <Button onClick={() => download.mutate({ path: `/lms/submissions/${item.id}/download/`, fallback: item.file?.name ?? "submission" })}>Download submission</Button>}
+          {item.file && <Button onClick={() => submissionDownload.mutate({ id: item.id, fallback: item.file?.name ?? "submission" })}>Download submission</Button>}
         </Stack>)}
       </ListState>
       {!history.isPending && !history.error && history.items.length === 0 && <form onSubmit={(event) => {
@@ -119,7 +121,7 @@ function AssignmentWork({ row }: { row: Assignment }) {
         const data = new FormData(); data.set("kind", row.submission_type);
         if (row.submission_type === "FILE") { if (file) data.set("file", file); }
         else data.set(row.submission_type === "LINK" ? "url" : "text", value);
-        write.mutate({ path: `/lms/assignments/${row.id}/submissions/`, data });
+        write.mutate(data);
       }}><Stack>
         {row.submission_type === "TEXT" && <Textarea label="Submission text" required value={value} onChange={(event) => setValue(event.currentTarget.value)} />}
         {row.submission_type === "LINK" && <TextInput label="Submission link" type="url" required value={value} onChange={(event) => setValue(event.currentTarget.value)} />}
@@ -133,7 +135,7 @@ function AssignmentWork({ row }: { row: Assignment }) {
 }
 
 function ReleasedGrades({ id }: { id: number }) {
-  const query = useLmsList<Grade>(`/lms/courses/${id}/grades/`);
+  const query = useGrades(id);
   return <section aria-label="My released grades"><Title order={2}>Released grades</Title>
     <ListState pending={query.isPending} error={query.error} empty={!query.items.length}
       more={query.hasNextPage} onMore={() => void query.fetchNextPage()}>

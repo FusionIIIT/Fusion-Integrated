@@ -2,13 +2,14 @@ import io
 
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiTypes, extend_schema, extend_schema_view
+from drf_spectacular.utils import OpenApiExample, OpenApiTypes, extend_schema, extend_schema_view
 from rest_framework.response import Response
 
 from core.api.exceptions import NotFoundError
 from core.files.writers import stream_upload
 from modules.lms.api import serializers as s
 from modules.lms.api.base import LmsView
+from modules.lms.api.examples import examples_for
 from modules.lms.selectors import scoping
 from modules.lms.selectors.workspaces import course_data, course_rows
 from modules.lms.services import (
@@ -22,7 +23,12 @@ from modules.lms.services import (
 from modules.lms.services import workspaces as workspace_services
 
 
-@extend_schema_view(get=extend_schema(responses=s.CourseSerializer(many=True)))
+@extend_schema_view(
+    get=extend_schema(
+        responses=s.CourseSerializer(many=True),
+        examples=examples_for(None, s.CourseSerializer, 200),
+    )
+)
 class Courses(LmsView):
     serializer_class = s.CourseSerializer
     permission_map = {"GET": "lms.course.view"}
@@ -35,8 +41,14 @@ class Courses(LmsView):
 
 
 @extend_schema_view(
-    get=extend_schema(responses=s.CourseSerializer),
-    patch=extend_schema(request=s.CourseInput, responses=s.CourseSerializer),
+    get=extend_schema(
+        responses=s.CourseSerializer, examples=examples_for(None, s.CourseSerializer, 200)
+    ),
+    patch=extend_schema(
+        request=s.CourseInput,
+        responses=s.CourseSerializer,
+        examples=examples_for(s.CourseInput, s.CourseSerializer, 200),
+    ),
 )
 class CourseDetail(LmsView):
     serializer_class = s.CourseSerializer
@@ -51,7 +63,11 @@ class CourseDetail(LmsView):
         return self.get(request, pk)
 
 
-@extend_schema_view(get=extend_schema(responses=s.PolicySerializer))
+@extend_schema_view(
+    get=extend_schema(
+        responses=s.PolicySerializer, examples=examples_for(None, s.PolicySerializer, 200)
+    )
+)
 class Policy(LmsView):
     serializer_class = s.PolicySerializer
     permission_map = {"GET": "lms.course_policy.view"}
@@ -63,14 +79,24 @@ class Policy(LmsView):
             s.PolicySerializer(row).data
             if row
             else {
+                "id": None,
                 "workspace_id": pk,
+                "effective_from": None,
+                "author_user_id": None,
+                "decision_version": "A9-LMS-BP-0.2",
                 "version": 0,
                 "can_ta_post_announcements": False,
             }
         )
 
 
-@extend_schema_view(post=extend_schema(request=s.PolicyInput, responses={201: s.PolicySerializer}))
+@extend_schema_view(
+    post=extend_schema(
+        request=s.PolicyInput,
+        responses={201: s.PolicySerializer},
+        examples=examples_for(s.PolicyInput, s.PolicySerializer, 201),
+    )
+)
 class PolicyVersions(LmsView):
     serializer_class = s.PolicySerializer
     permission_map = {"POST": "lms.course_policy.update"}
@@ -81,7 +107,11 @@ class PolicyVersions(LmsView):
 
 
 @extend_schema_view(
-    post=extend_schema(request=s.SectionInput, responses={201: s.SectionSerializer})
+    post=extend_schema(
+        request=s.SectionInput,
+        responses={201: s.SectionSerializer},
+        examples=examples_for(s.SectionInput, s.SectionSerializer, 201),
+    )
 )
 class Sections(LmsView):
     serializer_class = s.SectionSerializer
@@ -94,7 +124,13 @@ class Sections(LmsView):
         return Response(s.SectionSerializer(row).data, status=201)
 
 
-@extend_schema_view(patch=extend_schema(request=s.SectionInput, responses=s.SectionSerializer))
+@extend_schema_view(
+    patch=extend_schema(
+        request=s.SectionInput,
+        responses=s.SectionSerializer,
+        examples=examples_for(s.SectionInput, s.SectionSerializer, 200),
+    )
+)
 class SectionDetail(LmsView):
     serializer_class = s.SectionSerializer
     permission_map = {"PATCH": "lms.section.update"}
@@ -107,8 +143,15 @@ class SectionDetail(LmsView):
 
 
 @extend_schema_view(
-    get=extend_schema(responses=s.MaterialSerializer(many=True)),
-    post=extend_schema(request=s.MaterialInput, responses={201: s.MaterialSerializer}),
+    get=extend_schema(
+        responses=s.MaterialSerializer(many=True),
+        examples=examples_for(None, s.MaterialSerializer, 200),
+    ),
+    post=extend_schema(
+        request=s.MaterialInput,
+        responses={201: s.MaterialSerializer},
+        examples=examples_for(s.MaterialInput, s.MaterialSerializer, 201),
+    ),
 )
 class Materials(LmsView):
     serializer_class = s.MaterialSerializer
@@ -126,8 +169,14 @@ class Materials(LmsView):
 
 
 @extend_schema_view(
-    get=extend_schema(responses=s.MaterialSerializer),
-    patch=extend_schema(request=s.MaterialInput, responses=s.MaterialSerializer),
+    get=extend_schema(
+        responses=s.MaterialSerializer, examples=examples_for(None, s.MaterialSerializer, 200)
+    ),
+    patch=extend_schema(
+        request=s.MaterialInput,
+        responses=s.MaterialSerializer,
+        examples=examples_for(s.MaterialInput, s.MaterialSerializer, 200),
+    ),
 )
 class MaterialDetail(LmsView):
     serializer_class = s.MaterialSerializer
@@ -143,7 +192,13 @@ class MaterialDetail(LmsView):
         return Response(s.MaterialSerializer(row).data)
 
 
-@extend_schema_view(post=extend_schema(request=s.ReleaseInput, responses=s.MaterialSerializer))
+@extend_schema_view(
+    post=extend_schema(
+        request=s.ReleaseInput,
+        responses=s.MaterialSerializer,
+        examples=examples_for(s.ReleaseInput, s.MaterialSerializer, 200),
+    )
+)
 class MaterialPublish(LmsView):
     serializer_class = s.MaterialSerializer
     permission_map = {"POST": "lms.material.publish"}
@@ -153,12 +208,19 @@ class MaterialPublish(LmsView):
         return Response(s.MaterialSerializer(row).data)
 
 
-@extend_schema_view(post=extend_schema(request=s.EmptyInput, responses=s.MaterialSerializer))
+@extend_schema_view(
+    post=extend_schema(
+        request=s.EmptyInput,
+        responses=s.MaterialSerializer,
+        examples=examples_for(s.EmptyInput, s.MaterialSerializer, 200),
+    )
+)
 class MaterialWithdraw(LmsView):
     serializer_class = s.MaterialSerializer
     permission_map = {"POST": "lms.material.publish"}
 
     def post(self, request, pk):
+        self.inputs(s.EmptyInput)
         return Response(
             s.MaterialSerializer(
                 releases.change_release(self.scope, "material", pk, withdraw=True)
@@ -175,7 +237,17 @@ def download_file(row):
 
 
 @extend_schema_view(
-    get=extend_schema(responses={(200, "application/octet-stream"): OpenApiTypes.BINARY})
+    get=extend_schema(
+        responses={(200, "application/octet-stream"): OpenApiTypes.BINARY},
+        examples=[
+            OpenApiExample(
+                "Private attachment",
+                value="Validated attachment bytes",
+                media_type="application/octet-stream",
+                response_only=True,
+            )
+        ],
+    )
 )
 class MaterialDownload(LmsView):
     serializer_class = s.MaterialSerializer
@@ -186,8 +258,15 @@ class MaterialDownload(LmsView):
 
 
 @extend_schema_view(
-    get=extend_schema(responses=s.AnnouncementSerializer(many=True)),
-    post=extend_schema(request=s.AnnouncementInput, responses={201: s.AnnouncementSerializer}),
+    get=extend_schema(
+        responses=s.AnnouncementSerializer(many=True),
+        examples=examples_for(None, s.AnnouncementSerializer, 200),
+    ),
+    post=extend_schema(
+        request=s.AnnouncementInput,
+        responses={201: s.AnnouncementSerializer},
+        examples=examples_for(s.AnnouncementInput, s.AnnouncementSerializer, 201),
+    ),
 )
 class Announcements(LmsView):
     serializer_class = s.AnnouncementSerializer
@@ -205,8 +284,15 @@ class Announcements(LmsView):
 
 
 @extend_schema_view(
-    get=extend_schema(responses=s.AssignmentSerializer(many=True)),
-    post=extend_schema(request=s.AssignmentInput, responses={201: s.AssignmentSerializer}),
+    get=extend_schema(
+        responses=s.AssignmentSerializer(many=True),
+        examples=examples_for(None, s.AssignmentSerializer, 200),
+    ),
+    post=extend_schema(
+        request=s.AssignmentInput,
+        responses={201: s.AssignmentSerializer},
+        examples=examples_for(s.AssignmentInput, s.AssignmentSerializer, 201),
+    ),
 )
 class Assignments(LmsView):
     serializer_class = s.AssignmentSerializer
@@ -226,8 +312,14 @@ class Assignments(LmsView):
 
 
 @extend_schema_view(
-    get=extend_schema(responses=s.AssignmentSerializer),
-    patch=extend_schema(request=s.AssignmentInput, responses=s.AssignmentSerializer),
+    get=extend_schema(
+        responses=s.AssignmentSerializer, examples=examples_for(None, s.AssignmentSerializer, 200)
+    ),
+    patch=extend_schema(
+        request=s.AssignmentInput,
+        responses=s.AssignmentSerializer,
+        examples=examples_for(s.AssignmentInput, s.AssignmentSerializer, 200),
+    ),
 )
 class AssignmentDetail(LmsView):
     serializer_class = s.AssignmentSerializer
@@ -245,7 +337,13 @@ class AssignmentDetail(LmsView):
         return Response(s.AssignmentSerializer(row).data)
 
 
-@extend_schema_view(post=extend_schema(request=s.ReleaseInput, responses=s.AssignmentSerializer))
+@extend_schema_view(
+    post=extend_schema(
+        request=s.ReleaseInput,
+        responses=s.AssignmentSerializer,
+        examples=examples_for(s.ReleaseInput, s.AssignmentSerializer, 200),
+    )
+)
 class AssignmentPublish(LmsView):
     serializer_class = s.AssignmentSerializer
     permission_map = {"POST": "lms.assignment.publish"}
@@ -258,12 +356,19 @@ class AssignmentPublish(LmsView):
         )
 
 
-@extend_schema_view(post=extend_schema(request=s.EmptyInput, responses=s.AssignmentSerializer))
+@extend_schema_view(
+    post=extend_schema(
+        request=s.EmptyInput,
+        responses=s.AssignmentSerializer,
+        examples=examples_for(s.EmptyInput, s.AssignmentSerializer, 200),
+    )
+)
 class AssignmentWithdraw(LmsView):
     serializer_class = s.AssignmentSerializer
     permission_map = {"POST": "lms.assignment.publish"}
 
     def post(self, request, pk):
+        self.inputs(s.EmptyInput)
         return Response(
             s.AssignmentSerializer(
                 releases.change_release(self.scope, "assignment", pk, withdraw=True)
@@ -271,7 +376,19 @@ class AssignmentWithdraw(LmsView):
         )
 
 
-@extend_schema_view(get=extend_schema(responses={(200, "text/plain"): OpenApiTypes.BINARY}))
+@extend_schema_view(
+    get=extend_schema(
+        responses={(200, "text/plain"): OpenApiTypes.BINARY},
+        examples=[
+            OpenApiExample(
+                "Assignment instructions",
+                value="Exercise\nExplain the result\n",
+                media_type="text/plain",
+                response_only=True,
+            )
+        ],
+    )
+)
 class AssignmentDownload(LmsView):
     serializer_class = s.AssignmentSerializer
     permission_map = {"GET": "lms.assignment.view"}
@@ -293,8 +410,15 @@ class AssignmentDownload(LmsView):
 
 
 @extend_schema_view(
-    get=extend_schema(responses=s.SubmissionSerializer(many=True)),
-    post=extend_schema(request=s.SubmissionInput, responses={201: s.SubmissionSerializer}),
+    get=extend_schema(
+        responses=s.SubmissionSerializer(many=True),
+        examples=examples_for(None, s.SubmissionSerializer, 200),
+    ),
+    post=extend_schema(
+        request=s.SubmissionInput,
+        responses={201: s.SubmissionSerializer},
+        examples=examples_for(s.SubmissionInput, s.SubmissionSerializer, 201),
+    ),
 )
 class Submissions(LmsView):
     serializer_class = s.SubmissionSerializer
@@ -311,7 +435,11 @@ class Submissions(LmsView):
         return Response(s.SubmissionSerializer(row).data, status=201)
 
 
-@extend_schema_view(get=extend_schema(responses=s.SubmissionSerializer))
+@extend_schema_view(
+    get=extend_schema(
+        responses=s.SubmissionSerializer, examples=examples_for(None, s.SubmissionSerializer, 200)
+    )
+)
 class SubmissionDetail(LmsView):
     serializer_class = s.SubmissionSerializer
     permission_map = {"GET": "lms.submission.view"}
@@ -323,7 +451,17 @@ class SubmissionDetail(LmsView):
 
 
 @extend_schema_view(
-    get=extend_schema(responses={(200, "application/octet-stream"): OpenApiTypes.BINARY})
+    get=extend_schema(
+        responses={(200, "application/octet-stream"): OpenApiTypes.BINARY},
+        examples=[
+            OpenApiExample(
+                "Private attachment",
+                value="Validated attachment bytes",
+                media_type="application/octet-stream",
+                response_only=True,
+            )
+        ],
+    )
 )
 class SubmissionDownload(LmsView):
     serializer_class = s.SubmissionSerializer
@@ -334,8 +472,16 @@ class SubmissionDownload(LmsView):
 
 
 @extend_schema_view(
-    post=extend_schema(request=s.GradeInput, responses=s.GradeSerializer),
-    patch=extend_schema(request=s.GradeInput, responses=s.GradeSerializer),
+    post=extend_schema(
+        request=s.GradeInput,
+        responses=s.GradeSerializer,
+        examples=examples_for(s.GradeInput, s.GradeSerializer, 200),
+    ),
+    patch=extend_schema(
+        request=s.GradeInput,
+        responses=s.GradeSerializer,
+        examples=examples_for(s.GradeInput, s.GradeSerializer, 200),
+    ),
 )
 class SubmissionGrade(LmsView):
     serializer_class = s.GradeSerializer
@@ -350,16 +496,27 @@ class SubmissionGrade(LmsView):
         return self.post(request, pk)
 
 
-@extend_schema_view(post=extend_schema(request=s.EmptyInput, responses=s.GradeSerializer))
+@extend_schema_view(
+    post=extend_schema(
+        request=s.EmptyInput,
+        responses=s.GradeSerializer,
+        examples=examples_for(s.EmptyInput, s.GradeSerializer, 200),
+    )
+)
 class GradeRelease(LmsView):
     serializer_class = s.GradeSerializer
     permission_map = {"POST": "lms.grade.publish"}
 
     def post(self, request, pk):
-        return Response(s.GradeSerializer(grading.save_grade(self.scope, pk, release=True)).data)
+        self.inputs(s.EmptyInput)
+        return Response(s.GradeSerializer(grading.release_grade(self.scope, pk)).data)
 
 
-@extend_schema_view(get=extend_schema(responses=s.GradeSerializer(many=True)))
+@extend_schema_view(
+    get=extend_schema(
+        responses=s.GradeSerializer(many=True), examples=examples_for(None, s.GradeSerializer, 200)
+    )
+)
 class Grades(LmsView):
     serializer_class = s.GradeSerializer
     permission_map = {"GET": "lms.grade.view"}

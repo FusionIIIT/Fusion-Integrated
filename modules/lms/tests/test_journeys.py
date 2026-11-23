@@ -2,11 +2,9 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
-from django.utils import timezone
 from freezegun import freeze_time
 
-from modules.lms.models import Assignment, Grade, GradeAuditLog, Material, Submission
-from modules.lms.tasks import release_due_assignments, release_due_materials
+from modules.lms.models import Assignment, Grade, GradeAuditLog, Submission
 from modules.lms.tests.conftest import available, draft, submit
 
 pytestmark = pytest.mark.django_db
@@ -93,9 +91,7 @@ def test_uc_lms_005_post_uc_lms_006_read_announcement_and_ta_policy(world):
         .json()["can_ta_post_announcements"]
     )
     for role in ("faculty", "lms_ta"):
-        response = world.actor(role).post(
-            url, {"content": f"Announcement {role}", "author_user_id": 99}, format="json"
-        )
+        response = world.actor(role).post(url, {"content": f"Announcement {role}"}, format="json")
         assert response.status_code == 201 and response.json()["created_at"]
         assert response.json()["author_user_id"] != 99
     for role in ("student", "faculty", "lms_ta", "lms_observer"):
@@ -144,7 +140,13 @@ def test_uc_lms_010_submit_uc_lms_011_own_history(world):
     student = world.actor("student")
     bad = student.post(url, {"kind": "LINK", "url": "https://example.org/work"}, format="json")
     assert bad.status_code == 422 and Submission.objects.count() == 0
-    response = student.post(url, {"kind": "TEXT", "text": "My work", "user_id": 99}, format="json")
+    assert (
+        student.post(
+            url, {"kind": "TEXT", "text": "My work", "user_id": 99}, format="json"
+        ).status_code
+        == 400
+    )
+    response = student.post(url, {"kind": "TEXT", "text": "My work"}, format="json")
     assert response.status_code == 201 and response.json()["user_id"] == 2
     assert student.get(url).json()["results"][0]["text"] == "My work"
     again = student.post(url, {"kind": "TEXT", "text": "Again"}, format="json")
@@ -205,42 +207,6 @@ def test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade(world, role):
     )
     assert audit.actor_user_id == 1 and audit.changed_at
     assert Grade.objects.get().state == "RELEASED" and GradeAuditLog.objects.count() == 3
-
-
-def test_uc_lms_015_scheduled_material_and_assignment_release(world, monkeypatch):
-    # Source obligations: AFR-LMS-003.3 AFR-LMS-003.4 AFR-LMS-007.2 AFR-LMS-007.3 BR-LMS-006
-    #  UC-LMS-015 BW-LMS-01 BW-LMS-03
-    # BR-LMS-006/011; BW-LMS-01/BW-LMS-03; CW-LMS-01 scheduled branch.
-    monkeypatch.setattr("modules.lms.tasks.release_content.apply_async", lambda **kwargs: None)
-    assignment = draft(world)
-    material = (
-        world.actor()
-        .post(
-            f"{BASE}/courses/{world.workspace.pk}/materials/",
-            {"kind": "LINK", "url": "https://example.org/lesson"},
-            format="json",
-        )
-        .json()
-    )
-    now = timezone.now()
-    at = now + timedelta(minutes=1)
-    for kind, row in (("assignments", assignment), ("materials", material)):
-        response = world.actor().post(
-            f"{BASE}/{kind}/{row['id']}/publish/", {"release_at": at.isoformat()}, format="json"
-        )
-        assert response.status_code == 200 and response.json()["state"] == "SCHEDULED"
-        assert world.actor("student").get(f"{BASE}/{kind}/{row['id']}/").status_code == 404
-    assert release_due_assignments() == 0 and release_due_materials() == 0
-    with freeze_time(at):
-        assert release_due_assignments() == 1 and release_due_materials() == 1
-        assert release_due_assignments() == 0 and release_due_materials() == 0
-        assert (
-            world.actor("student").get(f"{BASE}/assignments/{assignment['id']}/").status_code == 200
-        )
-        assert world.actor("student").get(f"{BASE}/materials/{material['id']}/").status_code == 200
-        submit(world, assignment)
-    assert Assignment.objects.get().state == "AVAILABLE"
-    assert Material.objects.get().state == "PUBLISHED"
 
 
 def test_assignment_mutability_after_submissions_and_grades(world):

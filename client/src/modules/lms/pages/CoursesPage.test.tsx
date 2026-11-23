@@ -45,7 +45,7 @@ describe("CoursesPage", () => {
   it("shows missing then submitted status for the student's own work", async () => {
     const history = pageOf<Submission>([]);
     const submission: Submission = { id: 3, assignment_id: 2, user_id: 1, kind: "TEXT",
-      text: "My work", url: "", file: null, submitted_at: "2026-01-01T00:00:00Z" };
+      text: "My work", url: "", file: null, policy_version: "A9-LMS-BP-0.2", submitted_at: "2026-01-01T00:00:00Z" };
     mockReads({ "/lms/courses/1/": { ...course, acting_course_role: "STUDENT", can_post_announcements: false },
       "/lms/courses/1/assignments/": pageOf([{ id: 2, title: "Exercise", instructions: "Work", state: "AVAILABLE",
         due_at: "2027-01-01", submission_type: "TEXT", points_possible: "20" }]),

@@ -54,3 +54,9 @@ def save_grade(scope, submission_id, data=None, *, release=False):
         changed_at=now,
     )
     return grade
+
+
+@enforce_rules
+def release_grade(scope, submission_id):
+    rules.require_role(scope.role, ("FACULTY",))
+    return save_grade(scope, submission_id, release=True)

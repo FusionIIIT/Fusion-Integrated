@@ -62,7 +62,12 @@ def test_each_resource_refuses_an_out_of_course_identifier(world):
         f"submissions/{submission['id']}/grade/release/",
     ):
         assert (
-            client.post("/api/v1/lms/" + path, {"points": "10"}, format="json").status_code == 404
+            client.post(
+                "/api/v1/lms/" + path,
+                {"points": "10"} if path.endswith("/grade/") else {},
+                format="json",
+            ).status_code
+            == 404
         )
 
 

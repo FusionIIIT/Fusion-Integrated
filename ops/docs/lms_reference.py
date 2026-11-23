@@ -171,7 +171,7 @@ def inventory():
                 entry = (
                     (
                         "modules/lms/services/releases.py",
-                        "def release_one",
+                        "def transition_content",
                         "test_journeys.py",
                         "test_uc_lms_015_scheduled_material_and_assignment_release",
                     )
@@ -192,6 +192,15 @@ def inventory():
                 )
             else:
                 entry = ENTRIES[group]
+            if identifier in ("BR-LMS-017", "UC-LMS-013"):
+                entry = (
+                    "modules/lms/services/grading.py",
+                    "def release_grade",
+                    "test_journeys.py",
+                    "test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade",
+                )
+            if entry[3] == "test_uc_lms_015_scheduled_material_and_assignment_release":
+                entry = (entry[0], entry[1], "test_http_scheduling.py", entry[3])
             rows.append((identifier, statement, entry))
     assert len(rows) == len({row[0] for row in rows}) == 103
     return rows

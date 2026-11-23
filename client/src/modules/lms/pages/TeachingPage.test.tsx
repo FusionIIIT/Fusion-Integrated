@@ -29,6 +29,16 @@ describe("TeachingPage", () => {
     expect(screen.queryByRole("button", { name: "Create assignment draft" })).not.toBeInTheDocument();
     expect(http.get).not.toHaveBeenCalled();
   });
+  it("hides detail controls on a mounted page without course update permission", async () => {
+    mockReads();
+    renderLms(<TeachingPage />, facultyPermissions.filter((code) => code !== "lms.course.update"));
+    await chooseCourse();
+    expect(await screen.findByRole("heading", { name: "Course details" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Create assignment draft" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Publish course details" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Syllabus")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Schedule")).not.toBeInTheDocument();
+  });
   it("publishes updated course details", async () => {
     mockReads();
     vi.spyOn(http, "patch").mockResolvedValue({ data: {} });

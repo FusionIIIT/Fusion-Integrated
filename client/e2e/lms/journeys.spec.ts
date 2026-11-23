@@ -58,6 +58,143 @@ async function anotherActor(browser: Browser, key: AccountKey, problems: string[
   return { page, context };
 }
 
+interface JourneyContext {
+  page: Page; student: { page: Page }; ta: { page: Page }; observer: { page: Page };
+  note: string; section: string; news: string; correctedFeedback: string;
+  titles: string[]; studentCourseId: number;
+}
+async function journey1(context: JourneyContext) {
+  const { page } = context;
+  await selectDemoCourse(page, "lmsFaculty", "Teaching");
+  await page.getByLabel("Syllabus", { exact: true }).fill("Synthetic course syllabus for the browser journey");
+  await page.getByLabel("Schedule", { exact: true }).fill("Weekly synthetic schedule");
+  const saved = page.waitForResponse((response) => /\/lms\/courses\/\d+\/$/.test(response.url()) && response.request().method() === "PATCH");
+  await page.getByRole("button", { name: "Publish course details", exact: true }).click();
+  expect((await saved).status()).toBe(200);
+  await page.getByLabel("Allow assigned TAs to post announcements").check();
+  const policy = page.waitForResponse((response) => response.url().includes("/policy-versions/") && response.request().method() === "POST");
+  await page.getByRole("button", { name: "Save TA announcement policy" }).click();
+  expect((await policy).status()).toBe(201);
+}
+
+async function journey2(context: JourneyContext) {
+  const { page, note, section } = context;
+  await page.getByLabel("Section label").fill(section);
+  await page.getByRole("button", { name: "Create section", exact: true }).click();
+  await expect(page.getByRole("button", { name: `Edit section ${section}`, exact: true })).toBeVisible();
+  await page.getByLabel("Material title").fill(note);
+  await page.getByLabel("Material note").fill("Scheduled course material");
+  await page.getByLabel("Material section").selectOption({ label: section });
+  await page.getByRole("button", { name: "Create material", exact: true }).click();
+  const card = page.getByRole("heading", { name: note, exact: true }).locator("..");
+  await card.getByLabel("Release at (local time, optional)").fill(localTime(15));
+  await card.getByRole("button", { name: "Schedule release", exact: true }).click();
+  await expect(card).toContainText("SCHEDULED");
+}
+
+async function journey3(context: JourneyContext) {
+  const { page, titles } = context;
+  for (const [index, kind] of ["TEXT", "FILE", "LINK"].entries()) {
+    const title = titles[index];
+    if (title === undefined) throw new Error("Missing exercise title");
+    await page.getByLabel("Assignment title (optional)").fill(title);
+    await page.getByLabel("Assignment instructions").fill(`Complete the ${kind} exercise`);
+    await page.getByLabel("Assignment due date (local time)").fill(localTime(86_400));
+    await page.getByLabel("Assignment submission type").selectOption(kind);
+    await page.getByLabel("Points possible").fill("20");
+    await page.getByRole("button", { name: "Create assignment draft", exact: true }).click();
+    const card = page.getByRole("heading", { name: titles[index], exact: true }).locator("..");
+    await expect(card).toContainText("DRAFT");
+    if (index === 2) {
+      await card.getByLabel("Release at (local time, optional)").fill(localTime(15));
+      await card.getByRole("button", { name: "Schedule release", exact: true }).click();
+      await expect(card).toContainText("SCHEDULED");
+    } else {
+      await card.getByRole("button", { name: "Publish now", exact: true }).click();
+      await expect(card).toContainText("AVAILABLE");
+    }
+  }
+}
+
+async function journey4(context: JourneyContext) {
+  const { ta, observer, news } = context;
+  await selectDemoCourse(ta.page, "lmsTa", "My Courses");
+  await ta.page.getByLabel("Announcement content").fill(news);
+  await ta.page.getByRole("button", { name: "Post announcement", exact: true }).click();
+  await expect(ta.page.getByText(news, { exact: true })).toBeVisible();
+  await selectDemoCourse(observer.page, "lmsObserver", "My Courses");
+  await expect(observer.page.getByText("Synthetic course syllabus for the browser journey", { exact: true })).toBeVisible();
+  await expect(observer.page.getByText(news, { exact: true })).toBeVisible();
+  await expect(observer.page.getByRole("region", { name: "Course assignments" })).toHaveCount(0);
+  await expect(observer.page.getByRole("button", { name: "Post announcement" })).toHaveCount(0);
+}
+
+async function journey5(context: JourneyContext) {
+  const { student, note, titles } = context;
+  context.studentCourseId = await selectDemoCourse(student.page, "lmsStudent", "My Courses");
+  await expect.poll(async () => {
+    await student.page.reload();
+    await chooseLoadedCourse(student.page, context.studentCourseId);
+    try {
+      await student.page.getByRole("heading", { name: titles[2], exact: true }).waitFor({ state: "visible", timeout: 2000 });
+      return true;
+    } catch { return false; }
+  }, { timeout: 35_000 }).toBe(true);
+  await expect(student.page.getByRole("heading", { name: note, exact: true })).toBeVisible();
+  for (const [index, kind] of ["TEXT", "FILE", "LINK"].entries()) {
+    const card = student.page.getByRole("heading", { name: titles[index], exact: true }).locator("..");
+    await card.getByRole("button", { name: "View assignment", exact: true }).click();
+    await expect(card.getByText("Submission status: Missing", { exact: true })).toBeVisible();
+    const download = student.page.waitForEvent("download");
+    await card.getByRole("button", { name: "Download assignment", exact: true }).click();
+    expect((await download).suggestedFilename()).toMatch(/^assignment-\d+\.txt$/);
+    if (kind === "TEXT") await card.getByLabel("Submission text").fill("Synthetic text submission");
+    if (kind === "FILE") await card.getByLabel("Submission file").setInputFiles({ name: "exercise.txt", mimeType: "text/plain", buffer: Buffer.from("Synthetic file submission") });
+    if (kind === "LINK") await card.getByLabel("Submission link").fill("https://example.org/exercise");
+    await card.getByRole("button", { name: "Submit assignment", exact: true }).click();
+    await expect(card.getByText(/Submission status: Submitted/)).toBeVisible();
+    await card.getByRole("button", { name: "Close assignment", exact: true }).click();
+  }
+}
+
+async function journey6(context: JourneyContext) {
+  const { student, ta, titles } = context;
+  await selectDemoCourse(ta.page, "lmsTa", "Grading");
+  await ta.page.getByLabel("Assignment to grade").selectOption({ label: titles[0] });
+  await ta.page.getByLabel(/Points for submission/).fill("15");
+  await ta.page.getByLabel(/Feedback for submission/).fill("Synthetic draft feedback");
+  await ta.page.getByRole("button", { name: "Save draft grade", exact: true }).click();
+  await expect(ta.page.getByText(/Grade DRAFT: 15/)).toBeVisible();
+  await expect(ta.page.getByRole("button", { name: /Release grade/ })).toHaveCount(0);
+  await student.page.reload();
+  await chooseLoadedCourse(student.page, context.studentCourseId);
+  await expect(student.page.getByText("Synthetic draft feedback", { exact: true })).toHaveCount(0);
+}
+
+async function journey7(context: JourneyContext) {
+  const { page, student, correctedFeedback, titles } = context;
+  await selectDemoCourse(page, "lmsFaculty", "Grading");
+  for (const [index, title] of titles.slice(0, 2).entries()) {
+    await page.getByLabel("Assignment to grade").selectOption({ label: title });
+    if (index === 1) {
+      await page.getByLabel(/Points for submission/).fill("17");
+      await page.getByLabel(/Feedback for submission/).fill("Faculty draft feedback");
+      await page.getByRole("button", { name: "Save draft grade", exact: true }).click();
+      await expect(page.getByText(/Grade DRAFT: 17/)).toBeVisible();
+    }
+    await page.getByRole("button", { name: /Release grade for submission/ }).click();
+    await expect(page.getByText(/Grade RELEASED:/)).toBeVisible();
+  }
+  await page.getByLabel("Assignment to grade").selectOption({ label: titles[0] });
+  await page.getByLabel(/Points for submission/).fill("18");
+  await page.getByLabel(/Feedback for submission/).fill(correctedFeedback);
+  await page.getByRole("button", { name: "Correct released grade", exact: true }).click();
+  await expect(page.getByText(/Grade RELEASED: 18/)).toBeVisible();
+  await student.page.reload();
+  await chooseLoadedCourse(student.page, context.studentCourseId);
+  await expect(student.page.getByText(correctedFeedback, { exact: true })).toBeVisible();
+}
+
 test.describe("lms: complete course journeys", () => {
   test.use(signedInAs("lmsFaculty"));
   test("UC-LMS-001 through UC-LMS-015: publication, submissions, grading and scheduled release", async ({ page, browser }) => {
@@ -71,126 +208,15 @@ test.describe("lms: complete course journeys", () => {
     const news = uniqueName("Course announcement");
     const correctedFeedback = uniqueName("Corrected released feedback");
     const titles = [uniqueName("Text exercise"), uniqueName("File exercise"), uniqueName("Link exercise")];
-    let studentCourseId = 0;
+    const context: JourneyContext = { page, student, ta, observer, note, section, news, correctedFeedback, titles, studentCourseId: 0 };
     try {
-      await test.step("UC-LMS-001/002: faculty configures course details", async () => {
-        await selectDemoCourse(page, "lmsFaculty", "Teaching");
-        await page.getByLabel("Syllabus", { exact: true }).fill("Synthetic course syllabus for the browser journey");
-        await page.getByLabel("Schedule", { exact: true }).fill("Weekly synthetic schedule");
-        const saved = page.waitForResponse((response) => /\/lms\/courses\/\d+\/$/.test(response.url()) && response.request().method() === "PATCH");
-        await page.getByRole("button", { name: "Publish course details", exact: true }).click();
-        expect((await saved).status()).toBe(200);
-        await page.getByLabel("Allow assigned TAs to post announcements").check();
-        const policy = page.waitForResponse((response) => response.url().includes("/policy-versions/") && response.request().method() === "POST");
-        await page.getByRole("button", { name: "Save TA announcement policy" }).click();
-        expect((await policy).status()).toBe(201);
-      });
-      await test.step("UC-LMS-003/015: faculty organizes and schedules material", async () => {
-        await page.getByLabel("Section label").fill(section);
-        await page.getByRole("button", { name: "Create section", exact: true }).click();
-        await expect(page.getByRole("button", { name: `Edit section ${section}`, exact: true })).toBeVisible();
-        await page.getByLabel("Material title").fill(note);
-        await page.getByLabel("Material note").fill("Scheduled course material");
-        await page.getByLabel("Material section").selectOption({ label: section });
-        await page.getByRole("button", { name: "Create material", exact: true }).click();
-        const card = page.getByRole("heading", { name: note, exact: true }).locator("..");
-        await card.getByLabel("Release at (local time, optional)").fill(localTime(15));
-        await card.getByRole("button", { name: "Schedule release", exact: true }).click();
-        await expect(card).toContainText("SCHEDULED");
-      });
-      await test.step("UC-LMS-007/008: faculty creates and publishes all submission types", async () => {
-        for (const [index, kind] of ["TEXT", "FILE", "LINK"].entries()) {
-          const title = titles[index];
-          if (title === undefined) throw new Error("Missing exercise title");
-          await page.getByLabel("Assignment title (optional)").fill(title);
-          await page.getByLabel("Assignment instructions").fill(`Complete the ${kind} exercise`);
-          await page.getByLabel("Assignment due date (local time)").fill(localTime(86_400));
-          await page.getByLabel("Assignment submission type").selectOption(kind);
-          await page.getByLabel("Points possible").fill("20");
-          await page.getByRole("button", { name: "Create assignment draft", exact: true }).click();
-          const card = page.getByRole("heading", { name: titles[index], exact: true }).locator("..");
-          await expect(card).toContainText("DRAFT");
-          if (index === 2) {
-            await card.getByLabel("Release at (local time, optional)").fill(localTime(15));
-            await card.getByRole("button", { name: "Schedule release", exact: true }).click();
-            await expect(card).toContainText("SCHEDULED");
-          } else {
-            await card.getByRole("button", { name: "Publish now", exact: true }).click();
-            await expect(card).toContainText("AVAILABLE");
-          }
-        }
-      });
-      await test.step("UC-LMS-004/005/006: TA and Observer read common content", async () => {
-        await selectDemoCourse(ta.page, "lmsTa", "My Courses");
-        await ta.page.getByLabel("Announcement content").fill(news);
-        await ta.page.getByRole("button", { name: "Post announcement", exact: true }).click();
-        await expect(ta.page.getByText(news, { exact: true })).toBeVisible();
-        await selectDemoCourse(observer.page, "lmsObserver", "My Courses");
-        await expect(observer.page.getByText("Synthetic course syllabus for the browser journey", { exact: true })).toBeVisible();
-        await expect(observer.page.getByText(news, { exact: true })).toBeVisible();
-        await expect(observer.page.getByRole("region", { name: "Course assignments" })).toHaveCount(0);
-        await expect(observer.page.getByRole("button", { name: "Post announcement" })).toHaveCount(0);
-      });
-      await test.step("UC-LMS-009/010/011/015: student downloads and submits released assignments", async () => {
-        studentCourseId = await selectDemoCourse(student.page, "lmsStudent", "My Courses");
-        await expect.poll(async () => {
-          await student.page.reload();
-          await chooseLoadedCourse(student.page, studentCourseId);
-          try {
-            await student.page.getByRole("heading", { name: titles[2], exact: true }).waitFor({ state: "visible", timeout: 2000 });
-            return true;
-          } catch { return false; }
-        }, { timeout: 35_000 }).toBe(true);
-        await expect(student.page.getByRole("heading", { name: note, exact: true })).toBeVisible();
-        for (const [index, kind] of ["TEXT", "FILE", "LINK"].entries()) {
-          const card = student.page.getByRole("heading", { name: titles[index], exact: true }).locator("..");
-          await card.getByRole("button", { name: "View assignment", exact: true }).click();
-          await expect(card.getByText("Submission status: Missing", { exact: true })).toBeVisible();
-          const download = student.page.waitForEvent("download");
-          await card.getByRole("button", { name: "Download assignment", exact: true }).click();
-          expect((await download).suggestedFilename()).toMatch(/^assignment-\d+\.txt$/);
-          if (kind === "TEXT") await card.getByLabel("Submission text").fill("Synthetic text submission");
-          if (kind === "FILE") await card.getByLabel("Submission file").setInputFiles({ name: "exercise.txt", mimeType: "text/plain", buffer: Buffer.from("Synthetic file submission") });
-          if (kind === "LINK") await card.getByLabel("Submission link").fill("https://example.org/exercise");
-          await card.getByRole("button", { name: "Submit assignment", exact: true }).click();
-          await expect(card.getByText(/Submission status: Submitted/)).toBeVisible();
-          await card.getByRole("button", { name: "Close assignment", exact: true }).click();
-        }
-      });
-      await test.step("UC-LMS-012: TA grades a submission and cannot release it", async () => {
-        await selectDemoCourse(ta.page, "lmsTa", "Grading");
-        await ta.page.getByLabel("Assignment to grade").selectOption({ label: titles[0] });
-        await ta.page.getByLabel(/Points for submission/).fill("15");
-        await ta.page.getByLabel(/Feedback for submission/).fill("Synthetic draft feedback");
-        await ta.page.getByRole("button", { name: "Save draft grade", exact: true }).click();
-        await expect(ta.page.getByText(/Grade DRAFT: 15/)).toBeVisible();
-        await expect(ta.page.getByRole("button", { name: /Release grade/ })).toHaveCount(0);
-        await student.page.reload();
-        await chooseLoadedCourse(student.page, studentCourseId);
-        await expect(student.page.getByText("Synthetic draft feedback", { exact: true })).toHaveCount(0);
-      });
-      await test.step("UC-LMS-012/013/014: faculty grades, releases and audits a correction", async () => {
-        await selectDemoCourse(page, "lmsFaculty", "Grading");
-        for (const [index, title] of titles.slice(0, 2).entries()) {
-          await page.getByLabel("Assignment to grade").selectOption({ label: title });
-          if (index === 1) {
-            await page.getByLabel(/Points for submission/).fill("17");
-            await page.getByLabel(/Feedback for submission/).fill("Faculty draft feedback");
-            await page.getByRole("button", { name: "Save draft grade", exact: true }).click();
-            await expect(page.getByText(/Grade DRAFT: 17/)).toBeVisible();
-          }
-          await page.getByRole("button", { name: /Release grade for submission/ }).click();
-          await expect(page.getByText(/Grade RELEASED:/)).toBeVisible();
-        }
-        await page.getByLabel("Assignment to grade").selectOption({ label: titles[0] });
-        await page.getByLabel(/Points for submission/).fill("18");
-        await page.getByLabel(/Feedback for submission/).fill(correctedFeedback);
-        await page.getByRole("button", { name: "Correct released grade", exact: true }).click();
-        await expect(page.getByText(/Grade RELEASED: 18/)).toBeVisible();
-        await student.page.reload();
-        await chooseLoadedCourse(student.page, studentCourseId);
-        await expect(student.page.getByText(correctedFeedback, { exact: true })).toBeVisible();
-      });
+      await test.step("UC-LMS-001/002: faculty configures course details", () => journey1(context));
+      await test.step("UC-LMS-003/015: faculty organizes and schedules material", () => journey2(context));
+      await test.step("UC-LMS-007/008: faculty creates and publishes all submission types", () => journey3(context));
+      await test.step("UC-LMS-004/005/006: TA and Observer read common content", () => journey4(context));
+      await test.step("UC-LMS-009/010/011/015: student downloads and submits released assignments", () => journey5(context));
+      await test.step("UC-LMS-012: TA grades a submission and cannot release it", () => journey6(context));
+      await test.step("UC-LMS-012/013/014: faculty grades, releases and audits a correction", () => journey7(context));
       expect(problems).toEqual([]);
     } finally {
       await student.context.close(); await ta.context.close(); await observer.context.close();
