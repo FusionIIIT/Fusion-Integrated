@@ -1,0 +1,21 @@
+F
+=================================== FAILURES ===================================
+_ test_every_route_refuses_anonymous_missing_permission_missing_module[courses/-Courses] _
+modules/lms/tests/test_privilege_escalation.py:29: in test_every_route_refuses_anonymous_missing_permission_missing_module
+    assert (
+E   assert 200 == 403
+E    +  where 200 = <Response status_code=200, "application/json">.status_code
+E    +    where <Response status_code=200, "application/json"> = get('/api/v1/lms/courses/', {}, format='json')
+E    +      where get = getattr(<rest_framework.test.APIClient object at 0x7e578e187e30>, 'get')
+E    +        where <rest_framework.test.APIClient object at 0x7e578e187e30> = <function world.<locals>.actor at 0x7e578e10c180>(permissions=[])
+E    +          where <function world.<locals>.actor at 0x7e578e10c180> = namespace(workspace=<CourseWorkspace: CourseWorkspace object (1)>, other=<CourseWorkspace: CourseWorkspace object (2)>...ocals>.actor at 0x7e578e10c180>, due=datetime.datetime(2026, 11, 24, 11, 16, 55, 668563, tzinfo=datetime.timezone.utc)).actor
+E    +        and   'get' = <built-in method lower of str object at 0x7e5791ae78a0>()
+E    +          where <built-in method lower of str object at 0x7e5791ae78a0> = 'GET'.lower
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 16:46:55 WARNING django.request Unauthorized: /api/v1/lms/courses/
+------------------------------ Captured log call -------------------------------
+WARNING  django.request:log.py:293 Unauthorized: /api/v1/lms/courses/
+=========================== short test summary info ============================
+FAILED modules/lms/tests/test_privilege_escalation.py::test_every_route_refuses_anonymous_missing_permission_missing_module[courses/-Courses]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 4.07s

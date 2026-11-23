@@ -34,6 +34,198 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "lms": {
+      "grants": {
+        "faculty": [
+          "lms.announcement.create",
+          "lms.announcement.view",
+          "lms.assignment.create",
+          "lms.assignment.publish",
+          "lms.assignment.update",
+          "lms.assignment.view",
+          "lms.course.update",
+          "lms.course.view",
+          "lms.course_policy.update",
+          "lms.course_policy.view",
+          "lms.grade.create",
+          "lms.grade.publish",
+          "lms.grade.update",
+          "lms.grade.view",
+          "lms.material.create",
+          "lms.material.publish",
+          "lms.material.update",
+          "lms.material.view",
+          "lms.section.create",
+          "lms.section.update",
+          "lms.submission.view"
+        ],
+        "lms_observer": [
+          "lms.announcement.view",
+          "lms.course.view",
+          "lms.material.view"
+        ],
+        "lms_ta": [
+          "lms.announcement.create",
+          "lms.announcement.view",
+          "lms.assignment.view",
+          "lms.course.view",
+          "lms.grade.create",
+          "lms.grade.update",
+          "lms.grade.view",
+          "lms.material.view",
+          "lms.submission.view"
+        ],
+        "student": [
+          "lms.announcement.view",
+          "lms.assignment.view",
+          "lms.course.view",
+          "lms.grade.view",
+          "lms.material.view",
+          "lms.submission.create",
+          "lms.submission.view"
+        ]
+      },
+      "module_grants": [
+        "faculty",
+        "lms_observer",
+        "lms_ta",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/lms",
+        "icon": "BookOpen",
+        "items": [
+          {
+            "code": "lms.courses",
+            "icon": "BookOpen",
+            "label": "My Courses",
+            "required_permission": "lms.course.view",
+            "sort_order": 10,
+            "to": "/lms/courses"
+          },
+          {
+            "code": "lms.teaching",
+            "icon": "PencilSimple",
+            "label": "Teaching",
+            "required_permission": "lms.course.update",
+            "sort_order": 20,
+            "to": "/lms/teaching"
+          },
+          {
+            "code": "lms.grading",
+            "icon": "Exam",
+            "label": "Grading",
+            "required_permission": "lms.grade.update",
+            "sort_order": 30,
+            "to": "/lms/grading"
+          }
+        ],
+        "label": "Course Management",
+        "nav_section": "Learning",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "lms.course.view",
+          "label": "Read linked course workspaces"
+        },
+        {
+          "code": "lms.course.update",
+          "label": "Configure assigned courses"
+        },
+        {
+          "code": "lms.course_policy.view",
+          "label": "Read course announcement policy"
+        },
+        {
+          "code": "lms.course_policy.update",
+          "label": "Append course policy versions"
+        },
+        {
+          "code": "lms.section.create",
+          "label": "Create material sections"
+        },
+        {
+          "code": "lms.section.update",
+          "label": "Organize material sections"
+        },
+        {
+          "code": "lms.material.view",
+          "label": "Read published materials"
+        },
+        {
+          "code": "lms.material.create",
+          "label": "Create course materials"
+        },
+        {
+          "code": "lms.material.update",
+          "label": "Edit course materials"
+        },
+        {
+          "code": "lms.material.publish",
+          "label": "Publish or schedule course materials"
+        },
+        {
+          "code": "lms.assignment.view",
+          "label": "Read available assignments"
+        },
+        {
+          "code": "lms.assignment.create",
+          "label": "Create assignments"
+        },
+        {
+          "code": "lms.assignment.update",
+          "label": "Edit assignments"
+        },
+        {
+          "code": "lms.assignment.publish",
+          "label": "Publish or schedule assignments"
+        },
+        {
+          "code": "lms.announcement.view",
+          "label": "Read course announcements"
+        },
+        {
+          "code": "lms.announcement.create",
+          "label": "Post course announcements"
+        },
+        {
+          "code": "lms.submission.view",
+          "label": "Read scoped submissions"
+        },
+        {
+          "code": "lms.submission.create",
+          "label": "Submit own assignment work"
+        },
+        {
+          "code": "lms.grade.view",
+          "label": "Read scoped grades and feedback"
+        },
+        {
+          "code": "lms.grade.create",
+          "label": "Record draft grades"
+        },
+        {
+          "code": "lms.grade.update",
+          "label": "Update scoped grades"
+        },
+        {
+          "code": "lms.grade.publish",
+          "label": "Release grades and feedback"
+        },
+        {
+          "code": "lms.content.publish",
+          "label": "System scheduled release"
+        }
+      ],
+      "scope_permissions": [
+        "lms.course.view"
+      ],
+      "system_permissions": [
+        "lms.content.publish"
+      ]
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

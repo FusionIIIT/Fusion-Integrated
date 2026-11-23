@@ -41,6 +41,15 @@ class FakeIam:
         self.calls.append(("resolve_session", auth_token))
         return self.session
 
+    def set_active_role(self, auth_token: str, role: str) -> None:
+        from dataclasses import replace
+
+        self.calls.append(("set_active_role", role))
+        if self.session is None or role not in self.session.roles:
+            raise ValueError("Unknown role.")
+        self.session = getattr(self, "role_sessions", {}).get(
+            role, replace(self.session, active_role=role))
+
     def get_users(self, user_ids):
         ids = list(user_ids)
         self.calls.append(("get_users", tuple(sorted(ids))))
@@ -79,6 +88,22 @@ class FakeIam:
         if self.directory_error:
             raise self.directory_error
         return self.filters
+
+    def get_course_offerings(self, offering_keys=None):
+        self.calls.append(("get_course_offerings", offering_keys))
+        if error := getattr(self, "courses_error", None):
+            raise error
+        return [row for row in getattr(self, "course_offerings", [])
+                if offering_keys is None or row["offering_key"] in offering_keys]
+
+    def get_course_associations(self, user_ids, *, offering_keys=None, course_role=None):
+        self.calls.append(("get_course_associations", tuple(user_ids), course_role))
+        if error := getattr(self, "courses_error", None):
+            raise error
+        return [row for row in getattr(self, "course_associations", [])
+                if row["user_id"] in user_ids
+                and (offering_keys is None or row["offering_key"] in offering_keys)
+                and (course_role is None or row["course_role"] == course_role)]
 
     def get_academic_standings(self, user_ids):
         """A student absent from `standings` has no declared result, which is

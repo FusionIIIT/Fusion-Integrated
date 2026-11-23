@@ -1,0 +1,17 @@
+F
+=================================== FAILURES ===================================
+____ test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade[faculty] ____
+modules/lms/tests/test_journeys.py:174: in test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade
+    assert world.actor("student").get(url).json()["results"] == []
+E   AssertionError: assert [{'id': 1, 's..._id': 2, ...}] == []
+E
+E     Left contains one more item: {'id': 1, 'submission_id': 1, 'assignment_id': 1, 'user_id': 2, ...}
+E     Use -v to get more diff
+----------------------------- Captured stderr call -----------------------------
+2026-11-23 16:47:07 INFO fusion.lms.release lms.release.transition kind=assignment id=1 event=publish
+------------------------------ Captured log call -------------------------------
+INFO     fusion.lms.release:releases.py:82 lms.release.transition kind=assignment id=1 event=publish
+=========================== short test summary info ============================
+FAILED modules/lms/tests/test_journeys.py::test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade[faculty]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 4.11s

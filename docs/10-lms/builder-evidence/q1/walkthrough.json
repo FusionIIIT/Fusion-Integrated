@@ -1,0 +1,488 @@
+{
+  "use_cases": [
+    {
+      "uc": "UC-LMS-001",
+      "outcome": "Assigned course opens with syllabus, schedule and staff.",
+      "useCases": [
+        1,
+        2
+      ],
+      "actor": "Faculty",
+      "at": "2026-11-23T11:15:27.847Z",
+      "method": "GET",
+      "path": "/api/v1/lms/courses/1/",
+      "status": 200,
+      "server_log_line": 48,
+      "server_log": "[23/Nov/2026 16:45:27] \"GET /api/v1/lms/courses/1/ HTTP/1.1\" 200 2514"
+    },
+    {
+      "uc": "UC-LMS-002",
+      "outcome": "Course details publish and persist.",
+      "useCases": [
+        1,
+        2
+      ],
+      "actor": "Faculty",
+      "at": "2026-11-23T11:15:29.532Z",
+      "method": "PATCH",
+      "path": "/api/v1/lms/courses/1/",
+      "status": 200,
+      "server_log_line": 63,
+      "server_log": "[23/Nov/2026 16:45:29] \"PATCH /api/v1/lms/courses/1/ HTTP/1.1\" 200 2514"
+    },
+    {
+      "uc": "UC-LMS-003",
+      "outcome": "Section and NOTE material are created; material is scheduled.",
+      "useCases": [
+        3,
+        15
+      ],
+      "actor": "Faculty",
+      "at": "2026-11-23T11:15:33.902Z",
+      "method": "POST",
+      "path": "/api/v1/lms/courses/1/materials/",
+      "status": 201,
+      "server_log_line": 96,
+      "server_log": "[23/Nov/2026 16:45:33] \"POST /api/v1/lms/courses/1/materials/ HTTP/1.1\" 201 238"
+    },
+    {
+      "uc": "UC-LMS-004",
+      "outcome": "Published scheduled note becomes visible to the Student.",
+      "useCases": [
+        4,
+        9,
+        10,
+        11,
+        15
+      ],
+      "actor": "Student",
+      "at": "2026-11-23T11:16:02.104Z",
+      "method": "GET",
+      "path": "/api/v1/lms/courses/1/materials/",
+      "status": 200,
+      "server_log_line": 228,
+      "server_log": "[23/Nov/2026 16:46:02] \"GET /api/v1/lms/courses/1/materials/ HTTP/1.1\" 200 6239"
+    },
+    {
+      "uc": "UC-LMS-005",
+      "outcome": "Policy-authorized TA posts a timestamped announcement.",
+      "useCases": [
+        4,
+        5,
+        6
+      ],
+      "actor": "TA",
+      "at": "2026-11-23T11:15:41.736Z",
+      "method": "POST",
+      "path": "/api/v1/lms/courses/1/announcements/",
+      "status": 201,
+      "server_log_line": 156,
+      "server_log": "[23/Nov/2026 16:45:41] \"POST /api/v1/lms/courses/1/announcements/ HTTP/1.1\" 201 146"
+    },
+    {
+      "uc": "UC-LMS-006",
+      "outcome": "Observer sees the common announcement without authoring controls.",
+      "useCases": [
+        4,
+        5,
+        6
+      ],
+      "actor": "Observer",
+      "at": "2026-11-23T11:15:43.556Z",
+      "method": "GET",
+      "path": "/api/v1/lms/courses/1/announcements/",
+      "status": 200,
+      "server_log_line": 166,
+      "server_log": "[23/Nov/2026 16:45:43] \"GET /api/v1/lms/courses/1/announcements/ HTTP/1.1\" 200 3129"
+    },
+    {
+      "uc": "UC-LMS-007",
+      "outcome": "TEXT, FILE and LINK assignment drafts are created.",
+      "useCases": [
+        7,
+        8,
+        15
+      ],
+      "actor": "Faculty",
+      "at": "2026-11-23T11:15:36.263Z",
+      "method": "POST",
+      "path": "/api/v1/lms/courses/1/assignments/",
+      "status": 201,
+      "server_log_line": 111,
+      "server_log": "[23/Nov/2026 16:45:36] \"POST /api/v1/lms/courses/1/assignments/ HTTP/1.1\" 201 276"
+    },
+    {
+      "uc": "UC-LMS-008",
+      "outcome": "Assignments publish immediately or at the selected future release.",
+      "useCases": [
+        7,
+        8,
+        15
+      ],
+      "actor": "Faculty",
+      "at": "2026-11-23T11:15:36.784Z",
+      "method": "POST",
+      "path": "/api/v1/lms/assignments/56/publish/",
+      "status": 200,
+      "server_log_line": 118,
+      "server_log": "[23/Nov/2026 16:45:36] \"POST /api/v1/lms/assignments/56/publish/ HTTP/1.1\" 200 310"
+    },
+    {
+      "uc": "UC-LMS-009",
+      "outcome": "Released assignment instructions download successfully.",
+      "useCases": [
+        4,
+        9,
+        10,
+        11,
+        15
+      ],
+      "actor": "Student",
+      "at": "2026-11-23T11:15:58.017Z",
+      "method": "GET",
+      "path": "/api/v1/lms/assignments/56/download/",
+      "status": 200,
+      "server_log_line": 204,
+      "server_log": "[23/Nov/2026 16:45:58] \"GET /api/v1/lms/assignments/56/download/ HTTP/1.1\" 200 115"
+    },
+    {
+      "uc": "UC-LMS-010",
+      "outcome": "TEXT, FILE and LINK submissions are accepted once each.",
+      "useCases": [
+        4,
+        9,
+        10,
+        11,
+        15
+      ],
+      "actor": "Student",
+      "at": "2026-11-23T11:15:58.260Z",
+      "method": "POST",
+      "path": "/api/v1/lms/assignments/56/submissions/",
+      "status": 201,
+      "server_log_line": 205,
+      "server_log": "[23/Nov/2026 16:45:58] \"POST /api/v1/lms/assignments/56/submissions/ HTTP/1.1\" 201 196"
+    },
+    {
+      "uc": "UC-LMS-011",
+      "outcome": "Own submission history/status is displayed.",
+      "useCases": [
+        4,
+        9,
+        10,
+        11,
+        15
+      ],
+      "actor": "Student",
+      "at": "2026-11-23T11:16:02.260Z",
+      "method": "GET",
+      "path": "/api/v1/lms/assignments/58/submissions/",
+      "status": 200,
+      "server_log_line": 234,
+      "server_log": "[23/Nov/2026 16:46:02] \"GET /api/v1/lms/assignments/58/submissions/ HTTP/1.1\" 200 241"
+    },
+    {
+      "uc": "UC-LMS-012",
+      "outcome": "TA records a Draft grade; release control stays absent.",
+      "useCases": [
+        12
+      ],
+      "actor": "TA",
+      "at": "2026-11-23T11:16:04.320Z",
+      "method": "POST",
+      "path": "/api/v1/lms/submissions/43/grade/",
+      "status": 200,
+      "server_log_line": 243,
+      "server_log": "[23/Nov/2026 16:46:04] \"POST /api/v1/lms/submissions/43/grade/ HTTP/1.1\" 200 248"
+    },
+    {
+      "uc": "UC-LMS-013",
+      "outcome": "Faculty releases grades and corrects a released grade with audit.",
+      "useCases": [
+        12,
+        13,
+        14
+      ],
+      "actor": "Faculty",
+      "at": "2026-11-23T11:16:08.186Z",
+      "method": "POST",
+      "path": "/api/v1/lms/submissions/43/grade/release/",
+      "status": 200,
+      "server_log_line": 265,
+      "server_log": "[23/Nov/2026 16:46:08] \"POST /api/v1/lms/submissions/43/grade/release/ HTTP/1.1\" 200 281"
+    },
+    {
+      "uc": "UC-LMS-014",
+      "outcome": "Own released feedback is visible; prior Draft feedback was absent.",
+      "useCases": [
+        12,
+        13,
+        14
+      ],
+      "actor": "Student",
+      "at": "2026-11-23T11:16:13.811Z",
+      "method": "GET",
+      "path": "/api/v1/lms/courses/1/grades/",
+      "status": 200,
+      "server_log_line": 302,
+      "server_log": "[23/Nov/2026 16:46:13] \"GET /api/v1/lms/courses/1/grades/ HTTP/1.1\" 200 7372"
+    },
+    {
+      "uc": "UC-LMS-015",
+      "outcome": "Future material/assignment releases execute in the real Celery worker and become readable.",
+      "useCases": [
+        3,
+        15
+      ],
+      "actor": "Faculty",
+      "at": "2026-11-23T11:15:35.201Z",
+      "method": "POST",
+      "path": "/api/v1/lms/materials/21/publish/",
+      "status": 200,
+      "server_log_line": 105,
+      "server_log": "[23/Nov/2026 16:45:35] \"POST /api/v1/lms/materials/21/publish/ HTTP/1.1\" 200 265"
+    }
+  ],
+  "roles": [
+    {
+      "role": "Faculty",
+      "account": "fac00021",
+      "workspace_id": 1,
+      "assertions": [
+        "Opened actual assigned course, details and common-content panels"
+      ],
+      "responses": [
+        {
+          "method": "GET",
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/announcements/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/materials/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/assignments/",
+          "status": 200
+        }
+      ],
+      "runserver_lines": [
+        "[23/Nov/2026 16:46:19] \"GET /api/v1/me HTTP/1.1\" 200 1195",
+        "[23/Nov/2026 16:46:19] \"GET /api/v1/lms/courses/ HTTP/1.1\" 200 2649",
+        "[23/Nov/2026 16:46:20] \"GET /api/v1/lms/courses/1/ HTTP/1.1\" 200 2607",
+        "[23/Nov/2026 16:46:20] \"GET /api/v1/lms/courses/1/announcements/ HTTP/1.1\" 200 3129",
+        "[23/Nov/2026 16:46:20] \"GET /api/v1/lms/courses/1/materials/ HTTP/1.1\" 200 6239",
+        "[23/Nov/2026 16:46:20] \"GET /api/v1/lms/courses/1/assignments/ HTTP/1.1\" 200 8096"
+      ]
+    },
+    {
+      "role": "Student",
+      "account": "stu03009",
+      "workspace_id": 3607,
+      "assertions": [
+        "Opened actual assigned course, details and common-content panels"
+      ],
+      "responses": [
+        {
+          "method": "GET",
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/3607/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/3607/announcements/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/3607/grades/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/3607/assignments/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/3607/materials/",
+          "status": 200
+        }
+      ],
+      "runserver_lines": [
+        "[23/Nov/2026 16:46:21] \"GET /api/v1/me HTTP/1.1\" 200 1521",
+        "[23/Nov/2026 16:46:21] \"GET /api/v1/lms/courses/ HTTP/1.1\" 200 9009",
+        "[23/Nov/2026 16:46:22] \"GET /api/v1/lms/courses/3607/ HTTP/1.1\" 200 345",
+        "[23/Nov/2026 16:46:22] \"GET /api/v1/lms/courses/3607/announcements/ HTTP/1.1\" 200 42",
+        "[23/Nov/2026 16:46:22] \"GET /api/v1/lms/courses/3607/grades/ HTTP/1.1\" 200 42",
+        "[23/Nov/2026 16:46:22] \"GET /api/v1/lms/courses/3607/assignments/ HTTP/1.1\" 200 42",
+        "[23/Nov/2026 16:46:22] \"GET /api/v1/lms/courses/3607/materials/ HTTP/1.1\" 200 42"
+      ]
+    },
+    {
+      "role": "TA",
+      "account": "stu03008",
+      "workspace_id": 1,
+      "assertions": [
+        "Opened actual assigned course, details and common-content panels"
+      ],
+      "responses": [
+        {
+          "method": "GET",
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/assignments/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/materials/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/announcements/",
+          "status": 200
+        }
+      ],
+      "runserver_lines": [
+        "[23/Nov/2026 16:46:23] \"GET /api/v1/me HTTP/1.1\" 200 1674",
+        "[23/Nov/2026 16:46:23] \"GET /api/v1/lms/courses/ HTTP/1.1\" 200 2644",
+        "[23/Nov/2026 16:46:23] \"GET /api/v1/lms/courses/1/ HTTP/1.1\" 200 2602",
+        "[23/Nov/2026 16:46:23] \"GET /api/v1/lms/courses/1/assignments/ HTTP/1.1\" 200 8096",
+        "[23/Nov/2026 16:46:23] \"GET /api/v1/lms/courses/1/materials/ HTTP/1.1\" 200 6239",
+        "[23/Nov/2026 16:46:23] \"GET /api/v1/lms/courses/1/announcements/ HTTP/1.1\" 200 3129"
+      ]
+    },
+    {
+      "role": "Observer",
+      "account": "stf00001",
+      "workspace_id": 1,
+      "assertions": [
+        "Opened actual assigned course, details and common-content panels",
+        "No assignment or announcement write controls"
+      ],
+      "responses": [
+        {
+          "method": "GET",
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/announcements/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/1/materials/",
+          "status": 200
+        }
+      ],
+      "runserver_lines": [
+        "[23/Nov/2026 16:46:24] \"GET /api/v1/me HTTP/1.1\" 200 601",
+        "[23/Nov/2026 16:46:25] \"GET /api/v1/lms/courses/ HTTP/1.1\" 200 2651",
+        "[23/Nov/2026 16:46:25] \"GET /api/v1/lms/courses/1/ HTTP/1.1\" 200 2609",
+        "[23/Nov/2026 16:46:25] \"GET /api/v1/lms/courses/1/announcements/ HTTP/1.1\" 200 3129",
+        "[23/Nov/2026 16:46:25] \"GET /api/v1/lms/courses/1/materials/ HTTP/1.1\" 200 6239"
+      ]
+    },
+    {
+      "role": "Ordinary Student",
+      "account": "stu00001",
+      "workspace_id": 3506,
+      "assertions": [
+        "Opened actual assigned course, details and common-content panels",
+        "Teaching/grading direct routes refused by UI guard; unauthorized pages did not mount"
+      ],
+      "responses": [
+        {
+          "method": "GET",
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/lms/courses/3506/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/me",
+          "status": 200
+        }
+      ],
+      "runserver_lines": [
+        "[23/Nov/2026 16:46:26] \"GET /api/v1/me HTTP/1.1\" 200 1521",
+        "[23/Nov/2026 16:46:27] \"GET /api/v1/lms/courses/ HTTP/1.1\" 200 9006",
+        "[23/Nov/2026 16:46:27] \"GET /api/v1/lms/courses/3506/ HTTP/1.1\" 200 360",
+        "[23/Nov/2026 16:46:27] \"GET /api/v1/lms/courses/3506/assignments/ HTTP/1.1\" 200 42",
+        "[23/Nov/2026 16:46:27] \"GET /api/v1/lms/courses/3506/grades/ HTTP/1.1\" 200 42",
+        "[23/Nov/2026 16:46:27] \"GET /api/v1/lms/courses/3506/announcements/ HTTP/1.1\" 200 42",
+        "[23/Nov/2026 16:46:27] \"GET /api/v1/lms/courses/3506/materials/ HTTP/1.1\" 200 42",
+        "[23/Nov/2026 16:46:27] \"GET /api/v1/me HTTP/1.1\" 200 1521",
+        "[23/Nov/2026 16:46:27] \"GET /api/v1/me HTTP/1.1\" 200 1521"
+      ]
+    }
+  ]
+}

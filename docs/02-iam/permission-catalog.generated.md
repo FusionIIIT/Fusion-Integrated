@@ -13,6 +13,34 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `lms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `lms.course.view` | Read linked course workspaces | `faculty`, `lms_observer`, `lms_ta`, `student` |
+| `lms.course.update` | Configure assigned courses | `faculty` |
+| `lms.course_policy.view` | Read course announcement policy | `faculty` |
+| `lms.course_policy.update` | Append course policy versions | `faculty` |
+| `lms.section.create` | Create material sections | `faculty` |
+| `lms.section.update` | Organize material sections | `faculty` |
+| `lms.material.view` | Read published materials | `faculty`, `lms_observer`, `lms_ta`, `student` |
+| `lms.material.create` | Create course materials | `faculty` |
+| `lms.material.update` | Edit course materials | `faculty` |
+| `lms.material.publish` | Publish or schedule course materials | `faculty` |
+| `lms.assignment.view` | Read available assignments | `faculty`, `lms_ta`, `student` |
+| `lms.assignment.create` | Create assignments | `faculty` |
+| `lms.assignment.update` | Edit assignments | `faculty` |
+| `lms.assignment.publish` | Publish or schedule assignments | `faculty` |
+| `lms.announcement.view` | Read course announcements | `faculty`, `lms_observer`, `lms_ta`, `student` |
+| `lms.announcement.create` | Post course announcements | `faculty`, `lms_ta` |
+| `lms.submission.view` | Read scoped submissions | `faculty`, `lms_ta`, `student` |
+| `lms.submission.create` | Submit own assignment work | `student` |
+| `lms.grade.view` | Read scoped grades and feedback | `faculty`, `lms_ta`, `student` |
+| `lms.grade.create` | Record draft grades | `faculty`, `lms_ta` |
+| `lms.grade.update` | Update scoped grades | `faculty`, `lms_ta` |
+| `lms.grade.publish` | Release grades and feedback | `faculty` |
+| `lms.content.publish` | System scheduled release | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
