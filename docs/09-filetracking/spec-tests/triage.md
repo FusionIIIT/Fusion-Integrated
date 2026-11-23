@@ -3,7 +3,7 @@
 Student 1 (git author name): Utkarsh Gupta
 Student 2 (git author name): Sushanth
 Design commit (hash and subject): fb0c228a4c755278874d9975c4764d676f9f686e feat(spec): freeze FTS-007 test designs for FR, UC, BR, and WF
-Baseline commit (hash and subject): PENDING_BASELINE_COMMIT
+Baseline commit (hash and subject): 4a35aa5b30a564aa294948c04110a1571cf55907 feat(spec): implement FTS-007 spec test suites and initial baseline
 Student 1's 10/10 commit the baseline ran on (hash): b7c4564737e951ce0594132f92ef715950f3f300
 
 ## Results
