@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Card, Container, Group, Stack, Text, TextInput } from "@mantine/core";
+import { Badge, Button, Container, Stack, Text, TextInput } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPlus, FaSearch } from "react-icons/fa";
 
-import { http, errorMessage } from "../../../lib/http";
+import { http } from "../../../lib/http";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { DataTable } from "../../../ui/components/DataTable";
 import { ErrorState } from "../../../ui/components/ErrorState";

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Card, Container, Group, Stack, Text, TextInput, Title } from "@mantine/core";
+import { Badge, Button, Container, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 
 import { http, errorMessage } from "../../../lib/http";

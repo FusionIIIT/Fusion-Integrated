@@ -5,7 +5,6 @@ import { RequirePermission } from "../../auth/RequirePermission";
 
 const ComplaintsListPage = lazy(() => import("./pages/ComplaintsListPage"));
 const ComplaintSubmitPage = lazy(() => import("./pages/ComplaintSubmitPage"));
-const ComplaintDetailPage = lazy(() => import("./pages/ComplaintDetailPage"));
 const ApprovalsPage = lazy(() => import("./pages/ApprovalsPage"));
 const InventoryPage = lazy(() => import("./pages/InventoryPage"));
 const BillingPage = lazy(() => import("./pages/BillingPage"));

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Card, Container, Group, Modal, NumberInput, Stack, TextInput, Title } from "@mantine/core";
+import { Badge, Button, Container, Modal, NumberInput, Stack, TextInput } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { FaPlus } from "react-icons/fa";
 
