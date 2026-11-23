@@ -1,0 +1,22 @@
+{
+  "strategy": "WF",
+  "source": "docs/11-patents/patents-blueprint.md",
+  "note": "Only BW/CW workflows explicitly referenced by name/rows in the blueprint are included. BW-PMS-01, BW-PMS-02, BW-PMS-11 and CW-PMS-01 have no named definition in the blueprint, so they are not invented.",
+  "workflows": [
+    {"id": "BW-PMS-03", "name": "Appeal remand for amendment", "from_state": "APPEAL_SUBMITTED", "event": "remand_appeal", "to_state": "REMANDED", "actor": "Director"},
+    {"id": "BW-PMS-04", "name": "Appeal uphold rejection", "from_state": "APPEAL_SUBMITTED", "event": "uphold_rejection", "to_state": "REJECTION_UPHELD", "actor": "Director"},
+    {"id": "BW-PMS-05", "name": "Appeal modify decision", "from_state": "APPEAL_SUBMITTED", "event": "modify_decision", "to_state": "DECISION_MODIFIED", "actor": "Director"},
+    {"id": "BW-PMS-06", "name": "Attorney accepts assignment", "from_state": "ASSIGNMENT_OFFERED", "event": "accept_assignment", "to_state": "ATTORNEY_ASSIGNED", "actor": "Attorney"},
+    {"id": "BW-PMS-07", "name": "Attorney declines assignment then PCC_ADMIN reassigns", "from_state": "ASSIGNMENT_OFFERED", "event": "decline_assignment", "to_state": "PENDING_REVIEW", "actor": "Attorney"},
+    {"id": "BW-PMS-08", "name": "Budget approval", "entity": "PatentBudgetLedger", "from_state": "PENDING", "to_state": "APPROVED", "actor": "Director"},
+    {"id": "BW-PMS-09", "name": "Budget rejection", "entity": "PatentBudgetLedger", "from_state": "PENDING", "to_state": "REJECTED", "actor": "Director"},
+    {"id": "BW-PMS-10", "name": "Budget escalation on cost threshold", "entity": "PatentBudgetLedger", "from_state": "PENDING", "to_state": "ESCALATED", "actor": "Director"},
+    {"id": "BW-PMS-12", "name": "Office-action response cycle without applicant review", "entity": "OfficeActionRecord", "from_state": "RECORDED", "to_state": "SUBMITTED", "actor": "Attorney"},
+    {"id": "BW-PMS-13", "name": "Office-action response cycle with applicant review", "entity": "OfficeActionRecord", "from_state": "RECORDED", "to_state": "SUBMITTED", "actor": "Attorney"},
+    {"id": "BW-PMS-14", "name": "Maintenance renewal approval", "from_state": "MAINTENANCE_PENDING", "event": "approve_renewal", "to_state": "RENEWED", "actor": "Director"},
+    {"id": "BW-PMS-15", "name": "Maintenance renewal decline to lapsed", "from_state": "MAINTENANCE_PENDING", "event": "decline_renewal", "to_state": "LAPSED", "actor": "Director"},
+    {"id": "BW-PMS-16", "name": "Pre-filing withdrawal", "from_state": "DRAFT", "event": "withdraw", "to_state": "WITHDRAWN", "actor": "Applicant"},
+    {"id": "CW-PMS-02", "name": "Budget subordinate lifecycle tracked in PatentBudgetLedger, not PatentApplication.status", "entity": "PatentBudgetLedger", "to_state": "APPROVED"},
+    {"id": "CW-PMS-03", "name": "Office-action subordinate lifecycle tracked in OfficeActionRecord, not PatentApplication.status", "entity": "OfficeActionRecord", "to_state": "SUBMITTED"}
+  ]
+}
