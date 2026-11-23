@@ -1,0 +1,146 @@
+[
+  {
+    "test_id": "WF-001",
+    "source_id": "BW-GYM-01 STT Transition 1 — no membership to open",
+    "purpose": "A student applying to a confirmed club with no prior application transitions the system from 'No Membership Application' to 'Membership Application Open'.",
+    "preconditions": "Student authenticated. Confirmed club exists. No prior application from this student to this club. Guards: club is confirmed, no duplicate application.",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/apply/ with club id and description.",
+    "expected_result": "HTTP 201. Membership application record exists with status='open'. BR-GYM-007, BR-GYM-008, BR-GYM-009 all satisfied.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-002",
+    "source_id": "BW-GYM-01 STT Transition 1 guard — unconfirmed club blocks open state",
+    "purpose": "If the target club is not confirmed, the transition to 'Membership Application Open' is blocked.",
+    "preconditions": "Student authenticated. Club status='open' (not confirmed).",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/apply/ targeting the unconfirmed club.",
+    "expected_result": "HTTP 400. No membership application created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-003",
+    "source_id": "BW-GYM-01 STT Transition 2 — open to confirmed (membership approved)",
+    "purpose": "An applicable Club Head approving an open membership application transitions it to 'Membership Confirmed'.",
+    "preconditions": "Club Head authenticated. Open membership application exists for the club. BR-GYM-010, BR-GYM-011 applicable.",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/{id}/approve/.",
+    "expected_result": "HTTP 200. Application status='confirmed'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-004",
+    "source_id": "BW-GYM-01 STT Transition 2 guard — unauthorized Club Head cannot approve",
+    "purpose": "If the approving actor is not the applicable Club Head, the transition to 'Membership Confirmed' is blocked.",
+    "preconditions": "Club Head of Club B tries to approve an application belonging to Club A.",
+    "action_or_input": "POST /api/v1/gymkhana/memberships/{id}/approve/ where application belongs to Club A.",
+    "expected_result": "HTTP 403 or 404. Application remains open.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-005",
+    "source_id": "BW-GYM-01 full path — no membership → open → confirmed",
+    "purpose": "The complete BW-GYM-01 workflow: student applies (open), Club Head approves (confirmed).",
+    "preconditions": "Student S, Club Head H, confirmed club C. No prior application from S to C.",
+    "action_or_input": "Step 1: S calls POST /apply/ → application open. Step 2: H calls POST /approve/ → application confirmed.",
+    "expected_result": "After step 1: status='open'. After step 2: status='confirmed'. Full path completes without error.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-006",
+    "source_id": "BW-GYM-02 STT Transition 1 — poll not available to poll open",
+    "purpose": "An authorized Club Head creating a poll with valid data transitions the system from 'Poll Not Available' to 'Poll Open / Target Audience Defined / Student Not Yet Voted'.",
+    "preconditions": "Club Head authenticated. At least two choices. Valid target groups. BR-GYM-010, BR-GYM-012, BR-GYM-013 applicable.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/ with valid data.",
+    "expected_result": "HTTP 201. Poll with status='active', choices, and target groups created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-007",
+    "source_id": "BW-GYM-02 STT Transition 1 guard — fewer than two choices blocks creation",
+    "purpose": "If fewer than two choices are provided, the poll creation transition is blocked.",
+    "preconditions": "Club Head authenticated.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/ with only one choice.",
+    "expected_result": "HTTP 400. Poll not created. State remains 'Poll Not Available'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-008",
+    "source_id": "BW-GYM-02 STT Transition 2 — not voted to vote recorded",
+    "purpose": "An eligible targeted student voting in an active poll transitions from 'Student Not Yet Voted' to 'Student Vote Recorded'.",
+    "preconditions": "Active poll. Student in target batch/branch. Student has not voted. Poll not expired. BR-GYM-013, BR-GYM-014, BR-GYM-015 applicable.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/{id}/vote/ with valid choice_id.",
+    "expected_result": "HTTP 200/201. Vote recorded. Choice tally incremented by 1.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-009",
+    "source_id": "BW-GYM-02 STT Transition 2 guard — already voted blocks second vote",
+    "purpose": "A student who has already voted cannot transition again; second vote is rejected.",
+    "preconditions": "Student has already voted in the poll.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/{id}/vote/ again.",
+    "expected_result": "HTTP 400 or 409. No duplicate vote. Tally unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-010",
+    "source_id": "BW-GYM-02 STT Transition 2 guard — expired poll blocks vote",
+    "purpose": "If the poll has expired, the student cannot vote even if otherwise eligible.",
+    "preconditions": "Poll expires_at is in the past. Student eligible and not yet voted.",
+    "action_or_input": "POST /api/v1/gymkhana/polls/{id}/vote/ with valid choice_id.",
+    "expected_result": "HTTP 400. Vote not recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-011",
+    "source_id": "BW-GYM-02 full path — poll created → eligible student votes",
+    "purpose": "The complete BW-GYM-02 workflow: Club Head creates poll (active), eligible student votes (vote recorded).",
+    "preconditions": "Club Head H, eligible student S. No prior votes by S in this poll.",
+    "action_or_input": "Step 1: H creates poll via POST /polls/ → status='active'. Step 2: S votes via POST /polls/{id}/vote/.",
+    "expected_result": "After step 1: poll active with choices and target groups. After step 2: vote recorded, tally incremented.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-012",
+    "source_id": "BW-GYM-03 STT Transition 1 — club not created to club open",
+    "purpose": "Student Admin creating a club with valid data transitions from 'Club Not Created' to 'Club Open'.",
+    "preconditions": "Student Admin authenticated. Valid coordinator/co-coordinator (students), valid faculty councillor, allowed category. BR-GYM-001 to BR-GYM-004 applicable.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/ with valid data.",
+    "expected_result": "HTTP 201. Club with status='open' created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-013",
+    "source_id": "BW-GYM-03 STT Transition 1 guard — invalid coordinator blocks club creation",
+    "purpose": "If the coordinator is not a valid student, the transition to 'Club Open' is blocked.",
+    "preconditions": "Student Admin authenticated. coordinator_id refers to a non-student.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/ with invalid coordinator_id.",
+    "expected_result": "HTTP 400. Club not created. State remains 'Club Not Created'.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-014",
+    "source_id": "BW-GYM-03 STT Transition 2 — club open to club confirmed",
+    "purpose": "Student Admin approving an open club transitions it from 'Club Open' to 'Club Confirmed'.",
+    "preconditions": "Student Admin authenticated. Club exists with status='open'. BR-GYM-004 applicable.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/{id}/confirm/.",
+    "expected_result": "HTTP 200. Club status='confirmed'.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-015",
+    "source_id": "BW-GYM-03 STT Transition 2 guard — non-Student-Admin cannot confirm club",
+    "purpose": "If the actor is not Student Admin, the transition to 'Club Confirmed' is blocked.",
+    "preconditions": "Regular student (not Student Admin) authenticated. Open club exists.",
+    "action_or_input": "POST /api/v1/gymkhana/clubs/{id}/confirm/.",
+    "expected_result": "HTTP 403. Club remains open.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "WF-016",
+    "source_id": "BW-GYM-03 full path — club not created → open → confirmed",
+    "purpose": "The complete BW-GYM-03 workflow: Student Admin creates club (open), then confirms it (confirmed).",
+    "preconditions": "Student Admin A, valid coordinator, co-coordinator, faculty councillor.",
+    "action_or_input": "Step 1: A calls POST /clubs/ → club open. Step 2: A calls POST /clubs/{id}/confirm/ → club confirmed.",
+    "expected_result": "After step 1: status='open'. After step 2: status='confirmed'. Full path completes.",
+    "test_type": "positive"
+  }
+]
