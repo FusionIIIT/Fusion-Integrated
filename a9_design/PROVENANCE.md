@@ -49,9 +49,9 @@ it is not the canonical handoff commit.
 
 ## Path and chronology audit
 
-- In the current checkout, `docs/16-mms/spec-tests/` contains `triage.md` only; the four A9
-  design artifacts remain outside the prescribed canonical design path. Its recorded SHA-256
-  is `52b98e33ab806e5d74406f02be8b30e9c673e1704e12b947b817e96fba7b8222`.
+- In the current checkout, the four A9 design JSONs are present under the prescribed
+  `docs/16-mms/spec-tests/` path but remain untracked; their current location does not establish
+  a committed design-first artifact. The original committed designs are in `a9_design/`.
 - Current `HEAD` is `5595be6628b4cdc6f8b47cf74bac267a2470f780`; the A9 design JSON files are
   untracked in this checkout. The visible Git object
   `fb639b38aa147a9e1572e55e0f20f618c3200b13`, dated 2026-11-24 01:53:30 +05:30, contains the
@@ -63,6 +63,9 @@ it is not the canonical handoff commit.
   unproven; no commit or timestamp has been fabricated.
 - Student 2's current review session used OpenAI Codex, GPT-6. No Student 1 tool/model/provider
   record was found; provider separation cannot be verified.
+- Student 1 agrees with the active Caretaker interpretation for Served/Cancelled updates in
+  MMS-UC-021. This is a specification reading, not institution policy, and it does not decide
+  cancellation billing (ISS-MMS-015).
 
 ## Evidence not asserted
 
@@ -72,4 +75,4 @@ pre-implementation approval timestamp is evidenced. The dated review and approva
 preceded implementation. Existing unresolved items include ISS-MMS-012/013/014/015/019,
 rebate-date modification rules, special-food decision period, and special-food charge
 source/value. No institution/instructor policy value or decision is supplied here. Student 1's
-explicit ISS-MMS-014 agreement or disagreement is also not recorded.
+ISS-MMS-014 agreement is recorded above.
