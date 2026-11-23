@@ -1,0 +1,425 @@
+[
+  {
+    "test_id": "TEST-UC-001",
+    "source_id": "UC-LMS-001 Main Flow",
+    "purpose": "Verify authorized user can access course workspace and view course home with syllabus, schedule, instructors, and TAs",
+    "preconditions": "Course C101 exists with syllabus, schedule, instructor, and TA configured; user is enrolled student or assigned faculty/TA",
+    "action_or_input": "Authorized user requests to open course workspace for C101",
+    "expected_result": "System validates course access and returns course workspace details including syllabus, schedule, instructors, and TAs with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-002",
+    "source_id": "UC-LMS-001 Alternative Flow",
+    "purpose": "Verify system denies course workspace access when user is not authorized for the selected course",
+    "preconditions": "Course C101 exists; user U1 is not enrolled, assigned, or linked to C101",
+    "action_or_input": "User U1 requests to access course workspace for C101",
+    "expected_result": "System denies access with HTTP 403 or 404; no workspace details are disclosed",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-003",
+    "source_id": "UC-LMS-001 Exception Flow",
+    "purpose": "Verify workspace access is not exposed when registration or association link data is absent",
+    "preconditions": "User has valid login credentials but no course registration or membership record in the system",
+    "action_or_input": "User attempts to access C101 workspace",
+    "expected_result": "System cannot confirm course access and rejects request without exposing workspace content",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-004",
+    "source_id": "UC-LMS-002 Main Flow",
+    "purpose": "Verify assigned Faculty can configure course workspace details and save changes",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 updates course syllabus, description, and office hours for C101",
+    "expected_result": "System verifies Faculty authorization, stores updated details, and returns updated course details with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-005",
+    "source_id": "UC-LMS-002 Alternative Flow",
+    "purpose": "Verify assigned Faculty can edit previously published course details",
+    "preconditions": "Course C101 has existing published details; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 modifies existing syllabus and schedule",
+    "expected_result": "System persists modified details and presents new values on course home",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-006",
+    "source_id": "UC-LMS-002 Exception Flow",
+    "purpose": "Verify unauthorized user or non-assigned faculty cannot modify course details",
+    "preconditions": "Course C101 exists; User U2 is either student, TA, or faculty not assigned to C101",
+    "action_or_input": "User U2 attempts to update course details for C101",
+    "expected_result": "System rejects update with HTTP 403; existing course details remain unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-007",
+    "source_id": "UC-LMS-003 Main Flow",
+    "purpose": "Verify assigned Faculty can add course material with immediate publication",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 uploads file or link material with title, module section, and immediate publication flag",
+    "expected_result": "System validates input, saves material in Published state, and returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-008",
+    "source_id": "UC-LMS-003 Main Flow Scheduled",
+    "purpose": "Verify assigned Faculty can add course material with future release date",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 adds material specifying a future release timestamp",
+    "expected_result": "System validates input, saves material in Scheduled state, and returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-009",
+    "source_id": "UC-LMS-003 Alternative Flow",
+    "purpose": "Verify assigned Faculty can edit and reorganize existing course material",
+    "preconditions": "Material M1 exists in C101; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 updates material M1 title, description, and display order",
+    "expected_result": "System saves modifications and reflects updated metadata with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-010",
+    "source_id": "UC-LMS-003 Exception Flow",
+    "purpose": "Verify TA, Student, or Observer write attempts on course materials are rejected",
+    "preconditions": "User is a TA, Student, or Observer in course C101",
+    "action_or_input": "User attempts to create, update, or delete course material in C101",
+    "expected_result": "System rejects write attempt with HTTP 403; no material changes are committed",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-011",
+    "source_id": "UC-LMS-004 Main Flow",
+    "purpose": "Verify authorized Student, TA, or Observer can list and view published course materials in read-only form",
+    "preconditions": "Material M1 in C101 is Published; user is enrolled Student, TA, or linked Observer",
+    "action_or_input": "User requests materials list or material details for M1",
+    "expected_result": "System returns published material in read-only form with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-012",
+    "source_id": "UC-LMS-004 Alternative Flow",
+    "purpose": "Verify scheduled or unpublished course material is omitted from student and observer material views until released",
+    "preconditions": "Material M2 in C101 has Scheduled state (future release timestamp); student S1 is enrolled in C101",
+    "action_or_input": "Student S1 requests course materials list or material details for M2",
+    "expected_result": "Scheduled material M2 is omitted from the list; direct request returns HTTP 403 or 404",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-013",
+    "source_id": "UC-LMS-004 Exception Flow",
+    "purpose": "Verify user not enrolled or linked to the course is denied access to view published materials",
+    "preconditions": "Material M1 is published in C101; user U3 is not member of C101",
+    "action_or_input": "User U3 requests to view materials for C101",
+    "expected_result": "System denies access with HTTP 403 or 404",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-014",
+    "source_id": "UC-LMS-005 Main Flow",
+    "purpose": "Verify assigned Faculty can post course announcement with automatic timestamp and course-wide visibility",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 posts announcement with title and content",
+    "expected_result": "System records announcement with author attribution and timestamp, returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-015",
+    "source_id": "UC-LMS-005 Alternative Flow",
+    "purpose": "Verify TA permitted to post announcements can successfully post course announcement",
+    "preconditions": "TA T1 is assigned to course C101 and granted announcement posting permission",
+    "action_or_input": "TA T1 posts announcement with title and content",
+    "expected_result": "System verifies TA posting authority, records announcement with timestamp, and returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-016",
+    "source_id": "UC-LMS-005 Exception Flow",
+    "purpose": "Verify unauthorized user, Student, Observer, or TA without posting permission is rejected when attempting to post announcement",
+    "preconditions": "TA T2 in C101 lacks announcement permission, or user S1 is a Student",
+    "action_or_input": "User attempts to post announcement to C101",
+    "expected_result": "System rejects posting attempt with HTTP 403; no announcement is created",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-017",
+    "source_id": "UC-LMS-006 Main Flow",
+    "purpose": "Verify authorized course members can retrieve and view timestamped course announcements",
+    "preconditions": "Course C101 has announcements posted; user is enrolled student, assigned faculty, TA, or linked observer",
+    "action_or_input": "Authorized user requests announcements for C101",
+    "expected_result": "System returns announcements list with timestamps and author details with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-018",
+    "source_id": "UC-LMS-006 Exception Flow",
+    "purpose": "Verify unauthorized user cannot view course announcements",
+    "preconditions": "User U3 is not affiliated with course C101",
+    "action_or_input": "User U3 requests announcements for C101",
+    "expected_result": "System refuses access with HTTP 403 or 404; no announcements exposed",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-019",
+    "source_id": "UC-LMS-007 Main Flow",
+    "purpose": "Verify assigned Faculty can create new assignment with title, due date, instructions, submission type, and points, saving in Draft state",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 creates assignment providing title, instructions, submission_type='file', points_possible=100, and valid due_date",
+    "expected_result": "System validates configuration, saves assignment in Draft state, and returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-020",
+    "source_id": "UC-LMS-007 Alternative Flow",
+    "purpose": "Verify assigned Faculty can edit existing Draft assignment",
+    "preconditions": "Assignment A1 in C101 is in Draft state; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 updates title, instructions, or points possible for A1",
+    "expected_result": "System validates and saves modifications while preserving Draft state; returns HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-021",
+    "source_id": "UC-LMS-007 Exception Flow",
+    "purpose": "Verify TA, Student, or Observer assignment-authoring attempts are rejected",
+    "preconditions": "User is a TA, Student, or Observer in C101",
+    "action_or_input": "User attempts to create or update an assignment in C101",
+    "expected_result": "System rejects request with HTTP 403; assignment is not created or modified",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-022",
+    "source_id": "UC-LMS-008 Main Flow",
+    "purpose": "Verify assigned Faculty can publish Draft assignment for immediate release, making it Published and Available to students",
+    "preconditions": "Assignment A1 in C101 is valid Draft with release_at=None or release_at in the past; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 requests publication of assignment A1",
+    "expected_result": "System transitions assignment to Published/Available state; returns HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-023",
+    "source_id": "UC-LMS-008 Alternative Flow",
+    "purpose": "Verify assigned Faculty can publish Draft assignment with future release date, marking it Published and Scheduled for Release",
+    "preconditions": "Assignment A2 in C101 is valid Draft with future release_at timestamp; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 requests publication of assignment A2",
+    "expected_result": "System transitions assignment to Scheduled state; returns HTTP 200; content remains unreleased to students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-024",
+    "source_id": "UC-LMS-008 Exception Flow",
+    "purpose": "Verify incomplete or invalid Draft assignment cannot be published",
+    "preconditions": "Assignment A3 in C101 is missing due_date or has invalid points possible; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 attempts to publish assignment A3",
+    "expected_result": "System rejects publication with HTTP 400 or 422; assignment remains in Draft state",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-025",
+    "source_id": "UC-LMS-009 Main Flow",
+    "purpose": "Verify enrolled Student can view and download details of published and released assignment",
+    "preconditions": "Assignment A1 in C101 is Published and Available; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 requests assignment details for A1",
+    "expected_result": "System returns assignment details, instructions, due date, and points possible with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-026",
+    "source_id": "UC-LMS-009 Alternative Flow",
+    "purpose": "Verify future-dated unreleased assignment is hidden from enrolled Students",
+    "preconditions": "Assignment A2 in C101 is Published but Scheduled (future release_at); Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 lists assignments or requests details for A2",
+    "expected_result": "Assignment A2 is omitted from student view; direct request returns HTTP 403 or 404",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-027",
+    "source_id": "UC-LMS-009 Exception Flow",
+    "purpose": "Verify user not enrolled in course is denied access to view published assignment",
+    "preconditions": "Assignment A1 is published in C101; user U4 is not enrolled in C101",
+    "action_or_input": "User U4 requests details for assignment A1",
+    "expected_result": "System denies access with HTTP 403 or 404",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-028",
+    "source_id": "UC-LMS-010 Main Flow",
+    "purpose": "Verify enrolled Student can submit assignment conforming to configured submission type before due date",
+    "preconditions": "Assignment A1 is Available with submission_type='text' and future due date; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 submits text content for assignment A1",
+    "expected_result": "System validates type and timing, records submission with timestamp and student identity, returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-029",
+    "source_id": "UC-LMS-010 Exception Flow",
+    "purpose": "Verify submission with a type inconsistent with assignment configuration is rejected",
+    "preconditions": "Assignment A1 requires submission_type='file'; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 attempts to submit raw text instead of file upload",
+    "expected_result": "System rejects submission with HTTP 400 or 422; no submission is recorded",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-030",
+    "source_id": "UC-LMS-010 Exception Flow Auth",
+    "purpose": "Verify non-enrolled user or faculty/TA cannot submit assignment as a student",
+    "preconditions": "User U5 is not an enrolled student in course C101",
+    "action_or_input": "User U5 attempts to submit to assignment A1",
+    "expected_result": "System rejects submission attempt with HTTP 403",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-031",
+    "source_id": "UC-LMS-011 Main Flow",
+    "purpose": "Verify enrolled Student can view their own assignment submission history and status",
+    "preconditions": "Student S1 has submitted work for assignment A1 in C101",
+    "action_or_input": "Student S1 requests submission history for assignment A1",
+    "expected_result": "System returns Student S1's own submission records, status, and timestamps with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-032",
+    "source_id": "UC-LMS-011 Alternative Flow",
+    "purpose": "Verify submission status reflects submitted, missing, or evaluated accurately",
+    "preconditions": "Student S2 is enrolled in C101 but has not submitted assignment A1",
+    "action_or_input": "Student S2 queries submission status for assignment A1",
+    "expected_result": "System returns status indicating not submitted / missing with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-033",
+    "source_id": "UC-LMS-011 Exception Flow",
+    "purpose": "Verify Student is denied access to view another Student's submission data",
+    "preconditions": "Student S1 has submitted work for A1; Student S2 is another enrolled student",
+    "action_or_input": "Student S2 requests submission history or details of Student S1",
+    "expected_result": "System denies access with HTTP 403 or 404; no other student submission is exposed",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-034",
+    "source_id": "UC-LMS-012 Main Flow",
+    "purpose": "Verify assigned Faculty can grade a student submission, recording points and feedback in Draft state with actor attribution",
+    "preconditions": "Submission Sub1 exists for assignment A1 in C101; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 enters points=85 and feedback='Good analysis' for Sub1",
+    "expected_result": "System validates points, records grade in Draft state with grader attribution and timestamp, returns HTTP 200 or 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-035",
+    "source_id": "UC-LMS-012 Main Flow TA",
+    "purpose": "Verify course TA can grade a student submission, recording points and feedback in Draft state",
+    "preconditions": "Submission Sub1 exists in C101; TA T1 is assigned to C101",
+    "action_or_input": "TA T1 enters points=90 and feedback='Well done' for Sub1",
+    "expected_result": "System records Draft grade attributed to TA T1 with HTTP 200 or 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-036",
+    "source_id": "UC-LMS-012 Alternative Flow",
+    "purpose": "Verify modifying an already released grade generates an audit record capturing actor and timestamp",
+    "preconditions": "Grade G1 for Sub1 is in Released state; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 updates grade G1 points from 85 to 90 with justification",
+    "expected_result": "System updates grade and creates audit trail record containing actor, previous points, new points, and timestamp",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-037",
+    "source_id": "UC-LMS-012 Exception Flow",
+    "purpose": "Verify unauthorized user or non-course grader is rejected when attempting to grade submission",
+    "preconditions": "User U6 is a Student, Observer, or faculty not assigned to C101",
+    "action_or_input": "User U6 attempts to enter or update grade for Sub1",
+    "expected_result": "System rejects grading request with HTTP 403; grade remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-038",
+    "source_id": "UC-LMS-012 Exception Flow Conflict",
+    "purpose": "Verify conflict-of-interest check prevents an actor from grading their own submission",
+    "preconditions": "User is both an enrolled student who submitted work and has TA role in the course",
+    "action_or_input": "User attempts to grade their own submission",
+    "expected_result": "System rejects self-grading with HTTP 403 or 422 (CANNOT_GRADE_OWN_SUBMISSION)",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-039",
+    "source_id": "UC-LMS-013 Main Flow",
+    "purpose": "Verify assigned Faculty can release draft grades and feedback to Students",
+    "preconditions": "Draft grades exist for assignment A1 in C101; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 initiates release of draft grades for A1",
+    "expected_result": "System transitions grades from Draft to Released, making them visible to students; returns HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-040",
+    "source_id": "UC-LMS-013 Exception Flow",
+    "purpose": "Verify TA cannot perform grade release under baseline specification",
+    "preconditions": "Draft grades exist in C101; TA T1 is assigned to C101",
+    "action_or_input": "TA T1 attempts to trigger grade release for assignment A1",
+    "expected_result": "System denies grade release action with HTTP 403; draft grades remain unreleased",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-041",
+    "source_id": "UC-LMS-014 Main Flow",
+    "purpose": "Verify enrolled Student can view their own released grade and feedback in read-only form",
+    "preconditions": "Grade for Student S1's submission has been Released; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 requests their grade for assignment A1",
+    "expected_result": "System returns released points, maximum points, and feedback in read-only form with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-042",
+    "source_id": "UC-LMS-014 Alternative Flow",
+    "purpose": "Verify draft or unreleased grade is hidden from the Student",
+    "preconditions": "Grade for Student S1's submission is in Draft state",
+    "action_or_input": "Student S1 requests their grade for assignment A1",
+    "expected_result": "System does not expose draft grade; returns unreleased / pending evaluation status",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-043",
+    "source_id": "UC-LMS-014 Exception Flow",
+    "purpose": "Verify Student is denied access to view another Student's released grade and feedback",
+    "preconditions": "Grade for Student S1 is released; Student S2 is another enrolled student",
+    "action_or_input": "Student S2 attempts to view grade of Student S1",
+    "expected_result": "System refuses access with HTTP 403 or 404; no grade data disclosed",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-UC-044",
+    "source_id": "UC-LMS-015 Main Flow Material",
+    "purpose": "Verify scheduled course material is transitioned to Published/Available when configured release timestamp is reached",
+    "preconditions": "Material M1 in C101 is in Scheduled state with release timestamp T_rel; current time >= T_rel",
+    "action_or_input": "System executes scheduled release task for materials",
+    "expected_result": "System verifies eligibility, transitions M1 state to Published, making it visible to students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-045",
+    "source_id": "UC-LMS-015 Main Flow Assignment",
+    "purpose": "Verify scheduled assignment is transitioned to Available for submission when configured release timestamp is reached",
+    "preconditions": "Assignment A2 in C101 is in Scheduled state with release_at <= current time",
+    "action_or_input": "System executes scheduled release task for assignments",
+    "expected_result": "System transitions A2 state to Available, enabling student viewing and submission",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-046",
+    "source_id": "UC-LMS-015 Alternative Flow",
+    "purpose": "Verify withdrawn or unpublished scheduled content is not released when scheduled time arrives",
+    "preconditions": "Material M2 was scheduled but then withdrawn or deleted by Faculty before release time",
+    "action_or_input": "Release task runs at release timestamp",
+    "expected_result": "System detects content is no longer eligible; no release occurs",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-047",
+    "source_id": "UC-LMS-015 Exception Flow",
+    "purpose": "Verify content release failure keeps content unavailable without partial exposure",
+    "preconditions": "Scheduled content cannot be released due to system constraint or invalid state",
+    "action_or_input": "System release execution encounters exception",
+    "expected_result": "Content remains unavailable to students and operational log is recorded",
+    "test_type": "negative"
+  }
+]

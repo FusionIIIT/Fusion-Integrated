@@ -1,0 +1,182 @@
+[
+  {
+    "test_id": "TEST-WF-001",
+    "source_id": "BW-LMS-01 Step 1 Faculty Schedules Material",
+    "purpose": "Verify transition from Material Draft / Unpublished to Material Scheduled when Faculty configures future release",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 adds course material specifying a valid future release date/time",
+    "expected_result": "Material is created in Scheduled state with status 201; material remains inaccessible to students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-002",
+    "source_id": "BW-LMS-01 Step 2 System Releases Scheduled Material",
+    "purpose": "Verify transition from Material Scheduled to Material Published / Available when release timestamp is reached",
+    "preconditions": "Material M1 in C101 is in Scheduled state with release_at <= current timestamp",
+    "action_or_input": "System release task processes scheduled material release",
+    "expected_result": "Material M1 transitions to Published state and becomes visible/accessible to enrolled students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-003",
+    "source_id": "BW-LMS-02 Step 1 Faculty Creates Assignment Draft",
+    "purpose": "Verify transition from No Assignment / New to Assignment Draft upon Faculty creation with required configuration",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 creates assignment with title, due date, instructions, submission type, and points possible",
+    "expected_result": "Assignment is stored in Draft state with status 201; assignment is not visible to students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-004",
+    "source_id": "BW-LMS-02 Step 2 Faculty Publishes Assignment Immediately",
+    "purpose": "Verify transition from Assignment Draft to Assignment Available for Submission upon immediate publication",
+    "preconditions": "Assignment A1 is in Draft state; Faculty F1 is assigned to C101; release timing is immediate",
+    "action_or_input": "Faculty F1 initiates immediate publication of assignment A1",
+    "expected_result": "Assignment A1 status transitions to Published / Available; visible to students for submission",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-005",
+    "source_id": "BW-LMS-02 Step 3 Student Submits Assignment On-Time",
+    "purpose": "Verify transition from Assignment Available for Submission to Student Submission Recorded upon valid submission before due date",
+    "preconditions": "Assignment A1 is Available; Student S1 is enrolled in C101; current time < due date",
+    "action_or_input": "Student S1 submits work conforming to assignment submission type",
+    "expected_result": "System records submission with timestamp and student attribution; status is submitted / on-time",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-006",
+    "source_id": "BW-LMS-03 Step 1 Faculty Creates Assignment Draft",
+    "purpose": "Verify creation of assignment in Draft state with future release date configured",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 creates assignment providing required fields and future release_at timestamp",
+    "expected_result": "Assignment is stored in Draft state with status 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-007",
+    "source_id": "BW-LMS-03 Step 2 Faculty Publishes Assignment as Scheduled",
+    "purpose": "Verify transition from Assignment Draft to Assignment Published / Scheduled for Release",
+    "preconditions": "Assignment A2 is Draft with future release_at; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 publishes assignment A2",
+    "expected_result": "Assignment transitions to Scheduled for Release; remains withheld from enrolled students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-008",
+    "source_id": "BW-LMS-03 Step 3 System Transitions Scheduled to Available",
+    "purpose": "Verify automatic transition from Scheduled for Release to Available for Submission when release time arrives",
+    "preconditions": "Assignment A2 is in Scheduled state with release_at <= current timestamp",
+    "action_or_input": "System release task executes scheduled assignment release",
+    "expected_result": "Assignment transitions to Available for Submission; becomes visible and submittable to students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-009",
+    "source_id": "BW-LMS-03 Step 4 Student Submits to Released Assignment On-Time",
+    "purpose": "Verify student can submit on-time to scheduled assignment after release transition completes",
+    "preconditions": "Assignment A2 is now Available; Student S1 is enrolled in C101; current time < due date",
+    "action_or_input": "Student S1 submits valid assignment content",
+    "expected_result": "System records submission with timestamp and student identity",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-010",
+    "source_id": "BW-LMS-04 Step 1 Faculty Grades Recorded Submission",
+    "purpose": "Verify transition from Student Submission Recorded to Grade Draft when Faculty grades submission",
+    "preconditions": "Student submission Sub1 exists for assignment A1 in C101; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 enters points and feedback for Sub1",
+    "expected_result": "Grade is saved in Draft state with grader attribution; draft grade is invisible to student",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-011",
+    "source_id": "BW-LMS-04 Step 2 Faculty Releases Grade and Feedback",
+    "purpose": "Verify transition from Grade Draft to Grade Released / Student Visible when Faculty triggers grade release",
+    "preconditions": "Draft grade G1 exists for submission Sub1; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 releases grades for assignment A1",
+    "expected_result": "Grade G1 status transitions to Released; points and feedback become visible to student",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-012",
+    "source_id": "BW-LMS-05 Step 1 TA Grades Recorded Submission",
+    "purpose": "Verify transition from Student Submission Recorded to Grade Draft when TA grades submission",
+    "preconditions": "Student submission Sub1 exists in C101; TA T1 is assigned to C101",
+    "action_or_input": "TA T1 enters points and feedback for Sub1",
+    "expected_result": "Grade is saved in Draft state attributed to TA T1; draft grade is hidden from student",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-013",
+    "source_id": "BW-LMS-05 Step 2 Faculty Releases TA Draft Grade",
+    "purpose": "Verify transition from TA-authored Grade Draft to Grade Released when Faculty executes release",
+    "preconditions": "Draft grade G_ta authored by TA T1 exists; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 releases grades for assignment A1",
+    "expected_result": "Grade G_ta transitions to Released; student can view released grade in read-only form",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-014",
+    "source_id": "CW-LMS-01 Immediate Release Full Lifecycle",
+    "purpose": "Verify end-to-end composite lifecycle: Faculty creates draft assignment, publishes immediately, and Student submits on-time",
+    "preconditions": "Faculty F1 and Student S1 are members of course C101",
+    "action_or_input": "1. Faculty F1 creates assignment A_imm; 2. Faculty F1 publishes A_imm immediately; 3. Student S1 submits text content before due date",
+    "expected_result": "Assignment progresses New -> Draft -> Available; submission is recorded and verified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-015",
+    "source_id": "CW-LMS-01 Scheduled Release Full Lifecycle",
+    "purpose": "Verify end-to-end composite lifecycle: Faculty creates draft assignment with future release, publishes as scheduled, system releases, and Student submits on-time",
+    "preconditions": "Faculty F1 and Student S1 are members of course C101",
+    "action_or_input": "1. Faculty F1 creates assignment A_sch with future release; 2. Faculty F1 publishes A_sch; 3. System release task runs; 4. Student S1 submits work",
+    "expected_result": "Assignment progresses New -> Draft -> Scheduled -> Available; student submission recorded successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-016",
+    "source_id": "CW-LMS-02 Faculty Grading and Release Lifecycle",
+    "purpose": "Verify end-to-end composite grading lifecycle with Faculty: submission -> Faculty grade draft -> Faculty release -> Student read-only view",
+    "preconditions": "Student submission Sub1 exists; Faculty F1 is assigned to C101",
+    "action_or_input": "1. Faculty F1 grades Sub1 (Draft); 2. Faculty F1 releases grade (Released); 3. Student views grade",
+    "expected_result": "Grade progresses Draft -> Released; student accesses released points and feedback",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-017",
+    "source_id": "CW-LMS-02 TA Grading and Faculty Release Lifecycle",
+    "purpose": "Verify end-to-end composite grading lifecycle with TA: submission -> TA grade draft -> Faculty release -> Student read-only view",
+    "preconditions": "Student submission Sub2 exists; TA T1 and Faculty F1 are assigned to C101",
+    "action_or_input": "1. TA T1 grades Sub2 (Draft); 2. Faculty F1 releases grade (Released); 3. Student views grade",
+    "expected_result": "Grade progresses Draft -> Released; student accesses released points and feedback",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-WF-018",
+    "source_id": "BW-LMS-02 Invalid Transition Draft Submission Refused",
+    "purpose": "Verify submission attempt against Draft assignment before publication is rejected",
+    "preconditions": "Assignment A_draft is in Draft state; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 attempts to submit work to assignment A_draft",
+    "expected_result": "System refuses submission with HTTP 400 or 403; assignment state is unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-WF-019",
+    "source_id": "BW-LMS-05 Guard Check TA Release Refused",
+    "purpose": "Verify TA cannot trigger grade release transition",
+    "preconditions": "Draft grades exist in C101; TA T1 is assigned to C101",
+    "action_or_input": "TA T1 attempts to trigger grade release transition",
+    "expected_result": "System refuses release transition with HTTP 403; grades remain in Draft state",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-WF-020",
+    "source_id": "BW-LMS-04 Post-Release Grade Modification Audit Transition",
+    "purpose": "Verify post-release grade modification retains Released state and transitions audit log to recorded",
+    "preconditions": "Grade G_rel is in Released state; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 updates points on Released grade G_rel",
+    "expected_result": "Grade G_rel remains Released with updated points and an audit record is logged with actor and timestamp",
+    "test_type": "positive"
+  }
+]

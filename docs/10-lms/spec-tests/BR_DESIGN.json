@@ -1,0 +1,407 @@
+[
+  {
+    "test_id": "TEST-BR-001",
+    "source_id": "BR-LMS-001 condition-true",
+    "purpose": "Verify user enrolled, assigned, or linked to a course is granted access to the course workspace",
+    "preconditions": "Course C101 exists; user U1 has an active course association (student, faculty, TA, or observer)",
+    "action_or_input": "User U1 requests access to course C101 workspace",
+    "expected_result": "System validates course-specific association and grants access with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-002",
+    "source_id": "BR-LMS-001 condition-false",
+    "purpose": "Verify user without course association is denied access to the course workspace",
+    "preconditions": "Course C101 exists; user U2 has no enrollment, assignment, or linkage to C101",
+    "action_or_input": "User U2 requests access to course C101 workspace",
+    "expected_result": "System denies access with HTTP 403 or 404; no course content is disclosed",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-003",
+    "source_id": "BR-LMS-002 condition-true",
+    "purpose": "Verify Student course access is permitted based on authoritative registration data",
+    "preconditions": "Student S1 has an authoritative course enrollment record in course C101",
+    "action_or_input": "Student S1 accesses course home and syllabus for C101",
+    "expected_result": "System verifies registration data and returns course data with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-004",
+    "source_id": "BR-LMS-002 condition-false",
+    "purpose": "Verify Student not registered in course is rejected from accessing student course endpoints",
+    "preconditions": "Student S2 exists in identity system but is not registered in course C101",
+    "action_or_input": "Student S2 requests course home, assignments, or materials for C101",
+    "expected_result": "System denies access with HTTP 403 or 404",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-005",
+    "source_id": "BR-LMS-003 condition-true",
+    "purpose": "Verify linked Observer can view course details, published materials, and announcements",
+    "preconditions": "Observer O1 is linked to course C101; course has published materials and announcements",
+    "action_or_input": "Observer O1 retrieves course details, announcements, and published materials for C101",
+    "expected_result": "System returns read-only course details, announcements, and materials with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-006",
+    "source_id": "BR-LMS-003 condition-false-write",
+    "purpose": "Verify Observer is forbidden from performing any write action in course",
+    "preconditions": "Observer O1 is linked to course C101",
+    "action_or_input": "Observer O1 attempts to create material, post announcement, create assignment, or grade",
+    "expected_result": "System rejects write action with HTTP 403; no state change occurs",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-007",
+    "source_id": "BR-LMS-003 condition-false-student-data",
+    "purpose": "Verify Observer cannot view individual student submissions, grades, or private student data",
+    "preconditions": "Observer O1 is linked to course C101; students have submitted assignments with grades",
+    "action_or_input": "Observer O1 requests student submission list, specific submission, or gradebook",
+    "expected_result": "System denies access to student-specific data with HTTP 403; returns empty or forbidden",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-008",
+    "source_id": "BR-LMS-004 condition-true",
+    "purpose": "Verify TA can view course content, view submissions, and record draft grades",
+    "preconditions": "TA T1 is assigned to course C101; submissions exist for assignment A1",
+    "action_or_input": "TA T1 views submissions and submits draft grade for student submission Sub1",
+    "expected_result": "System accepts TA draft grade and returns HTTP 200 or 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-009",
+    "source_id": "BR-LMS-004 condition-false-assignment-authoring",
+    "purpose": "Verify TA is prohibited from creating or editing assignments",
+    "preconditions": "TA T1 is assigned to course C101",
+    "action_or_input": "TA T1 attempts to create a new assignment or update existing assignment details",
+    "expected_result": "System denies assignment authoring with HTTP 403; assignment remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-010",
+    "source_id": "BR-LMS-004 condition-false-material-authoring",
+    "purpose": "Verify TA is prohibited from creating, updating, or deleting course materials or structure",
+    "preconditions": "TA T1 is assigned to course C101",
+    "action_or_input": "TA T1 attempts to upload course material or edit course details",
+    "expected_result": "System denies material authoring with HTTP 403; course content remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-011",
+    "source_id": "BR-LMS-005 condition-true",
+    "purpose": "Verify published course material is visible to authorized students, TAs, and observers",
+    "preconditions": "Material M1 in C101 is in Published state; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 requests course materials list or material details for M1",
+    "expected_result": "System returns published material metadata and content with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-012",
+    "source_id": "BR-LMS-005 condition-false",
+    "purpose": "Verify unpublished or draft course material is invisible to Students and Observers",
+    "preconditions": "Material M2 in C101 is in Unpublished / Draft state; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 requests materials list or material details for M2",
+    "expected_result": "System omits M2 from list and denies direct detail access with HTTP 403 or 404",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-013",
+    "source_id": "BR-LMS-006 condition-false-before-time",
+    "purpose": "Verify course material configured with future release date remains unavailable before release time",
+    "preconditions": "Material M3 has release_at timestamp set to tomorrow; current time < release_at",
+    "action_or_input": "Student S1 attempts to view or download material M3",
+    "expected_result": "System withholds material M3; request returns HTTP 403 or 404",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-014",
+    "source_id": "BR-LMS-006 condition-true-after-time",
+    "purpose": "Verify scheduled material becomes published and available when configured release timestamp is reached",
+    "preconditions": "Material M3 release timestamp has arrived; scheduled release task has executed",
+    "action_or_input": "Student S1 requests material M3 details",
+    "expected_result": "System provides access to released material with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-015",
+    "source_id": "BR-LMS-007 condition-true-faculty",
+    "purpose": "Verify assigned Faculty can post course announcements",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 posts announcement with title 'Exam Notice' and content",
+    "expected_result": "System creates announcement and returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-016",
+    "source_id": "BR-LMS-007 condition-true-ta-permitted",
+    "purpose": "Verify TA with posting permission can post course announcements",
+    "preconditions": "TA T1 in C101 has announcement posting authority enabled",
+    "action_or_input": "TA T1 posts announcement with title 'Lab Timings' and content",
+    "expected_result": "System validates permission, creates announcement, and returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-017",
+    "source_id": "BR-LMS-007 condition-false-unauthorized",
+    "purpose": "Verify TA without permission or Student cannot post course announcements",
+    "preconditions": "Student S1 or TA T2 without posting permission attempts to post",
+    "action_or_input": "User attempts to post announcement to C101",
+    "expected_result": "System rejects posting request with HTTP 403; no announcement is created",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-018",
+    "source_id": "BR-LMS-008 condition-true",
+    "purpose": "Verify posted announcement has server timestamp and is visible to all course members",
+    "preconditions": "Announcement Ann1 posted in C101; Student S1 and Faculty F1 belong to C101",
+    "action_or_input": "Student S1 views course announcements list",
+    "expected_result": "System returns Ann1 with non-null timestamp, author identity, and content with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-019",
+    "source_id": "BR-LMS-008 condition-false",
+    "purpose": "Verify course announcement is not exposed to non-course members",
+    "preconditions": "Announcement Ann1 posted in C101; user U3 has no affiliation with C101",
+    "action_or_input": "User U3 attempts to retrieve announcements for C101",
+    "expected_result": "System rejects request with HTTP 403 or 404",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-020",
+    "source_id": "BR-LMS-009 condition-true",
+    "purpose": "Verify assignment with valid title, due date, instructions, submission type, and points possible is accepted",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 creates assignment providing title='Lab 1', due_date in future, instructions='Follow spec', submission_type='file', points_possible=50",
+    "expected_result": "System validates all required fields and saves assignment returning HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-021",
+    "source_id": "BR-LMS-009 condition-false-missing-due-date",
+    "purpose": "Verify assignment creation without due date is rejected",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 creates assignment omitting due_date",
+    "expected_result": "System rejects request with HTTP 400; assignment is not created",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-022",
+    "source_id": "BR-LMS-009 condition-false-missing-submission-type",
+    "purpose": "Verify assignment creation without valid submission type is rejected",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 creates assignment with missing or invalid submission_type",
+    "expected_result": "System rejects request with HTTP 400; assignment is not created",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-023",
+    "source_id": "BR-LMS-009 condition-false-invalid-points",
+    "purpose": "Verify assignment creation with negative or zero points possible is rejected",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 creates assignment with points_possible=-10 or 0",
+    "expected_result": "System rejects request with HTTP 400; assignment is not created",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-024",
+    "source_id": "BR-LMS-010 condition-true-draft",
+    "purpose": "Verify assignment remains in Draft state after creation until explicitly published",
+    "preconditions": "Faculty F1 created assignment A1 without publish action; A1 is in Draft state",
+    "action_or_input": "Student S1 queries assignments for C101",
+    "expected_result": "Draft assignment A1 is omitted from Student S1 view; cannot be submitted to",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-025",
+    "source_id": "BR-LMS-010 condition-true-published",
+    "purpose": "Verify assignment transitions to Published state only when Faculty publishes it",
+    "preconditions": "Assignment A1 in C101 is in Draft state; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 invokes publish action on assignment A1",
+    "expected_result": "System transitions assignment status to Published with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-026",
+    "source_id": "BR-LMS-011 condition-false-scheduled",
+    "purpose": "Verify published assignment configured with future release date is withheld from students until release date",
+    "preconditions": "Assignment A2 is Published with future release_at; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 requests assignments list or details for A2",
+    "expected_result": "Assignment A2 is withheld from Student S1; direct request returns HTTP 403 or 404",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-027",
+    "source_id": "BR-LMS-011 condition-true-released",
+    "purpose": "Verify published assignment whose release condition is satisfied is visible and accessible to students",
+    "preconditions": "Assignment A1 has release condition satisfied (immediate or release_at reached)",
+    "action_or_input": "Student S1 requests assignment details for A1",
+    "expected_result": "System exposes assignment details and submission capability with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-028",
+    "source_id": "BR-LMS-012 condition-true-file",
+    "purpose": "Verify submission conforming to configured 'file' type is accepted",
+    "preconditions": "Assignment A_file has submission_type='file'; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 submits valid file upload payload",
+    "expected_result": "System accepts submission and returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-029",
+    "source_id": "BR-LMS-012 condition-true-text",
+    "purpose": "Verify submission conforming to configured 'text' type is accepted",
+    "preconditions": "Assignment A_text has submission_type='text'; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 submits non-empty text content",
+    "expected_result": "System accepts submission and returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-030",
+    "source_id": "BR-LMS-012 condition-true-link",
+    "purpose": "Verify submission conforming to configured 'link' type with valid URL is accepted",
+    "preconditions": "Assignment A_link has submission_type='link'; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 submits valid URL link 'https://github.com/project'",
+    "expected_result": "System accepts submission and returns HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-031",
+    "source_id": "BR-LMS-012 condition-false-mismatch",
+    "purpose": "Verify submission with mismatched or malformed payload type is rejected",
+    "preconditions": "Assignment A_file requires 'file' submission; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 attempts to submit raw text without file",
+    "expected_result": "System rejects submission with HTTP 400 or 422; no submission recorded",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-032",
+    "source_id": "BR-LMS-013 condition-true-on-time",
+    "purpose": "Verify submission submitted prior to due date is accepted and marked on-time",
+    "preconditions": "Assignment A1 has due date in future; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 submits valid assignment content before due date",
+    "expected_result": "System records submission with current timestamp and on-time status with HTTP 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-033",
+    "source_id": "BR-LMS-014 condition-true-own-submission",
+    "purpose": "Verify Student can view own submission history and status",
+    "preconditions": "Student S1 submitted assignment A1",
+    "action_or_input": "Student S1 requests submission history for assignment A1",
+    "expected_result": "System returns Student S1's own submission data with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-034",
+    "source_id": "BR-LMS-014 condition-false-other-submission",
+    "purpose": "Verify Student cannot view another Student's submission history or files",
+    "preconditions": "Student S1 submitted Sub1; Student S2 is another student enrolled in C101",
+    "action_or_input": "Student S2 requests details or file of submission Sub1",
+    "expected_result": "System denies access with HTTP 403 or 404; no submission data disclosed",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-035",
+    "source_id": "BR-LMS-015 condition-true-faculty-attribution",
+    "purpose": "Verify Faculty grading records grader attribution and timestamp",
+    "preconditions": "Submission Sub1 exists in C101; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 grades Sub1 with points=45 and feedback='Good'",
+    "expected_result": "System stores grade record attributing grader_user_id to F1 with timestamp; returns HTTP 200 or 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-036",
+    "source_id": "BR-LMS-015 condition-true-ta-attribution",
+    "purpose": "Verify TA grading records grader attribution and timestamp",
+    "preconditions": "Submission Sub1 exists in C101; TA T1 is assigned to C101",
+    "action_or_input": "TA T1 grades Sub1 with points=40 and feedback='Adequate'",
+    "expected_result": "System stores grade record attributing grader_user_id to T1 with timestamp; returns HTTP 200 or 201",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-037",
+    "source_id": "BR-LMS-015 condition-false-unauthorized",
+    "purpose": "Verify student, observer, or unassigned user is rejected when attempting to grade",
+    "preconditions": "User U7 is not Faculty or TA for course C101; submission Sub1 exists",
+    "action_or_input": "User U7 attempts to enter grade for Sub1",
+    "expected_result": "System denies grading request with HTTP 403; grade remains unrecorded",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-038",
+    "source_id": "BR-LMS-015 condition-false-self-grading",
+    "purpose": "Verify grader is prohibited from grading their own submission",
+    "preconditions": "User is a TA in C101 but also submitted work Sub_self as an enrolled student",
+    "action_or_input": "User attempts to grade Sub_self",
+    "expected_result": "System rejects request with HTTP 403 or 422 (CANNOT_GRADE_OWN_SUBMISSION)",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-039",
+    "source_id": "BR-LMS-016 condition-true-draft-hidden",
+    "purpose": "Verify draft grades and feedback remain invisible to the submitting student",
+    "preconditions": "Draft grade G_draft exists for Student S1's submission Sub1",
+    "action_or_input": "Student S1 requests their grade for assignment A1",
+    "expected_result": "System withholds draft grade points and feedback from Student S1; status shown as ungraded / submitted",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-040",
+    "source_id": "BR-LMS-016 condition-true-released-visible",
+    "purpose": "Verify released grades and feedback become visible to the submitting student",
+    "preconditions": "Grade G_rel for Student S1's submission has been Released",
+    "action_or_input": "Student S1 requests their grade for assignment A1",
+    "expected_result": "System returns released grade points and feedback with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-041",
+    "source_id": "BR-LMS-017 condition-true-faculty",
+    "purpose": "Verify assigned Faculty has authority to release draft grades",
+    "preconditions": "Draft grades exist in C101; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 executes grade release for assignment A1",
+    "expected_result": "System marks applicable grades as Released and returns HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-042",
+    "source_id": "BR-LMS-017 condition-false-ta",
+    "purpose": "Verify TA does not have authority to release grades",
+    "preconditions": "Draft grades exist in C101; TA T1 is assigned to C101",
+    "action_or_input": "TA T1 attempts to trigger grade release for assignment A1",
+    "expected_result": "System denies grade release with HTTP 403; draft grades remain unreleased",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-043",
+    "source_id": "BR-LMS-018 condition-true-read-only",
+    "purpose": "Verify Student can view released grade in read-only form",
+    "preconditions": "Grade G_rel for Student S1 is Released; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 retrieves their released grade",
+    "expected_result": "System returns grade and feedback with HTTP 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-044",
+    "source_id": "BR-LMS-018 condition-false-no-student-write",
+    "purpose": "Verify Student is denied from modifying or tampering with released grade",
+    "preconditions": "Grade G_rel for Student S1 is Released; Student S1 is enrolled in C101",
+    "action_or_input": "Student S1 attempts PUT/PATCH request to update points or feedback of G_rel",
+    "expected_result": "System rejects modification with HTTP 403; grade data remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-045",
+    "source_id": "BR-LMS-019 condition-true-audit-record",
+    "purpose": "Verify changing an already released grade creates an audit trail entry with actor and timestamp",
+    "preconditions": "Grade G_rel for Sub1 is in Released state; Faculty F1 is assigned to C101",
+    "action_or_input": "Faculty F1 modifies points of G_rel from 40 to 45 with justification",
+    "expected_result": "System persists modified grade and creates audit record storing actor_id, prior grade, new grade, and timestamp; returns HTTP 200",
+    "test_type": "positive"
+  }
+]

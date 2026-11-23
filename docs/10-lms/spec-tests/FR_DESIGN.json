@@ -1,0 +1,461 @@
+[
+  {
+    "test_id": "TEST-FR-001",
+    "source_id": "AFR-LMS-001.1",
+    "purpose": "Verify system opens dedicated course workspace when authorized user selects an associated course",
+    "preconditions": "User is enrolled in or assigned to course C101",
+    "action_or_input": "User requests to open course workspace for C101",
+    "expected_result": "Course workspace for C101 opens successfully with status 200",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-002",
+    "source_id": "AFR-LMS-001.2",
+    "purpose": "Verify system displays syllabus, schedule, instructor(s), and TA(s) on course home page",
+    "preconditions": "Course C101 workspace is configured with syllabus, schedule, instructors, and TAs",
+    "action_or_input": "Authorized user views course home page for C101",
+    "expected_result": "Course home displays syllabus, schedule, instructor contacts, and TA contacts",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-003",
+    "source_id": "AFR-LMS-001.3",
+    "purpose": "Verify course workspace access is granted to enrolled, assigned, or linked users",
+    "preconditions": "User U1 has valid course association for course C101",
+    "action_or_input": "User U1 requests access to C101 workspace",
+    "expected_result": "Access is granted and course workspace data is returned",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-004",
+    "source_id": "AFR-LMS-001.3-neg",
+    "purpose": "Verify system denies course workspace access to user not enrolled, assigned, or linked to the course",
+    "preconditions": "User U2 has no enrollment, assignment, or linkage to course C101",
+    "action_or_input": "User U2 requests access to C101 workspace",
+    "expected_result": "Access is refused with HTTP 403 or 404 and no course details are disclosed",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-005",
+    "source_id": "AFR-LMS-002.1",
+    "purpose": "Verify Faculty can configure workspace for assigned course",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 updates workspace settings and details for C101",
+    "expected_result": "Course workspace configuration is successfully saved and updated",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-006",
+    "source_id": "AFR-LMS-002.2",
+    "purpose": "Verify Faculty can publish and edit course details in assigned course workspace",
+    "preconditions": "Faculty F1 is assigned to course C101 with existing course details",
+    "action_or_input": "Faculty F1 edits syllabus text and publishes updated details",
+    "expected_result": "Updated syllabus is stored and published to the course workspace",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-007",
+    "source_id": "AFR-LMS-003.1",
+    "purpose": "Verify Faculty can upload and add course materials as files, links, or notes",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 adds material item with valid note text, link URL, or file upload",
+    "expected_result": "Material item of specified kind is successfully created and persisted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-008",
+    "source_id": "AFR-LMS-003.2",
+    "purpose": "Verify Faculty can organize course materials into modules or weekly sections",
+    "preconditions": "Faculty F1 is assigned to course C101 with existing material sections",
+    "action_or_input": "Faculty F1 creates a module/weekly section and assigns material item to that section",
+    "expected_result": "Material is associated with the section and appears organized under it",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-009",
+    "source_id": "AFR-LMS-003.3",
+    "purpose": "Verify Faculty can schedule future material release date/time",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 creates material and sets release timestamp to future date/time",
+    "expected_result": "Material state is set to SCHEDULED with release_at timestamp stored",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-010",
+    "source_id": "AFR-LMS-003.4",
+    "purpose": "Verify system releases scheduled material when configured release time is reached",
+    "preconditions": "Material M1 is in SCHEDULED state with release_at <= current server time",
+    "action_or_input": "System scheduled release process executes",
+    "expected_result": "Material M1 transitions from SCHEDULED to PUBLISHED state and becomes visible",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-011",
+    "source_id": "AFR-LMS-004.1",
+    "purpose": "Verify Student has read-only access to published course materials",
+    "preconditions": "Student S1 is registered in C101; C101 has published and draft materials",
+    "action_or_input": "Student S1 requests materials list for C101",
+    "expected_result": "Published materials are returned in read-only form; draft/scheduled materials omitted",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-012",
+    "source_id": "AFR-LMS-004.2",
+    "purpose": "Verify TA has read-only access to published course materials",
+    "preconditions": "TA T1 is assigned to C101; C101 has published materials",
+    "action_or_input": "TA T1 requests materials list for C101",
+    "expected_result": "Published materials are returned in read-only form",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-013",
+    "source_id": "AFR-LMS-004.3",
+    "purpose": "Verify Observer has read-only access to published course materials",
+    "preconditions": "Observer O1 is linked to C101; C101 has published materials",
+    "action_or_input": "Observer O1 requests materials list for C101",
+    "expected_result": "Published materials are returned in read-only form with no write capabilities",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-014",
+    "source_id": "AFR-LMS-005.1",
+    "purpose": "Verify Faculty can post course-wide announcement",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 posts announcement with title and content",
+    "expected_result": "Announcement is created, stored, and marked active for C101",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-015",
+    "source_id": "AFR-LMS-005.2",
+    "purpose": "Verify TA can post course-wide announcement when permitted by Faculty",
+    "preconditions": "TA T1 is assigned to C101; course policy can_ta_post_announcements is enabled",
+    "action_or_input": "TA T1 posts announcement for C101",
+    "expected_result": "Announcement is created and posted successfully",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-016",
+    "source_id": "AFR-LMS-005.2-neg",
+    "purpose": "Verify TA cannot post course-wide announcement when not permitted by Faculty",
+    "preconditions": "TA T1 is assigned to C101; course policy can_ta_post_announcements is false",
+    "action_or_input": "TA T1 attempts to post announcement for C101",
+    "expected_result": "Request is refused with HTTP 403 Forbidden and announcement is not created",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-017",
+    "source_id": "AFR-LMS-005.3",
+    "purpose": "Verify system timestamps each posted course announcement",
+    "preconditions": "Authorized user posts announcement in C101",
+    "action_or_input": "User submits announcement payload",
+    "expected_result": "Persisted announcement contains server-generated UTC created_at timestamp",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-018",
+    "source_id": "AFR-LMS-005.4",
+    "purpose": "Verify posted announcement is visible to all users enrolled in or linked to course",
+    "preconditions": "Announcement A1 posted in C101; users S1 (Student), F1 (Faculty), T1 (TA), O1 (Observer) linked to C101",
+    "action_or_input": "Each linked user requests announcements for C101",
+    "expected_result": "Announcement A1 is visible in the announcement list for all linked users",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-019",
+    "source_id": "AFR-LMS-006.1",
+    "purpose": "Verify Faculty can create an assignment for assigned course",
+    "preconditions": "Faculty F1 is assigned to course C101",
+    "action_or_input": "Faculty F1 creates assignment for C101",
+    "expected_result": "Assignment is created and associated with C101",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-020",
+    "source_id": "AFR-LMS-006.2",
+    "purpose": "Verify system captures due date, instructions, submission type, and points possible",
+    "preconditions": "Faculty F1 creates assignment in C101",
+    "action_or_input": "Faculty F1 provides due_date, instructions, submission_type (FILE/TEXT/LINK), points_possible",
+    "expected_result": "All configuration fields are stored accurately on the assignment record",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-021",
+    "source_id": "AFR-LMS-006.3",
+    "purpose": "Verify Faculty can edit an assignment",
+    "preconditions": "Assignment A1 exists in C101; Faculty F1 assigned to C101",
+    "action_or_input": "Faculty F1 updates assignment instructions and due date",
+    "expected_result": "Updated assignment fields are persisted successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-022",
+    "source_id": "AFR-LMS-006.4",
+    "purpose": "Verify system maintains assignment in Draft state until publication",
+    "preconditions": "Faculty F1 saves new assignment without publishing",
+    "action_or_input": "Faculty F1 retrieves saved assignment",
+    "expected_result": "Assignment has state DRAFT and is not visible to students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-023",
+    "source_id": "AFR-LMS-007.1",
+    "purpose": "Verify Faculty can publish an assignment",
+    "preconditions": "Assignment A1 is in DRAFT state with valid configuration; Faculty F1 assigned to course",
+    "action_or_input": "Faculty F1 issues publish request for A1 with immediate release",
+    "expected_result": "Assignment transitions to AVAILABLE state and becomes visible to students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-024",
+    "source_id": "AFR-LMS-007.2",
+    "purpose": "Verify system withholds published assignment from Students until configured release date/time",
+    "preconditions": "Assignment A1 published with future release timestamp; Student S1 enrolled",
+    "action_or_input": "Student S1 requests visible assignments for C101 before release time",
+    "expected_result": "Assignment A1 is omitted from student assignments list",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-025",
+    "source_id": "AFR-LMS-007.3",
+    "purpose": "Verify system releases scheduled assignment when release time is reached",
+    "preconditions": "Assignment A1 in SCHEDULED state with release_at <= current server time",
+    "action_or_input": "Scheduled content release task executes",
+    "expected_result": "Assignment A1 transitions to AVAILABLE state and becomes visible to enrolled students",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-026",
+    "source_id": "AFR-LMS-007.4",
+    "purpose": "Verify Student can view and download released assignment",
+    "preconditions": "Assignment A1 is in AVAILABLE state in course C101; Student S1 enrolled",
+    "action_or_input": "Student S1 requests assignment details and downloads assignment content",
+    "expected_result": "Assignment details and instructions content are returned to Student S1",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-027",
+    "source_id": "AFR-LMS-008.1",
+    "purpose": "Verify Student can submit assignment work conforming to configured submission type",
+    "preconditions": "Assignment A1 is AVAILABLE with submission_type=TEXT; Student S1 enrolled",
+    "action_or_input": "Student S1 submits text content before due date",
+    "expected_result": "Submission is accepted, recorded, and HTTP 201 Created returned",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-028",
+    "source_id": "AFR-LMS-008.1-neg",
+    "purpose": "Verify submission type mismatch is refused",
+    "preconditions": "Assignment A1 configured with submission_type=FILE; Student S1 enrolled",
+    "action_or_input": "Student S1 submits plain text payload without file",
+    "expected_result": "Request refused with HTTP 422 Unprocessable Entity and no submission created",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-FR-029",
+    "source_id": "AFR-LMS-008.2",
+    "purpose": "Verify system accepts and records Student submission made before due date",
+    "preconditions": "Assignment A1 has due date in future; Student S1 enrolled with no prior submission",
+    "action_or_input": "Student S1 submits valid work with timestamp <= due_date",
+    "expected_result": "Submission is stored with submitted_at timestamp and status submitted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-030",
+    "source_id": "AFR-LMS-008.2-neg",
+    "purpose": "Verify submission attempted after due date is rejected",
+    "preconditions": "Assignment A1 due date has passed (current time > due_date); Student S1 enrolled",
+    "action_or_input": "Student S1 attempts to submit work",
+    "expected_result": "Submission refused with HTTP 422 (SUBMISSION_DUE_DATE_EXCEEDED) and no row created",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TEST-FR-031",
+    "source_id": "AFR-LMS-009.1",
+    "purpose": "Verify Student can view own submission history",
+    "preconditions": "Student S1 has submitted work for assignment A1",
+    "action_or_input": "Student S1 requests submission history for A1",
+    "expected_result": "Own submission record is returned with submitted timestamp and payload info",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-032",
+    "source_id": "AFR-LMS-009.2",
+    "purpose": "Verify system displays own submission status (submitted, missing)",
+    "preconditions": "Student S1 submitted A1; Student S2 has not submitted A1",
+    "action_or_input": "S1 and S2 request their submission status for A1",
+    "expected_result": "S1 status is displayed as submitted; S2 status is displayed as missing",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-033",
+    "source_id": "AFR-LMS-010.1",
+    "purpose": "Verify Faculty can grade individual student submission by entering points and feedback",
+    "preconditions": "Student submission SUB1 exists in C101; Faculty F1 assigned to C101",
+    "action_or_input": "Faculty F1 enters points and feedback for SUB1",
+    "expected_result": "Grade record is created/saved in Draft state with points and feedback",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-034",
+    "source_id": "AFR-LMS-010.2",
+    "purpose": "Verify TA can grade individual student submission for assigned course",
+    "preconditions": "Student submission SUB1 exists in C101; TA T1 assigned to C101",
+    "action_or_input": "TA T1 enters points and feedback for SUB1",
+    "expected_result": "Grade record is created/saved in Draft state attributed to TA T1",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-035",
+    "source_id": "AFR-LMS-010.3",
+    "purpose": "Verify system records identity of grader for each grading action",
+    "preconditions": "TA T1 grades submission SUB1",
+    "action_or_input": "TA T1 saves grade evaluation",
+    "expected_result": "Grade record and grading attribution log explicitly record TA T1 user ID",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-036",
+    "source_id": "AFR-LMS-011.1",
+    "purpose": "Verify system holds grade and feedback in Draft state until Faculty release",
+    "preconditions": "Grade G1 is saved by Faculty or TA for submission SUB1",
+    "action_or_input": "Grader retrieves G1 before release",
+    "expected_result": "Grade G1 state is DRAFT and has not been published to Student",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-037",
+    "source_id": "AFR-LMS-011.2",
+    "purpose": "Verify Student cannot view draft grade or feedback",
+    "preconditions": "Submission SUB1 has draft grade G1",
+    "action_or_input": "Student S1 (owner of SUB1) requests grade details",
+    "expected_result": "Draft grade is omitted / returned as unreleased; student cannot see score/feedback",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-038",
+    "source_id": "AFR-LMS-011.3",
+    "purpose": "Verify Faculty can release draft grades and feedback to Students",
+    "preconditions": "Grade G1 is in DRAFT state; Faculty F1 assigned to course",
+    "action_or_input": "Faculty F1 executes release grade action",
+    "expected_result": "Grade G1 state transitions from DRAFT to RELEASED and releasing actor/time recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-039",
+    "source_id": "AFR-LMS-012.1",
+    "purpose": "Verify Student can view own released grade and feedback",
+    "preconditions": "Grade G1 is in RELEASED state for submission by Student S1",
+    "action_or_input": "Student S1 requests own grade for the assignment",
+    "expected_result": "Released score and feedback are displayed to Student S1",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-040",
+    "source_id": "AFR-LMS-012.2",
+    "purpose": "Verify released grade and feedback are read-only to Student",
+    "preconditions": "Grade G1 is RELEASED for Student S1",
+    "action_or_input": "Student S1 attempts to modify or update grade G1",
+    "expected_result": "Request refused with HTTP 403 Forbidden and grade remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-041",
+    "source_id": "AFR-LMS-013.1",
+    "purpose": "Verify system logs actor who made post-release grade change",
+    "preconditions": "Grade G1 is in RELEASED state; Faculty F1 assigned to course",
+    "action_or_input": "Faculty F1 updates points/feedback on released grade G1",
+    "expected_result": "GradeAuditLog record is created recording Faculty F1 user ID as changed_by",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-042",
+    "source_id": "AFR-LMS-013.2",
+    "purpose": "Verify system logs timestamp when post-release grade change occurs",
+    "preconditions": "Grade G1 is in RELEASED state; Faculty F1 modifies G1",
+    "action_or_input": "Faculty F1 saves updated score",
+    "expected_result": "GradeAuditLog record contains authoritative UTC timestamp of the change",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-FR-043",
+    "source_id": "AFR-LMS-014.1",
+    "purpose": "Verify TA can view course details, published materials, and announcements",
+    "preconditions": "TA T1 assigned to course C101",
+    "action_or_input": "TA T1 requests course details, materials, and announcements",
+    "expected_result": "Content is returned successfully in read-only form",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-044",
+    "source_id": "AFR-LMS-014.2",
+    "purpose": "Verify TA can view Student submissions for assigned course",
+    "preconditions": "TA T1 assigned to C101; submissions exist in C101",
+    "action_or_input": "TA T1 requests submissions list for an assignment in C101",
+    "expected_result": "Student submissions are returned to TA T1 for grading review",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-045",
+    "source_id": "AFR-LMS-014.3",
+    "purpose": "Verify system prevents TA from creating or editing assignments",
+    "preconditions": "TA T1 assigned to course C101",
+    "action_or_input": "TA T1 attempts to create or edit an assignment in C101",
+    "expected_result": "Request is refused with HTTP 403 Forbidden",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-046",
+    "source_id": "AFR-LMS-014.4",
+    "purpose": "Verify system prevents TA from creating or editing course materials",
+    "preconditions": "TA T1 assigned to course C101",
+    "action_or_input": "TA T1 attempts to add or edit course material in C101",
+    "expected_result": "Request is refused with HTTP 403 Forbidden",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-047",
+    "source_id": "AFR-LMS-014.5",
+    "purpose": "Verify system prevents TA from modifying course structure or sections",
+    "preconditions": "TA T1 assigned to course C101",
+    "action_or_input": "TA T1 attempts to create or modify material sections in C101",
+    "expected_result": "Request is refused with HTTP 403 Forbidden",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-048",
+    "source_id": "AFR-LMS-015.1",
+    "purpose": "Verify Observer can view course details, published materials, and announcements for linked course",
+    "preconditions": "Observer O1 linked to course C101",
+    "action_or_input": "Observer O1 views course details, published materials, and announcements",
+    "expected_result": "Content is returned in read-only view",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-049",
+    "source_id": "AFR-LMS-015.2",
+    "purpose": "Verify system prevents Observer from viewing individual student submissions",
+    "preconditions": "Observer O1 linked to course C101; submissions exist in C101",
+    "action_or_input": "Observer O1 attempts to view student submissions",
+    "expected_result": "Request is refused with HTTP 403 Forbidden",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-050",
+    "source_id": "AFR-LMS-015.3",
+    "purpose": "Verify system prevents Observer from viewing student grades or student-specific data",
+    "preconditions": "Observer O1 linked to course C101; student grades exist in C101",
+    "action_or_input": "Observer O1 attempts to view student grades or roster",
+    "expected_result": "Request is refused with HTTP 403 Forbidden",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-FR-051",
+    "source_id": "AFR-LMS-015.4",
+    "purpose": "Verify system prevents Observer from performing any write access anywhere in module",
+    "preconditions": "Observer O1 linked to course C101",
+    "action_or_input": "Observer O1 attempts POST/PATCH/DELETE on courses, materials, announcements, assignments, submissions, or grades",
+    "expected_result": "All write requests are refused with HTTP 403 Forbidden",
+    "test_type": "authorization"
+  }
+]
