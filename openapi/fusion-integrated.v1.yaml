@@ -63,6 +63,506 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/gymkhana/bookings/:
+    get:
+      operationId: gymkhana_list_bookings
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VenueBooking'
+          description: ''
+  /api/v1/gymkhana/bookings/{id}/:
+    get:
+      operationId: gymkhana_get_booking
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenueBooking'
+          description: ''
+  /api/v1/gymkhana/bookings/event/:
+    post:
+      operationId: gymkhana_book_event
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventBookingCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventBookingCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventBookingCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenueBooking'
+          description: ''
+  /api/v1/gymkhana/bookings/session/:
+    post:
+      operationId: gymkhana_book_session
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionBookingCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SessionBookingCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SessionBookingCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenueBooking'
+          description: ''
+  /api/v1/gymkhana/budgets/:
+    get:
+      operationId: gymkhana_list_budgets
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BudgetRequest'
+          description: ''
+    post:
+      operationId: gymkhana_submit_budget
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BudgetRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BudgetRequestCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetRequest'
+          description: ''
+  /api/v1/gymkhana/budgets/{id}/:
+    get:
+      operationId: gymkhana_get_budget
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetRequest'
+          description: ''
+  /api/v1/gymkhana/clubs/:
+    get:
+      operationId: gymkhana_list_clubs
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Club'
+          description: ''
+    post:
+      operationId: gymkhana_create_club
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClubCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClubCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClubCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Club'
+          description: ''
+  /api/v1/gymkhana/clubs/{id}/:
+    get:
+      operationId: gymkhana_get_club
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Club'
+          description: ''
+  /api/v1/gymkhana/clubs/{id}/confirm/:
+    post:
+      operationId: gymkhana_confirm_club
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Club'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Club'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Club'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Club'
+          description: ''
+  /api/v1/gymkhana/clubs/{id}/leadership/:
+    post:
+      operationId: gymkhana_change_leadership
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadershipChange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeadershipChange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeadershipChange'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Club'
+          description: ''
+  /api/v1/gymkhana/memberships/:
+    get:
+      operationId: gymkhana_list_memberships
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Membership'
+          description: ''
+  /api/v1/gymkhana/memberships/{id}/approve/:
+    post:
+      operationId: gymkhana_approve_membership
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MembershipApprove'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MembershipApprove'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MembershipApprove'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+  /api/v1/gymkhana/memberships/apply/:
+    post:
+      operationId: gymkhana_apply_membership
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MembershipApply'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MembershipApply'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MembershipApply'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+          description: ''
+  /api/v1/gymkhana/polls/:
+    get:
+      operationId: gymkhana_list_polls
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Poll'
+          description: ''
+    post:
+      operationId: gymkhana_create_poll
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PollCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PollCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PollCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+          description: ''
+  /api/v1/gymkhana/polls/{id}/:
+    get:
+      operationId: gymkhana_get_poll
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+          description: ''
+  /api/v1/gymkhana/polls/{id}/vote/:
+    post:
+      operationId: gymkhana_cast_vote
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Vote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Vote'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+          description: ''
+  /api/v1/gymkhana/reports/:
+    get:
+      operationId: gymkhana_list_reports
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventReport'
+          description: ''
+    post:
+      operationId: gymkhana_submit_report
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventReportCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventReportCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventReportCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventReport'
+          description: ''
+  /api/v1/gymkhana/reports/{id}/:
+    get:
+      operationId: gymkhana_get_report
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventReport'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -1993,6 +2493,78 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BudgetRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club_id:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        submitted_by_id:
+          type: integer
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        supporting_file:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - club_id
+      - club_name
+      - description
+      - id
+      - purpose
+      - status
+      - submitted_at
+      - submitted_by_id
+      - supporting_file
+    BudgetRequestCreate:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        purpose:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          default: ''
+        supporting_file:
+          type: string
+          format: uri
+      required:
+      - amount
+      - club_id
+      - purpose
+      - supporting_file
     BulkOutcome:
       type: object
       properties:
@@ -2101,6 +2673,76 @@ components:
       - cleared
       - message
       - user_id
+    Club:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        category:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        coordinator_id:
+          type: integer
+          readOnly: true
+        co_coordinator_id:
+          type: integer
+          readOnly: true
+        faculty_councillor_id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - co_coordinator_id
+      - coordinator_id
+      - created_at
+      - description
+      - faculty_councillor_id
+      - id
+      - name
+      - status
+      - updated_at
+    ClubCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        category:
+          type: string
+          maxLength: 30
+        description:
+          type: string
+          default: ''
+        coordinator_id:
+          type: integer
+        co_coordinator_id:
+          type: integer
+        faculty_councillor_id:
+          type: integer
+      required:
+      - category
+      - co_coordinator_id
+      - coordinator_id
+      - faculty_councillor_id
+      - name
     Company:
       type: object
       properties:
@@ -2407,6 +3049,116 @@ components:
       - season_decision
       - semester
       - standing
+    EventBookingCreate:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        venue:
+          type: string
+          maxLength: 100
+        booking_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          default: ''
+        faculty_councillor_id:
+          type: integer
+        poster_file:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - booking_date
+      - club_id
+      - end_time
+      - faculty_councillor_id
+      - name
+      - start_time
+      - venue
+    EventReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club_id:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        submitted_by_id:
+          type: integer
+          readOnly: true
+        student_incharge_id:
+          type: integer
+          readOnly: true
+        event_name:
+          type: string
+          readOnly: true
+        event_date:
+          type: string
+          format: date-time
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        report_file:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - club_id
+      - club_name
+      - description
+      - event_date
+      - event_name
+      - id
+      - report_file
+      - student_incharge_id
+      - submitted_at
+      - submitted_by_id
+    EventReportCreate:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        student_incharge_id:
+          type: integer
+        event_name:
+          type: string
+          maxLength: 150
+        event_date:
+          type: string
+          format: date-time
+        description:
+          type: string
+          default: ''
+        report_file:
+          type: string
+          format: uri
+      required:
+      - club_id
+      - event_date
+      - event_name
+      - report_file
+      - student_incharge_id
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2637,6 +3389,16 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeadershipChange:
+      type: object
+      properties:
+        coordinator_id:
+          type: integer
+        co_coordinator_id:
+          type: integer
+      required:
+      - co_coordinator_id
+      - coordinator_id
     LiftSanction:
       type: object
       properties:
@@ -2663,6 +3425,70 @@ components:
       required:
       - password
       - username
+    Membership:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club_id:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        student_id:
+          type: integer
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        remarks:
+          type: string
+          readOnly: true
+        applied_at:
+          type: string
+          format: date-time
+          readOnly: true
+        approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        approved_by_id:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - applied_at
+      - approved_at
+      - approved_by_id
+      - club_id
+      - club_name
+      - description
+      - id
+      - remarks
+      - status
+      - student_id
+    MembershipApply:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        description:
+          type: string
+          default: ''
+      required:
+      - club_id
+    MembershipApprove:
+      type: object
+      properties:
+        remarks:
+          type: string
+          default: ''
     ModeEnum:
       enum:
       - online
@@ -3145,6 +3971,122 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    Poll:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club_id:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        created_by_id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        expires_at:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/PollChoice'
+          readOnly: true
+        target_groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/PollTargetGroup'
+          readOnly: true
+        has_voted:
+          type: boolean
+          readOnly: true
+      required:
+      - choices
+      - club_id
+      - club_name
+      - created_at
+      - created_by_id
+      - description
+      - expires_at
+      - has_voted
+      - id
+      - status
+      - target_groups
+      - title
+    PollChoice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        choice_text:
+          type: string
+          maxLength: 200
+        vote_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+      - choice_text
+      - id
+    PollCreate:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          default: ''
+        expires_at:
+          type: string
+          format: date-time
+        choices:
+          type: array
+          items:
+            type: string
+            maxLength: 200
+          minItems: 2
+        target_groups:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - choices
+      - club_id
+      - expires_at
+      - title
+    PollTargetGroup:
+      type: object
+      properties:
+        batch:
+          type: string
+          maxLength: 20
+        branch:
+          type: string
+          maxLength: 50
+      required:
+      - batch
+      - branch
     ProfileDocument:
       type: object
       description: |-
@@ -3632,6 +4574,40 @@ components:
       - permissions
       - roles
       - user
+    SessionBookingCreate:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        venue:
+          type: string
+          maxLength: 100
+        booking_date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+        name:
+          type: string
+          default: ''
+          maxLength: 150
+        description:
+          type: string
+          default: ''
+        poster_file:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - booking_date
+      - club_id
+      - end_time
+      - start_time
+      - venue
     SessionUser:
       type: object
       properties:
@@ -3814,6 +4790,80 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VenueBooking:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club_id:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        booking_type:
+          type: string
+          readOnly: true
+        venue:
+          type: string
+          readOnly: true
+        booking_date:
+          type: string
+          format: date
+          readOnly: true
+        start_time:
+          type: string
+          format: time
+          readOnly: true
+        end_time:
+          type: string
+          format: time
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        poster_file:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        faculty_councillor_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        booked_by_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - booked_by_id
+      - booking_date
+      - booking_type
+      - club_id
+      - club_name
+      - created_at
+      - description
+      - end_time
+      - faculty_councillor_id
+      - id
+      - name
+      - poster_file
+      - start_time
+      - venue
+    Vote:
+      type: object
+      properties:
+        choice_id:
+          type: integer
+      required:
+      - choice_id
     WaiveIncident:
       type: object
       properties:

@@ -13,6 +13,27 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `gymkhana`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `gymkhana.club.view` | View active and confirmed clubs | `faculty`, `student`, `student_admin` |
+| `gymkhana.club.create` | Create a new club proposal | `student_admin` |
+| `gymkhana.club.approve` | Confirm and approve open clubs | `student_admin` |
+| `gymkhana.club.manage` | Manage club operations, members, and bookings | `student` |
+| `gymkhana.booking.view` | View venue bookings and schedules | `faculty`, `student`, `student_admin` |
+| `gymkhana.booking.create` | Book club sessions and events | `student` |
+| `gymkhana.membership.view` | View club membership applications | `student` |
+| `gymkhana.membership.create` | Apply for club membership | `student` |
+| `gymkhana.membership.approve` | Approve club membership applications | `student` |
+| `gymkhana.poll.view` | View active targeted polls | `student` |
+| `gymkhana.poll.create` | Create targeted voting polls | `student` |
+| `gymkhana.poll.vote` | Cast vote in targeted polls | `student` |
+| `gymkhana.budget.view` | View club budget tracking requests | `student`, `student_admin` |
+| `gymkhana.budget.create` | Submit club budget tracking requests | `student` |
+| `gymkhana.report.view` | View submitted club event reports | `faculty`, `student_admin` |
+| `gymkhana.report.create` | Submit club event reports | `student` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
