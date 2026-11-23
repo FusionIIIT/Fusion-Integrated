@@ -70,6 +70,58 @@ def _get_actor_info(actor) -> tuple[int, str, str]:
     return user_id, active_role, department
 
 
+def is_admin_or_security(actor) -> bool:
+    active_role = getattr(actor, "active_role", "") or ""
+    roles = tuple(getattr(actor, "roles", ()) or ())
+    admin_roles = {"SysAdmin", "acadadmin", "Super Admin", "Director", "IT Security"}
+    return active_role in admin_roles or any(r in admin_roles for r in roles)
+
+
+def get_authorized_departments_for_actor(actor) -> set[str] | None:
+    """Return authorized departments for actor, or None if unrestricted (admin/security)."""
+    if not actor:
+        return set()
+
+    _user_id, active_role, department = _get_actor_info(actor)
+    roles = tuple(getattr(actor, "roles", ()) or ())
+
+    if _is_admin(active_role, roles) or active_role == "IT Security" or "IT Security" in roles:
+        return None  # Unrestricted access across all departments
+
+    depts = set()
+    if department:
+        depts.add(department)
+
+    if active_role.startswith("HOD (") and active_role.endswith(")"):
+        depts.add(active_role[5:-1].strip())
+
+    for r in roles:
+        if r.startswith("HOD (") and r.endswith(")"):
+            depts.add(r[5:-1].strip())
+
+    resolved = resolve_actor_department(actor, default="")
+    if resolved:
+        depts.add(resolved)
+
+    return depts
+
+
+def can_access_department(actor, department: str) -> bool:
+    """Check if the actor can access data/reports for the given department."""
+    auth_depts = get_authorized_departments_for_actor(actor)
+    if auth_depts is None:
+        return True
+    return department in auth_depts
+
+
+def validate_department_scope(actor, department: str) -> None:
+    """Enforce department-level access using authenticated principal's HOD role/dept (BR-BA-010)."""
+    if not can_access_department(actor, department):
+        from core.api.exceptions import NotFoundError
+
+        raise NotFoundError("Department not found in your authorized scope.")
+
+
 def scope_backup_records(actor) -> QuerySet[BackupRecord]:
     user_id, active_role, _ = _get_actor_info(actor)
     roles = tuple(getattr(actor, "roles", ()) or ())

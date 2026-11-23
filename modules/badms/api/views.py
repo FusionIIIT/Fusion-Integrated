@@ -3,10 +3,11 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.api.exceptions import BadRequestError, NotFoundError
+from core.api.exceptions import BadRequestError
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.badms.api import serializers as s
 from modules.badms.selectors import (
+    get_authorized_departments_for_actor,
     get_department_report,
     scope_archival_requests,
     scope_audit_events,
@@ -15,6 +16,7 @@ from modules.badms.selectors import (
     scope_restoration_requests,
     scope_security_policies,
     scope_storage_extensions,
+    validate_department_scope,
 )
 from modules.badms.services import (
     approve_sensitive_restoration,
@@ -332,16 +334,17 @@ class DepartmentReportView(APIView):
 
     @extend_schema(responses={200: s.DepartmentReportSerializer})
     def get(self, request):
-        dept = (
-            request.query_params.get("department")
-            or getattr(_actor(request), "department", "")
-            or ""
-        )
+        actor = _actor(request)
+        dept = request.query_params.get("department")
+        if not dept:
+            dept = getattr(actor, "department", "") or ""
+            if not dept:
+                auth_depts = get_authorized_departments_for_actor(actor)
+                if auth_depts and len(auth_depts) == 1:
+                    dept = next(iter(auth_depts))
         if not dept:
             raise BadRequestError("Department parameter is required.")
-        actor = _actor(request)
-        if getattr(actor, "active_role", "") == "HOD" and getattr(actor, "department", "") != dept:
-            raise NotFoundError("Department not found in your authorized scope.")
+        validate_department_scope(actor, dept)
         report = get_department_report(actor, dept)
         return Response(s.DepartmentReportSerializer(report).data, status=status.HTTP_200_OK)
 

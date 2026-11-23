@@ -81,6 +81,54 @@ def test_schedules_crud_api(stub_iam):
     assert len(res_list.json()["results"]) >= 1
 
 
+def test_schedules_conflict_returns_409_api(stub_iam):
+    """Regression test for AFR-BA-014: Conflicting schedules return 409 Conflict with actionable message."""
+    c = _client(
+        stub_iam,
+        user_id=1,
+        roles=("SysAdmin",),
+        active_role="SysAdmin",
+        modules=("badms",),
+        permissions=("badms.backup.manage",),
+    )
+
+    # 1. First schedule creation succeeds
+    res1 = c.post(
+        "/api/v1/badms/schedules/local/",
+        {
+            "name": "Local DB Schedule",
+            "dataset_name": "unique_dataset_afr_014",
+            "cron_expression": "0 2 * * *",
+        },
+    )
+    assert res1.status_code == 201
+
+    # 2. Conflicting schedule creation returns HTTP 409 Conflict
+    res2 = c.post(
+        "/api/v1/badms/schedules/local/",
+        {
+            "name": "Conflicting Local DB Schedule",
+            "dataset_name": "unique_dataset_afr_014",
+            "cron_expression": "0 3 * * *",
+        },
+    )
+    assert res2.status_code == 409
+    error_data = res2.json()["error"]
+    assert error_data["code"] == "conflict"
+    assert "unique_dataset_afr_014" in error_data["message"]
+    assert "Update the existing schedule or deactivate it" in error_data["message"]
+
+    # 3. Exactly one active schedule persisted in DB
+    from modules.badms.models import BackupSchedule
+
+    assert (
+        BackupSchedule.objects.filter(
+            dataset_name="unique_dataset_afr_014", is_active=True
+        ).count()
+        == 1
+    )
+
+
 def test_archival_requests_lifecycle_api(stub_iam):
     # 1. Student submits request
     c_student = _client(

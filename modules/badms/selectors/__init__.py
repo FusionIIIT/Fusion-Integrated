@@ -1,6 +1,8 @@
 from django.db.models import Count
 
 from modules.badms.selectors.scoping import (
+    can_access_department,
+    get_authorized_departments_for_actor,
     resolve_actor_department,
     scope_archival_requests,
     scope_audit_events,
@@ -10,10 +12,12 @@ from modules.badms.selectors.scoping import (
     scope_security_policies,
     scope_storage_extensions,
     scope_user_storage_quotas,
+    validate_department_scope,
 )
 
 
 def get_department_report(actor, department: str) -> dict:
+    validate_department_scope(actor, department)
     archival_qs = scope_archival_requests(actor).filter(department=department)
     storage_qs = scope_storage_extensions(actor).filter(department=department)
     return {
@@ -26,6 +30,8 @@ def get_department_report(actor, department: str) -> dict:
 
 
 __all__ = [
+    "can_access_department",
+    "get_authorized_departments_for_actor",
     "get_department_report",
     "resolve_actor_department",
     "scope_archival_requests",
@@ -36,4 +42,5 @@ __all__ = [
     "scope_security_policies",
     "scope_storage_extensions",
     "scope_user_storage_quotas",
+    "validate_department_scope",
 ]

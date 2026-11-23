@@ -357,3 +357,70 @@ def test_faculty_archival_request_maps_to_directory_department_and_visible_to_ho
     )
     assert res_refuse.status_code == 404
 
+
+def test_hod_department_report_scoping_br_ba_010(stub_iam):
+    """Regression test for BR-BA-010: HOD CSE must access CSE report (200) and cannot access ECE report (404)."""
+    ArchivalRequest.objects.create(
+        requester_user_id=1001,
+        department="CSE",
+        file_name="cse.tar",
+        file_type="tar",
+        file_size_bytes=100,
+        file_storage_path="/tmp/cse.tar",
+        status="submitted",
+    )
+    ArchivalRequest.objects.create(
+        requester_user_id=2001,
+        department="ECE",
+        file_name="ece.tar",
+        file_type="tar",
+        file_size_bytes=200,
+        file_storage_path="/tmp/ece.tar",
+        status="submitted",
+    )
+
+    client_hod = _client(
+        stub_iam,
+        user_id=5001,
+        roles=("HOD (CSE)",),
+        active_role="HOD (CSE)",
+        modules=("badms",),
+        permissions=("badms.report.view",),
+    )
+
+    # Own department report succeeds (HTTP 200)
+    res_cse = client_hod.get("/api/v1/badms/reports/department/?department=CSE")
+    assert res_cse.status_code == 200
+    assert res_cse.json()["department"] == "CSE"
+    assert res_cse.json()["total_archival_requests"] == 1
+
+    # Cross department report is refused (HTTP 404)
+    res_ece = client_hod.get("/api/v1/badms/reports/department/?department=ECE")
+    assert res_ece.status_code == 404
+    assert "not found in your authorized scope" in res_ece.json()["error"]["message"]
+
+
+def test_admin_and_it_security_cross_department_report_access(stub_iam):
+    """Authorized roles (SysAdmin, IT Security) preserve legitimate access across departments."""
+    client_admin = _client(
+        stub_iam,
+        user_id=6001,
+        roles=("SysAdmin",),
+        active_role="SysAdmin",
+        modules=("badms",),
+        permissions=("badms.report.view",),
+    )
+    assert client_admin.get("/api/v1/badms/reports/department/?department=CSE").status_code == 200
+    assert client_admin.get("/api/v1/badms/reports/department/?department=ECE").status_code == 200
+
+    client_sec = _client(
+        stub_iam,
+        user_id=7001,
+        roles=("IT Security",),
+        active_role="IT Security",
+        modules=("badms",),
+        permissions=("badms.report.view",),
+    )
+    assert client_sec.get("/api/v1/badms/reports/department/?department=CSE").status_code == 200
+    assert client_sec.get("/api/v1/badms/reports/department/?department=ECE").status_code == 200
+

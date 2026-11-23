@@ -11,6 +11,22 @@ class InvalidScheduleParametersError(Exception):
         super().__init__(message)
 
 
+class ScheduleConflictError(Exception):
+    """Raised when an active backup schedule already exists for the dataset and scope."""
+
+    def __init__(self, message: str = "A conflicting backup schedule already exists."):
+        super().__init__(message)
+
+
+def validate_schedule_conflict(has_conflict: bool, dataset_name: str, scope_type: str) -> None:
+    if has_conflict:
+        raise ScheduleConflictError(
+            f"An active backup schedule already exists for dataset '{dataset_name}' "
+            f"with scope '{scope_type}'. "
+            "Update the existing schedule or deactivate it before creating a new one."
+        )
+
+
 def validate_cron_expression(expression: str) -> None:
     parts = expression.strip().split()
     if len(parts) != 5 or not re.match(CRON_REGEX, expression.strip()):

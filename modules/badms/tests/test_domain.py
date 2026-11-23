@@ -131,6 +131,17 @@ def test_resolve_effective_schedule():
     assert sched.resolve_effective_schedule(None, None) is None
 
 
+def test_validate_schedule_conflict():
+    # Conflict detected -> raises ScheduleConflictError
+    with pytest.raises(sched.ScheduleConflictError) as exc_info:
+        sched.validate_schedule_conflict(True, "test_dataset", "local")
+    assert "test_dataset" in str(exc_info.value)
+    assert "local" in str(exc_info.value)
+
+    # No conflict -> does not raise
+    sched.validate_schedule_conflict(False, "test_dataset", "local")
+
+
 # ---- Storage Quotas ----
 
 def test_check_storage_quota_within_limit():

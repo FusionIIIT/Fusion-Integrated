@@ -193,13 +193,13 @@ modules/badms/__init__.py                                                    0  
 modules/badms/api/__init__.py                                                0      0      0      0   100%
 modules/badms/api/serializers.py                                            96      0      0      0   100%
 modules/badms/api/urls.py                                                    4      0      0      0   100%
-modules/badms/api/views.py                                                 207      4      4      2    97%   267, 341, 344, 356
+modules/badms/api/views.py                                                 212      7      8      2    94%   340-344, 346, 359
 modules/badms/apps.py                                                        4      0      0      0   100%
 modules/badms/contracts.py                                                  51      0     10      0   100%
 modules/badms/domain/__init__.py                                             6      0      0      0   100%
 modules/badms/domain/crypto.py                                              97      3     30      2    96%   21->31, 32, 38-39
 modules/badms/domain/retention.py                                           19      0      4      0   100%
-modules/badms/domain/schedules.py                                           15      0      6      0   100%
+modules/badms/domain/schedules.py                                           21      0      8      0   100%
 modules/badms/domain/state_machine.py                                       63      0     18      0   100%
 modules/badms/domain/storage.py                                             16      0      4      0   100%
 modules/badms/management/__init__.py                                         0      0      0      0   100%
@@ -220,22 +220,22 @@ modules/badms/models/schedules.py                                           24  
 modules/badms/models/storage.py                                             46      0      0      0   100%
 modules/badms/registry.py                                                   15      1      0      0    93%   185
 modules/badms/schedule.py                                                    3      3      0      0     0%   1-10
-modules/badms/selectors/__init__.py                                          7      0      0      0   100%
-modules/badms/selectors/scoping.py                                         104      5     52      3    95%   28->37, 35-36, 65-66, 69
+modules/badms/selectors/__init__.py                                          8      0      0      0   100%
+modules/badms/selectors/scoping.py                                         137     10     70      8    91%   28->37, 35-36, 65-66, 69, 74-77, 83, 92->95, 95->98, 99->98, 103->106
 modules/badms/services/__init__.py                                           9      0      0      0   100%
-modules/badms/services/archival.py                                         106     13     14      5    85%   58-59, 93, 121, 124, 129-130, 137, 160, 164-165, 171-172
+modules/badms/services/archival.py                                         106     10     14      4    88%   58-59, 93, 121, 124, 160, 164-165, 171-172
 modules/badms/services/audit.py                                              7      0      0      0   100%
-modules/badms/services/backups.py                                           32      1      4      1    94%   66
+modules/badms/services/backups.py                                           32      0      4      0   100%
 modules/badms/services/notifications.py                                      5      0      0      0   100%
 modules/badms/services/policies.py                                          16      0      2      0   100%
 modules/badms/services/restoration.py                                       53      5      6      3    86%   24, 49, 54-55, 73
-modules/badms/services/schedules.py                                         44      1     12      2    95%   73->80, 83
+modules/badms/services/schedules.py                                         43      0     10      1    98%   81->88
 modules/badms/services/storage.py                                           51      4     10      3    89%   37, 78, 86-87, 101->113
 modules/badms/tasks.py                                                      48      1     12      3    93%   27, 45->47, 57->55
 --------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                     1347     94    196     24    92%
-Required test coverage of 90% reached. Total coverage: 91.83%
-91 passed in 3.59s
+TOTAL                                                                     1391     97    218     26    92%
+Required test coverage of 90% reached. Total coverage: 91.61%
+213 passed, 27 skipped in 4.75s
 ```
 
 ### 2.2 Pure Domain Coverage Run
@@ -247,13 +247,13 @@ Name                                    Stmts   Miss Branch BrPart  Cover   Miss
 modules/badms/domain/__init__.py            6      0      0      0   100%
 modules/badms/domain/crypto.py             97      3     30      2    96%   21->31, 32, 38-39
 modules/badms/domain/retention.py          19      0      4      0   100%
-modules/badms/domain/schedules.py          15      0      6      0   100%
+modules/badms/domain/schedules.py          21      0      8      0   100%
 modules/badms/domain/state_machine.py      63      0     18      0   100%
 modules/badms/domain/storage.py            16      0      4      0   100%
 -----------------------------------------------------------------------------------
-TOTAL                                     216      3     62      2    98%
-Required test coverage of 95% reached. Total coverage: 98.20%
-91 passed in 3.00s
+TOTAL                                     222      3     64      2    98%
+Required test coverage of 95% reached. Total coverage: 98.25%
+213 passed, 27 skipped in 4.69s
 ```
 
 ### 2.3 Playwright End-to-End Suite (`make e2e`)
@@ -272,18 +272,18 @@ All 18 Playwright end-to-end tests passing with 0 failures across BADMS archival
 
 ## 3. Test Counts & Inventory
 
-Total: **91 backend tests** across 13 test files (plus 59 client vitest unit tests across 15 files and 5 Playwright E2E suites).
+Total: **95 backend tests** across 13 test files (plus 118 Student 2 spec-tests [27 skipped], 59 client vitest unit tests across 15 files and 5 Playwright E2E suites).
 
 | Test File | Test Count | Description & Tested Concerns |
 |---|---|---|
-| `test_domain.py` | 32 | Pure Python domain tests: transitions, schedule cron parser, quota math, AES-256-GCM crypto, retention |
+| `test_domain.py` | 33 | Pure Python domain tests: transitions, schedule cron parser, quota math, AES-256-GCM crypto, retention, schedule conflict validation |
 | `test_client_route_guards.py` | 2 | Navigation permission parity and client route guards |
-| `test_scoping.py` | 6 | Department isolation, student self-scope, HOD role-derived scoping, and dynamic faculty-to-department directory mapping |
+| `test_scoping.py` | 8 | Department isolation, student self-scope, HOD role-derived scoping, dynamic faculty-to-department directory mapping, HOD report scoping (BR-BA-010) |
 | `test_privilege_escalation.py` | 11 | 401 unauthenticated, 403 unauthorized across roles, missing CSRF token, empty modules, and route refusal |
-| `test_services.py` | 10 | Transactional service orchestration (backups, archival, quotas, restores, invalid state refusal) |
+| `test_services.py` | 10 | Transactional service orchestration (backups, archival, quotas, restores, invalid state refusal, schedule conflict prevention) |
 | `test_schedule.py` | 4 | Celery catch-up scheduler, quota monitoring, failure alert SLA, purge |
 | `test_contracts.py` | 4 | Plural read-only cross-module contract queries |
-| `test_api.py` | 9 | End-to-end REST API endpoint validation and responses |
+| `test_api.py` | 10 | End-to-end REST API endpoint validation and responses (including 409 Conflict on duplicate schedules) |
 | `test_concurrency.py` | 1 | Real multithreaded race conditions with `threading.Barrier` and `select_for_update` |
 | `test_query_budgets.py` | 3 | Query budgets on list endpoints (1 item vs 5 items, constant 1 query, zero N+1) |
 | `test_permissions.py` | 2 | Permission catalog drift detection and role grant integrity |

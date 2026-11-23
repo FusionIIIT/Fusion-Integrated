@@ -1,11 +1,13 @@
 from datetime import UTC, datetime
 
-from django.db import transaction
+from django.db import models, transaction
 
-from core.api.exceptions import BadRequestError, NotFoundError
+from core.api.exceptions import BadRequestError, ConflictError, NotFoundError
 from modules.badms.domain.schedules import (
     InvalidScheduleParametersError,
+    ScheduleConflictError,
     validate_cron_expression,
+    validate_schedule_conflict,
 )
 from modules.badms.models import BackupSchedule
 from modules.badms.services.audit import log_audit_event
@@ -29,17 +31,23 @@ def create_backup_schedule(
     if scope_type not in (BackupSchedule.SCOPE_GLOBAL, BackupSchedule.SCOPE_LOCAL):
         raise BadRequestError("Scope type must be either 'global' or 'local'.")
 
-    # Supersede existing active schedule for the same dataset and scope
+    # Conflict validation: reject if an active schedule already exists for the same
+    # dataset and scope (AFR-BA-014)
     now = datetime.now(UTC)
-    existing = BackupSchedule.objects.select_for_update().filter(
+    existing_active = BackupSchedule.objects.select_for_update().filter(
         dataset_name=dataset_name, scope_type=scope_type, is_active=True
     )
-    version = 1
-    for old_sched in existing:
-        old_sched.is_active = False
-        old_sched.effective_to = now
-        old_sched.save(update_fields=["is_active", "effective_to"])
-        version = max(version, old_sched.version + 1)
+    try:
+        validate_schedule_conflict(existing_active.exists(), dataset_name, scope_type)
+    except ScheduleConflictError as err:
+        raise ConflictError(str(err)) from err
+
+    version = (
+        BackupSchedule.objects.filter(dataset_name=dataset_name, scope_type=scope_type).aggregate(
+            max_v=models.Max("version")
+        )["max_v"]
+        or 0
+    ) + 1
 
     schedule = BackupSchedule.objects.create(
         name=name,

@@ -252,7 +252,7 @@ def test_restoration_execution_refuses_unapproved_or_rejected_state():
 
 
 def test_schedule_service_flow():
-    from core.api.exceptions import BadRequestError, NotFoundError
+    from core.api.exceptions import BadRequestError, ConflictError, NotFoundError
     from modules.badms.services import schedules as sched_svc
 
     actor = SimpleActor(user_id=1, department="Central", role="SysAdmin")
@@ -276,24 +276,23 @@ def test_schedule_service_flow():
     assert s1.version == 1
     assert s1.is_active is True
 
-    # 4. Create another schedule superseding s1
-    s2 = sched_svc.create_backup_schedule(
-        actor, name="Nightly v2", scope_type="global", dataset_name="d1", cron_expression="0 3 * * *"
-    )
-    assert s2.version == 2
+    # 4. Attempt to create conflicting schedule raises ConflictError (AFR-BA-014)
+    with pytest.raises(ConflictError):
+        sched_svc.create_backup_schedule(
+            actor, name="Nightly v2", scope_type="global", dataset_name="d1", cron_expression="0 3 * * *"
+        )
     s1.refresh_from_db()
-    assert s1.is_active is False
-    assert s1.effective_to is not None
+    assert s1.is_active is True
 
     # 5. Update schedule
-    s2_up = sched_svc.update_backup_schedule(
-        actor, schedule_id=s2.id, name="Nightly Final", cron_expression="0 4 * * *"
+    s1_up = sched_svc.update_backup_schedule(
+        actor, schedule_id=s1.id, name="Nightly Final", cron_expression="0 4 * * *"
     )
-    assert s2_up.name == "Nightly Final"
+    assert s1_up.name == "Nightly Final"
 
     # 6. Update invalid cron
     with pytest.raises(BadRequestError):
-        sched_svc.update_backup_schedule(actor, schedule_id=s2.id, cron_expression="invalid")
+        sched_svc.update_backup_schedule(actor, schedule_id=s1.id, cron_expression="invalid")
 
     # 7. Update nonexistent schedule
     with pytest.raises(NotFoundError):
