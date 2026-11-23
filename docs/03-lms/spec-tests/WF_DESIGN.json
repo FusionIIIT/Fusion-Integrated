@@ -1,0 +1,317 @@
+[
+  {
+    "test_id": "TC-WF-001",
+    "source_id": "BW-LMS-01 step-1-success",
+    "purpose": "Verify transition from Material Draft / Unpublished to Material Scheduled when Faculty configures a valid future release date.",
+    "preconditions": "Course C101 exists in Fusion LMS; Faculty F1 is assigned to Course C101; a valid course material item exists in Material Draft / Unpublished state.",
+    "action_or_input": "Faculty F1 configures a valid future release timestamp (T_release > T_current) for the course material item and saves the schedule via UC-LMS-003.",
+    "expected_result": "The system validates future release timing per BR-LMS-005 and BR-LMS-006, transitions the material to Material Scheduled state, and withholds material content from student and observer access.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-002",
+    "source_id": "BW-LMS-01 step-2-holding-guard",
+    "purpose": "Verify that course material in Material Scheduled state remains unpublished while current system time has not reached the configured release timestamp.",
+    "preconditions": "Course C101 exists; course material item M1 is in Material Scheduled state with configured release time T_release; current system time T satisfies T < T_release.",
+    "action_or_input": "System scheduled content evaluation executes or an enrolled student/observer attempts to query course materials at time T < T_release.",
+    "expected_result": "Guard condition evaluates to false (release time not reached); material M1 remains in Material Scheduled state and is withheld from student view and download.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-WF-003",
+    "source_id": "BW-LMS-01 step-2-success",
+    "purpose": "Verify transition from Material Scheduled to Material Published / Available when the configured release time is reached.",
+    "preconditions": "Course C101 exists; course material item M1 is in Material Scheduled state with configured release time T_release; system clock reaches T >= T_release.",
+    "action_or_input": "System background execution triggers UC-LMS-015 (Process Scheduled Content Release) at or after T_release.",
+    "expected_result": "The system evaluates release guard as satisfied, automatically transitions material M1 to Material Published / Available state per BR-LMS-005/006, making it accessible to enrolled students and observers.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-004",
+    "source_id": "BW-LMS-01 full-path",
+    "purpose": "Verify the complete end-to-end scheduled course material release basis workflow from Faculty scheduling through automatic system release at the configured time.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned and Student S1 is enrolled in Course C101; draft course material exists.",
+    "action_or_input": "Faculty F1 schedules material with a future release timestamp T_release; system holds material in scheduled state until time reaches T_release, then automatically executes release.",
+    "expected_result": "Course material transitions sequentially: Material Draft / Unpublished -> Material Scheduled -> Material Published / Available, successfully completing basis workflow BW-LMS-01.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-005",
+    "source_id": "BW-LMS-02 step-1-success",
+    "purpose": "Verify transition from No Assignment / New to Assignment Draft when Faculty configures valid assignment parameters.",
+    "preconditions": "Course C101 exists in Fusion LMS; Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 creates a new assignment defining title, due date, instructions, submission type, and positive points possible via UC-LMS-007, and saves as draft.",
+    "expected_result": "The system validates configuration per BR-LMS-009 and BR-LMS-010, stores the new assignment in Assignment Draft state, and does not expose it to students.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-006",
+    "source_id": "BW-LMS-02 step-2-success",
+    "purpose": "Verify transition from Assignment Draft to Assignment Available for Submission when Faculty publishes with immediate release condition.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned; assignment A1 is in Assignment Draft state with complete valid configuration.",
+    "action_or_input": "Faculty F1 executes UC-LMS-008 to publish assignment A1 with immediate release condition specified.",
+    "expected_result": "The system validates immediate publication per BR-LMS-009\u2013011, transitions assignment A1 to Assignment Available for Submission state, and makes it visible and open for student submissions.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-007",
+    "source_id": "BW-LMS-02 step-3-success",
+    "purpose": "Verify transition from Assignment Available for Submission to Student Submission Recorded when an enrolled student submits valid work before the due date.",
+    "preconditions": "Course C101 exists; Student S1 is enrolled; assignment A1 is in Assignment Available for Submission state; current time is prior to the assignment due date.",
+    "action_or_input": "Student S1 submits work matching the configured submission type before the due date via UC-LMS-010.",
+    "expected_result": "The system validates submission type conformity and on-time timeliness per BR-LMS-012\u2013014, records the submission artifact with timestamp, and transitions state to Student Submission Recorded.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-008",
+    "source_id": "BW-LMS-02 full-path",
+    "purpose": "Verify the complete end-to-end basis workflow from Faculty assignment creation through immediate release to on-time student submission.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned and Student S1 is enrolled in Course C101.",
+    "action_or_input": "Faculty F1 creates assignment A1, publishes it immediately to students, and Student S1 accesses the published assignment and submits valid work prior to the due date.",
+    "expected_result": "Assignment transitions sequentially: No Assignment / New -> Assignment Draft -> Assignment Available for Submission -> Student Submission Recorded, successfully completing basis workflow BW-LMS-02.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-009",
+    "source_id": "BW-LMS-03 step-1-success",
+    "purpose": "Verify transition from No Assignment / New to Assignment Draft when Faculty creates an assignment intended for scheduled release.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 creates a new assignment with valid title, due date, instructions, submission format, and points possible via UC-LMS-007, saving as draft.",
+    "expected_result": "The system validates assignment configuration per BR-LMS-009 and BR-LMS-010 and stores the assignment in Assignment Draft state.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-010",
+    "source_id": "BW-LMS-03 step-2-success",
+    "purpose": "Verify transition from Assignment Draft to Assignment Published / Scheduled for Release when Faculty publishes with future release configured.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned; assignment A2 is in Assignment Draft state; release timestamp T_release is configured in the future (T_current < T_release < T_due).",
+    "action_or_input": "Faculty F1 executes UC-LMS-008 to publish assignment A2 with future release schedule configured.",
+    "expected_result": "The system validates future release timing per BR-LMS-009\u2013011, transitions assignment A2 to Assignment Published / Scheduled for Release state, and withholds assignment visibility from students.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-011",
+    "source_id": "BW-LMS-03 step-3-holding-guard",
+    "purpose": "Verify that an assignment in Assignment Published / Scheduled for Release remains in scheduled state and inaccessible to students while current time is before the release date.",
+    "preconditions": "Course C101 exists; assignment A2 is in Assignment Published / Scheduled for Release state with release time T_release; current time T satisfies T < T_release.",
+    "action_or_input": "An enrolled student attempts to view or access assignment A2, or System evaluates scheduled releases at time T < T_release.",
+    "expected_result": "Guard condition evaluates to false (release time not reached); assignment A2 remains in Assignment Published / Scheduled for Release state and is not available for student access or submission.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-WF-012",
+    "source_id": "BW-LMS-03 step-3-success",
+    "purpose": "Verify transition from Assignment Published / Scheduled for Release to Assignment Available for Submission when configured release time is reached.",
+    "preconditions": "Course C101 exists; assignment A2 is in Assignment Published / Scheduled for Release state; system clock reaches T >= T_release.",
+    "action_or_input": "System triggers UC-LMS-015 (Process Scheduled Content Release) upon reaching configured release timestamp.",
+    "expected_result": "The system evaluates release guard as satisfied, automatically transitions assignment A2 to Assignment Available for Submission state per BR-LMS-011, making it visible and open for submission.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-013",
+    "source_id": "BW-LMS-03 step-4-success",
+    "purpose": "Verify transition from Assignment Available for Submission to Student Submission Recorded upon valid on-time student submission.",
+    "preconditions": "Course C101 exists; Student S1 is enrolled; assignment A2 is in Assignment Available for Submission state; current time is before assignment due date.",
+    "action_or_input": "Student S1 submits valid deliverable conforming to required submission type prior to deadline via UC-LMS-010.",
+    "expected_result": "The system verifies valid submission type and timing per BR-LMS-012\u2013014, records submission artifact, and transitions state to Student Submission Recorded.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-014",
+    "source_id": "BW-LMS-03 full-path",
+    "purpose": "Verify the complete end-to-end scheduled assignment release and submission basis workflow from creation through future release and on-time student submission.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned and Student S1 is enrolled in Course C101.",
+    "action_or_input": "Faculty F1 creates assignment A2 with future release schedule, System automatically releases A2 upon reaching release time, and Student S1 submits work before due date.",
+    "expected_result": "Assignment transitions sequentially: No Assignment / New -> Assignment Draft -> Assignment Published / Scheduled for Release -> Assignment Available for Submission -> Student Submission Recorded, completing basis workflow BW-LMS-03.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-015",
+    "source_id": "BW-LMS-04 step-1-success",
+    "purpose": "Verify transition from Student Submission Recorded to Grade Draft when assigned Faculty grades submission with points and feedback.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned to Course C101; Student S1 has an on-time submission in Student Submission Recorded state for Assignment A1.",
+    "action_or_input": "Faculty F1 opens Student S1 submission, enters valid score and feedback within points possible via UC-LMS-012, and saves.",
+    "expected_result": "The system validates Faculty authorization and score range per BR-LMS-015 and BR-LMS-016, stores evaluation in Grade Draft state, and withholds grade and feedback from student view.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-016",
+    "source_id": "BW-LMS-04 step-2-success",
+    "purpose": "Verify transition from Grade Draft to Grade Released / Student Visible when assigned Faculty releases grade and feedback.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned; a grade draft for Student S1 submission exists in Grade Draft state.",
+    "action_or_input": "Faculty F1 executes UC-LMS-013 to release grades and feedback for Assignment A1.",
+    "expected_result": "The system validates Faculty release authority per BR-LMS-016\u2013018, transitions grade to Grade Released / Student Visible state, and allows Student S1 to view grade and feedback in read-only form.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-017",
+    "source_id": "BW-LMS-04 full-path",
+    "purpose": "Verify the complete end-to-end faculty grading and grade release basis workflow from recorded submission through Faculty grading to student visibility.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned and Student S1 is enrolled with a recorded submission for Assignment A1.",
+    "action_or_input": "Faculty F1 grades Student S1 submission creating a draft grade, and subsequently executes grade release to publish grade and feedback.",
+    "expected_result": "Evaluation transitions sequentially: Student Submission Recorded -> Grade Draft -> Grade Released / Student Visible, fully completing basis workflow BW-LMS-04.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-018",
+    "source_id": "BW-LMS-05 step-1-success",
+    "purpose": "Verify transition from Student Submission Recorded to Grade Draft when an authorized TA grades a student submission with attribution.",
+    "preconditions": "Course C101 exists; TA T1 is assigned to Course C101; Student S1 has a submission in Student Submission Recorded state.",
+    "action_or_input": "TA T1 opens Student S1 submission, enters points and feedback via UC-LMS-012, and saves evaluation.",
+    "expected_result": "The system validates TA grading permission per BR-LMS-004 and BR-LMS-015, attributes grading action to TA T1, stores evaluation in Grade Draft state, and withholds grade from student view.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-019",
+    "source_id": "BW-LMS-05 step-2-unauthorized-ta-release",
+    "purpose": "Verify that a TA is prohibited from releasing grades from Grade Draft to students and grade remains in draft state.",
+    "preconditions": "Course C101 exists; TA T1 is assigned to Course C101; a student submission evaluation exists in Grade Draft state.",
+    "action_or_input": "TA T1 attempts to execute UC-LMS-013 to release grades and feedback to students.",
+    "expected_result": "The system enforces authorization policy per BR-LMS-004 and BR-LMS-017, rejects the release action, and maintains evaluation in Grade Draft state.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-WF-020",
+    "source_id": "BW-LMS-05 step-2-success",
+    "purpose": "Verify transition from Grade Draft to Grade Released / Student Visible when assigned Faculty releases grades previously drafted by a TA.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned to Course C101; Student S1 submission has an evaluation in Grade Draft state entered by TA T1.",
+    "action_or_input": "Faculty F1 reviews the TA-drafted evaluation and executes UC-LMS-013 to release grades and feedback.",
+    "expected_result": "The system validates Faculty release authority per BR-LMS-016\u2013018, transitions grade to Grade Released / Student Visible state, and enables Student S1 to view score and feedback.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-021",
+    "source_id": "BW-LMS-05 full-path",
+    "purpose": "Verify the complete end-to-end multi-actor basis workflow from recorded submission through TA grading and subsequent Faculty grade release.",
+    "preconditions": "Course C101 exists; Faculty F1 and TA T1 are assigned to Course C101; Student S1 is enrolled with a recorded submission.",
+    "action_or_input": "TA T1 grades Student S1 submission creating a grade draft, and Faculty F1 subsequently releases the draft grade to students.",
+    "expected_result": "Evaluation transitions sequentially: Student Submission Recorded -> Grade Draft (by TA) -> Grade Released / Student Visible (by Faculty), successfully completing basis workflow BW-LMS-05.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-022",
+    "source_id": "CW-LMS-01 step-1-success",
+    "purpose": "Verify composite workflow initiation transition from No Assignment / New to Assignment Draft upon valid assignment creation by Faculty.",
+    "preconditions": "Course C101 exists in Fusion LMS; Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 defines required assignment parameters (title, instructions, due date, submission type, points) and saves draft via UC-LMS-007.",
+    "expected_result": "The system creates assignment in Assignment Draft state per BR-LMS-009 and BR-LMS-010, ready for publication path branching.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-023",
+    "source_id": "CW-LMS-01 step-2-immediate-decision",
+    "purpose": "Verify composite publication decision branch A transitioning Assignment Draft directly to Assignment Available for Submission when immediate release condition is chosen.",
+    "preconditions": "Course C101 exists; assignment A1 is in Assignment Draft state; Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 executes UC-LMS-008 to publish assignment A1 selecting immediate release condition.",
+    "expected_result": "The system evaluates release guard as immediate, bypasses scheduled queue, and transitions assignment A1 to Assignment Available for Submission state per BR-LMS-011.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-024",
+    "source_id": "CW-LMS-01 step-3-scheduled-decision",
+    "purpose": "Verify composite publication decision branch B transitioning Assignment Draft to Assignment Published / Scheduled for Release when future release schedule is chosen.",
+    "preconditions": "Course C101 exists; assignment A2 is in Assignment Draft state; Faculty F1 is assigned to Course C101.",
+    "action_or_input": "Faculty F1 executes UC-LMS-008 to publish assignment A2 with future release timestamp configured (T_future > T_current).",
+    "expected_result": "The system validates future release configuration and transitions assignment A2 to Assignment Published / Scheduled for Release state per BR-LMS-011, hiding it from students.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-025",
+    "source_id": "CW-LMS-01 step-4-holding-guard",
+    "purpose": "Verify that an assignment on the scheduled composite path remains in Assignment Published / Scheduled for Release while current time has not reached the release schedule.",
+    "preconditions": "Course C101 exists; assignment A2 is in Assignment Published / Scheduled for Release with release time T_release; system clock is at T < T_release.",
+    "action_or_input": "System scheduled task runs or student attempts to access assignment A2 at time T < T_release.",
+    "expected_result": "Guard condition evaluates to false; assignment A2 remains in Assignment Published / Scheduled for Release state and is not open for submission.",
+    "test_type": "Boundary"
+  },
+  {
+    "test_id": "TC-WF-026",
+    "source_id": "CW-LMS-01 step-4-system-release",
+    "purpose": "Verify automatic transition from Assignment Published / Scheduled for Release to Assignment Available for Submission when release time is reached.",
+    "preconditions": "Course C101 exists; assignment A2 is in Assignment Published / Scheduled for Release state; system clock reaches T >= T_release.",
+    "action_or_input": "System background process triggers UC-LMS-015 (Process Scheduled Content Release) upon reaching configured release timestamp.",
+    "expected_result": "The system verifies release timestamp arrival and transitions assignment A2 to Assignment Available for Submission state per BR-LMS-011.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-027",
+    "source_id": "CW-LMS-01 step-5-student-submission",
+    "purpose": "Verify composite workflow convergence transition from Assignment Available for Submission to Student Submission Recorded upon valid on-time student submission.",
+    "preconditions": "Course C101 exists; Student S1 is enrolled in Course C101; assignment is in Assignment Available for Submission state; current time is before due date.",
+    "action_or_input": "Student S1 submits required deliverable conforming to configured submission type before the deadline via UC-LMS-010.",
+    "expected_result": "The system validates submission type and on-time submission per BR-LMS-012\u2013014, records submission artifact and timestamp, and transitions state to Student Submission Recorded.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-028",
+    "source_id": "CW-LMS-01 immediate-release-path",
+    "purpose": "Verify the complete integrated composite workflow Path 1: creation -> immediate publication -> available for submission -> on-time student submission.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned and Student S1 is enrolled in Course C101.",
+    "action_or_input": "Faculty F1 creates assignment A1, chooses immediate publication branch, and Student S1 submits work before the due date.",
+    "expected_result": "Assignment transitions sequentially: No Assignment / New -> Assignment Draft -> Assignment Available for Submission -> Student Submission Recorded, validating the immediate branch of CW-LMS-01.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-029",
+    "source_id": "CW-LMS-01 scheduled-release-path",
+    "purpose": "Verify the complete integrated composite workflow Path 2: creation -> scheduled publication -> system release at configured time -> available for submission -> on-time student submission.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned and Student S1 is enrolled in Course C101.",
+    "action_or_input": "Faculty F1 creates assignment A2 with future release schedule, System automatically releases A2 upon reaching release time, and Student S1 submits work before due date.",
+    "expected_result": "Assignment transitions sequentially: No Assignment / New -> Assignment Draft -> Assignment Published / Scheduled for Release -> Assignment Available for Submission -> Student Submission Recorded, validating the scheduled branch of CW-LMS-01.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-030",
+    "source_id": "CW-LMS-02 step-1-faculty-grade",
+    "purpose": "Verify composite grading decision branch A transitioning Student Submission Recorded to Grade Draft when Faculty performs grading.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned to Course C101; Student S1 has a submission in Student Submission Recorded state.",
+    "action_or_input": "Faculty F1 enters points and qualitative feedback for Student S1 submission via UC-LMS-012 and saves.",
+    "expected_result": "The system validates Faculty grading authority per BR-LMS-015 and BR-LMS-016 and transitions evaluation to Grade Draft state; grade remains hidden from student view.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-031",
+    "source_id": "CW-LMS-02 step-2-ta-grade",
+    "purpose": "Verify composite grading decision branch B transitioning Student Submission Recorded to Grade Draft when an authorized TA performs grading.",
+    "preconditions": "Course C101 exists; TA T1 is assigned to Course C101; Student S2 has a submission in Student Submission Recorded state.",
+    "action_or_input": "TA T1 enters points and qualitative feedback for Student S2 submission via UC-LMS-012 and saves.",
+    "expected_result": "The system validates TA grading privileges per BR-LMS-004 and BR-LMS-015, attributes evaluation to TA T1, and stores evaluation in Grade Draft state; grade remains hidden from student view.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-032",
+    "source_id": "CW-LMS-02 step-3-unauthorized-ta-release",
+    "purpose": "Verify composite grade release guard enforcement preventing TA from releasing grade drafts and maintaining evaluation in Grade Draft state.",
+    "preconditions": "Course C101 exists; TA T1 is assigned to Course C101; a student submission evaluation exists in Grade Draft state.",
+    "action_or_input": "TA T1 attempts to execute UC-LMS-013 to release grades to students.",
+    "expected_result": "The system validates release authority against BR-LMS-004 and BR-LMS-017, rejects the action, and maintains evaluation in Grade Draft state.",
+    "test_type": "Authorization"
+  },
+  {
+    "test_id": "TC-WF-033",
+    "source_id": "CW-LMS-02 step-3-faculty-release",
+    "purpose": "Verify composite grade release transition from Grade Draft to Grade Released / Student Visible when assigned Faculty releases grades.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned to Course C101; student submission evaluation is in Grade Draft state (graded by Faculty or TA).",
+    "action_or_input": "Faculty F1 executes UC-LMS-013 to release grades and feedback.",
+    "expected_result": "The system validates Faculty authority per BR-LMS-016\u2013018, transitions grade to Grade Released / Student Visible state, making score and feedback readable by the enrolled student.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-034",
+    "source_id": "CW-LMS-02 faculty-grading-path",
+    "purpose": "Verify the complete integrated composite grading workflow Path 1: recorded submission -> Faculty grading to draft -> Faculty release of grade to student.",
+    "preconditions": "Course C101 exists; Faculty F1 is assigned; Student S1 has a recorded submission for Assignment A1.",
+    "action_or_input": "Faculty F1 grades Student S1 submission creating grade draft, then executes grade release to publish results.",
+    "expected_result": "Evaluation transitions sequentially: Student Submission Recorded -> Grade Draft (Faculty) -> Grade Released / Student Visible, validating CW-LMS-02 Faculty grading path.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-WF-035",
+    "source_id": "CW-LMS-02 ta-grading-path",
+    "purpose": "Verify the complete integrated composite grading workflow Path 2: recorded submission -> TA grading to draft -> Faculty release of grade to student.",
+    "preconditions": "Course C101 exists; Faculty F1 and TA T1 are assigned; Student S2 has a recorded submission for Assignment A1.",
+    "action_or_input": "TA T1 grades Student S2 submission creating grade draft, and Faculty F1 subsequently reviews and executes grade release.",
+    "expected_result": "Evaluation transitions sequentially: Student Submission Recorded -> Grade Draft (TA) -> Grade Released / Student Visible (Faculty), validating CW-LMS-02 TA grading path.",
+    "test_type": "Positive"
+  }
+]

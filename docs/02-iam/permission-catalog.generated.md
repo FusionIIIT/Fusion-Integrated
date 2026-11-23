@@ -13,6 +13,34 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `lms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `lms.workspace.view` | View course workspace, syllabus, schedule, and instructors | `Assistant Professor`, `Associate Professor`, `Professor`, `course_observer`, `faculty`, `student`, `teaching_assistant` |
+| `lms.workspace.update` | Configure course workspace settings and details | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.material.view` | View and download published course materials | `Assistant Professor`, `Associate Professor`, `Professor`, `course_observer`, `faculty`, `student`, `teaching_assistant` |
+| `lms.material.create` | Upload course materials and configure release schedules | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.material.update` | Edit course materials | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.material.delete` | Remove course materials | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.material.publish` | Publish course materials immediately or on schedule | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.announcement.view` | Read course announcements | `Assistant Professor`, `Associate Professor`, `Professor`, `course_observer`, `faculty`, `student`, `teaching_assistant` |
+| `lms.announcement.create` | Post course announcements | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty`, `teaching_assistant` |
+| `lms.announcement.update` | Edit course announcements | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.announcement.delete` | Delete course announcements | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.assignment.view` | View published assignments and instructions | `Assistant Professor`, `Associate Professor`, `Professor`, `course_observer`, `faculty`, `student`, `teaching_assistant` |
+| `lms.assignment.create` | Create draft assignments | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.assignment.update` | Edit draft assignments | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.assignment.delete` | Delete assignments | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.assignment.publish` | Publish assignments immediately or on schedule | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+| `lms.submission.view` | View assignment submissions within authorized scope | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty`, `student`, `teaching_assistant` |
+| `lms.submission.create` | Submit assignment work conforming to configured type | `student` |
+| `lms.submission.review` | Review and evaluate student submissions for assigned courses | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty`, `teaching_assistant` |
+| `lms.grade.view` | View assignment grades within authorized scope | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty`, `student`, `teaching_assistant` |
+| `lms.grade.create` | Enter draft grades and feedback for submissions | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty`, `teaching_assistant` |
+| `lms.grade.update` | Modify draft or published grades | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty`, `teaching_assistant` |
+| `lms.grade.publish` | Publish grades and feedback to students | `Assistant Professor`, `Associate Professor`, `Professor`, `faculty` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

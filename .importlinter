@@ -13,6 +13,7 @@ name = Modules may reach each other ONLY through contracts.py
 type = forbidden
 source_modules =
     modules.placement
+    modules.lms
     modules.directory
     modules.accesscontrol
 forbidden_modules =
@@ -21,6 +22,11 @@ forbidden_modules =
     modules.placement.selectors
     modules.placement.api
     modules.placement.domain
+    modules.lms.models
+    modules.lms.services
+    modules.lms.selectors
+    modules.lms.api
+    modules.lms.domain
     modules.directory.models
     modules.directory.services
     modules.directory.api
@@ -38,6 +44,7 @@ type = forbidden
 source_modules =
 # Every module's domain, not just the first one written.
     modules.placement.domain
+    modules.lms.domain
 forbidden_modules =
     django
     rest_framework
@@ -66,3 +73,13 @@ layers =
     modules.placement.selectors
     modules.placement.models
     modules.placement.domain
+
+[importlinter:contract:lms-layers]
+name = Layering inside lms
+type = layers
+layers =
+    modules.lms.api
+    modules.lms.services
+    modules.lms.selectors
+    modules.lms.models
+    modules.lms.domain

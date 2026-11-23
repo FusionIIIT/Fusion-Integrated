@@ -1,0 +1,51 @@
+# Spec tests: lms
+
+Student 1 (git author name): Abhinavreddy2006
+Student 2 (git author name): Kavuri Manogna
+
+Design commit:
+537dd98488f48f3c843966986b4478e7d9ef0b3c
+test(lms): freeze specification test designs
+
+Baseline commit:
+97476e478bf81c47882195cc3ec0fd75db4d1b53 test(lms): add specification-based test suites and baseline
+
+Student 1's 10/10 commit the baseline ran on:
+4cf66e841e2954a343a2a6c0d049b6082aef0988
+
+## Results
+
+| Run | Strategy | Cases | Passed | Failed | Skipped | Line % | Branch % |
+|---|---|---:|---:|---:|---:|---:|---:|
+| baseline | FR | 47 | 47 | 0 | 0 | 73.19% | 47.87% |
+| baseline | UC | 42 | 42 | 0 | 0 | 75.45% | 52.13% |
+| baseline | BR | 41 | 41 | 0 | 0 | 66.76% | 40.55% |
+| baseline | WF | 35 | 35 | 0 | 0 | 60.45% | 28.96% |
+| Q2 | FR | 47 | 47 | 0 | 0 | 72.97% | 47.87% |
+| Q2 | UC | 42 | 42 | 0 | 0 | 75.21% | 52.13% |
+| Q2 | BR | 41 | 41 | 0 | 0 | 66.58% | 40.55% |
+| Q2 | WF | 35 | 35 | 0 | 0 | 60.32% | 28.96% |
+| Q3 | FR | 47 | 47 | 0 | 0 | 72.33% | 46.73% |
+| Q3 | UC | 42 | 42 | 0 | 0 | 74.53% | 50.89% |
+| Q3 | BR | 41 | 41 | 0 | 0 | 66.04% | 39.58% |
+| Q3 | WF | 35 | 35 | 0 | 0 | 59.88% | 28.27% |
+| Q4 | FR | 47 | 47 | 0 | 0 | 72.33% | 46.73% |
+| Q4 | UC | 42 | 42 | 0 | 0 | 74.53% | 50.89% |
+| Q4 | BR | 41 | 41 | 0 | 0 | 66.04% | 39.58% |
+| Q4 | WF | 35 | 35 | 0 | 0 | 59.88% | 28.27% |
+
+## Failures and skips
+
+No failures or skipped tests in the formal baseline, Q2, Q3 or Q4.
+No spec-test failure or skip triage items are open as of Q4.
+
+Q2 was run against commit:
+a941ffdaa08e2626b5e3085a83001038c2c19368
+
+
+Q3 was run against commit:
+c5726c0497790393aa7797e0f7fe405d0559c407
+
+
+Q4 was run against commit:
+ac0d70b34c978aa2069cbacfbc0d0a66a287d10a
