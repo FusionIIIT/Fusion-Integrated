@@ -34,6 +34,344 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "oap": {
+      "grants": {
+        "Academic Administrator": [
+          "oap.assistantship_claim.update",
+          "oap.assistantship_claim.view",
+          "oap.bonafide_request.approve",
+          "oap.bonafide_request.review",
+          "oap.bonafide_request.view",
+          "oap.no_dues_case.approve",
+          "oap.no_dues_case.view"
+        ],
+        "Department Administrator": [
+          "oap.assistantship_claim.review",
+          "oap.assistantship_claim.view",
+          "oap.seminar_request.view",
+          "oap.seminar_schedule.update",
+          "oap.seminar_schedule.view",
+          "oap.ta_assignment.assign",
+          "oap.ta_assignment.view",
+          "oap.thesis_supervisor_assignment.assign",
+          "oap.thesis_supervisor_assignment.view"
+        ],
+        "Head of Department": [
+          "oap.assistantship_claim.approve",
+          "oap.assistantship_claim.view",
+          "oap.leave_application.approve",
+          "oap.leave_application.view"
+        ],
+        "Hostel Warden": [
+          "oap.no_dues_case.view",
+          "oap.no_dues_result.update"
+        ],
+        "Lab Supervisor": [
+          "oap.no_dues_case.view",
+          "oap.no_dues_result.update"
+        ],
+        "Librarian": [
+          "oap.no_dues_case.view",
+          "oap.no_dues_result.update"
+        ],
+        "Mess In-charge": [
+          "oap.no_dues_case.view",
+          "oap.no_dues_result.update"
+        ],
+        "PG Student": [
+          "oap.assistantship_claim.create",
+          "oap.assistantship_claim.view_self",
+          "oap.seminar_request.create",
+          "oap.seminar_request.view_self",
+          "oap.seminar_schedule.view"
+        ],
+        "faculty": [
+          "oap.assistantship_verification.review",
+          "oap.seminar_schedule.view"
+        ],
+        "student": [
+          "oap.bonafide_certificate.view_self",
+          "oap.bonafide_request.create",
+          "oap.bonafide_request.view_self",
+          "oap.leave_application.create",
+          "oap.leave_application.view_self",
+          "oap.no_dues_case.create",
+          "oap.no_dues_case.view_self",
+          "oap.no_dues_certificate.view_self",
+          "oap.notification.view_self"
+        ]
+      },
+      "module_grants": [
+        "Academic Administrator",
+        "Department Administrator",
+        "Head of Department",
+        "Hostel Warden",
+        "Lab Supervisor",
+        "Librarian",
+        "Mess In-charge",
+        "PG Student",
+        "faculty",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/oap",
+        "icon": "Files",
+        "items": [
+          {
+            "code": "oap.leave",
+            "icon": "CalendarBlank",
+            "label": "Leave",
+            "required_permission": "oap.leave_application.view_self",
+            "sort_order": 10,
+            "to": "/oap/leave"
+          },
+          {
+            "code": "oap.leave-decisions",
+            "icon": "Checks",
+            "label": "Leave Decisions",
+            "required_permission": "oap.leave_application.approve",
+            "sort_order": 20,
+            "to": "/oap/leave-decisions"
+          },
+          {
+            "code": "oap.bonafide",
+            "icon": "Certificate",
+            "label": "Bonafide",
+            "required_permission": "oap.bonafide_request.view_self",
+            "sort_order": 30,
+            "to": "/oap/bonafide"
+          },
+          {
+            "code": "oap.bonafide-queue",
+            "icon": "ClipboardText",
+            "label": "Bonafide Queue",
+            "required_permission": "oap.bonafide_request.review",
+            "sort_order": 40,
+            "to": "/oap/bonafide-queue"
+          },
+          {
+            "code": "oap.no-dues",
+            "icon": "ShieldCheck",
+            "label": "No-Dues",
+            "required_permission": "oap.no_dues_case.view_self",
+            "sort_order": 50,
+            "to": "/oap/no-dues"
+          },
+          {
+            "code": "oap.no-dues-queue",
+            "icon": "Users",
+            "label": "No-Dues Queue",
+            "required_permission": "oap.no_dues_case.view",
+            "sort_order": 60,
+            "to": "/oap/no-dues-queue"
+          },
+          {
+            "code": "oap.claims",
+            "icon": "Wallet",
+            "label": "Assistantship",
+            "required_permission": "oap.assistantship_claim.view_self",
+            "sort_order": 70,
+            "to": "/oap/claims"
+          },
+          {
+            "code": "oap.claim-queue",
+            "icon": "Briefcase",
+            "label": "Claim Queue",
+            "required_permission": "oap.assistantship_claim.view",
+            "sort_order": 80,
+            "to": "/oap/claim-queue"
+          },
+          {
+            "code": "oap.verifications",
+            "icon": "Signature",
+            "label": "Verifications",
+            "required_permission": "oap.assistantship_verification.review",
+            "sort_order": 90,
+            "to": "/oap/verifications"
+          },
+          {
+            "code": "oap.assignments",
+            "icon": "UserCheck",
+            "label": "Assignments",
+            "required_permission": "oap.thesis_supervisor_assignment.view",
+            "sort_order": 100,
+            "to": "/oap/assignments"
+          },
+          {
+            "code": "oap.seminars",
+            "icon": "GraduationCap",
+            "label": "Seminars",
+            "required_permission": "oap.seminar_request.view_self",
+            "sort_order": 110,
+            "to": "/oap/seminars"
+          },
+          {
+            "code": "oap.seminar-queue",
+            "icon": "Presentation",
+            "label": "Seminar Queue",
+            "required_permission": "oap.seminar_request.view",
+            "sort_order": 120,
+            "to": "/oap/seminar-queue"
+          },
+          {
+            "code": "oap.seminar-schedules",
+            "icon": "CalendarBlank",
+            "label": "Seminar Schedules",
+            "required_permission": "oap.seminar_schedule.view",
+            "sort_order": 130,
+            "to": "/oap/seminar-schedules"
+          },
+          {
+            "code": "oap.notifications",
+            "icon": "Bell",
+            "label": "Alerts",
+            "required_permission": "oap.notification.view_self",
+            "sort_order": 140,
+            "to": "/oap/notifications"
+          }
+        ],
+        "label": "Other Academic Procedures",
+        "nav_section": "Academics",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "oap.leave_application.create",
+          "label": "Submit a leave application"
+        },
+        {
+          "code": "oap.leave_application.view_self",
+          "label": "See one's own leave applications"
+        },
+        {
+          "code": "oap.leave_application.view",
+          "label": "See leave applications routed to you"
+        },
+        {
+          "code": "oap.leave_application.approve",
+          "label": "Approve or reject a leave application"
+        },
+        {
+          "code": "oap.bonafide_request.create",
+          "label": "Request a bonafide certificate"
+        },
+        {
+          "code": "oap.bonafide_request.view_self",
+          "label": "See one's own bonafide requests"
+        },
+        {
+          "code": "oap.bonafide_request.view",
+          "label": "See bonafide requests routed to you"
+        },
+        {
+          "code": "oap.bonafide_request.review",
+          "label": "Verify a bonafide request"
+        },
+        {
+          "code": "oap.bonafide_request.approve",
+          "label": "Approve or reject a bonafide request"
+        },
+        {
+          "code": "oap.bonafide_certificate.view_self",
+          "label": "Download one's own approved bonafide certificate"
+        },
+        {
+          "code": "oap.no_dues_case.create",
+          "label": "Initiate no-dues clearance"
+        },
+        {
+          "code": "oap.no_dues_case.view_self",
+          "label": "Track one's own no-dues clearance"
+        },
+        {
+          "code": "oap.no_dues_case.view",
+          "label": "See no-dues cases for clearance"
+        },
+        {
+          "code": "oap.no_dues_case.approve",
+          "label": "Finalize no-dues clearance"
+        },
+        {
+          "code": "oap.no_dues_result.update",
+          "label": "Record one's own no-dues domain result"
+        },
+        {
+          "code": "oap.no_dues_certificate.view_self",
+          "label": "Download one's own no-dues certificate"
+        },
+        {
+          "code": "oap.assistantship_claim.create",
+          "label": "Submit an assistantship claim"
+        },
+        {
+          "code": "oap.assistantship_claim.view_self",
+          "label": "Track one's own assistantship claims"
+        },
+        {
+          "code": "oap.assistantship_claim.view",
+          "label": "See assistantship claims routed to you"
+        },
+        {
+          "code": "oap.assistantship_claim.review",
+          "label": "Review and forward an assistantship claim"
+        },
+        {
+          "code": "oap.assistantship_claim.approve",
+          "label": "Approve or reject an assistantship claim"
+        },
+        {
+          "code": "oap.assistantship_claim.update",
+          "label": "Record stipend processing"
+        },
+        {
+          "code": "oap.assistantship_verification.review",
+          "label": "Verify a claim in an assigned supervisor role"
+        },
+        {
+          "code": "oap.thesis_supervisor_assignment.assign",
+          "label": "Record a thesis-supervisor assignment"
+        },
+        {
+          "code": "oap.thesis_supervisor_assignment.view",
+          "label": "See thesis-supervisor assignments"
+        },
+        {
+          "code": "oap.ta_assignment.assign",
+          "label": "Record a TA assignment"
+        },
+        {
+          "code": "oap.ta_assignment.view",
+          "label": "See TA assignments"
+        },
+        {
+          "code": "oap.seminar_request.create",
+          "label": "Request graduate seminar scheduling"
+        },
+        {
+          "code": "oap.seminar_request.view_self",
+          "label": "See one's own seminar requests"
+        },
+        {
+          "code": "oap.seminar_request.view",
+          "label": "See seminar requests routed to you"
+        },
+        {
+          "code": "oap.seminar_schedule.update",
+          "label": "Schedule and log a graduate seminar"
+        },
+        {
+          "code": "oap.seminar_schedule.view",
+          "label": "View graduate seminar schedules"
+        },
+        {
+          "code": "oap.notification.view_self",
+          "label": "See one's own OAP alerts"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [

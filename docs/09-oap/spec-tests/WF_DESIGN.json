@@ -1,0 +1,119 @@
+[
+  {
+    "test_id": "TEST-WF-001",
+    "source_id": "BW-OAP-01 normal-path",
+    "purpose": "Exercise basis workflow BW-OAP-01: Leave Application \u2013 Approved",
+    "preconditions": "Student is authorized; HoD is authorized",
+    "action_or_input": "Student submits leave application -> HoD reviews and approves application",
+    "expected_result": "Leave transitions: Draft -> Submitted -> Approved, notifications dispatched",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-002",
+    "source_id": "BW-OAP-02 rejection-path",
+    "purpose": "Exercise basis workflow BW-OAP-02: Leave Application \u2013 Rejected",
+    "preconditions": "Student is authorized; HoD is authorized",
+    "action_or_input": "Student submits leave application -> HoD reviews and rejects application",
+    "expected_result": "Leave transitions: Draft -> Submitted -> Rejected, notifications dispatched",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-003",
+    "source_id": "CW-OAP-01 composite-decision-branching",
+    "purpose": "Exercise composite workflow CW-OAP-01: Leave Application Decision branching",
+    "preconditions": "Two submitted leave applications exist for students",
+    "action_or_input": "HoD approves first application (BW-OAP-01 path) and rejects second application (BW-OAP-02 path)",
+    "expected_result": "First application reaches terminal Approved state; second reaches terminal Rejected state",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-004",
+    "source_id": "BW-OAP-03 normal-path",
+    "purpose": "Exercise basis workflow BW-OAP-03: Bonafide Request \u2013 Approved",
+    "preconditions": "Student is authorized; Academic Administrator is authorized",
+    "action_or_input": "Student submits bonafide request -> AA verifies request -> AA approves request -> Student downloads certificate",
+    "expected_result": "Transitions: Submitted -> Verified -> Approved -> Downloaded, notifications dispatched",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-005",
+    "source_id": "BW-OAP-04 rejection-path",
+    "purpose": "Exercise basis workflow BW-OAP-04: Bonafide Request \u2013 Rejected",
+    "preconditions": "Student is authorized; Academic Administrator is authorized",
+    "action_or_input": "Student submits bonafide request -> AA verifies request -> AA rejects request",
+    "expected_result": "Transitions: Submitted -> Verified -> Rejected, certificate download unavailable",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-006",
+    "source_id": "CW-OAP-02 composite-decision-branching",
+    "purpose": "Exercise composite workflow CW-OAP-02: Bonafide Request Decision branching",
+    "preconditions": "Two submitted bonafide requests exist",
+    "action_or_input": "AA approves first request (BW-OAP-03 path) and rejects second request (BW-OAP-04 path)",
+    "expected_result": "First request produces downloadable certificate; second request terminates with Rejected status",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-007",
+    "source_id": "BW-OAP-05 normal-path",
+    "purpose": "Exercise basis workflow BW-OAP-05: No-Dues Clearance \u2013 Cleared",
+    "preconditions": "Student is authorized; all seven clearance authorities and AA are authorized",
+    "action_or_input": "Student initiates no-dues -> all 7 authorities record Clear -> AA finalizes -> Student downloads certificate",
+    "expected_result": "Transitions: Initiated -> Verification Complete (All Clear) -> Finalized -> Certificate Downloaded",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-008",
+    "source_id": "BW-OAP-06 dues-outstanding-path",
+    "purpose": "Exercise basis workflow BW-OAP-06: No-Dues Clearance \u2013 Dues Outstanding",
+    "preconditions": "Student initiates no-dues; six authorities record Clear, one authority records Dues Outstanding",
+    "action_or_input": "Authority records Dues Outstanding; AA attempts finalization",
+    "expected_result": "Case enters Verification Complete Dues Outstanding; finalization is blocked until due is cleared",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-009",
+    "source_id": "CW-OAP-03 composite-branching",
+    "purpose": "Exercise composite workflow CW-OAP-03: No-Dues Clearance branching",
+    "preconditions": "Two separate no-dues cases exist",
+    "action_or_input": "Case 1 completes all 7 Clear and finalizes (BW-OAP-05); Case 2 has dues outstanding and finalization is blocked (BW-OAP-06)",
+    "expected_result": "Case 1 reaches Finalized and releases certificate; Case 2 remains unfinalized with dues outstanding",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-010",
+    "source_id": "BW-OAP-07 normal-path",
+    "purpose": "Exercise basis workflow BW-OAP-07: Assistantship Claim \u2013 Approved and Processed",
+    "preconditions": "PG student has active supervisor assignments; TS, TA, DA, HoD, AA are authorized",
+    "action_or_input": "Student submits claim -> TS verifies -> TA verifies -> DA forwards -> HoD approves -> AA processes stipend",
+    "expected_result": "Claim transitions: Submitted -> Supervisor Verified -> Dept Forwarded -> HoD Approved -> Stipend Processed",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-011",
+    "source_id": "BW-OAP-08 rejection-path",
+    "purpose": "Exercise basis workflow BW-OAP-08: Assistantship Claim \u2013 Rejected by HoD",
+    "preconditions": "PG student submits claim; TS and TA verify; DA forwards to HoD",
+    "action_or_input": "HoD records Reject decision on forwarded claim",
+    "expected_result": "Claim transitions to Rejected; stipend processing is not available",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-012",
+    "source_id": "CW-OAP-04 composite-branching",
+    "purpose": "Exercise composite workflow CW-OAP-04: Assistantship Claim Processing branching",
+    "preconditions": "Two assistantship claims are forwarded to HoD",
+    "action_or_input": "HoD approves claim 1 leading to AA stipend processing; HoD rejects claim 2 terminating the claim",
+    "expected_result": "Claim 1 completes stipend processing; Claim 2 terminates in Rejected state",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TEST-WF-013",
+    "source_id": "BW-OAP-09 normal-path",
+    "purpose": "Exercise basis workflow BW-OAP-09: Graduate Seminar Scheduling",
+    "preconditions": "PG student is authorized; Department Administrator is authorized",
+    "action_or_input": "PG student requests seminar scheduling -> DA assigns date/time and venue",
+    "expected_result": "Transitions: Requested -> Scheduled, scheduling history logged, schedule visible to faculty and PG students",
+    "test_type": "workflow"
+  }
+]
