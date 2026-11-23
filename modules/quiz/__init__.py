@@ -1,0 +1,1 @@
+"""Quiz Management domain module."""
