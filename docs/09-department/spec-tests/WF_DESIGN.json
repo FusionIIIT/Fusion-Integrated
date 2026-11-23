@@ -1,0 +1,146 @@
+[
+  {
+    "test_id": "WF-001-01",
+    "source_id": "BW-DEPT-01 Stock Request Approved and Issued Path",
+    "purpose": "Execute complete successful stock lifecycle: request -> HOD approval -> issuance",
+    "preconditions": "Inventory item available; Faculty, HOD, Dept_Admin in department",
+    "action_or_input": "Faculty requests stock -> HOD approves -> Dept_Admin issues",
+    "expected_result": "Transitions: Draft/New -> Pending HOD Approval -> Approved for Issuance -> Issued; stock decremented and logged",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-002-01",
+    "source_id": "BW-DEPT-02 Stock Request Rejected by HOD Path",
+    "purpose": "Execute stock lifecycle ending in HOD rejection",
+    "preconditions": "Inventory item available; Faculty, HOD in department",
+    "action_or_input": "Faculty requests stock -> HOD rejects request with rejection reason",
+    "expected_result": "Transitions: New -> Pending HOD Approval -> Rejected; no stock issued or decremented; Faculty notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-003-01",
+    "source_id": "CW-DEPT-01 Stock Request Composite Lifecycle Approved Branch",
+    "purpose": "Verify composite stock workflow branching to approval and successful issuance",
+    "preconditions": "Inventory stock available; valid Faculty request",
+    "action_or_input": "Run composite stock lifecycle along approval branch to completion",
+    "expected_result": "All transitions and intermediate states (Pending -> Approved -> Issued) validated with audit trail",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-003-02",
+    "source_id": "CW-DEPT-01 Stock Request Composite Lifecycle Rejected Branch",
+    "purpose": "Verify composite stock workflow branching to HOD rejection branch",
+    "preconditions": "Inventory stock available; valid Faculty request",
+    "action_or_input": "Run composite stock lifecycle along rejection branch",
+    "expected_result": "Transitions through Pending HOD Approval to terminal Rejected state",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-004-01",
+    "source_id": "BW-DEPT-03 Feedback Disposed by Dept_Admin Path",
+    "purpose": "Execute feedback workflow where Dept_Admin performs initial review and closes simple issue",
+    "preconditions": "Authenticated Student/Faculty submits feedback; Dept_Admin reviews",
+    "action_or_input": "Feedback submitted (New) -> Dept_Admin reviews & categorizes (Under Review) -> Dept_Admin closes (Closed)",
+    "expected_result": "Transitions: New -> Under Review -> Closed; submitter notified of closure",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-005-01",
+    "source_id": "BW-DEPT-04 Feedback Disposed with HOD Oversight Path",
+    "purpose": "Execute feedback workflow where Dept_Admin reviews and HOD performs resolution",
+    "preconditions": "Feedback submitted; Dept_Admin and HOD active",
+    "action_or_input": "Feedback submitted (New) -> Dept_Admin reviews (Under Review) -> HOD resolves (Resolved)",
+    "expected_result": "Transitions: New -> Under Review -> Resolved; submitter notified of resolution",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-006-01",
+    "source_id": "CW-DEPT-02 Feedback Handling Composite Lifecycle Admin Branch",
+    "purpose": "Verify composite feedback handling lifecycle through Dept_Admin direct resolution",
+    "preconditions": "Feedback submitted into New state",
+    "action_or_input": "Execute composite feedback lifecycle along Dept_Admin initial review and closure path",
+    "expected_result": "Mandatory initial review enforced before terminal disposition",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-006-02",
+    "source_id": "CW-DEPT-02 Feedback Handling Composite Lifecycle HOD Oversight Branch",
+    "purpose": "Verify composite feedback handling lifecycle through HOD oversight and resolution",
+    "preconditions": "Feedback submitted into New state",
+    "action_or_input": "Execute composite feedback lifecycle along HOD oversight path",
+    "expected_result": "Transitions through New -> Under Review -> HOD Resolved/Closed validated",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-007-01",
+    "source_id": "BW-DEPT-05 Official Department Change Approved Path",
+    "purpose": "Execute official change workflow from Dept_Admin proposal to HOD approval",
+    "preconditions": "Authenticated Dept_Admin and HOD in department",
+    "action_or_input": "Dept_Admin proposes official detail change -> HOD approves",
+    "expected_result": "Transitions: Pending HOD Approval -> Approved; official department details updated and effective",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-008-01",
+    "source_id": "BW-DEPT-06 Official Department Change Rejected Path",
+    "purpose": "Execute official change workflow from Dept_Admin proposal to HOD rejection",
+    "preconditions": "Authenticated Dept_Admin and HOD in department",
+    "action_or_input": "Dept_Admin proposes official detail change -> HOD rejects",
+    "expected_result": "Transitions: Pending HOD Approval -> Rejected; official details remain unchanged",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-009-01",
+    "source_id": "CW-DEPT-03 Official Department Change Composite Lifecycle Approved Branch",
+    "purpose": "Verify composite official change lifecycle exercising approval outcome",
+    "preconditions": "Dept_Admin submits official detail change proposal",
+    "action_or_input": "Execute composite official change workflow along approval path",
+    "expected_result": "State transitions to Approved and official details take effect",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-009-02",
+    "source_id": "CW-DEPT-03 Official Department Change Composite Lifecycle Rejected Branch",
+    "purpose": "Verify composite official change lifecycle exercising rejection outcome",
+    "preconditions": "Dept_Admin submits official detail change proposal",
+    "action_or_input": "Execute composite official change workflow along rejection path",
+    "expected_result": "State transitions to Rejected and official details remain in previous state",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-010-01",
+    "source_id": "BW-DEPT-07 HOD Reassignment and Headship Synchronization Path",
+    "purpose": "Execute HOD role reassignment and synchronize displayed department Headship",
+    "preconditions": "Current HOD User A; incoming HOD User B; authenticated Institute Admin",
+    "action_or_input": "Institute Admin records reassignment -> effective transition occurs",
+    "expected_result": "User A HOD access revoked, User B HOD access granted, Headship display synchronized to User B",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-011-01",
+    "source_id": "BW-DEPT-08 Dept_Admin Role Reassignment and Access Transition Path",
+    "purpose": "Execute Dept_Admin reassignment and immediate access transition",
+    "preconditions": "Current Dept_Admin User A; incoming Dept_Admin User B; authenticated Institute Admin",
+    "action_or_input": "Institute Admin records reassignment -> effective transition occurs",
+    "expected_result": "User A Dept_Admin access revoked, User B Dept_Admin access granted immediately",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-012-01",
+    "source_id": "CW-DEPT-04 Department Role Reassignment Composite Lifecycle HOD Path",
+    "purpose": "Verify composite role reassignment lifecycle for HOD role with tenure and uniqueness",
+    "preconditions": "Central assignment maintenance; valid time bounds; unique active role rule",
+    "action_or_input": "Execute composite role lifecycle for HOD transition",
+    "expected_result": "Validation, tenure recording, atomic handoff, and single active holder enforced",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "WF-012-02",
+    "source_id": "CW-DEPT-04 Department Role Reassignment Composite Lifecycle Dept_Admin Path",
+    "purpose": "Verify composite role reassignment lifecycle for Dept_Admin role",
+    "preconditions": "Central assignment maintenance; valid time bounds; unique active role rule",
+    "action_or_input": "Execute composite role lifecycle for Dept_Admin transition",
+    "expected_result": "Validation, tenure recording, atomic handoff, and single active holder enforced",
+    "test_type": "positive"
+  }
+]
