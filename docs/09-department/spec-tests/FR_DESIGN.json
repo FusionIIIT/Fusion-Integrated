@@ -1,0 +1,542 @@
+[
+  {
+    "test_id": "FR-001",
+    "source_id": "AFR-DEPT-001 Eligible publishers (CFR-DEPT-001)",
+    "purpose": "Eligible publishers",
+    "preconditions": "One authenticated Faculty member, Dept_Admin and HOD in the department",
+    "action_or_input": "Have each actor create and publish a distinct targeted announcement",
+    "expected_result": "Each actor's announcement is published with its selected audience",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-002",
+    "source_id": "AFR-DEPT-046 Publication notifications (CFR-DEPT-001)",
+    "purpose": "Publication notifications",
+    "preconditions": "A new announcement targets both Student and Faculty audiences, with matching and nonmatching users in each",
+    "action_or_input": "Publish the announcement and check recipients",
+    "expected_result": "Matching Students and Faculty receive the publication notification and users outside the target do not",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-003",
+    "source_id": "AFR-DEPT-002 All three audience filters (CFR-DEPT-002)",
+    "purpose": "All three audience filters",
+    "preconditions": "A published announcement and otherwise comparable viewers differing individually in role, program or academic year",
+    "action_or_input": "Read the announcement as a full match and as each single-dimension mismatch",
+    "expected_result": "The full match can see it and each mismatch cannot",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-004",
+    "source_id": "AFR-DEPT-003 Relevant announcement access (CFR-DEPT-002)",
+    "purpose": "Relevant announcement access",
+    "preconditions": "An authenticated department user and a published announcement relevant to that user",
+    "action_or_input": "Open the announcement feed",
+    "expected_result": "The relevant announcement is visible to the user",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-005",
+    "source_id": "AFR-DEPT-004 HOD edits an active announcement (CFR-DEPT-003)",
+    "purpose": "HOD edits an active announcement",
+    "preconditions": "An active department announcement published by another eligible user",
+    "action_or_input": "Have the HOD change its content",
+    "expected_result": "The active announcement reflects the HOD's change",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-006",
+    "source_id": "AFR-DEPT-005 HOD hides an active announcement (CFR-DEPT-003)",
+    "purpose": "HOD hides an active announcement",
+    "preconditions": "An active announcement visible to a matching user",
+    "action_or_input": "Have the HOD hide the announcement and check the matching user's feed",
+    "expected_result": "The announcement is hidden from the matching user",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-007",
+    "source_id": "AFR-DEPT-006 HOD deletes an active announcement (CFR-DEPT-003)",
+    "purpose": "HOD deletes an active announcement",
+    "preconditions": "An active announcement published by another eligible user",
+    "action_or_input": "Have the HOD delete the announcement",
+    "expected_result": "The deleted announcement is no longer available as an active announcement",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-008",
+    "source_id": "AFR-DEPT-007 Department stock insertion (CFR-DEPT-004)",
+    "purpose": "Department stock insertion",
+    "preconditions": "A Dept_Admin and a stock item to add to the department",
+    "action_or_input": "Insert a stock record with a known quantity",
+    "expected_result": "The stock record exists in the department inventory",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-009",
+    "source_id": "AFR-DEPT-008 Current quantity is maintained (CFR-DEPT-004)",
+    "purpose": "Current quantity is maintained",
+    "preconditions": "An inventory item with an initial quantity and a valid stock insertion for that item",
+    "action_or_input": "Record the insertion and read the current inventory state",
+    "expected_result": "The current item quantity reflects the known addition",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-010",
+    "source_id": "AFR-DEPT-014 Immutable insertion log (CFR-DEPT-004)",
+    "purpose": "Immutable insertion log",
+    "preconditions": "A Dept_Admin able to insert stock",
+    "action_or_input": "Insert stock, inspect the resulting movement and attempt to alter or remove that movement",
+    "expected_result": "An insertion movement records the item and quantity and persists unchanged",
+    "test_type": "integrity"
+  },
+  {
+    "test_id": "FR-011",
+    "source_id": "AFR-DEPT-009 Faculty submits a request (CFR-DEPT-005)",
+    "purpose": "Faculty submits a request",
+    "preconditions": "An authenticated Faculty member and a department inventory item with sufficient stock",
+    "action_or_input": "Submit a stock request",
+    "expected_result": "The request is accepted for HOD approval",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-012",
+    "source_id": "AFR-DEPT-010 Request quantity equal to availability (CFR-DEPT-005)",
+    "purpose": "Request quantity equal to availability",
+    "preconditions": "An item with a positive available quantity and an eligible Faculty requester",
+    "action_or_input": "Request exactly the quantity currently available",
+    "expected_result": "The quantity check accepts the request for approval",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-013",
+    "source_id": "AFR-DEPT-010 Request quantity above availability (CFR-DEPT-005)",
+    "purpose": "Request quantity above availability",
+    "preconditions": "An item with a known positive available quantity and an eligible Faculty requester",
+    "action_or_input": "Request one more than the available quantity",
+    "expected_result": "The request does not proceed to HOD approval and inventory stays unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-014",
+    "source_id": "AFR-DEPT-011 Both HOD decisions (CFR-DEPT-005)",
+    "purpose": "Both HOD decisions",
+    "preconditions": "Two distinct requests pending HOD decision",
+    "action_or_input": "Have the HOD approve one and reject the other",
+    "expected_result": "The selected requests reach Approved and Rejected respectively",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-015",
+    "source_id": "AFR-DEPT-012 Approved issuance (CFR-DEPT-005)",
+    "purpose": "Approved issuance",
+    "preconditions": "A stock request already approved by the HOD and a Dept_Admin",
+    "action_or_input": "Have the Dept_Admin issue the requested item",
+    "expected_result": "The request reaches Issued",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-016",
+    "source_id": "AFR-DEPT-012 Issuance requires prior approval (CFR-DEPT-005)",
+    "purpose": "Issuance requires prior approval",
+    "preconditions": "A pending request, a rejected request and a Dept_Admin",
+    "action_or_input": "Attempt to issue each unapproved request",
+    "expected_result": "Both attempts are refused and neither request nor inventory changes",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-017",
+    "source_id": "AFR-DEPT-013 Issuance deducts the requested quantity (CFR-DEPT-005)",
+    "purpose": "Issuance deducts the requested quantity",
+    "preconditions": "An approved request for a known quantity and an inventory balance sufficient for issue",
+    "action_or_input": "Have the Dept_Admin issue the stock and read the balance",
+    "expected_result": "The balance decreases by the issued quantity",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-018",
+    "source_id": "AFR-DEPT-015 Immutable issuance log (CFR-DEPT-005)",
+    "purpose": "Immutable issuance log",
+    "preconditions": "An approved stock request that can be issued",
+    "action_or_input": "Issue stock, inspect the movement and attempt to alter or remove it",
+    "expected_result": "An issuance movement records the item and quantity and persists unchanged",
+    "test_type": "integrity"
+  },
+  {
+    "test_id": "FR-019",
+    "source_id": "AFR-DEPT-041 New request alerts Dept_Admin (CFR-DEPT-005)",
+    "purpose": "New request alerts Dept_Admin",
+    "preconditions": "An eligible Faculty requester, available stock and the department's Dept_Admin",
+    "action_or_input": "Submit a new stock request",
+    "expected_result": "The Dept_Admin receives a notification about the new request",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-020",
+    "source_id": "AFR-DEPT-042 Approval request alerts HOD (CFR-DEPT-005)",
+    "purpose": "Approval request alerts HOD",
+    "preconditions": "The department has a HOD and the Faculty requester can submit a valid stock request",
+    "action_or_input": "Submit a request that proceeds to HOD authorization",
+    "expected_result": "The HOD receives a notification about the request requiring authorization",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-021",
+    "source_id": "AFR-DEPT-043 Requester receives both kinds of final outcome (CFR-DEPT-005)",
+    "purpose": "Requester receives both kinds of final outcome",
+    "preconditions": "One request ready to issue and one request pending rejection, with known Faculty requesters",
+    "action_or_input": "Issue the approved request and have the HOD reject the other",
+    "expected_result": "Each requesting Faculty member receives the notification for their own final outcome",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-022",
+    "source_id": "AFR-DEPT-016 Faculty issued history is relevant (CFR-DEPT-006)",
+    "purpose": "Faculty issued history is relevant",
+    "preconditions": "Two Faculty members with distinct issued items and a pending request for one member",
+    "action_or_input": "Open issued-stock history as that Faculty member",
+    "expected_result": "The relevant issued item appears, and the other Faculty member's item and pending request are absent",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-023",
+    "source_id": "AFR-DEPT-017 Both feedback submitter roles (CFR-DEPT-007)",
+    "purpose": "Both feedback submitter roles",
+    "preconditions": "An authenticated department Student and Faculty member",
+    "action_or_input": "Submit distinct feedback as each actor",
+    "expected_result": "Both submissions are accepted",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-024",
+    "source_id": "AFR-DEPT-018 Feedback remains confidential (CFR-DEPT-007)",
+    "purpose": "Feedback remains confidential",
+    "preconditions": "A submitted feedback item, an authorized handler and a user outside the authorized handling scope",
+    "action_or_input": "Attempt to read it as each user",
+    "expected_result": "The authorized handler can read it and the outside user cannot retrieve its confidential content",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-025",
+    "source_id": "AFR-DEPT-044 New feedback alerts Dept_Admin (CFR-DEPT-007)",
+    "purpose": "New feedback alerts Dept_Admin",
+    "preconditions": "An eligible feedback submitter and the department's Dept_Admin",
+    "action_or_input": "Submit feedback",
+    "expected_result": "The Dept_Admin receives a notification about the submission",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-026",
+    "source_id": "AFR-DEPT-019 Initial feedback review (CFR-DEPT-008)",
+    "purpose": "Initial feedback review",
+    "preconditions": "New feedback awaiting review and a Dept_Admin",
+    "action_or_input": "Perform the initial review as the Dept_Admin",
+    "expected_result": "The feedback leaves the unreviewed state and records completed initial review",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-027",
+    "source_id": "AFR-DEPT-020 Initial review categorization (CFR-DEPT-008)",
+    "purpose": "Initial review categorization",
+    "preconditions": "New feedback and a permitted category",
+    "action_or_input": "Have the Dept_Admin categorize the item during initial review",
+    "expected_result": "The selected category is retained on the reviewed item",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-028",
+    "source_id": "AFR-DEPT-021 Close a simple issue during initial review (CFR-DEPT-008)",
+    "purpose": "Close a simple issue during initial review",
+    "preconditions": "Unreviewed feedback considered a simple issue",
+    "action_or_input": "Have the Dept_Admin review and close it in the initial review",
+    "expected_result": "The item reaches Closed through that initial review",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-029",
+    "source_id": "AFR-DEPT-022 Both reviewers can reach both terminal states (CFR-DEPT-008)",
+    "purpose": "Both reviewers can reach both terminal states",
+    "preconditions": "Distinct feedback items with Dept_Admin initial review complete",
+    "action_or_input": "Have the Dept_Admin resolve one and close another and have the HOD resolve and close two others",
+    "expected_result": "Each supported action reaches its selected terminal state",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-030",
+    "source_id": "AFR-DEPT-022 HOD terminal action requires initial review (CFR-DEPT-008)",
+    "purpose": "HOD terminal action requires initial review",
+    "preconditions": "New feedback with no Dept_Admin initial review",
+    "action_or_input": "Have the HOD attempt to resolve it and attempt to close it",
+    "expected_result": "Neither terminal action takes effect and the item remains unreviewed",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-031",
+    "source_id": "AFR-DEPT-023 HOD oversight starts after initial review (CFR-DEPT-008)",
+    "purpose": "HOD oversight starts after initial review",
+    "preconditions": "New feedback and the department's HOD and Dept_Admin",
+    "action_or_input": "Check HOD access before and after Dept_Admin initial review",
+    "expected_result": "The HOD cannot access the item before review and can access it afterward",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-032",
+    "source_id": "AFR-DEPT-045 Submitter notified on resolution and closure (CFR-DEPT-008)",
+    "purpose": "Submitter notified on resolution and closure",
+    "preconditions": "Two reviewed items with known submitters",
+    "action_or_input": "Resolve one item and close the other through supported review actions",
+    "expected_result": "Each submitter receives a notification of their item's terminal outcome",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-033",
+    "source_id": "AFR-DEPT-024 Department profile management (CFR-DEPT-009)",
+    "purpose": "Department profile management",
+    "preconditions": "A Dept_Admin and Faculty, Student and Alumni profiles within the department",
+    "action_or_input": "Perform an authorized profile-management update on each profile",
+    "expected_result": "Each authorized update persists on the intended profile",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-034",
+    "source_id": "AFR-DEPT-024 Management stays within the department (CFR-DEPT-009)",
+    "purpose": "Management stays within the department",
+    "preconditions": "A Dept_Admin and a profile in a different department",
+    "action_or_input": "Attempt the same profile-management update across departments",
+    "expected_result": "The update is refused and the other department's profile stays unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-035",
+    "source_id": "AFR-DEPT-025 Student profile visibility is basic (CFR-DEPT-010)",
+    "purpose": "Student profile visibility is basic",
+    "preconditions": "A Student viewer, a peer Student and a Faculty profile containing both basic and non-basic fields under the applicable policy",
+    "action_or_input": "Read both profiles as the Student",
+    "expected_result": "Both views contain only basic permitted fields",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-036",
+    "source_id": "AFR-DEPT-026 Faculty sees detailed profiles for Students in their courses (CFR-DEPT-010)",
+    "purpose": "Faculty sees detailed profiles for Students in their courses",
+    "preconditions": "A Faculty viewer and an enrolled Student whose profile has permitted detailed fields",
+    "action_or_input": "Read the Student profile as the Faculty member",
+    "expected_result": "Detailed permitted profile information is visible",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-037",
+    "source_id": "AFR-DEPT-026 Detailed access is scoped to the Faculty course relationship (CFR-DEPT-010)",
+    "purpose": "Detailed access is scoped to the Faculty course relationship",
+    "preconditions": "A Faculty viewer and a Student outside that Faculty member's courses",
+    "action_or_input": "Attempt to retrieve the same detailed profile information",
+    "expected_result": "Course-scoped detailed information is withheld",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-038",
+    "source_id": "AFR-DEPT-027 Faculty and Alumni visibility is limited (CFR-DEPT-010)",
+    "purpose": "Faculty and Alumni visibility is limited",
+    "preconditions": "A Faculty viewer and Faculty and Alumni profiles containing limited-scope fields and fields outside that scope",
+    "action_or_input": "Read both profiles as the Faculty member",
+    "expected_result": "Each view is limited to its permitted fields",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-039",
+    "source_id": "AFR-DEPT-028 Full department view excludes protected data (CFR-DEPT-010)",
+    "purpose": "Full department view excludes protected data",
+    "preconditions": "HOD and Dept_Admin viewers and department profiles containing permitted and policy-protected fields",
+    "action_or_input": "Read the department profiles as each role",
+    "expected_result": "Both roles receive the full permitted profile and no protected sensitive fields",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-040",
+    "source_id": "AFR-DEPT-029 Upload class and lab timetables (CFR-DEPT-011)",
+    "purpose": "Upload class and lab timetables",
+    "preconditions": "A Dept_Admin and valid conflict-free class and lab timetable entries",
+    "action_or_input": "Upload both kinds of timetable",
+    "expected_result": "Both sets of entries are saved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-041",
+    "source_id": "AFR-DEPT-030 Modify class and lab timetables (CFR-DEPT-011)",
+    "purpose": "Modify class and lab timetables",
+    "preconditions": "Existing class and lab timetable entries and a Dept_Admin",
+    "action_or_input": "Make a conflict-free modification to each kind",
+    "expected_result": "Both modifications are saved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-042",
+    "source_id": "AFR-DEPT-031 Block overlapping timetable uploads (CFR-DEPT-011)",
+    "purpose": "Block overlapping timetable uploads",
+    "preconditions": "A Dept_Admin and an upload containing overlapping slots",
+    "action_or_input": "Attempt the upload and inspect the timetable afterward",
+    "expected_result": "The conflict is detected and no conflicting upload is saved",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-043",
+    "source_id": "AFR-DEPT-031 Block overlapping timetable edits (CFR-DEPT-011)",
+    "purpose": "Block overlapping timetable edits",
+    "preconditions": "An existing valid timetable and an edit that overlaps another slot",
+    "action_or_input": "Attempt the edit and reload the timetable",
+    "expected_result": "The edit is refused and the saved timetable remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-044",
+    "source_id": "AFR-DEPT-034 Update lab resource details (CFR-DEPT-012)",
+    "purpose": "Update lab resource details",
+    "preconditions": "A Dept_Admin and a department lab profile with equipment and resource details",
+    "action_or_input": "Update the equipment and resource details",
+    "expected_result": "The changed details are retained on the lab profile",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-045",
+    "source_id": "AFR-DEPT-035 Faculty can view lab profiles (CFR-DEPT-012)",
+    "purpose": "Faculty can view lab profiles",
+    "preconditions": "A Faculty member and department lab profiles with known resource details",
+    "action_or_input": "Open the lab resource profiles as Faculty",
+    "expected_result": "The resource profiles and their details are available for planning",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-046",
+    "source_id": "AFR-DEPT-036 Student academic program information (CFR-DEPT-013)",
+    "purpose": "Student academic program information",
+    "preconditions": "A Student and department academic program information",
+    "action_or_input": "Open department academic program information as the Student",
+    "expected_result": "The department's program information is visible",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-047",
+    "source_id": "AFR-DEPT-037 Applicable Student timetable (CFR-DEPT-013)",
+    "purpose": "Applicable Student timetable",
+    "preconditions": "A Student and applicable class and lab timetable entries",
+    "action_or_input": "Open the timetable as the Student",
+    "expected_result": "Applicable class and lab entries are visible",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-048",
+    "source_id": "AFR-DEPT-038 General department detail update (CFR-DEPT-014)",
+    "purpose": "General department detail update",
+    "preconditions": "A Dept_Admin and a non-official department detail",
+    "action_or_input": "Update the general detail and reload published department information",
+    "expected_result": "The updated general information is visible",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-049",
+    "source_id": "AFR-DEPT-039 Pending official detail stays unpublished (CFR-DEPT-015)",
+    "purpose": "Pending official detail stays unpublished",
+    "preconditions": "A current official detail and a Dept_Admin with a proposed value for an independently editable official field",
+    "action_or_input": "Submit the proposal, then inspect both the pending change and published detail before HOD decision",
+    "expected_result": "The proposal is pending and the published detail retains the current value",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-050",
+    "source_id": "AFR-DEPT-040 Approved official change becomes effective (CFR-DEPT-015)",
+    "purpose": "Approved official change becomes effective",
+    "preconditions": "A pending official-detail proposal and the HOD",
+    "action_or_input": "Approve the proposal and reload the department detail",
+    "expected_result": "The proposal is approved and its official value becomes effective",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-051",
+    "source_id": "AFR-DEPT-040 Rejected official change retains current data (CFR-DEPT-015)",
+    "purpose": "Rejected official change retains current data",
+    "preconditions": "A pending official-detail proposal and an existing published value",
+    "action_or_input": "Have the HOD reject the proposal and reload the department detail",
+    "expected_result": "The proposal is rejected and the published value remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "FR-052",
+    "source_id": "AFR-DEPT-047 Central authority assigns both department roles (CFR-DEPT-016)",
+    "purpose": "Central authority assigns both department roles",
+    "preconditions": "An authorized Institute Admin, eligible institute employees and a department",
+    "action_or_input": "Have the central authority assign the HOD and Dept_Admin roles according to the validity rules",
+    "expected_result": "Each eligible employee holds the intended department role during its active interval",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-053",
+    "source_id": "AFR-DEPT-047 Department roles require central assignment authority (CFR-DEPT-016)",
+    "purpose": "Department roles require central assignment authority",
+    "preconditions": "A department actor without central assignment authority and existing valid role assignments",
+    "action_or_input": "Attempt to assign or reassign either role as that actor",
+    "expected_result": "The assignments are refused and existing role holders stay unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "FR-054",
+    "source_id": "AFR-DEPT-048 Each assignment has a validity interval (CFR-DEPT-016)",
+    "purpose": "Each assignment has a validity interval",
+    "preconditions": "Scheduled successor HOD and Dept_Admin assignments with an effective start and end and valid neighboring assignments",
+    "action_or_input": "Inspect each role's effective holder before, during and after the successor's validity interval",
+    "expected_result": "Each successor is active only during its validity interval",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-055",
+    "source_id": "AFR-DEPT-049 Revoke outgoing access at the effective transition (CFR-DEPT-016)",
+    "purpose": "Revoke outgoing access at the effective transition",
+    "preconditions": "An outgoing HOD and Dept_Admin with scheduled successor assignments and known role-specific operations",
+    "action_or_input": "Exercise each outgoing holder's department-role access immediately before and at the effective transition",
+    "expected_result": "The outgoing holders have the role access before the transition and lose it when the transition takes effect",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-056",
+    "source_id": "AFR-DEPT-050 Grant incoming access at the effective transition (CFR-DEPT-016)",
+    "purpose": "Grant incoming access at the effective transition",
+    "preconditions": "Incoming HOD and Dept_Admin with scheduled assignments and no other grant of the tested role-specific operations",
+    "action_or_input": "Exercise each incoming holder's department-role access immediately before and at the effective transition",
+    "expected_result": "Incoming holders lack the role access before the transition and gain it when the transition takes effect",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-057",
+    "source_id": "AFR-DEPT-051 Exactly one active HOD (CFR-DEPT-016)",
+    "purpose": "Exactly one active HOD",
+    "preconditions": "A department with one valid active HOD and a central authority",
+    "action_or_input": "Attempt a second simultaneous HOD and an update that would leave a gap before the successor",
+    "expected_result": "Neither attempt can leave the department with two or zero active HODs",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-058",
+    "source_id": "AFR-DEPT-052 Exactly one active Dept_Admin (CFR-DEPT-016)",
+    "purpose": "Exactly one active Dept_Admin",
+    "preconditions": "A department with one valid active Dept_Admin and a central authority",
+    "action_or_input": "Attempt a second simultaneous Dept_Admin and an update that would leave a gap before the successor",
+    "expected_result": "Neither attempt can leave the department with two or zero active Dept_Admins",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "FR-059",
+    "source_id": "AFR-DEPT-053 Displayed Headship follows effective HOD (CFR-DEPT-016)",
+    "purpose": "Displayed Headship follows effective HOD",
+    "preconditions": "The department has a current HOD and a scheduled HOD successor",
+    "action_or_input": "Read displayed Headship before and at the effective transition",
+    "expected_result": "Displayed Headship identifies the current HOD before the transition and the successor when the assignment takes effect",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "FR-060",
+    "source_id": "AFR-DEPT-053 Headship cannot be independently edited as an official detail (CFR-DEPT-016)",
+    "purpose": "Headship cannot be independently edited as an official detail",
+    "preconditions": "An active HOD assignment and a Dept_Admin authorized to propose independent official details",
+    "action_or_input": "Attempt to propose a different Headship through the official-detail change process",
+    "expected_result": "The attempt cannot change the displayed Headship or create an independently approvable Headship change",
+    "test_type": "negative"
+  }
+]

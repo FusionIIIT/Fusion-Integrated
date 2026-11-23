@@ -1,0 +1,398 @@
+[
+  {
+    "test_id": "UC-001-01",
+    "source_id": "UC-DEPT-001 Main Success Scenario",
+    "purpose": "View active announcements matching viewer role, program, and academic year",
+    "preconditions": "Authenticated department user; active announcements exist matching viewer context",
+    "action_or_input": "User requests department announcement list",
+    "expected_result": "Matching announcements are displayed without exposing out-of-scope announcements",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-001-02",
+    "source_id": "UC-DEPT-001 Alternative Flow No Relevant Announcement",
+    "purpose": "Display empty-state message when no matching active announcement exists",
+    "preconditions": "Authenticated department user; no announcements target the user context",
+    "action_or_input": "User requests department announcement list",
+    "expected_result": "System displays an empty-state message and no announcements",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "UC-002-01",
+    "source_id": "UC-DEPT-002 Main Success Scenario",
+    "purpose": "Eligible actor creates and publishes targeted announcement with notifications",
+    "preconditions": "Authenticated Faculty, Dept_Admin, or HOD; valid title, content, target scope",
+    "action_or_input": "Submit valid announcement publication form",
+    "expected_result": "Announcement is published and notifications dispatched to targeted scope",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-002-02",
+    "source_id": "UC-DEPT-002 Alternative Flow Invalid/Missing Target or Content",
+    "purpose": "Block announcement publication when required content or target scope is invalid/missing",
+    "preconditions": "Authenticated eligible actor; empty title or missing target audience scope",
+    "action_or_input": "Submit announcement creation form with invalid data",
+    "expected_result": "Publication is blocked, validation feedback shown, announcement not created",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-003-01",
+    "source_id": "UC-DEPT-003 Main Success Scenario Edit",
+    "purpose": "HOD edits content and target scope of an active department announcement",
+    "preconditions": "Active announcement published; authenticated HOD",
+    "action_or_input": "HOD submits updated content and target scope for the active announcement",
+    "expected_result": "Announcement content and target scope are updated successfully",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-003-02",
+    "source_id": "UC-DEPT-003 Alternative Flow Hide",
+    "purpose": "HOD hides an active announcement from normal viewing",
+    "preconditions": "Active announcement published; authenticated HOD",
+    "action_or_input": "HOD triggers hide action on the announcement",
+    "expected_result": "Announcement state is updated to hidden and omitted from standard user feeds",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-003-03",
+    "source_id": "UC-DEPT-003 Alternative Flow Delete",
+    "purpose": "HOD deletes an active department announcement",
+    "preconditions": "Active announcement published; authenticated HOD",
+    "action_or_input": "HOD triggers delete action on the announcement",
+    "expected_result": "Announcement is removed from active department announcements",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-004-01",
+    "source_id": "UC-DEPT-004 Main Success Scenario",
+    "purpose": "Faculty submits a stock request when inventory is sufficient",
+    "preconditions": "Authenticated Faculty; inventory item exists with available quantity >= requested quantity",
+    "action_or_input": "Faculty submits request for valid item and quantity",
+    "expected_result": "Request created in Pending HOD Approval state; Dept_Admin and HOD notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-004-02",
+    "source_id": "UC-DEPT-004 Alternative Flow Insufficient Inventory",
+    "purpose": "Reject stock request when requested quantity exceeds available inventory",
+    "preconditions": "Authenticated Faculty; requested quantity exceeds current inventory stock",
+    "action_or_input": "Faculty submits stock request for unavailable quantity",
+    "expected_result": "Request is blocked from entering HOD approval and validation feedback is shown",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-005-01",
+    "source_id": "UC-DEPT-005 Main Success Scenario Approved",
+    "purpose": "HOD approves a pending stock request",
+    "preconditions": "Stock request in Pending HOD Approval state; authenticated HOD",
+    "action_or_input": "HOD submits approval decision",
+    "expected_result": "Request transitions to Approved for Issuance state; made available to Dept_Admin",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-005-02",
+    "source_id": "UC-DEPT-005 Alternative Flow Rejected",
+    "purpose": "HOD rejects a pending stock request",
+    "preconditions": "Stock request in Pending HOD Approval state; authenticated HOD",
+    "action_or_input": "HOD submits rejection decision",
+    "expected_result": "Request transitions to Rejected state; requesting Faculty is notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-006-01",
+    "source_id": "UC-DEPT-006 Main Success Scenario",
+    "purpose": "Dept_Admin allocates and issues stock for an approved request",
+    "preconditions": "Stock request in Approved for Issuance state; authenticated Dept_Admin",
+    "action_or_input": "Dept_Admin confirms issuance of approved stock request",
+    "expected_result": "Request transitions to Issued, inventory decrements, immutable movement logged, Faculty notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-007-01",
+    "source_id": "UC-DEPT-007 Main Success Scenario",
+    "purpose": "Authenticated Student or Faculty submits confidential department feedback",
+    "preconditions": "Authenticated Student or Faculty; valid feedback content",
+    "action_or_input": "User submits feedback form",
+    "expected_result": "Feedback stored in New state, marked confidential, Dept_Admin notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-007-02",
+    "source_id": "UC-DEPT-007 Exception Flow Submission Failure",
+    "purpose": "Handle failure during feedback submission atomically without partial state",
+    "preconditions": "Submission payload fails database transaction or required fields missing",
+    "action_or_input": "User submits invalid feedback payload",
+    "expected_result": "No partial feedback saved; failure feedback returned to actor",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-008-01",
+    "source_id": "UC-DEPT-008 Main Success Scenario Under Review",
+    "purpose": "Dept_Admin performs initial review and categorization of new feedback",
+    "preconditions": "Feedback in New state; authenticated Dept_Admin",
+    "action_or_input": "Dept_Admin records category and acknowledges initial review",
+    "expected_result": "Feedback transitions to Under Review state with assigned category",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-008-02",
+    "source_id": "UC-DEPT-008 Alternative Flow Simple Issue Closure",
+    "purpose": "Dept_Admin closes simple feedback directly during initial review",
+    "preconditions": "Feedback in New state; simple issue identified; authenticated Dept_Admin",
+    "action_or_input": "Dept_Admin categorizes and closes the feedback in initial review",
+    "expected_result": "Feedback transitions to Closed state; submitter is notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-008-03",
+    "source_id": "UC-DEPT-008 Alternative Flow Resolved Disposition",
+    "purpose": "Dept_Admin resolves feedback during review",
+    "preconditions": "Feedback under review; authenticated Dept_Admin",
+    "action_or_input": "Dept_Admin marks feedback as Resolved with resolution details",
+    "expected_result": "Feedback transitions to Resolved state; submitter is notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-009-01",
+    "source_id": "UC-DEPT-009 Main Success Scenario",
+    "purpose": "Dept_Admin uploads conflict-free class/lab timetable slots",
+    "preconditions": "Authenticated Dept_Admin; conflict-free timetable slots payload",
+    "action_or_input": "Dept_Admin uploads timetable slots",
+    "expected_result": "Timetable slots are saved successfully and published to department view",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-009-02",
+    "source_id": "UC-DEPT-009 Alternative Flow Slot Conflict Detected",
+    "purpose": "Block saving timetable when slot overlap is detected",
+    "preconditions": "Authenticated Dept_Admin; payload contains overlapping room, instructor, or cohort",
+    "action_or_input": "Dept_Admin submits timetable with overlapping slots",
+    "expected_result": "Save is blocked, conflict error returned, existing timetable unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-010-01",
+    "source_id": "UC-DEPT-010 Main Success Scenario General Details",
+    "purpose": "Dept_Admin updates general (non-official) department details directly",
+    "preconditions": "Authenticated Dept_Admin; valid general information update",
+    "action_or_input": "Dept_Admin saves updated general department details",
+    "expected_result": "General details are updated immediately without requiring HOD approval",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-010-02",
+    "source_id": "UC-DEPT-010 Main Success Scenario Official Change Proposal",
+    "purpose": "Dept_Admin proposes official department detail change requiring HOD approval",
+    "preconditions": "Authenticated Dept_Admin; official detail change proposal",
+    "action_or_input": "Dept_Admin submits proposed official detail change",
+    "expected_result": "Proposal created in Pending HOD Approval state; not published until approved",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-010-03",
+    "source_id": "UC-DEPT-010 Alternative Flow Validation Failure",
+    "purpose": "Reject invalid department detail update",
+    "preconditions": "Authenticated Dept_Admin; invalid payload data",
+    "action_or_input": "Dept_Admin submits malformed department detail update",
+    "expected_result": "Update rejected with validation feedback; no changes applied",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-011-01",
+    "source_id": "UC-DEPT-011 Main Success Scenario",
+    "purpose": "Faculty views department lab equipment and resource profiles",
+    "preconditions": "Authenticated Faculty; lab resources registered in the department",
+    "action_or_input": "Faculty accesses department resource view",
+    "expected_result": "Department lab resources and profiles are displayed within Faculty scope",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-011-02",
+    "source_id": "UC-DEPT-011 Alternative Flow Empty State",
+    "purpose": "Display empty-state when no lab resources exist in department",
+    "preconditions": "Authenticated Faculty; no resources configured in department",
+    "action_or_input": "Faculty accesses department resource view",
+    "expected_result": "System displays empty-state message indicating no resources available",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "UC-012-01",
+    "source_id": "UC-DEPT-012 Main Success Scenario Approved",
+    "purpose": "HOD approves a pending official department detail change",
+    "preconditions": "Official change in Pending HOD Approval state; authenticated HOD",
+    "action_or_input": "HOD submits approval for the pending change",
+    "expected_result": "Change is approved and official department details are updated effectively",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-012-02",
+    "source_id": "UC-DEPT-012 Alternative Flow Rejected",
+    "purpose": "HOD rejects a pending official department detail change",
+    "preconditions": "Official change in Pending HOD Approval state; authenticated HOD",
+    "action_or_input": "HOD submits rejection for the pending change",
+    "expected_result": "Proposal transitions to Rejected; official details remain unchanged",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-014-01",
+    "source_id": "UC-DEPT-014 Main Success Scenario Terminal Disposition",
+    "purpose": "HOD reviews reviewed feedback and marks it Resolved or Closed",
+    "preconditions": "Feedback in Under Review state; authenticated HOD",
+    "action_or_input": "HOD sets feedback status to Resolved or Closed with resolution notes",
+    "expected_result": "Feedback state updated to terminal status; submitter notified",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-014-02",
+    "source_id": "UC-DEPT-014 Alternative Flow Non-Terminal Review",
+    "purpose": "HOD reviews feedback without changing terminal state",
+    "preconditions": "Feedback in Under Review state; authenticated HOD",
+    "action_or_input": "HOD adds oversight notes without terminal disposition",
+    "expected_result": "Feedback remains in Under Review state with oversight recorded",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-015-01",
+    "source_id": "UC-DEPT-015 Main Success Scenario Student Peer View",
+    "purpose": "Student views basic permitted peer/Faculty profile information",
+    "preconditions": "Authenticated Student; target user in department",
+    "action_or_input": "Student requests profile of peer Student or Faculty",
+    "expected_result": "Basic permitted profile information displayed; sensitive data excluded",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "UC-015-02",
+    "source_id": "UC-DEPT-015 Main Success Scenario Faculty Course View",
+    "purpose": "Faculty views detailed profile of student enrolled in Faculty course",
+    "preconditions": "Authenticated Faculty; target student enrolled in Faculty course",
+    "action_or_input": "Faculty requests enrolled student profile",
+    "expected_result": "Detailed academic profile information displayed for enrolled student",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-015-03",
+    "source_id": "UC-DEPT-015 Alternative Flow Faculty Non-Course Student Mismatch",
+    "purpose": "Restrict Faculty from viewing detailed profile of unenrolled student",
+    "preconditions": "Authenticated Faculty; target student not in any course taught by Faculty",
+    "action_or_input": "Faculty requests detailed student profile",
+    "expected_result": "Detailed view denied; only basic permitted profile shown or access restricted",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "UC-015-04",
+    "source_id": "UC-DEPT-015 Alternative Flow HOD/Admin Privacy Masking",
+    "purpose": "Exclude sensitive personal privacy data from HOD and Dept_Admin profile views",
+    "preconditions": "Authenticated HOD or Dept_Admin; target user profile exists",
+    "action_or_input": "HOD or Dept_Admin requests department user profile",
+    "expected_result": "Full department profile returned excluding privacy-protected sensitive data",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "UC-016-01",
+    "source_id": "UC-DEPT-016 Main Success Scenario",
+    "purpose": "Dept_Admin manages department user profile record within authorized scope",
+    "preconditions": "Authenticated Dept_Admin; target user belongs to department",
+    "action_or_input": "Dept_Admin submits authorized profile updates",
+    "expected_result": "Profile changes validated and applied within department scope",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-016-02",
+    "source_id": "UC-DEPT-016 Alternative Flow Validation Failure",
+    "purpose": "Reject invalid user profile modifications",
+    "preconditions": "Authenticated Dept_Admin; invalid profile data submitted",
+    "action_or_input": "Dept_Admin submits invalid profile modification payload",
+    "expected_result": "System rejects invalid update and leaves profile unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-017-01",
+    "source_id": "UC-DEPT-017 Main Success Scenario",
+    "purpose": "Dept_Admin updates lab equipment and resource profiles",
+    "preconditions": "Authenticated Dept_Admin; lab profile exists in department",
+    "action_or_input": "Dept_Admin updates lab equipment details",
+    "expected_result": "Lab profile details saved and reflected in department resources",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-017-02",
+    "source_id": "UC-DEPT-017 Alternative Flow Validation Failure",
+    "purpose": "Reject invalid lab resource profile update",
+    "preconditions": "Authenticated Dept_Admin; invalid resource payload",
+    "action_or_input": "Dept_Admin submits invalid lab profile data",
+    "expected_result": "Update rejected with validation feedback; profile unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-018-01",
+    "source_id": "UC-DEPT-018 Main Success Scenario",
+    "purpose": "Student views published academic program information and applicable timetable",
+    "preconditions": "Authenticated Student; program and timetable published for student cohort",
+    "action_or_input": "Student accesses academic information and timetable view",
+    "expected_result": "Applicable program details and cohort timetable slots are displayed",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-018-02",
+    "source_id": "UC-DEPT-018 Alternative Flow Unavailable Data",
+    "purpose": "Show empty/unavailable state when no program or timetable data published",
+    "preconditions": "Authenticated Student; no timetable or program data published for cohort",
+    "action_or_input": "Student accesses academic timetable view",
+    "expected_result": "System displays empty/unavailable state message",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "UC-019-01",
+    "source_id": "UC-DEPT-019 Main Success Scenario Insertion",
+    "purpose": "Dept_Admin inserts stock item and records immutable movement log",
+    "preconditions": "Authenticated Dept_Admin; valid item name, quantity, category",
+    "action_or_input": "Dept_Admin inserts new inventory item and stock quantity",
+    "expected_result": "Inventory record created/updated, current quantity updated, movement log appended",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-019-02",
+    "source_id": "UC-DEPT-019 Alternative Flow Invalid Stock Data",
+    "purpose": "Reject invalid stock insertion or negative quantity",
+    "preconditions": "Authenticated Dept_Admin; negative quantity or missing item name",
+    "action_or_input": "Dept_Admin submits invalid inventory payload",
+    "expected_result": "Insertion rejected with validation error; no movement logged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-020-01",
+    "source_id": "UC-DEPT-020 Main Success Scenario",
+    "purpose": "Institute Admin records valid time-bounded HOD or Dept_Admin role assignment",
+    "preconditions": "Authenticated Institute Admin; valid institute employee; bounded tenure interval",
+    "action_or_input": "Institute Admin records department role assignment with valid validity interval",
+    "expected_result": "Role assignment recorded with unique active-role constraint enforced",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-020-02",
+    "source_id": "UC-DEPT-020 Alternative Flow Cardinality Violation",
+    "purpose": "Block role assignment that would cause multiple active holders for single department role",
+    "preconditions": "Active assignment already exists without end date or transition plan",
+    "action_or_input": "Institute Admin submits concurrent active assignment for same department role",
+    "expected_result": "System blocks inconsistent assignment and requires valid transition",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "UC-022-01",
+    "source_id": "UC-DEPT-022 Main Success Scenario Role Transition",
+    "purpose": "System executes effective role transition, revoking outgoing and granting incoming access",
+    "preconditions": "Valid recorded role reassignment reaches effective start time; existing outgoing holder",
+    "action_or_input": "Effective role transition event triggered",
+    "expected_result": "Outgoing holder access revoked immediately, incoming holder granted, Headship updated",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-022-02",
+    "source_id": "UC-DEPT-022 Alternative Flow Initial Assignment",
+    "purpose": "Execute initial role assignment when no outgoing role holder exists",
+    "preconditions": "First-time assignment with no outgoing holder reaches effective start time",
+    "action_or_input": "Effective transition event triggered for initial assignment",
+    "expected_result": "Incoming holder granted access immediately without outgoing revocation; single holder active",
+    "test_type": "positive"
+  }
+]
