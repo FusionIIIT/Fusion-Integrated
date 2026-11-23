@@ -105,6 +105,876 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/phc/advisories:
+    get:
+      operationId: v1_phc_advisories_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HealthAdvisory'
+              examples:
+                PublishedAdvisories:
+                  value:
+                  - []
+                  summary: Published advisories
+          description: ''
+    post:
+      operationId: v1_phc_advisories_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthAdvisoryWrite'
+            examples:
+              PublishAdvisory:
+                value:
+                  title: Seasonal health advisory
+                  body: Advisory details
+                summary: Publish advisory
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HealthAdvisoryWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HealthAdvisoryWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthAdvisory'
+          description: ''
+  /api/v1/phc/ambulance-usage:
+    get:
+      operationId: v1_phc_ambulance_usage_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AmbulanceUsage'
+              examples:
+                AmbulanceLog:
+                  value:
+                  - []
+                  summary: Ambulance log
+          description: ''
+    post:
+      operationId: v1_phc_ambulance_usage_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AmbulanceUsageWrite'
+            examples:
+              RecordUse:
+                value:
+                  used_at: '2026-11-23T10:30:00+05:30'
+                  patient_name: Patient Name
+                  destination: Hospital
+                summary: Record use
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AmbulanceUsageWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AmbulanceUsageWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AmbulanceUsage'
+          description: ''
+  /api/v1/phc/directory/patients:
+    get:
+      operationId: v1_phc_directory_patients_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatientSearch'
+              examples:
+                DirectoryMatches:
+                  value:
+                  - - user_id: 1001
+                      display_name: Institute Member
+                      kind: staff
+                  summary: Directory matches
+          description: ''
+  /api/v1/phc/doctor-attendance:
+    get:
+      operationId: v1_phc_doctor_attendance_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attendance'
+              examples:
+                Today'sAttendance:
+                  value:
+                  - []
+                  summary: Today's attendance
+          description: ''
+    post:
+      operationId: v1_phc_doctor_attendance_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttendanceWrite'
+            examples:
+              MarkAvailable:
+                value:
+                  doctor_id: 2
+                  status: available
+                summary: Mark available
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AttendanceWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttendanceWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attendance'
+          description: ''
+  /api/v1/phc/doctor-availability:
+    get:
+      operationId: v1_phc_doctor_availability_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleAvailability'
+              examples:
+                PublishedWeeklyAvailability:
+                  value:
+                  - - id: 4
+                      doctor:
+                        id: 2
+                        display_name: Doctor
+                        specialization: General Medicine
+                        is_active: true
+                      day_of_week: 1
+                      starts_at: 09:00:00
+                      ends_at: '12:00:00'
+                      publication: published
+                      attendance_status: available
+                  summary: Published weekly availability
+          description: ''
+  /api/v1/phc/doctor-schedules:
+    get:
+      operationId: v1_phc_doctor_schedules_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleSlot'
+              examples:
+                ScheduleSlots:
+                  value:
+                  - []
+                  summary: Schedule slots
+          description: ''
+    post:
+      operationId: v1_phc_doctor_schedules_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleSlotPatch'
+            examples:
+              CreateWeeklySlot:
+                value:
+                  display_name: Visiting Doctor
+                  specialization: General Medicine
+                  day_of_week: 1
+                  starts_at: 09:00:00
+                  ends_at: '12:00:00'
+                summary: Create weekly slot
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ScheduleSlotPatch'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScheduleSlotPatch'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleSlot'
+          description: ''
+  /api/v1/phc/doctor-schedules/{id}:
+    patch:
+      operationId: v1_phc_doctor_schedules_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedScheduleSlotWrite'
+            examples:
+              UpdateSlot:
+                value:
+                  day_of_week: 2
+                  starts_at: '10:00:00'
+                  ends_at: '13:00:00'
+                summary: Update slot
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedScheduleSlotWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedScheduleSlotWrite'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleSlot'
+          description: ''
+  /api/v1/phc/doctor-schedules/{id}/publish:
+    post:
+      operationId: v1_phc_doctor_schedules_publish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleSlot'
+              examples:
+                PublishedSlot:
+                  value:
+                    id: 4
+                    publication: published
+                  summary: Published slot
+          description: ''
+  /api/v1/phc/inventory:
+    get:
+      operationId: v1_phc_inventory_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+              examples:
+                InventoryItems:
+                  value:
+                  - []
+                  summary: Inventory items
+          description: ''
+    post:
+      operationId: v1_phc_inventory_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItemWrite'
+            examples:
+              CreateItem:
+                value:
+                  name: Bandage
+                  unit: units
+                  reorder_threshold: 10
+                summary: Create item
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryItemWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryItemWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+  /api/v1/phc/inventory/{id}/movements:
+    post:
+      operationId: v1_phc_inventory_movements_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockAdjustment'
+            examples:
+              AddStock:
+                value:
+                  quantity_delta: 25
+                  reason: Supply received
+                summary: Add stock
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockAdjustment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockAdjustment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryMovement'
+          description: ''
+  /api/v1/phc/inventory/low-stock-alerts:
+    get:
+      operationId: v1_phc_inventory_low_stock_alerts_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LowStockAlert'
+              examples:
+                Low-stockAlerts:
+                  value:
+                  - []
+                  summary: Low-stock alerts
+          description: ''
+  /api/v1/phc/notifications:
+    get:
+      operationId: v1_phc_notifications_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+              examples:
+                Notifications:
+                  value:
+                  - []
+          description: ''
+  /api/v1/phc/records:
+    get:
+      operationId: v1_phc_records_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatientVisit'
+              examples:
+                OwnMedicalHistory:
+                  value:
+                  - - id: 12
+                      patient_user_id: 1001
+                      visited_on: '2026-11-01'
+                      notes: Clinical notes
+                      recorded_by_user_id: 8
+                      prescriptions: []
+                      created_at: '2026-11-01T08:00:00Z'
+                  summary: Own medical history
+          description: ''
+  /api/v1/phc/records/pdf:
+    post:
+      operationId: v1_phc_records_pdf_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalPdfRequest'
+            examples:
+              ExportSelectedVisits:
+                value:
+                  visit_ids:
+                  - 12
+                  - 18
+                summary: Export selected visits
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MedicalPdfRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MedicalPdfRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: PDF containing the caller's selected medical history.
+  /api/v1/phc/reimbursements:
+    get:
+      operationId: v1_phc_reimbursements_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reimbursement'
+              examples:
+                ClaimHistory:
+                  value:
+                  - []
+                  summary: Claim history
+          description: ''
+    post:
+      operationId: v1_phc_reimbursements_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReimbursementWrite'
+            examples:
+              SubmitReimbursementClaim:
+                value:
+                  prescription_id: 13
+                  claim_amount: '1250.00'
+                  expense_date: '2026-11-01'
+                  bill_reference: BILL-23
+                  remarks: Consultation expense
+                summary: Submit reimbursement claim
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReimbursementWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReimbursementWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reimbursement'
+          description: ''
+  /api/v1/phc/reimbursements/{id}/payment:
+    post:
+      operationId: v1_phc_reimbursements_payment_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reimbursement'
+              examples:
+                ClaimStageChanged:
+                  value:
+                    id: 21
+                    state: pending_accounts_verification
+                  summary: Claim stage changed
+          description: ''
+  /api/v1/phc/reimbursements/{id}/review:
+    post:
+      operationId: v1_phc_reimbursements_review_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reimbursement'
+              examples:
+                ClaimStageChanged:
+                  value:
+                    id: 21
+                    state: pending_accounts_verification
+                  summary: Claim stage changed
+          description: ''
+  /api/v1/phc/reimbursements/{id}/sanction:
+    post:
+      operationId: v1_phc_reimbursements_sanction_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SanctionDecision'
+            examples:
+              ApproveSanction:
+                value:
+                  decision: approve
+                summary: Approve sanction
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SanctionDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SanctionDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reimbursement'
+          description: ''
+  /api/v1/phc/reimbursements/{id}/verification:
+    post:
+      operationId: v1_phc_reimbursements_verification_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reimbursement'
+              examples:
+                ClaimStageChanged:
+                  value:
+                    id: 21
+                    state: pending_accounts_verification
+                  summary: Claim stage changed
+          description: ''
+  /api/v1/phc/reports/{report_type}:
+    get:
+      operationId: v1_phc_reports_retrieve
+      parameters:
+      - in: path
+        name: report_type
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+              examples:
+                AggregateReport:
+                  value:
+                    report_type: visits
+                    data:
+                      total: 0
+                      by_month: []
+                  summary: Aggregate report
+          description: ''
+  /api/v1/phc/requisitions:
+    get:
+      operationId: v1_phc_requisitions_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Requisition'
+              examples:
+                RequisitionList:
+                  value:
+                  - []
+                  summary: Requisition list
+          description: ''
+    post:
+      operationId: v1_phc_requisitions_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisitionWrite'
+            examples:
+              SubmitRequisition:
+                value:
+                  lines:
+                  - item_id: 4
+                    quantity: 12
+                summary: Submit requisition
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RequisitionWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RequisitionWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisition'
+          description: ''
+  /api/v1/phc/requisitions/{id}/decision:
+    post:
+      operationId: v1_phc_requisitions_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SanctionDecision'
+            examples:
+              ApproveRequisition:
+                value:
+                  decision: approve
+                summary: Approve requisition
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SanctionDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SanctionDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisition'
+          description: ''
+  /api/v1/phc/requisitions/{id}/fulfill:
+    post:
+      operationId: v1_phc_requisitions_fulfill_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisition'
+              examples:
+                Fulfilled:
+                  value:
+                    id: 32
+                    state: fulfilled
+          description: ''
+  /api/v1/phc/visits:
+    post:
+      operationId: v1_phc_visits_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitWrite'
+            examples:
+              RecordVisit:
+                value:
+                  patient_user_id: 1001
+                  visited_on: '2026-11-23'
+                  notes: Symptoms and clinical remarks
+                  prescription_details: Medicine and dosage instructions
+                  issued_on: '2026-11-23'
+                summary: Record visit
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientVisit'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -1774,6 +2644,47 @@ components:
           minItems: 1
       required:
       - application_ids
+    AmbulanceUsage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        used_at:
+          type: string
+          format: date-time
+          readOnly: true
+        patient_name:
+          type: string
+          readOnly: true
+        destination:
+          type: string
+          readOnly: true
+        recorded_by_user_id:
+          type: integer
+          readOnly: true
+      required:
+      - destination
+      - id
+      - patient_name
+      - recorded_by_user_id
+      - used_at
+    AmbulanceUsageWrite:
+      type: object
+      properties:
+        used_at:
+          type: string
+          format: date-time
+        patient_name:
+          type: string
+          maxLength: 160
+        destination:
+          type: string
+          maxLength: 200
+      required:
+      - destination
+      - patient_name
+      - used_at
     Announcement:
       type: object
       properties:
@@ -1981,6 +2892,52 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    Attendance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doctor:
+          allOf:
+          - $ref: '#/components/schemas/Doctor'
+          readOnly: true
+        attendance_date:
+          type: string
+          format: date
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - attendance_date
+      - doctor
+      - id
+      - status
+      - updated_at
+    AttendanceWrite:
+      type: object
+      properties:
+        doctor_id:
+          type: integer
+          minimum: 1
+        status:
+          $ref: '#/components/schemas/AttendanceWriteStatusEnum'
+      required:
+      - doctor_id
+      - status
+    AttendanceWriteStatusEnum:
+      enum:
+      - available
+      - departed
+      type: string
+      description: |-
+        * `available` - Available
+        * `departed` - Departed
     AudienceEnum:
       enum:
       - students
@@ -2315,6 +3272,14 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
     Detail:
       type: object
       properties:
@@ -2322,6 +3287,26 @@ components:
           type: string
       required:
       - detail
+    Doctor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        specialization:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+      required:
+      - display_name
+      - id
+      - is_active
+      - specialization
     DocumentLink:
       type: object
       description: A Drive link. Validated in core.files.drive.
@@ -2423,6 +3408,44 @@ components:
       - fee_reference
       - season
       - user_id
+    HealthAdvisory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        published_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - body
+      - id
+      - published_at
+      - published_by_user_id
+      - title
+    HealthAdvisoryWrite:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 180
+        body:
+          type: string
+      required:
+      - body
+      - title
     IncidentRecorded:
       type: object
       properties:
@@ -2508,6 +3531,79 @@ components:
         * `tech` - Technical interview
         * `hr` - HR interview
         * `other` - Other
+    InventoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 160
+        unit:
+          type: string
+          maxLength: 40
+        reorder_threshold:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_active:
+          type: boolean
+          readOnly: true
+        stock_quantity:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - is_active
+      - name
+      - reorder_threshold
+      - stock_quantity
+    InventoryItemWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 160
+        unit:
+          type: string
+          default: units
+          maxLength: 40
+        reorder_threshold:
+          type: integer
+          minimum: 1
+      required:
+      - name
+      - reorder_threshold
+    InventoryMovement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item:
+          type: integer
+          readOnly: true
+        quantity_delta:
+          type: integer
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_user_id
+      - created_at
+      - id
+      - item
+      - quantity_delta
+      - reason
     JobPosting:
       type: object
       properties:
@@ -2663,6 +3759,47 @@ components:
       required:
       - password
       - username
+    LowStockAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        quantity_after:
+          type: integer
+          readOnly: true
+        reorder_threshold:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - item
+      - item_name
+      - quantity_after
+      - reorder_threshold
+    MedicalPdfRequest:
+      type: object
+      properties:
+        visit_ids:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          maxItems: 50
+          minItems: 1
+      required:
+      - visit_ids
     ModeEnum:
       enum:
       - online
@@ -2732,6 +3869,41 @@ components:
       - is_late
       - message
       - record
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        event_type:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        target_type:
+          type: string
+          readOnly: true
+        target_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - event_type
+      - id
+      - message
+      - read_at
+      - target_id
+      - target_type
     OffCampusRecord:
       type: object
       properties:
@@ -3085,6 +4257,77 @@ components:
       properties:
         active_role:
           type: string
+    PatchedScheduleSlotWrite:
+      type: object
+      properties:
+        doctor_id:
+          type: integer
+          minimum: 1
+        display_name:
+          type: string
+          maxLength: 160
+        specialization:
+          type: string
+          maxLength: 120
+        day_of_week:
+          type: integer
+          maximum: 6
+          minimum: 0
+        starts_at:
+          type: string
+          format: time
+        ends_at:
+          type: string
+          format: time
+    PatientSearch:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        display_name:
+          type: string
+        kind:
+          type: string
+      required:
+      - display_name
+      - kind
+      - user_id
+    PatientVisit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient_user_id:
+          type: integer
+          readOnly: true
+        visited_on:
+          type: string
+          format: date
+          readOnly: true
+        notes:
+          type: string
+          readOnly: true
+        recorded_by_user_id:
+          type: integer
+          readOnly: true
+        prescriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Prescription'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - notes
+      - patient_user_id
+      - prescriptions
+      - recorded_by_user_id
+      - visited_on
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3145,6 +4388,32 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    Prescription:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        details:
+          type: string
+          readOnly: true
+        issued_on:
+          type: string
+          format: date
+          readOnly: true
+        issued_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - details
+      - id
+      - issued_by_user_id
+      - issued_on
     ProfileDocument:
       type: object
       description: |-
@@ -3201,6 +4470,14 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    PublicationEnum:
+      enum:
+      - draft
+      - published
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `published` - Published
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4743,231 @@ components:
       - message
       - reason
       - route
+    Reimbursement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        claimant_user_id:
+          type: integer
+          readOnly: true
+        prescription:
+          type: integer
+          readOnly: true
+        prescription_issued_on:
+          type: string
+          format: date
+          readOnly: true
+        prescription_details:
+          type: string
+          readOnly: true
+        claim_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        expense_date:
+          type: string
+          format: date
+          readOnly: true
+        bill_reference:
+          type: string
+          readOnly: true
+        remarks:
+          type: string
+          readOnly: true
+        state:
+          allOf:
+          - $ref: '#/components/schemas/ReimbursementStateEnum'
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReimbursementAction'
+          readOnly: true
+      required:
+      - actions
+      - bill_reference
+      - claim_amount
+      - claimant_user_id
+      - expense_date
+      - id
+      - prescription
+      - prescription_details
+      - prescription_issued_on
+      - remarks
+      - state
+      - submitted_at
+    ReimbursementAction:
+      type: object
+      properties:
+        from_state:
+          type: string
+          readOnly: true
+        to_state:
+          type: string
+          readOnly: true
+        event:
+          type: string
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_user_id
+      - created_at
+      - event
+      - from_state
+      - to_state
+    ReimbursementStateEnum:
+      enum:
+      - pending_phc_review
+      - pending_accounts_verification
+      - pending_sanction
+      - approved_for_payment
+      - rejected
+      - reimbursed
+      type: string
+      description: |-
+        * `pending_phc_review` - Pending PHC Review
+        * `pending_accounts_verification` - Pending Accounts Verification
+        * `pending_sanction` - Pending Sanction
+        * `approved_for_payment` - Approved for Payment
+        * `rejected` - Rejected
+        * `reimbursed` - Reimbursed
+    ReimbursementWrite:
+      type: object
+      properties:
+        prescription_id:
+          type: integer
+          minimum: 1
+        claim_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        expense_date:
+          type: string
+          format: date
+        bill_reference:
+          type: string
+          maxLength: 200
+        remarks:
+          type: string
+      required:
+      - claim_amount
+      - expense_date
+      - prescription_id
+    Report:
+      type: object
+      properties:
+        report_type:
+          type: string
+        data: {}
+      required:
+      - data
+      - report_type
+    Requisition:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        originator_user_id:
+          type: integer
+          readOnly: true
+        state:
+          allOf:
+          - $ref: '#/components/schemas/RequisitionStateEnum'
+          readOnly: true
+        decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        fulfilled_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequisitionLineRead'
+          readOnly: true
+      required:
+      - decided_by_user_id
+      - fulfilled_by_user_id
+      - id
+      - lines
+      - originator_user_id
+      - state
+      - submitted_at
+    RequisitionLineRead:
+      type: object
+      properties:
+        item:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        unit:
+          type: string
+          readOnly: true
+        quantity:
+          type: integer
+          readOnly: true
+      required:
+      - item
+      - item_name
+      - quantity
+      - unit
+    RequisitionLineWrite:
+      type: object
+      properties:
+        item_id:
+          type: integer
+          minimum: 1
+        quantity:
+          type: integer
+          minimum: 1
+      required:
+      - item_id
+      - quantity
+    RequisitionStateEnum:
+      enum:
+      - draft
+      - pending_approval
+      - approved
+      - rejected
+      - fulfilled
+      type: string
+      description: |-
+        * `draft` - Draft
+        * `pending_approval` - Pending Approval
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `fulfilled` - Fulfilled
+    RequisitionWrite:
+      type: object
+      properties:
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequisitionLineWrite'
+      required:
+      - lines
     RoundOutcome:
       type: object
       properties:
@@ -3539,6 +5041,13 @@ components:
         * `absent` - Absent
         * `passed` - Passed
         * `failed` - Failed
+    SanctionDecision:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+      required:
+      - decision
     SanctionEnum:
       enum:
       - bar_next_two
@@ -3551,6 +5060,108 @@ components:
         * `deregister` - deregister
         * `bar_season` - bar_season
         * `bar_permanent` - bar_permanent
+    ScheduleAvailability:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doctor:
+          allOf:
+          - $ref: '#/components/schemas/Doctor'
+          readOnly: true
+        day_of_week:
+          type: integer
+          readOnly: true
+        starts_at:
+          type: string
+          format: time
+          readOnly: true
+        ends_at:
+          type: string
+          format: time
+          readOnly: true
+        publication:
+          allOf:
+          - $ref: '#/components/schemas/PublicationEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        attendance_status:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - attendance_status
+      - created_at
+      - day_of_week
+      - doctor
+      - ends_at
+      - id
+      - publication
+      - starts_at
+      - updated_at
+    ScheduleSlot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doctor:
+          allOf:
+          - $ref: '#/components/schemas/Doctor'
+          readOnly: true
+        day_of_week:
+          type: integer
+          readOnly: true
+        starts_at:
+          type: string
+          format: time
+          readOnly: true
+        ends_at:
+          type: string
+          format: time
+          readOnly: true
+        publication:
+          allOf:
+          - $ref: '#/components/schemas/PublicationEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - day_of_week
+      - doctor
+      - ends_at
+      - id
+      - publication
+      - starts_at
+      - updated_at
+    ScheduleSlotPatch:
+      type: object
+      properties:
+        day_of_week:
+          type: integer
+          maximum: 6
+          minimum: 0
+        starts_at:
+          type: string
+          format: time
+        ends_at:
+          type: string
+          format: time
     ScheduledCount:
       type: object
       properties:
@@ -3691,6 +5302,16 @@ components:
       required:
       - available
       - season
+    StockAdjustment:
+      type: object
+      properties:
+        quantity_delta:
+          type: integer
+        reason:
+          type: string
+          maxLength: 200
+      required:
+      - quantity_delta
     SubmitOfferLetter:
       type: object
       properties:
@@ -3814,6 +5435,28 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VisitWrite:
+      type: object
+      properties:
+        patient_user_id:
+          type: integer
+          minimum: 1
+        visited_on:
+          type: string
+          format: date
+        notes:
+          type: string
+        prescription_details:
+          type: string
+        issued_on:
+          type: string
+          format: date
+      required:
+      - issued_on
+      - notes
+      - patient_user_id
+      - prescription_details
+      - visited_on
     WaiveIncident:
       type: object
       properties:

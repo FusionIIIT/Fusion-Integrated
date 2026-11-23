@@ -12,6 +12,15 @@ export const ACCOUNTS = {
   placementOfficer: {
     username: "stf00062", role: "placement_officer", grants: ["placement_officer"],
   },
+  phcCompounder: {
+    username: "stf00062", role: "Compounder", grants: ["Compounder"],
+  },
+  phcAccountsAdmin: {
+    username: "stf00062", role: "Accounts Admin", grants: ["Accounts Admin"],
+  },
+  phcRegistrar: {
+    username: "stf00062", role: "Registrar", grants: ["Registrar"],
+  },
 } as const satisfies Record<string, Account>;
 
 export type AccountKey = keyof typeof ACCOUNTS;
