@@ -6,6 +6,7 @@ STOCK_TRANSITIONS = {
 
 FEEDBACK_TRANSITIONS = {
     ("new", "review", "admin"): "reviewed",
+    ("reviewed", "record_oversight", "hod"): "reviewed",
     ("reviewed", "close", "admin"): "closed",
     ("reviewed", "close", "hod"): "closed",
     ("reviewed", "resolve", "admin"): "resolved",

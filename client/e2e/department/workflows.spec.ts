@@ -102,6 +102,10 @@ async function feedbackJourney(student: Page, admin: Page, hod: Page) {
   await expect(review.getByRole("button", { name: "Resolve" })).toBeVisible();
   await hod.reload();
   const disposition = hod.getByRole("article").filter({ hasText: feedback });
+  await disposition.getByLabel("HOD oversight notes").fill("Discuss at the next meeting");
+  await disposition.getByRole("button", { name: "Record oversight" }).click();
+  await expect(disposition.getByText(/HOD oversight recorded/)).toBeVisible();
+  await expect(disposition.getByText(/reviewed/)).toBeVisible();
   await disposition.getByRole("button", { name: "Resolve" }).click();
   await expect(disposition.getByText(/resolved/)).toBeVisible();
 }

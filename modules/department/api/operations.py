@@ -93,7 +93,9 @@ class FeedbackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feedback
-        fields = ("id", "content", "category", "status", "created_at", "reviewed_at", "disposed_at")
+        fields = ("id", "content", "category", "status", "created_at", "reviewed_at", "disposed_at",
+                  "oversight_at", "oversight_notes")
+        read_only_fields = ("oversight_at", "oversight_notes")
 
 
 class FeedbackSubmissionSerializer(CheckedFields, serializers.Serializer):
@@ -127,9 +129,18 @@ class FeedbackView(DepartmentAccess, generics.ListCreateAPIView):
 
 
 class FeedbackActionSerializer(CheckedFields, serializers.Serializer):
-    action = serializers.ChoiceField(choices=["review", "close", "resolve"])
+    action = serializers.ChoiceField(choices=["review", "record_oversight", "close", "resolve"])
     category = serializers.CharField(max_length=100, required=False)
     close_simple = serializers.BooleanField(default=False)
+    oversight_notes = serializers.CharField(max_length=8000, required=False)
+
+    def validate(self, attrs):
+        recording = attrs["action"] == "record_oversight"
+        if recording and "oversight_notes" not in attrs:
+            raise serializers.ValidationError({"oversight_notes": "Enter the HOD oversight notes."})
+        if not recording and "oversight_notes" in attrs:
+            raise serializers.ValidationError({"oversight_notes": "Use the HOD oversight action."})
+        return attrs
 
 
 class FeedbackActionView(DepartmentAccess, APIView):

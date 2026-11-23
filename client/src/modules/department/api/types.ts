@@ -54,6 +54,8 @@ export interface Feedback {
   created_at: string;
   reviewed_at: string | null;
   disposed_at: string | null;
+  oversight_at: string | null;
+  oversight_notes: string;
 }
 
 export interface ManagedAnnouncement extends Announcement {

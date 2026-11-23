@@ -3293,10 +3293,20 @@ components:
           type: string
           format: date-time
           nullable: true
+        oversight_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        oversight_notes:
+          type: string
+          readOnly: true
       required:
       - content
       - created_at
       - id
+      - oversight_at
+      - oversight_notes
       - status
     FeedbackAction:
       type: object
@@ -3309,16 +3319,21 @@ components:
         close_simple:
           type: boolean
           default: false
+        oversight_notes:
+          type: string
+          maxLength: 8000
       required:
       - action
     FeedbackActionActionEnum:
       enum:
       - review
+      - record_oversight
       - close
       - resolve
       type: string
       description: |-
         * `review` - review
+        * `record_oversight` - record_oversight
         * `close` - close
         * `resolve` - resolve
     FeedbackReceipt:

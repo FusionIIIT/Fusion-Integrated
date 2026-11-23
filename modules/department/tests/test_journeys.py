@@ -115,6 +115,38 @@ def test_feedback_is_reviewed_before_hod_disposition(role_client):
     assert Notice.objects.filter(user_id=20).exists()
 
 
+def test_hod_records_non_terminal_feedback_oversight(role_client):
+    student = role_client("student", user_id=20, kind="student")
+    pk = post(student, "feedback", {"content": "Improve lab access"}).json()["id"]
+    path = f"feedback/{pk}/action"
+    oversight = {"action": "record_oversight", "oversight_notes": "Discuss at the next meeting"}
+
+    hod = role_client("HOD (CSE)", user_id=21)
+    assert post(hod, path, oversight).status_code == 404
+    admin = role_client("deptadmin_cse", kind="staff", user_id=22)
+    assert post(admin, path, {"action": "review", "category": "Access"}).status_code == 200
+    assert post(admin, path, oversight).status_code == 403
+    other_hod = role_client("HOD (ECE)", user_id=23, department="ECE")
+    assert post(other_hod, path, oversight).status_code == 404
+
+    hod = role_client("HOD (CSE)", user_id=21)
+    assert post(hod, path, {"action": "record_oversight"}).status_code == 400
+    recorded = post(hod, path, oversight)
+    assert recorded.status_code == 200
+    assert recorded.json()["status"] == "reviewed"
+    row = Feedback.objects.get(pk=pk)
+    assert row.reviewed_by_id == 22
+    assert row.oversight_by_id == 21
+    assert row.oversight_at is not None
+    assert row.oversight_notes == oversight["oversight_notes"]
+    assert row.disposed_at is None
+    assert not Notice.objects.filter(user_id=20).exists()
+    repeated = post(hod, path, {**oversight, "oversight_notes": "Replacement notes"})
+    assert repeated.status_code == 409
+    row.refresh_from_db()
+    assert row.oversight_notes == oversight["oversight_notes"]
+
+
 def test_timetable_batches_are_atomic_and_student_reads_match_cohort(role_client):
     """UC-DEPT-009, UC-DEPT-018; BR-DEPT-010; AFR-DEPT-029-031/036/037."""
     admin = role_client("deptadmin_cse", kind="staff")

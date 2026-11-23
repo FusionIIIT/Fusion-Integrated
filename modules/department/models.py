@@ -104,6 +104,9 @@ class Feedback(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     reviewed_at = models.DateTimeField(null=True)
     reviewed_by_id = models.PositiveIntegerField(null=True)
+    oversight_at = models.DateTimeField(null=True)
+    oversight_by_id = models.PositiveIntegerField(null=True)
+    oversight_notes = models.TextField(blank=True, default="")
     disposed_at = models.DateTimeField(null=True)
     disposed_by_id = models.PositiveIntegerField(null=True)
 

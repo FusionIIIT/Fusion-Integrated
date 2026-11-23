@@ -149,9 +149,13 @@ def submit_feedback(*, actor, content):
 
 
 @transaction.atomic
-def advance_feedback(*, actor, feedback_id, action, category="", close_simple=False):
+def advance_feedback(*, actor, feedback_id, action, category="", close_simple=False,
+                     oversight_notes=""):
     reviewing = action == "review"
+    overseeing = action == "record_oversight"
     roles = ADMIN_DEPARTMENTS if reviewing else {**ADMIN_DEPARTMENTS, **HOD_DEPARTMENTS}
+    if overseeing:
+        roles = HOD_DEPARTMENTS
     department = _department(actor, p.REVIEW_FEEDBACK if reviewing else p.DISPOSE_FEEDBACK, roles)
     queryset = Feedback.objects.select_for_update().filter(pk=feedback_id, department=department)
     if actor.active_role in HOD_DEPARTMENTS:
@@ -171,6 +175,12 @@ def advance_feedback(*, actor, feedback_id, action, category="", close_simple=Fa
             feedback.status = _next_state(
                 FEEDBACK_TRANSITIONS, feedback.status, "close", office_lane(actor),
             )
+    if overseeing:
+        if feedback.oversight_at is not None:
+            raise ConflictError("HOD oversight has already been recorded for this feedback.")
+        feedback.oversight_at = now
+        feedback.oversight_by_id = actor.user_id
+        feedback.oversight_notes = oversight_notes
     if feedback.status in {Feedback.Status.CLOSED, Feedback.Status.RESOLVED}:
         feedback.disposed_at = now
         feedback.disposed_by_id = actor.user_id
