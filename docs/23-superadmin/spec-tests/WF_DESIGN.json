@@ -1,0 +1,116 @@
+[
+  {
+    "test_id": "WF-01",
+    "source_id": "BW-SA-01 / STT rows 1–2",
+    "purpose": "Verify that an eligible permanent-purge request proceeds to permanent purge when the IT Head approves it.",
+    "preconditions": [
+      "The archived data set has passed its retention period.",
+      "The Super Admin can complete authenticated destructive-action confirmation.",
+      "The IT Head is able to decide the pending purge request."
+    ],
+    "action_or_input": "The Super Admin requests permanent purge and completes authenticated confirmation; the IT Head approves the request.",
+    "expected_result": "The request enters Purge Request Pending IT Head Authorization, then the data set enters Permanently Purged.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-02",
+    "source_id": "BW-SA-02 / STT row 2",
+    "purpose": "Verify that an eligible permanent-purge request is rejected when the IT Head rejects it.",
+    "preconditions": [
+      "The archived data set has passed its retention period.",
+      "The Super Admin can complete authenticated destructive-action confirmation.",
+      "The IT Head is able to decide the pending purge request."
+    ],
+    "action_or_input": "The Super Admin requests permanent purge and completes authenticated confirmation; the IT Head rejects the request.",
+    "expected_result": "The request enters Purge Request Pending IT Head Authorization, then Purge Request Rejected; the data remains archived.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-03",
+    "source_id": "BW-SA-03 / STT rows 1–2",
+    "purpose": "Verify immediate activation and automatic expiry of a valid time-bound role.",
+    "preconditions": [
+      "The target user is eligible for the role.",
+      "Role singularity and conflict checks pass.",
+      "The role requires an end date, and the assignment is not superseded by extension, reassignment, or revocation."
+    ],
+    "action_or_input": "The Super Admin assigns the role with a start date effective immediately and a valid end date; advance to the applicable end date.",
+    "expected_result": "The assignment becomes an Active Time-Bound Role immediately, then becomes Role Expired / Inactive at the end date.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-04",
+    "source_id": "BW-SA-04 / STT rows 1–3",
+    "purpose": "Verify scheduled activation and automatic expiry of a future-dated time-bound role.",
+    "preconditions": [
+      "The target user is eligible for the role.",
+      "Role singularity and conflict checks pass.",
+      "The role requires an end date, and the assignment remains valid and is not superseded by another lifecycle action."
+    ],
+    "action_or_input": "The Super Admin assigns the role with a future start date and valid end date; advance first to the start date and then to the end date.",
+    "expected_result": "The assignment is Scheduled Role Assignment, becomes Active Time-Bound Role on its start date, then becomes Role Expired / Inactive on its end date.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-05",
+    "source_id": "BW-SA-05 / STT rows 1–2",
+    "purpose": "Verify one valid extension of an active time-bound role followed by expiry at the revised end date.",
+    "preconditions": [
+      "The role is active and time-bound.",
+      "The current end date has not passed.",
+      "The new end date and reason are valid, and compatibility and singularity remain valid."
+    ],
+    "action_or_input": "The Super Admin extends the role validity once before the current end date; advance to the revised end date.",
+    "expected_result": "The role remains active with extended validity, then becomes Role Expired / Inactive at the revised end date.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-06",
+    "source_id": "BW-SA-06 / STT row 1",
+    "purpose": "Verify reactivation of a deactivated user who is not archived.",
+    "preconditions": [
+      "The user is deactivated, is not archived, and reactivation is allowed by applicable policy."
+    ],
+    "action_or_input": "The Super Admin selects Reactivate User for the account.",
+    "expected_result": "The user transitions from Deactivated User to Active User.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-07",
+    "source_id": "BW-SA-07 / STT rows 1–2",
+    "purpose": "Verify archival of an eligible deactivated user and restoration within the reversible period.",
+    "preconditions": [
+      "The configured deactivation interval has elapsed.",
+      "No pending transaction blocks archival.",
+      "Required authorization for restoration is available."
+    ],
+    "action_or_input": "The Super Admin archives the user with required critical confirmation; before the reversible period expires, the Super Admin restores the user with required authorization and authenticated confirmation where designated critical.",
+    "expected_result": "The user transitions to Archived User – Reversible, then to User Restored from Archive.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-08",
+    "source_id": "BW-SA-08 / STT rows 1–2; Problem Statement §5, ISS-SA-004",
+    "purpose": "Verify that an archived user's account becomes permanently non-restorable when the reversible period expires and that a later restoration attempt is rejected.",
+    "preconditions": [
+      "The user is eligible for archival and required critical confirmation succeeds.",
+      "The configured reversible period expires without a completed restoration."
+    ],
+    "action_or_input": "The Super Admin archives the user; advance beyond the reversible period, then attempt to restore the archived account.",
+    "expected_result": "The user transitions from Archived User – Reversible to Archived User – Permanent / Non-Restorable; the restoration attempt is rejected and the account remains non-restorable.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "WF-09",
+    "source_id": "BW-SA-09 / STT rows 1–2",
+    "purpose": "Verify archival of eligible historical data and its later approved restoration.",
+    "preconditions": [
+      "The historical data satisfies retention, completion, and dependency criteria.",
+      "Authenticated confirmation succeeds and backup is completed.",
+      "Required approval for restoration exists and restoration is allowed by policy."
+    ],
+    "action_or_input": "The Super Admin archives the eligible historical data; later, the Super Admin restores it with required critical confirmation where applicable.",
+    "expected_result": "The data transitions to Archived Historical Data, then to Historical Data Restored to Active System.",
+    "test_type": "workflow"
+  }
+]

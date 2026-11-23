@@ -38,3 +38,18 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `superadmin`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `superadmin.dashboard.view` | View admin dashboard and metrics | `it_head`, `super_admin` |
+| `superadmin.archival.view` | View archived users and historical datasets | `it_head`, `super_admin` |
+| `superadmin.archival.add` | Archive users and historical datasets | `super_admin` |
+| `superadmin.archival.change` | Restore archived users and datasets | `super_admin` |
+| `superadmin.purge.view` | View permanent purge requests | `it_head`, `super_admin` |
+| `superadmin.purge.add` | Initiate and execute permanent purge | `super_admin` |
+| `superadmin.purge.change` | Authorize or reject dual-auth purge | `it_head` |
+| `superadmin.policy.view` | View system governance policies | `it_head`, `super_admin` |
+| `superadmin.policy.change` | Supersede system governance policies | `super_admin` |
+| `superadmin.audit.view` | View and export compliance audit logs | `it_head`, `super_admin` |

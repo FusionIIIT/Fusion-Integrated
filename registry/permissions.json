@@ -278,6 +278,131 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "superadmin": {
+      "grants": {
+        "it_head": [
+          "superadmin.archival.view",
+          "superadmin.audit.view",
+          "superadmin.dashboard.view",
+          "superadmin.policy.view",
+          "superadmin.purge.change",
+          "superadmin.purge.view"
+        ],
+        "super_admin": [
+          "superadmin.archival.add",
+          "superadmin.archival.change",
+          "superadmin.archival.view",
+          "superadmin.audit.view",
+          "superadmin.dashboard.view",
+          "superadmin.policy.change",
+          "superadmin.policy.view",
+          "superadmin.purge.add",
+          "superadmin.purge.view"
+        ]
+      },
+      "module_grants": [
+        "it_head",
+        "super_admin"
+      ],
+      "nav": {
+        "base_path": "/superadmin",
+        "icon": "ShieldCheck",
+        "items": [
+          {
+            "code": "superadmin.dashboard",
+            "icon": "ChartPie",
+            "label": "Dashboard",
+            "required_permission": "superadmin.dashboard.view",
+            "sort_order": 10,
+            "to": "/superadmin/dashboard"
+          },
+          {
+            "code": "superadmin.archival",
+            "icon": "Archive",
+            "label": "Archival Governance",
+            "required_permission": "superadmin.archival.view",
+            "sort_order": 20,
+            "to": "/superadmin/archival"
+          },
+          {
+            "code": "superadmin.purge",
+            "icon": "Trash",
+            "label": "Purge Authorization",
+            "required_permission": "superadmin.purge.view",
+            "sort_order": 30,
+            "to": "/superadmin/purge"
+          },
+          {
+            "code": "superadmin.policy",
+            "icon": "Sliders",
+            "label": "System Policies",
+            "required_permission": "superadmin.policy.view",
+            "sort_order": 40,
+            "to": "/superadmin/policy"
+          },
+          {
+            "code": "superadmin.audit",
+            "icon": "Scroll",
+            "label": "Audit Logs",
+            "required_permission": "superadmin.audit.view",
+            "sort_order": 50,
+            "to": "/superadmin/audit"
+          }
+        ],
+        "label": "System Administration",
+        "nav_section": "System Admin",
+        "sort_order": 99,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "superadmin.dashboard.view",
+          "label": "View admin dashboard and metrics"
+        },
+        {
+          "code": "superadmin.archival.view",
+          "label": "View archived users and historical datasets"
+        },
+        {
+          "code": "superadmin.archival.add",
+          "label": "Archive users and historical datasets"
+        },
+        {
+          "code": "superadmin.archival.change",
+          "label": "Restore archived users and datasets"
+        },
+        {
+          "code": "superadmin.purge.view",
+          "label": "View permanent purge requests"
+        },
+        {
+          "code": "superadmin.purge.add",
+          "label": "Initiate and execute permanent purge"
+        },
+        {
+          "code": "superadmin.purge.change",
+          "label": "Authorize or reject dual-auth purge"
+        },
+        {
+          "code": "superadmin.policy.view",
+          "label": "View system governance policies"
+        },
+        {
+          "code": "superadmin.policy.change",
+          "label": "Supersede system governance policies"
+        },
+        {
+          "code": "superadmin.audit.view",
+          "label": "View and export compliance audit logs"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "superadmin.drain_outbox",
+        "superadmin.sweep_archival",
+        "superadmin.sweep_purge"
+      ]
     }
   },
   "publisher": "integrated",
