@@ -5,8 +5,13 @@ export interface Page<T> {
   results: T[];
 }
 
+export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type AttendanceStatus = "available" | "departed";
+export type ClaimEvent = "approve" | "forward" | "pay" | "reject" | "verify";
+export type RequisitionEvent = "approve" | "fulfill" | "reject";
+
 export interface Slot {
-  day_of_week: number;
+  day_of_week: DayOfWeek;
   day_label?: string;
   start_time: string;
   end_time: string;
@@ -19,7 +24,7 @@ export interface Schedule {
   is_published: boolean;
   published_at: string | null;
   slots: Slot[];
-  today_status: "available" | "departed" | null;
+  today_status: AttendanceStatus | null;
 }
 
 export interface ScheduleInput {
@@ -80,7 +85,7 @@ export interface Claim {
   status_label: string;
   submitted_at: string;
   actions: ClaimAction[];
-  allowed_events: string[];
+  allowed_events: ClaimEvent[];
 }
 
 export interface ClaimInput {
@@ -150,7 +155,7 @@ export interface Requisition {
   decided_at: string | null;
   fulfilled_at: string | null;
   created_at: string;
-  allowed_events: string[];
+  allowed_events: RequisitionEvent[];
 }
 
 export interface RequisitionInput {

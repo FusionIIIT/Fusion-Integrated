@@ -3,9 +3,11 @@ import { Card, Container, Stack, Text } from "@mantine/core";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { useNotifications } from "../api/hooks";
 import { ListStates } from "../components/ListStates";
+import { LoadMore } from "../components/LoadMore";
 
 export default function NotificationsPage() {
-  const { data, isPending, error } = useNotifications();
+  const list = useNotifications();
+  const { data, isPending, error } = list;
   const rows = data?.results ?? [];
   return (
     <Container size="md">
@@ -20,6 +22,7 @@ export default function NotificationsPage() {
           </Card>
         ))}
       </Stack>
+      <LoadMore list={list} />
     </Container>
   );
 }

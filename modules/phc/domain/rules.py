@@ -8,6 +8,9 @@ from decimal import Decimal
 # The IAM's person kinds; an employee is anyone on the institute payroll.
 EMPLOYEE_KINDS = frozenset({"faculty", "staff"})
 
+# The largest stock level a NUMERIC(12, 2) column holds.
+MAX_STOCK_LEVEL = Decimal("9999999999.99")
+
 
 class RuleViolation(Exception):
     def __init__(self, code: str, message: str):
@@ -58,6 +61,11 @@ def apply_stock_change(level: Decimal, delta: Decimal) -> Decimal:
         raise RuleViolation("zero_adjustment",
                             "Enter a quantity to add or deduct; zero changes nothing.")
     updated = level + delta
+    if updated > MAX_STOCK_LEVEL:
+        raise RuleViolation(
+            "stock_too_large",
+            f"That would make the stock {updated}, more than the {MAX_STOCK_LEVEL} the PHC can "
+            "record. Check the quantity and enter it again.")
     if updated < 0:
         raise RuleViolation(
             "insufficient_stock",

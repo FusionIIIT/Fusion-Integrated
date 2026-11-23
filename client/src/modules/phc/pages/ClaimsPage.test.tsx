@@ -82,4 +82,19 @@ describe("ClaimsPage", () => {
     expect(http.post).toHaveBeenCalledWith("/phc/claims/7/transition",
       { event: "forward", note: "" });
   });
+
+  it("reaches claims beyond the first page", async () => {
+    state.permissions = new Set(["phc.claim.view", "phc.claim.review"]);
+    http.get.mockImplementation((_url: string, config?: { params?: { cursor?: string } }) =>
+      Promise.resolve({ data: config?.params?.cursor === "p2"
+        ? { results: [{ ...claim, id: 99 }], next: null, previous: null }
+        : { results: [claim], next: "http://testserver/api/v1/phc/claims?cursor=p2",
+          previous: null } }));
+    renderPage(<ClaimsPage />);
+    expect(await screen.findByText(/Claim #7/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /load more/i }));
+    expect(await screen.findByText(/Claim #99/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /load more/i })).not.toBeInTheDocument();
+    expect(http.get).toHaveBeenCalledWith("/phc/claims", { params: { cursor: "p2" } });
+  });
 });

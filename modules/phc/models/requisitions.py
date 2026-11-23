@@ -18,9 +18,6 @@ class Requisition(TimeStampedModel):
 
     class Meta:
         db_table = "phc_requisition"
-        indexes = [
-            models.Index(fields=["status", "-created_at"], name="phc_requisition_queue_idx"),
-        ]
         constraints = [
             models.CheckConstraint(
                 condition=models.Q(status="pending_approval") | models.Q(

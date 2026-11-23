@@ -36,7 +36,6 @@ class StockAdjustment(AppendOnlyModel):
     class Meta:
         db_table = "phc_stock_adjustment"
         indexes = [
-            models.Index(fields=["item", "-created_at"], name="phc_adjustment_item_idx"),
             models.Index(fields=["created_at"], name="phc_adjustment_time_idx"),
         ]
         constraints = [

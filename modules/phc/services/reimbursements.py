@@ -22,20 +22,25 @@ from modules.phc.domain.state_machine import (
 )
 from modules.phc.models import ClaimAction, ReimbursementClaim, ReimbursementPolicy
 from modules.phc.selectors import scoping
+from modules.phc.selectors.policy import active_policy
 from modules.phc.services import trail
 
 STATUS_LABELS = dict(ClaimStatus.CHOICES)
+PAST = {"forward": "forwarded", "verify": "verified", "approve": "approved",
+        "reject": "rejected", "pay": "paid"}
+# Who moves a claim next from each open stage (PHC-BR-08).
+NEXT_OFFICE = {
+    ClaimStatus.PENDING_PHC_REVIEW: "PHC Staff",
+    ClaimStatus.PENDING_ACCOUNTS: "Accounts & Audit",
+    ClaimStatus.PENDING_SANCTION: "the Approving Authority",
+    ClaimStatus.APPROVED_FOR_PAYMENT: "Accounts & Audit",
+}
 
 
 class PolicyMissingError(ConflictError):
     code = "policy_missing"
     message = ("Reimbursement claims cannot be accepted yet because no submission window has "
                "been configured. Ask the PHC office to configure it.")
-
-
-def active_policy(on: date) -> ReimbursementPolicy | None:
-    return (ReimbursementPolicy.objects.filter(effective_from__lte=on)
-            .order_by("-effective_from").first())
 
 
 @transaction.atomic
@@ -106,7 +111,8 @@ def transition_claim(*, actor, claim_id: int, event: str, note: str = "") -> Rei
     except IllegalTransition as exc:
         raise ConflictError(
             f"This claim is {STATUS_LABELS[claim.status].lower()}, so it cannot be "
-            f"{event}ed by your office now.", code="illegal_transition") from exc
+            f"{PAST.get(event, event)} by your office now. It is waiting for "
+            f"{NEXT_OFFICE[claim.status]} to act.", code="illegal_transition") from exc
     previous = claim.status
     claim.status = move.target
     claim.save(update_fields=("status", "updated_at"))

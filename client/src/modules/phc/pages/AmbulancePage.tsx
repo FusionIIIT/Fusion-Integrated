@@ -6,10 +6,12 @@ import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { useAmbulanceLogs, useLogAmbulance } from "../api/hooks";
 import { ListStates } from "../components/ListStates";
+import { LoadMore } from "../components/LoadMore";
 
 export default function AmbulancePage() {
   const { can } = useAuth();
-  const { data, isPending, error } = useAmbulanceLogs();
+  const list = useAmbulanceLogs();
+  const { data, isPending, error } = list;
   const log = useLogAmbulance();
   const [open, setOpen] = useState(false);
   const [usedAt, setUsedAt] = useState("");
@@ -55,6 +57,7 @@ export default function AmbulancePage() {
           </Table.Tbody>
         </Table>
       )}
+      <LoadMore list={list} />
       <FormModal
         opened={open} onClose={close} title="Log ambulance use" submitting={log.isPending}
         error={log.error} disabled={!usedAt || !patient.trim() || !destination.trim()}

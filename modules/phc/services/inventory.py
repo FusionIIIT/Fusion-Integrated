@@ -54,4 +54,5 @@ def adjust_stock(*, actor, item_id: int, delta: Decimal, reason: str) -> StockAd
     if rules.is_low_stock(level, item.reorder_threshold):
         LowStockAlert.objects.create(item=item, adjustment=adjustment, level=level,
                                      threshold=item.reorder_threshold)
+    adjustment.raised_low_stock_alert = rules.is_low_stock(level, item.reorder_threshold)
     return adjustment

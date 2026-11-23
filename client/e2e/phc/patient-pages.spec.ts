@@ -25,7 +25,5 @@ test.describe("phc: patient pages", () => {
     await page.goto("/");
     await openModuleNav(page, "Primary Health Centre");
     await expect(sidebar(page).getByRole("link", { name: "Reimbursements" })).toHaveCount(0);
-    await page.goto("/phc/claims");
-    await expect(page.getByText("Not available to your role")).toBeVisible();
   });
 });

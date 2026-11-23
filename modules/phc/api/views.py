@@ -9,10 +9,12 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.api.exceptions import BadRequestError, NotFoundError
+from core.api.exceptions import BadRequestError, DomainError, NotFoundError
+from fusion_auth.client import IamUnavailable
 from fusion_auth.permissions import HasModuleGrant, HasPermission
 from modules.phc.api import serializers as s
 from modules.phc.domain import reports as report_rules
+from modules.phc.selectors import patients as patient_selectors
 from modules.phc.selectors import reports as report_selectors
 from modules.phc.selectors import scoping
 from modules.phc.services import inventory as inventory_service
@@ -25,6 +27,12 @@ from modules.phc.services import schedules as schedule_service
 MODULE = HasModuleGrant("phc")
 WRITE_SCOPE = "phc_write"
 MAX_PDF_RECORDS = 50
+
+
+class DirectoryUnavailableError(DomainError):
+    code = "directory_unavailable"
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    message = "The institute directory cannot be reached right now. Try the search again shortly."
 
 
 def _actor(request):
@@ -133,7 +141,15 @@ class PatientSearchView(_Gates, APIView):
     method_permissions = {"GET": ("phc.patient.view",)}
 
     def get(self, request):
-        people = records_service.search_patients(request.query_params.get("q", ""))
+        q = request.query_params.get("q", "").strip()
+        # AFR-PHC-006
+        if len(q) < patient_selectors.MIN_QUERY:
+            raise BadRequestError("Type at least two characters to search for a patient.",
+                                  code="search_too_short")
+        try:
+            people = patient_selectors.search_patients(q)
+        except IamUnavailable as exc:
+            raise DirectoryUnavailableError() from exc
         return Response(s.PatientSerializer(people, many=True).data)
 
 

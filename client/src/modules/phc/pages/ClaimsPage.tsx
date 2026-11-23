@@ -11,6 +11,7 @@ import {
   useClaimTransition, useClaims, useEligiblePrescriptions, useSubmitClaim,
 } from "../api/hooks";
 import { ListStates } from "../components/ListStates";
+import { LoadMore } from "../components/LoadMore";
 
 const EVENT_LABELS: Record<string, string> = {
   forward: "Forward to Accounts", verify: "Mark verified", approve: "Approve sanction",
@@ -55,7 +56,8 @@ function SubmitClaimModal({ onClose }: { onClose: () => void }) {
 
 export default function ClaimsPage() {
   const { can } = useAuth();
-  const { data, isPending, error } = useClaims();
+  const list = useClaims();
+  const { data, isPending, error } = list;
   const transition = useClaimTransition();
   const [creating, setCreating] = useState(false);
   const rows = data?.results ?? [];
@@ -106,6 +108,7 @@ export default function ClaimsPage() {
           </Card>
         ))}
       </Stack>
+      <LoadMore list={list} />
       {creating && <SubmitClaimModal onClose={() => setCreating(false)} />}
     </Container>
   );

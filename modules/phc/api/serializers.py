@@ -205,7 +205,7 @@ class StockAdjustmentSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_low_stock_alert(self, obj) -> bool:
-        return LowStockAlert.objects.filter(adjustment=obj).exists()
+        return getattr(obj, "raised_low_stock_alert", False)
 
 
 class LowStockAlertSerializer(serializers.ModelSerializer):

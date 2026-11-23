@@ -1,14 +1,33 @@
 """A dependency-free single-font PDF writer for a patient's own records (PHC-UC-03)."""
 from __future__ import annotations
 
+import textwrap
 from collections.abc import Sequence
 
 LINES_PER_PAGE = 52
+# Helvetica at 11 pt across a 512-pt text block fits about 90 characters.
+WRAP_AT = 90
+
+
+def printable(text: str) -> bool:
+    try:
+        text.encode("latin-1")
+    except UnicodeEncodeError:
+        return False
+    return True
+
+
+def wrap(lines: Sequence[str]) -> list[str]:
+    out: list[str] = []
+    for line in lines:
+        indent = line[:len(line) - len(line.lstrip())]
+        out.extend(textwrap.wrap(line, WRAP_AT, subsequent_indent=indent + "  ",
+                                 break_long_words=True) or [""])
+    return out
 
 
 def _literal(value: object) -> str:
     text = " ".join(str(value or "").split())
-    text = text.encode("latin-1", "replace").decode("latin-1")
     return text.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
 
 
@@ -19,10 +38,11 @@ def _page_stream(lines: Sequence[str]) -> bytes:
             stream.append("T*")
         stream.append(f"({_literal(line)}) Tj")
     stream.append("ET")
-    return "\n".join(stream).encode("latin-1", "replace")
+    return "\n".join(stream).encode("latin-1")
 
 
 def render(lines: Sequence[str]) -> bytes:
+    lines = wrap(lines)
     pages = [lines[i:i + LINES_PER_PAGE] for i in range(0, len(lines), LINES_PER_PAGE)]
     if not pages:
         pages = [[]]

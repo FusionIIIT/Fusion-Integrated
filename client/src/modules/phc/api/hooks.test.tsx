@@ -3,7 +3,9 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useClaimTransition, usePatientSearch, useReport, useSubmitClaim } from "./hooks";
+import {
+  useAllInventory, useClaimTransition, usePatientSearch, useReport, useSubmitClaim,
+} from "./hooks";
 
 const http = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn() }));
 vi.mock("../../../lib/http", async (orig) => ({
@@ -51,5 +53,15 @@ describe("phc hooks", () => {
     await act(() => result.current.mutateAsync({ id: 9, event: "verify", note: "" }));
     expect(http.post).toHaveBeenCalledWith("/phc/claims/9/transition",
       { event: "verify", note: "" });
+  });
+
+  it("follows every inventory page so a picker can offer any item", async () => {
+    http.get.mockImplementation((_url: string, config?: { params?: { cursor?: string } }) =>
+      Promise.resolve({ data: config?.params?.cursor === "b"
+        ? { results: [{ id: 2 }], next: null, previous: null }
+        : { results: [{ id: 1 }], next: "/api/v1/phc/inventory?cursor=b", previous: null } }));
+    const { Wrap } = wrapper();
+    const { result } = renderHook(() => useAllInventory(true), { wrapper: Wrap });
+    await waitFor(() => expect(result.current.data?.map((i) => i.id)).toEqual([1, 2]));
   });
 });

@@ -2,6 +2,7 @@
 from datetime import timedelta
 
 import pytest
+from django.db import DatabaseError
 from django.utils import timezone
 
 from modules.phc.models import (
@@ -135,16 +136,29 @@ def test_phc_uc_06_e1_missing_prescription_saves_nothing(stub_iam, user_ref):
 
 # AFR-PHC-006
 def test_afr_phc_006_staff_search_patients(stub_iam, user_ref):
-    staff = client_as(stub_iam, "PHC Staff", PHC_STAFF_ID,
-                      users={EMPLOYEE_ID: user_ref(EMPLOYEE_ID, name="Asha Verma",
-                                                   kind="staff")})
-    from modules.directory import contracts as directory
-
-    directory.get_users([EMPLOYEE_ID])
+    staff = client_as(stub_iam, "PHC Staff", PHC_STAFF_ID, users={
+        STUDENT_ID: user_ref(STUDENT_ID, name="Asha Verma", kind="student"),
+        EMPLOYEE_ID: user_ref(EMPLOYEE_ID, name="Asha Rao", kind="staff"),
+        9001: user_ref(9001, name="Asha Corp", kind="recruiter")})
     r = staff.get("/api/v1/phc/patients", {"q": "Asha"})
     assert r.status_code == 200
-    assert [p["user_id"] for p in r.data] == [EMPLOYEE_ID]
+    # Students are patients too, and only patient kinds come back.
+    assert sorted(p["user_id"] for p in r.data) == [STUDENT_ID, EMPLOYEE_ID]
     assert staff.get("/api/v1/phc/patients", {"q": "A"}).status_code == 400
+
+
+def test_patient_search_says_so_when_the_directory_is_down(stub_iam, monkeypatch):
+    from fusion_auth.client import IamUnavailable
+
+    staff = client_as(stub_iam, "PHC Staff", PHC_STAFF_ID)
+
+    def down(**kwargs):
+        raise IamUnavailable("timeout")
+
+    monkeypatch.setattr("modules.phc.selectors.patients.get_client",
+                        type("C", (), {"search_users": staticmethod(down)}))
+    r = staff.get("/api/v1/phc/patients", {"q": "Asha"})
+    assert (r.status_code, r.data["error"]["code"]) == (503, "directory_unavailable")
 
 
 # PHC-UC-02, AFR-PHC-009, AFR-PHC-010
@@ -595,3 +609,93 @@ def test_notifications_list_is_the_callers_own(stub_iam):
     assert len(rows) == 1 and rows[0]["resource_id"] == cid
     other = client_as(stub_iam, "staff", 2002)
     assert other.get("/api/v1/phc/notifications").data["results"] == []
+
+
+# -- Exception flows: a failure leaves nothing half-done ----------------------------
+def _failing_client(client):
+    client.raise_request_exception = False
+    return client
+
+
+# PHC-UC-01 E1
+def test_phc_uc_01_e1_retrieval_failure_shows_no_stale_status(stub_iam, monkeypatch):
+    sid = _schedule(stub_iam)
+    staff = client_as(stub_iam, "PHC Staff", PHC_STAFF_ID)
+    staff.post(f"/api/v1/phc/schedules/{sid}/attendance", {"status": "available"})
+    student = _failing_client(client_as(stub_iam, "student", STUDENT_ID))
+
+    def broken(*args, **kwargs):
+        raise DatabaseError("attendance store unavailable")
+
+    monkeypatch.setattr("modules.phc.selectors.scoping.schedules_for", broken)
+    r = student.get("/api/v1/phc/schedules")
+    assert r.status_code == 500
+    assert b"available" not in r.content
+
+
+# PHC-UC-03 E1
+def test_phc_uc_03_e1_pdf_failure_gives_no_partial_file(stub_iam, monkeypatch):
+    visit = visit_for(STUDENT_ID)
+    student = _failing_client(client_as(stub_iam, "student", STUDENT_ID))
+
+    def broken(lines):
+        raise RuntimeError("renderer crashed")
+
+    monkeypatch.setattr("modules.phc.domain.pdf.render", broken)
+    r = student.get("/api/v1/phc/records/pdf", {"ids": str(visit.pk)})
+    assert r.status_code == 500
+    assert r.get("Content-Type") != "application/pdf"
+    assert b"%PDF" not in r.content
+
+
+# PHC-UC-04 E1
+def test_phc_uc_04_e1_failed_creation_leaves_no_workflow_instance(stub_iam, monkeypatch):
+    policy()
+    visit = visit_for(EMPLOYEE_ID)
+    employee = _failing_client(client_as(stub_iam, "staff", EMPLOYEE_ID))
+
+    def broken(**kwargs):
+        raise DatabaseError("audit store unavailable")
+
+    monkeypatch.setattr("modules.phc.services.trail.audit", broken)
+    r = employee.post("/api/v1/phc/claims", {
+        "prescription_id": visit.prescriptions.get().pk,
+        "expense_date": str(timezone.localdate()), "amount": "10.00"}, format="json")
+    assert r.status_code == 500
+    assert not ReimbursementClaim.objects.exists()
+    assert not ClaimAction.objects.exists()
+
+
+# PHC-UC-05 E1
+def test_phc_uc_05_e1_retrieval_failure_exposes_no_other_claims(stub_iam, monkeypatch):
+    policy()
+    _submit(stub_iam, user_id=2002)
+    employee = _failing_client(client_as(stub_iam, "staff", EMPLOYEE_ID))
+
+    def broken(actor):
+        raise DatabaseError("claims store unavailable")
+
+    monkeypatch.setattr("modules.phc.selectors.scoping.claims_for", broken)
+    r = employee.get("/api/v1/phc/claims")
+    assert r.status_code == 500
+    assert b"Pharmacy bill" not in r.content
+    assert b"2002" not in r.content
+
+
+# PHC-UC-08 E1
+def test_phc_uc_08_e1_failed_update_keeps_prior_status(stub_iam, monkeypatch):
+    from modules.phc.models import DoctorAttendance
+
+    sid = _schedule(stub_iam)
+    staff = _failing_client(client_as(stub_iam, "PHC Staff", PHC_STAFF_ID))
+    staff.post(f"/api/v1/phc/schedules/{sid}/attendance", {"status": "available"})
+    original = DoctorAttendance.objects.update_or_create
+
+    def broken(*args, **kwargs):
+        raise DatabaseError("write failed")
+
+    monkeypatch.setattr(DoctorAttendance.objects, "update_or_create", broken)
+    r = staff.post(f"/api/v1/phc/schedules/{sid}/attendance", {"status": "departed"})
+    assert r.status_code == 500
+    monkeypatch.setattr(DoctorAttendance.objects, "update_or_create", original)
+    assert DoctorAttendance.objects.get(schedule_id=sid).status == "available"

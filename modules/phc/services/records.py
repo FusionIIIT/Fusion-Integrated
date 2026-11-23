@@ -13,15 +13,6 @@ from modules.phc.models import PatientVisit, Prescription
 from modules.phc.services import trail
 
 
-def search_patients(q: str, limit: int = 25):
-    # AFR-PHC-006
-    if len(q.strip()) < 2:
-        raise BadRequestError("Type at least two characters to search for a patient.",
-                              code="search_too_short")
-    return [u for u in directory.search(q=q.strip(), limit=limit)
-            if u.kind in {"student", "faculty", "staff"}]
-
-
 @transaction.atomic
 def record_visit(*, actor, patient_user_id: int, visit_date: date, complaint: str,
                  diagnosis: str, prescriptions: list[dict]) -> PatientVisit:
@@ -34,6 +25,14 @@ def record_visit(*, actor, patient_user_id: int, visit_date: date, complaint: st
     if not prescriptions:
         raise BadRequestError("Enter the prescription from the visit.",
                               code="prescription_required")
+    texts = [complaint, diagnosis] + [str(v or "") for p in prescriptions
+                                      for v in (p.get("medicine"), p.get("dosage"),
+                                                p.get("instructions"))]
+    # PHC-UC-03: the patient's PDF copy must reproduce every character it was given.
+    if not all(pdf.printable(t) for t in texts):
+        raise BadRequestError("Enter the record in English letters, digits and common "
+                              "punctuation; the PDF copy cannot print other scripts yet.",
+                              code="unprintable_text")
     if patient_user_id not in directory.get_users([patient_user_id]):
         raise NotFoundError("No patient profile matches that person.", code="unknown_patient")
     visit = PatientVisit.objects.create(patient_user_id=patient_user_id, visit_date=visit_date,

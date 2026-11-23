@@ -21,28 +21,26 @@ for it, and PostgreSQL's own templates were not altered.
 | `ops/checks/nav_matches_routes.py` | nav items and client routes agree |
 | `permission_manifest --check` | permission manifest matches the registries |
 | `make schema-check` | openapi schema matches the code |
-| `pytest` (whole repository) | 786 passed, 27 subtests passed in 84.26s |
+| `pytest` (whole repository) | 805 passed, 27 subtests passed in 84.61s |
 
-`make check-client`: exit 0 (`tsc` for the app and `e2e/`, `Tests 91 passed (91)`, build succeeds;
+`make check-client`: exit 0 (`tsc` for the app and `e2e/`, `Tests 93 passed (93)`, build succeeds;
 PHC page chunks total about 12 kB gzip).
 
 ## 2. Coverage
 
 ```
 .venv/bin/pytest modules/phc --cov=modules/phc --cov-branch --cov-report=term-missing --cov-fail-under=90
-TOTAL   1236   3   152   1   99%
-Required test coverage of 90% reached. Total coverage: 99.71%
-361 passed
+TOTAL   1267   0   158   0   100%
+Required test coverage of 90% reached. Total coverage: 100.00%
+380 passed
 
 .venv/bin/pytest modules/phc --cov=modules/phc/domain --cov-branch --cov-report=term-missing --cov-fail-under=95
-TOTAL   142   0   32   0   100%
+TOTAL   159   0   36   0   100%
 Required test coverage of 95% reached. Total coverage: 100.00%
-361 passed
+380 passed
 ```
 
-Uncovered: `api/views.py` 189 and 306 (an empty `ids` list after parsing, and the fallback branch of
-`get_permissions` for an unmapped method) and `selectors/scoping.py` 85 (the empty-queryset return
-for an actor with no requisition permission reaching the selector, which the view gate prevents).
+Nothing is uncovered. Spec tests are excluded from both runs (`--ignore=modules/phc/tests/spec`).
 
 ## 3. Test counts
 
@@ -50,20 +48,21 @@ for an actor with no requisition permission reaching the selector, which the vie
 |---|---|
 | test_state_machine.py | 162 |
 | test_privilege_escalation.py | 92 |
-| test_journeys.py | 44 |
-| test_domain.py | 19 |
-| test_refusals.py | 11 |
+| test_journeys.py | 49 |
+| test_domain.py | 22 |
+| test_refusals.py | 15 |
+| test_query_budgets.py | 11 |
 | test_patient_isolation.py | 9 |
 | test_registry.py | 8 |
 | test_audit_and_policy.py | 5 |
-| test_query_budgets.py | 5 |
 | test_client_route_guards.py | 3 |
-| test_concurrency.py | 2 |
+| test_concurrency.py | 3 |
 | test_schedule.py | 1 |
-| **Total** | **361, all passing** |
+| **Total** | **380, all passing** |
 
 Journey tests are named for their use cases: every live `PHC-UC-` main flow and every A/E flow the
-spec names has one (`test_journeys.py`). Every one of the 90 live CFR, AFR, UC, BR and workflow ids is
+spec names has one (`test_journeys.py`), including the E1 failure flows of PHC-UC-01, 03, 04, 05 and
+08. Every one of the 90 live CFR, AFR, UC, BR and workflow ids is
 cited by at least one test.
 
 ## 4. Rules broken on purpose (Step 5.15)
@@ -165,4 +164,21 @@ None accepted yet. Open questions are in the blueprint's Step 3.8.
 
 ## 12. Review rounds
 
-None yet.
+| Round | Commit reviewed | Spec | Arch | Code | Security | Tests | E2E | Frontend | Ops | Hygiene | Verdict |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | f746475 | — | — | — | — | — | — | — | — | — | Stopped at step 1: a home-folder instruction file and Markdown under home-folder tool folders existed. No scores. |
+| 2 | f746475 | 7 | 8 | 9 | 3 | 5 | 0 | 4 | 8 | 3 | Not yet: 21 findings (2 Blocker, 8 Major, 11 Minor) |
+
+Round 2 findings fixed after f746475: R2-01 (overflow refused with 422 `stock_too_large`), R2-02
+(AI-name grep clean), R2-03 (PDF wraps long lines; text the PDF font cannot print is refused at
+entry with 400 `unprintable_text`), R2-04 (every list pages with "Load more"; the requisition picker
+loads every item), R2-05 (51-record PDF test), R2-09 (UC-01, 03, 04, 05 and 08 E1 journeys),
+R2-11 (unused indexes removed; initial migration regenerated), R2-12 (policy and patient reads in
+`selectors/`; no query in the serializer), R2-13 (claim refusal names the waiting office), R2-14
+(budgets on every list), R2-15 (requisition decision race), R2-16 (schema enums in `types.ts`),
+R2-17 (hooks for `records/<id>` and `claims/<id>`), R2-19 (`phc-deployment.md`), R2-20 (this table).
+
+Still open, needing the IAM seeded and roles assigned first: R2-06 and R2-07 (Playwright flows and
+deep links), R2-08 and R2-18 (browser walkthrough, keyboard flow), R2-10 (first user action on the
+fresh database). R2-21 (commit message gives no reason) is addressed by the next commit's message.
+Round 2's seven questions for the approvers are open.

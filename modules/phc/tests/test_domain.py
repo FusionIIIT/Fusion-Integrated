@@ -107,3 +107,28 @@ def test_pdf_is_well_formed_and_paginates_afr_phc_011():
 
 def test_empty_pdf_still_has_one_page():
     assert b"/Count 1" in pdf.render([])
+
+
+# PHC-UC-03
+def test_long_lines_wrap_and_every_word_survives():
+    text = ("Diagnosis: Acute viral upper respiratory tract infection with persistent dry cough "
+            "and mild fever, advised rest and fluids, review after five days if symptoms persist")
+    lines = pdf.wrap([text])
+    assert len(lines) > 1
+    assert all(len(line) <= pdf.WRAP_AT for line in lines)
+    assert " ".join(part.strip() for part in lines).split() == text.split()
+    body = pdf.render([text])
+    assert b"review after five days" in body
+
+
+def test_printable_accepts_latin_and_refuses_other_scripts():
+    assert pdf.printable("Paracetamol 500mg, 1-0-1 (after food)")
+    assert not pdf.printable("बुखार")
+
+
+def test_stock_change_refuses_a_level_the_column_cannot_hold():
+    with pytest.raises(rules.RuleViolation) as exc:
+        rules.apply_stock_change(Decimal("9999999999.00"), Decimal("1.00"))
+    assert exc.value.code == "stock_too_large"
+    assert rules.apply_stock_change(Decimal("9999999998.99"), Decimal("1.00")) == \
+        rules.MAX_STOCK_LEVEL

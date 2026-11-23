@@ -189,3 +189,48 @@ def test_every_model_names_itself_without_personal_data():
     assert all(labels)
     assert not any("Hidden" in label for label in labels)
     assert str(slot).startswith("Tuesday 09:00")
+
+
+# PHC-UC-09 E1
+def test_adjustment_beyond_what_the_column_holds_is_refused(stub_iam):
+    stock = item(level="9999999999.00", threshold="0")
+    r = _staff(stub_iam).post(f"/api/v1/phc/inventory/{stock.pk}/adjust",
+                              {"delta": "9999999999.00"})
+    assert (r.status_code, r.data["error"]["code"]) == (422, "stock_too_large")
+    stock.refresh_from_db()
+    assert str(stock.stock_level) == "9999999999.00"
+    assert not StockAdjustment.objects.exists()
+
+
+# PHC-UC-03
+def test_more_than_fifty_records_in_one_pdf_is_refused(stub_iam):
+    student = client_as(stub_iam, "student", STUDENT_ID)
+    ids = ",".join(str(i) for i in range(1, 52))
+    r = student.get("/api/v1/phc/records/pdf", {"ids": ids})
+    assert (r.status_code, r.data["error"]["code"]) == (400, "too_many_records")
+
+
+# PHC-UC-03
+def test_text_the_pdf_cannot_print_is_refused_at_entry(stub_iam, user_ref):
+    staff = _staff(stub_iam, users={EMPLOYEE_ID: user_ref(EMPLOYEE_ID, kind="staff")})
+    r = staff.post("/api/v1/phc/records", {
+        "patient_user_id": EMPLOYEE_ID, "visit_date": str(timezone.localdate()),
+        "complaint": "बुखार और खांसी", "prescriptions": [{"medicine": "m", "dosage": "d"}]},
+        format="json")
+    assert (r.status_code, r.data["error"]["code"]) == (400, "unprintable_text")
+    assert not PatientVisit.objects.exists()
+
+
+# PHC-BR-08
+def test_illegal_claim_move_says_who_acts_next(stub_iam):
+    visit = visit_for(EMPLOYEE_ID)
+    claim = ReimbursementClaim.objects.create(user_id=EMPLOYEE_ID,
+                                              prescription=visit.prescriptions.get(),
+                                              expense_date=timezone.localdate(),
+                                              amount="1.00", submitted_at=timezone.now())
+    accounts = client_as(stub_iam, "Accounts & Audit", 4001)
+    r = accounts.post(f"/api/v1/phc/claims/{claim.pk}/transition", {"event": "verify"})
+    assert r.status_code == 409
+    assert r.data["error"]["message"] == (
+        "This claim is pending phc review, so it cannot be verified by your office now. "
+        "It is waiting for PHC Staff to act.")

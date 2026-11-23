@@ -6,10 +6,12 @@ import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import { useAdvisories, usePublishAdvisory } from "../api/hooks";
 import { ListStates } from "../components/ListStates";
+import { LoadMore } from "../components/LoadMore";
 
 export default function AdvisoriesPage() {
   const { can } = useAuth();
-  const { data, isPending, error } = useAdvisories();
+  const list = useAdvisories();
+  const { data, isPending, error } = list;
   const publish = usePublishAdvisory();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -43,6 +45,7 @@ export default function AdvisoriesPage() {
           </Card>
         ))}
       </Stack>
+      <LoadMore list={list} />
       <FormModal
         opened={open} onClose={close} title="Publish a health advisory"
         submitLabel="Publish" submitting={publish.isPending} error={publish.error}

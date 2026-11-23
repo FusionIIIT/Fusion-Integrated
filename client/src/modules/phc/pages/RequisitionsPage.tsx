@@ -8,9 +8,10 @@ import { errorMessage } from "../../../lib/http";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import {
-  useInventory, useRequisitionTransition, useRequisitions, useSubmitRequisition,
+  useAllInventory, useRequisitionTransition, useRequisitions, useSubmitRequisition,
 } from "../api/hooks";
 import { ListStates } from "../components/ListStates";
+import { LoadMore } from "../components/LoadMore";
 
 const EVENT_LABELS: Record<string, string> = {
   approve: "Approve", reject: "Reject", fulfill: "Mark fulfilled",
@@ -18,7 +19,7 @@ const EVENT_LABELS: Record<string, string> = {
 
 function NewRequisitionModal({ onClose }: { onClose: () => void }) {
   const submit = useSubmitRequisition();
-  const items = useInventory();
+  const items = useAllInventory(true);
   const [purpose, setPurpose] = useState("");
   const [lines, setLines] = useState([{ item_id: "", quantity: "" }]);
   const setLine = (i: number, patch: Partial<(typeof lines)[number]>) =>
@@ -41,7 +42,7 @@ function NewRequisitionModal({ onClose }: { onClose: () => void }) {
           <Group key={i} grow align="flex-end">
             <Select label={`Item ${i + 1}`} required value={line.item_id || null}
               onChange={(v) => setLine(i, { item_id: v ?? "" })}
-              data={(items.data?.results ?? []).map((it) => ({
+              data={(items.data ?? []).map((it) => ({
                 value: String(it.id), label: `${it.name} (${it.unit})`,
               }))} />
             <TextInput label="Quantity" required inputMode="decimal" value={line.quantity}
@@ -58,7 +59,8 @@ function NewRequisitionModal({ onClose }: { onClose: () => void }) {
 
 export default function RequisitionsPage() {
   const { can } = useAuth();
-  const { data, isPending, error } = useRequisitions();
+  const list = useRequisitions();
+  const { data, isPending, error } = list;
   const transition = useRequisitionTransition();
   const [creating, setCreating] = useState(false);
   const rows = data?.results ?? [];
@@ -100,6 +102,7 @@ export default function RequisitionsPage() {
           </Card>
         ))}
       </Stack>
+      <LoadMore list={list} />
       {creating && <NewRequisitionModal onClose={() => setCreating(false)} />}
     </Container>
   );

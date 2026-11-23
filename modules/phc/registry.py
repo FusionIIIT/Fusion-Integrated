@@ -118,7 +118,7 @@ ROLE_GRANTS = {
 def readiness() -> list[str]:
     from django.utils import timezone
 
-    from modules.phc.services.reimbursements import active_policy
+    from modules.phc.selectors.policy import active_policy
 
     if active_policy(timezone.localdate()) is None:
         return [("No reimbursement submission window is in effect (PHC-BR-06). Run "

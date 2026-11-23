@@ -13,6 +13,7 @@ import {
 } from "../api/hooks";
 import type { Prescription } from "../api/types";
 import { ListStates } from "../components/ListStates";
+import { LoadMore } from "../components/LoadMore";
 
 const BLANK: Prescription = { medicine: "", dosage: "", duration_days: null, instructions: "" };
 
@@ -73,7 +74,8 @@ function RecordVisitModal({ onClose }: { onClose: () => void }) {
 
 export default function RecordsPage() {
   const { can } = useAuth();
-  const { data, isPending, error } = useVisits();
+  const list = useVisits();
+  const { data, isPending, error } = list;
   const download = useDownloadRecords();
   const [selected, setSelected] = useState<number[]>([]);
   const [recording, setRecording] = useState(false);
@@ -124,6 +126,7 @@ export default function RecordsPage() {
           </Card>
         ))}
       </Stack>
+      <LoadMore list={list} />
       {recording && <RecordVisitModal onClose={() => setRecording(false)} />}
     </Container>
   );

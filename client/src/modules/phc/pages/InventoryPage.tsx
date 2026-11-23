@@ -7,6 +7,7 @@ import { PageHeader } from "../../../ui/components/PageHeader";
 import { useAdjustStock, useCreateItem, useInventory, useLowStockAlerts } from "../api/hooks";
 import type { InventoryItem } from "../api/types";
 import { ListStates } from "../components/ListStates";
+import { LoadMore } from "../components/LoadMore";
 
 function AdjustModal({ item, onClose }: { item: InventoryItem; onClose: () => void }) {
   const adjust = useAdjustStock();
@@ -56,7 +57,8 @@ function NewItemModal({ onClose }: { onClose: () => void }) {
 
 export default function InventoryPage() {
   const { can } = useAuth();
-  const { data, isPending, error } = useInventory();
+  const list = useInventory();
+  const { data, isPending, error } = list;
   const alerts = useLowStockAlerts();
   const [adjusting, setAdjusting] = useState<InventoryItem | null>(null);
   const [adding, setAdding] = useState(false);
@@ -113,6 +115,7 @@ export default function InventoryPage() {
           </Table.Tbody>
         </Table>
       )}
+      <LoadMore list={list} />
       {adjusting && <AdjustModal item={adjusting} onClose={() => setAdjusting(null)} />}
       {adding && <NewItemModal onClose={() => setAdding(false)} />}
     </Container>

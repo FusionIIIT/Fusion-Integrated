@@ -10,7 +10,7 @@ import { PageHeader } from "../../../ui/components/PageHeader";
 import {
   useCreateSchedule, useMarkAttendance, usePublishSchedule, useSchedules, useUpdateSchedule,
 } from "../api/hooks";
-import type { Schedule, Slot } from "../api/types";
+import type { DayOfWeek, Schedule, Slot } from "../api/types";
 import { ListStates } from "../components/ListStates";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -60,7 +60,7 @@ function ScheduleForm({ editing, onClose }: { editing: Schedule | "new"; onClose
           <Group key={i} align="flex-end" grow>
             <Select label={`Day ${i + 1}`} value={String(slot.day_of_week)}
               data={DAYS.map((d, n) => ({ value: String(n), label: d }))}
-              onChange={(v) => setSlot(i, { day_of_week: Number(v ?? 0) })} />
+              onChange={(v) => setSlot(i, { day_of_week: Number(v ?? 0) as DayOfWeek })} />
             <TextInput label="From" type="time" value={slot.start_time}
               onChange={(e) => setSlot(i, { start_time: e.currentTarget.value })} />
             <TextInput label="To" type="time" value={slot.end_time}

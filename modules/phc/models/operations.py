@@ -42,10 +42,6 @@ class AuditRecord(AppendOnlyModel):
 
     class Meta:
         db_table = "phc_audit_record"
-        indexes = [
-            models.Index(fields=["resource_type", "resource_id", "created_at"],
-                         name="phc_audit_resource_idx"),
-        ]
 
     def __str__(self) -> str:
         return f"{self.resource_type}:{self.resource_id} {self.action}"

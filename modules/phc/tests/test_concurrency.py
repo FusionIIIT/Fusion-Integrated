@@ -61,3 +61,28 @@ def test_concurrent_deductions_never_drive_stock_negative():
     stock.refresh_from_db()
     assert stock.stock_level == Decimal("3")
     assert StockAdjustment.objects.filter(item=stock).count() == 1
+
+
+# PHC-UC-16 E1
+def test_two_authorities_racing_on_one_requisition_decide_it_once():
+    from modules.phc.models import Notification, Requisition
+    from modules.phc.services import requisitions
+
+    stock = item()
+    req = Requisition.objects.create(originator_user_id=PHC_STAFF_ID, purpose="restock")
+    req.lines.create(item=stock, quantity="5")
+    authorities = [make_principal(user_id=5001 + i, kind="faculty", modules=("phc",),
+                                  permissions=ROLE_GRANTS["Approving Authority"])
+                   for i in range(2)]
+    events = iter(["approve", "reject"])
+    lock = threading.Lock()
+
+    def decide():
+        with lock:
+            actor, event = authorities.pop(), next(events)
+        return requisitions.transition(actor=actor, requisition_id=req.pk, event=event)
+
+    results = _race(decide)
+    assert sorted(r[0] for r in results) == ["ok", "refused"]
+    assert Notification.objects.filter(resource_type="requisition",
+                                       resource_id=req.pk).count() == 1
