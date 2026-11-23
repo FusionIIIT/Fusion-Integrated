@@ -69,6 +69,11 @@ def test_bad_content_failure_remains_unpublished_and_logged(world, caplog):
     row.refresh_from_db()
     assert row.state == "SCHEDULED" and row.published_at is None
     assert "lms.release.validation_failed" in caplog.text
+    failures = [record for record in caplog.records if record.name == "fusion.lms.release"]
+    assert len(failures) == 1 and failures[0].levelname == "WARNING"
+    assert failures[0].exc_info is None
+    assert f"kind=material id={row.pk}" in failures[0].getMessage()
+    assert "Traceback" not in caplog.text
 
 
 def test_missing_future_and_invalid_kind_tasks(world):

@@ -137,73 +137,105 @@ UC = {
 }
 
 
+SCHEDULED_IDS = {
+    "BW-LMS-01",
+    "BW-LMS-03",
+    "UC-LMS-015",
+    "AFR-LMS-003.3",
+    "AFR-LMS-003.4",
+    "AFR-LMS-007.2",
+    "AFR-LMS-007.3",
+}
+SOURCE_OVERRIDES = {
+    "CFR-LMS-001": ("modules/lms/api/views.py", "class CourseDetail("),
+    "AFR-LMS-001.1": ("modules/lms/api/views.py", "class CourseDetail("),
+    "AFR-LMS-001.2": ("client/src/modules/lms/pages/CoursesPage.tsx", "function Workspace("),
+    "AFR-LMS-003.2": ("modules/lms/services/workspaces.py", "def save_section("),
+    "AFR-LMS-005.4": ("modules/lms/selectors/scoping.py", "def announcements("),
+    "UC-LMS-006": ("modules/lms/selectors/scoping.py", "def announcements("),
+    "AFR-LMS-007.2": ("modules/lms/selectors/scoping.py", "def assignments("),
+    "AFR-LMS-007.4": ("modules/lms/api/views.py", "class AssignmentDownload("),
+    "UC-LMS-009": ("modules/lms/api/views.py", "class AssignmentDownload("),
+    "BR-LMS-011": ("modules/lms/selectors/scoping.py", "def assignments("),
+    "BR-LMS-006": ("modules/lms/selectors/scoping.py", "def materials("),
+    "AFR-LMS-003.3": ("modules/lms/services/releases.py", "def change_release("),
+    "AFR-LMS-009.2": ("client/src/modules/lms/pages/CoursesPage.tsx", "function AssignmentWork("),
+    "AFR-LMS-011.1": ("modules/lms/services/grading.py", "def save_grade("),
+    "AFR-LMS-011.3": ("modules/lms/services/grading.py", "def release_grade("),
+    "BR-LMS-017": ("modules/lms/services/grading.py", "def release_grade("),
+    "UC-LMS-013": ("modules/lms/services/grading.py", "def release_grade("),
+    "AFR-LMS-012.2": ("client/src/modules/lms/pages/CoursesPage.tsx", "function ReleasedGrades("),
+    "AFR-LMS-014.2": ("modules/lms/selectors/scoping.py", "def submissions("),
+    "AFR-LMS-015.2": ("modules/lms/selectors/scoping.py", "def submissions("),
+    "AFR-LMS-015.3": ("modules/lms/selectors/scoping.py", "def submissions("),
+}
+EXTRA_ENFORCEMENT = {
+    "CFR-LMS-001": [("client/src/modules/lms/pages/CoursesPage.tsx", "function Workspace(")],
+    "CFR-LMS-003": [
+        ("modules/lms/services/workspaces.py", "def save_section("),
+        ("modules/lms/services/releases.py", "def transition_content("),
+    ],
+    "CFR-LMS-007": [
+        ("modules/lms/selectors/scoping.py", "def assignments("),
+        ("modules/lms/api/views.py", "class AssignmentDownload("),
+    ],
+    "CFR-LMS-009": [("client/src/modules/lms/pages/CoursesPage.tsx", "function AssignmentWork(")],
+    "CFR-LMS-011": [("modules/lms/services/grading.py", "def release_grade(")],
+    "CFR-LMS-014": [
+        ("modules/lms/services/grading.py", "def save_grade("),
+        ("modules/lms/services/announcements.py", "def post_announcement("),
+    ],
+    "CFR-LMS-015": [("modules/lms/selectors/scoping.py", "def submissions(")],
+    "BR-LMS-008": [("modules/lms/selectors/scoping.py", "def announcements(")],
+    "AFR-LMS-012.2": [("modules/lms/selectors/scoping.py", "def grades(")],
+    "UC-LMS-009": [("modules/lms/api/views.py", "class AssignmentDetail(")],
+    "BW-LMS-02": [("modules/lms/services/releases.py", "def transition_content(")],
+    "BW-LMS-03": [("modules/lms/services/submissions.py", "def create_submission(")],
+    "BW-LMS-04": [("modules/lms/services/grading.py", "def release_grade(")],
+    "BW-LMS-05": [("modules/lms/services/grading.py", "def release_grade(")],
+    "CW-LMS-01": [("modules/lms/services/releases.py", "def transition_content(")],
+    "CW-LMS-02": [("modules/lms/services/grading.py", "def release_grade(")],
+}
+
+
+def group_for(kind, number):
+    if kind in ("CFR", "AFR"):
+        return number
+    return {"BR": BR, "UC": UC, "BW": {1: 3, 2: 8, 3: 8, 4: 10, 5: 10}, "CW": {1: 8, 2: 10}}[kind][
+        number
+    ]
+
+
+def entry_for(identifier, kind, number):
+    entry = ENTRIES[group_for(kind, number)]
+    if identifier in SCHEDULED_IDS:
+        entry = (
+            "modules/lms/services/releases.py",
+            "def transition_content",
+            "test_http_scheduling.py",
+            "test_uc_lms_015_scheduled_material_and_assignment_release",
+        )
+    source, anchor = SOURCE_OVERRIDES.get(identifier, entry[:2])
+    return source, anchor, entry[2], entry[3]
+
+
 def inventory():
     rows = []
     for line in (DOCS / "lms-blueprint.md").read_text().splitlines():
         match = re.match(r"\| ((CFR|AFR|BR|UC|BW|CW)-LMS-(\d+)(?:\.\d+)?) \| ([^|]+) \|", line)
         if match:
             identifier, kind, number, statement = match[1], match[2], int(match[3]), match[4]
-            group = (
-                number
-                if kind in ("CFR", "AFR")
-                else (
-                    BR[number]
-                    if kind == "BR"
-                    else UC[number]
-                    if kind == "UC"
-                    else {1: 3, 2: 8, 3: 8, 4: 10, 5: 10}[number]
-                    if kind == "BW"
-                    else {1: 8, 2: 10}[number]
-                )
-            )
-            if (
-                kind in ("BW", "CW")
-                or identifier == "UC-LMS-015"
-                or identifier == "BR-LMS-006"
-                or identifier
-                in (
-                    "AFR-LMS-003.3",
-                    "AFR-LMS-003.4",
-                    "AFR-LMS-007.2",
-                    "AFR-LMS-007.3",
-                )
-            ):
-                entry = (
-                    (
-                        "modules/lms/services/releases.py",
-                        "def transition_content",
-                        "test_journeys.py",
-                        "test_uc_lms_015_scheduled_material_and_assignment_release",
-                    )
-                    if (
-                        identifier
-                        in (
-                            "BW-LMS-01",
-                            "BW-LMS-03",
-                            "UC-LMS-015",
-                            "BR-LMS-006",
-                            "AFR-LMS-003.3",
-                            "AFR-LMS-003.4",
-                            "AFR-LMS-007.2",
-                            "AFR-LMS-007.3",
-                        )
-                    )
-                    else ENTRIES[group]
-                )
-            else:
-                entry = ENTRIES[group]
-            if identifier in ("BR-LMS-017", "UC-LMS-013"):
-                entry = (
-                    "modules/lms/services/grading.py",
-                    "def release_grade",
-                    "test_journeys.py",
-                    "test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade",
-                )
-            if entry[3] == "test_uc_lms_015_scheduled_material_and_assignment_release":
-                entry = (entry[0], entry[1], "test_http_scheduling.py", entry[3])
-            rows.append((identifier, statement, entry))
+            rows.append((identifier, statement, entry_for(identifier, kind, number)))
     assert len(rows) == len({row[0] for row in rows}) == 103
     return rows
+
+
+def source_links(identifier, source, anchor):
+    links = [(source, anchor), *EXTRA_ENFORCEMENT.get(identifier, [])]
+    return "; ".join(
+        f"[{path}:{line_number(path, target)}](../../{path}#L{line_number(path, target)})"
+        for path, target in links
+    )
 
 
 def line_number(path, anchor):
@@ -220,11 +252,10 @@ def main():
     text += "| ID | Obligation | Enforcement | Builder test |\n|---|---|---|---|\n"
     for identifier, statement, (source, anchor, test_file, test_name) in inventory():
         test_path = f"modules/lms/tests/{test_file}"
-        source_line = line_number(source, anchor)
         test_line = line_number(test_path, f"def {test_name}(")
         text += (
             f"| {identifier} | {statement} | "
-            f"[{source}:{source_line}](../../{source}#L{source_line}) | "
+            f"{source_links(identifier, source, anchor)} | "
             f"[{test_name}](../../{test_path}#L{test_line}) |\n"
         )
     (DOCS / "lms-reference.md").write_text(text, newline="\n")

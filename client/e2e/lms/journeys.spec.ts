@@ -1,7 +1,10 @@
+import { writeFileSync } from "node:fs";
 import type { Browser, Page, Response } from "@playwright/test";
 
 import type { AccountKey } from "../accounts";
 import { actAs, expect, openModuleNav, sidebar, signedInAs, test, uniqueName } from "../support/test";
+
+import { localTime } from "./time";
 
 const OFFERING = "cof_000b15335a733ab06119a0b2ec528564dfbf2d9084e0d849bb461a458e141b5f";
 interface CourseRow { id: number; external_offering_key: string }
@@ -29,10 +32,6 @@ async function selectDemoCourse(page: Page, key: AccountKey, route: "My Courses"
   return row.id;
 }
 
-function localTime(afterSeconds: number) {
-  const now = new Date(Date.now() + afterSeconds * 1000);
-  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 19);
-}
 
 async function chooseLoadedCourse(page: Page, id: number) {
   const picker = page.getByLabel("Course", { exact: true });
@@ -63,6 +62,17 @@ interface JourneyContext {
   note: string; section: string; news: string; correctedFeedback: string;
   titles: string[]; studentCourseId: number;
 }
+async function completeGradeLookup(page: Page) {
+  await expect(page.getByRole("heading", { name: /^Submission \d+ · User/ }).first()).toBeVisible();
+  const more = page.getByRole("button", { name: "Load more grades", exact: true });
+  while (await more.isVisible()) {
+    const response = page.waitForResponse((result) => result.url().includes("/grades/?cursor=") && result.request().method() === "GET");
+    await more.click();
+    expect((await response).status()).toBe(200);
+    await expect.poll(async () => (await more.count()) === 0 || await more.isEnabled()).toBe(true);
+  }
+}
+
 async function journey1(context: JourneyContext) {
   const { page } = context;
   await selectDemoCourse(page, "lmsFaculty", "Teaching");
@@ -161,6 +171,7 @@ async function journey6(context: JourneyContext) {
   const { student, ta, titles } = context;
   await selectDemoCourse(ta.page, "lmsTa", "Grading");
   await ta.page.getByLabel("Assignment to grade").selectOption({ label: titles[0] });
+  await completeGradeLookup(ta.page);
   await ta.page.getByLabel(/Points for submission/).fill("15");
   await ta.page.getByLabel(/Feedback for submission/).fill("Synthetic draft feedback");
   await ta.page.getByRole("button", { name: "Save draft grade", exact: true }).click();
@@ -176,6 +187,7 @@ async function journey7(context: JourneyContext) {
   await selectDemoCourse(page, "lmsFaculty", "Grading");
   for (const [index, title] of titles.slice(0, 2).entries()) {
     await page.getByLabel("Assignment to grade").selectOption({ label: title });
+    await completeGradeLookup(page);
     if (index === 1) {
       await page.getByLabel(/Points for submission/).fill("17");
       await page.getByLabel(/Feedback for submission/).fill("Faculty draft feedback");
@@ -195,11 +207,47 @@ async function journey7(context: JourneyContext) {
   await expect(student.page.getByText(correctedFeedback, { exact: true })).toBeVisible();
 }
 
+interface JourneyRequest {
+  useCases: number[]; actor: string; at: string; method: string; path: string; status: number;
+}
+
+async function recordJourney(useCases: number[], context: JourneyContext, records: JourneyRequest[], action: () => Promise<void>) {
+  const actors = [
+    { actor: "Faculty", page: context.page }, { actor: "Student", page: context.student.page },
+    { actor: "TA", page: context.ta.page }, { actor: "Observer", page: context.observer.page },
+  ];
+  const listeners = actors.map(({ actor, page }) => {
+    const listener = (response: Response) => {
+      const url = new URL(response.url());
+      if (url.pathname.startsWith("/api/v1/lms/")) records.push({ useCases, actor, at: new Date().toISOString(),
+        method: response.request().method(), path: url.pathname + url.search, status: response.status() });
+    };
+    page.on("response", listener);
+    return { page, listener };
+  });
+  try { await action(); }
+  finally { for (const { page, listener } of listeners) page.off("response", listener); }
+}
+
+
 test.describe("lms: complete course journeys", () => {
   test.use(signedInAs("lmsFaculty"));
+  test("accepts minute-boundary and second-precision datetime input", async ({ page }) => {
+    await selectDemoCourse(page, "lmsFaculty", "Teaching");
+    const base = new Date();
+    base.setMilliseconds(0);
+    for (const seconds of [0, 1, 59]) {
+      base.setSeconds(seconds);
+      const value = localTime(86_400, base.getTime());
+      const field = page.getByLabel("Assignment due date (local time)");
+      await field.fill(value);
+      await expect(field).toHaveValue(value);
+    }
+  });
   test("UC-LMS-001 through UC-LMS-015: publication, submissions, grading and scheduled release", async ({ page, browser }) => {
     test.setTimeout(240_000);
     const problems: string[] = [];
+    const records: JourneyRequest[] = [];
     const student = await anotherActor(browser, "lmsStudent", problems);
     const ta = await anotherActor(browser, "lmsTa", problems);
     const observer = await anotherActor(browser, "lmsObserver", problems);
@@ -210,15 +258,20 @@ test.describe("lms: complete course journeys", () => {
     const titles = [uniqueName("Text exercise"), uniqueName("File exercise"), uniqueName("Link exercise")];
     const context: JourneyContext = { page, student, ta, observer, note, section, news, correctedFeedback, titles, studentCourseId: 0 };
     try {
-      await test.step("UC-LMS-001/002: faculty configures course details", () => journey1(context));
-      await test.step("UC-LMS-003/015: faculty organizes and schedules material", () => journey2(context));
-      await test.step("UC-LMS-007/008: faculty creates and publishes all submission types", () => journey3(context));
-      await test.step("UC-LMS-004/005/006: TA and Observer read common content", () => journey4(context));
-      await test.step("UC-LMS-009/010/011/015: student downloads and submits released assignments", () => journey5(context));
-      await test.step("UC-LMS-012: TA grades a submission and cannot release it", () => journey6(context));
-      await test.step("UC-LMS-012/013/014: faculty grades, releases and audits a correction", () => journey7(context));
+      await test.step("UC-LMS-001/002: faculty configures course details", () => recordJourney([1, 2], context, records, () => journey1(context)));
+      await test.step("UC-LMS-003/015: faculty organizes and schedules material", () => recordJourney([3, 15], context, records, () => journey2(context)));
+      await test.step("UC-LMS-007/008: faculty creates and publishes all submission types", () => recordJourney([7, 8, 15], context, records, () => journey3(context)));
+      await test.step("UC-LMS-004/005/006: TA and Observer read common content", () => recordJourney([4, 5, 6], context, records, () => journey4(context)));
+      await test.step("UC-LMS-004/009/010/011/015: student downloads and submits released assignments", () => recordJourney([4, 9, 10, 11, 15], context, records, () => journey5(context)));
+      await test.step("UC-LMS-012: TA grades a submission and cannot release it", () => recordJourney([12], context, records, () => journey6(context)));
+      await test.step("UC-LMS-012/013/014: faculty grades, releases and audits a correction", () => recordJourney([12, 13, 14], context, records, () => journey7(context)));
       expect(problems).toEqual([]);
     } finally {
+      const evidence = test.info().outputPath("lms-journey-requests.json");
+      writeFileSync(evidence, JSON.stringify(records, null, 2));
+      await test.info().attach("lms-journey-requests", {
+        path: evidence, contentType: "application/json",
+      });
       await student.context.close(); await ta.context.close(); await observer.context.close();
     }
   });

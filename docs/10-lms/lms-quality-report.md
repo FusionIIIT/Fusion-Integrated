@@ -1,306 +1,321 @@
 # LMS implementation quality report
 
-## Step 8 — DEF-LMS-01 follow-up
+Record date: 23 November 2026 (IST). Student 1 builder corrections on parent
+`46a9076d483b480942b898e105f8f93c88e002e9`, branch `module/lms`.
 
-The self-grading defect handed off by Student 2 is fixed locally on the partner's
-spec baseline `600a6469438611af71c2081d2d21ffa2a7d0a503`. Owner grading mutations now return
-422 / CANNOT_GRADE_OWN_SUBMISSION before any grade/audit changes. Current backend
-verification: 388 LMS cases, including all 163 partner cases, passed;
-module branch coverage 98.64% and domain 100%.
-Both reserved spec-test directories are present from partner commits and remained
-byte-for-byte unchanged by this fix. [Full defect response](DEF-LMS-01.md).
+All 13 reconciled Q1/Round 3 findings have corresponding corrections and the
+verification recorded below. This is the builder's disposition; a fresh independent
+Q2 review is still required. No new score or 10/10 verdict is claimed. PR #628 stays
+draft. Student 2's 163 cases, frozen designs and triage files are byte-for-byte
+unchanged by this correction. No failing or skipped test was removed.
 
-Round 3 reviewed f09c49d with 13 open findings; no 10/10 verdict or Q1 result is
-claimed. This update resolves DEF-LMS-01 only. The remainder below is the historical
-Round 2 correction record, retained as evidence of that earlier revision.
+## Approved basis and scope
 
-## Historical Round 2 correction record
+Vedha's written Stage B approval is for A9-LMS-BP-0.2 at
+`fca2636c8b92c9312acbfa25d59c4fd636b47ba9`, 22 November 2026. Original blueprint
+SHA-256: `f053725ae7f6b25b1e8e8c457c176209f9b954e562c1783c318512d9eb8c5d39`;
+policy SHA-256: `80f98063d05be3df3fa74794ca6d8b7dc5c3866fd634083e49828bb112b30b38`.
+The implementation-aligned blueprint is a record of corrections, not a new human
+approval. D-01–D-06 and F-03/F-04/F-05 remain adopted. D-07 is the later explicit
+self-grading refusal ruling recorded in [DEF-LMS-01.md](DEF-LMS-01.md).
 
-Record date: 23 November 2026 (IST). Scope: Student 1 builder corrections after
-completed Round 2 on `92b4ed5f563494c372bd543af4fb5bbc4ea6505a`.
+IAM prerequisite: local `494160849bd101a5cb77a1b1c9f0881307079888`, parent
+`d143e4e61b11a2a5e21c03355f8b784d83103b5d`. It is not an official upstream
+merge. Nonstudent associations are labelled synthetic fixtures, not a production
+teaching feed. Working module/folder identifiers are pair-endorsed; separate
+instructor confirmation is not claimed.
 
-**Historical status:** all 17 Round 2 findings have corresponding builder corrections
-below. The corrected revision has not had a subsequent independent review.
-PR #628 remains draft. Step 8 remains on hold, and neither reserved spec-test
-directory has been created or touched. No independent final score is claimed.
+The preapproved scope includes IAM wrappers, the module-neutral private writer
+(F-03), backend/client implementation, shared registrations, new browser accounts
+and regenerated artifacts. The current forwarded RQ1-11 specifically requests the
+writer refusal wording. No dependency or test-harness change was introduced.
+Additional Celery bootstrap and Principal refresh approvals are preserved in
+[Shared_Changes_Approval_Decision.md](Shared_Changes_Approval_Decision.md).
+The signed text says MeView.post; the existing implemented handler is MeView.patch.
+The signed record has not been rewritten to conceal that method-label mismatch.
 
-## Approved basis and shared changes
+## Q1 finding disposition
 
-Paired approver Vedha approved blueprint A9-LMS-BP-0.2 at documentation commit
-`fca2636c8b92c9312acbfa25d59c4fd636b47ba9` on 22 November 2026:
-
-> I formally approve Blueprint A9-LMS-BP-0.2 (commit
-> fca2636c8b92c9312acbfa25d59c4fd636b47ba9) and authorize Student 1 to proceed
-> with Stage B LMS application implementation.
-
-Original approved blueprint SHA-256:
-`f053725ae7f6b25b1e8e8c457c176209f9b954e562c1783c318512d9eb8c5d39`.
-Policy record SHA-256:
-`80f98063d05be3df3fa74794ca6d8b7dc5c3866fd634083e49828bb112b30b38`.
-The implementation-aligned blueprint 0.3 records actual code locations, without
-claiming a new human specification approval or changing the stored policy version.
-
-The 22 November written scope authorizes the real IAM wrappers and FakeIam,
-shared private writer, backend/client builder implementation, preapproved
-settings/URL/Celery/import/client registrations, new browser demo accounts, and
-rebuilt schema/permission artifacts. F-03 storage, F-04 edit guards and F-05 release
-scheduling are adopted policies. No dependency was added or harness gate relaxed.
-
-### Shared-file changes approval authority
-
-The additional changes to `config/__init__.py` and `fusion_auth/views.py` were
-formally approved by paired approver Vedha on 23 November 2026. The complete dated
-approval wording is preserved with trailing Markdown whitespace normalized in
-[Shared_Changes_Approval_Decision.md](Shared_Changes_Approval_Decision.md). The original received file has SHA-256
-`2a48d1c16b1e3555da11ae1cde7f57575ee8a51a9bd0a66afffe2386ce461b7c`.
-It approves the exact Celery bootstrap and exact Principal-refresh code. Its
-method label says `MeView.post`; the actual existing role-switch handler is
-`MeView.patch`. The approved file/diff is unchanged and implemented in that PATCH
-handler; the signed original is not silently edited to correct this label.
-Both shared changes have dedicated regressions.
-
-The IAM prerequisite remains locally committed and verified at
-`494160849bd101a5cb77a1b1c9f0881307079888`, parent
-`d143e4e61b11a2a5e21c03355f8b784d83103b5d`. It is not an official upstream merge.
-Nonstudent course associations are approved labelled synthetic fixtures, not a
-claim of a production teaching feed. There are no accepted LMS specification gaps,
-new dependency approvals or waivers to report.
-
-## Round 2 correction register
-
-The unedited completed report and raw evidence remain in the Student 1 handoff
-package. The table below is a builder disposition, not an altered scorecard.
-Round 2 reported 2 Blockers, 10 Majors and 5 Minors. Its scores were
-10, 3, 8, 4, 10, 4, 3, 0, 3 across the nine dimensions.
-
-| Finding | Correction and evidence |
-|---|---|
-| R2-01 | Dated paired approval preserved above for the two additional shared changes. |
-| R2-02 | Removed the initial migration tool header and reworded ordinary manifest prose; exact mandated attribution scan is empty. No provenance was relabelled. |
-| R2-03 | Human and scheduled lifecycle writes converge in locked atomic `transition_content`; append-only ContentTransitionLog persists state/release time/actor/event together. Audit failure rolls back publication. |
-| R2-04 | All input serializers reject undeclared fields/non-object JSON, including empty action bodies; every write has a no-side-effect unknown-field refusal. Forged owners are rejected, never accepted/ignored. |
-| R2-05 | All 17 write operations have endpoint-specific 429 refusal/state-preservation tests. Absent/repeated grade release explicitly returns 409 without extra audit. Existing permission, scope, CSRF, semantic and conflict regressions remain. |
-| R2-06 | UC-LMS-015 journeys use only HTTP business operations while an actual thread worker processes ETA messages on a local memory transport. Success, withdrawal and injected processing-failure branches preserve the correct visibility. Direct task calls stay in dedicated task/unit/concurrency tests. |
-| R2-07 | Five serialized real-browser rows below each retain their own matching runserver lines. Plain-user UI refusals are distinguished from successful allowed HTTP reads. |
-| R2-08 | Complete response DTO fields/nullability, string submission policy version, release attribution and policy metadata; unseeded policy response now has the same full nullable contract. Acting-role choices are explicit in schema. |
-| R2-09 | Teaching is mounted with every Faculty permission except course.update; details controls are absent while assignment controls remain. Removing that guard now fails the test; original source restored. |
-| R2-10 | Blueprint 0.3 maps all 103 obligations to existing enforcement locations and records actual registry/nav, aggregate files, commands, APIs, implementation and review status. Approved 0.2 identity is retained. |
-| R2-11 | BR-LMS-017 and UC-LMS-013 now point to Faculty-only `grading.release_grade`, rather than a grade-read selector. All 103 source/test links resolve. |
-| R2-12 | Both scheduled sweeps have management commands, with idempotence regressions and deployment instructions. |
-| R2-13 | Models split into aggregate files; package initializer only re-exports them. Existing business schema retained; audit added in migration 0002. |
-| R2-14 | Domain refusals give actionable next steps for deadline, actor, payload, points, required instructions/date, immutable edits and state/time conflicts; no unsupported late override is implied. |
-| R2-15 | Browser journey split into seven named stages preserving all actor progression and assertions. |
-| R2-16 | 31 endpoint-specific typed TanStack hooks wrap shared internal read/list/write/download helpers; pages consume endpoint hooks and preserve user/role cache isolation. |
-| R2-17 | Every API operation has response examples; applicable writes also have request examples. Binary responses use their actual media types. OpenAPI rebuilt and schema check passes. |
+| Finding | Correction / verification | Location |
+|---|---|---|
+| RQ1-01 | Datetime values omit only zero seconds, preserving nonzero-second ETA precision. Real Chromium boundary cases 00/01/59 pass. | client/e2e/lms/time.ts; journeys.spec.ts |
+| RQ1-02 | An unknown grade stays non-editable until the remaining grade pages are loaded. A TA cannot edit a Released grade found on a later page. | GradingPage.tsx; paginated mounted-page regressions |
+| RQ1-03 | Mounted create/update controls are absent without their corresponding permission. Removing the permission expression fails both new regressions. | GradingPage.test.tsx; mutations/frontend-1.log |
+| RQ1-04 | A selected-course failure renders the server error. Replacing it with Pending fails the new regression. | GradingPage.test.tsx; mutations/frontend-2.log |
+| RQ1-05 | Response ChoiceFields constrain all six finite kind/state/type fields; regenerated OpenAPI matches the existing client unions. | serializers.py; test_response_enums.py |
+| RQ1-06 | Direct /lms/courses visit is refused with no controls for a real module-granted actor lacking lms.course.view. | workspaces.spec.ts; iam-fixture.ts |
+| RQ1-07 | All 15 UCs have role-bound browser requests matched to real HTTP log lines below; all five roles also have serialized read replays. | walkthrough.json; http-requests.log; release-worker.log |
+| RQ1-08 | Per-file collected test counts and five actual backend mutation failures are restored below, with exact commands and failing test identities. | collection tables and mutation table |
+| RQ1-09 | Course-home display points to Workspace; student assignment download points to AssignmentDownloadAPI. Other publication/read mismatches also corrected. | ops/docs/lms_reference.py; lms-reference.md |
+| RQ1-10 | Inventory delegates grouping, entry selection and link rendering to small helpers. | ops/docs/lms_reference.py |
+| RQ1-11 | Duplicate submission and private-storage refusals tell the user what to do next. No unsupported resubmission exemption is promised. | services/submissions.py; core/files/writers.py |
+| RQ1-12 | Handled release validation uses a bounded warning with kind/ID/action, no traceback or payload. Regression asserts exc_info is absent. | tasks.py; test_schedule.py |
+| RQ1-13 | One complete 0001_initial includes transition audit. Fresh rollback/reapply and readiness pass; existing business-row digests are unchanged. | migrations/0001_initial.py; fresh-install.log |
 
 ## Current verification gates
 
-| Command/check | Current observed result |
+| Gate | Actual result |
 |---|---|
-| `make check` | Passed: Django/migration checks, lint, all 5 import contracts, no cross-module FK, plural contracts, nav, manifest, schema and whole platform suite. 634 tests collected. |
-| `make check-client` | Passed: both TypeScript projects, 59 client tests, production build. |
-| `make e2e` | 17 passed in 55.8 seconds against this checkout, real IAM/API and Redis worker. Includes existing auth/shell/Placement tests. |
-| Module coverage command below | 209 passed; 98.64% branch-aware production module coverage, floor 90%. |
-| Domain coverage command below | 209 passed; 100.00% branch-aware pure domain coverage, floor 95%. |
-| Production deployment check | Passed with exact upstream CI environment plus DB_PASSWORD; no issues, two existing silenced checks. |
-| Reference regeneration | 103 live enforcement/test links validated. |
-| Fresh PostgreSQL database | Both migrations applied, rolled back and reapplied; missing setup named; 3,686 workspaces initialized; readiness passed. |
-| Fresh browser | Actual Student course read passed; cookie-authenticated write without CSRF returned 403. |
-| Role walkthrough | Five real browser rows below, including plain Student direct-route refusal and Observer hidden controls. |
-| Keyboard course flow | Tab/arrow/Enter navigation, course selection and TA announcement posting passed. |
-| Teaching guard mutation | New mounted-control regression fails when guard is removed; original source bytes restored. |
+| `DJANGO_SETTINGS_MODULE=config.settings.test make check` | Passed; 819 platform cases collected; supplied test settings and gates unchanged. |
+| Builder module coverage (spec folders excluded) | 231 passed; 98.65% branch-aware module coverage; pure domain has zero missing lines or branches (100%). |
+| Partner spec suites | FR 51, UC 47, BR 45, WF 20: 163 passed. |
+| All LMS collection | 394 = 231 builder + 163 partner cases. |
+| `make check-client` | Both TypeScript projects, 65 tests in 10 files and production build passed. |
+| Production deployment | Exact upstream CI deployment environment plus local DB_PASSWORD; no issues, two existing silenced checks. |
+| `make e2e` | 19 passed, default 8 workers, real IAM/API/Redis/Celery; includes platform auth/shell/Placement cases. |
+| Browser walkthrough | 15 live UCs and five real role/account replays; keyboard-only course selection and TA posting passed. |
+| Fresh installation | One initial migration applied, rolled back, reapplied; readiness failed before sync and passed after 3,686 workspaces initialized; browser read passed and CSRF-less write returned 403. |
+| Mutation checks | Five backend and two frontend mutants failed the expected assertions; original bytes restored and targeted tests passed afterward. |
+| Reference | 103 unique live IDs have resolving actual enforcement and builder-test anchors. |
 
+Reproduction (use the supplied test settings, not development settings):
+
+```sh
+DJANGO_SETTINGS_MODULE=config.settings.test make check
+make check-client
+DJANGO_SETTINGS_MODULE=config.settings.test .venv/bin/pytest modules/lms --ignore=modules/lms/tests/spec -o addopts= -q --cov=modules/lms --cov-branch --cov-report=term-missing --cov-fail-under=90
+DJANGO_SETTINGS_MODULE=config.settings.test .venv/bin/pytest modules/lms --ignore=modules/lms/tests/spec -o addopts= -q --cov=modules/lms/domain --cov-branch --cov-fail-under=95
+.venv/bin/python ops/docs/lms_reference.py
+make e2e
 ```
-.venv/bin/pytest modules/lms --ignore=modules/lms/tests/spec --cov=modules/lms --cov-branch --cov-report=term-missing --cov-fail-under=90
-.venv/bin/pytest modules/lms --ignore=modules/lms/tests/spec --cov=modules/lms/domain --cov-branch --cov-report=term-missing --cov-fail-under=95
-```
 
-Coverage excludes tests and migrations. The three lazy page chunks remain below
-150 KB gzip. The shared entry still emits the existing Vite size warning, without
-failing the build. No test is skipped, marked expected-failure or made exclusive.
-All gates use the supplied test settings and harness without blanket role bypasses.
+Coverage excludes tests and migrations. Domain 100% is computed from the same
+branch-aware builder run, without counting specification cases. LMS lazy chunks
+gzip sizes: Grading 1.74 KB, Courses 2.29 KB, Teaching 2.97 KB. The existing shared
+entry emits the Vite size warning; build succeeds. No skip, xfail, exclusive test,
+blanket authorization bypass or weakened supplied harness was added.
 
-Selected real gate output:
+Verification logs are in [builder-evidence/q1/](builder-evidence/q1/); the local
+evidence-workspace path and trailing whitespace are normalized in copied output; original logs are
+retained locally. Counts below come from
+actual collected node IDs and the successful client run, rather than the forwarded
+Q1 narrative's inconsistent 832-case figure.
+
+## Test counts per file
+
+| Backend LMS file | Collected cases | Owner |
+|---|---:|---|
+| `modules/lms/tests/spec/br/test_br_spec.py` | 45 | Student 2 |
+| `modules/lms/tests/spec/fr/test_fr_spec.py` | 51 | Student 2 |
+| `modules/lms/tests/spec/uc/test_uc_spec.py` | 47 | Student 2 |
+| `modules/lms/tests/spec/wf/test_wf_spec.py` | 20 | Student 2 |
+| `modules/lms/tests/test_celery_bootstrap.py` | 1 | Builder |
+| `modules/lms/tests/test_client_route_guards.py` | 1 | Builder |
+| `modules/lms/tests/test_concurrency.py` | 4 | Builder |
+| `modules/lms/tests/test_domain.py` | 30 | Builder |
+| `modules/lms/tests/test_files.py` | 29 | Builder |
+| `modules/lms/tests/test_grading_conflicts.py` | 16 | Builder |
+| `modules/lms/tests/test_http_scheduling.py` | 4 | Builder |
+| `modules/lms/tests/test_iam_contract.py` | 20 | Builder |
+| `modules/lms/tests/test_journeys.py` | 9 | Builder |
+| `modules/lms/tests/test_privilege_escalation.py` | 35 | Builder |
+| `modules/lms/tests/test_refusals.py` | 8 | Builder |
+| `modules/lms/tests/test_response_enums.py` | 6 | Builder |
+| `modules/lms/tests/test_review_regressions.py` | 38 | Builder |
+| `modules/lms/tests/test_schedule.py` | 4 | Builder |
+| `modules/lms/tests/test_setup_and_queries.py` | 10 | Builder |
+| `modules/lms/tests/test_shared_role_switch.py` | 4 | Builder |
+| `modules/lms/tests/test_validation_errors.py` | 12 | Builder |
+
+| Client file | Passing cases |
+|---|---:|
+| `client/src/app/LoginPage.test.ts` | 17 |
+| `client/src/auth/RequireAuth.test.tsx` | 4 |
+| `client/src/auth/RequirePermission.test.tsx` | 2 |
+| `client/src/lib/download.test.ts` | 10 |
+| `client/src/modules/lms/api/hooks.test.tsx` | 4 |
+| `client/src/modules/lms/pages/CoursesPage.test.tsx` | 6 |
+| `client/src/modules/lms/pages/GradingPage.test.tsx` | 11 |
+| `client/src/modules/lms/pages/TeachingPage.test.tsx` | 6 |
+| `client/src/modules/placement/api/hooks.test.tsx` | 4 |
+| `client/src/modules/placement/pages/CompaniesPage.test.tsx` | 1 |
+
+## Broken-on-purpose rules and catching tests
+
+Each mutation was applied to the real source, executed, and restored in a finally
+block with SHA-256 equality checked. Backend mutations ran under
+`DJANGO_SETTINGS_MODULE=config.settings.test`. Each command exited 1 with the
+listed assertion failure, not an import/setup error. Restored targeted backend
+and GradingPage suites passed. The schema uniqueness mutation changes the actual
+initial migration used to create the isolated test database.
+
+| Rule temporarily broken | Exact command | Observed failing test(s) | Raw output |
+|---|---|---|---|
+| course offering scope | `.venv/bin/pytest modules/lms/tests/test_journeys.py::test_uc_lms_001_access_and_uc_lms_002_manage_details --maxfail=1 --tb=short` | FAILED modules/lms/tests/test_journeys.py::test_uc_lms_001_access_and_uc_lms_002_manage_details | [log](builder-evidence/q1/mutations/backend-1.log) |
+| action permission | `.venv/bin/pytest modules/lms/tests/test_privilege_escalation.py::test_every_route_refuses_anonymous_missing_permission_missing_module --maxfail=1 --tb=short` | FAILED modules/lms/tests/test_privilege_escalation.py::test_every_route_refuses_anonymous_missing_permission_missing_module[courses/-Courses] | [log](builder-evidence/q1/mutations/backend-2.log) |
+| submission deadline | `.venv/bin/pytest modules/lms/tests/test_journeys.py::test_submission_at_deadline_and_late_refusal --maxfail=1 --tb=short` | FAILED modules/lms/tests/test_journeys.py::test_submission_at_deadline_and_late_refusal | [log](builder-evidence/q1/mutations/backend-3.log) |
+| draft grade privacy | `.venv/bin/pytest modules/lms/tests/test_journeys.py::test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade --maxfail=1 --tb=short` | FAILED modules/lms/tests/test_journeys.py::test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade[faculty] | [log](builder-evidence/q1/mutations/backend-4.log) |
+| submission database uniqueness | `.venv/bin/pytest modules/lms/tests/test_refusals.py::test_database_uniqueness_survives_service_bypass --maxfail=1 --tb=short` | FAILED modules/lms/tests/test_refusals.py::test_database_uniqueness_survives_service_bypass | [log](builder-evidence/q1/mutations/backend-5.log) |
+| grading control permission | `npm test -- src/modules/lms/pages/GradingPage.test.tsx` | FAIL  src/modules/lms/pages/GradingPage.test.tsx > GradingPage > hides a mounted grading form without grade.create<br>FAIL  src/modules/lms/pages/GradingPage.test.tsx > GradingPage > hides a mounted grading form without grade.update | [log](builder-evidence/q1/mutations/frontend-1.log) |
+| selected course error | `npm test -- src/modules/lms/pages/GradingPage.test.tsx` | FAIL  src/modules/lms/pages/GradingPage.test.tsx > GradingPage > shows a selected course detail error instead of a spinner | [log](builder-evidence/q1/mutations/frontend-2.log) |
+
+## Browser walkthrough: every live use case
+
+Automation: `client/e2e/lms/journeys.spec.ts` has named steps for UC-LMS-001–015,
+separate real Faculty/Student/TA/Observer contexts, UI assertions, real HTTP and
+real Redis-backed worker execution. Each row below selects one representative
+successful request from the passing journey. The complete role-bound response
+records are in [journey-requests.json](builder-evidence/q1/journey-requests.json).
+Matching lines below are copied from the actual Django log, with method/path/status
+and response/server times checked within four seconds; server lines alone do not
+attribute the actor. The actor attribution comes from the browser context.
+
+| UC | Actor | Observed UI result | Matching server request log |
+|---|---|---|---|
+| UC-LMS-001 | Faculty | Assigned course opens with syllabus, schedule and staff. | `[23/Nov/2026 16:45:27] "GET /api/v1/lms/courses/1/ HTTP/1.1" 200 2514` |
+| UC-LMS-002 | Faculty | Course details publish and persist. | `[23/Nov/2026 16:45:29] "PATCH /api/v1/lms/courses/1/ HTTP/1.1" 200 2514` |
+| UC-LMS-003 | Faculty | Section and NOTE material are created; material is scheduled. | `[23/Nov/2026 16:45:33] "POST /api/v1/lms/courses/1/materials/ HTTP/1.1" 201 238` |
+| UC-LMS-004 | Student | Published scheduled note becomes visible to the Student. | `[23/Nov/2026 16:46:02] "GET /api/v1/lms/courses/1/materials/ HTTP/1.1" 200 6239` |
+| UC-LMS-005 | TA | Policy-authorized TA posts a timestamped announcement. | `[23/Nov/2026 16:45:41] "POST /api/v1/lms/courses/1/announcements/ HTTP/1.1" 201 146` |
+| UC-LMS-006 | Observer | Observer sees the common announcement without authoring controls. | `[23/Nov/2026 16:45:43] "GET /api/v1/lms/courses/1/announcements/ HTTP/1.1" 200 3129` |
+| UC-LMS-007 | Faculty | TEXT, FILE and LINK assignment drafts are created. | `[23/Nov/2026 16:45:36] "POST /api/v1/lms/courses/1/assignments/ HTTP/1.1" 201 276` |
+| UC-LMS-008 | Faculty | Assignments publish immediately or at the selected future release. | `[23/Nov/2026 16:45:36] "POST /api/v1/lms/assignments/56/publish/ HTTP/1.1" 200 310` |
+| UC-LMS-009 | Student | Released assignment instructions download successfully. | `[23/Nov/2026 16:45:58] "GET /api/v1/lms/assignments/56/download/ HTTP/1.1" 200 115` |
+| UC-LMS-010 | Student | TEXT, FILE and LINK submissions are accepted once each. | `[23/Nov/2026 16:45:58] "POST /api/v1/lms/assignments/56/submissions/ HTTP/1.1" 201 196` |
+| UC-LMS-011 | Student | Own submission history/status is displayed. | `[23/Nov/2026 16:46:02] "GET /api/v1/lms/assignments/58/submissions/ HTTP/1.1" 200 241` |
+| UC-LMS-012 | TA | TA records a Draft grade; release control stays absent. | `[23/Nov/2026 16:46:04] "POST /api/v1/lms/submissions/43/grade/ HTTP/1.1" 200 248` |
+| UC-LMS-013 | Faculty | Faculty releases grades and corrects a released grade with audit. | `[23/Nov/2026 16:46:08] "POST /api/v1/lms/submissions/43/grade/release/ HTTP/1.1" 200 281` |
+| UC-LMS-014 | Student | Own released feedback is visible; prior Draft feedback was absent. | `[23/Nov/2026 16:46:13] "GET /api/v1/lms/courses/1/grades/ HTTP/1.1" 200 7372` |
+| UC-LMS-015 | Faculty | Future material/assignment releases execute in the real Celery worker and become readable. | `[23/Nov/2026 16:45:35] "POST /api/v1/lms/materials/21/publish/ HTTP/1.1" 200 265` |
+
+UC-LMS-015 System evidence from the real worker (the scheduled content was then asserted visible in the Student UI):
 
 ```text
-Contracts: 5 kept, 0 broken.
-no cross-module foreign keys
-all contract getters are plural
-nav items and client routes agree
-permission manifest matches the registries
-openapi schema matches the code
-Tests 59 passed (59)
-17 passed (55.8s)
-Required test coverage of 90% reached. Total coverage: 98.64%
-Required test coverage of 95% reached. Total coverage: 100.00%
-System check identified no issues (2 silenced).
+[2026-11-23 16:45:48,052: INFO/ForkPoolWorker-1] lms.release.transition kind=material id=21 event=release
+[2026-11-23 16:45:54,026: INFO/ForkPoolWorker-1] lms.release.transition kind=assignment id=58 event=release
 ```
 
-## Behavioral and adversarial coverage
+## Browser walkthrough: every role and ordinary user
 
-HTTP journeys cover course access/details, material organization/publication,
-conditional TA announcements and audience reads, assignment draft/edit/immediate
-and scheduled publication/download, all submission payload types, own history,
-Faculty/TA Draft grading, Faculty release and audited Released correction, and
-own Released grade visibility. UC-LMS-015 adds withdrawal and processing-failure
-journeys on real asynchronous worker execution. The independent specification
-test phase has not begun; these are builder tests.
+These serialized replay rows use actual synthetic account sessions and each row's
+own captured server lines. Automation: the builder role walkthrough following the
+passing browser suite. Observer has no authoring controls; the plain Student's
+Teaching/Grading visits are refused by the client guard, without mounting controls.
+Those client refusals are not falsely described as backend HTTP 403 responses.
+All backend routes separately have missing-verb/module/scope refusal tests.
 
-Negative coverage includes every route's anonymous/missing-module/missing-method
-permission refusals, live offering revocation/outage and wrong acting role, foreign
-IDs, peer/Observer privacy, cookie CSRF, each write's throttle/unknown-field refusal,
-domain error categories, malformed link and huge order validation, both sides of
-the inclusive deadline, duplicate successes and state conflicts. Refusals preserve
-business state and do not consume a successful submission.
-
-Dedicated real PostgreSQL concurrent transactions prove one successful submission,
-serialized grade old/new audit, assignment-edit/submit/grade lock ordering, and
-duplicate scheduled delivery idempotency. Grade/audit and publication/audit failure
-probes prove rollback. Scheduled tests cover due/not-due, reschedule, withdrawal,
-bad content, dispatch failure, missing IDs, bounded 50-item sweeps and repeated runs.
-File tests cover private scoped downloads, byte limits, formats, hostile names and
-cleanup; content is never executed or extracted. Query-budget tests compare small
-and larger collections with batched identity enrichment.
-
-Security audit: module/verb/course gates stay mandatory; active roles are not
-unioned; client caches separate users/roles; server ownership/timestamps are fixed;
-Students never receive peer or Draft evaluation data; TAs cannot release/correct
-Released work; Observers cannot access student-specific endpoints. The client uses
-escaped text, shared HTTP/CSRF and private downloads, without token storage,
-unsafe HTML, arbitrary SQL or request-controlled execution. No local access-control
-tables, cross-module FKs, artificial score cap or financial ledger was introduced.
-
-## Fresh installation and operations
-
-The host uses native PostgreSQL with a dedicated local role. The disposable fresh
-database check preserves the working database and asserts that the fresh name is
-absent before creating it. It applies/rolls back/reapplies both LMS migrations,
-checks readiness before/after idempotent IAM synchronization, and starts an isolated
-API on 8012 plus temporary client proxy on 5183 for the first browser action/CSRF
-proof. The temporary processes/database are removed in a finally block. The
-committed client proxy and browser harness are unchanged.
-
-```text
-Applying lms.0001_initial... OK
-Applying lms.0002_contenttransitionlog... OK
-CommandError: Run manage.py sync_lms_workspaces after the IAM catalogue sync.
-Initialized 3686 new LMS workspaces.
-LMS prerequisites satisfied.
-Fresh browser: My Courses -> linked workspace opened; cookie write without CSRF: 403.
-Fresh migration rollback/reapply, readiness and browser verification passed.
-```
-
-Setup: configure synthetic DB/IAM credentials and private storage, migrate, run
-`sync_lms_workspaces`, seed modules/permission manifest into IAM, then run
-`check_lms_ready`. Start API, client, Celery worker and beat. Beat merges the two
-60-second / 50-item sweeps; ETA dispatch happens after commit. The supplied dev
-settings force eager mode, so real-worker verification uses an external settings
-overlay changing only CELERY_TASK_ALWAYS_EAGER to false. No test setting was edited.
-
-Operator replay commands (each tested twice on an empty due set):
-
-```
-.venv/bin/python manage.py release_due_materials
-.venv/bin/python manage.py release_due_assignments
-```
-
-Each prints zero released rows when no work is due and uses the ordinary locked
-transition/audit path. Both commands are safe to repeat. Worker failure leaves
-scheduled content private; the catch-up sweep retries due content after recovery.
-
-## Browser walkthrough with row-specific request evidence
-
-These rows are serialized, read-only UI replays after the full successful E2E
-journey, using synthetic fixture accounts. Every block contains that row's actual
-runserver lines captured from a fresh journal cursor. The selected workspace is
-the account's first associated course and need not be the shared demo offering.
-The full E2E journey separately covers writes and all three submission variants.
-
-| Role/account | Walkthrough | Observed result |
-|---|---|---|
-| Faculty / fac00021 | UC-LMS-001 and common-content reads in workspace 1 | Passed; Opened actual assigned course, details and common-content panels |
-| Student / stu03009 | UC-LMS-001 and common-content reads in workspace 3607 | Passed; Opened actual assigned course, details and common-content panels |
-| TA / stu03008 | UC-LMS-001 and common-content reads in workspace 1 | Passed; Opened actual assigned course, details and common-content panels |
-| Observer / stf00001 | UC-LMS-001 and common-content reads in workspace 1 | Passed; Opened actual assigned course, details and common-content panels; No assignment or announcement write controls |
-| Ordinary Student / stu00001 | UC-LMS-001 and common-content reads in workspace 3506 | Passed; Opened actual assigned course, details and common-content panels; Teaching/grading direct routes refused by UI guard; unauthorized pages did not mount |
+| Role / account | Workspace | Observed result |
+|---|---:|---|
+| Faculty / `fac00021` | 1 | Opened actual assigned course, details and common-content panels |
+| Student / `stu03009` | 3607 | Opened actual assigned course, details and common-content panels |
+| TA / `stu03008` | 1 | Opened actual assigned course, details and common-content panels |
+| Observer / `stf00001` | 1 | Opened actual assigned course, details and common-content panels; No assignment or announcement write controls |
+| Ordinary Student / `stu00001` | 3506 | Opened actual assigned course, details and common-content panels; Teaching/grading direct routes refused by UI guard; unauthorized pages did not mount |
 
 ### Faculty / `fac00021`
 
 ```text
-[23/Nov/2026 01:17:40] "GET /api/v1/me HTTP/1.1" 200 1195
-[23/Nov/2026 01:17:40] "GET /api/v1/lms/courses/ HTTP/1.1" 200 1719
-[23/Nov/2026 01:17:41] "GET /api/v1/lms/courses/1/ HTTP/1.1" 200 1677
-[23/Nov/2026 01:17:41] "GET /api/v1/lms/courses/1/announcements/ HTTP/1.1" 200 1654
-[23/Nov/2026 01:17:41] "GET /api/v1/lms/courses/1/assignments/ HTTP/1.1" 200 8084
-[23/Nov/2026 01:17:41] "GET /api/v1/lms/courses/1/materials/ HTTP/1.1" 200 3279
+[23/Nov/2026 16:46:19] "GET /api/v1/me HTTP/1.1" 200 1195
+[23/Nov/2026 16:46:19] "GET /api/v1/lms/courses/ HTTP/1.1" 200 2649
+[23/Nov/2026 16:46:20] "GET /api/v1/lms/courses/1/ HTTP/1.1" 200 2607
+[23/Nov/2026 16:46:20] "GET /api/v1/lms/courses/1/announcements/ HTTP/1.1" 200 3129
+[23/Nov/2026 16:46:20] "GET /api/v1/lms/courses/1/materials/ HTTP/1.1" 200 6239
+[23/Nov/2026 16:46:20] "GET /api/v1/lms/courses/1/assignments/ HTTP/1.1" 200 8096
 ```
 
 ### Student / `stu03009`
 
 ```text
-[23/Nov/2026 01:17:42] "GET /api/v1/me HTTP/1.1" 200 1521
-[23/Nov/2026 01:17:42] "GET /api/v1/lms/courses/ HTTP/1.1" 200 9009
-[23/Nov/2026 01:17:43] "GET /api/v1/lms/courses/3607/ HTTP/1.1" 200 345
-[23/Nov/2026 01:17:43] "GET /api/v1/lms/courses/3607/assignments/ HTTP/1.1" 200 42
-[23/Nov/2026 01:17:43] "GET /api/v1/lms/courses/3607/grades/ HTTP/1.1" 200 42
-[23/Nov/2026 01:17:43] "GET /api/v1/lms/courses/3607/materials/ HTTP/1.1" 200 42
-[23/Nov/2026 01:17:43] "GET /api/v1/lms/courses/3607/announcements/ HTTP/1.1" 200 42
+[23/Nov/2026 16:46:21] "GET /api/v1/me HTTP/1.1" 200 1521
+[23/Nov/2026 16:46:21] "GET /api/v1/lms/courses/ HTTP/1.1" 200 9009
+[23/Nov/2026 16:46:22] "GET /api/v1/lms/courses/3607/ HTTP/1.1" 200 345
+[23/Nov/2026 16:46:22] "GET /api/v1/lms/courses/3607/announcements/ HTTP/1.1" 200 42
+[23/Nov/2026 16:46:22] "GET /api/v1/lms/courses/3607/grades/ HTTP/1.1" 200 42
+[23/Nov/2026 16:46:22] "GET /api/v1/lms/courses/3607/assignments/ HTTP/1.1" 200 42
+[23/Nov/2026 16:46:22] "GET /api/v1/lms/courses/3607/materials/ HTTP/1.1" 200 42
 ```
 
 ### TA / `stu03008`
 
 ```text
-[23/Nov/2026 01:17:44] "GET /api/v1/me HTTP/1.1" 200 1674
-[23/Nov/2026 01:17:44] "GET /api/v1/lms/courses/ HTTP/1.1" 200 1714
-[23/Nov/2026 01:17:44] "GET /api/v1/lms/courses/1/ HTTP/1.1" 200 1672
-[23/Nov/2026 01:17:45] "GET /api/v1/lms/courses/1/announcements/ HTTP/1.1" 200 1654
-[23/Nov/2026 01:17:45] "GET /api/v1/lms/courses/1/assignments/ HTTP/1.1" 200 8084
-[23/Nov/2026 01:17:45] "GET /api/v1/lms/courses/1/materials/ HTTP/1.1" 200 3279
+[23/Nov/2026 16:46:23] "GET /api/v1/me HTTP/1.1" 200 1674
+[23/Nov/2026 16:46:23] "GET /api/v1/lms/courses/ HTTP/1.1" 200 2644
+[23/Nov/2026 16:46:23] "GET /api/v1/lms/courses/1/ HTTP/1.1" 200 2602
+[23/Nov/2026 16:46:23] "GET /api/v1/lms/courses/1/assignments/ HTTP/1.1" 200 8096
+[23/Nov/2026 16:46:23] "GET /api/v1/lms/courses/1/materials/ HTTP/1.1" 200 6239
+[23/Nov/2026 16:46:23] "GET /api/v1/lms/courses/1/announcements/ HTTP/1.1" 200 3129
 ```
 
 ### Observer / `stf00001`
 
 ```text
-[23/Nov/2026 01:17:46] "GET /api/v1/me HTTP/1.1" 200 601
-[23/Nov/2026 01:17:46] "GET /api/v1/lms/courses/ HTTP/1.1" 200 1721
-[23/Nov/2026 01:17:46] "GET /api/v1/lms/courses/1/ HTTP/1.1" 200 1679
-[23/Nov/2026 01:17:46] "GET /api/v1/lms/courses/1/announcements/ HTTP/1.1" 200 1654
-[23/Nov/2026 01:17:46] "GET /api/v1/lms/courses/1/materials/ HTTP/1.1" 200 3279
+[23/Nov/2026 16:46:24] "GET /api/v1/me HTTP/1.1" 200 601
+[23/Nov/2026 16:46:25] "GET /api/v1/lms/courses/ HTTP/1.1" 200 2651
+[23/Nov/2026 16:46:25] "GET /api/v1/lms/courses/1/ HTTP/1.1" 200 2609
+[23/Nov/2026 16:46:25] "GET /api/v1/lms/courses/1/announcements/ HTTP/1.1" 200 3129
+[23/Nov/2026 16:46:25] "GET /api/v1/lms/courses/1/materials/ HTTP/1.1" 200 6239
 ```
 
 ### Ordinary Student / `stu00001`
 
 ```text
-[23/Nov/2026 01:17:47] "GET /api/v1/me HTTP/1.1" 200 1521
-[23/Nov/2026 01:17:48] "GET /api/v1/lms/courses/ HTTP/1.1" 200 9006
-[23/Nov/2026 01:17:48] "GET /api/v1/lms/courses/3506/ HTTP/1.1" 200 360
-[23/Nov/2026 01:17:48] "GET /api/v1/lms/courses/3506/assignments/ HTTP/1.1" 200 42
-[23/Nov/2026 01:17:48] "GET /api/v1/lms/courses/3506/grades/ HTTP/1.1" 200 42
-[23/Nov/2026 01:17:48] "GET /api/v1/lms/courses/3506/announcements/ HTTP/1.1" 200 42
-[23/Nov/2026 01:17:48] "GET /api/v1/lms/courses/3506/materials/ HTTP/1.1" 200 42
-[23/Nov/2026 01:17:48] "GET /api/v1/me HTTP/1.1" 200 1521
-[23/Nov/2026 01:17:48] "GET /api/v1/me HTTP/1.1" 200 1521
+[23/Nov/2026 16:46:26] "GET /api/v1/me HTTP/1.1" 200 1521
+[23/Nov/2026 16:46:27] "GET /api/v1/lms/courses/ HTTP/1.1" 200 9006
+[23/Nov/2026 16:46:27] "GET /api/v1/lms/courses/3506/ HTTP/1.1" 200 360
+[23/Nov/2026 16:46:27] "GET /api/v1/lms/courses/3506/assignments/ HTTP/1.1" 200 42
+[23/Nov/2026 16:46:27] "GET /api/v1/lms/courses/3506/grades/ HTTP/1.1" 200 42
+[23/Nov/2026 16:46:27] "GET /api/v1/lms/courses/3506/announcements/ HTTP/1.1" 200 42
+[23/Nov/2026 16:46:27] "GET /api/v1/lms/courses/3506/materials/ HTTP/1.1" 200 42
+[23/Nov/2026 16:46:27] "GET /api/v1/me HTTP/1.1" 200 1521
+[23/Nov/2026 16:46:27] "GET /api/v1/me HTTP/1.1" 200 1521
 ```
 
-For the plain Student, direct Teaching/Grading visits display “Not available to
-your role” with no page controls. The UI guard prevents protected module requests;
-the actual session/read requests above return 200. No fictitious backend 403 is
-ascribed to a client route guard. Backend method-permission 403s are separately
-tested on every endpoint. Observer read replay omits assignment/submission/grade
-requests and exposes no write controls.
+The additional direct `/lms/courses` test uses `stf00003`, a synthetic staff account
+assigned the existing placement_officer designation. Its temporary IAM coarse LMS
+module grant has source `e2e:lms-course-refusal`, no LMS verb permission, and is
+removed in finally if created by that test. The real CSRF-protected role-switch
+endpoint refreshes the saved session after the fixture change. The test checks
+both module presence and missing lms.course.view, then requires NotPermitted with
+zero page buttons. Existing actor roles are never stripped to force a refusal.
 
-## Review history and remaining handoff
+## Installation, migration and operations
 
-- Round 1 on cdd8de9 was interrupted before a final scorecard. Three validation
-  errors were fixed in 92b4ed5 with 12 regression cases.
-- Round 2 on 92b4ed5 completed with 17 findings. Its complete unedited report has
-  SHA-256 `d98a72ce9d0d1ee20fbffe08cdf0c8ee14b4cbe91ace6aad8a9818af6cdd6438`
-  and is retained in the handoff package with raw review evidence.
-- This corrective builder revision has current successful gates, not a completed
-  independent verdict. The user chose to update the existing draft PR without
-  opening the next independent review now.
-- The remaining Step 7 gate is a fresh independent review after the last code
-  change, preserving its unedited nine-dimension scorecard. Only a genuine 10/10
-  revision unlocks the partner's Step 8 design/automation/testing work. Collaborator
-  push access must also be confirmed before that handoff. Neither reserved
-  specification-test directory belongs to this builder correction.
+One complete unmerged `0001_initial.py` now includes all business and append-only
+lifecycle audit models. For the existing local development database, only the
+obsolete 0002 migration-recorder row was removed after verifying the matching audit
+table already existed; no physical business table was dropped or recreated.
+Before/after sorted-row SHA-256 digests match for all 11 LMS tables and 7,620 rows
+at the consolidation checkpoint (before later browser fixtures). Digest evidence
+is committed; business row contents and database dumps are not.
+
+The disposable fresh database was required to be absent before creation. It was
+migrated, rolled back to LMS zero, reapplied, synchronized, checked and exercised
+through a real Student browser on isolated ports 8012/5183. Cleanup removes only
+that newly created database and owned processes. See [fresh-install.log](builder-evidence/q1/fresh-install.log).
+
+Configure synthetic DB/IAM credentials, private storage outside web root and Redis.
+Run migrate, seed_modules, sync_lms_workspaces and check_lms_ready, and seed the
+committed permission manifest in IAM. Start API, client, Celery worker and beat.
+Real-worker verification uses an external overlay changing only
+CELERY_TASK_ALWAYS_EAGER to false; supplied dev/test settings remain unchanged.
+The post-commit ETA dispatch and 60-second, 50-item catch-up sweeps converge on the
+same locked, audited transition. These replay commands are idempotent:
+
+```sh
+.venv/bin/python manage.py release_due_materials
+.venv/bin/python manage.py release_due_assignments
+```
+
+These runs use native PostgreSQL and real Redis. Docker Compose itself was not
+reverified; no claim of a successful Docker gate is made.
+
+## Behavioral coverage and remaining review
+
+HTTP journeys cover all live use cases, successful submission variants, own
+history, publication/download, Draft grading, Faculty release and audited correction.
+Adversarial cases include missing module/verb/scope, peer/Observer privacy, CSRF,
+throttling, undeclared fields, payload/storage refusals, duplicate/conflicting work,
+deadline bounds and offering revocation. PostgreSQL concurrency tests cover locks,
+one-success uniqueness, audit rollback and duplicate scheduling. Query budgets
+cover batched identity enrichment. Logs omit handled validation tracebacks.
+
+Round 1 was interrupted. Round 2 had 17 findings corrected in f09c49d. Round 3 on
+f09c49d had 13 findings, with scores 10/10/8/6/10/0/1/3/10. The self-grading
+defect was separately fixed in 37557a2. The reconciled Q1 notice on 46a9076 correctly
+retained those 13 findings; its prior premature all-10 claim is not adopted here.
+This revision supplies the corresponding corrections, not an independent verdict.
+
+Next: Vedha/fresh independent reviewer should review the new correction commit
+as Q2, preserve the unedited scorecard, and rerun the partner suites. Keep PR #628
+draft until an actual independent review establishes zero open findings. No score
+is prefilled and no partner-owned test/design/triage file is edited by Student 1.

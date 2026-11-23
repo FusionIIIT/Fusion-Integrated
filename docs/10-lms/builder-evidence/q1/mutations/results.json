@@ -1,0 +1,122 @@
+[
+  {
+    "category": "backend",
+    "rule": "course offering scope",
+    "command": [
+      ".venv/bin/pytest",
+      "modules/lms/tests/test_journeys.py::test_uc_lms_001_access_and_uc_lms_002_manage_details",
+      "--maxfail=1",
+      "--tb=short"
+    ],
+    "covering_test": "modules/lms/tests/test_journeys.py::test_uc_lms_001_access_and_uc_lms_002_manage_details",
+    "failed_tests": [
+      "FAILED modules/lms/tests/test_journeys.py::test_uc_lms_001_access_and_uc_lms_002_manage_details"
+    ],
+    "original_sha256": "9359bf096dd6152a6cdf97073c7b5f2188c4050099cf7e4333e08f7baaf94dd3",
+    "log": "mutations/backend-1.log",
+    "exit_code": 1
+  },
+  {
+    "category": "backend",
+    "rule": "action permission",
+    "command": [
+      ".venv/bin/pytest",
+      "modules/lms/tests/test_privilege_escalation.py::test_every_route_refuses_anonymous_missing_permission_missing_module",
+      "--maxfail=1",
+      "--tb=short"
+    ],
+    "covering_test": "modules/lms/tests/test_privilege_escalation.py::test_every_route_refuses_anonymous_missing_permission_missing_module",
+    "failed_tests": [
+      "FAILED modules/lms/tests/test_privilege_escalation.py::test_every_route_refuses_anonymous_missing_permission_missing_module[courses/-Courses]"
+    ],
+    "original_sha256": "500ad996ffb64c0c769e79e814288055f72c962daf5cd8dc38d92acbe730c69e",
+    "log": "mutations/backend-2.log",
+    "exit_code": 1
+  },
+  {
+    "category": "backend",
+    "rule": "submission deadline",
+    "command": [
+      ".venv/bin/pytest",
+      "modules/lms/tests/test_journeys.py::test_submission_at_deadline_and_late_refusal",
+      "--maxfail=1",
+      "--tb=short"
+    ],
+    "covering_test": "modules/lms/tests/test_journeys.py::test_submission_at_deadline_and_late_refusal",
+    "failed_tests": [
+      "FAILED modules/lms/tests/test_journeys.py::test_submission_at_deadline_and_late_refusal"
+    ],
+    "original_sha256": "5cbc7d586128a749991fb2e98cc239b30cfdb35e8437e49a909d98ab38a99263",
+    "log": "mutations/backend-3.log",
+    "exit_code": 1
+  },
+  {
+    "category": "backend",
+    "rule": "draft grade privacy",
+    "command": [
+      ".venv/bin/pytest",
+      "modules/lms/tests/test_journeys.py::test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade",
+      "--maxfail=1",
+      "--tb=short"
+    ],
+    "covering_test": "modules/lms/tests/test_journeys.py::test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade",
+    "failed_tests": [
+      "FAILED modules/lms/tests/test_journeys.py::test_uc_lms_012_grade_uc_lms_013_release_uc_lms_014_own_grade[faculty]"
+    ],
+    "original_sha256": "9359bf096dd6152a6cdf97073c7b5f2188c4050099cf7e4333e08f7baaf94dd3",
+    "log": "mutations/backend-4.log",
+    "exit_code": 1
+  },
+  {
+    "category": "backend",
+    "rule": "submission database uniqueness",
+    "command": [
+      ".venv/bin/pytest",
+      "modules/lms/tests/test_refusals.py::test_database_uniqueness_survives_service_bypass",
+      "--maxfail=1",
+      "--tb=short"
+    ],
+    "covering_test": "modules/lms/tests/test_refusals.py::test_database_uniqueness_survives_service_bypass",
+    "failed_tests": [
+      "FAILED modules/lms/tests/test_refusals.py::test_database_uniqueness_survives_service_bypass"
+    ],
+    "original_sha256": "776867c0e7a115d9344d109b9b122ed5c1e1d27be096ead0d86664d28a9bacb0",
+    "log": "mutations/backend-5.log",
+    "exit_code": 1
+  },
+  {
+    "category": "frontend",
+    "rule": "grading control permission",
+    "command": [
+      "npm",
+      "test",
+      "--",
+      "src/modules/lms/pages/GradingPage.test.tsx"
+    ],
+    "covering_test": "src/modules/lms/pages/GradingPage.test.tsx",
+    "failed_tests": [
+      "FAIL  src/modules/lms/pages/GradingPage.test.tsx > GradingPage > hides a mounted grading form without grade.create",
+      "FAIL  src/modules/lms/pages/GradingPage.test.tsx > GradingPage > hides a mounted grading form without grade.update"
+    ],
+    "original_sha256": "2b456f2054b7eb15a32f8389e276f185f658f405639ae3d59ecf53d7739aa274",
+    "log": "mutations/frontend-1.log",
+    "exit_code": 1
+  },
+  {
+    "category": "frontend",
+    "rule": "selected course error",
+    "command": [
+      "npm",
+      "test",
+      "--",
+      "src/modules/lms/pages/GradingPage.test.tsx"
+    ],
+    "covering_test": "src/modules/lms/pages/GradingPage.test.tsx",
+    "failed_tests": [
+      "FAIL  src/modules/lms/pages/GradingPage.test.tsx > GradingPage > shows a selected course detail error instead of a spinner"
+    ],
+    "original_sha256": "2b456f2054b7eb15a32f8389e276f185f658f405639ae3d59ecf53d7739aa274",
+    "log": "mutations/frontend-2.log",
+    "exit_code": 1
+  }
+]

@@ -51,10 +51,14 @@ def create_submission(scope, assignment_id, data):
             and exc.__cause__.diag.constraint_name == "lms_submission_assignment_user_uniq"
         ):
             raise ConflictError(
-                "A successful submission already exists.", code="SUBMISSION_ALREADY_EXISTS"
+                "View your recorded submission; a second successful submission is not allowed.",
+                code="SUBMISSION_ALREADY_EXISTS",
             ) from exc
         raise
 
 
 def _duplicate():
-    raise ConflictError("A successful submission already exists.", code="SUBMISSION_ALREADY_EXISTS")
+    raise ConflictError(
+        "View your recorded submission; a second successful submission is not allowed.",
+        code="SUBMISSION_ALREADY_EXISTS",
+    )

@@ -49,7 +49,8 @@ def check_private_upload_root(**kwargs):
 
 def _invalid():
     return DomainError(
-        "The file content does not match an allowed file type.", code="UPLOAD_TYPE_REJECTED"
+        "Choose a valid PDF, ZIP, TAR.GZ, TXT, DOCX or IPYNB file with its matching extension.",
+        code="UPLOAD_TYPE_REJECTED",
     )
 
 
@@ -99,7 +100,10 @@ def _sniff(raw, suffix):
 def write_upload(upload, *, profile, namespace):
     """Validate bounded bytes, atomically persist, and return path-free metadata."""
     if check_private_upload_root():
-        raise DomainError("Private upload storage is not configured.", code="UPLOAD_UNAVAILABLE")
+        raise DomainError(
+            "Ask an administrator to configure private upload storage before retrying.",
+            code="UPLOAD_UNAVAILABLE",
+        )
     if profile not in LIMITS or not namespace.replace("_", "").isalnum():
         raise ValueError("Invalid upload profile or namespace")
     name = Path(str(upload.name).replace("\\", "/")).name
@@ -111,14 +115,19 @@ def write_upload(upload, *, profile, namespace):
     for chunk in upload.chunks():
         raw.extend(chunk)
         if len(raw) > LIMITS[profile]:
-            raise DomainError("The file exceeds the allowed size.", code="UPLOAD_TOO_LARGE")
+            raise DomainError(
+                "Choose a smaller file within the displayed upload limit.", code="UPLOAD_TOO_LARGE"
+            )
     mime = _sniff(bytes(raw), suffix)
     key = f"{namespace}/{uuid4().hex}{suffix}"
     root = private_root()
     folder = root / namespace
     folder.mkdir(parents=True, exist_ok=True, mode=0o700)
     if folder.is_symlink() or not folder.resolve().is_relative_to(root):
-        raise DomainError("Private upload storage is unavailable.", code="UPLOAD_UNAVAILABLE")
+        raise DomainError(
+            "Try again later or ask an administrator to restore private upload storage.",
+            code="UPLOAD_UNAVAILABLE",
+        )
     temporary = None
     try:
         with tempfile.NamedTemporaryFile(dir=folder, delete=False) as stream:
@@ -158,7 +167,9 @@ def stream_upload(key, *, name, mime_type):
     try:
         stream = _path(key).open("rb")
     except OSError as exc:
-        raise NotFoundError("The file is unavailable.") from exc
+        raise NotFoundError(
+            "Ask the file owner or administrator to restore or replace the unavailable file."
+        ) from exc
     response = FileResponse(stream, as_attachment=True, filename=name, content_type=mime_type)
     response["X-Content-Type-Options"] = "nosniff"
     response["Cache-Control"] = "private, no-store"

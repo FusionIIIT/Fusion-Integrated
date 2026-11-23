@@ -43,14 +43,19 @@ function SubmissionRows({ courseId, assignmentId, faculty }: { courseId: number;
     <ListState pending={submissions.isPending || grades.isPending} error={submissions.error || grades.error}
       empty={!submissions.items.length} more={submissions.hasNextPage} onMore={() => void submissions.fetchNextPage()}>
       {submissions.items.map((row) => <Evaluation key={row.id} row={row}
-        grade={grades.items.find((grade) => grade.submission_id === row.id)} faculty={faculty} />)}
+        grade={grades.items.find((grade) => grade.submission_id === row.id)} faculty={faculty}
+        gradeLookupComplete={!grades.hasNextPage} />)}
     </ListState>
     {grades.hasNextPage && <Button onClick={() => void grades.fetchNextPage()} loading={grades.isFetchingNextPage}>Load more grades</Button>}
   </Stack>;
 }
 
-function Evaluation({ row, grade, faculty }: { row: Submission; grade?: Grade; faculty: boolean }) {
-  const { can } = useAuth();
+function Evaluation({ row, grade, faculty, gradeLookupComplete }: {
+  row: Submission; grade?: Grade; faculty: boolean; gradeLookupComplete: boolean;
+}) {
+  const { can, session } = useAuth();
+  const gradeKnown = Boolean(grade) || gradeLookupComplete;
+  const ownSubmission = session?.user.id === row.user_id;
   const download = useDownloadSubmission();
   return <Card withBorder><Stack>
     <Title order={3}>Submission {row.id} · User {row.user_id}</Title>
@@ -61,10 +66,12 @@ function Evaluation({ row, grade, faculty }: { row: Submission; grade?: Grade; f
       id: row.id, fallback: row.file?.name ?? "submission",
     })}>Download submission {row.id}</Button>}
     <Feedback error={download.error} />
+    {!gradeKnown && <Text>Load more grades to determine this submission's grade status.</Text>}
+    {ownSubmission && <Text>Ask another authorized grader to handle your submission.</Text>}
     {grade && <Text>Grade {grade.state}: {grade.points} · {grade.feedback}</Text>}
-    {can(grade ? "lms.grade.update" : "lms.grade.create") && (grade?.state !== "RELEASED" || faculty)
+    {gradeKnown && !ownSubmission && can(grade ? "lms.grade.update" : "lms.grade.create") && (grade?.state !== "RELEASED" || faculty)
       && <GradeForm key={`${grade?.id}-${grade?.points}-${grade?.feedback}`} row={row} grade={grade} />}
-    {grade?.state === "DRAFT" && can("lms.grade.publish") && faculty && <ReleaseGrade id={row.id} />}
+    {!ownSubmission && grade?.state === "DRAFT" && can("lms.grade.publish") && faculty && <ReleaseGrade id={row.id} />}
   </Stack></Card>;
 }
 
@@ -88,7 +95,5 @@ function GradeForm({ row, grade }: { row: Submission; grade?: Grade }) {
 
 function ReleaseGrade({ id }: { id: number }) {
   const write = useReleaseGrade(id);
-  return <Stack><Button loading={write.isPending} onClick={() => write.mutate({
-
-  })}>Release grade for submission {id}</Button><Feedback error={write.error} success={write.isSuccess} /></Stack>;
+  return <Stack><Button loading={write.isPending} onClick={() => write.mutate({})}>Release grade for submission {id}</Button><Feedback error={write.error} success={write.isSuccess} /></Stack>;
 }

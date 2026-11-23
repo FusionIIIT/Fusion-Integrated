@@ -3343,7 +3343,8 @@ components:
           format: date-time
           readOnly: true
         submission_type:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/LmsSubmissionKindEnum'
           readOnly: true
         points_possible:
           type: string
@@ -3351,7 +3352,8 @@ components:
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
           readOnly: true
         state:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/AssignmentStateEnum'
           readOnly: true
         release_at:
           type: string
@@ -3400,6 +3402,16 @@ components:
       - instructions
       - points_possible
       - submission_type
+    AssignmentStateEnum:
+      enum:
+      - DRAFT
+      - SCHEDULED
+      - AVAILABLE
+      type: string
+      description: |-
+        * `DRAFT` - DRAFT
+        * `SCHEDULED` - SCHEDULED
+        * `AVAILABLE` - AVAILABLE
     AudienceEnum:
       enum:
       - students
@@ -3937,7 +3949,8 @@ components:
           type: string
           readOnly: true
         state:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/GradeStateEnum'
           readOnly: true
         grader_user_id:
           type: integer
@@ -3978,6 +3991,14 @@ components:
           type: string
       required:
       - points
+    GradeStateEnum:
+      enum:
+      - DRAFT
+      - RELEASED
+      type: string
+      description: |-
+        * `DRAFT` - DRAFT
+        * `RELEASED` - RELEASED
     IncidentRecorded:
       type: object
       properties:
@@ -4288,7 +4309,8 @@ components:
           type: string
           readOnly: true
         kind:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/LmsMaterialKindEnum'
           readOnly: true
         text:
           type: string
@@ -4306,7 +4328,8 @@ components:
           type: integer
           readOnly: true
         state:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/MaterialStateEnum'
           readOnly: true
         release_at:
           type: string
@@ -4361,6 +4384,16 @@ components:
           minimum: 0
       required:
       - kind
+    MaterialStateEnum:
+      enum:
+      - DRAFT
+      - SCHEDULED
+      - PUBLISHED
+      type: string
+      description: |-
+        * `DRAFT` - DRAFT
+        * `SCHEDULED` - SCHEDULED
+        * `PUBLISHED` - PUBLISHED
     ModeEnum:
       enum:
       - online
@@ -5699,7 +5732,8 @@ components:
           type: integer
           readOnly: true
         kind:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/LmsSubmissionKindEnum'
           readOnly: true
         text:
           type: string

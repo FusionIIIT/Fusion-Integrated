@@ -19,20 +19,23 @@ export const course: Course = {
 };
 export const pageOf = <T,>(results: T[]) => ({ results, next: null, previous: null });
 
-export function mockReads(overrides: Record<string, unknown> = {}) {
+export function mockReads(overrides: Record<string, unknown> = {}, errors: Record<string, unknown> = {}) {
   const values: Record<string, unknown> = {
     "/lms/courses/": pageOf([course]), "/lms/courses/1/": course,
     "/lms/courses/1/policy/": { version: 1, can_ta_post_announcements: false },
     "/lms/courses/1/materials/": pageOf([]), "/lms/courses/1/announcements/": pageOf([]),
     "/lms/courses/1/assignments/": pageOf([]), "/lms/courses/1/grades/": pageOf([]), ...overrides,
   };
-  return vi.spyOn(http, "get").mockImplementation(async (url) => ({ data: values[String(url)] }));
+  return vi.spyOn(http, "get").mockImplementation(async (url) => {
+    if (String(url) in errors) throw errors[String(url)];
+    return { data: values[String(url)] };
+  });
 }
 
-export function renderLms(node: ReactNode, permissions: string[], guard?: string) {
+export function renderLms(node: ReactNode, permissions: string[], guard?: string, activeRole = "faculty") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
   const session: Session = { user: { id: 1, username: "synthetic", display_name: "Synthetic User", kind: "faculty", email: "" },
-    active_role: "faculty", roles: ["faculty"], permissions, modules: ["lms"], navigation: [], csrf_token: "fixture" };
+    active_role: activeRole, roles: [activeRole], permissions, modules: ["lms"], navigation: [], csrf_token: "fixture" };
   client.setQueryData(["session"], session);
   return render(<MemoryRouter><QueryClientProvider client={client}><MantineProvider><AuthProvider>
     {guard ? <RequirePermission permission={guard}>{node}</RequirePermission> : node}

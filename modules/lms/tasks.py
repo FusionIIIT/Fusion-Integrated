@@ -15,7 +15,9 @@ def release_content(kind, pk):
     try:
         return release_one(kind, pk)
     except DomainError:
-        log.exception("lms.release.validation_failed kind=%s id=%s", kind, pk)
+        log.warning(
+            "lms.release.validation_failed kind=%s id=%s action=correct_content_and_retry", kind, pk
+        )
         return False
 
 

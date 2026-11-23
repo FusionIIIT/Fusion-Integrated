@@ -84,6 +84,8 @@ class FileSerializer(serializers.ModelSerializer):
 
 
 class MaterialSerializer(serializers.ModelSerializer):
+    kind = serializers.ChoiceField(choices=("FILE", "NOTE", "LINK"), read_only=True)
+    state = serializers.ChoiceField(choices=("DRAFT", "SCHEDULED", "PUBLISHED"), read_only=True)
     file = FileSerializer(source="stored_file", read_only=True, allow_null=True)
 
     class Meta:
@@ -133,6 +135,9 @@ class AnnouncementInput(serializers.Serializer):
 
 
 class AssignmentSerializer(serializers.ModelSerializer):
+    submission_type = serializers.ChoiceField(choices=("FILE", "TEXT", "LINK"), read_only=True)
+    state = serializers.ChoiceField(choices=("DRAFT", "SCHEDULED", "AVAILABLE"), read_only=True)
+
     class Meta:
         model = Assignment
         fields = (
@@ -160,6 +165,7 @@ class AssignmentInput(serializers.Serializer):
 
 
 class GradeSerializer(serializers.ModelSerializer):
+    state = serializers.ChoiceField(choices=("DRAFT", "RELEASED"), read_only=True)
     assignment_id = serializers.IntegerField(source="submission.assignment_id", read_only=True)
     user_id = serializers.IntegerField(source="submission.user_id", read_only=True)
 
@@ -182,6 +188,7 @@ class GradeSerializer(serializers.ModelSerializer):
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
+    kind = serializers.ChoiceField(choices=("FILE", "TEXT", "LINK"), read_only=True)
     file = FileSerializer(source="stored_file", read_only=True, allow_null=True)
 
     class Meta:

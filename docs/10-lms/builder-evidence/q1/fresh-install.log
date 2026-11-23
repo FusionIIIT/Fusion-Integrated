@@ -1,0 +1,61 @@
+DB_NAME=fusion_integrated_fresh manage.py migrate --noinput
+Operations to perform:
+  Apply all migrations: accesscontrol, auth, contenttypes, directory, lms, placement
+Running migrations:
+  Applying accesscontrol.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying directory.0001_initial... OK
+  Applying directory.0002_userref_profile_completed_userref_resume_link... OK
+  Applying lms.0001_initial... OK
+  Applying placement.0001_initial... OK
+  Applying placement.0002_announcement_companycontact_interviewround_and_more... OK
+  Applying placement.0003_remove_placementpolicy_dream_threshold_lpa_and_more... OK
+  Applying placement.0004_document_drive_link... OK
+  Applying placement.0005_outbox_claim... OK
+  Applying placement.0006_conduct_incidents... OK
+  Applying placement.0007_registration_flow... OK
+  Applying placement.0008_post_offer_obligations... OK
+  Applying placement.0009_remove_profiledocument_profile_and_more... OK
+  Applying placement.0010_retire_resume_documents... OK
+DB_NAME=fusion_integrated_fresh manage.py migrate lms zero --noinput
+Operations to perform:
+  Unapply all migrations: lms
+Running migrations:
+  Rendering model states... DONE
+  Unapplying lms.0001_initial... OK
+DB_NAME=fusion_integrated_fresh manage.py migrate --noinput
+Operations to perform:
+  Apply all migrations: accesscontrol, auth, contenttypes, directory, lms, placement
+Running migrations:
+  Applying lms.0001_initial... OK
+DB_NAME=fusion_integrated_fresh manage.py seed_modules
+  registered placement_cell (active)
+  lms: registered but NOT active — 1 prerequisite(s) unmet:
+      Run manage.py sync_lms_workspaces after the IAM catalogue sync.
+  registered lms (active)
+2 module(s) registered
+DB_NAME=fusion_integrated_fresh manage.py check_lms_ready
+CommandError: Run manage.py sync_lms_workspaces after the IAM catalogue sync.
+DB_NAME=fusion_integrated_fresh manage.py sync_lms_workspaces
+Initialized 3686 new LMS workspaces.
+DB_NAME=fusion_integrated_fresh manage.py seed_modules
+  registered placement_cell (active)
+  registered lms (active)
+2 module(s) registered
+DB_NAME=fusion_integrated_fresh manage.py check_lms_ready
+LMS prerequisites satisfied.
+Fresh browser: My Courses -> linked workspace opened; cookie write without CSRF: 403.
+Fresh migration rollback/reapply, readiness and browser verification passed.
