@@ -1,0 +1,29 @@
+[
+  {
+    "test_id": "FR-T001",
+    "source_id": "PMS-AFR-070",
+    "purpose": "Verify PMS-AFR-070: Assigning a Director to a RESUBMITTED application restarts the review cycle.",
+    "preconditions": "Application exists in RESUBMITTED status.",
+    "action_or_input": "PCC_ADMIN assigns an eligible Director to the RESUBMITTED application.",
+    "expected_result": "Application moves to UNDER_REVIEW and a new review cycle starts.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T002",
+    "source_id": "PMS-AFR-080",
+    "purpose": "Verify PMS-AFR-080: Attorney acceptance of an offered assignment moves the application to ATTORNEY_ASSIGNED.",
+    "preconditions": "Application exists in ASSIGNMENT_OFFERED status with an offered Attorney assignment.",
+    "action_or_input": "Assigned Attorney accepts the assignment.",
+    "expected_result": "Application moves to ATTORNEY_ASSIGNED.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "FR-T003",
+    "source_id": "PMS-AFR-081",
+    "purpose": "Verify PMS-AFR-081: Attorney decline of an offered assignment moves the application to PENDING_REVIEW for reassignment.",
+    "preconditions": "Application exists in ASSIGNMENT_OFFERED status with an offered Attorney assignment.",
+    "action_or_input": "Assigned Attorney declines the assignment.",
+    "expected_result": "Application moves to PENDING_REVIEW awaiting PCC_ADMIN reassignment.",
+    "test_type": "functional"
+  }
+]
