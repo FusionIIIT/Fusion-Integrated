@@ -1674,6 +1674,3807 @@ paths:
               schema:
                 $ref: '#/components/schemas/AcademicFilters'
           description: ''
+  /api/v1/pms/acting:
+    get:
+      operationId: v1_pms_acting_retrieve
+      summary: The PMS permissions of the role you are acting as
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Response:
+                  value:
+                    role: pms_director
+                    permissions:
+                    - pms.review.approve
+                  summary: response
+          description: ''
+  /api/v1/pms/appeals/{id}/assign:
+    post:
+      operationId: v1_pms_appeals_assign_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Assign the Director who hears an appeal (blueprint Q-1)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsPersonIn'
+            examples:
+              Request:
+                value:
+                  director_user_id: 2002
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsPersonIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsPersonIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsAppeal'
+              examples:
+                Response:
+                  value:
+                    id: 4
+                    application_id: 7
+                    director_user_id: 2002
+                    director_name: D 2002
+                    grounds: '...'
+                    justification: '...'
+                    status: open
+                    outcome: ''
+                    modified_decision: ''
+                    outcome_note: Remanded so claim 4 can be narrowed to...
+                    created_at: '2026-11-05T09:00:00+05:30'
+                    decided_at: null
+                  summary: response
+          description: ''
+  /api/v1/pms/appeals/{id}/decision:
+    post:
+      operationId: v1_pms_appeals_decision_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Decide an appeal (UC-PMS-023; BR-PMS-095)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsAppealDecisionIn'
+            examples:
+              Request:
+                value:
+                  outcome: remand
+                  note: Remanded so claim 4 can be narrowed to the tested temperature
+                    range.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsAppealDecisionIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsAppealDecisionIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsAppeal'
+              examples:
+                Response:
+                  value:
+                    id: 4
+                    application_id: 7
+                    director_user_id: 2002
+                    director_name: D 2002
+                    grounds: '...'
+                    justification: '...'
+                    status: decided
+                    outcome: remand
+                    modified_decision: ''
+                    outcome_note: Remanded so claim 4 can be narrowed to...
+                    created_at: '2026-11-05T09:00:00+05:30'
+                    decided_at: '2026-11-09T09:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/applications:
+    get:
+      operationId: v1_pms_applications_list
+      description: Writes are throttled; reads on the same path are not.
+      summary: Applications within your scope
+      parameters:
+      - in: query
+        name: cursor
+        schema:
+          type: string
+      - in: query
+        name: domain_code
+        schema:
+          type: string
+      - in: query
+        name: limit
+        schema:
+          type: integer
+      - in: query
+        name: q
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsApplicationList'
+              examples:
+                Response:
+                  value:
+                  - next: null
+                    previous: null
+                    results:
+                    - id: 7
+                      reference: PMS-2026-00007
+                      title: Graphene anode
+                      status: under_review
+                      domain_code: materials
+                      applicant_user_id: 1001
+                      applicant_name: Applicant 1001
+                      submitted_at: '2026-11-02T10:00:00+05:30'
+                      updated_at: '2026-11-03T09:00:00+05:30'
+                      revision_due_on: null
+                      appeal_due_on: null
+                  summary: response
+          description: ''
+    post:
+      operationId: v1_pms_applications_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Start a draft application (UC-PMS-001)
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsApplicationIn'
+            examples:
+              Request:
+                value:
+                  title: Graphene anode
+                  domain_code: materials
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsApplicationIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsApplicationIn'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: ''
+                    title: Graphene anode
+                    status: draft
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}:
+    get:
+      operationId: v1_pms_applications_retrieve
+      description: Writes are throttled; reads on the same path are not.
+      summary: One application with its history of decisions (UC-PMS-002)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: under_review
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+    patch:
+      operationId: v1_pms_applications_partial_update
+      description: Writes are throttled; reads on the same path are not.
+      summary: Edit a draft or an application being revised
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPmsApplicationIn'
+            examples:
+              Request:
+                value:
+                  abstract: Revised abstract
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPmsApplicationIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPmsApplicationIn'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: under_review
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/appeal:
+    post:
+      operationId: v1_pms_applications_appeal_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Appeal a rejection (UC-PMS-022)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsAppealIn'
+            examples:
+              Request:
+                value:
+                  grounds: The prior art cited is from a different field.
+                  justification: The examiner-style search missed claim 4.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsAppealIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsAppealIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: appeal_submitted
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/assessments:
+    post:
+      operationId: v1_pms_applications_assessments_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Save a patentability assessment draft (UC-PMS-012)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsAssessmentIn'
+            examples:
+              Request:
+                value:
+                  analysis: Claims 1-3 read on...
+                  novelty: Novel over D1.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsAssessmentIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsAssessmentIn'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: under_review
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/assign-attorney:
+    post:
+      operationId: v1_pms_applications_assign_attorney_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Offer the case to an attorney (UC-PMS-010)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsAttorneyIn'
+            examples:
+              Request:
+                value:
+                  attorney_user_id: 3001
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsAttorneyIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsAttorneyIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: under_review
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/assign-director:
+    post:
+      operationId: v1_pms_applications_assign_director_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Assign or reassign the reviewing Director (UC-PMS-007)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsPersonIn'
+            examples:
+              Request:
+                value:
+                  director_user_id: 2001
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsPersonIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsPersonIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: under_review
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/attorney-candidates:
+    get:
+      operationId: v1_pms_applications_attorney_candidates_list
+      summary: Panel attorneys for this application, preference first (BR-PMS-041..045)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsCandidate'
+              examples:
+                Response:
+                  value:
+                  - - user_id: 3001
+                      name: Attorney 3001
+                      domain_codes:
+                      - materials
+                      workload: 1
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/budgets:
+    post:
+      operationId: v1_pms_applications_budgets_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Propose the filing and prosecution budget (UC-PMS-009)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsBudgetIn'
+            examples:
+              Request:
+                value:
+                  filing_fee: '8000'
+                  attorney_fee: '40000'
+                  admin_cost: '2000'
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsBudgetIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsBudgetIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsBudget'
+              examples:
+                Response:
+                  value:
+                    id: 5
+                    application_id: 7
+                    filing_fee: '8000.00'
+                    attorney_fee: '40000.00'
+                    admin_cost: '2000.00'
+                    total: '50000.00'
+                    status: proposed
+                    decision_note: ''
+                    decided_at: null
+                    threshold_at_decision: '100000.00'
+                    availability: not_available
+                    routed_to: ''
+                    external_reference: ''
+                    external_decided_on: null
+                    created_at: '2026-11-11T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/communications:
+    post:
+      operationId: v1_pms_applications_communications_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record a patent-office communication (UC-PMS-014)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsCommunicationIn'
+            examples:
+              Request:
+                value:
+                  kind: office_action
+                  received_on: '2027-03-01'
+                  reference: FER/2027/11
+                  response_due_on: '2027-09-01'
+                  requires_applicant_review: true
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsCommunicationIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsCommunicationIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: filed
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/director-candidates:
+    get:
+      operationId: v1_pms_applications_director_candidates_list
+      summary: Eligible Directors, least loaded first (BR-PMS-023..026)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsCandidate'
+              examples:
+                Response:
+                  value:
+                  - - user_id: 2001
+                      name: Director 2001
+                      domain_codes:
+                      - materials
+                      workload: 1
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/documents:
+    get:
+      operationId: v1_pms_applications_documents_list
+      description: Writes are throttled; reads on the same path are not.
+      summary: Documents you may read, each with its readable versions (BR-PMS-084)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsDocument'
+              examples:
+                Response:
+                  value:
+                  - - id: 1
+                      kind: specification
+                      title: Complete specification
+                      sensitivity: confidential
+                      versions:
+                      - id: 3
+                        number: 2
+                        original_name: spec.pdf
+                        size_bytes: 182000
+                        sha256: 9f2c...
+                        uploaded_at: '2026-11-02T10:00:00+05:30'
+                        uploaded_by_user_id: 1001
+                        is_current: true
+                  summary: response
+          description: ''
+    post:
+      operationId: v1_pms_applications_documents_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Upload a PDF, or a new version of one (BR-PMS-014..016, 082)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsUploadIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsDocument'
+              examples:
+                Response:
+                  value:
+                  - - id: 1
+                      kind: specification
+                      title: Complete specification
+                      sensitivity: confidential
+                      versions:
+                      - id: 3
+                        number: 2
+                        original_name: spec.pdf
+                        size_bytes: 182000
+                        sha256: 9f2c...
+                        uploaded_at: '2026-11-02T10:00:00+05:30'
+                        uploaded_by_user_id: 1001
+                        is_current: true
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/filings:
+    post:
+      operationId: v1_pms_applications_filings_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record a filing confirmed by the patent office (UC-PMS-013)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsFilingIn'
+            examples:
+              Request:
+                value:
+                  jurisdiction: IN
+                  office_name: Indian Patent Office
+                  external_filing_id: '202621004321'
+                  filing_date: '2026-11-20'
+                  confirmation_reference: CBR 11023
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsFilingIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsFilingIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: filed
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/history:
+    get:
+      operationId: v1_pms_applications_history_list
+      summary: The application's audit trail (PMS-AFR-047)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsAudit'
+              examples:
+                Response:
+                  value:
+                  - - id: 1
+                      at: '2026-11-02T10:00:00+05:30'
+                      actor_user_id: 1001
+                      actor_role: student
+                      action: application.submit
+                      application_id: 7
+                      application_reference: PMS-2026-00007
+                      object_type: Application
+                      object_id: 7
+                      from_state: draft
+                      to_state: submitted
+                      details: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/inventors:
+    put:
+      operationId: v1_pms_applications_inventors_update
+      description: Writes are throttled; reads on the same path are not.
+      summary: Replace the inventors and their shares (UC-PMS-003)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsInventorsIn'
+            examples:
+              Request:
+                value:
+                  inventors:
+                  - user_id: 1001
+                    share_percent: '60'
+                  - name: R. Rao
+                    affiliation: IISc
+                    share_percent: '40'
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsInventorsIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsInventorsIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: under_review
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/inventors/{inventor_id}/agreement:
+    post:
+      operationId: v1_pms_applications_inventors_agreement_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record an inventor's agreement and consent (BR-PMS-075, 078)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: inventor_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsAgreementIn'
+            examples:
+              Request:
+                value:
+                  agreement_reference: IPR/2026/14
+                  consent: true
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsAgreementIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsAgreementIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: under_review
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/legal-advice:
+    post:
+      operationId: v1_pms_applications_legal_advice_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record legal advice (UC-PMS-033)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsAdviceIn'
+            examples:
+              Request:
+                value:
+                  advice: Avoid publishing the thesis chapter before filing.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsAdviceIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsAdviceIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: under_review
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/legal-requests:
+    post:
+      operationId: v1_pms_applications_legal_requests_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Ask the applicant for information or an extension (PMS-AFR-086, 087)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsLegalRequestIn'
+            examples:
+              Request:
+                value:
+                  kind: information
+                  message: Send the test data for claim 2.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsLegalRequestIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsLegalRequestIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: under_review
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/maintenance-cycles:
+    post:
+      operationId: v1_pms_applications_maintenance_cycles_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Enter a maintenance due date by hand (blueprint Q-12)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsDueDateIn'
+            examples:
+              Request:
+                value:
+                  due_on: '2029-03-01'
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsDueDateIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsDueDateIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsMaintenanceCycle'
+              examples:
+                Response:
+                  value:
+                    id: 1
+                    application_id: 7
+                    seq: 1
+                    due_on: '2029-03-01'
+                    source: manual
+                    status: scheduled
+                    deciding_director_user_id: 2001
+                    director_name: Director 2001
+                    decided_at: null
+                    decision_note: ''
+                    action_reference: ''
+                    amount: null
+                    actioned_on: null
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/prior-art:
+    get:
+      operationId: v1_pms_applications_prior_art_list
+      description: Writes are throttled; reads on the same path are not.
+      summary: Prior art attached to an application
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsPriorArt'
+              examples:
+                Response:
+                  value:
+                  - - id: 4
+                      application_id: 7
+                      kind: patent
+                      title: Graphene anode coating
+                      identifier: US1234567B2
+                      url: https://example.org/US1234567
+                      source_name: Espacenet
+                      notes: Closest art for claim 1.
+                      created_at: '2026-11-03T10:00:00+05:30'
+                  summary: response
+          description: ''
+    post:
+      operationId: v1_pms_applications_prior_art_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Attach a reference (PMS-AFR-146)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsReferenceIn'
+            examples:
+              Request:
+                value:
+                  kind: patent
+                  title: Graphene anode coating
+                  identifier: US1234567B2
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsReferenceIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsReferenceIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsPriorArt'
+              examples:
+                Response:
+                  value:
+                    id: 4
+                    application_id: 7
+                    kind: patent
+                    title: Graphene anode coating
+                    identifier: US1234567B2
+                    url: https://example.org/US1234567
+                    source_name: Espacenet
+                    notes: Closest art for claim 1.
+                    created_at: '2026-11-03T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/resubmit:
+    post:
+      operationId: v1_pms_applications_resubmit_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Resubmit a revised application (UC-PMS-005)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsResubmitIn'
+            examples:
+              Request:
+                value:
+                  responses:
+                    review: Claims 2 and 3 now state the coating thickness the Director
+                      asked about.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsResubmitIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsResubmitIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: resubmitted
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/review:
+    post:
+      operationId: v1_pms_applications_review_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record the review decision (UC-PMS-008; BR-PMS-029..031)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsDecisionIn'
+            examples:
+              Request:
+                value:
+                  decision: approve
+                  justification: Novel coating method; claims are clear and enabled.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsDecisionIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsDecisionIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: approved
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/submit:
+    post:
+      operationId: v1_pms_applications_submit_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Submit a draft (BR-PMS-014..017)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: submitted
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/applications/{id}/withdraw:
+    post:
+      operationId: v1_pms_applications_withdraw_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Withdraw before filing (UC-PMS-006)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsWithdrawIn'
+            examples:
+              Request:
+                value:
+                  reason: Publishing instead.
+                  consented_inventor_ids:
+                  - 12
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsWithdrawIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsWithdrawIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsApplicationDetail'
+              examples:
+                Response:
+                  value:
+                    id: 7
+                    reference: PMS-2026-00007
+                    title: Graphene anode
+                    status: withdrawn
+                    domain_code: materials
+                    applicant_user_id: 1001
+                    applicant_name: Applicant 1001
+                    submitted_at: '2026-11-02T10:00:00+05:30'
+                    updated_at: '2026-11-03T09:00:00+05:30'
+                    revision_due_on: null
+                    appeal_due_on: null
+                    abstract: An anode...
+                    description: '...'
+                    claims: 1. An anode...
+                    preferred_attorney_user_id: null
+                    version: 1
+                    decided_on: null
+                    grant_date: null
+                    grant_jurisdiction: ''
+                    patent_number: ''
+                    inventors: []
+                    review_cycles: []
+                    appeals: []
+                    attorney_assignments: []
+                    budgets: []
+                    filings: []
+                    communications: []
+                    office_actions: []
+                    maintenance_cycles: []
+                    assessments: []
+                    legal_requests: []
+                    legal_advice: []
+                    revision_responses: []
+                    relations:
+                    - applicant
+                    feedback: {}
+                  summary: response
+          description: ''
+  /api/v1/pms/assessments/{id}/finalize:
+    post:
+      operationId: v1_pms_assessments_finalize_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Finalize the opinion with one recommendation (BR-PMS-046)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsAssessment'
+              examples:
+                Response:
+                  value:
+                    id: 1
+                    analysis: '...'
+                    novelty: '...'
+                    non_obviousness: '...'
+                    utility: '...'
+                    recommendation: file_patent
+                    status: final
+                    finalized_at: '2026-11-14T10:00:00+05:30'
+                    updated_at: '2026-11-14T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/attorney-assignments/{id}/respond:
+    post:
+      operationId: v1_pms_attorney_assignments_respond_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Accept or decline an offered case (UC-PMS-011)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsRespondIn'
+            examples:
+              Request:
+                value:
+                  accept: true
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsRespondIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsRespondIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsAssignment'
+              examples:
+                Response:
+                  value:
+                    id: 9
+                    application_id: 7
+                    application_reference: PMS-2026-00007
+                    application_title: Graphene anode
+                    attorney_user_id: 3001
+                    attorney_name: Attorney 3001
+                    is_exception: false
+                    exception_reason: ''
+                    status: accepted
+                    responded_at: '2026-11-10T09:00:00+05:30'
+                    decline_reason: ''
+                    created_at: '2026-11-09T09:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/attorney-panel:
+    get:
+      operationId: v1_pms_attorney_panel_list
+      description: Writes are throttled; reads on the same path are not.
+      summary: The approved attorney panel (UC-PMS-026)
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsRoster'
+              examples:
+                Response:
+                  value:
+                  - - id: 3
+                      user_id: 3001
+                      name: Attorney 3001
+                      domain_codes:
+                      - materials
+                      valid_from: '2026-11-01T09:00:00+05:30'
+                      valid_to: null
+                      workload: 1
+                  summary: response
+          description: ''
+    post:
+      operationId: v1_pms_attorney_panel_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Add an attorney to the panel or change their areas
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsRosterIn'
+            examples:
+              Request:
+                value:
+                  user_id: 3001
+                  domain_codes:
+                  - materials
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsRosterIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsRosterIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsRoster'
+              examples:
+                Response:
+                  value:
+                  - - id: 3
+                      user_id: 3001
+                      name: Attorney 3001
+                      domain_codes:
+                      - materials
+                      valid_from: '2026-11-01T09:00:00+05:30'
+                      valid_to: null
+                      workload: 1
+                  summary: response
+          description: ''
+  /api/v1/pms/attorney-panel/{id}/end:
+    post:
+      operationId: v1_pms_attorney_panel_end_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Take an attorney off the panel
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsRoster'
+              examples:
+                Response:
+                  value:
+                  - []
+                  summary: response
+          description: ''
+  /api/v1/pms/attorney-panel/options:
+    get:
+      operationId: v1_pms_attorney_panel_options_list
+      summary: Panel attorneys an applicant may name as a preference (BR-PMS-045)
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsPanelOption'
+              examples:
+                Response:
+                  value:
+                  - - user_id: 3001
+                      name: Attorney 3001
+                      domain_codes:
+                      - materials
+                  summary: response
+          description: ''
+  /api/v1/pms/audit:
+    get:
+      operationId: v1_pms_audit_list
+      summary: Audit entries within your scope (UC-PMS-028)
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+      - in: query
+        name: actor
+        schema:
+          type: integer
+      - in: query
+        name: application
+        schema:
+          type: integer
+      - in: query
+        name: cursor
+        schema:
+          type: string
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsAudit'
+              examples:
+                Response:
+                  value:
+                  - next: null
+                    previous: null
+                    results: []
+                  summary: response
+          description: ''
+  /api/v1/pms/audit/export:
+    get:
+      operationId: v1_pms_audit_export_retrieve
+      summary: Audit entries as CSV for compliance review (PMS-AFR-213)
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/pms/budgets/{id}/decision:
+    post:
+      operationId: v1_pms_budgets_decision_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Decide a budget; above the threshold it escalates (BR-PMS-051..053)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsBudgetDecisionIn'
+            examples:
+              Request:
+                value:
+                  approve: true
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsBudgetDecisionIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsBudgetDecisionIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsBudget'
+              examples:
+                Response:
+                  value:
+                    id: 5
+                    application_id: 7
+                    filing_fee: '8000.00'
+                    attorney_fee: '40000.00'
+                    admin_cost: '2000.00'
+                    total: '50000.00'
+                    status: approved
+                    decision_note: ''
+                    decided_at: '2026-11-12T10:00:00+05:30'
+                    threshold_at_decision: '100000.00'
+                    availability: not_available
+                    routed_to: ''
+                    external_reference: ''
+                    external_decided_on: null
+                    created_at: '2026-11-11T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/budgets/{id}/external-decision:
+    post:
+      operationId: v1_pms_budgets_external_decision_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record the higher authority's decision (ruling C14)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsExternalDecisionIn'
+            examples:
+              Request:
+                value:
+                  approved: true
+                  reference: FC/2026/31
+                  decided_on: '2026-11-20'
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsExternalDecisionIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsExternalDecisionIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsBudget'
+              examples:
+                Response:
+                  value:
+                    id: 5
+                    application_id: 7
+                    filing_fee: '8000.00'
+                    attorney_fee: '40000.00'
+                    admin_cost: '2000.00'
+                    total: '50000.00'
+                    status: external_approved
+                    decision_note: ''
+                    decided_at: '2026-11-12T10:00:00+05:30'
+                    threshold_at_decision: '100000.00'
+                    availability: not_available
+                    routed_to: ''
+                    external_reference: FC/2026/31
+                    external_decided_on: null
+                    created_at: '2026-11-11T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/budgets/{id}/route:
+    post:
+      operationId: v1_pms_budgets_route_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Route an escalated budget to the higher authority (BW-PMS-10)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsRouteIn'
+            examples:
+              Request:
+                value:
+                  routed_to: Finance Committee
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsRouteIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsRouteIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsBudget'
+              examples:
+                Response:
+                  value:
+                    id: 5
+                    application_id: 7
+                    filing_fee: '8000.00'
+                    attorney_fee: '40000.00'
+                    admin_cost: '2000.00'
+                    total: '50000.00'
+                    status: escalation_tracked
+                    decision_note: ''
+                    decided_at: '2026-11-12T10:00:00+05:30'
+                    threshold_at_decision: '100000.00'
+                    availability: not_available
+                    routed_to: Finance Committee
+                    external_reference: ''
+                    external_decided_on: null
+                    created_at: '2026-11-11T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/deadlines:
+    get:
+      operationId: v1_pms_deadlines_list
+      summary: Every tracked deadline, soonest first (UC-PMS-016)
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsDeadline'
+              examples:
+                Response:
+                  value:
+                  - - kind: review
+                      subject_id: 11
+                      application_id: 7
+                      reference: PMS-2026-00007
+                      due_on: '2026-11-23'
+                      responsible: Director 2001
+                      missed: false
+                  summary: response
+          description: ''
+  /api/v1/pms/directors:
+    get:
+      operationId: v1_pms_directors_list
+      description: Writes are throttled; reads on the same path are not.
+      summary: The Director roster with workloads (PMS-AFR-222)
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsRoster'
+              examples:
+                Response:
+                  value:
+                  - - id: 3
+                      user_id: 2001
+                      name: Director 2001
+                      domain_codes:
+                      - materials
+                      valid_from: '2026-11-01T09:00:00+05:30'
+                      valid_to: null
+                      workload: 1
+                  summary: response
+          description: ''
+    post:
+      operationId: v1_pms_directors_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Add a Director or change their areas (ruling C13)
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsRosterIn'
+            examples:
+              Request:
+                value:
+                  user_id: 2001
+                  domain_codes:
+                  - materials
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsRosterIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsRosterIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsRoster'
+              examples:
+                Response:
+                  value:
+                  - - id: 3
+                      user_id: 2001
+                      name: Director 2001
+                      domain_codes:
+                      - materials
+                      valid_from: '2026-11-01T09:00:00+05:30'
+                      valid_to: null
+                      workload: 1
+                  summary: response
+          description: ''
+  /api/v1/pms/directors/{id}/end:
+    post:
+      operationId: v1_pms_directors_end_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Take a Director off the roster
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsRoster'
+              examples:
+                Response:
+                  value:
+                  - []
+                  summary: response
+          description: ''
+  /api/v1/pms/documents/{id}:
+    patch:
+      operationId: v1_pms_documents_partial_update
+      description: Writes are throttled; reads on the same path are not.
+      summary: Change a document's sensitivity (ruling C16)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPmsSensitivityIn'
+            examples:
+              Request:
+                value:
+                  sensitivity: restricted
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPmsSensitivityIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPmsSensitivityIn'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsDocumentRow'
+              examples:
+                Response:
+                  value:
+                    id: 1
+                    kind: claims
+                    title: Claims
+                    sensitivity: restricted
+                    updated_at: '2026-11-04T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/documents/versions/{id}/download:
+    get:
+      operationId: v1_pms_documents_versions_download_retrieve
+      summary: Download one version, as an attachment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/pms/escalations:
+    get:
+      operationId: v1_pms_escalations_list
+      summary: Escalations and exceptional cases (UC-PMS-027)
+      parameters:
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsEscalation'
+              examples:
+                Response:
+                  value:
+                  - - id: 2
+                      kind: missed_review
+                      application_id: 7
+                      application_reference: PMS-2026-00007
+                      subject_id: 11
+                      deadline: '2026-11-23'
+                      status: open
+                      note: ''
+                      handled_at: null
+                      created_at: '2026-11-24T00:05:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/escalations/{id}/handle:
+    post:
+      operationId: v1_pms_escalations_handle_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Route or resolve an escalation
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsHandleIn'
+            examples:
+              Request:
+                value:
+                  action: resolve
+                  note: Reassigned to Director 2002.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsHandleIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsHandleIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsEscalation'
+              examples:
+                Response:
+                  value:
+                    id: 2
+                    kind: missed_review
+                    application_id: 7
+                    application_reference: PMS-2026-00007
+                    subject_id: 11
+                    deadline: '2026-11-23'
+                    status: resolved
+                    note: ''
+                    handled_at: null
+                    created_at: '2026-11-24T00:05:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/licensing-requests:
+    get:
+      operationId: v1_pms_licensing_requests_list
+      description: Writes are throttled; reads on the same path are not.
+      summary: Licensing requests within your scope (BR-PMS-091)
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsLicensing'
+              examples:
+                Response:
+                  value:
+                  - - id: 3
+                      application_id: 7
+                      application_reference: PMS-2026-00007
+                      kind: licensing
+                      summary: Licence the coating to a battery maker.
+                      status: routed
+                      route_kind: committee
+                      routed_director_user_id: null
+                      committee_name: Technology Transfer Committee
+                      routed_at: '2026-12-01T10:00:00+05:30'
+                      notes: []
+                      agreement: null
+                      created_at: '2026-12-01T10:00:00+05:30'
+                  summary: response
+          description: ''
+    post:
+      operationId: v1_pms_licensing_requests_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Submit a licensing or technology-transfer request (UC-PMS-020)
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsLicensingIn'
+            examples:
+              Request:
+                value:
+                  application_id: 7
+                  kind: licensing
+                  summary: Licence the coating to a battery maker.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsLicensingIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsLicensingIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsLicensing'
+              examples:
+                Response:
+                  value:
+                    id: 3
+                    application_id: 7
+                    application_reference: PMS-2026-00007
+                    kind: licensing
+                    summary: Licence the coating to a battery maker.
+                    status: routed
+                    route_kind: committee
+                    routed_director_user_id: null
+                    committee_name: Technology Transfer Committee
+                    routed_at: '2026-12-01T10:00:00+05:30'
+                    notes: []
+                    agreement: null
+                    created_at: '2026-12-01T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/licensing-requests/{id}/agreement:
+    post:
+      operationId: v1_pms_licensing_requests_agreement_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record the final agreement (PMS-AFR-162)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsLicenseAgreementIn'
+            examples:
+              Request:
+                value:
+                  counterparty: Acme Cells
+                  signed_on: '2027-01-10'
+                  terms_summary: Non-exclusive, India, 5 years.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsLicenseAgreementIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsLicenseAgreementIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsLicensing'
+              examples:
+                Response:
+                  value:
+                    id: 3
+                    application_id: 7
+                    application_reference: PMS-2026-00007
+                    kind: licensing
+                    summary: Licence the coating to a battery maker.
+                    status: agreement_recorded
+                    route_kind: committee
+                    routed_director_user_id: null
+                    committee_name: Technology Transfer Committee
+                    routed_at: '2026-12-01T10:00:00+05:30'
+                    notes: []
+                    agreement: null
+                    created_at: '2026-12-01T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/licensing-requests/{id}/notes:
+    post:
+      operationId: v1_pms_licensing_requests_notes_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record negotiation progress (PMS-AFR-161)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsNoteIn'
+            examples:
+              Request:
+                value:
+                  note: Term sheet received.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsNoteIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsNoteIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsLicensing'
+              examples:
+                Response:
+                  value:
+                    id: 3
+                    application_id: 7
+                    application_reference: PMS-2026-00007
+                    kind: licensing
+                    summary: Licence the coating to a battery maker.
+                    status: negotiating
+                    route_kind: committee
+                    routed_director_user_id: null
+                    committee_name: Technology Transfer Committee
+                    routed_at: '2026-12-01T10:00:00+05:30'
+                    notes: []
+                    agreement: null
+                    created_at: '2026-12-01T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/licensing-requests/{id}/route:
+    post:
+      operationId: v1_pms_licensing_requests_route_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Route a request once a route is configured (BR-PMS-088)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsLicensing'
+              examples:
+                Response:
+                  value:
+                    id: 3
+                    application_id: 7
+                    application_reference: PMS-2026-00007
+                    kind: licensing
+                    summary: Licence the coating to a battery maker.
+                    status: routed
+                    route_kind: committee
+                    routed_director_user_id: null
+                    committee_name: Technology Transfer Committee
+                    routed_at: '2026-12-01T10:00:00+05:30'
+                    notes: []
+                    agreement: null
+                    created_at: '2026-12-01T10:00:00+05:30'
+                  summary: response
+          description: ''
+  /api/v1/pms/maintenance-cycles/{id}/action:
+    post:
+      operationId: v1_pms_maintenance_cycles_action_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record the maintenance payment (PMS-AFR-113)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsMaintenanceActionIn'
+            examples:
+              Request:
+                value:
+                  reference: RCPT-88
+                  amount: '4000'
+                  actioned_on: '2029-02-20'
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsMaintenanceActionIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsMaintenanceActionIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsMaintenanceCycle'
+              examples:
+                Response:
+                  value:
+                    id: 1
+                    application_id: 7
+                    seq: 1
+                    due_on: '2029-03-01'
+                    source: schedule
+                    status: renewed
+                    deciding_director_user_id: 2001
+                    director_name: Director 2001
+                    decided_at: null
+                    decision_note: ''
+                    action_reference: RCPT-88
+                    amount: null
+                    actioned_on: null
+                  summary: response
+          description: ''
+  /api/v1/pms/maintenance-cycles/{id}/decision:
+    post:
+      operationId: v1_pms_maintenance_cycles_decision_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Decide Renew or Do Not Renew (UC-PMS-018)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsRenewalIn'
+            examples:
+              Request:
+                value:
+                  renew: true
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsRenewalIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsRenewalIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsMaintenanceCycle'
+              examples:
+                Response:
+                  value:
+                    id: 1
+                    application_id: 7
+                    seq: 1
+                    due_on: '2029-03-01'
+                    source: schedule
+                    status: renew_approved
+                    deciding_director_user_id: 2001
+                    director_name: Director 2001
+                    decided_at: null
+                    decision_note: ''
+                    action_reference: ''
+                    amount: null
+                    actioned_on: null
+                  summary: response
+          description: ''
+  /api/v1/pms/maintenance-cycles/{id}/reassign:
+    post:
+      operationId: v1_pms_maintenance_cycles_reassign_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Give the renewal decision to another Director (ruling C19)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsPersonIn'
+            examples:
+              Request:
+                value:
+                  director_user_id: 2002
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsPersonIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsPersonIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsMaintenanceCycle'
+              examples:
+                Response:
+                  value:
+                    id: 1
+                    application_id: 7
+                    seq: 1
+                    due_on: '2029-03-01'
+                    source: schedule
+                    status: decision_requested
+                    deciding_director_user_id: 2002
+                    director_name: Director 2001
+                    decided_at: null
+                    decision_note: ''
+                    action_reference: ''
+                    amount: null
+                    actioned_on: null
+                  summary: response
+          description: ''
+  /api/v1/pms/maintenance-cycles/{id}/request-decision:
+    post:
+      operationId: v1_pms_maintenance_cycles_request_decision_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Ask the Director for a renewal decision (PMS-AFR-111)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsMaintenanceCycle'
+              examples:
+                Response:
+                  value:
+                    id: 1
+                    application_id: 7
+                    seq: 1
+                    due_on: '2029-03-01'
+                    source: schedule
+                    status: decision_requested
+                    deciding_director_user_id: 2001
+                    director_name: Director 2001
+                    decided_at: null
+                    decision_note: ''
+                    action_reference: ''
+                    amount: null
+                    actioned_on: null
+                  summary: response
+          description: ''
+  /api/v1/pms/my-work:
+    get:
+      operationId: v1_pms_my_work_list
+      summary: What is waiting on you
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsWorkItem'
+              examples:
+                Response:
+                  value:
+                  - - kind: review
+                      id: 11
+                      application_id: 7
+                      reference: PMS-2026-00007
+                      title: Graphene anode
+                      status: open
+                  summary: response
+          description: ''
+  /api/v1/pms/office-actions/{id}/approve:
+    post:
+      operationId: v1_pms_office_actions_approve_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Approve the response as the applicant (UC-PMS-029)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsOfficeAction'
+              examples:
+                Response:
+                  value:
+                    id: 2
+                    application_id: 7
+                    reference: FER/2027/11
+                    received_on: '2027-03-01'
+                    response_due_on: '2027-09-01'
+                    current_due_on: '2027-09-01'
+                    requires_applicant_review: true
+                    status: applicant_approved
+                    draft_response: '...'
+                    approved_at: null
+                    submitted_on: null
+                    submission_reference: ''
+                    extensions: []
+                  summary: response
+          description: ''
+  /api/v1/pms/office-actions/{id}/extension:
+    post:
+      operationId: v1_pms_office_actions_extension_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record an extension the office granted (PMS-AFR-122)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsExtensionIn'
+            examples:
+              Request:
+                value:
+                  new_due_on: '2027-10-01'
+                  reason: Lab data pending.
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsExtensionIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsExtensionIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsOfficeAction'
+              examples:
+                Response:
+                  value:
+                    id: 2
+                    application_id: 7
+                    reference: FER/2027/11
+                    received_on: '2027-03-01'
+                    response_due_on: '2027-09-01'
+                    current_due_on: '2027-10-01'
+                    requires_applicant_review: true
+                    status: awaiting_applicant_approval
+                    draft_response: '...'
+                    approved_at: null
+                    submitted_on: null
+                    submission_reference: ''
+                    extensions: []
+                  summary: response
+          description: ''
+  /api/v1/pms/office-actions/{id}/response:
+    post:
+      operationId: v1_pms_office_actions_response_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Prepare the office-action response (UC-PMS-015)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsDraftResponseIn'
+            examples:
+              Request:
+                value:
+                  draft: Claim 1 is amended...
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsDraftResponseIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsDraftResponseIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsOfficeAction'
+              examples:
+                Response:
+                  value:
+                    id: 2
+                    application_id: 7
+                    reference: FER/2027/11
+                    received_on: '2027-03-01'
+                    response_due_on: '2027-09-01'
+                    current_due_on: '2027-09-01'
+                    requires_applicant_review: true
+                    status: awaiting_applicant_approval
+                    draft_response: '...'
+                    approved_at: null
+                    submitted_on: null
+                    submission_reference: ''
+                    extensions: []
+                  summary: response
+          description: ''
+  /api/v1/pms/office-actions/{id}/submission:
+    post:
+      operationId: v1_pms_office_actions_submission_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Record the response's submission (BR-PMS-065)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsSubmissionIn'
+            examples:
+              Request:
+                value:
+                  submitted_on: '2027-08-20'
+                  reference: RESP/2027/4
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsSubmissionIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsSubmissionIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsOfficeAction'
+              examples:
+                Response:
+                  value:
+                    id: 2
+                    application_id: 7
+                    reference: FER/2027/11
+                    received_on: '2027-03-01'
+                    response_due_on: '2027-09-01'
+                    current_due_on: '2027-09-01'
+                    requires_applicant_review: true
+                    status: submitted
+                    draft_response: '...'
+                    approved_at: null
+                    submitted_on: '2027-08-20'
+                    submission_reference: ''
+                    extensions: []
+                  summary: response
+          description: ''
+  /api/v1/pms/oversight:
+    get:
+      operationId: v1_pms_oversight_retrieve
+      summary: Workflow oversight within your scope (UC-PMS-032)
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Response:
+                  value:
+                    by_status:
+                      submitted: 2
+                      under_review: 3
+                    total: 5
+                    overdue_reviews: 1
+                    open_escalations: 1
+                  summary: response
+          description: ''
+  /api/v1/pms/people:
+    get:
+      operationId: v1_pms_people_retrieve
+      summary: Find a person by name for a picker (ids, names and kinds only)
+      parameters:
+      - in: query
+        name: kind
+        schema:
+          type: string
+      - in: query
+        name: q
+        schema:
+          type: string
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Response:
+                  value:
+                    results:
+                    - user_id: 1001
+                      display_name: Person 1001
+                      kind: student
+                  summary: response
+          description: ''
+  /api/v1/pms/policy:
+    get:
+      operationId: v1_pms_policy_retrieve
+      description: Writes are throttled; reads on the same path are not.
+      summary: The settings in effect and every earlier version (UC-PMS-025)
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Response:
+                  value:
+                    version: 0
+                    payload:
+                      appeal_period_days: 30
+                    history: []
+                  summary: response
+          description: ''
+    post:
+      operationId: v1_pms_policy_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Publish a new settings version (409 if someone published first)
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsPolicyIn'
+            examples:
+              Request:
+                value:
+                  based_on_version: 0
+                  payload:
+                    cost_threshold: '100000.00'
+                    domains:
+                    - code: materials
+                      label: Materials
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsPolicyIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsPolicyIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Response:
+                  value:
+                    version: 1
+                    payload:
+                      cost_threshold: '100000.00'
+                    history: []
+                  summary: response
+          description: ''
+  /api/v1/pms/prior-art/searches:
+    post:
+      operationId: v1_pms_prior_art_searches_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Search recorded prior art and log the session (UC-PMS-004)
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsSearchIn'
+            examples:
+              Request:
+                value:
+                  query: graphene anode coating
+                  classification_codes:
+                  - H01M
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsSearchIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsSearchIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Response:
+                  value:
+                    search_id: 12
+                    terms:
+                    - graphene
+                    - anode
+                    - coating
+                    suggested_keywords:
+                    - lithium
+                    classification_codes:
+                    - H01M
+                    suggested_classifications:
+                    - H01M
+                    sources:
+                    - code: patent_databases
+                      label: Patent databases
+                      status: not connected
+                    results:
+                    - reference:
+                        id: 4
+                        application_id: 7
+                        kind: patent
+                        title: Graphene anode coating
+                        identifier: US1234567B2
+                        url: https://example.org/US1234567
+                        source_name: Espacenet
+                        notes: Closest art for claim 1.
+                        created_at: '2026-11-03T10:00:00+05:30'
+                      score: 4
+                  summary: response
+          description: ''
+  /api/v1/pms/reference-data:
+    get:
+      operationId: v1_pms_reference_data_retrieve
+      summary: Areas, sensitivity levels and report types for forms
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Response:
+                  value:
+                    domains:
+                    - code: materials
+                      label: Materials
+                      ipc_classes:
+                      - H01M
+                    sensitivities:
+                    - public_internal
+                    - confidential
+                    - restricted
+                    document_kinds:
+                    - specification
+                    alert_offsets_days:
+                    - 30
+                    - 15
+                    - 5
+                    withdrawal_statuses: []
+                    report_types:
+                    - status
+                    appeal_period_days: 30
+                  summary: response
+          description: ''
+  /api/v1/pms/report-definitions:
+    get:
+      operationId: v1_pms_report_definitions_list
+      description: Writes are throttled; reads on the same path are not.
+      summary: Your saved and scheduled reports (PMS-AFR-188, 190)
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PmsReportDefinition'
+              examples:
+                Response:
+                  value:
+                  - - id: 1
+                      name: Weekly status
+                      report_type: status
+                      filters: {}
+                      columns:
+                      - reference
+                      - status
+                      schedule: weekly
+                      active: true
+                      created_at: '2026-11-01T10:00:00+05:30'
+                      runs: []
+                  summary: response
+          description: ''
+    post:
+      operationId: v1_pms_report_definitions_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Save a report definition
+      tags:
+      - pms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PmsReportDefinitionIn'
+            examples:
+              Request:
+                value:
+                  name: Weekly status
+                  report_type: status
+                  columns:
+                  - reference
+                  - status
+                  schedule: weekly
+                summary: request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PmsReportDefinitionIn'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PmsReportDefinitionIn'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsReportDefinition'
+              examples:
+                Response:
+                  value:
+                    id: 1
+                    name: Weekly status
+                    report_type: status
+                    filters: {}
+                    columns:
+                    - reference
+                    - status
+                    schedule: weekly
+                    active: true
+                    created_at: '2026-11-01T10:00:00+05:30'
+                    runs: []
+                  summary: response
+          description: ''
+  /api/v1/pms/report-definitions/{id}/deactivate:
+    post:
+      operationId: v1_pms_report_definitions_deactivate_create
+      description: Writes are throttled; reads on the same path are not.
+      summary: Switch a saved report off
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PmsReportDefinition'
+              examples:
+                Response:
+                  value:
+                    id: 1
+                    name: Weekly status
+                    report_type: status
+                    filters: {}
+                    columns: []
+                    schedule: weekly
+                    active: false
+                    created_at: '2026-11-01T10:00:00+05:30'
+                    runs: []
+                  summary: response
+          description: ''
+  /api/v1/pms/report-runs/{id}/download:
+    get:
+      operationId: v1_pms_report_runs_download_retrieve
+      summary: A scheduled run, rebuilt from your live scope (blueprint S-1)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/pms/reports/{report_type}:
+    get:
+      operationId: v1_pms_reports_retrieve
+      summary: A report within your scope; viewing it is logged (PMS-AFR-191)
+      parameters:
+      - in: path
+        name: report_type
+        schema:
+          type: string
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Response:
+                  value:
+                    columns:
+                    - reference
+                    - status
+                    rows:
+                    - reference: PMS-2026-00007
+                      status: filed
+                  summary: response
+          description: ''
+  /api/v1/pms/reports/{report_type}/export:
+    get:
+      operationId: v1_pms_reports_export_retrieve
+      summary: The same report as CSV (PMS-AFR-189)
+      parameters:
+      - in: path
+        name: report_type
+        schema:
+          type: string
+        required: true
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/pms/setup:
+    get:
+      operationId: v1_pms_setup_retrieve
+      summary: What PCC_ADMIN still has to configure (Step 2.8)
+      tags:
+      - pms
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                Response:
+                  value:
+                    gaps:
+                    - No technical areas are configured...
+                  summary: response
+          description: ''
 components:
   schemas:
     AcademicDirectory:
@@ -1763,6 +5564,14 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - route
+      - resolve
+      type: string
+      description: |-
+        * `route` - route
+        * `resolve` - resolve
     AddCandidates:
       type: object
       properties:
@@ -1993,6 +5802,9 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    BlankEnum:
+      enum:
+      - ''
     BulkOutcome:
       type: object
       properties:
@@ -2315,6 +6127,16 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - approve
+      - reject
+      - needs_revision
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+        * `needs_revision` - needs_revision
     Detail:
       type: object
       properties:
@@ -2671,6 +6493,14 @@ components:
       description: |-
         * `online` - Online
         * `offline` - Offline
+    ModifiedDecisionEnum:
+      enum:
+      - approve
+      - needs_revision
+      type: string
+      description: |-
+        * `approve` - approve
+        * `needs_revision` - needs_revision
     NavGroup:
       type: object
       description: |-
@@ -2732,6 +6562,9 @@ components:
       - is_late
       - message
       - record
+    NullEnum:
+      enum:
+      - null
     OffCampusRecord:
       type: object
       properties:
@@ -3080,6 +6913,35 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedPmsApplicationIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        title:
+          type: string
+          maxLength: 300
+        abstract:
+          type: string
+          maxLength: 5000
+        description:
+          type: string
+          maxLength: 100000
+        claims:
+          type: string
+          maxLength: 50000
+        domain_code:
+          type: string
+          maxLength: 40
+        preferred_attorney_user_id:
+          type: integer
+          minimum: 1
+          nullable: true
+    PatchedPmsSensitivityIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        sensitivity:
+          $ref: '#/components/schemas/SensitivityEnum'
     PatchedRole:
       type: object
       properties:
@@ -3145,6 +7007,2003 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PmsAdviceIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        advice:
+          type: string
+          maxLength: 20000
+      required:
+      - advice
+    PmsAgreementIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        agreement_reference:
+          type: string
+          maxLength: 200
+        consent:
+          type: boolean
+      required:
+      - agreement_reference
+      - consent
+    PmsAppeal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        director_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        director_name:
+          type: string
+          readOnly: true
+        grounds:
+          type: string
+          readOnly: true
+        justification:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        outcome:
+          type: string
+          readOnly: true
+        modified_decision:
+          type: string
+          readOnly: true
+        outcome_note:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - application_id
+      - created_at
+      - decided_at
+      - director_name
+      - director_user_id
+      - grounds
+      - id
+      - justification
+      - modified_decision
+      - outcome
+      - outcome_note
+      - status
+    PmsAppealDecisionIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        outcome:
+          $ref: '#/components/schemas/PmsAppealDecisionInOutcomeEnum'
+        modified_decision:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ModifiedDecisionEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        note:
+          type: string
+          maxLength: 10000
+      required:
+      - note
+      - outcome
+    PmsAppealDecisionInOutcomeEnum:
+      enum:
+      - uphold
+      - remand
+      - modify
+      type: string
+      description: |-
+        * `uphold` - uphold
+        * `remand` - remand
+        * `modify` - modify
+    PmsAppealIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        grounds:
+          type: string
+          maxLength: 5000
+        justification:
+          type: string
+          maxLength: 10000
+      required:
+      - grounds
+      - justification
+    PmsApplicationDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reference:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        domain_code:
+          type: string
+          readOnly: true
+        applicant_user_id:
+          type: integer
+          readOnly: true
+        applicant_name:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        revision_due_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        appeal_due_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        abstract:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        claims:
+          type: string
+          readOnly: true
+        preferred_attorney_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        version:
+          type: integer
+          readOnly: true
+        decided_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        grant_date:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        grant_jurisdiction:
+          type: string
+          readOnly: true
+        patent_number:
+          type: string
+          readOnly: true
+        inventors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsInventor'
+          readOnly: true
+        review_cycles:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsReviewCycle'
+          readOnly: true
+        appeals:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsAppeal'
+          readOnly: true
+        attorney_assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsAssignment'
+          readOnly: true
+        budgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsBudget'
+          readOnly: true
+        filings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsFiling'
+          readOnly: true
+        communications:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsCommunication'
+          readOnly: true
+        office_actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsOfficeAction'
+          readOnly: true
+        maintenance_cycles:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsMaintenanceCycle'
+          readOnly: true
+        assessments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsAssessment'
+          readOnly: true
+        legal_requests:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsLegalRequest'
+          readOnly: true
+        legal_advice:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsLegalAdvice'
+          readOnly: true
+        revision_responses:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsRevisionResponse'
+          readOnly: true
+        relations:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        feedback:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+      required:
+      - abstract
+      - appeal_due_on
+      - appeals
+      - applicant_name
+      - applicant_user_id
+      - assessments
+      - attorney_assignments
+      - budgets
+      - claims
+      - communications
+      - decided_on
+      - description
+      - domain_code
+      - feedback
+      - filings
+      - grant_date
+      - grant_jurisdiction
+      - id
+      - inventors
+      - legal_advice
+      - legal_requests
+      - maintenance_cycles
+      - office_actions
+      - patent_number
+      - preferred_attorney_user_id
+      - reference
+      - relations
+      - review_cycles
+      - revision_due_on
+      - revision_responses
+      - status
+      - submitted_at
+      - title
+      - updated_at
+      - version
+    PmsApplicationIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        title:
+          type: string
+          maxLength: 300
+        abstract:
+          type: string
+          maxLength: 5000
+        description:
+          type: string
+          maxLength: 100000
+        claims:
+          type: string
+          maxLength: 50000
+        domain_code:
+          type: string
+          maxLength: 40
+        preferred_attorney_user_id:
+          type: integer
+          minimum: 1
+          nullable: true
+    PmsApplicationList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reference:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        domain_code:
+          type: string
+          readOnly: true
+        applicant_user_id:
+          type: integer
+          readOnly: true
+        applicant_name:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        revision_due_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        appeal_due_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+      required:
+      - appeal_due_on
+      - applicant_name
+      - applicant_user_id
+      - domain_code
+      - id
+      - reference
+      - revision_due_on
+      - status
+      - submitted_at
+      - title
+      - updated_at
+    PmsAssessment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        analysis:
+          type: string
+          readOnly: true
+        novelty:
+          type: string
+          readOnly: true
+        non_obviousness:
+          type: string
+          readOnly: true
+        utility:
+          type: string
+          readOnly: true
+        recommendation:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        finalized_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - analysis
+      - finalized_at
+      - id
+      - non_obviousness
+      - novelty
+      - recommendation
+      - status
+      - updated_at
+      - utility
+    PmsAssessmentIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        assessment_id:
+          type: integer
+          minimum: 1
+          nullable: true
+        analysis:
+          type: string
+          maxLength: 50000
+        novelty:
+          type: string
+          maxLength: 50000
+        non_obviousness:
+          type: string
+          maxLength: 50000
+        utility:
+          type: string
+          maxLength: 50000
+        recommendation:
+          oneOf:
+          - $ref: '#/components/schemas/RecommendationEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+    PmsAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        application_reference:
+          type: string
+          readOnly: true
+        application_title:
+          type: string
+          readOnly: true
+        attorney_user_id:
+          type: integer
+          readOnly: true
+        attorney_name:
+          type: string
+          readOnly: true
+        is_exception:
+          type: boolean
+          readOnly: true
+        exception_reason:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        responded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decline_reason:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - application_id
+      - application_reference
+      - application_title
+      - attorney_name
+      - attorney_user_id
+      - created_at
+      - decline_reason
+      - exception_reason
+      - id
+      - is_exception
+      - responded_at
+      - status
+    PmsAttorneyIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        attorney_user_id:
+          type: integer
+          minimum: 1
+        exception_reason:
+          type: string
+          default: ''
+          maxLength: 2000
+      required:
+      - attorney_user_id
+    PmsAudit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        actor_role:
+          type: string
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        application_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        application_reference:
+          type: string
+          readOnly: true
+        object_type:
+          type: string
+          readOnly: true
+        object_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        from_state:
+          type: string
+          readOnly: true
+        to_state:
+          type: string
+          readOnly: true
+        details:
+          readOnly: true
+      required:
+      - action
+      - actor_role
+      - actor_user_id
+      - application_id
+      - application_reference
+      - at
+      - details
+      - from_state
+      - id
+      - object_id
+      - object_type
+      - to_state
+    PmsBudget:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        filing_fee:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        attorney_fee:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        admin_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        decision_note:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        threshold_at_decision:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        availability:
+          type: string
+          readOnly: true
+        routed_to:
+          type: string
+          readOnly: true
+        external_reference:
+          type: string
+          readOnly: true
+        external_decided_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - admin_cost
+      - application_id
+      - attorney_fee
+      - availability
+      - created_at
+      - decided_at
+      - decision_note
+      - external_decided_on
+      - external_reference
+      - filing_fee
+      - id
+      - routed_to
+      - status
+      - threshold_at_decision
+      - total
+    PmsBudgetDecisionIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        approve:
+          type: boolean
+        note:
+          type: string
+          default: ''
+          maxLength: 2000
+      required:
+      - approve
+    PmsBudgetIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        filing_fee:
+          type: string
+          maxLength: 20
+        attorney_fee:
+          type: string
+          maxLength: 20
+        admin_cost:
+          type: string
+          maxLength: 20
+      required:
+      - admin_cost
+      - attorney_fee
+      - filing_fee
+    PmsCandidate:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        domain_codes:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        workload:
+          type: integer
+          readOnly: true
+      required:
+      - domain_codes
+      - name
+      - user_id
+      - workload
+    PmsCommunication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        received_on:
+          type: string
+          format: date
+          readOnly: true
+        reference:
+          type: string
+          readOnly: true
+        details:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - details
+      - id
+      - kind
+      - received_on
+      - reference
+    PmsCommunicationIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        kind:
+          $ref: '#/components/schemas/PmsCommunicationInKindEnum'
+        received_on:
+          type: string
+          format: date
+        reference:
+          type: string
+          maxLength: 200
+        details:
+          type: string
+          default: ''
+          maxLength: 20000
+        response_due_on:
+          type: string
+          format: date
+          nullable: true
+        requires_applicant_review:
+          type: boolean
+          default: false
+        grant_date:
+          type: string
+          format: date
+          nullable: true
+        patent_number:
+          type: string
+          default: ''
+          maxLength: 64
+        jurisdiction:
+          type: string
+          default: ''
+          maxLength: 5
+      required:
+      - kind
+      - received_on
+      - reference
+    PmsCommunicationInKindEnum:
+      enum:
+      - office_action
+      - grant
+      - refusal
+      - other
+      type: string
+      description: |-
+        * `office_action` - office_action
+        * `grant` - grant
+        * `refusal` - refusal
+        * `other` - other
+    PmsDeadline:
+      type: object
+      properties:
+        kind:
+          type: string
+          readOnly: true
+        subject_id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        reference:
+          type: string
+          readOnly: true
+        due_on:
+          type: string
+          format: date
+          readOnly: true
+        responsible:
+          type: string
+          readOnly: true
+        missed:
+          type: boolean
+          readOnly: true
+      required:
+      - application_id
+      - due_on
+      - kind
+      - missed
+      - reference
+      - responsible
+      - subject_id
+    PmsDecisionIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        justification:
+          type: string
+          maxLength: 10000
+      required:
+      - decision
+      - justification
+    PmsDocument:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        sensitivity:
+          type: string
+          readOnly: true
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsVersion'
+          readOnly: true
+      required:
+      - id
+      - kind
+      - sensitivity
+      - title
+      - versions
+    PmsDocumentRow:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        sensitivity:
+          type: string
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - id
+      - kind
+      - sensitivity
+      - title
+      - updated_at
+    PmsDraftResponseIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        draft:
+          type: string
+          maxLength: 100000
+      required:
+      - draft
+    PmsDueDateIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        due_on:
+          type: string
+          format: date
+      required:
+      - due_on
+    PmsEscalation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        application_reference:
+          type: string
+          readOnly: true
+        subject_id:
+          type: integer
+          readOnly: true
+        deadline:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        status:
+          type: string
+          readOnly: true
+          default: open
+        note:
+          type: string
+          readOnly: true
+        handled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - application_id
+      - application_reference
+      - created_at
+      - deadline
+      - handled_at
+      - id
+      - kind
+      - note
+      - status
+      - subject_id
+    PmsExtensionIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        new_due_on:
+          type: string
+          format: date
+        reason:
+          type: string
+          maxLength: 2000
+      required:
+      - new_due_on
+      - reason
+    PmsExternalDecisionIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        approved:
+          type: boolean
+        reference:
+          type: string
+          maxLength: 200
+        decided_on:
+          type: string
+          format: date
+      required:
+      - approved
+      - decided_on
+      - reference
+    PmsFiling:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        jurisdiction:
+          type: string
+          readOnly: true
+        office_name:
+          type: string
+          readOnly: true
+        international_justification:
+          type: string
+          readOnly: true
+        external_filing_id:
+          type: string
+          readOnly: true
+        filing_date:
+          type: string
+          format: date
+          readOnly: true
+        confirmation_reference:
+          type: string
+          readOnly: true
+        format_validation:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - confirmation_reference
+      - created_at
+      - external_filing_id
+      - filing_date
+      - format_validation
+      - id
+      - international_justification
+      - jurisdiction
+      - office_name
+    PmsFilingIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        jurisdiction:
+          type: string
+          maxLength: 5
+        office_name:
+          type: string
+          maxLength: 120
+        external_filing_id:
+          type: string
+          maxLength: 64
+        filing_date:
+          type: string
+          format: date
+        confirmation_reference:
+          type: string
+          maxLength: 200
+        international_justification:
+          type: string
+          default: ''
+          maxLength: 5000
+      required:
+      - confirmation_reference
+      - external_filing_id
+      - filing_date
+      - jurisdiction
+      - office_name
+    PmsHandleIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        note:
+          type: string
+          maxLength: 2000
+      required:
+      - action
+      - note
+    PmsInventor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        affiliation:
+          type: string
+          readOnly: true
+        share_percent:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+          readOnly: true
+        agreement_completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        agreement_reference:
+          type: string
+          readOnly: true
+        consent_recorded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - affiliation
+      - agreement_completed_at
+      - agreement_reference
+      - consent_recorded_at
+      - email
+      - id
+      - name
+      - share_percent
+      - user_id
+    PmsInventorIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+          nullable: true
+        name:
+          type: string
+          maxLength: 200
+        email:
+          type: string
+          maxLength: 254
+        affiliation:
+          type: string
+          maxLength: 200
+        share_percent:
+          type: string
+          maxLength: 10
+      required:
+      - share_percent
+    PmsInventorsIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        inventors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsInventorIn'
+      required:
+      - inventors
+    PmsLegalAdvice:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        stage:
+          type: string
+          readOnly: true
+        advice:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - advice
+      - created_at
+      - id
+      - stage
+    PmsLegalRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - kind
+      - message
+    PmsLegalRequestIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        kind:
+          $ref: '#/components/schemas/PmsLegalRequestInKindEnum'
+        message:
+          type: string
+          maxLength: 5000
+      required:
+      - kind
+      - message
+    PmsLegalRequestInKindEnum:
+      enum:
+      - information
+      - extension
+      type: string
+      description: |-
+        * `information` - information
+        * `extension` - extension
+    PmsLicenseAgreementIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        counterparty:
+          type: string
+          maxLength: 200
+        signed_on:
+          type: string
+          format: date
+        terms_summary:
+          type: string
+          maxLength: 20000
+        financial_terms:
+          type: string
+          default: ''
+          maxLength: 20000
+      required:
+      - counterparty
+      - signed_on
+      - terms_summary
+    PmsLicensing:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        application_reference:
+          type: string
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        summary:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        route_kind:
+          type: string
+          readOnly: true
+        routed_director_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        committee_name:
+          type: string
+          readOnly: true
+        routed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PmsNote'
+          readOnly: true
+        agreement:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - agreement
+      - application_id
+      - application_reference
+      - committee_name
+      - created_at
+      - id
+      - kind
+      - notes
+      - route_kind
+      - routed_at
+      - routed_director_user_id
+      - status
+      - summary
+    PmsLicensingIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        application_id:
+          type: integer
+          minimum: 1
+        kind:
+          $ref: '#/components/schemas/PmsLicensingInKindEnum'
+        summary:
+          type: string
+          maxLength: 5000
+      required:
+      - application_id
+      - kind
+      - summary
+    PmsLicensingInKindEnum:
+      enum:
+      - licensing
+      - technology_transfer
+      type: string
+      description: |-
+        * `licensing` - licensing
+        * `technology_transfer` - technology_transfer
+    PmsMaintenanceActionIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        reference:
+          type: string
+          maxLength: 200
+        amount:
+          type: string
+          maxLength: 20
+        actioned_on:
+          type: string
+          format: date
+      required:
+      - actioned_on
+      - amount
+      - reference
+    PmsMaintenanceCycle:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        seq:
+          type: integer
+          readOnly: true
+        due_on:
+          type: string
+          format: date
+          readOnly: true
+        source:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        deciding_director_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        director_name:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_note:
+          type: string
+          readOnly: true
+        action_reference:
+          type: string
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        actioned_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+      required:
+      - action_reference
+      - actioned_on
+      - amount
+      - application_id
+      - decided_at
+      - deciding_director_user_id
+      - decision_note
+      - director_name
+      - due_on
+      - id
+      - seq
+      - source
+      - status
+    PmsNote:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author_user_id:
+          type: integer
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_user_id
+      - created_at
+      - id
+      - note
+    PmsNoteIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        note:
+          type: string
+          maxLength: 5000
+      required:
+      - note
+    PmsOfficeAction:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        reference:
+          type: string
+          readOnly: true
+        received_on:
+          type: string
+          format: date
+          readOnly: true
+        response_due_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        current_due_on:
+          type: string
+          nullable: true
+          readOnly: true
+        requires_applicant_review:
+          type: boolean
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        draft_response:
+          type: string
+          readOnly: true
+        approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        submitted_on:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        submission_reference:
+          type: string
+          readOnly: true
+        extensions:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+      required:
+      - application_id
+      - approved_at
+      - current_due_on
+      - draft_response
+      - extensions
+      - id
+      - received_on
+      - reference
+      - requires_applicant_review
+      - response_due_on
+      - status
+      - submission_reference
+      - submitted_on
+    PmsPanelOption:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        domain_codes:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - domain_codes
+      - name
+      - user_id
+    PmsPersonIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        director_user_id:
+          type: integer
+          minimum: 1
+      required:
+      - director_user_id
+    PmsPolicyIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        based_on_version:
+          type: integer
+          minimum: 0
+        payload:
+          type: object
+          additionalProperties: {}
+      required:
+      - based_on_version
+      - payload
+    PmsPriorArt:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        identifier:
+          type: string
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        source_name:
+          type: string
+          readOnly: true
+        notes:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - application_id
+      - created_at
+      - id
+      - identifier
+      - kind
+      - notes
+      - source_name
+      - title
+      - url
+    PmsReferenceIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        kind:
+          $ref: '#/components/schemas/PmsReferenceInKindEnum'
+        title:
+          type: string
+          maxLength: 500
+        identifier:
+          type: string
+          default: ''
+          maxLength: 120
+        url:
+          type: string
+          default: ''
+          maxLength: 500
+        source_name:
+          type: string
+          default: ''
+          maxLength: 120
+        notes:
+          type: string
+          default: ''
+          maxLength: 10000
+        search_id:
+          type: integer
+          minimum: 1
+          nullable: true
+      required:
+      - kind
+      - title
+    PmsReferenceInKindEnum:
+      enum:
+      - patent
+      - publication
+      type: string
+      description: |-
+        * `patent` - patent
+        * `publication` - publication
+    PmsRenewalIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        renew:
+          type: boolean
+        note:
+          type: string
+          default: ''
+          maxLength: 2000
+      required:
+      - renew
+    PmsReportDefinition:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        report_type:
+          type: string
+          readOnly: true
+        filters:
+          readOnly: true
+        columns:
+          readOnly: true
+        schedule:
+          type: string
+          readOnly: true
+        active:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        runs:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+      required:
+      - active
+      - columns
+      - created_at
+      - filters
+      - id
+      - name
+      - report_type
+      - runs
+      - schedule
+    PmsReportDefinitionIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        report_type:
+          $ref: '#/components/schemas/ReportTypeEnum'
+        filters:
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 40
+        columns:
+          type: array
+          items:
+            type: string
+            maxLength: 40
+          maxItems: 20
+        schedule:
+          $ref: '#/components/schemas/ScheduleEnum'
+      required:
+      - name
+      - report_type
+      - schedule
+    PmsRespondIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        accept:
+          type: boolean
+        reason:
+          type: string
+          default: ''
+          maxLength: 2000
+      required:
+      - accept
+    PmsResubmitIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        responses:
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 10000
+      required:
+      - responses
+    PmsReviewCycle:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cycle_no:
+          type: integer
+          readOnly: true
+        director_user_id:
+          type: integer
+          readOnly: true
+        director_name:
+          type: string
+          readOnly: true
+        assigned_on:
+          type: string
+          format: date
+          readOnly: true
+        due_on:
+          type: string
+          format: date
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        decision:
+          type: string
+          readOnly: true
+        justification:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - assigned_on
+      - cycle_no
+      - decided_at
+      - decision
+      - director_name
+      - director_user_id
+      - due_on
+      - id
+      - justification
+      - status
+    PmsRevisionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+        feedback_key:
+          type: string
+          readOnly: true
+        response:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - feedback_key
+      - id
+      - response
+      - version
+    PmsRoster:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        domain_codes:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        valid_from:
+          type: string
+          format: date-time
+          readOnly: true
+        valid_to:
+          type: string
+          format: date-time
+          readOnly: true
+        workload:
+          type: integer
+          readOnly: true
+      required:
+      - domain_codes
+      - id
+      - name
+      - user_id
+      - valid_from
+      - valid_to
+      - workload
+    PmsRosterIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        domain_codes:
+          type: array
+          items:
+            type: string
+            maxLength: 40
+          maxItems: 50
+      required:
+      - domain_codes
+      - user_id
+    PmsRouteIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        routed_to:
+          type: string
+          maxLength: 200
+      required:
+      - routed_to
+    PmsSearchIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        query:
+          type: string
+          maxLength: 500
+        application_id:
+          type: integer
+          minimum: 1
+          nullable: true
+        classification_codes:
+          type: array
+          items:
+            type: string
+            maxLength: 20
+          maxItems: 20
+      required:
+      - query
+    PmsSubmissionIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        submitted_on:
+          type: string
+          format: date
+        reference:
+          type: string
+          maxLength: 200
+      required:
+      - reference
+      - submitted_on
+    PmsUploadIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        file:
+          type: string
+          format: uri
+        kind:
+          $ref: '#/components/schemas/PmsUploadInKindEnum'
+        title:
+          type: string
+          maxLength: 200
+        sensitivity:
+          $ref: '#/components/schemas/SensitivityEnum'
+        document_id:
+          type: integer
+          minimum: 1
+          nullable: true
+      required:
+      - file
+    PmsUploadInKindEnum:
+      enum:
+      - specification
+      - claims
+      - drawings
+      - supporting
+      - filing_package
+      - office_action
+      - other
+      type: string
+      description: |-
+        * `specification` - specification
+        * `claims` - claims
+        * `drawings` - drawings
+        * `supporting` - supporting
+        * `filing_package` - filing_package
+        * `office_action` - office_action
+        * `other` - other
+    PmsVersion:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        number:
+          type: integer
+          readOnly: true
+        original_name:
+          type: string
+          readOnly: true
+        size_bytes:
+          type: integer
+          readOnly: true
+        sha256:
+          type: string
+          readOnly: true
+        uploaded_at:
+          type: string
+          format: date-time
+          readOnly: true
+        uploaded_by_user_id:
+          type: integer
+          readOnly: true
+        is_current:
+          type: boolean
+          readOnly: true
+      required:
+      - id
+      - is_current
+      - number
+      - original_name
+      - sha256
+      - size_bytes
+      - uploaded_at
+      - uploaded_by_user_id
+    PmsWithdrawIn:
+      type: object
+      description: An unknown key is refused rather than silently ignored.
+      properties:
+        reason:
+          type: string
+          maxLength: 2000
+        consented_inventor_ids:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          maxItems: 50
+      required:
+      - reason
+    PmsWorkItem:
+      type: object
+      properties:
+        kind:
+          type: string
+          readOnly: true
+        id:
+          type: integer
+          readOnly: true
+        application_id:
+          type: integer
+          readOnly: true
+        reference:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+      required:
+      - application_id
+      - id
+      - kind
+      - reference
+      - status
+      - title
     ProfileDocument:
       type: object
       description: |-
@@ -3220,6 +9079,14 @@ components:
       - message
       - rule
       - sanction
+    RecommendationEnum:
+      enum:
+      - file_patent
+      - do_not_file
+      - needs_amendment
+      type: string
+      description: "* `` - \n* `file_patent` - file_patent\n* `do_not_file` - do_not_file\n*
+        `needs_amendment` - needs_amendment"
     RecordIncident:
       type: object
       properties:
@@ -3466,6 +9333,28 @@ components:
       - message
       - reason
       - route
+    ReportTypeEnum:
+      enum:
+      - status
+      - financial
+      - deadlines
+      - inventors
+      - portfolio
+      - workload
+      - dashboard
+      - history
+      - trend
+      type: string
+      description: |-
+        * `status` - status
+        * `financial` - financial
+        * `deadlines` - deadlines
+        * `inventors` - inventors
+        * `portfolio` - portfolio
+        * `workload` - workload
+        * `dashboard` - dashboard
+        * `history` - history
+        * `trend` - trend
     RoundOutcome:
       type: object
       properties:
@@ -3551,6 +9440,16 @@ components:
         * `deregister` - deregister
         * `bar_season` - bar_season
         * `bar_permanent` - bar_permanent
+    ScheduleEnum:
+      enum:
+      - none
+      - weekly
+      - monthly
+      type: string
+      description: |-
+        * `none` - none
+        * `weekly` - weekly
+        * `monthly` - monthly
     ScheduledCount:
       type: object
       properties:
@@ -3598,6 +9497,16 @@ components:
         * `it` - IT / software
         * `core` - Core engineering
         * `other` - Other
+    SensitivityEnum:
+      enum:
+      - public_internal
+      - confidential
+      - restricted
+      type: string
+      description: |-
+        * `public_internal` - public_internal
+        * `confidential` - confidential
+        * `restricted` - restricted
     Session:
       type: object
       properties:

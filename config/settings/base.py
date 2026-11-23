@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.pms",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -188,7 +189,18 @@ PLACEMENT_UPLOAD_ROOT = env(
 #: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
 PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
 
-# No multipart endpoints remain, so this only caps the JSON body.
+#: Patent documents (BR-PMS-015 allows up to 50 MB); outside BASE_DIR or boot fails.
+PMS_UPLOAD_ROOT = env(
+    "PMS_UPLOAD_ROOT",
+    str(Path.home() / ".local" / "share" / "fusion-integrated" / "pms-uploads"))
+#: `clamd` in every deployed environment; `development` only ever runs with DEBUG on.
+PMS_MALWARE_SCANNER = env("PMS_MALWARE_SCANNER", "clamd")
+#: A unix socket wins over host and port; neither set means no scanner, so uploads are refused.
+PMS_CLAMD_SOCKET = env("PMS_CLAMD_SOCKET", "")
+PMS_CLAMD_HOST = env("PMS_CLAMD_HOST", "")
+PMS_CLAMD_PORT = env_int("PMS_CLAMD_PORT", 3310)
+
+# Caps the non-file part of a body; PMS document bytes are capped by the module itself.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 
 REST_FRAMEWORK = {
@@ -216,6 +228,11 @@ REST_FRAMEWORK = {
         "export": "5/hour",
         "upload": "20/hour",
         "directory_search": "120/hour",
+        "pms_write": "240/hour",
+        "pms_submit": "30/hour",
+        "pms_upload": "60/hour",
+        "pms_search": "120/hour",
+        "pms_export": "10/hour",
     },
 }
 

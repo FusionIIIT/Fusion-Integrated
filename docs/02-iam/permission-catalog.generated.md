@@ -38,3 +38,52 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `pms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `pms.application.view` | See applications within one's scope | `faculty`, `pms_attorney`, `pms_director`, `pms_pcc_admin`, `staff`, `student` |
+| `pms.application.create` | Draft and submit a patent application | `faculty`, `staff`, `student` |
+| `pms.application.update` | Edit and resubmit one's own application | `faculty`, `staff`, `student` |
+| `pms.inventor.update` | Maintain an application's inventors and agreements | `faculty`, `staff`, `student` |
+| `pms.withdrawal.create` | Withdraw one's own application | `faculty`, `staff`, `student` |
+| `pms.appeal.create` | Appeal a rejection | `faculty`, `staff`, `student` |
+| `pms.appeal.review` | Decide an appeal | `pms_director` |
+| `pms.review.assign` | Assign or reassign an application to a Director | `pms_pcc_admin` |
+| `pms.review.approve` | Record a review decision on an assigned application | `pms_director` |
+| `pms.director_profile.update` | Maintain Directors' expertise areas | `pms_pcc_admin` |
+| `pms.attorney_panel.update` | Maintain the approved attorney panel | `pms_pcc_admin` |
+| `pms.attorney.assign` | Assign an attorney to an approved application | `pms_pcc_admin` |
+| `pms.attorney_assignment.review` | Accept or decline an attorney assignment | `pms_attorney` |
+| `pms.assessment.create` | Record a patentability assessment | `pms_attorney` |
+| `pms.legal_request.create` | Ask the applicant for information or an extension | `pms_attorney` |
+| `pms.legal_advice.create` | Record legal advice | `pms_attorney` |
+| `pms.budget.create` | Propose a filing and prosecution budget | `pms_attorney` |
+| `pms.budget.approve` | Approve or reject a budget | `pms_director` |
+| `pms.filing.create` | Record an external patent filing | `pms_attorney` |
+| `pms.communication.create` | Record a patent-office communication | `pms_attorney` |
+| `pms.office_action_response.create` | Prepare an office-action response | `pms_attorney` |
+| `pms.office_action_response.update` | Record a response's submission or extension | `pms_attorney` |
+| `pms.office_action_response.approve` | Approve a response as the applicant | `faculty`, `staff`, `student` |
+| `pms.maintenance.update` | Track maintenance and record maintenance actions | `pms_attorney` |
+| `pms.renewal.approve` | Decide Renew or Do Not Renew | `pms_director` |
+| `pms.renewal.assign` | Reassign a renewal decision to another Director | `pms_pcc_admin` |
+| `pms.document.view` | Read application documents within one's scope | `faculty`, `pms_attorney`, `pms_director`, `pms_pcc_admin`, `staff`, `student` |
+| `pms.document.create` | Upload a document or a new version | `faculty`, `pms_attorney`, `pms_pcc_admin`, `staff`, `student` |
+| `pms.document.update` | Change a document's sensitivity level | `pms_pcc_admin` |
+| `pms.prior_art.view` | See prior-art references within one's scope | `faculty`, `pms_attorney`, `pms_director`, `pms_pcc_admin`, `staff`, `student` |
+| `pms.prior_art.create` | Search prior art and attach references | `faculty`, `pms_attorney`, `staff`, `student` |
+| `pms.licensing_request.view` | See licensing requests within one's scope | `faculty`, `pms_director`, `pms_pcc_admin`, `staff`, `student` |
+| `pms.licensing_request.create` | Submit a licensing or technology-transfer request | `faculty`, `staff`, `student` |
+| `pms.licensing_request.review` | Route, negotiate and record licensing agreements | `pms_director`, `pms_pcc_admin` |
+| `pms.escalation.review` | Monitor deadlines and handle escalations | `pms_pcc_admin` |
+| `pms.workflow.view` | See workflow oversight | `pms_director`, `pms_pcc_admin` |
+| `pms.report.view` | See reports within one's scope | `faculty`, `pms_director`, `pms_pcc_admin`, `staff`, `student` |
+| `pms.report.export` | Export reports | `pms_director`, `pms_pcc_admin` |
+| `pms.report_definition.create` | Save and schedule report definitions | `pms_director`, `pms_pcc_admin` |
+| `pms.audit_log.view` | See audit logs within one's scope | `pms_director`, `pms_pcc_admin` |
+| `pms.audit_log.export` | Export audit logs | `pms_pcc_admin` |
+| `pms.policy.publish` | Publish a new PMS settings version | `pms_pcc_admin` |
+| `pms.deadline.manage` | Scheduled sweep: expire, alert and escalate deadlines | _service only_ |
+| `pms.routing.assign` | Scheduled automatic assignment of Directors | _service only_ |
