@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError, PermissionDeniedError
 from modules.directory.contracts import get_users
@@ -20,7 +20,7 @@ from modules.gymkhana.selectors.scoping import is_club_head
 
 
 def _verify_student_leaders(coordinator_id: int, co_coordinator_id: int) -> None:
-    """Validate that coordinator and co-coordinator are valid students (BR-GYM-001)."""
+    """Both leaders are valid students (BR-GYM-001, AFR-GYM-002, AFR-GYM-008)."""
     try:
         validate_distinct_leaders(coordinator_id, co_coordinator_id)
     except DomainError as exc:
@@ -35,7 +35,7 @@ def _verify_student_leaders(coordinator_id: int, co_coordinator_id: int) -> None
 
 
 def _verify_faculty_councillor(faculty_councillor_id: int) -> None:
-    """Validate that faculty councillor is a valid faculty member (BR-GYM-002)."""
+    """The councillor is a valid faculty member (BR-GYM-002, AFR-GYM-003)."""
     users = get_users([faculty_councillor_id])
     councillor = users.get(faculty_councillor_id)
     if not councillor or councillor.kind != "faculty":
@@ -53,7 +53,7 @@ def create_club(
     faculty_councillor_id: int,
     creator_id: int,
 ) -> Club:
-    """Create a new club in open status (UC-GYM-001, AFR-GYM-001 to 005)."""
+    """Create an open club (UC-GYM-001, CFR-GYM-001, AFR-GYM-001, AFR-GYM-005)."""
     try:
         norm_category = validate_club_category(category)
     except DomainError as exc:
@@ -64,15 +64,19 @@ def create_club(
     if Club.objects.filter(name__iexact=name.strip()).exists():
         raise ConflictError(f"A club with name '{name.strip()}' already exists.")
 
-    club = Club.objects.create(
-        name=name.strip(),
-        category=norm_category,
-        description=description.strip(),
-        coordinator_id=coordinator_id,
-        co_coordinator_id=co_coordinator_id,
-        faculty_councillor_id=faculty_councillor_id,
-        status=CLUB_STATUS_OPEN,
-    )
+    try:
+        with transaction.atomic():
+            club = Club.objects.create(
+                name=name.strip(),
+                category=norm_category,
+                description=description.strip(),
+                coordinator_id=coordinator_id,
+                co_coordinator_id=co_coordinator_id,
+                faculty_councillor_id=faculty_councillor_id,
+                status=CLUB_STATUS_OPEN,
+            )
+    except IntegrityError as exc:
+        raise ConflictError(f"A club with name '{name.strip()}' already exists.") from exc
     ClubLeadershipHistory.objects.create(
         club=club,
         coordinator_id=coordinator_id,
@@ -84,7 +88,7 @@ def create_club(
 
 @transaction.atomic
 def approve_club(*, club_id: int, approver_id: int, roles: Sequence[str]) -> Club:
-    """Approve an open club and change status to confirmed (UC-GYM-011, AFR-GYM-006, BW-GYM-03)."""
+    """Confirm an open club (UC-GYM-011, BR-GYM-004, AFR-GYM-006, BW-GYM-03)."""
     if "student_admin" not in roles:
         raise PermissionDeniedError("Only Student Admin can approve and confirm clubs.")
 
@@ -110,7 +114,7 @@ def change_leadership(
     new_coordinator_id: int,
     new_co_coordinator_id: int,
 ) -> Club:
-    """Replace club coordinator and co-coordinator (UC-GYM-008, AFR-GYM-007 to 009, BR-GYM-016)."""
+    """Replace both leaders (UC-GYM-008, CFR-GYM-002, AFR-GYM-007, AFR-GYM-009, BR-GYM-016)."""
     club = Club.objects.select_for_update().filter(id=club_id).first()
     if not club:
         raise NotFoundError(f"Club {club_id} not found.")

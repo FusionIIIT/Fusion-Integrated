@@ -14,7 +14,7 @@ ROUTES = (
     / "gymkhana"
     / "routes.tsx"
 )
-OFFICE_PAGES = {"manage", "admin", "reports"}
+OFFICE_PAGES = {"clubs", "memberships", "polls", "calendar", "manage", "admin", "reports"}
 
 
 def guarded_routes() -> dict[str, str]:
@@ -30,7 +30,7 @@ def nav_permission(path: str) -> str | None:
     return None
 
 
-def test_every_office_page_is_guarded():
+def test_every_page_is_guarded():
     assert set(guarded_routes()) >= OFFICE_PAGES
 
 

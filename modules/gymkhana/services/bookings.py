@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import datetime
 
-from django.conf import settings
 from django.db import transaction
 
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError, PermissionDeniedError
@@ -13,37 +12,19 @@ from modules.gymkhana.domain.constants import (
     BOOKING_TYPE_EVENT,
     BOOKING_TYPE_SESSION,
     CLUB_STATUS_CONFIRMED,
+    POSTER_EXTENSIONS,
 )
 from modules.gymkhana.domain.exceptions import DomainError
-from modules.gymkhana.domain.validation import (
-    validate_booking_times,
-    validate_venue,
-)
-from modules.gymkhana.models.booking import VenueBooking
+from modules.gymkhana.domain.validation import validate_booking_times, validate_venue
+from modules.gymkhana.models.booking import VenueBooking, VenueDay
 from modules.gymkhana.models.club import Club
+from modules.gymkhana.selectors.bookings import check_venue_conflict
 from modules.gymkhana.selectors.scoping import is_club_head
+from modules.gymkhana.selectors.venues import configured_venues
+from modules.gymkhana.services.notifications import announce_booking
+from modules.gymkhana.services.uploads import check_upload
 
 
-def _get_configured_venues() -> list[str]:
-    return getattr(
-        settings,
-        "GYMKHANA_CONFIGURED_VENUES",
-        [
-            "Hall 1",
-            "Hall 2",
-            "L-101",
-            "L-102",
-            "Open Air Theatre",
-            "SAC Gym",
-            "Football Ground",
-            "Basketball Court",
-            "Badminton Court",
-            "Volleyball Court",
-        ],
-    )
-
-
-@transaction.atomic
 def book_session(
     *,
     club_id: int,
@@ -56,54 +37,22 @@ def book_session(
     poster_file=None,
     name: str = "",
 ) -> VenueBooking:
-    """Book a club session with venue conflict prevention (UC-GYM-002, AFR-GYM-010 to 013)."""
-    club = Club.objects.filter(id=club_id).first()
-    if not club:
-        raise NotFoundError(f"Club {club_id} not found.")
-
-    if not is_club_head(actor_id, club):
-        raise PermissionDeniedError("Only the active Club Head can book a session.")
-
-    if club.status != CLUB_STATUS_CONFIRMED:
-        raise ConflictError("Sessions can only be booked for confirmed clubs.")
-
-    try:
-        validate_booking_times(start_time, end_time)
-        clean_venue = validate_venue(venue, _get_configured_venues())
-    except DomainError as exc:
-        raise BadRequestError(str(exc)) from exc
-
-    # Enforce cross-type exclusivity (BR-GYM-006) under table lock
-    overlapping = (
-        VenueBooking.objects.select_for_update()
-        .filter(
-            venue=clean_venue,
-            booking_date=booking_date,
-            start_time__lt=end_time,
-            end_time__gt=start_time,
-        )
-        .exists()
-    )
-    if overlapping:
-        raise ConflictError(
-            f"Venue '{clean_venue}' is already booked on {booking_date} during that time."
-        )
-
-    return VenueBooking.objects.create(
-        club=club,
+    """Book a club session (UC-GYM-002, AFR-GYM-010)."""
+    return _book(
         booking_type=BOOKING_TYPE_SESSION,
-        venue=clean_venue,
+        club_id=club_id,
+        actor_id=actor_id,
+        venue=venue,
         booking_date=booking_date,
         start_time=start_time,
         end_time=end_time,
-        name=name.strip() or f"{club.name} Session",
-        description=description.strip(),
+        name=name,
+        description=description,
         poster_file=poster_file,
-        booked_by_id=actor_id,
+        faculty_councillor_id=None,
     )
 
 
-@transaction.atomic
 def book_event(
     *,
     club_id: int,
@@ -117,54 +66,84 @@ def book_event(
     faculty_councillor_id: int,
     poster_file=None,
 ) -> VenueBooking:
-    """Book an event with venue conflict check and faculty context (UC-GYM-003)."""
+    """Book a club event with its faculty context (UC-GYM-003, AFR-GYM-014)."""
+    return _book(
+        booking_type=BOOKING_TYPE_EVENT,
+        club_id=club_id,
+        actor_id=actor_id,
+        venue=venue,
+        booking_date=booking_date,
+        start_time=start_time,
+        end_time=end_time,
+        name=name,
+        description=description,
+        poster_file=poster_file,
+        faculty_councillor_id=faculty_councillor_id,
+    )
+
+
+@transaction.atomic
+def _book(
+    *,
+    booking_type: str,
+    club_id: int,
+    actor_id: int,
+    venue: str,
+    booking_date: datetime.date,
+    start_time: datetime.time,
+    end_time: datetime.time,
+    name: str,
+    description: str,
+    poster_file,
+    faculty_councillor_id: int | None,
+) -> VenueBooking:
+    """The one path to a booking, whatever its type (CFR-GYM-003, BR-GYM-006, BR-GYM-010)."""
     club = Club.objects.filter(id=club_id).first()
     if not club:
         raise NotFoundError(f"Club {club_id} not found.")
-
     if not is_club_head(actor_id, club):
-        raise PermissionDeniedError("Only the active Club Head can book an event.")
-
+        raise PermissionDeniedError(f"Only the active Club Head can book a {booking_type}.")
     if club.status != CLUB_STATUS_CONFIRMED:
-        raise ConflictError("Events can only be booked for confirmed clubs.")
+        raise ConflictError(f"A {booking_type} can only be booked for a confirmed club.")
 
     try:
         validate_booking_times(start_time, end_time)
-        clean_venue = validate_venue(venue, _get_configured_venues())
+        clean_venue = validate_venue(venue, configured_venues())
     except DomainError as exc:
         raise BadRequestError(str(exc)) from exc
+    if booking_type == BOOKING_TYPE_EVENT:
+        _verify_faculty(faculty_councillor_id)
+    if poster_file:
+        check_upload(poster_file, POSTER_EXTENSIONS)
 
-    # Validate faculty councillor context (BR-GYM-002, AFR-GYM-003)
-    users = get_users([faculty_councillor_id])
-    fc = users.get(faculty_councillor_id)
-    if not fc or fc.kind != "faculty":
-        raise BadRequestError(f"User {faculty_councillor_id} is not a valid faculty member.")
-
-    overlapping = (
-        VenueBooking.objects.select_for_update()
-        .filter(
-            venue=clean_venue,
-            booking_date=booking_date,
-            start_time__lt=end_time,
-            end_time__gt=start_time,
-        )
-        .exists()
-    )
-    if overlapping:
+    # Locking a row that always exists serialises bookings even when the day is empty (BR-GYM-006).
+    VenueDay.objects.get_or_create(venue=clean_venue, booking_date=booking_date)
+    VenueDay.objects.select_for_update().get(venue=clean_venue, booking_date=booking_date)
+    if check_venue_conflict(clean_venue, booking_date, start_time, end_time):
         raise ConflictError(
-            f"Venue '{clean_venue}' is already booked on {booking_date} during that time."
+            f"Venue '{clean_venue}' is already booked on {booking_date} during that time. "
+            f"Select another slot."
         )
 
-    return VenueBooking.objects.create(
+    booking = VenueBooking.objects.create(
         club=club,
-        booking_type=BOOKING_TYPE_EVENT,
+        booking_type=booking_type,
         venue=clean_venue,
         booking_date=booking_date,
         start_time=start_time,
         end_time=end_time,
-        name=name.strip(),
+        name=name.strip() or f"{club.name} Session",
         description=description.strip(),
         faculty_councillor_id=faculty_councillor_id,
         poster_file=poster_file,
         booked_by_id=actor_id,
     )
+    announce_booking(booking)
+    return booking
+
+
+def _verify_faculty(faculty_councillor_id: int | None) -> None:
+    """The event names a valid faculty member (BR-GYM-002, AFR-GYM-003)."""
+    user = get_users([faculty_councillor_id]).get(faculty_councillor_id)
+    if not user or user.kind != "faculty":
+        raise BadRequestError(f"User {faculty_councillor_id} is not a valid faculty member.")

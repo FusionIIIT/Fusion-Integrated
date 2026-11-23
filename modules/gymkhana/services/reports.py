@@ -8,12 +8,16 @@ from django.db import transaction
 
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError, PermissionDeniedError
 from modules.directory.contracts import get_users
-from modules.gymkhana.domain.constants import CLUB_STATUS_CONFIRMED
+from modules.gymkhana.domain.constants import CLUB_STATUS_CONFIRMED, DOCUMENT_EXTENSIONS
 from modules.gymkhana.domain.exceptions import DomainError
-from modules.gymkhana.domain.validation import validate_file_present
+from modules.gymkhana.domain.validation import (
+    validate_event_has_occurred,
+    validate_file_present,
+)
 from modules.gymkhana.models.club import Club
 from modules.gymkhana.models.report import ClubEventReport
 from modules.gymkhana.selectors.scoping import is_club_head
+from modules.gymkhana.services.uploads import check_upload
 
 
 @transaction.atomic
@@ -27,7 +31,7 @@ def submit_event_report(
     description: str,
     report_file,
 ) -> ClubEventReport:
-    """Submit an event report documentation record with mandatory file (UC-GYM-010, CFR-GYM-007)."""
+    """Store a club's report on a past event (UC-GYM-010, AFR-GYM-032)."""
     club = Club.objects.filter(id=club_id).first()
     if not club:
         raise NotFoundError(f"Club {club_id} not found.")
@@ -45,8 +49,10 @@ def submit_event_report(
 
     try:
         validate_file_present(bool(report_file), "report_file")
+        validate_event_has_occurred(event_date, datetime.datetime.now(datetime.UTC))
     except DomainError as exc:
         raise BadRequestError(str(exc)) from exc
+    check_upload(report_file, DOCUMENT_EXTENSIONS)
 
     return ClubEventReport.objects.create(
         club=club,

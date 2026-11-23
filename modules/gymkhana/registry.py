@@ -129,6 +129,14 @@ ROLE_GRANTS = {
         "gymkhana.club.approve",
         "gymkhana.booking.view",
         "gymkhana.budget.view",
-        "gymkhana.report.view",
     ],
 }
+
+
+def readiness() -> list[str]:
+    """Unmet prerequisites, each saying what to do."""
+    from modules.gymkhana.selectors.venues import configured_venues
+
+    if not configured_venues():
+        return ["No venue is configured: set GYMKHANA_CONFIGURED_VENUES before booking opens."]
+    return []

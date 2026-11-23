@@ -7,7 +7,11 @@ from decimal import Decimal
 from django.db import transaction
 
 from core.api.exceptions import BadRequestError, ConflictError, NotFoundError, PermissionDeniedError
-from modules.gymkhana.domain.constants import BUDGET_STATUS_OPEN, CLUB_STATUS_CONFIRMED
+from modules.gymkhana.domain.constants import (
+    BUDGET_STATUS_OPEN,
+    CLUB_STATUS_CONFIRMED,
+    DOCUMENT_EXTENSIONS,
+)
 from modules.gymkhana.domain.exceptions import DomainError
 from modules.gymkhana.domain.validation import (
     validate_budget_amount,
@@ -16,6 +20,7 @@ from modules.gymkhana.domain.validation import (
 from modules.gymkhana.models.budget import ClubBudgetRequest
 from modules.gymkhana.models.club import Club
 from modules.gymkhana.selectors.scoping import is_club_head
+from modules.gymkhana.services.uploads import check_upload
 
 
 @transaction.atomic
@@ -28,7 +33,7 @@ def submit_budget_request(
     description: str,
     supporting_file,
 ) -> ClubBudgetRequest:
-    """Submit a non-negative club budget request with mandatory file (UC-GYM-009, CFR-GYM-006)."""
+    """Store an open request (UC-GYM-009, CFR-GYM-006, AFR-GYM-029, AFR-GYM-031)."""
     club = Club.objects.filter(id=club_id).first()
     if not club:
         raise NotFoundError(f"Club {club_id} not found.")
@@ -44,6 +49,7 @@ def submit_budget_request(
         validate_file_present(bool(supporting_file), "supporting_file")
     except DomainError as exc:
         raise BadRequestError(str(exc)) from exc
+    check_upload(supporting_file, DOCUMENT_EXTENSIONS)
 
     return ClubBudgetRequest.objects.create(
         club=club,

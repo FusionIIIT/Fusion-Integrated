@@ -7,6 +7,7 @@ from django.db.models import CheckConstraint, Q
 
 from modules.gymkhana.domain.constants import BUDGET_STATUS_OPEN
 from modules.gymkhana.models.club import Club
+from modules.gymkhana.models.files import PrivateStorage, budget_key
 
 
 class ClubBudgetRequest(models.Model):
@@ -17,7 +18,7 @@ class ClubBudgetRequest(models.Model):
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     purpose = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    supporting_file = models.FileField(upload_to="gymkhana/budgets/")
+    supporting_file = models.FileField(upload_to=budget_key, storage=PrivateStorage())
     status = models.CharField(max_length=20, default=BUDGET_STATUS_OPEN)
     submitted_at = models.DateTimeField(auto_now_add=True)
 

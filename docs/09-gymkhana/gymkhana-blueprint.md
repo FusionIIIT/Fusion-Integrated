@@ -5,8 +5,8 @@
 **Specification ID Prefixes:** `CFR-GYM-`, `AFR-GYM-`, `UC-GYM-`, `BR-GYM-`, `BW-GYM-`  
 **Target Environment:** `module-only`  
 **Reference Module:** `modules/placement`  
-**Author:** Student 1 (Builder — Gemini 3.8 Flash)  
-**Approver:** Student 2 (Reviewer — Claude / Sonnet)  
+**Author:** Student 1  
+**Approver:** Student 2 (revision 2, at the end of this document, is awaiting written approval)  
 
 ---
 
@@ -361,7 +361,6 @@ ROLE_GRANTS = {
         "gymkhana.club.approve",
         "gymkhana.booking.view",
         "gymkhana.budget.view",
-        "gymkhana.report.view",
     ],
 }
 ```
@@ -464,3 +463,62 @@ BEAT_SCHEDULE = {
    - When batch or branch is `"all"`, all students in the institute are targeted. If specific batch and branch are provided, student must match both batch and branch to vote.
 5. **No New External Python/JS Dependencies:**
    - No external libraries outside standard Django, DRF, and existing packages in `Fusion-Integrated` are introduced.
+
+---
+
+## Revision 2 — awaiting Student 2's written approval
+
+Made after commit `38eca25`, when re-checking the module found that it did not meet this blueprint.
+
+### Changes to the design above
+
+| Change | Why |
+|---|---|
+| `student_admin` no longer holds `gymkhana.report.view` | CFR-GYM-007 allows "only the assigned Club Faculty Councillor" to read reports |
+| Permissions are narrowed to the acting role (`selectors/access.py`) | The session lists the permissions of every role held |
+| New `VenueDay(venue, booking_date)`, locked before each booking | Locking overlapping rows locks nothing when there are none, so BR-GYM-006 could be raced |
+| New `GymkhanaNotification` outbox, and a task every 60 seconds to send it | AFR-GYM-013, AFR-GYM-015 and AFR-GYM-025 had no implementation |
+| Uploads go to `PLACEMENT_UPLOAD_ROOT/gymkhana`, private, under a generated name | They were written into the repository |
+| A student's batch and branch come from the directory | The session carries neither, so targeted voting always refused |
+| A poll needs at least one target group | BW-GYM-02, transition 1: "valid target groups" |
+| A report cannot be dated in the future | UC-GYM-010 precondition |
+| Nobody approves their own membership application | BR-GYM-010; a security rule |
+
+### Endpoints added
+
+| Method | Path | Permission | Purpose |
+|---|---|---|---|
+| `GET` | `/access/` | `gymkhana.club.view` | What the acting role may do, and the clubs led |
+| `GET` | `/venues/` | `gymkhana.booking.view` | Venues for the booking form |
+| `GET` | `/people/` | `gymkhana.club.create` or `gymkhana.club.manage` | Username search, for Student Admin and club heads only |
+| `GET` | `/poll-options/` | `gymkhana.poll.create` | Batches and branches that exist, for club heads only |
+| `GET` | `/bookings/{id}/poster/` | `gymkhana.booking.view` | Poster download |
+| `GET` | `/budgets/{id}/file/` | `gymkhana.budget.view` | Supporting file download |
+| `GET` | `/reports/{id}/file/` | `gymkhana.report.view` | Report download |
+
+Every write endpoint carries the `gymkhana_write` throttle.
+
+### Open questions for Student 2
+
+Each is built on the reading in the second column, and changes if you decide otherwise.
+
+| Question | Reading used |
+|---|---|
+| Who are the "intended student recipients" of a session or event? | The club's confirmed members |
+| How are notifications sent? | Email, through the module's own outbox, as Placement does |
+| Is a poster required for an event? AFR-GYM-014 lists it and AFR-GYM-010 calls only the session's optional | Optional, because FR-015 expects an event without one to be accepted |
+| Must an event name the club's own councillor, or any faculty member? | Any faculty member |
+| Polls, reports and leadership changes list no confirmed-club precondition | Polls and reports need a confirmed club; a leadership change does not |
+| Who sees a poll's tally? | Whoever may open the poll |
+| May coordinator and co-coordinator be the same person, or two clubs share a name? | No to both |
+| May a booking be made for a past date? | Yes; no rule forbids it |
+| Should a file's bytes have to match its extension? | No: the spec tests upload plain text as `.pdf`. Type, size and active content are checked, and files are only ever downloaded |
+
+### Known gaps
+
+- "Valid student" and "valid faculty" check the person's kind. The directory contract does not say
+  whether an account is active.
+- The poll audience is read from the IAM's `academics/directory`, which also returns CPI. Only ids
+  are kept.
+- `PLACEMENT_UPLOAD_ROOT` is another module's setting name. A setting of our own is a shared-file
+  change and needs approval.

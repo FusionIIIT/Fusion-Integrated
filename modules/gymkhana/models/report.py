@@ -5,6 +5,7 @@ from __future__ import annotations
 from django.db import models
 
 from modules.gymkhana.models.club import Club
+from modules.gymkhana.models.files import PrivateStorage, report_key
 
 
 class ClubEventReport(models.Model):
@@ -16,7 +17,7 @@ class ClubEventReport(models.Model):
     event_name = models.CharField(max_length=150)
     event_date = models.DateTimeField()
     description = models.TextField(blank=True)
-    report_file = models.FileField(upload_to="gymkhana/reports/")
+    report_file = models.FileField(upload_to=report_key, storage=PrivateStorage())
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

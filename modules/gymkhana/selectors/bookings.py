@@ -12,7 +12,7 @@ from modules.gymkhana.models.booking import VenueBooking
 
 def get_booking_by_id(booking_id: int) -> VenueBooking:
     """Return booking by ID or raise NotFound."""
-    booking = VenueBooking.objects.filter(id=booking_id).first()
+    booking = VenueBooking.objects.select_related("club").filter(id=booking_id).first()
     if not booking:
         raise NotFoundError(f"Booking {booking_id} not found.")
     return booking
@@ -41,7 +41,7 @@ def check_venue_conflict(
     end_time: datetime.time,
     exclude_booking_id: int | None = None,
 ) -> bool:
-    """Check whether any existing booking overlaps this venue, date, and time range (BR-GYM-006)."""
+    """Whether any session or event overlaps this slot (BR-GYM-006, AFR-GYM-012)."""
     # Overlap occurs when start_time < existing.end_time AND end_time > existing.start_time
     qs = VenueBooking.objects.filter(
         venue=venue,

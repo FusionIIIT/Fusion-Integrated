@@ -194,8 +194,7 @@ def test_poll_selectors(sample_club):
     assert is_student_targeted(p_open, "2025", "ECE")
 
     # list_active_polls_for_student
-    active = list_active_polls_for_student()
-    assert active.count() >= 2
+    assert list(list_active_polls_for_student()) == [p_open]
     targeted = list_active_polls_for_student(batch="2024", branch="CSE")
     assert poll in targeted
 
@@ -314,15 +313,12 @@ def test_scoping_budgets_and_reports(sample_club):
         scope_budget_requests(999, ["student"], club_id=sample_club.id)
 
     # Event report scoping
-    # Student admin
-    assert scope_event_reports(999, ["student_admin"]).count() == 1
-    assert scope_event_reports(999, ["student_admin"], club_id=sample_club.id).count() == 1
-    # Faculty councillor & Club head
-    assert scope_event_reports(201, ["faculty"], club_id=sample_club.id).count() == 1
-    assert scope_event_reports(101, ["student"], club_id=sample_club.id).count() == 1
-    assert scope_event_reports(201, ["faculty"]).count() == 1
-    # Unauthorized
+    # CFR-GYM-007: only the assigned Club Faculty Councillor
+    assert scope_event_reports(201, club_id=sample_club.id).count() == 1
+    assert scope_event_reports(201).count() == 1
+    for outsider in (999, 101):
+        assert scope_event_reports(outsider).count() == 0
+        with pytest.raises(NotFoundError):
+            scope_event_reports(outsider, club_id=sample_club.id)
     with pytest.raises(NotFoundError):
-        scope_event_reports(999, ["student"], club_id=sample_club.id)
-    with pytest.raises(NotFoundError):
-        scope_event_reports(999, ["student"], club_id=999999)
+        scope_event_reports(201, club_id=999999)

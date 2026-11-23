@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_schema_serializer
 from rest_framework import serializers
 
 from modules.gymkhana.models.booking import VenueBooking
@@ -12,12 +13,80 @@ from modules.gymkhana.models.poll import (
     Poll,
     PollChoice,
     PollTargetGroup,
-    PollVote,
 )
 from modules.gymkhana.models.report import ClubEventReport
 
+EXAMPLE_CLUB = {
+    "id": 1,
+    "name": "Robotics Club",
+    "category": "technical",
+    "description": "Builds robots.",
+    "coordinator_id": 101,
+    "coordinator_name": "Student A",
+    "co_coordinator_id": 102,
+    "co_coordinator_name": "Student B",
+    "faculty_councillor_id": 201,
+    "faculty_councillor_name": "Faculty A",
+    "status": "open",
+    "created_at": "2026-12-01T10:00:00+05:30",
+    "updated_at": "2026-12-01T10:00:00+05:30",
+}
 
+
+@extend_schema_field(str)
+class NameField(serializers.SerializerMethodField):
+    """A person's name, from the batch the view already fetched."""
+
+    def __init__(self, source_id: str):
+        self.source_id = source_id
+        super().__init__()
+
+    def to_representation(self, value) -> str:
+        return self.context.get("names", {}).get(getattr(value, self.source_id), "")
+
+
+def file_path(segment: str, pk: int, leaf: str, stored) -> str | None:
+    """Where the scoped download lives; the storage key itself never leaves the server."""
+    return f"/gymkhana/{segment}/{pk}/{leaf}/" if stored else None
+
+
+class LedClubSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Club
+        fields = ("id", "name", "status", "faculty_councillor_id")
+        read_only_fields = fields
+
+
+class AccessSerializer(serializers.Serializer):
+    permissions = serializers.ListField(child=serializers.CharField())
+    clubs_led = LedClubSerializer(many=True)
+
+
+class VenueListSerializer(serializers.Serializer):
+    venues = serializers.ListField(child=serializers.CharField())
+
+
+class PollOptionsSerializer(serializers.Serializer):
+    batches = serializers.ListField(child=serializers.CharField())
+    branches = serializers.ListField(child=serializers.CharField())
+
+
+class PersonSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    username = serializers.CharField()
+    display_name = serializers.CharField()
+
+
+class PeopleSerializer(serializers.Serializer):
+    results = PersonSerializer(many=True)
+
+
+@extend_schema_serializer(examples=[OpenApiExample("Club", value=EXAMPLE_CLUB)])
 class ClubSerializer(serializers.ModelSerializer):
+    coordinator_name = NameField("coordinator_id")
+    co_coordinator_name = NameField("co_coordinator_id")
+    faculty_councillor_name = NameField("faculty_councillor_id")
+
     class Meta:
         model = Club
         fields = (
@@ -26,8 +95,11 @@ class ClubSerializer(serializers.ModelSerializer):
             "category",
             "description",
             "coordinator_id",
+            "coordinator_name",
             "co_coordinator_id",
+            "co_coordinator_name",
             "faculty_councillor_id",
+            "faculty_councillor_name",
             "status",
             "created_at",
             "updated_at",
@@ -51,6 +123,10 @@ class LeadershipChangeSerializer(serializers.Serializer):
 
 class VenueBookingSerializer(serializers.ModelSerializer):
     club_name = serializers.CharField(source="club.name", read_only=True)
+    poster_file = serializers.SerializerMethodField()
+
+    def get_poster_file(self, obj) -> str | None:
+        return file_path("bookings", obj.pk, "poster", obj.poster_file)
 
     class Meta:
         model = VenueBooking
@@ -98,6 +174,7 @@ class EventBookingCreateSerializer(serializers.Serializer):
 
 class MembershipSerializer(serializers.ModelSerializer):
     club_name = serializers.CharField(source="club.name", read_only=True)
+    student_name = NameField("student_id")
 
     class Meta:
         model = ClubMembership
@@ -106,6 +183,7 @@ class MembershipSerializer(serializers.ModelSerializer):
             "club_id",
             "club_name",
             "student_id",
+            "student_name",
             "description",
             "status",
             "remarks",
@@ -141,7 +219,7 @@ class PollSerializer(serializers.ModelSerializer):
     club_name = serializers.CharField(source="club.name", read_only=True)
     choices = PollChoiceSerializer(many=True, read_only=True)
     target_groups = PollTargetGroupSerializer(many=True, read_only=True)
-    has_voted = serializers.SerializerMethodField()
+    has_voted = serializers.BooleanField(source="voted", read_only=True)
 
     class Meta:
         model = Poll
@@ -161,11 +239,10 @@ class PollSerializer(serializers.ModelSerializer):
         )
         read_only_fields = fields
 
-    def get_has_voted(self, obj) -> bool:
-        request = self.context.get("request")
-        if not request or not getattr(request, "principal", None):
-            return False
-        return PollVote.objects.filter(poll=obj, student_id=request.principal.user_id).exists()
+
+class PollGroupInputSerializer(serializers.Serializer):
+    batch = serializers.CharField(max_length=20)
+    branch = serializers.CharField(max_length=50)
 
 
 class PollCreateSerializer(serializers.Serializer):
@@ -173,12 +250,10 @@ class PollCreateSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=200)
     description = serializers.CharField(required=False, allow_blank=True, default="")
     expires_at = serializers.DateTimeField()
-    choices = serializers.ListField(child=serializers.CharField(max_length=200), min_length=2)
-    target_groups = serializers.ListField(
-        child=serializers.DictField(),
-        required=False,
-        default=list,
+    choices = serializers.ListField(
+        child=serializers.CharField(max_length=200), min_length=2, max_length=20
     )
+    target_groups = PollGroupInputSerializer(many=True, allow_empty=False)
 
 
 class VoteSerializer(serializers.Serializer):
@@ -187,6 +262,10 @@ class VoteSerializer(serializers.Serializer):
 
 class BudgetRequestSerializer(serializers.ModelSerializer):
     club_name = serializers.CharField(source="club.name", read_only=True)
+    supporting_file = serializers.SerializerMethodField()
+
+    def get_supporting_file(self, obj) -> str | None:
+        return file_path("budgets", obj.pk, "file", obj.supporting_file)
 
     class Meta:
         model = ClubBudgetRequest
@@ -215,6 +294,11 @@ class BudgetRequestCreateSerializer(serializers.Serializer):
 
 class EventReportSerializer(serializers.ModelSerializer):
     club_name = serializers.CharField(source="club.name", read_only=True)
+    student_incharge_name = NameField("student_incharge_id")
+    report_file = serializers.SerializerMethodField()
+
+    def get_report_file(self, obj) -> str | None:
+        return file_path("reports", obj.pk, "file", obj.report_file)
 
     class Meta:
         model = ClubEventReport
@@ -224,6 +308,7 @@ class EventReportSerializer(serializers.ModelSerializer):
             "club_name",
             "submitted_by_id",
             "student_incharge_id",
+            "student_incharge_name",
             "event_name",
             "event_date",
             "description",

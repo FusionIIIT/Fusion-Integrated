@@ -15,6 +15,9 @@ export const ACCOUNTS = {
   studentAdmin: {
     username: "stu00002", role: "student_admin", grants: ["student_admin"],
   },
+  clubHead: {
+    username: "stu00003", role: "ug_student", grants: [],
+  },
   facultyCouncillor: {
     username: "fac00001", role: "faculty", grants: [],
   },

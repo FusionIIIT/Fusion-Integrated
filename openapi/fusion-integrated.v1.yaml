@@ -63,9 +63,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/gymkhana/access/:
+    get:
+      operationId: gymkhana_access
+      description: What the acting role may do here, so no screen offers what the
+        server would refuse.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Access'
+          description: ''
   /api/v1/gymkhana/bookings/:
     get:
       operationId: gymkhana_list_bookings
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
+      parameters:
+      - in: query
+        name: booking_date
+        schema:
+          type: string
+      - in: query
+        name: club_id
+        schema:
+          type: integer
+      - in: query
+        name: venue
+        schema:
+          type: string
       tags:
       - v1
       security:
@@ -82,6 +113,8 @@ paths:
   /api/v1/gymkhana/bookings/{id}/:
     get:
       operationId: gymkhana_get_booking
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       parameters:
       - in: path
         name: id
@@ -99,9 +132,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/VenueBooking'
           description: ''
+  /api/v1/gymkhana/bookings/{id}/poster/:
+    get:
+      operationId: gymkhana_booking_poster
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
+        '404':
+          description: Absent, or outside the caller's scope.
   /api/v1/gymkhana/bookings/event/:
     post:
       operationId: gymkhana_book_event
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       tags:
       - v1
       requestBody:
@@ -128,6 +188,8 @@ paths:
   /api/v1/gymkhana/bookings/session/:
     post:
       operationId: gymkhana_book_session
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       tags:
       - v1
       requestBody:
@@ -154,6 +216,13 @@ paths:
   /api/v1/gymkhana/budgets/:
     get:
       operationId: gymkhana_list_budgets
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
+      parameters:
+      - in: query
+        name: club_id
+        schema:
+          type: integer
       tags:
       - v1
       security:
@@ -169,16 +238,12 @@ paths:
           description: ''
     post:
       operationId: gymkhana_submit_budget
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       tags:
       - v1
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BudgetRequestCreate'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/BudgetRequestCreate'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/BudgetRequestCreate'
@@ -195,6 +260,8 @@ paths:
   /api/v1/gymkhana/budgets/{id}/:
     get:
       operationId: gymkhana_get_budget
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       parameters:
       - in: path
         name: id
@@ -212,9 +279,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/BudgetRequest'
           description: ''
+  /api/v1/gymkhana/budgets/{id}/file/:
+    get:
+      operationId: gymkhana_budget_file
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
+        '404':
+          description: Absent, or outside the caller's scope.
   /api/v1/gymkhana/clubs/:
     get:
       operationId: gymkhana_list_clubs
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       tags:
       - v1
       security:
@@ -227,9 +321,27 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Club'
+              examples:
+                Club:
+                  value:
+                  - id: 1
+                    name: Robotics Club
+                    category: technical
+                    description: Builds robots.
+                    coordinator_id: 101
+                    coordinator_name: Student A
+                    co_coordinator_id: 102
+                    co_coordinator_name: Student B
+                    faculty_councillor_id: 201
+                    faculty_councillor_name: Faculty A
+                    status: open
+                    created_at: '2026-12-01T10:00:00+05:30'
+                    updated_at: '2026-12-01T10:00:00+05:30'
           description: ''
     post:
       operationId: gymkhana_create_club
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       tags:
       - v1
       requestBody:
@@ -252,10 +364,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Club'
+              examples:
+                Club:
+                  value:
+                    id: 1
+                    name: Robotics Club
+                    category: technical
+                    description: Builds robots.
+                    coordinator_id: 101
+                    coordinator_name: Student A
+                    co_coordinator_id: 102
+                    co_coordinator_name: Student B
+                    faculty_councillor_id: 201
+                    faculty_councillor_name: Faculty A
+                    status: open
+                    created_at: '2026-12-01T10:00:00+05:30'
+                    updated_at: '2026-12-01T10:00:00+05:30'
           description: ''
   /api/v1/gymkhana/clubs/{id}/:
     get:
       operationId: gymkhana_get_club
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       parameters:
       - in: path
         name: id
@@ -272,10 +402,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Club'
+              examples:
+                Club:
+                  value:
+                    id: 1
+                    name: Robotics Club
+                    category: technical
+                    description: Builds robots.
+                    coordinator_id: 101
+                    coordinator_name: Student A
+                    co_coordinator_id: 102
+                    co_coordinator_name: Student B
+                    faculty_councillor_id: 201
+                    faculty_councillor_name: Faculty A
+                    status: open
+                    created_at: '2026-12-01T10:00:00+05:30'
+                    updated_at: '2026-12-01T10:00:00+05:30'
           description: ''
   /api/v1/gymkhana/clubs/{id}/confirm/:
     post:
       operationId: gymkhana_confirm_club
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       parameters:
       - in: path
         name: id
@@ -284,17 +432,6 @@ paths:
         required: true
       tags:
       - v1
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Club'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Club'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Club'
       security:
       - iamSession: []
       responses:
@@ -303,10 +440,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Club'
+              examples:
+                Club:
+                  value:
+                    id: 1
+                    name: Robotics Club
+                    category: technical
+                    description: Builds robots.
+                    coordinator_id: 101
+                    coordinator_name: Student A
+                    co_coordinator_id: 102
+                    co_coordinator_name: Student B
+                    faculty_councillor_id: 201
+                    faculty_councillor_name: Faculty A
+                    status: open
+                    created_at: '2026-12-01T10:00:00+05:30'
+                    updated_at: '2026-12-01T10:00:00+05:30'
           description: ''
   /api/v1/gymkhana/clubs/{id}/leadership/:
     post:
       operationId: gymkhana_change_leadership
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       parameters:
       - in: path
         name: id
@@ -335,10 +490,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Club'
+              examples:
+                Club:
+                  value:
+                    id: 1
+                    name: Robotics Club
+                    category: technical
+                    description: Builds robots.
+                    coordinator_id: 101
+                    coordinator_name: Student A
+                    co_coordinator_id: 102
+                    co_coordinator_name: Student B
+                    faculty_councillor_id: 201
+                    faculty_councillor_name: Faculty A
+                    status: open
+                    created_at: '2026-12-01T10:00:00+05:30'
+                    updated_at: '2026-12-01T10:00:00+05:30'
           description: ''
   /api/v1/gymkhana/memberships/:
     get:
       operationId: gymkhana_list_memberships
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
+      parameters:
+      - in: query
+        name: club_id
+        schema:
+          type: integer
       tags:
       - v1
       security:
@@ -355,6 +533,8 @@ paths:
   /api/v1/gymkhana/memberships/{id}/approve/:
     post:
       operationId: gymkhana_approve_membership
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       parameters:
       - in: path
         name: id
@@ -386,6 +566,8 @@ paths:
   /api/v1/gymkhana/memberships/apply/:
     post:
       operationId: gymkhana_apply_membership
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       tags:
       - v1
       requestBody:
@@ -409,9 +591,61 @@ paths:
               schema:
                 $ref: '#/components/schemas/Membership'
           description: ''
+  /api/v1/gymkhana/people/:
+    get:
+      operationId: gymkhana_search_people
+      description: 'A picker for people who assign someone: Student Admin, or the
+        head of a club.'
+      parameters:
+      - in: query
+        name: kind
+        schema:
+          type: string
+          enum:
+          - faculty
+          - student
+      - in: query
+        name: q
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/People'
+          description: ''
+  /api/v1/gymkhana/poll-options/:
+    get:
+      operationId: gymkhana_poll_options
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PollOptions'
+          description: ''
   /api/v1/gymkhana/polls/:
     get:
       operationId: gymkhana_list_polls
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
+      parameters:
+      - in: query
+        name: club_id
+        schema:
+          type: integer
       tags:
       - v1
       security:
@@ -427,6 +661,8 @@ paths:
           description: ''
     post:
       operationId: gymkhana_create_poll
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       tags:
       - v1
       requestBody:
@@ -453,6 +689,8 @@ paths:
   /api/v1/gymkhana/polls/{id}/:
     get:
       operationId: gymkhana_get_poll
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       parameters:
       - in: path
         name: id
@@ -473,6 +711,8 @@ paths:
   /api/v1/gymkhana/polls/{id}/vote/:
     post:
       operationId: gymkhana_cast_vote
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       parameters:
       - in: path
         name: id
@@ -505,6 +745,13 @@ paths:
   /api/v1/gymkhana/reports/:
     get:
       operationId: gymkhana_list_reports
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
+      parameters:
+      - in: query
+        name: club_id
+        schema:
+          type: integer
       tags:
       - v1
       security:
@@ -520,16 +767,12 @@ paths:
           description: ''
     post:
       operationId: gymkhana_submit_report
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       tags:
       - v1
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EventReportCreate'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/EventReportCreate'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/EventReportCreate'
@@ -546,6 +789,8 @@ paths:
   /api/v1/gymkhana/reports/{id}/:
     get:
       operationId: gymkhana_get_report
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
       parameters:
       - in: path
         name: id
@@ -562,6 +807,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventReport'
+          description: ''
+  /api/v1/gymkhana/reports/{id}/file/:
+    get:
+      operationId: gymkhana_report_file
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
+        '404':
+          description: Absent, or outside the caller's scope.
+  /api/v1/gymkhana/venues/:
+    get:
+      operationId: gymkhana_list_venues
+      description: Both gates on every method; a write is checked against its own
+        permission and throttled.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenueList'
           description: ''
   /api/v1/me:
     get:
@@ -2263,6 +2549,20 @@ components:
       - semester
       - semester_type
       - user_id
+    Access:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+        clubs_led:
+          type: array
+          items:
+            $ref: '#/components/schemas/LedClub'
+      required:
+      - clubs_led
+      - permissions
     AddCandidates:
       type: object
       properties:
@@ -2521,7 +2821,6 @@ components:
           readOnly: true
         supporting_file:
           type: string
-          format: uri
           nullable: true
           readOnly: true
         status:
@@ -2691,11 +2990,20 @@ components:
         coordinator_id:
           type: integer
           readOnly: true
+        coordinator_name:
+          type: string
+          readOnly: true
         co_coordinator_id:
           type: integer
           readOnly: true
+        co_coordinator_name:
+          type: string
+          readOnly: true
         faculty_councillor_id:
           type: integer
+          readOnly: true
+        faculty_councillor_name:
+          type: string
           readOnly: true
         status:
           type: string
@@ -2711,10 +3019,13 @@ components:
       required:
       - category
       - co_coordinator_id
+      - co_coordinator_name
       - coordinator_id
+      - coordinator_name
       - created_at
       - description
       - faculty_councillor_id
+      - faculty_councillor_name
       - id
       - name
       - status
@@ -3104,6 +3415,9 @@ components:
         student_incharge_id:
           type: integer
           readOnly: true
+        student_incharge_name:
+          type: string
+          readOnly: true
         event_name:
           type: string
           readOnly: true
@@ -3116,7 +3430,6 @@ components:
           readOnly: true
         report_file:
           type: string
-          format: uri
           nullable: true
           readOnly: true
         submitted_at:
@@ -3132,6 +3445,7 @@ components:
       - id
       - report_file
       - student_incharge_id
+      - student_incharge_name
       - submitted_at
       - submitted_by_id
     EventReportCreate:
@@ -3399,6 +3713,26 @@ components:
       required:
       - co_coordinator_id
       - coordinator_id
+    LedClub:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        faculty_councillor_id:
+          type: integer
+          readOnly: true
+      required:
+      - faculty_councillor_id
+      - id
+      - name
+      - status
     LiftSanction:
       type: object
       properties:
@@ -3440,6 +3774,9 @@ components:
         student_id:
           type: integer
           readOnly: true
+        student_name:
+          type: string
+          readOnly: true
         description:
           type: string
           readOnly: true
@@ -3473,6 +3810,7 @@ components:
       - remarks
       - status
       - student_id
+      - student_name
     MembershipApply:
       type: object
       properties:
@@ -3911,6 +4249,28 @@ components:
       properties:
         active_role:
           type: string
+    People:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Person'
+      required:
+      - results
+    Person:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+        display_name:
+          type: string
+      required:
+      - display_name
+      - user_id
+      - username
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -4064,17 +4424,44 @@ components:
           items:
             type: string
             maxLength: 200
+          maxItems: 20
           minItems: 2
         target_groups:
           type: array
           items:
-            type: object
-            additionalProperties: {}
+            $ref: '#/components/schemas/PollGroupInput'
       required:
       - choices
       - club_id
       - expires_at
+      - target_groups
       - title
+    PollGroupInput:
+      type: object
+      properties:
+        batch:
+          type: string
+          maxLength: 20
+        branch:
+          type: string
+          maxLength: 50
+      required:
+      - batch
+      - branch
+    PollOptions:
+      type: object
+      properties:
+        batches:
+          type: array
+          items:
+            type: string
+        branches:
+          type: array
+          items:
+            type: string
+      required:
+      - batches
+      - branches
     PollTargetGroup:
       type: object
       properties:
@@ -4828,7 +5215,6 @@ components:
           readOnly: true
         poster_file:
           type: string
-          format: uri
           nullable: true
           readOnly: true
         faculty_councillor_id:
@@ -4857,6 +5243,15 @@ components:
       - poster_file
       - start_time
       - venue
+    VenueList:
+      type: object
+      properties:
+        venues:
+          type: array
+          items:
+            type: string
+      required:
+      - venues
     Vote:
       type: object
       properties:

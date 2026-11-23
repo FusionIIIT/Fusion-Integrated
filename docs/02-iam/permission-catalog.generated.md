@@ -31,7 +31,7 @@ For the intended taxonomy of modules not yet built, see
 | `gymkhana.poll.vote` | Cast vote in targeted polls | `student` |
 | `gymkhana.budget.view` | View club budget tracking requests | `student`, `student_admin` |
 | `gymkhana.budget.create` | Submit club budget tracking requests | `student` |
-| `gymkhana.report.view` | View submitted club event reports | `faculty`, `student_admin` |
+| `gymkhana.report.view` | View submitted club event reports | `faculty` |
 | `gymkhana.report.create` | Submit club event reports | `student` |
 
 ## `placement_cell`

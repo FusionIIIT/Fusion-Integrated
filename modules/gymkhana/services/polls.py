@@ -18,6 +18,7 @@ from modules.gymkhana.domain.exceptions import DomainError
 from modules.gymkhana.domain.validation import (
     validate_poll_active,
     validate_poll_choices,
+    validate_target_groups,
 )
 from modules.gymkhana.models.club import Club
 from modules.gymkhana.models.poll import (
@@ -28,6 +29,7 @@ from modules.gymkhana.models.poll import (
 )
 from modules.gymkhana.selectors.polls import is_student_targeted
 from modules.gymkhana.selectors.scoping import is_club_head
+from modules.gymkhana.services.notifications import announce_poll
 
 
 @transaction.atomic
@@ -41,7 +43,7 @@ def create_poll(
     choices: Sequence[str],
     target_groups: Sequence[tuple[str, str]],  # (batch, branch)
 ) -> Poll:
-    """Create a new targeted voting poll (UC-GYM-006, AFR-GYM-023 to 025, BW-GYM-02)."""
+    """Create a targeted poll (UC-GYM-006, CFR-GYM-005, AFR-GYM-023, BW-GYM-02)."""
     club = Club.objects.filter(id=club_id).first()
     if not club:
         raise NotFoundError(f"Club {club_id} not found.")
@@ -58,6 +60,7 @@ def create_poll(
 
     try:
         clean_choices = validate_poll_choices(choices)
+        clean_groups = validate_target_groups(target_groups)
     except DomainError as exc:
         raise BadRequestError(str(exc)) from exc
 
@@ -70,18 +73,13 @@ def create_poll(
         status=POLL_STATUS_ACTIVE,
     )
 
-    for choice_text in clean_choices:
-        PollChoice.objects.create(poll=poll, choice_text=choice_text)
-
-    if not target_groups:
-        PollTargetGroup.objects.create(poll=poll, batch="all", branch="all")
-    else:
-        for batch, branch in target_groups:
-            PollTargetGroup.objects.create(
-                poll=poll,
-                batch=batch.strip() or "all",
-                branch=branch.strip() or "all",
-            )
+    PollChoice.objects.bulk_create(
+        [PollChoice(poll=poll, choice_text=text) for text in clean_choices]
+    )
+    PollTargetGroup.objects.bulk_create(
+        [PollTargetGroup(poll=poll, batch=batch, branch=branch) for batch, branch in clean_groups]
+    )
+    announce_poll(poll)
     return poll
 
 
@@ -94,7 +92,7 @@ def cast_vote(
     student_batch: str | None = None,
     student_branch: str | None = None,
 ) -> PollVote:
-    """Cast a student vote with single-vote guarantee and tally update (UC-GYM-007, BR-GYM-015)."""
+    """Record one vote and its tally (UC-GYM-007, AFR-GYM-027, AFR-GYM-028, BR-GYM-015)."""
     poll = (
         Poll.objects.select_for_update()
         .prefetch_related("target_groups")

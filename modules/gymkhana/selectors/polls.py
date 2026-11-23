@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import datetime
 
-from django.db.models import Q, QuerySet
+from django.db.models import Exists, OuterRef, Q, QuerySet
 
 from core.api.exceptions import NotFoundError
-from modules.gymkhana.domain.constants import POLL_STATUS_ACTIVE
-from modules.gymkhana.models.poll import Poll, PollVote
+from modules.gymkhana.domain.constants import ALL_GROUPS, POLL_STATUS_ACTIVE
+from modules.gymkhana.models.poll import Poll, PollTargetGroup, PollVote
 
 
 def get_poll_by_id(poll_id: int) -> Poll:
@@ -34,12 +34,23 @@ def is_student_targeted(poll: Poll, batch: str | None, branch: str | None) -> bo
     targets = poll.target_groups.all()
     if not targets:
         return True
-    for t in targets:
-        match_batch = t.batch.lower() == "all" or (batch and t.batch.lower() == batch.lower())
-        match_branch = t.branch.lower() == "all" or (branch and t.branch.lower() == branch.lower())
-        if match_batch and match_branch:
-            return True
-    return False
+
+    def matches(selected: str, own: str | None) -> bool:
+        wanted = selected.lower()
+        return wanted == ALL_GROUPS or (own is not None and wanted == own.lower())
+
+    return any(matches(t.batch, batch) and matches(t.branch, branch) for t in targets)
+
+
+def _targets(batch: str | None, branch: str | None) -> Q:
+    """One group of the poll matches on batch and branch together (BR-GYM-013)."""
+    batch_q, branch_q = Q(batch__iexact=ALL_GROUPS), Q(branch__iexact=ALL_GROUPS)
+    if batch:
+        batch_q |= Q(batch__iexact=batch)
+    if branch:
+        branch_q |= Q(branch__iexact=branch)
+    groups = PollTargetGroup.objects.filter(poll=OuterRef("pk"))
+    return Q(Exists(groups.filter(batch_q, branch_q))) | ~Q(Exists(groups))
 
 
 def list_active_polls_for_student(
@@ -47,20 +58,30 @@ def list_active_polls_for_student(
     branch: str | None = None,
     now: datetime.datetime | None = None,
 ) -> QuerySet[Poll]:
-    """Return active polls that have not expired."""
+    """Active, unexpired polls addressed to this batch and branch (BR-GYM-014)."""
     current_time = now or datetime.datetime.now(datetime.UTC)
-    qs = (
-        Poll.objects.filter(status=POLL_STATUS_ACTIVE, expires_at__gt=current_time)
+    return (
+        Poll.objects.filter(
+            _targets(batch, branch), status=POLL_STATUS_ACTIVE, expires_at__gt=current_time
+        )
         .select_related("club")
         .prefetch_related("choices", "target_groups")
     )
-    if not batch and not branch:
-        return qs
-    # Filter in Python or via target groups
-    target_q = Q(target_groups__batch__iexact="all")
-    if batch:
-        target_q |= Q(target_groups__batch__iexact=batch)
-    branch_q = Q(target_groups__branch__iexact="all")
-    if branch:
-        branch_q |= Q(target_groups__branch__iexact=branch)
-    return qs.filter(target_q & branch_q).distinct()
+
+
+def polls_for(
+    user_id: int,
+    batch: str | None,
+    branch: str | None,
+    now: datetime.datetime | None = None,
+) -> QuerySet[Poll]:
+    """Polls addressed to this person and active, or their own club's (AFR-GYM-026, BR-GYM-014)."""
+    current_time = now or datetime.datetime.now(datetime.UTC)
+    votable = Q(status=POLL_STATUS_ACTIVE, expires_at__gt=current_time) & _targets(batch, branch)
+    heads = Q(club__coordinator_id=user_id) | Q(club__co_coordinator_id=user_id)
+    return (
+        Poll.objects.filter(votable | heads)
+        .select_related("club")
+        .prefetch_related("choices", "target_groups")
+        .annotate(voted=Exists(PollVote.objects.filter(poll=OuterRef("pk"), student_id=user_id)))
+    )
