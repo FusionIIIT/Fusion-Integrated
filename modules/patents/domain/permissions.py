@@ -30,5 +30,6 @@ P_TECH_TRANSFER_REVIEW = "patents.tech_transfer.review"
 P_PRIOR_ART_SEARCH = "patents.prior_art.search"
 
 P_PANEL_MANAGE = "patents.panel.manage"
+P_WORKFLOW_HANDLE = "patents.workflow.handle_exceptions"
 P_AUDIT_VIEW = "patents.audit.view"
 P_REPORT_VIEW = "patents.report.view"

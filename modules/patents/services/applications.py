@@ -8,7 +8,14 @@ from django.db import transaction
 from django.db.models import QuerySet
 from django.utils import timezone
 
-from core.api.exceptions import BadRequestError, ConflictError, NotFoundError, PermissionDeniedError
+from core.api.exceptions import (
+    BadRequestError,
+    ConflictError,
+    DomainError,
+    NotFoundError,
+    PermissionDeniedError,
+)
+from modules.patents.domain import deadlines as dl
 from modules.patents.domain import filing as fil
 from modules.patents.domain import state_machine as sm
 from modules.patents.domain import validation as val
@@ -21,6 +28,8 @@ from modules.patents.models import (
     ReviewDecision,
 )
 from modules.patents.selectors import scoping
+from modules.patents.services import audit, notifications
+from modules.patents.services.errors import rule_errors
 
 
 def actor_lane(actor, application: PatentApplication | None = None) -> str:
@@ -76,11 +85,12 @@ def create_application(
     if user_id is None:
         raise PermissionDeniedError("Actor has no identity.")
 
-    val.validate_application_fields(title, abstract, description, claims)
+    with rule_errors():
+        val.validate_application_fields(title, abstract, description, claims)
 
-    if co_inventors:
-        shares = [Decimal(str(c.get("share_percentage", 0))) for c in co_inventors]
-        val.validate_ownership_shares(shares)
+        if co_inventors:
+            shares = [Decimal(str(c.get("share_percentage", 0))) for c in co_inventors]
+            val.validate_ownership_shares(shares)
 
     app_num = generate_application_number()
 
@@ -109,6 +119,20 @@ def create_application(
     return app
 
 
+def _ensure_within_revision_window(app: PatentApplication) -> None:
+    """BR-PMS-035: a revision must be resubmitted within the policy's resubmission period
+    (60 days by default) of the rejection or revision-request decision."""
+    if app.status not in (sm.NEEDS_REVISION, sm.REJECTED) or not app.decision_date:
+        return
+    policy = PatentPolicy.objects.filter(is_active=True).first()
+    days = policy.revision_resubmission_days if policy else 60
+    if dl.is_revision_expired(app.decision_date, timezone.now(), limit_days=days):
+        raise DomainError(
+            f"The {days}-day resubmission period has expired (BR-PMS-035).",
+            code="revision_deadline_expired",
+        )
+
+
 def update_application(
     actor,
     application_id: int,
@@ -128,11 +152,7 @@ def update_application(
         if app.status not in (sm.DRAFT, sm.NEEDS_REVISION, sm.REJECTED):
             raise ConflictError(f"Application in status {app.status} cannot be edited.")
 
-        # BR-PMS-035: If REJECTED, must be within 60 days of decision_date
-        if app.status == sm.REJECTED and app.decision_date:
-            deadline = app.decision_date + datetime.timedelta(days=60)
-            if timezone.now() > deadline:
-                raise ConflictError("Resubmission period of 60 days has expired.")
+        _ensure_within_revision_window(app)
 
         if title is not None:
             app.title = title
@@ -145,7 +165,8 @@ def update_application(
         if domain_category is not None:
             app.domain_category = domain_category
 
-        val.validate_application_fields(app.title, app.abstract, app.description, app.claims)
+        with rule_errors():
+            val.validate_application_fields(app.title, app.abstract, app.description, app.claims)
         app.version += 1
         app.save()
     return app
@@ -196,7 +217,8 @@ def transition_application(
             raise NotFoundError("Patent application not found.")
 
         lane = actor_lane(actor, app)
-        to_status = _resolve_target(app, event, actor, payload)
+        with rule_errors():
+            to_status = _resolve_target(app, event, actor, payload)
         if not to_status:
             raise BadRequestError(f"Cannot resolve target status for event {event!r}.")
 
@@ -211,6 +233,9 @@ def transition_application(
             bool(app.assigned_attorney_id)
             and app.status in {sm.ATTORNEY_ASSIGNED, sm.ASSESSMENT_IN_PROGRESS, sm.FILED}
         )
+        previous_status = app.status
+        previous_director = app.assigned_director_id
+        previous_attorney = app.assigned_attorney_id
         _apply_side_effects(app, event, actor, payload, had_active_attorney)
 
 
@@ -223,8 +248,81 @@ def transition_application(
         app.status = to_status
         app.version += 1
         app.save()
+        audit.record(
+            actor, event, app, previous_status, to_status,
+            **_audit_details(app, event, payload),
+        )
 
+    for user_ids, subject, body in _notices(
+        app, event, payload, previous_director, previous_attorney,
+    ):
+        notifications.notify(user_ids, app, subject, body)
     return app
+
+
+def _audit_details(app, event: str, payload: dict) -> dict:
+    """The facts an action recorded, kept with its audit record."""
+    if event == "withdraw":
+        cis = list(app.co_inventors.all())
+        return {
+            "reason": payload.get("reason", ""),
+            "co_inventor_consents": f"{sum(c.consent_granted for c in cis)}/{len(cis)} granted",
+        }
+    if event == "file_external":
+        return {
+            "external_filing_id": app.external_filing_id,
+            "filing_date": app.filing_date.isoformat() if app.filing_date else "",
+            "filing_office": app.filing_office,
+            "confirmation": app.filing_confirmation,
+            "justification": app.filing_justification,
+        }
+    if event == "submit_review":
+        return {"decision": payload.get("decision", "")}
+    if event == "assign_director":
+        return {"director_id": payload.get("director_id")}
+    if event == "assign_attorney":
+        return {"attorney_id": payload.get("attorney_id")}
+    if event == "decide_appeal":
+        return {"outcome": payload.get("outcome", "")}
+    return {}
+
+
+def _notices(app, event, payload, previous_director, previous_attorney):
+    """Who is told about this event (PMS-AFR-192..205). PMS triggers the email only."""
+    applicant = app.user_id
+    if event == "submit":
+        return [([applicant], "Application submitted", "Your application was accepted.")]
+    if event == "assign_director":
+        return [
+            ([app.assigned_director_id], "Assigned for review",
+             "You have been assigned to review this application within 15 business days."),
+            ([applicant], "Application under review", "A Director has been assigned."),
+        ]
+    if event == "submit_review":
+        decision = payload.get("decision", "")
+        return [([applicant], f"Review decision: {decision}", payload.get("justification", ""))]
+    if event == "assign_attorney":
+        return [([app.assigned_attorney_id], "Attorney assignment offered",
+                 "Accept or decline this assignment.")]
+    if event == "accept_assignment":
+        return [([applicant, app.assigned_director_id], "Attorney assigned",
+                 "The assigned Attorney accepted the assignment.")]
+    if event == "file_external":
+        office = app.filing_office or "the patent office"
+        return [([applicant, app.assigned_attorney_id], "Filing confirmation",
+                 f"Filed with {office} as {app.external_filing_id}.")]
+    if event == "grant":
+        return [([applicant, app.assigned_attorney_id], "Patent granted",
+                 "The patent was recorded as granted.")]
+    if event == "withdraw":
+        return [([previous_director, previous_attorney], "Application withdrawn",
+                 f"Withdrawn by the Applicant: {payload.get('reason', '')}")]
+    if event == "file_appeal":
+        return [([app.assigned_director_id], "Appeal filed",
+                 "An appeal against the rejection awaits your review.")]
+    if event == "decide_appeal":
+        return [([applicant], "Appeal outcome", f"Outcome: {payload.get('outcome', '')}")]
+    return []
 
 
 
@@ -297,6 +395,13 @@ def _resolve_mid_target(app, event: str, actor, payload: dict) -> str | None:
         )
         if not clearance.cleared:
             raise ConflictError("; ".join(clearance.reasons))
+        jurisdiction = (payload.get("jurisdiction") or app.jurisdiction or "IN").upper()
+        international = jurisdiction != "IN" or payload.get("filing_type") == "international"
+        if international and not (payload.get("justification") or "").strip():
+            raise DomainError(
+                "An international filing needs a recorded justification (BR-PMS-056).",
+                code="international_justification_required",
+            )
     elif event == "grant":
         to_status = sm.GRANTED
     elif event in {"reject", "reject_assessment"}:
@@ -341,6 +446,7 @@ def _resolve_remaining_target(app, event: str, actor, payload: dict) -> str | No
         }[outcome]
     elif event == "resubmit":
         to_status = sm.RESUBMITTED
+        _ensure_within_revision_window(app)
     elif event == "expire":
         to_status = sm.EXPIRED
     else:
@@ -408,7 +514,12 @@ def _apply_appeal_and_filing_effects(app, event: str, actor, payload: dict,
             appeal.save()
     elif event == "file_external":
         app.external_filing_id = payload.get("external_filing_id", f"IPO-{app.id}")
-        app.filing_date = timezone.now().date()
+        app.filing_date = payload.get("filing_date") or timezone.now().date()
+        app.filing_office = payload.get("filing_office", "")
+        app.filing_confirmation = payload.get("confirmation", "")
+        app.filing_justification = payload.get("justification", "")
+        if payload.get("jurisdiction"):
+            app.jurisdiction = payload["jurisdiction"]
     elif event == "grant":
         app.grant_date = timezone.now().date()
         due = payload.get("renewal_due_date")

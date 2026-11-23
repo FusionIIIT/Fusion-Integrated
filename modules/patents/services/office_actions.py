@@ -9,6 +9,7 @@ from django.utils import timezone
 from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from modules.patents.models import OfficeActionRecord
 from modules.patents.selectors import scoping
+from modules.patents.services import audit, notifications
 
 
 def log_office_action(
@@ -27,7 +28,7 @@ def log_office_action(
         raise NotFoundError("Patent application not found.")
 
     with transaction.atomic():
-        return OfficeActionRecord.objects.create(
+        oa = OfficeActionRecord.objects.create(
             application=app,
             action_code=action_code,
             issuing_authority=issuing_authority,
@@ -36,6 +37,16 @@ def log_office_action(
             requires_applicant_review=requires_applicant_review,
             status="RECORDED",
         )
+        audit.record(
+            actor, "office_action_recorded", app, new_state=oa.status,
+            action_code=action_code, issuing_authority=issuing_authority,
+            response_deadline=response_deadline.isoformat(),
+        )
+    notifications.notify(
+        [app.user_id, app.assigned_attorney_id], app, "Office action received",
+        f"{issuing_authority} issued {action_code}; respond by {response_deadline.isoformat()}.",
+    )
+    return oa
 
 
 def draft_response(
@@ -52,12 +63,22 @@ def draft_response(
         if oa is None:
             raise NotFoundError("Office action not found.")
 
+        previous = oa.status
         oa.response_summary = response_summary
         if oa.requires_applicant_review:
             oa.status = "AWAITING_APPLICANT"
         else:
             oa.status = "RESPONSE_READY"
         oa.save()
+        audit.record(
+            actor, "office_action_response_drafted", oa.application, previous, oa.status,
+            office_action_id=oa.id,
+        )
+    if oa.status == "AWAITING_APPLICANT":
+        notifications.notify(
+            [oa.application.user_id], oa.application, "Response awaiting your approval",
+            "Review and approve the drafted office-action response.",
+        )
     return oa
 
 
@@ -79,8 +100,12 @@ def applicant_approve_response(
         if oa.status != "AWAITING_APPLICANT":
             raise ConflictError("Office action is not awaiting applicant approval.")
 
-        oa.status = "RESPONSE_READY"
+        oa.status = "APPLICANT_APPROVED"
         oa.save()
+        audit.record(
+            actor, "office_action_response_approved", oa.application,
+            "AWAITING_APPLICANT", oa.status, office_action_id=oa.id,
+        )
     return oa
 
 
@@ -97,10 +122,15 @@ def submit_response(
         if oa is None:
             raise NotFoundError("Office action not found.")
 
-        if oa.status != "RESPONSE_READY":
+        if oa.status not in ("RESPONSE_READY", "APPLICANT_APPROVED"):
             raise ConflictError("Office action response is not ready for submission.")
 
+        previous = oa.status
         oa.status = "SUBMITTED"
         oa.submitted_at = timezone.now()
         oa.save()
+        audit.record(
+            actor, "office_action_response_submitted", oa.application, previous, oa.status,
+            office_action_id=oa.id,
+        )
     return oa

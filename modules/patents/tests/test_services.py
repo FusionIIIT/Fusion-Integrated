@@ -305,7 +305,7 @@ def test_office_action_and_tech_transfer():
 
     # Applicant approve response
     oa = applicant_approve_response(app_actor, oa.id)
-    assert oa.status == "RESPONSE_READY"
+    assert oa.status == "APPLICANT_APPROVED"
 
     # Submit response
     oa = submit_response(att_actor, oa.id)

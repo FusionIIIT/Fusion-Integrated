@@ -7,6 +7,7 @@ from core.api.exceptions import NotFoundError
 from modules.patents.domain import validation as val
 from modules.patents.models import ApplicationDocument
 from modules.patents.selectors import scoping
+from modules.patents.services.errors import rule_errors
 
 
 def upload_document(
@@ -25,7 +26,8 @@ def upload_document(
         raise NotFoundError("Patent application not found.")
 
     fmt = file_name.rsplit(".", maxsplit=1)[-1] if "." in file_name else ""
-    val.validate_document(file_format=fmt, size_bytes=len(file_bytes))
+    with rule_errors():
+        val.validate_document(file_format=fmt, size_bytes=len(file_bytes))
 
     with transaction.atomic():
         # Versioning: increment document version if doc of same type exists

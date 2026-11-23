@@ -16,9 +16,17 @@ class PatentApplication(TimeStampedModel, UserScopedModel):
     assigned_attorney_id = models.IntegerField(null=True, blank=True, db_index=True)
     external_filing_id = models.CharField(max_length=100, blank=True, default="")
     filing_date = models.DateField(null=True, blank=True)
+    filing_office = models.CharField(max_length=100, blank=True, default="")
+    filing_confirmation = models.CharField(max_length=200, blank=True, default="")
+    filing_justification = models.TextField(blank=True, default="")
     grant_date = models.DateField(null=True, blank=True)
     renewal_due_date = models.DateField(null=True, blank=True)
     renewal_decided_at = models.DateTimeField(null=True, blank=True)
+    #: Director's explicit maintenance outcome, RENEW or DO_NOT_RENEW (BR-PMS-061).
+    renewal_decision = models.CharField(max_length=20, blank=True, default="")
+    #: Where the current maintenance cycle stands; see domain/maintenance.py.
+    maintenance_state = models.CharField(max_length=24, blank=True, default="")
+    renewal_requested_at = models.DateTimeField(null=True, blank=True)
     jurisdiction = models.CharField(max_length=50, default="IN")
     decision_date = models.DateTimeField(null=True, blank=True)
     version = models.PositiveIntegerField(default=1)

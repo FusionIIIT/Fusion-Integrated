@@ -440,6 +440,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/PatentBudgetLedger'
           description: ''
+  /api/v1/patents/applications/{id}/budget-escalation:
+    post:
+      operationId: v1_patents_applications_budget_escalation_create
+      description: POST /api/v1/patents/applications/<pk>/budget-escalation
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalationTrackInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EscalationTrackInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EscalationTrackInput'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentBudgetLedger'
+          description: ''
   /api/v1/patents/applications/{id}/co-inventors/{ci_pk}/consent-token:
     post:
       operationId: v1_patents_applications_co_inventors_consent_token_create
@@ -551,6 +583,39 @@ paths:
               schema:
                 $ref: '#/components/schemas/PatentApplicationDetail'
           description: ''
+  /api/v1/patents/applications/{id}/maintenance-action:
+    post:
+      operationId: v1_patents_applications_maintenance_action_create
+      description: POST /api/v1/patents/applications/<pk>/maintenance-action
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceActionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MaintenanceActionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MaintenanceActionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
   /api/v1/patents/applications/{id}/office-actions:
     post:
       operationId: v1_patents_applications_office_actions_create
@@ -608,6 +673,38 @@ paths:
             schema:
               $ref: '#/components/schemas/RenewalDecisionInput'
         required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}/renewal-request:
+    post:
+      operationId: v1_patents_applications_renewal_request_create
+      description: POST /api/v1/patents/applications/<pk>/renewal-request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewalRequestInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RenewalRequestInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RenewalRequestInput'
       security:
       - iamSession: []
       responses:
@@ -3506,6 +3603,14 @@ components:
       - season_decision
       - semester
       - standing
+    EscalationTrackInput:
+      type: object
+      properties:
+        budget_entry_id:
+          type: integer
+        notes:
+          type: string
+          default: ''
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -3528,6 +3633,30 @@ components:
         external_filing_id:
           type: string
           maxLength: 100
+        filing_date:
+          type: string
+          format: date
+        jurisdiction:
+          type: string
+          maxLength: 50
+        filing_type:
+          $ref: '#/components/schemas/FilingTypeEnum'
+        filing_office:
+          type: string
+          maxLength: 100
+        confirmation:
+          type: string
+          maxLength: 200
+        justification:
+          type: string
+    FilingTypeEnum:
+      enum:
+      - national
+      - international
+      type: string
+      description: |-
+        * `national` - national
+        * `international` - international
     IncidentRecorded:
       type: object
       properties:
@@ -3768,6 +3897,21 @@ components:
       required:
       - password
       - username
+    MaintenanceActionInput:
+      type: object
+      properties:
+        reference:
+          type: string
+          maxLength: 200
+        next_due_date:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          default: ''
+      required:
+      - reference
     ModeEnum:
       enum:
       - online
@@ -4333,10 +4477,33 @@ components:
           type: string
           format: date
           nullable: true
+        filing_office:
+          type: string
+          maxLength: 100
+        filing_confirmation:
+          type: string
+          maxLength: 200
+        filing_justification:
+          type: string
         grant_date:
           type: string
           format: date
           nullable: true
+        renewal_decision:
+          type: string
+          maxLength: 20
+        maintenance_state:
+          type: string
+          maxLength: 24
+        renewal_requested_at:
+          type: string
+          format: date-time
+          nullable: true
+        renewal_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/RenewalHistory'
+          readOnly: true
         jurisdiction:
           type: string
           maxLength: 50
@@ -4441,10 +4608,33 @@ components:
           type: string
           format: date
           nullable: true
+        filing_office:
+          type: string
+          maxLength: 100
+        filing_confirmation:
+          type: string
+          maxLength: 200
+        filing_justification:
+          type: string
         grant_date:
           type: string
           format: date
           nullable: true
+        renewal_decision:
+          type: string
+          maxLength: 20
+        maintenance_state:
+          type: string
+          maxLength: 24
+        renewal_requested_at:
+          type: string
+          format: date-time
+          nullable: true
+        renewal_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/RenewalHistory'
+          readOnly: true
         jurisdiction:
           type: string
           maxLength: 50
@@ -4512,6 +4702,7 @@ components:
       - id
       - licensing_records
       - office_actions
+      - renewal_history
       - reviews
       - title
       - updated_at
@@ -5029,6 +5220,52 @@ components:
           default: ''
       required:
       - renew
+    RenewalHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cycle_due_date:
+          type: string
+          format: date
+          nullable: true
+        requested_at:
+          type: string
+          format: date-time
+          nullable: true
+        decision:
+          type: string
+          maxLength: 20
+        decided_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        decided_at:
+          type: string
+          format: date-time
+        action_reference:
+          type: string
+          maxLength: 200
+        action_recorded_at:
+          type: string
+          format: date-time
+          nullable: true
+        next_due_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - decided_at
+      - decided_by_user_id
+      - decision
+      - id
+    RenewalRequestInput:
+      type: object
+      properties:
+        notes:
+          type: string
+          default: ''
     ReportsResponse:
       type: object
       properties:
@@ -5085,7 +5322,6 @@ components:
           $ref: '#/components/schemas/ReviewDecisionInputDecisionEnum'
         justification:
           type: string
-          minLength: 50
       required:
       - decision
       - justification

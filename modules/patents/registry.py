@@ -144,6 +144,7 @@ PERMISSIONS = [
 
     # Administration & Oversight
     ("patents.panel.manage", "Manage attorney panel roster and expertise mappings"),
+    ("patents.workflow.handle_exceptions", "Handle and route escalated and exceptional cases"),
     ("patents.audit.view", "View audit trail and compliance logs"),
     ("patents.report.view", "Generate and view reports and analytics"),
 
@@ -198,6 +199,7 @@ _ATTORNEY = [
 
 _PCC_ADMIN = [
     "patents.application.view",
+    "patents.workflow.handle_exceptions",
     "patents.application.assign_director",
     "patents.attorney.assign",
     "patents.panel.manage",

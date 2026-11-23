@@ -123,12 +123,31 @@ export interface PatentApplicationSummary {
   updated_at: string;
 }
 
+export interface RenewalHistoryEntry {
+  id: number;
+  cycle_due_date: string | null;
+  requested_at: string | null;
+  decision: "RENEW" | "DO_NOT_RENEW";
+  decided_by_user_id: number;
+  decided_at: string;
+  action_reference: string;
+  action_recorded_at: string | null;
+  next_due_date: string | null;
+}
+
 export interface PatentApplicationDetail extends PatentApplicationSummary {
   abstract: string;
   description: string;
   claims: string;
   filing_date: string | null;
+  filing_office: string;
+  filing_confirmation: string;
+  filing_justification: string;
   grant_date: string | null;
+  renewal_decision: "" | "RENEW" | "DO_NOT_RENEW";
+  maintenance_state: "" | "ACTIVE" | "DECISION_REQUESTED" | "RENEWAL_APPROVED" | "DO_NOT_RENEW" | "RENEWED";
+  renewal_requested_at: string | null;
+  renewal_history: RenewalHistoryEntry[];
   decision_date: string | null;
   co_inventors: CoInventor[];
   documents: ApplicationDocument[];

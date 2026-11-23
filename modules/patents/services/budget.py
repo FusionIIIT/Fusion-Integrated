@@ -9,6 +9,7 @@ from django.db.models import Sum
 from core.api.exceptions import ConflictError, NotFoundError, PermissionDeniedError
 from modules.patents.models import PatentBudgetLedger, PatentPolicy
 from modules.patents.selectors import scoping
+from modules.patents.services import audit, notifications
 
 DECISION_KINDS = ("APPROVAL", "ESCALATION")
 
@@ -88,7 +89,7 @@ def decide_budget(
             else:
                 kind, status = "APPROVAL", "APPROVED"
 
-        return PatentBudgetLedger.objects.create(
+        decision_row = PatentBudgetLedger.objects.create(
             application=request.application,
             entry_kind=kind,
             replaces_entry=request,
@@ -100,6 +101,76 @@ def decide_budget(
             authorized_by_user_id=getattr(actor, "user_id", request.authorized_by_user_id),
             notes=notes,
         )
+        audit.record(
+            actor, "budget_decision", request.application, new_state=status,
+            entry_kind=kind, amount=str(request.amount), currency=request.currency,
+            category=request.category,
+        )
+
+    _notify_budget_decision(decision_row, request)
+    return decision_row
+
+
+def _notify_budget_decision(decision: PatentBudgetLedger, request: PatentBudgetLedger) -> None:
+    """Budget approval, rejection or escalation notice (PMS-AFR-196, CFR-PMS-030)."""
+    app = decision.application
+    outcome = {"APPROVED": "approved", "REJECTED": "rejected", "ESCALATED": "escalated"}.get(
+        decision.status, decision.status.lower(),
+    )
+    notifications.notify(
+        [app.user_id, request.authorized_by_user_id],
+        app,
+        f"Budget {outcome}",
+        f"The {request.entry_type} budget of {request.amount} {request.currency} was {outcome}.",
+    )
+
+
+def track_escalation(
+    actor,
+    application_id: int,
+    entry_id: int | None = None,
+    notes: str = "",
+) -> PatentBudgetLedger:
+    """PCC_ADMIN records an escalated case as tracked while the external decision is pending.
+
+    PMS invents no higher-authority decision: the row only records that the case is being
+    handled (BW-PMS-10 step 2, UC-PMS-027).
+    """
+    if not scoping.is_pcc_admin(actor):
+        raise PermissionDeniedError("PCC_ADMIN authority required to handle escalations.")
+
+    with transaction.atomic():
+        requests = PatentBudgetLedger.objects.select_for_update().filter(
+            application_id=application_id, entry_kind="REQUEST",
+        )
+        if entry_id is not None:
+            requests = requests.filter(pk=entry_id)
+        target = None
+        for request in requests.order_by("id"):
+            latest = _latest_decision(request)
+            if latest is not None and latest.status == "ESCALATED":
+                target = (request, latest)
+                break
+        if target is None:
+            raise ConflictError("No escalated budget case is waiting to be tracked.")
+        request, latest = target
+        row = PatentBudgetLedger.objects.create(
+            application=request.application,
+            entry_kind="ESCALATION",
+            replaces_entry=request,
+            entry_type=request.entry_type,
+            amount=request.amount,
+            currency=request.currency,
+            category=request.category,
+            status="ESCALATION_TRACKED",
+            authorized_by_user_id=getattr(actor, "user_id", 0),
+            notes=notes,
+        )
+        audit.record(
+            actor, "budget_escalation_tracked", request.application,
+            "ESCALATED", "ESCALATION_TRACKED", amount=str(request.amount), notes=notes,
+        )
+    return row
 
 
 def reverse_budget_entry(actor, approval_id: int, notes: str = "") -> PatentBudgetLedger:

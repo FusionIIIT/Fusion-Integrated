@@ -11,6 +11,7 @@ from modules.patents.models import (
     OfficeActionRecord,
     PatentApplication,
     PatentBudgetLedger,
+    RenewalHistory,
     ReviewDecision,
     TechnologyTransferRecord,
 )
@@ -161,7 +162,17 @@ class PatentApplicationSummarySerializer(serializers.ModelSerializer):
         ]
 
 
+class RenewalHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RenewalHistory
+        fields = [
+            "id", "cycle_due_date", "requested_at", "decision", "decided_by_user_id",
+            "decided_at", "action_reference", "action_recorded_at", "next_due_date",
+        ]
+
+
 class PatentApplicationDetailSerializer(serializers.ModelSerializer):
+    renewal_history = RenewalHistorySerializer(many=True, read_only=True)
     co_inventors = CoInventorSerializer(many=True, read_only=True)
     documents = ApplicationDocumentSerializer(many=True, read_only=True)
     reviews = ReviewDecisionSerializer(many=True, read_only=True)
@@ -186,7 +197,14 @@ class PatentApplicationDetailSerializer(serializers.ModelSerializer):
             "assigned_attorney_id",
             "external_filing_id",
             "filing_date",
+            "filing_office",
+            "filing_confirmation",
+            "filing_justification",
             "grant_date",
+            "renewal_decision",
+            "maintenance_state",
+            "renewal_requested_at",
+            "renewal_history",
             "jurisdiction",
             "decision_date",
             "version",
@@ -228,7 +246,8 @@ class AssignDirectorSerializer(serializers.Serializer):
 
 class ReviewDecisionInputSerializer(serializers.Serializer):
     decision = serializers.ChoiceField(choices=["APPROVE", "REJECT", "NEEDS_REVISION"])
-    justification = serializers.CharField(min_length=50)
+    # Length is a business rule (BR-PMS-030), enforced by the service as a 422 refusal.
+    justification = serializers.CharField(allow_blank=True)
 
 
 class AssignAttorneySerializer(serializers.Serializer):
@@ -250,6 +269,12 @@ class PatentWithdrawSerializer(serializers.Serializer):
 
 class FilingInputSerializer(serializers.Serializer):
     external_filing_id = serializers.CharField(max_length=100, required=False)
+    filing_date = serializers.DateField(required=False)
+    jurisdiction = serializers.CharField(max_length=50, required=False)
+    filing_type = serializers.ChoiceField(choices=["national", "international"], required=False)
+    filing_office = serializers.CharField(max_length=100, required=False)
+    confirmation = serializers.CharField(max_length=200, required=False)
+    justification = serializers.CharField(required=False, allow_blank=True)
 
 
 class BudgetDecisionInputSerializer(serializers.Serializer):
@@ -278,6 +303,21 @@ class TechTransferInputSerializer(serializers.Serializer):
 
 class RenewalDecisionInputSerializer(serializers.Serializer):
     renew = serializers.BooleanField()
+    notes = serializers.CharField(required=False, default="")
+
+
+class RenewalRequestInputSerializer(serializers.Serializer):
+    notes = serializers.CharField(required=False, default="")
+
+
+class MaintenanceActionInputSerializer(serializers.Serializer):
+    reference = serializers.CharField(max_length=200)
+    next_due_date = serializers.DateField(required=False, allow_null=True, default=None)
+    notes = serializers.CharField(required=False, default="")
+
+
+class EscalationTrackInputSerializer(serializers.Serializer):
+    budget_entry_id = serializers.IntegerField(required=False)
     notes = serializers.CharField(required=False, default="")
 
 

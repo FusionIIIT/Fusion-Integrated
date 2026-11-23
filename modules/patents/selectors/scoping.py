@@ -31,6 +31,7 @@ from modules.patents.models import (
     CoInventor,
     OfficeActionRecord,
     PatentApplication,
+    PatentAuditLog,
     PatentBudgetLedger,
     PatentPolicy,
     ReviewDecision,
@@ -154,6 +155,18 @@ def applications_for(actor) -> QuerySet[PatentApplication]:
         q |= Q(assigned_attorney_id=own)
 
     return base.filter(q)
+
+
+# -- Audit trail ----------------------------------------------------------------
+
+def audit_logs_for(actor) -> QuerySet[PatentAuditLog]:
+    """Audit records for applications the actor may see; PCC_ADMIN sees all (UC-PMS-028)."""
+    base = PatentAuditLog.objects.select_related("application")
+    if not has_pms_access(actor):
+        return base.none()
+    if is_pcc_admin(actor):
+        return base
+    return base.filter(application__in=applications_for(actor))
 
 
 # -- Subordinate Collections --------------------------------------------------

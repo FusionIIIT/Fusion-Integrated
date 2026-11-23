@@ -314,7 +314,7 @@ def test_main_lifecycle_journey(stub_iam):
     )
     approve_oa_resp = client.post(f"/api/v1/patents/office-actions/{oa_id}/approve")
     assert approve_oa_resp.status_code == status.HTTP_200_OK
-    assert approve_oa_resp.data["status"] == "RESPONSE_READY"
+    assert approve_oa_resp.data["status"] == "APPLICANT_APPROVED"
 
     # Transition application to GRANTED directly to test post-grant maintenance
     app_obj = PatentApplication.objects.get(pk=app_id)

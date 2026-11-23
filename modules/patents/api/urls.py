@@ -58,6 +58,21 @@ urlpatterns = [
         v.ApplicationRenewalDecisionView.as_view(),
         name="patents-application-renewal-decision",
     ),
+    path(
+        "applications/<int:pk>/renewal-request",
+        v.ApplicationRenewalRequestView.as_view(),
+        name="patents-application-renewal-request",
+    ),
+    path(
+        "applications/<int:pk>/maintenance-action",
+        v.ApplicationMaintenanceActionView.as_view(),
+        name="patents-application-maintenance-action",
+    ),
+    path(
+        "applications/<int:pk>/budget-escalation",
+        v.ApplicationBudgetEscalationView.as_view(),
+        name="patents-application-budget-escalation",
+    ),
 
     # Appeals
     path(

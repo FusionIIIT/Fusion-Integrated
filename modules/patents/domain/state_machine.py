@@ -194,11 +194,16 @@ TRANSITIONS: tuple[Transition, ...] = (
         frozenset({ATTORNEY}),
     ),
 
-    # External filing recorded (BR-PMS-020, 055..056, 078, 128, 138, 142)
-    Transition(
-        ASSESSMENT_IN_PROGRESS, FILED, "patents.filing.record",
-        frozenset({ATTORNEY}),
-        ("agreements_completed", "budget_approved", "filing_format_valid"),
+    # External filing recorded (BR-PMS-020, 055..056, 078, 128, 138, 142). The specification
+    # does not order the patentability assessment before filing (CW-PMS-02), so filing is
+    # reachable from Attorney Assigned as well as Assessment In Progress.
+    *(
+        Transition(
+            s, FILED, "patents.filing.record",
+            frozenset({ATTORNEY}),
+            ("agreements_completed", "budget_approved", "filing_format_valid"),
+        )
+        for s in (ATTORNEY_ASSIGNED, ASSESSMENT_IN_PROGRESS)
     ),
 
     # Patent grant recorded (BR-PMS-059)
@@ -233,7 +238,7 @@ TRANSITIONS: tuple[Transition, ...] = (
             ("has_reason", "withdrawal_eligible"),
         )
         for s in (
-            DRAFT, SUBMITTED, UNDER_REVIEW, NEEDS_REVISION, APPROVED,
+            DRAFT, SUBMITTED, UNDER_REVIEW, NEEDS_REVISION, REJECTED, APPROVED,
             ATTORNEY_ASSIGNED, PENDING_REVIEW, ASSESSMENT_IN_PROGRESS,
         )
     ),

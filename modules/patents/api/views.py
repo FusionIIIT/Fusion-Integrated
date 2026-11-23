@@ -13,6 +13,7 @@ from modules.patents.domain import permissions as p
 from modules.patents.domain import state_machine as sm
 from modules.patents.selectors import scoping
 from modules.patents.services import applications as app_service
+from modules.patents.services import audit as audit_service
 from modules.patents.services import budget as budget_service
 from modules.patents.services import documents as doc_service
 from modules.patents.services import maintenance as maint_service
@@ -412,6 +413,66 @@ class ApplicationRenewalDecisionView(APIView):
         return Response(s.PatentApplicationDetailSerializer(app).data)
 
 
+@extend_schema(
+    request=s.RenewalRequestInputSerializer,
+    responses=s.PatentApplicationDetailSerializer,
+)
+class ApplicationRenewalRequestView(APIView):
+    """POST /api/v1/patents/applications/<pk>/renewal-request"""
+    permission_classes = [MODULE, HasPermission(p.P_MAINTENANCE_TRACK)]
+    throttle_scope = "patent_mutate"
+
+    def post(self, request, pk):
+        payload = s.RenewalRequestInputSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        app = maint_service.request_renewal_decision(
+            actor=_actor(request),
+            application_id=pk,
+            notes=payload.validated_data.get("notes", ""),
+        )
+        return Response(s.PatentApplicationDetailSerializer(app).data)
+
+
+@extend_schema(
+    request=s.MaintenanceActionInputSerializer,
+    responses=s.PatentApplicationDetailSerializer,
+)
+class ApplicationMaintenanceActionView(APIView):
+    """POST /api/v1/patents/applications/<pk>/maintenance-action"""
+    permission_classes = [MODULE, HasPermission(p.P_MAINTENANCE_TRACK)]
+    throttle_scope = "patent_mutate"
+
+    def post(self, request, pk):
+        payload = s.MaintenanceActionInputSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        app = maint_service.record_maintenance_action(
+            actor=_actor(request),
+            application_id=pk,
+            reference=payload.validated_data["reference"],
+            next_due_date=payload.validated_data.get("next_due_date"),
+            notes=payload.validated_data.get("notes", ""),
+        )
+        return Response(s.PatentApplicationDetailSerializer(app).data)
+
+
+@extend_schema(request=s.EscalationTrackInputSerializer, responses=s.PatentBudgetLedgerSerializer)
+class ApplicationBudgetEscalationView(APIView):
+    """POST /api/v1/patents/applications/<pk>/budget-escalation"""
+    permission_classes = [MODULE, HasPermission(p.P_WORKFLOW_HANDLE)]
+    throttle_scope = "patent_mutate"
+
+    def post(self, request, pk):
+        payload = s.EscalationTrackInputSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        row = budget_service.track_escalation(
+            actor=_actor(request),
+            application_id=pk,
+            entry_id=payload.validated_data.get("budget_entry_id"),
+            notes=payload.validated_data.get("notes", ""),
+        )
+        return Response(s.PatentBudgetLedgerSerializer(row).data)
+
+
 class AttorneyPanelListView(generics.ListAPIView):
     """GET /api/v1/patents/attorney-panel"""
     permission_classes = [MODULE, HasPermission(p.P_PANEL_MANAGE)]
@@ -474,7 +535,8 @@ class AuditLogsView(APIView):
     permission_classes = [MODULE, HasPermission(p.P_AUDIT_VIEW)]
 
     def get(self, request):
-        return Response({"audit_logs": []})
+        entries = scoping.audit_logs_for(_actor(request)).order_by("-id")[:500]
+        return Response({"audit_logs": [audit_service.render(e) for e in entries]})
 
 
 @extend_schema(request=None, responses=s.ConsentTokenIssuedSerializer)
