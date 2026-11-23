@@ -1,0 +1,749 @@
+[
+  {
+    "test_id": "TC-001-MAIN",
+    "source_id": "PSM-UC-001 Main Success Scenario",
+    "purpose": "Submit an indent and verify its identifier, timestamp, audit entry, stock check, and notification.",
+    "preconditions": "An authenticated employee is authorized to create an indent; required item, quantity, estimated cost, and justification are available.",
+    "action_or_input": "Enter the required indent details and submit.",
+    "expected_result": "The system stores the indent as Submitted with a unique ID, submission timestamp, audit entry, submitted version, initiated stock check, and submission notification.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-001-A1",
+    "source_id": "PSM-UC-001 Alternative A1",
+    "purpose": "Verify submission is blocked when mandatory indent information is missing.",
+    "preconditions": "An authenticated employee is authorized to create an indent.",
+    "action_or_input": "Submit an indent with one or more mandatory fields missing.",
+    "expected_result": "Submission is blocked, missing information is identified, and no indent is submitted.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-001-A2",
+    "source_id": "PSM-UC-001 Alternative A2",
+    "purpose": "Verify a likely duplicate is flagged for Department Admin review.",
+    "preconditions": "An authenticated employee is authorized to create an indent; a likely duplicate exists.",
+    "action_or_input": "Submit an indent that the system detects as a potential duplicate.",
+    "expected_result": "The indent is traceably flagged for Department Admin review; it is not automatically merged or cancelled.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-001-A3",
+    "source_id": "PSM-UC-001 Alternative A3",
+    "purpose": "Verify the requestor is informed when system stock records show the requested item.",
+    "preconditions": "An authenticated employee is authorized to create an indent; system stock records show the requested item.",
+    "action_or_input": "Submit an indent for the item present in system stock records.",
+    "expected_result": "The requestor is informed that the item is present in system stock records, and the indent may proceed toward internal fulfilment.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-002-MAIN",
+    "source_id": "PSM-UC-002 Main Success Scenario",
+    "purpose": "Confirm an accepted delivery receipt and verify downstream eligibility information.",
+    "preconditions": "The relevant indent, issue, or PO is active; delivery has been recorded; no unresolved discrepancy applies.",
+    "action_or_input": "Open the delivery record, verify the goods, and record receipt confirmation.",
+    "expected_result": "The confirmation is timestamped and audited; final stock posting is permitted as applicable; relevant stakeholders are notified and Accounts can access the confirmation for payment eligibility checks.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-002-A1",
+    "source_id": "PSM-UC-002 Alternative A1",
+    "purpose": "Verify partial receipt confirmation leaves the remaining quantity open.",
+    "preconditions": "An active delivery record exists for a quantity greater than the accepted portion.",
+    "action_or_input": "Confirm receipt of only the accepted portion.",
+    "expected_result": "The accepted portion is confirmed and the remaining quantity stays open.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-002-A2",
+    "source_id": "PSM-UC-002 Alternative A2",
+    "purpose": "Verify discrepant goods are routed to discrepancy reporting instead of final acceptance.",
+    "preconditions": "An active delivery record contains damage, shortage, a wrong item, or another discrepancy.",
+    "action_or_input": "Record the discrepancy through PSM-UC-020 instead of confirming the discrepant portion as finally accepted.",
+    "expected_result": "The discrepancy is recorded through PSM-UC-020 and the discrepant portion is not finally accepted.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-003-MAIN",
+    "source_id": "PSM-UC-003 Main Success Scenario",
+    "purpose": "View the current status and authorized history of an indent.",
+    "preconditions": "The indent exists and the employee is authorized to view it.",
+    "action_or_input": "Select the indent from My Requests or search for it.",
+    "expected_result": "The system displays the lifecycle state, available key milestones, authorized history, visible hold or discrepancy status, and major generated lifecycle notifications where available; no business state changes.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-003-A1",
+    "source_id": "PSM-UC-003 Alternative A1",
+    "purpose": "Verify role-restricted information is omitted from procurement status.",
+    "preconditions": "The employee can view the indent but some information is restricted by role.",
+    "action_or_input": "Open the indent status and history.",
+    "expected_result": "Restricted information is omitted from the displayed status and history.",
+    "test_type": "Access Control"
+  },
+  {
+    "test_id": "TC-003-A2",
+    "source_id": "PSM-UC-003 Alternative A2",
+    "purpose": "Verify active reminders, escalations, or discrepancies are reflected without unauthorized disclosure.",
+    "preconditions": "An authorized employee can view the indent; an SLA reminder, escalation, or discrepancy is active.",
+    "action_or_input": "Open the indent status.",
+    "expected_result": "The current status reflects the active reminder, escalation, or discrepancy without exposing unauthorized information.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-005-MAIN",
+    "source_id": "PSM-UC-005 Main Success Scenario",
+    "purpose": "Withdraw or cancel a pending indent in a state where policy permits the action.",
+    "preconditions": "The employee owns or is authorized to act on an existing indent in a permissible state.",
+    "action_or_input": "Select Withdraw or Cancel, then confirm the action.",
+    "expected_result": "The indent enters the applicable withdrawn or cancelled state; the action is audited and relevant stakeholders are notified.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-005-A1",
+    "source_id": "PSM-UC-005 Alternative A1",
+    "purpose": "Verify withdrawal or cancellation is blocked in a non-permissible state.",
+    "preconditions": "The employee is authorized to view an existing indent whose current state is not permissible for withdrawal or cancellation.",
+    "action_or_input": "Select Withdraw or Cancel.",
+    "expected_result": "The action is blocked and the indent remains unchanged.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-007-MAIN",
+    "source_id": "PSM-UC-007 Main Success Scenario",
+    "purpose": "Check stock and reserve sufficient allocable quantity for internal issue.",
+    "preconditions": "An indent exists and stock records are available; allocable departmental or central stock is sufficient.",
+    "action_or_input": "Department Admin opens the indent stock view, reviews availability and reservations, and reserves the required quantity.",
+    "expected_result": "The system displays stock and reservations, records the reservation, updates allocable availability, and marks insufficient-stock cases for external procurement progression when applicable.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-007-A1",
+    "source_id": "PSM-UC-007 Alternative A1",
+    "purpose": "Verify a partial stock availability result is recorded without assuming split fulfilment.",
+    "preconditions": "An indent exists and only part of its requested quantity is allocable.",
+    "action_or_input": "Department Admin checks stock availability for the indent.",
+    "expected_result": "The partial stock result is recorded; no split-fulfilment behavior beyond the specification is applied.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-007-A2",
+    "source_id": "PSM-UC-007 Alternative A2",
+    "purpose": "Verify the stock check remains pending when stock records are unavailable.",
+    "preconditions": "An indent exists; stock records are unavailable.",
+    "action_or_input": "Department Admin attempts to check stock availability.",
+    "expected_result": "The check cannot be completed and the indent remains pending review.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-008-MAIN",
+    "source_id": "PSM-UC-008 Main Success Scenario",
+    "purpose": "Record and post an authorized stock adjustment with its audit entry.",
+    "preconditions": "Department Admin is authorized; a consistent source event and stock item/location exist; no unresolved discrepancy blocks posting.",
+    "action_or_input": "Select the stock item, location, and source event; enter the authorized adjustment and reason or reference.",
+    "expected_result": "The system validates role and source-event consistency, posts the adjustment, and records an audit entry.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-008-A1",
+    "source_id": "PSM-UC-008 Alternative A1",
+    "purpose": "Verify an adjustment linked to an unresolved discrepancy is not finally posted.",
+    "preconditions": "The proposed stock adjustment is linked to an unresolved discrepancy.",
+    "action_or_input": "Attempt to record and post the adjustment.",
+    "expected_result": "Final posting is blocked.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-008-A2",
+    "source_id": "PSM-UC-008 Alternative A2",
+    "purpose": "Verify an unauthorized stock adjustment is blocked.",
+    "preconditions": "The actor lacks authorization to record the stock adjustment.",
+    "action_or_input": "Attempt to record and post the adjustment.",
+    "expected_result": "The adjustment is blocked.",
+    "test_type": "Access Control"
+  },
+  {
+    "test_id": "TC-009-MAIN",
+    "source_id": "PSM-UC-009 Main Success Scenario",
+    "purpose": "Schedule picking and dispatch or collection readiness for an approved internal issue.",
+    "preconditions": "An approved internal issue exists with a reserved quantity.",
+    "action_or_input": "Department Admin opens the issue, schedules picking, and records dispatch or readiness for collection.",
+    "expected_result": "The issue state is updated, the reservation is retained until the applicable receipt or posting point, the action is logged, and the requestor is alerted.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-009-A1",
+    "source_id": "PSM-UC-009 Alternative A1",
+    "purpose": "Verify an internal issue cannot proceed when verified inventory correction makes reserved stock unavailable.",
+    "preconditions": "An approved internal issue exists; verified inventory correction shows reserved stock is no longer allocable.",
+    "action_or_input": "Attempt to proceed with the internal issue.",
+    "expected_result": "The issue cannot proceed and the indent returns to stock or procurement review.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-010-MAIN",
+    "source_id": "PSM-UC-010 Main Success Scenario",
+    "purpose": "Generate, review, optionally export, and log an operational, procurement, or stock report.",
+    "preconditions": "The user is authorized for the selected report and its data.",
+    "action_or_input": "Select an operational, procurement, or stock report; supply supported filters; generate and review it; optionally export it.",
+    "expected_result": "The report is generated and its generation event is logged.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-010-A1",
+    "source_id": "PSM-UC-010 Alternative A1",
+    "purpose": "Verify access to a restricted report or data set is denied.",
+    "preconditions": "The user lacks access to the selected report or data set.",
+    "action_or_input": "Attempt to access the report or data set.",
+    "expected_result": "Access is denied.",
+    "test_type": "Access Control"
+  },
+  {
+    "test_id": "TC-011-MAIN",
+    "source_id": "PSM-UC-011 Main Success Scenario",
+    "purpose": "Review an indent, record priority where relevant, and route it for the applicable next step.",
+    "preconditions": "An indent is available for Department Admin review.",
+    "action_or_input": "Review its duplicate flag and stock result, record criticality or priority where relevant, and approve it for internal issue or the next configured approval or recommendation step.",
+    "expected_result": "The indent is routed under the applicable workflow and the decision is recorded.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-011-A1",
+    "source_id": "PSM-UC-011 Alternative A1",
+    "purpose": "Verify Department Admin can reject an indent only with a justification.",
+    "preconditions": "An indent is available for Department Admin review.",
+    "action_or_input": "Reject the indent and provide a rejection justification.",
+    "expected_result": "The rejection is recorded with the mandatory justification.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-011-A2",
+    "source_id": "PSM-UC-011 Alternative A2",
+    "purpose": "Verify a potential duplicate is reviewed rather than automatically cancelled.",
+    "preconditions": "An indent flagged as a potential duplicate is available for Department Admin review.",
+    "action_or_input": "Review the flagged indent.",
+    "expected_result": "The duplicate is presented for review and the indent is not automatically cancelled.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-012-MAIN",
+    "source_id": "PSM-UC-012 Main Success Scenario",
+    "purpose": "Complete final review, approve procurement, and route it to Procurement & Stores Admin.",
+    "preconditions": "An indent is routed to Director or Registrar for final review with audit and recommendation information.",
+    "action_or_input": "Review the indent and approve it.",
+    "expected_result": "The approved procurement is routed to Procurement & Stores Admin for tender or PO execution; the decision is recorded and applicable notifications are sent.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-012-A1",
+    "source_id": "PSM-UC-012 Alternative A1",
+    "purpose": "Verify a final rejection requires justification and enters Rejected state.",
+    "preconditions": "An indent is routed to Director or Registrar for final review.",
+    "action_or_input": "Reject the indent and provide a justification.",
+    "expected_result": "The rejection is recorded with mandatory justification and the indent enters Rejected state.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-013-MAIN",
+    "source_id": "PSM-UC-013 Main Success Scenario",
+    "purpose": "Verify a matching invoice against its PO and GRN.",
+    "preconditions": "The invoice, linked PO, and GRN are available; required quantities, amounts, receipt status, and vendor verification match.",
+    "action_or_input": "Accounts Admin opens the invoice and linked PO/GRN, performs three-way matching, and records verification.",
+    "expected_result": "The invoice is verified, the eligible portion is determined for partial receipt or invoice as applicable, and invoice status and verification action are recorded.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-013-A1",
+    "source_id": "PSM-UC-013 Alternative A1",
+    "purpose": "Verify a PO, GRN, and invoice mismatch places the invoice on hold.",
+    "preconditions": "The invoice, linked PO, and GRN contain a mismatch.",
+    "action_or_input": "Accounts Admin attempts three-way matching.",
+    "expected_result": "The invoice is placed on hold.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-013-A2",
+    "source_id": "PSM-UC-013 Alternative A2",
+    "purpose": "Verify an invoice with invalid vendor verification cannot proceed to payment.",
+    "preconditions": "The invoice is linked to a vendor whose verification is not valid.",
+    "action_or_input": "Attempt to proceed with the invoice toward payment.",
+    "expected_result": "The invoice cannot proceed to payment.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-014-MAIN",
+    "source_id": "PSM-UC-014 Main Success Scenario",
+    "purpose": "Review authorized procurement and financial records and generate or export an audit output.",
+    "preconditions": "The auditor is authorized for the selected audit scope.",
+    "action_or_input": "Select the audit scope, retrieve and review its relevant records, and generate or export the authorized audit output.",
+    "expected_result": "Relevant records and audit history are available; the authorized audit access or report is logged.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-014-A1",
+    "source_id": "PSM-UC-014 Alternative A1",
+    "purpose": "Verify unauthorized data is excluded from audit scope.",
+    "preconditions": "The auditor's authorized scope excludes some records or data.",
+    "action_or_input": "Retrieve records and generate the audit output for the authorized scope.",
+    "expected_result": "Unauthorized data is excluded.",
+    "test_type": "Access Control"
+  },
+  {
+    "test_id": "TC-015-MAIN",
+    "source_id": "PSM-UC-015 Main Success Scenario",
+    "purpose": "Generate, optionally export, and log a financial report.",
+    "preconditions": "Accounts Admin is authorized to access the selected financial report and data.",
+    "action_or_input": "Select a financial report type, supply supported filters, generate and review it, and optionally export it.",
+    "expected_result": "The report is generated from available procurement and payment data, and the generation event is logged.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-015-A1",
+    "source_id": "PSM-UC-015 Alternative A1",
+    "purpose": "Verify unauthorized financial report or data access is blocked.",
+    "preconditions": "Accounts Admin is not authorized for the selected report or data.",
+    "action_or_input": "Attempt to access the report or data.",
+    "expected_result": "Access is blocked.",
+    "test_type": "Access Control"
+  },
+  {
+    "test_id": "TC-016-MAIN",
+    "source_id": "PSM-UC-016 Main Success Scenario",
+    "purpose": "Review and recommend an indent for the next configured approval or procurement step.",
+    "preconditions": "An indent is available to the Department Head for review.",
+    "action_or_input": "Review the indent, stock information, necessity, priority, and budget considerations; record a recommendation.",
+    "expected_result": "The indent is routed according to the configured approval path; the recommendation is recorded and applicable notifications are sent.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-016-A1",
+    "source_id": "PSM-UC-016 Alternative A1",
+    "purpose": "Verify a recommendation for changes returns the indent to the employee for modification.",
+    "preconditions": "An indent is available to the Department Head for review.",
+    "action_or_input": "Recommend changes to the employee.",
+    "expected_result": "The indent returns to the employee for modification through PSM-UC-023.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-016-A2",
+    "source_id": "PSM-UC-016 Alternative A2",
+    "purpose": "Verify Department Head rejection requires justification.",
+    "preconditions": "An indent is available to the Department Head for review.",
+    "action_or_input": "Reject the indent and provide a justification.",
+    "expected_result": "The rejection is recorded with the mandatory justification.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-017-MAIN",
+    "source_id": "PSM-UC-017 Main Success Scenario",
+    "purpose": "View authorized stock availability and reservations during Department Head review.",
+    "preconditions": "An indent is available for Department Head review and stock information is available.",
+    "action_or_input": "Open the stock view for the indent and use the displayed information in the review or recommendation.",
+    "expected_result": "Authorized departmental and central availability and reservations are displayed for the review.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-017-A1",
+    "source_id": "PSM-UC-017 Alternative A1",
+    "purpose": "Verify unavailable stock information is not treated as a current stock result.",
+    "preconditions": "An indent is available for Department Head review; stock information is unavailable.",
+    "action_or_input": "Open the stock view for the indent.",
+    "expected_result": "The review cannot rely on a current stock result.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-019-MAIN",
+    "source_id": "PSM-UC-019 Main Success Scenario",
+    "purpose": "Create or update a vendor record and record its verification status and history.",
+    "preconditions": "Procurement & Stores Admin is authorized to manage vendor master data.",
+    "action_or_input": "Create or open a vendor record; enter required vendor information, GST and bank details, and compliance documents; complete verification.",
+    "expected_result": "The system validates required information, records the vendor as verified/eligible or unverified/ineligible as applicable, and retains version history and an audit record.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-019-A1",
+    "source_id": "PSM-UC-019 Alternative A1",
+    "purpose": "Verify incomplete or invalid vendor information leaves the vendor unverified and ineligible.",
+    "preconditions": "Procurement & Stores Admin is authorized to manage vendor data.",
+    "action_or_input": "Submit vendor details with required verification information incomplete or invalid.",
+    "expected_result": "The vendor remains unverified and cannot be used for PO issuance or payment.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-019-A2",
+    "source_id": "PSM-UC-019 Alternative A2",
+    "purpose": "Verify vendor master updates preserve traceable prior versions.",
+    "preconditions": "An existing vendor record has a stored version.",
+    "action_or_input": "Update the vendor record.",
+    "expected_result": "The previous vendor-master version remains traceable.",
+    "test_type": "Audit"
+  },
+  {
+    "test_id": "TC-020-MAIN",
+    "source_id": "PSM-UC-020 Main Success Scenario",
+    "purpose": "Record a goods discrepancy, request an applicable resolution, and gate final posting or payment.",
+    "preconditions": "An authorized receiving actor can access a delivered goods record with a discrepancy.",
+    "action_or_input": "Record discrepancy details and available evidence, link the case to the receipt/indent/PO, select an applicable requested resolution, and submit.",
+    "expected_result": "A discrepancy case is created or updated; Procurement & Stores Admin is notified; Accounts can see the unresolved discrepancy so final posting or payment remains gated.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-020-A1",
+    "source_id": "PSM-UC-020 Alternative A1",
+    "purpose": "Verify accepted and discrepant portions remain separately traceable.",
+    "preconditions": "Only part of a receipt is discrepant.",
+    "action_or_input": "Record the discrepancy for the affected portion.",
+    "expected_result": "Accepted and discrepant portions remain separately traceable.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-020-A2",
+    "source_id": "PSM-UC-020 Alternative A2",
+    "purpose": "Verify an immediately resolved issue returns to the accepted receipt path.",
+    "preconditions": "A discrepancy has been identified and can be resolved immediately as accepted.",
+    "action_or_input": "Resolve the issue immediately as accepted.",
+    "expected_result": "The receipt can return to the accepted receipt path.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-021-MAIN",
+    "source_id": "PSM-UC-021 Main Success Scenario",
+    "purpose": "Create an inter-department transfer request and route an allocable request for source processing.",
+    "preconditions": "Requesting Department Admin is authorized; source and destination locations and requested quantities are available.",
+    "action_or_input": "Create the transfer request with source, destination, and quantities.",
+    "expected_result": "The request is recorded, source availability is checked, an allocable request is prepared for source processing and reservation, and the relevant source party is notified.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-021-A1",
+    "source_id": "PSM-UC-021 Alternative A1",
+    "purpose": "Verify a transfer request cannot proceed for unavailable source quantity.",
+    "preconditions": "Requested transfer quantity exceeds sufficient allocable source stock.",
+    "action_or_input": "Submit the transfer request.",
+    "expected_result": "The request cannot proceed for the unavailable quantity.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-022-MAIN",
+    "source_id": "PSM-UC-022 Main Success Scenario",
+    "purpose": "Publish a tender, record bids, evaluate them, and record committee selection.",
+    "preconditions": "A tender procurement is ready; the defined scope, criteria, and timeline are available.",
+    "action_or_input": "Publish the tender invitation, record submitted bids, have the Procurement Committee evaluate them against the defined criteria, and record its approval or selection.",
+    "expected_result": "Tender decision and supporting records are retained, and the selected vendor is available for PO creation subject to vendor verification.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-022-A1",
+    "source_id": "PSM-UC-022 Alternative A1",
+    "purpose": "Verify a tender without an approved selection remains unresolved.",
+    "preconditions": "A tender has not resulted in an approved selection.",
+    "action_or_input": "Complete tender evaluation without recording an approved selection.",
+    "expected_result": "The tender remains unresolved or requires a new tender action according to policy; no automatic retender occurs.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-023-MAIN",
+    "source_id": "PSM-UC-023 Main Success Scenario",
+    "purpose": "Modify an eligible pending indent while preserving version history and rerouting it for review.",
+    "preconditions": "The employee is authorized to modify an indent in a modifiable state.",
+    "action_or_input": "Edit the indent, satisfy mandatory validation, submit the modified version, and allow duplicate checking.",
+    "expected_result": "The prior version is retained; the new version is created and logged; the indent is routed through the applicable review path.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-023-A1",
+    "source_id": "PSM-UC-023 Alternative A1",
+    "purpose": "Verify editing is blocked when the indent state is not modifiable.",
+    "preconditions": "The employee can access an indent whose state is not modifiable.",
+    "action_or_input": "Attempt to edit the indent.",
+    "expected_result": "Editing is blocked and the prior active version and state remain intact.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-023-A2",
+    "source_id": "PSM-UC-023 Alternative A2",
+    "purpose": "Verify a modified version that fails validation is not resubmitted.",
+    "preconditions": "The employee is authorized to modify an indent in a modifiable state.",
+    "action_or_input": "Edit the indent with information that fails mandatory validation and attempt to resubmit.",
+    "expected_result": "The modified version is not resubmitted and the prior active version and state remain intact.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-024-MAIN",
+    "source_id": "PSM-UC-024 Main Success Scenario",
+    "purpose": "Repeat a previous indent into a distinct editable draft and submit it as a new indent.",
+    "preconditions": "The employee can access the previous indent and is authorized to create an indent.",
+    "action_or_input": "Select the previous indent, create a draft from reusable data, change required details, and submit through PSM-UC-001.",
+    "expected_result": "A new draft is created; on submission it receives its own ID and audit history; the previous indent remains unchanged.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-024-A1",
+    "source_id": "PSM-UC-024 Alternative A1",
+    "purpose": "Verify repeat or reorder is unavailable for an inaccessible prior indent.",
+    "preconditions": "The prior indent is not accessible to the employee.",
+    "action_or_input": "Attempt to repeat or reorder the prior indent.",
+    "expected_result": "Repeat or reorder is unavailable; the previous indent remains unchanged and no new indent is created.",
+    "test_type": "Access Control"
+  },
+  {
+    "test_id": "TC-025-MAIN",
+    "source_id": "PSM-UC-025 Main Success Scenario",
+    "purpose": "Record the procurement method and route an externally sourced indent for approval or execution.",
+    "preconditions": "Stock is insufficient; prior required department review has occurred; procurement is ready for PS Admin review.",
+    "action_or_input": "Review the indent, stock result, approval history, and value; record the method determined under the configured rules; route for final review if required.",
+    "expected_result": "The procurement-method decision and supporting record are saved; the indent is routed for required final review or proceeds to direct PO creation or tender management as applicable.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-025-A1",
+    "source_id": "PSM-UC-025 Alternative A1",
+    "purpose": "Verify procurement execution is blocked when required prior approval is missing.",
+    "preconditions": "An externally routed indent is missing a required prior approval.",
+    "action_or_input": "Attempt procurement execution.",
+    "expected_result": "Procurement execution is blocked.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-025-A2",
+    "source_id": "PSM-UC-025 Alternative A2",
+    "purpose": "Verify an unverified selected vendor must complete onboarding or verification before PO issuance.",
+    "preconditions": "Procurement is ready for execution but the selected vendor is not verified.",
+    "action_or_input": "Attempt to proceed toward PO issuance with the selected vendor.",
+    "expected_result": "Vendor onboarding or verification is required before PO issuance.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-026-MAIN",
+    "source_id": "PSM-UC-026 Main Success Scenario",
+    "purpose": "Create and issue a PO linked to an approved indent and verified vendor.",
+    "preconditions": "Required approvals are complete; a vendor is selected and verified.",
+    "action_or_input": "Open the approved procurement, create a PO linked to its indent and vendor, and issue it.",
+    "expected_result": "The system records the PO status and audit history; the PO is issued and centrally tracked.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-026-A1",
+    "source_id": "PSM-UC-026 Alternative A1",
+    "purpose": "Verify PO creation or issuance is blocked when required approval is missing.",
+    "preconditions": "The procurement is missing a required approval.",
+    "action_or_input": "Attempt to create or issue a PO.",
+    "expected_result": "PO creation or issuance is blocked.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-026-A2",
+    "source_id": "PSM-UC-026 Alternative A2",
+    "purpose": "Verify PO issuance is blocked when vendor verification is incomplete.",
+    "preconditions": "Required approvals are complete; vendor verification is incomplete.",
+    "action_or_input": "Attempt to issue the PO.",
+    "expected_result": "PO issuance is blocked.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-027-MAIN",
+    "source_id": "PSM-UC-027 Main Success Scenario",
+    "purpose": "View and update an authorized PO status or delivery schedule.",
+    "preconditions": "A PO exists; PS Admin is authorized to update it.",
+    "action_or_input": "Open the PO and record an authorized status or schedule update that includes a dispatch or delivery status event.",
+    "expected_result": "The current status and schedule are displayed; the update is timestamped and audited; relevant stakeholders are alerted for the dispatch or delivery event.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-027-A1",
+    "source_id": "PSM-UC-027 Alternative A1",
+    "purpose": "Verify an unauthorized user cannot update PO status or schedule.",
+    "preconditions": "A PO exists; the user lacks authorization to update it.",
+    "action_or_input": "Attempt to update the PO status or delivery schedule.",
+    "expected_result": "The update is blocked and the PO remains unchanged.",
+    "test_type": "Access Control"
+  },
+  {
+    "test_id": "TC-028-MAIN",
+    "source_id": "PSM-UC-028 Main Success Scenario",
+    "purpose": "Inspect delivered goods and record an accepted receipt in a GRN.",
+    "preconditions": "A relevant issue or PO exists; the receiving actor is authorized; the delivered goods are accepted.",
+    "action_or_input": "Open the delivery record, inspect the goods, and record quantities and condition.",
+    "expected_result": "The system creates or updates the GRN, marks accepted quantities accepted subject to required delivery confirmation, records the inspection, and notifies relevant stakeholders.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-028-A1",
+    "source_id": "PSM-UC-028 Alternative A1",
+    "purpose": "Verify partial receipt records accepted quantity and leaves the outstanding quantity open.",
+    "preconditions": "A relevant issue or PO exists; only part of the ordered or issued quantity is received.",
+    "action_or_input": "Inspect the delivery and record the partial accepted quantity.",
+    "expected_result": "The GRN records the accepted received quantity and leaves the outstanding quantity open.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-028-A2",
+    "source_id": "PSM-UC-028 Alternative A2",
+    "purpose": "Verify rejected, damaged, or mismatched goods are recorded and routed to discrepancy handling.",
+    "preconditions": "A relevant issue or PO exists; delivered goods are rejected, damaged, or mismatched.",
+    "action_or_input": "Inspect and record the affected goods.",
+    "expected_result": "The GRN records the rejection or discrepancy and invokes PSM-UC-020.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-029-MAIN",
+    "source_id": "PSM-UC-029 Main Success Scenario",
+    "purpose": "Process an eligible vendor payment and record its status and alert.",
+    "preconditions": "An invoice record exists; Accounts Admin is authorized; required PO, accepted receipt, confirmation, invoice, vendor, and hold conditions permit payment.",
+    "action_or_input": "Open the invoice/payment record, evaluate the required conditions, and record processing or release for an eligible full or partial amount.",
+    "expected_result": "Payment status and audit history are recorded and the applicable payment-status alert is sent.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-029-A1",
+    "source_id": "PSM-UC-029 Alternative A1",
+    "purpose": "Verify payment remains on hold when a required condition is not satisfied.",
+    "preconditions": "An invoice/payment record exists; at least one required payment condition is unsatisfied.",
+    "action_or_input": "Attempt payment processing.",
+    "expected_result": "Payment remains or becomes On Hold with a recorded reason.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-029-A2",
+    "source_id": "PSM-UC-029 Alternative A2",
+    "purpose": "Verify unresolved invoice mismatch prevents payment release.",
+    "preconditions": "An invoice/payment record exists with an unresolved mismatch.",
+    "action_or_input": "Attempt to release payment.",
+    "expected_result": "Payment release is prevented.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-029-A3",
+    "source_id": "PSM-UC-029 Alternative A3",
+    "purpose": "Verify an unverified vendor cannot receive payment.",
+    "preconditions": "An invoice/payment record exists; the vendor is unverified.",
+    "action_or_input": "Attempt to release payment.",
+    "expected_result": "Payment release is prevented.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-030-MAIN",
+    "source_id": "PSM-UC-030 Main Success Scenario",
+    "purpose": "View P&S dashboard metrics and permitted records within the user's authorized scope.",
+    "preconditions": "The user is authenticated and has dashboard access.",
+    "action_or_input": "Open the P&S dashboard and navigate to a permitted detailed record.",
+    "expected_result": "The system identifies the authorized dashboard scope and displays current status and key metrics within it; no business state changes.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-030-A1",
+    "source_id": "PSM-UC-030 Alternative A1",
+    "purpose": "Verify restricted dashboard data is omitted.",
+    "preconditions": "The user's dashboard scope excludes some data.",
+    "action_or_input": "Open the P&S dashboard.",
+    "expected_result": "Restricted data is omitted.",
+    "test_type": "Access Control"
+  },
+  {
+    "test_id": "TC-031-MAIN",
+    "source_id": "PSM-UC-031 Main Success Scenario",
+    "purpose": "Create and activate an authorized scheduled-report definition.",
+    "preconditions": "The user is authorized for the selected report and scheduling function.",
+    "action_or_input": "Select a report and supported filters, define the schedule using available parameters, and save it.",
+    "expected_result": "The scheduled-report definition is saved and the system confirms the schedule is active.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-031-A1",
+    "source_id": "PSM-UC-031 Alternative A1",
+    "purpose": "Verify an unauthorized report schedule is not created.",
+    "preconditions": "The user is unauthorized for the selected report or scheduling function.",
+    "action_or_input": "Attempt to schedule the report.",
+    "expected_result": "No schedule is created and no future execution is established from the failed request.",
+    "test_type": "Access Control"
+  },
+  {
+    "test_id": "TC-032-MAIN",
+    "source_id": "PSM-UC-032 Main Success Scenario",
+    "purpose": "Resolve a return, replacement, or warranty case with traceable communication and adjustments.",
+    "preconditions": "An open discrepancy case exists; Procurement & Stores Admin is authorized to resolve it.",
+    "action_or_input": "Review the evidence, record vendor communication and the authorized resolution, record any return or replacement progression, apply required inventory and accounting adjustments, and close when resolved.",
+    "expected_result": "Resolution history and required adjustments are recorded, and the case is closed when resolved.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-032-A1",
+    "source_id": "PSM-UC-032 Alternative A1",
+    "purpose": "Verify replacement delivery is inspected before the case is treated as fully resolved.",
+    "preconditions": "An open case has a replacement delivery.",
+    "action_or_input": "Attempt to treat the case as fully resolved without completing replacement inspection and GRN recording through PSM-UC-028.",
+    "expected_result": "The replacement must be inspected and recorded through PSM-UC-028 before the case can be treated as fully resolved.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-032-A2",
+    "source_id": "PSM-UC-032 Alternative A2",
+    "purpose": "Verify applicable invoice or payment hold remains while resolution is pending.",
+    "preconditions": "A discrepancy case remains unresolved and an invoice or payment hold applies.",
+    "action_or_input": "Leave the case resolution pending and inspect the related invoice/payment status.",
+    "expected_result": "The applicable invoice or payment hold remains effective.",
+    "test_type": "Alternative"
+  },
+  {
+    "test_id": "TC-033-MAIN",
+    "source_id": "PSM-UC-033 Main Success Scenario",
+    "purpose": "Reserve and dispatch an available inter-departmental stock transfer.",
+    "preconditions": "A transfer request exists; source stock is available and allocable; source user is authorized.",
+    "action_or_input": "Review the request and availability, reserve the approved quantity, and record dispatch.",
+    "expected_result": "The transfer is dispatched and its state updated; the destination is notified.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-033-A1",
+    "source_id": "PSM-UC-033 Alternative A1",
+    "purpose": "Verify unavailable source quantity cannot be dispatched.",
+    "preconditions": "A transfer request exists but source stock is insufficient for the requested quantity.",
+    "action_or_input": "Attempt to dispatch the unavailable quantity.",
+    "expected_result": "The unavailable quantity cannot be dispatched and the transfer remains unfulfilled for that quantity.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-034-MAIN",
+    "source_id": "PSM-UC-034 Main Success Scenario",
+    "purpose": "Confirm a dispatched transfer and complete both stock-ledger postings.",
+    "preconditions": "A transfer is in Dispatched state.",
+    "action_or_input": "Destination Department Admin opens the transfer and confirms receipt.",
+    "expected_result": "The transfer is completed, source and destination ledgers are updated, and a completion audit entry is recorded.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-034-A1",
+    "source_id": "PSM-UC-034 Alternative A1",
+    "purpose": "Verify an unconfirmed transfer receipt leaves the transfer open without completed ledger posting.",
+    "preconditions": "A transfer is in Dispatched state; receipt cannot be confirmed.",
+    "action_or_input": "Attempt to confirm receipt without being able to confirm it.",
+    "expected_result": "The transfer remains open and completed ledger posting is not performed.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-035-MAIN",
+    "source_id": "PSM-UC-035 Main Success Scenario",
+    "purpose": "Generate an authorized scheduled report when its schedule becomes due and log the generation.",
+    "preconditions": "An active authorized report schedule exists; the report definition and permitted filters are valid.",
+    "action_or_input": "Allow the configured report-generation schedule to become due.",
+    "expected_result": "The system validates the active authorized schedule and report definition, generates the report using permitted criteria, records the generation event, and makes the report available through the authorized reporting mechanism.",
+    "test_type": "Positive"
+  },
+  {
+    "test_id": "TC-035-A1",
+    "source_id": "PSM-UC-035 Alternative A1",
+    "purpose": "Verify a disabled or no-longer-authorized schedule does not generate a report.",
+    "preconditions": "A scheduled report is disabled or is no longer authorized.",
+    "action_or_input": "Allow the configured schedule to become due.",
+    "expected_result": "No report is generated and the failed or blocked attempt is auditable.",
+    "test_type": "Negative"
+  },
+  {
+    "test_id": "TC-035-A2",
+    "source_id": "PSM-UC-035 Alternative A2",
+    "purpose": "Verify report generation failure is logged without recording a successful generation.",
+    "preconditions": "An active authorized report schedule becomes due, but report generation fails.",
+    "action_or_input": "Run the scheduled report generation.",
+    "expected_result": "No successful generation is recorded; the failure is logged for authorized follow-up.",
+    "test_type": "Negative"
+  }
+]

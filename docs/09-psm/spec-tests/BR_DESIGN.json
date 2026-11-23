@@ -1,0 +1,425 @@
+[
+  {
+    "test_id": "TC-001",
+    "source_id": "BR-PSM-001 missing required information",
+    "purpose": "Block submission when source-required indent information is missing and identify the missing information.",
+    "preconditions": ["An employee can submit an indent."],
+    "action_or_input": "Submit an indent with one or more of item details, quantity, estimated cost, or justification missing.",
+    "expected_result": "Submission is blocked and the missing required information is identified.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-002",
+    "source_id": "BR-PSM-001 all source-required information present",
+    "purpose": "Allow submission when all source-required indent information is present.",
+    "preconditions": ["An employee can submit an indent."],
+    "action_or_input": "Submit an indent containing item details, quantity, estimated cost, and justification.",
+    "expected_result": "The completeness rule does not block submission.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-003",
+    "source_id": "BR-PSM-003 sufficient allocable stock",
+    "purpose": "Route an indent to internal issue when sufficient allocable departmental or central stock is available.",
+    "preconditions": ["A submitted indent requires fulfilment.", "Sufficient allocable stock is available in departmental or central stock records."],
+    "action_or_input": "Process the indent for fulfilment.",
+    "expected_result": "The system checks stock and routes the indent to internal issue.",
+    "test_type": "routing"
+  },
+  {
+    "test_id": "TC-004",
+    "source_id": "BR-PSM-003 insufficient allocable stock",
+    "purpose": "Route an indent toward external procurement when sufficient allocable stock is unavailable.",
+    "preconditions": ["A submitted indent requires fulfilment.", "Departmental and central stock together do not provide sufficient allocable stock."],
+    "action_or_input": "Process the indent for fulfilment.",
+    "expected_result": "The system checks stock and routes the indent toward external procurement.",
+    "test_type": "routing"
+  },
+  {
+    "test_id": "TC-005",
+    "source_id": "BR-PSM-004 configured approval hierarchy",
+    "purpose": "Verify approval routing follows the configured hierarchy and applicable cost threshold.",
+    "preconditions": ["An indent requires approval or recommendation.", "A configured approval hierarchy and applicable cost threshold determine the required authority."],
+    "action_or_input": "Submit the indent for approval.",
+    "expected_result": "The indent is routed to the authority required by the configured hierarchy and threshold.",
+    "test_type": "routing"
+  },
+  {
+    "test_id": "TC-006",
+    "source_id": "BR-PSM-005 rejection without justification",
+    "purpose": "Require a justification before an approver can reject an indent.",
+    "preconditions": ["An indent is awaiting an approver's decision."],
+    "action_or_input": "Attempt to reject the indent without recording a justification.",
+    "expected_result": "The rejection is not completed without a justification.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-007",
+    "source_id": "BR-PSM-005 rejection with justification",
+    "purpose": "Verify a justified rejection updates the indent, notifies the requestor, and is auditable.",
+    "preconditions": ["An indent is awaiting an approver's decision."],
+    "action_or_input": "Reject the indent with a justification.",
+    "expected_result": "The indent is set to rejected, the requestor is notified, and the decision is retained in the audit trail.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-008",
+    "source_id": "BR-PSM-006 lifecycle event notifications and history",
+    "purpose": "Verify notifications and communication-history retention for specified lifecycle events.",
+    "preconditions": ["Relevant stakeholders and notification settings are configured."],
+    "action_or_input": "Exercise each event as a parameterized case: submission, approval, dispatch, receipt, invoice, payment, SLA reminder, and SLA escalation.",
+    "expected_result": "For each event, the applicable notification is sent to configured relevant stakeholders and the resulting communication history is retained.",
+    "test_type": "parameterized"
+  },
+  {
+    "test_id": "TC-009",
+    "source_id": "BR-PSM-007 permissible-state actions",
+    "purpose": "Allow modification, withdrawal, or cancellation only when the indent is in a policy-designated permissible state.",
+    "preconditions": ["An existing indent is in a state designated permissible by configured procurement policy."],
+    "action_or_input": "Attempt modification, withdrawal, and cancellation as separate parameterized cases.",
+    "expected_result": "Each requested action is allowed when permitted by policy; a modification is saved as a new version and re-enters the applicable review path.",
+    "test_type": "parameterized"
+  },
+  {
+    "test_id": "TC-010",
+    "source_id": "BR-PSM-007 impermissible-state actions",
+    "purpose": "Block modification, withdrawal, or cancellation when the indent is not in a policy-designated permissible state.",
+    "preconditions": ["An existing indent is in a state not designated permissible by configured procurement policy."],
+    "action_or_input": "Attempt modification, withdrawal, and cancellation as separate parameterized cases.",
+    "expected_result": "Each action is blocked.",
+    "test_type": "parameterized"
+  },
+  {
+    "test_id": "TC-011",
+    "source_id": "BR-PSM-008 configured direct-procurement outcome",
+    "purpose": "Verify external procurement uses direct procurement when required by configured thresholds and policy.",
+    "preconditions": ["An indent is routed for external procurement.", "Configured thresholds and policy require direct procurement for this case."],
+    "action_or_input": "Process the indent's procurement method.",
+    "expected_result": "Direct procurement is selected.",
+    "test_type": "routing"
+  },
+  {
+    "test_id": "TC-012",
+    "source_id": "BR-PSM-008 configured tender-procurement outcome",
+    "purpose": "Verify external procurement uses tender procurement when required by configured thresholds and policy.",
+    "preconditions": ["An indent is routed for external procurement.", "Configured thresholds and policy require tender procurement for this case."],
+    "action_or_input": "Process the indent's procurement method.",
+    "expected_result": "Tender procurement is selected.",
+    "test_type": "routing"
+  },
+  {
+    "test_id": "TC-013",
+    "source_id": "BR-PSM-009 confirmed receipt without unresolved discrepancy",
+    "purpose": "Verify a confirmed receipt without unresolved discrepancy can proceed to final stock posting and payment release, subject to other required conditions.",
+    "preconditions": ["Goods have been delivered.", "Receipt is accepted and delivery is confirmed.", "No delivery discrepancy is unresolved.", "Other payment eligibility conditions are satisfied."],
+    "action_or_input": "Complete the receipt and evaluate final stock posting and payment eligibility.",
+    "expected_result": "Final stock posting and payment release are not blocked by the receipt-confirmation or discrepancy gate.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-014",
+    "source_id": "BR-PSM-009 unresolved delivery discrepancy",
+    "purpose": "Verify an unresolved delivery discrepancy blocks final stock posting and payment release.",
+    "preconditions": ["Goods have been delivered.", "A delivery discrepancy remains unresolved."],
+    "action_or_input": "Attempt final stock posting and payment release.",
+    "expected_result": "Discrepancy handling is opened and both final stock posting and payment release are blocked until resolution.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-015",
+    "source_id": "BR-PSM-010 high-value final approval approved path",
+    "purpose": "Verify the configured high-value final-approval route and return to PS Admin after approval.",
+    "preconditions": ["Configured policy requires Director/Registrar final review.", "The Procurement & Stores Admin has made a recommendation."],
+    "action_or_input": "Route the recommendation for final review and approve the procurement.",
+    "expected_result": "The recommendation is routed to the Director/Registrar, and approved procurement returns to the Procurement & Stores Admin for PO/tender execution.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-016",
+    "source_id": "BR-PSM-010 high-value final approval rejected path",
+    "purpose": "Verify a rejected high-value final review closes the indent as rejected with justification.",
+    "preconditions": ["Configured policy requires Director/Registrar final review.", "The Procurement & Stores Admin has made a recommendation."],
+    "action_or_input": "Reject the recommendation with a justification.",
+    "expected_result": "The indent is closed as rejected and the justification is recorded.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-017",
+    "source_id": "BR-PSM-012 unverified vendor gate",
+    "purpose": "Block PO issuance and payment for a vendor whose required master data is unverified.",
+    "preconditions": ["A vendor lacks verification of one or more required categories: GST details, bank details, or required compliance documents."],
+    "action_or_input": "Attempt PO issuance and vendor payment as separate parameterized cases.",
+    "expected_result": "Both PO issuance and payment are blocked while the vendor is unverified.",
+    "test_type": "parameterized"
+  },
+  {
+    "test_id": "TC-018",
+    "source_id": "BR-PSM-012 verified vendor continuation",
+    "purpose": "Allow PO issuance or payment to continue past the vendor-verification gate when required master data is verified.",
+    "preconditions": ["The vendor's required GST details, bank details, and compliance documents are verified.", "Other applicable conditions for the attempted action are satisfied."],
+    "action_or_input": "Attempt PO issuance or vendor payment.",
+    "expected_result": "The vendor-verification gate permits continuation.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-019",
+    "source_id": "BR-PSM-013 stock reservation and allocable availability",
+    "purpose": "Verify reserved stock is excluded from availability and remains reserved through the relevant dispatch/receipt lifecycle.",
+    "preconditions": ["Stock is allocated to an internal issue or approved transfer."],
+    "action_or_input": "Reserve the allocated quantity, query allocable availability, and exercise the relevant dispatch/receipt lifecycle.",
+    "expected_result": "The reserved quantity is excluded from available stock, preventing over-commitment, and remains reserved until the relevant lifecycle releases or consumes it.",
+    "test_type": "inventory"
+  },
+  {
+    "test_id": "TC-020",
+    "source_id": "BR-PSM-014 configured SLA reminder and escalation",
+    "purpose": "Verify pending approval actions trigger configured reminders and escalation notifications and are audited.",
+    "preconditions": ["An approval action is pending.", "Configured SLA rules define a reminder or escalation condition."],
+    "action_or_input": "Advance the pending action to each configured reminder and escalation condition as parameterized cases.",
+    "expected_result": "The configured reminder or escalation notification is issued and the event is retained in the audit trail.",
+    "test_type": "parameterized"
+  },
+  {
+    "test_id": "TC-021",
+    "source_id": "BR-PSM-014 configured priority handling",
+    "purpose": "Verify higher-criticality indents receive configured approval-queue priority where policy provides it.",
+    "preconditions": ["Multiple approval tasks are pending.", "Configured policy specifies priority behavior for higher-criticality indents."],
+    "action_or_input": "Place a higher-criticality indent in the approval queue with other pending tasks.",
+    "expected_result": "The queue applies the configured priority behavior.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-022",
+    "source_id": "BR-PSM-015 potential duplicate indent",
+    "purpose": "Flag a potential duplicate for Department Admin review before procurement continues.",
+    "preconditions": ["Configured comparison criteria identify a submitted new or modified indent as a potential duplicate."],
+    "action_or_input": "Submit the new or modified indent.",
+    "expected_result": "The indent is flagged for Department Admin review before procurement continues; it is not silently merged or automatically cancelled.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TC-023",
+    "source_id": "BR-PSM-015 no potential duplicate",
+    "purpose": "Verify an indent not identified as a potential duplicate is not flagged by duplicate detection.",
+    "preconditions": ["A new or modified indent is submitted.", "Configured comparison criteria do not identify it as a potential duplicate."],
+    "action_or_input": "Submit the indent for processing.",
+    "expected_result": "Duplicate detection does not flag the indent as a potential duplicate.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-024",
+    "source_id": "BR-PSM-017 payment eligibility conditions satisfied",
+    "purpose": "Allow payment eligibility only when all required PO, receipt, verification, delivery-confirmation, and vendor-verification conditions are satisfied.",
+    "preconditions": ["A required PO exists.", "The relevant GRN/receipt is accepted.", "Invoice verification is complete.", "Delivery confirmation requirements are satisfied.", "Vendor verification is valid."],
+    "action_or_input": "Accounts evaluates the invoice for payment.",
+    "expected_result": "Payment is marked eligible.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-025",
+    "source_id": "BR-PSM-017 payment eligibility condition missing",
+    "purpose": "Hold payment when any required payment eligibility condition is not satisfied.",
+    "preconditions": ["A required payment eligibility condition is unsatisfied; exercise each condition as a parameterized case: required PO, accepted receipt, completed invoice verification, delivery confirmation, or valid vendor verification."],
+    "action_or_input": "Accounts evaluates the invoice for payment.",
+    "expected_result": "Payment is not marked eligible and is held with the reason recorded.",
+    "test_type": "parameterized"
+  },
+  {
+    "test_id": "TC-026",
+    "source_id": "BR-PSM-018 three-way match mismatch",
+    "purpose": "Place a mismatched invoice on hold and prevent payment release until the mismatch is resolved.",
+    "preconditions": ["Three-way matching identifies a mismatch among the PO, GRN, and invoice."],
+    "action_or_input": "Complete invoice verification and attempt payment release.",
+    "expected_result": "The invoice/payment is placed on hold, the reason is recorded, responsible parties are notified, and payment is not released until resolution.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-027",
+    "source_id": "BR-PSM-018 three-way match without mismatch",
+    "purpose": "Verify the mismatch-hold rule does not hold an invoice when the required three-way match has no mismatch.",
+    "preconditions": ["The PO, GRN, and invoice match as required."],
+    "action_or_input": "Complete three-way matching.",
+    "expected_result": "The invoice is not placed on hold by the mismatch rule.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-028",
+    "source_id": "BR-PSM-019 resolved return replacement or warranty case",
+    "purpose": "Verify a resolved return, replacement, or warranty case applies policy-required inventory and accounting adjustments and remains traceable.",
+    "preconditions": ["A return, replacement, or warranty case has an approved or recorded resolution.", "Applicable policy specifies the required adjustments."],
+    "action_or_input": "Record the resolution.",
+    "expected_result": "Required inventory and accounting adjustments are applied and the resolution history remains traceable.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-029",
+    "source_id": "BR-PSM-020 authorized role access",
+    "purpose": "Permit an authorized user to access a function or information within their authorized role.",
+    "preconditions": ["A user has an authorized role for the requested function or information."],
+    "action_or_input": "Access the function or information.",
+    "expected_result": "Access is permitted.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-030",
+    "source_id": "BR-PSM-020 unauthorized role access",
+    "purpose": "Deny access to a function or information when the user's role does not authorize it.",
+    "preconditions": ["A user does not have an authorized role for the requested function or information."],
+    "action_or_input": "Attempt to access the function or information.",
+    "expected_result": "Access is denied.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-031",
+    "source_id": "BR-PSM-021 material action audit trail",
+    "purpose": "Verify material module actions retain audit information sufficient to identify actor, action, target, resulting state, and timestamp.",
+    "preconditions": ["A user can perform a material module action."],
+    "action_or_input": "Perform the action and inspect its audit record.",
+    "expected_result": "The audit record contains the actor, action, target, resulting state, and timestamp sufficient for audit.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TC-032",
+    "source_id": "BR-PSM-021 indent modification version history",
+    "purpose": "Verify an indent modification is retained as a distinct version.",
+    "preconditions": ["An indent is in a policy-permissible state for modification."],
+    "action_or_input": "Modify the indent.",
+    "expected_result": "A new indent version is retained, with the change auditable.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TC-033",
+    "source_id": "BR-PSM-021 vendor master change audit",
+    "purpose": "Verify vendor master changes retain audit records sufficient for audit.",
+    "preconditions": ["A vendor master record can be changed."],
+    "action_or_input": "Change the vendor master record and inspect its audit record.",
+    "expected_result": "The change is auditable with actor, action, target, resulting state, and timestamp sufficient for audit.",
+    "test_type": "audit"
+  },
+  {
+    "test_id": "TC-034",
+    "source_id": "BR-PSM-022 partial receipt",
+    "purpose": "Record a partial receipt and preserve the remaining open balance or state.",
+    "preconditions": ["A delivery is partial."],
+    "action_or_input": "Record the received portion as a partial GRN/receipt.",
+    "expected_result": "The partial receipt is recorded and the remaining balance or state remains open.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TC-035",
+    "source_id": "BR-PSM-022 partial payment supported by accepted receipt and invoice verification",
+    "purpose": "Allow only the policy-determined payable portion supported by accepted receipt and invoice verification.",
+    "preconditions": ["An invoice or delivery is partial.", "A quantity or amount is supported by accepted receipt and invoice verification.", "Configured payment rules determine a payable portion."],
+    "action_or_input": "Evaluate and release the partial payment under configured rules.",
+    "expected_result": "Only the policy-determined supported payable portion may be released, and the remaining balance or state is retained.",
+    "test_type": "financial"
+  },
+  {
+    "test_id": "TC-036",
+    "source_id": "BR-PSM-022 partial payment unsupported portion",
+    "purpose": "Prevent partial payment for quantities or amounts unsupported by accepted receipt or invoice verification.",
+    "preconditions": ["An invoice or delivery is partial.", "The proposed payment portion is not supported by accepted receipt or invoice verification."],
+    "action_or_input": "Evaluate and attempt the proposed partial payment.",
+    "expected_result": "The unsupported portion is not released.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-037",
+    "source_id": "BR-PSM-023 tender evaluation and committee approval",
+    "purpose": "Require evaluation against defined tender criteria and a recorded committee decision before selected procurement proceeds.",
+    "preconditions": ["A tender has received bids and reached evaluation."],
+    "action_or_input": "Evaluate bids against the defined criteria and record the committee selection decision and approval.",
+    "expected_result": "The evaluation and committee decision/approval are recorded with traceability before the selected procurement proceeds.",
+    "test_type": "workflow"
+  },
+  {
+    "test_id": "TC-038",
+    "source_id": "BR-PSM-023 committee decision not recorded",
+    "purpose": "Prevent selected tender procurement from proceeding before the committee decision or approval is recorded.",
+    "preconditions": ["A tender has received bids and reached evaluation.", "The committee decision or approval has not been recorded."],
+    "action_or_input": "Attempt to proceed with the selected procurement.",
+    "expected_result": "The selected procurement does not proceed until the committee decision and approval are recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-039",
+    "source_id": "BR-PSM-024 authorized report generation",
+    "purpose": "Permit an authorized user to request a report, dashboard, filter, or export and log each report generation event.",
+    "preconditions": ["A user is authorized for the requested reporting function."],
+    "action_or_input": "Request a report, dashboard, filtered report, or export as separate parameterized cases.",
+    "expected_result": "The authorized request is available and each report generation event is logged.",
+    "test_type": "parameterized"
+  },
+  {
+    "test_id": "TC-040",
+    "source_id": "BR-PSM-024 unauthorized report generation",
+    "purpose": "Restrict report, dashboard, filter, and export access to authorized users.",
+    "preconditions": ["A user is not authorized for the requested reporting function."],
+    "action_or_input": "Attempt report, dashboard, filtered report, or export access as separate parameterized cases.",
+    "expected_result": "The unauthorized request is denied.",
+    "test_type": "parameterized"
+  },
+  {
+    "test_id": "TC-041",
+    "source_id": "BR-PSM-024 scheduled report generation",
+    "purpose": "Verify scheduled report generation validates the configured schedule and report authorization, then logs generation.",
+    "preconditions": ["A configured report-generation schedule becomes due."],
+    "action_or_input": "Run the scheduled report generation with an authorized configuration, then exercise an unauthorized report configuration as a separate parameterized case.",
+    "expected_result": "Generation occurs only when the configured schedule and report authorization are valid; each report generation event is logged.",
+    "test_type": "parameterized"
+  },
+  {
+    "test_id": "TC-042",
+    "source_id": "BR-PSM-025 vendor master versioning",
+    "purpose": "Verify vendor master creation or change retains a version record and audit entry.",
+    "preconditions": ["Vendor master maintenance is available."],
+    "action_or_input": "Create a vendor master record and change a vendor master record as separate parameterized cases.",
+    "expected_result": "Each creation or change persists a version/change record and audit entry so prior values and changes remain traceable.",
+    "test_type": "parameterized"
+  },
+  {
+    "test_id": "TC-043",
+    "source_id": "BR-PSM-026 accepted receipt quantities",
+    "purpose": "Post stock only for accepted receipt quantities when confirmation conditions are satisfied.",
+    "preconditions": ["A goods receipt is recorded with accepted quantities and delivery confirmation conditions satisfied."],
+    "action_or_input": "Complete receipt processing and inspect final stock posting.",
+    "expected_result": "Stock is posted only for accepted receipt quantities.",
+    "test_type": "inventory"
+  },
+  {
+    "test_id": "TC-044",
+    "source_id": "BR-PSM-026 rejected or unresolved-discrepancy quantities",
+    "purpose": "Prevent final stock posting of rejected or unresolved-discrepancy quantities.",
+    "preconditions": ["A goods receipt includes rejected quantities or quantities with an unresolved discrepancy."],
+    "action_or_input": "Complete receipt processing and inspect final stock posting.",
+    "expected_result": "Rejected and unresolved-discrepancy quantities are not finally posted; discrepant quantities remain unresolved.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-045",
+    "source_id": "BR-PSM-027 confirmed stock-transfer receipt",
+    "purpose": "Verify destination receipt confirmation completes the transfer, updates both stock ledgers, and retains an audit trail.",
+    "preconditions": ["An inter-departmental stock transfer has been dispatched."],
+    "action_or_input": "Confirm receipt at the destination.",
+    "expected_result": "The transfer is completed, source and destination stock ledgers are updated, and the transfer completion is logged.",
+    "test_type": "inventory"
+  },
+  {
+    "test_id": "TC-046",
+    "source_id": "BR-PSM-027 unconfirmed stock-transfer receipt",
+    "purpose": "Verify transfer ledger posting does not occur before destination receipt confirmation.",
+    "preconditions": ["An inter-departmental stock transfer has been dispatched but destination receipt is not confirmed."],
+    "action_or_input": "Inspect transfer completion and source and destination stock ledgers.",
+    "expected_result": "The transfer is not completed by the confirmation-triggered posting rule, and the ledgers are not updated by that rule.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-047",
+    "source_id": "BR-PSM-028 configured procurement and financial policy",
+    "purpose": "Verify a configured procurement or financial rule is applied before a governed action proceeds.",
+    "preconditions": ["A governed action is subject to a configured procurement or financial policy rule."],
+    "action_or_input": "Attempt the governed action under conditions that do not satisfy the applicable configured rule.",
+    "expected_result": "The action does not proceed until the applicable configured rule is satisfied.",
+    "test_type": "compliance"
+  }
+]
