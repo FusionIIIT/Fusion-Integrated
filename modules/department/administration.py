@@ -118,7 +118,9 @@ def decide_official_details(*, actor, proposal_id, action):
     row = DepartmentDetails.objects.select_for_update().filter(department=department).first()
     if row is None:
         raise NotFoundError()
-    proposal = DepartmentProposal.objects.filter(pk=proposal_id, department=row).first()
+    proposal = DepartmentProposal.objects.filter(pk=proposal_id, department=row).exclude(
+        proposed_by_id=actor.user_id,
+    ).first()
     if proposal is None:
         raise NotFoundError()
     proposal.status = _next_state(OFFICIAL_TRANSITIONS, proposal.status, action, office_lane(actor))

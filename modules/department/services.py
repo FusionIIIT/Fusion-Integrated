@@ -114,7 +114,7 @@ def advance_stock_request(*, actor, request_id, action):
         department = _department(actor, p.REVIEW_STOCK, HOD_DEPARTMENTS)
     request = StockRequest.objects.select_for_update().filter(
         pk=request_id, item__department=department,
-    ).first()
+    ).exclude(user_id=actor.user_id).first()
     if request is None:
         raise NotFoundError()
     state = _next_state(STOCK_TRANSITIONS, request.status, action, office_lane(actor))
@@ -157,7 +157,9 @@ def advance_feedback(*, actor, feedback_id, action, category="", close_simple=Fa
     if overseeing:
         roles = HOD_DEPARTMENTS
     department = _department(actor, p.REVIEW_FEEDBACK if reviewing else p.DISPOSE_FEEDBACK, roles)
-    queryset = Feedback.objects.select_for_update().filter(pk=feedback_id, department=department)
+    queryset = Feedback.objects.select_for_update().filter(
+        pk=feedback_id, department=department,
+    ).exclude(user_id=actor.user_id)
     if actor.active_role in HOD_DEPARTMENTS:
         queryset = queryset.exclude(status=Feedback.Status.NEW)
     feedback = queryset.first()

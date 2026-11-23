@@ -134,7 +134,7 @@ The enforcement points below describe the module. The generated reference links 
 
 - **Announcement.** Department key from the IAM department projection, authored content, publication timestamp, active/hidden status, and applicable role, programme and cohort-year lists. Target axes combine with AND and values within one axis with OR. An empty axis means explicitly unrestricted within the department. Filter on the current identity and active role, before pagination.
 - **Inventory and requests.** Inventory has a department, item identity and nonnegative quantity. Requests reference an item within the module and an integer IAM requester ID, with a strictly positive requested quantity. One atomic transaction locks the item and request during issuance and records an append-only movement and notification event. Constrain the quantity in the database. Request submission checks availability without reserving stock.
-- **Feedback.** Department, integer submitter ID, confidential content, categorization, review and disposition timestamps. Initial review and a simple closure may be recorded in one transaction, in that order. Staff queries start with department scoping and per-stage permissions.
+- **Feedback.** Department, integer submitter ID, confidential content, categorization, and separate initial review, HOD oversight and disposition records. Initial review and a simple closure may be recorded in one transaction, in that order. Staff queries enforce department scope and per-stage permissions.
 - **Timetable and lab.** Department timetable slots use half-open intervals for the applicable term and day. PostgreSQL exclusion constraints prevent any overlapping room, instructor or cohort slot within a department and term. Lab resource and inventory records are separate.
 - **Department details.** Store published details separately from proposed official changes. Name and Core Policies are candidates for the HOD approval allowlist. Headship is a read-only IAM projection once the authoritative contract exists.
 
@@ -148,10 +148,13 @@ Person references use integer IAM IDs. Cross-module foreign keys are excluded. P
 | Stock request | Pending HOD approval | Approve or reject by HOD | Approved or rejected |
 | Stock request | Approved | Issue by Dept_Admin | Issued |
 | Feedback | Submitted | Categorize by Dept_Admin | Reviewed |
+| Feedback | Reviewed | Record oversight notes by HOD | Reviewed |
 | Feedback | Reviewed | Resolve or close by Dept_Admin or HOD | Resolved or closed |
 | Official change | Pending | Approve or reject by HOD | Approved or rejected |
 
 The issuance operation aborts if stock has been consumed since approval. It leaves the approved request, quantity and movement log intact. This concurrency behavior is a proposed integrity interpretation for review.
+
+Approval and review queues exclude the caller's own submissions. The corresponding write checks apply by person ID even when a caller changes roles.
 
 ## Permissions and navigation
 
@@ -166,12 +169,14 @@ The platform shell currently receives union navigation from IAM. Department's ac
 | `GET /api/v1/department/announcements` | Department module grant and `department.announcement.view` | Cursor-paginated active posts visible within the caller's department and target scope. `UC-DEPT-001`, `BR-DEPT-002`, `AFR-DEPT-002` and `AFR-DEPT-003`. |
 | `POST /api/v1/department/announcements` and `announcements/{id}/action` | Publication or HOD maintenance permissions | Publish a scoped announcement or edit, hide or delete an active one. |
 | `inventory`, `stock-requests`, `stock-requests/{id}/action` | Stock view, insertion, request, review or issue permissions | Current inventory, role-specific request queue, Faculty issued history and transitions. |
-| `feedback`, `feedback/{id}/action` | Confidential feedback submit, view, review or disposition permissions | Submit a new record, review it, or close or resolve it. |
+| `feedback`, `feedback/{id}/action` | Confidential feedback submit, view, review or disposition permissions | Submit a record, perform the initial review, record HOD oversight, close or resolve. |
 | `labs`, `timetable`, `timetable/{id}`, `academic-context` | Lab or timetable view and update permissions | Faculty resource profiles, Dept_Admin slot upload and replacement, and the student's verified programme, batch and applicable timetable. |
 | `details`, `proposals`, `proposals/{id}/action` | Details view or update, official-change proposal or HOD decision permissions | Immediate general update and pending official proposal with approval or rejection. |
 | `notices`, `access` | Department grant plus notice-view or announcement-view permission, respectively | Role-scoped in-app notifications and current module action permissions. |
 
 The `/department` index redirects to `/department/announcements`. Each page uses its permission from the Department access response. For the external Fusion shell, add a sidebar entry with id `department`, label `Department`, icon `Buildings`, destination `/department`, and section `Department`.
+
+For example, a HOD posts `{"action":"record_oversight","oversight_notes":"Discuss lab access at the next meeting."}` to `/api/v1/department/feedback/42/action`. A successful response returns the reviewed feedback with `oversight_at` and `oversight_notes` set and `disposed_at` unchanged. The [OpenAPI schema](../../openapi/fusion-integrated.v1.yaml) defines the request and response fields for each endpoint.
 
 ## Contracts
 

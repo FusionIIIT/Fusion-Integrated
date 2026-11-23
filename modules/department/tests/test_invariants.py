@@ -136,8 +136,8 @@ def test_all_department_lists_keep_a_constant_request_query_budget(stub_iam, dja
     for i in range(20):
         Announcement.objects.create(department="CSE", content=f"Seminar {i}")
         item = StockItem.objects.create(department="CSE", name=f"Item {i}", quantity=10)
-        StockRequest.objects.create(item=item, user_id=11, quantity=1)
-        Feedback.objects.create(department="CSE", user_id=11, content=f"Feedback {i}")
+        StockRequest.objects.create(item=item, user_id=12, quantity=1)
+        Feedback.objects.create(department="CSE", user_id=12, content=f"Feedback {i}")
         Notice.objects.create(department="CSE", audience="admin", message=f"Notice {i}")
         LabResource.objects.create(department="CSE", name=f"Lab {i}", details="Lab resources")
         TimetableSlot.objects.create(department="CSE", term=f"Term {i}", day=1, starts_at=time(10),

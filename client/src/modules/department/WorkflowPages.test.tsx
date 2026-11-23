@@ -163,6 +163,33 @@ it("requires a category before initial feedback review", async () => {
   }));
 });
 
+it.each([true, false])("gates oversight for a reviewed feedback record (%s)", async (isHod) => {
+  access.permissions = isHod
+    ? ["department.feedback.update"]
+    : ["department.feedback.update", "department.feedback.review"];
+  const feedback = { id: 8, content: "Broken ramp", category: "Access", status: "reviewed" };
+  vi.mocked(http.get).mockResolvedValue({ data: { next: null, results: [feedback] } });
+  show(<FeedbackInboxPage />);
+  expect(await screen.findByText("Broken ramp")).toBeInTheDocument();
+  if (!isHod) {
+    expect(screen.queryByRole("button", { name: "Record oversight" })).not.toBeInTheDocument();
+    return;
+  }
+  const submit = screen.getByRole("button", { name: "Record oversight" });
+  expect(submit).toBeDisabled();
+  const notes = screen.getByRole("textbox", { name: "HOD oversight notes" });
+  await userEvent.type(notes, "Discuss at the next meeting");
+  vi.mocked(http.get).mockResolvedValue({ data: { next: null, results: [{
+    ...feedback, oversight_at: "2026-11-23T10:00:00Z", oversight_notes: "Discuss at the next meeting",
+  }] } });
+  await userEvent.click(submit);
+  expect(await screen.findByText("HOD oversight recorded. Discuss at the next meeting")).toBeInTheDocument();
+  expect(screen.getByText("#8 · reviewed · Access")).toBeInTheDocument();
+  expect(http.post).toHaveBeenCalledWith("/department/feedback/8/action", {
+    action: "record_oversight", oversight_notes: "Discuss at the next meeting",
+  });
+});
+
 it("publishes a timetable slot from the editor", async () => {
   access.permissions = ["department.timetable.update"];
   show(<TimetablePage />);

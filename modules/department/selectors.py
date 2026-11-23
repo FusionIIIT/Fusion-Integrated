@@ -72,10 +72,11 @@ def stock_requests_for(principal):
     if not department:
         return StockRequest.objects.none()
     requests = StockRequest.objects.filter(item__department=department).select_related("item")
+    other_requests = requests.exclude(user_id=principal.user_id)
     if principal.active_role in HOD_DEPARTMENTS:
-        return requests.filter(status=StockRequest.Status.PENDING)
+        return other_requests.filter(status=StockRequest.Status.PENDING)
     if principal.active_role in ADMIN_DEPARTMENTS:
-        return requests.filter(status=StockRequest.Status.APPROVED)
+        return other_requests.filter(status=StockRequest.Status.APPROVED)
     return requests.filter(user_id=principal.user_id, status=StockRequest.Status.ISSUED)
 
 
@@ -83,7 +84,7 @@ def feedback_for(principal):
     department = department_for(principal, live_identity(principal))
     if not department:
         return Feedback.objects.none()
-    feedback = Feedback.objects.filter(department=department)
+    feedback = Feedback.objects.filter(department=department).exclude(user_id=principal.user_id)
     if principal.active_role in ADMIN_DEPARTMENTS:
         return feedback
     if principal.active_role in HOD_DEPARTMENTS:
@@ -140,4 +141,7 @@ def proposals_for(principal):
     department = department_for(principal, live_identity(principal))
     if not department:
         return DepartmentProposal.objects.none()
-    return DepartmentProposal.objects.filter(department__department=department)
+    proposals = DepartmentProposal.objects.filter(department__department=department)
+    if principal.active_role in HOD_DEPARTMENTS:
+        return proposals.exclude(proposed_by_id=principal.user_id, status="pending")
+    return proposals

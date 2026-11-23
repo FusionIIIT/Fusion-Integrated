@@ -6,7 +6,7 @@
 | Checkout commit | `fc65686cccb157fe1ab768c4ed57e624a8bb4e58` |
 | Upstream fetch | Succeeded |
 | Working tree | Clean at the end of the session |
-| Review preflight | Stopped under §1.1 because an ancestor `.codex/` folder contained Markdown instruction files |
+| Review preflight | Stopped under §1.1 because an ancestor folder contained Markdown instruction files |
 
 | Dimension | Score |
 | --- | --- |

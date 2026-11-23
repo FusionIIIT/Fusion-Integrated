@@ -7,25 +7,28 @@ The Department build implements announcement viewing, publication and maintenanc
 | Check | Observed result |
 | --- | --- |
 | `make check` | Django checks, migration drift, Ruff, five import contracts, cross-module FK, contracts, navigation, generated permissions, schema and the PostgreSQL pytest suite passed. |
-| `make check-client` | Type checking passed. Nine test files and 77 tests passed. Vite produced the production build. |
-| `.venv/bin/pytest modules/department --cov=modules/department --cov-branch --cov-report=term-missing --cov-fail-under=90` | 91 tests passed. Combined line and branch coverage was 92.74%. |
-| `.venv/bin/pytest modules/department --cov=modules/department/domain --cov-branch --cov-report=term-missing --cov-fail-under=95` | 91 tests passed. Domain coverage was 100%. |
+| `make check-client` | Type checking and the production build passed. All 99 client tests passed. |
+| Department backend coverage, excluding spec tests | 139 tests passed. Combined line and branch coverage was 94.23% against the 90% gate. |
+| Domain coverage, excluding spec tests | 100% coverage against the 95% gate. |
+| Active specification strategies | BR 36, FR 45, UC 34 and WF 12 passed. There were zero failures or skips. |
 | `manage.py check --deploy --fail-level WARNING` with local production-shaped settings | System check identified no issues (2 silenced). |
-| Repository-wide `make e2e` | 13 passed, including completed Department journeys for Student, Faculty, HOD and Dept_Admin, confidential feedback submission and direct-route refusals. |
+| Repository-wide `make e2e` | 14 passed, including the Department role journeys, confidential feedback, HOD oversight, direct-route refusals and keyboard-only feedback submission. |
 
 ## Test evidence
 
-The [Round 1 fix record](reviews/round-1/fix-record.md) preserves the original independent report, maps all 15 findings to fixes or remaining work, and links the actual command output. The backend now has 10 announcement tests, 18 HTTP journey tests, 7 invariant tests and 56 review regression tests. It covers database timetable conflicts, real threaded stock issuance, the two endpoint permission gates, cookie CSRF, write throttling, constant query counts and illegal state transitions. Five intentional enforcement mutations each caused test failures; restoring the original files returned all 91 tests to green.
+The [Round 1 fix record](reviews/round-1/fix-record.md) preserves the original independent report, maps all 15 findings to fixes or remaining work, and links the command output. The Department builder suite now has 10 announcement tests, 20 HTTP journey tests, 8 invariant tests and 101 review regression tests. It covers database timetable conflicts, threaded stock issuance, the two endpoint permission gates, cookie CSRF, write throttling, constant query counts and illegal state transitions.
 
-The component suite covers workflow loading/empty/error states, denied controls, selected main actions and direct-route permission checks. Real-browser journeys complete the 16 locally implemented use cases through forms and role switches. External-contract use cases, the exhaustive alternate-flow and per-page action matrices, and a complete Department keyboard-only walkthrough remain open. These are builder checks, not an independent 10/10 verdict.
+The Step 9 check found that a person could change roles and act on their own submission. Department now excludes that person's pending stock requests, feedback and pending proposals from the relevant queues and refuses the write by ID. Three backend mutations verified the feedback queue scope, proposal ownership check and oversight overwrite protection. Two frontend mutations verified the HOD-only control and inbox error state. All five mutations caused test failures and were restored before the final run.
+
+The component suite covers workflow loading, empty and error states, denied controls, selected main actions and all nine production route guards. The browser suites exercise the main flows through forms and role switches. The Step 9 review was a self-review. Exhaustive alternate-flow and manual per-page walkthrough evidence was outside this pass.
 
 ## Deployment and authorization
 
-1. Apply Django migrations to the Fusion-Integrated PostgreSQL database. The single initial migration installs the stock movement immutability trigger and timetable exclusion constraints. Existing developer databases on the old incremental history must follow the transition note in the Round 1 fix record; fresh databases migrate normally.
+1. Apply Django migrations to the Fusion-Integrated PostgreSQL database. The initial migration installs the stock movement immutability trigger and timetable exclusion constraints. Two subsequent migrations add stock decision and feedback oversight records. Existing developer databases on the old incremental history must follow the transition note in the Round 1 fix record. Fresh databases migrate normally.
 2. Run `manage.py seed_modules` and `make permissions`. Apply the manifest from the IAM checkout using `manage.py seed_iam_permissions --manifest <Fusion-Integrated>/registry/permissions.json`.
-3. Use IAM to confirm verified designations and the active role. Check the Department announcement page under a basic student or Faculty designation and the relevant workflows under a scoped HOD and Dept_Admin designation.
+3. Run `manage.py department_readiness`. Use IAM to confirm the verified designations and active role, then check the Department announcement page under a basic student or Faculty designation.
 
-The isolated database accepted all Department migrations. The portal uses the shared HTTP and CSRF stack. Department intersects the active designation's grant set with IAM permissions, scopes queries before returning rows, and resolves identity attributes live. Feedback notices omit confidential content. Issuance, stock audit and notices commit atomically. The browser refreshes in-app notices while the Department module is open. Fresh test databases apply the complete initial schema and staff browser journeys pass. A complete fresh IAM/ERP installation remains unverified because the available public fixture lacks tables used by the full IAM academic sync.
+A throwaway PostgreSQL database migrated, rolled back Department to zero and migrated again. Readiness reported the missing module registration before seeding and passed after seeding. With the provisioned IAM fixture, a fresh platform database returned HTTP 200 for student login and the first announcement read, and HTTP 403 for a cookie-authenticated feedback write without a CSRF header. Feedback notices omit confidential content. Issuance, stock audit and notices commit atomically.
 
 ## Approval and known gaps
 

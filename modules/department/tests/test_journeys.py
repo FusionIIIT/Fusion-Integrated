@@ -95,6 +95,32 @@ def test_stock_audit_cannot_be_updated(role_client):
     assert StockMovement.objects.get().delta == 2
 
 
+def test_role_switch_cannot_put_own_record_in_approval_queue(role_client):
+    admin = role_client("deptadmin_cse", kind="staff", user_id=14)
+    item = post(admin, "inventory", {"name": "Cable", "quantity": 3}).json()["id"]
+    faculty = role_client("faculty", user_id=11)
+    request = post(faculty, "stock-requests", {"item_id": item, "quantity": 1}).json()["id"]
+    feedback = post(faculty, "feedback", {"content": "Improve lab access"}).json()["id"]
+    admin = role_client("deptadmin_cse", user_id=11)
+    proposal = post(admin, "proposals", {"field": "official_name", "value": "Computing"}).json()["id"]
+
+    assert admin.get(f"{BASE}/feedback").json()["results"] == []
+    assert post(admin, f"feedback/{feedback}/action", {"action": "review", "category": "Lab"}).status_code == 404
+    hod = role_client("HOD (CSE)", user_id=11)
+    assert hod.get(f"{BASE}/stock-requests").json()["results"] == []
+    assert hod.get(f"{BASE}/proposals").json()["results"] == []
+    assert post(hod, f"stock-requests/{request}/action", {"action": "approve"}).status_code == 404
+    assert post(hod, f"proposals/{proposal}/action", {"action": "approve"}).status_code == 404
+
+    hod = role_client("HOD (CSE)", user_id=13)
+    assert post(hod, f"stock-requests/{request}/action", {"action": "approve"}).status_code == 200
+    assert post(hod, f"proposals/{proposal}/action", {"action": "approve"}).status_code == 200
+    admin = role_client("deptadmin_cse", user_id=11)
+    assert admin.get(f"{BASE}/stock-requests").json()["results"] == []
+    assert post(admin, f"stock-requests/{request}/action", {"action": "issue"}).status_code == 404
+    assert StockItem.objects.get(pk=item).quantity == 3
+
+
 def test_feedback_is_reviewed_before_hod_disposition(role_client):
     """UC-DEPT-007, UC-DEPT-008, UC-DEPT-014; BR-DEPT-017, BR-DEPT-018; BW-DEPT-04."""
     student = role_client("student", user_id=20, kind="student")
@@ -204,7 +230,7 @@ def test_stock_shortage_after_approval_preserves_existing_movements(role_client)
     admin = role_client("deptadmin_cse", kind="staff")
     item = post(admin, "inventory", {"name": "Scope probe", "quantity": 4}).json()["id"]
     assert post(admin, "inventory", {"name": "Scope probe", "quantity": 1}).json()["quantity"] == 5
-    faculty = role_client("faculty")
+    faculty = role_client("faculty", user_id=11)
     assert post(faculty, "stock-requests", {"item_id": item, "quantity": 6}).status_code == 409
     ids = [post(faculty, "stock-requests", {"item_id": item, "quantity": 4}).json()["id"]
            for _ in range(2)]
@@ -315,7 +341,7 @@ def test_official_proposal_cannot_bypass_approval_or_repeat_decision(role_client
     assert post(admin, "proposals", proposal).status_code == 409
     assert post(admin, f"proposals/{pk}/action", {"action": "approve"}).status_code == 403
     assert admin.get(f"{BASE}/details").json()["core_policies"] == ""
-    hod = role_client("HOD (CSE)")
+    hod = role_client("HOD (CSE)", user_id=13)
     assert post(hod, f"proposals/{pk}/action", {"action": "reject"}).status_code == 200
     assert post(hod, f"proposals/{pk}/action", {"action": "approve"}).status_code == 409
     assert hod.get(f"{BASE}/details").json()["core_policies"] == ""
