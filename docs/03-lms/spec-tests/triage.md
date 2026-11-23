@@ -21,8 +21,15 @@ Student 1's 10/10 commit the baseline ran on:
 | baseline | UC | 42 | 42 | 0 | 0 | 75.45% | 52.13% |
 | baseline | BR | 41 | 41 | 0 | 0 | 66.76% | 40.55% |
 | baseline | WF | 35 | 35 | 0 | 0 | 60.45% | 28.96% |
+| Q2 | FR | 47 | 47 | 0 | 0 | 72.97% | 47.87% |
+| Q2 | UC | 42 | 42 | 0 | 0 | 75.21% | 52.13% |
+| Q2 | BR | 41 | 41 | 0 | 0 | 66.58% | 40.55% |
+| Q2 | WF | 35 | 35 | 0 | 0 | 60.32% | 28.96% |
 
 ## Failures and skips
 
-No failures or skipped tests in the formal baseline.
-No triage items are open.
+No failures or skipped tests in the formal baseline or Q2.
+No triage items are open as of Q2.
+
+Q2 was run against commit:
+a941ffdaa08e2626b5e3085a83001038c2c19368
