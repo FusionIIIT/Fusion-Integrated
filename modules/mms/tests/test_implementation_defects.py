@@ -11,6 +11,8 @@ from modules.mms.models import (
     Feedback,
     RegistrationWindow,
     RoleAssignment,
+    SpecialFoodHistory,
+    SpecialFoodRequest,
     StudentRequest,
     VacationResponse,
     VacationSurvey,
@@ -107,6 +109,35 @@ def test_reassigned_caretaker_can_see_and_act_on_pending_requests(
         {"approve": True}, format="json")
     assert decision.status_code == 200
     assert decision.json()["status"] == "approved"
+
+
+def test_special_food_approval_fails_closed_without_authoritative_charge_policy(
+        stub_iam):
+    now = timezone.now()
+    RoleAssignment.objects.create(
+        role="caretaker", user_id=202, starts_at=now - timedelta(days=1),
+        ends_at=now + timedelta(days=30), is_current=True,
+        assigned_by_user_id=101)
+    request = SpecialFoodRequest.objects.create(
+        user_id=1001, reason="illness", details="Diet request",
+        requested_for=timezone.localdate() + timedelta(days=2))
+    SpecialFoodHistory.objects.create(
+        request=request, status="requested", actor_user_id=1001)
+    client = _client(
+        stub_iam, 202, ("mms.requests.review",), kind="faculty",
+        active_role="mess_caretaker")
+
+    response = client.post(
+        f"/api/v1/mms/special-food/{request.pk}/decision",
+        {"approve": True, "charge_amount": "10.00"}, format="json")
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "special_food_charge_policy_unavailable"
+    request.refresh_from_db()
+    assert request.status == "requested"
+    assert request.charge_amount is None
+    assert list(SpecialFoodHistory.objects.filter(request=request).values_list(
+        "status", flat=True)) == ["requested"]
 
 
 def test_menu_accepts_deletion_with_fewer_entries(stub_iam):

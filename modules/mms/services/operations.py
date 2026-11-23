@@ -360,6 +360,13 @@ def decide_special_food(*, actor, request_id, approve, charge_amount=None):
     if request.status != "requested":
         raise ConflictError("This request is no longer awaiting a decision.",
                             code="request_not_pending")
+    # The frozen requirements define chargeability but no authoritative source or
+    # amount. A caller-supplied amount cannot establish that policy.
+    if approve:
+        raise ConflictError(
+            "Approval is unavailable until an authoritative special-food charge "
+            "policy is supplied.",
+            code="special_food_charge_policy_unavailable")
     now = timezone.now()
     decision_hours = settings.MMS_SPECIAL_FOOD_DECISION_HOURS
     if decision_hours is not None and decision_hours <= 0:
@@ -372,21 +379,9 @@ def decide_special_food(*, actor, request_id, approve, charge_amount=None):
                 "The institution-defined decision period has expired; this request "
                 "will be rejected by deadline processing.",
                 code="special_food_decision_period_expired")
-    if approve and charge_amount is None:
-        raise ConflictError("A policy-provided charge is required for approval.",
-                            code="special_food_charge_required")
-    if approve and (
-        not charge_amount.is_finite()
-        or charge_amount < 0
-        or charge_amount > Decimal("9999999.99")
-    ):
-        raise ConflictError("Charge must be a finite non-negative policy value.",
-                            code="invalid_special_food_charge")
-    request.status = "approved" if approve else "rejected"
+    request.status = "rejected"
     request.decided_at = now
     request.decided_by_user_id = actor.user_id
-    if approve:
-        request.charge_amount = charge_amount
     request.save()
     SpecialFoodHistory.objects.create(request=request, status=request.status,
                                       actor_user_id=actor.user_id)

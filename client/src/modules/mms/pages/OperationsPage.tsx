@@ -65,7 +65,6 @@ export default function OperationsPage() {
   const [surveyDeadline, setSurveyDeadline] = useState("");
   const [announcementTitle, setAnnouncementTitle] = useState("");
   const [announcementBody, setAnnouncementBody] = useState("");
-  const [decisionCharges, setDecisionCharges] = useState<Record<number, string>>({});
   const [report, setReport] = useState<string | null>(null);
   const [reportSearch, setReportSearch] = useState("");
   const now = new Date();
@@ -351,22 +350,15 @@ export default function OperationsPage() {
               </Group>
               <Text size="xs">{row.details}</Text>
               {caretaker && row.status === "requested" && (
-                <Group>
-                  <TextInput aria-label={`Charge for request ${row.id}`} placeholder="Policy-provided charge"
-                    value={decisionCharges[row.id] ?? ""}
-                    onChange={(event) => setDecisionCharges((current) => ({
-                      ...current, [row.id]: event.currentTarget.value,
-                    }))} />
-                  <Button size="xs" loading={specialAction.isPending} onClick={() =>
-                    specialAction.mutate({ path: `special-food/${row.id}/decision`,
-                      body: { approve: true, charge_amount: decisionCharges[row.id] } })}>
-                    Approve
-                  </Button>
+                <Stack gap="xs">
+                  <Alert color="yellow" title="Approval unavailable">
+                    An institution-approved charge source and value have not been defined.
+                  </Alert>
                   <Button size="xs" color="red" variant="light"
                     loading={specialAction.isPending} onClick={() =>
                       specialAction.mutate({ path: `special-food/${row.id}/decision`,
                         body: { approve: false } })}>Reject</Button>
-                </Group>
+                </Stack>
               )}
               {caretaker && row.status === "approved" && (
                 <Group>

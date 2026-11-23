@@ -35,11 +35,11 @@ The public module module-grant and permission prefix is `mms`. Semantic display 
 
 - Mess Admin menu visibility remains unresolved (`ISS-MMS-012`). No Mess Admin menu grant is added.
 - The special-food decision period remains unset until institution policy supplies it (`ISS-MMS-013`). No default is applied.
-- MMS-UC-021 assigns Served/Cancelled updates to the active Mess Caretaker, and Student 2 approves that specification reading. Student 1's explicit joint agreement is not recorded, so ISS-MMS-014 remains pending and those transitions are not treated as settled.
+- **ISS-MMS-014 resolved as a specification reading:** Student 1 agrees that the active Mess Caretaker records Served/Cancelled updates. MMS-UC-021 names the Mess Caretaker as Primary Actor and assigns those actions in its main success scenario (steps 1–5); Student 2 approved the same reading. The Problem Statement describes the post-approval states but leaves the actor unstated. This applies the more specific use-case requirement; it does not decide cancellation billing (ISS-MMS-015) or create institutional policy.
 - Cancelled special-food billing remains unresolved (`ISS-MMS-015`). MMS does not invent a reversal or suppression rule.
 - Vacation reminder cadence remains unspecified (`ISS-MMS-019`). No guessed beat entry is added.
 - Rebate date modification remains unavailable until external policy is supplied.
-- The special-food charge source and value remain unavailable. Approval does not invent a charge.
+- **Special-food charge policy remains unavailable:** the frozen PS §3.3.7 and BR-MMS-030 require approved requests to be chargeable and the charge to be added to the monthly bill, but provide no authoritative charge source, amount/rate, or rule for selecting a value per request. Until the institution supplies those decisions, MMS blocks approval (HTTP 409, `special_food_charge_policy_unavailable`) and permits rejection. No caller-entered amount is accepted as policy; no charge is added.
 
 ## Registration
 
