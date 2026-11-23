@@ -1,19 +1,16 @@
+import type { Details } from "./api/types";
 import { Button, Container, Group, Loader, Paper, Select, Stack, Text, Textarea, TextInput } from "@mantine/core";
 import { useState } from "react";
 
 import { ErrorState } from "../../ui/components/ErrorState";
 import { PageHeader } from "../../ui/components/PageHeader";
-import { useDepartmentAction, useDepartmentFeed, useDepartmentRecord } from "./api";
+import { useDepartmentAction, useLabs, useProposals, useDetails } from "./api";
 import { useDepartmentCan } from "./DepartmentLayout";
 import { FeedState } from "./FeedState";
 
-interface Lab { id: number; name: string; details: string }
-interface Details { department: string; official_name: string; general_information: string; core_policies: string }
-interface Proposal { id: number; field: "official_name" | "core_policies"; value: string; status: string; decided_at: string | null }
-
 export function LabsPage() {
   const can = useDepartmentCan();
-  const feed = useDepartmentFeed<Lab>("labs");
+  const feed = useLabs();
   const action = useDepartmentAction();
   const [name, setName] = useState("");
   const [details, setDetails] = useState("");
@@ -40,7 +37,7 @@ export function LabsPage() {
           </Paper>
         )}
         {feed.rows.map((lab) => (
-          <Paper key={lab.id} withBorder p="md">
+          <Paper component="article" key={lab.id} withBorder p="md">
             <Group justify="space-between">
               <Text fw={600}>{lab.name}</Text>
               {canUpdate && <Button variant="default" onClick={() => { setName(lab.name); setDetails(lab.details); }}>Edit</Button>}
@@ -48,6 +45,7 @@ export function LabsPage() {
             <Text style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{lab.details}</Text>
           </Paper>
         ))}
+        {action.isSuccess && <Text role="status">Lab profile saved.</Text>}
         <FeedState query={feed} empty="There are no lab resource profiles." />
       </Stack>
     </Container>
@@ -73,14 +71,36 @@ function GeneralDetailsForm({ details }: { details: Details }) {
   );
 }
 
-export function DepartmentDetailsPage() {
-  const can = useDepartmentCan();
-  const details = useDepartmentRecord<Details>("details");
-  const proposals = useDepartmentFeed<Proposal>("proposals");
+const label = (name: string) => name === "official_name" ? "Official name" : "Core policies";
+
+function ProposalForm() {
   const action = useDepartmentAction();
   const [field, setField] = useState<string | null>("official_name");
   const [value, setValue] = useState("");
-  const label = (name: string) => name === "official_name" ? "Official name" : "Core policies";
+  return (
+    <Paper withBorder p="md" component="form" onSubmit={(event) => {
+      event.preventDefault();
+      action.mutate({ path: "proposals", data: { field, value } }, { onSuccess: () => setValue("") });
+    }}>
+      <Stack>
+        <Select label="Official field" value={field} onChange={setField} allowDeselect={false}
+          data={["official_name", "core_policies"].map((key) => ({ value: key, label: label(key) }))} />
+        <Textarea label="Proposed value" required value={value} maxLength={field === "official_name" ? 200 : 8000}
+          onChange={(event) => setValue(event.currentTarget.value)} />
+        <Button type="submit" loading={action.isPending} disabled={!value.trim()}>Submit for approval</Button>
+      {action.isError && <ErrorState error={action.error} />}
+        {action.isSuccess && <Text role="status">Proposal saved.</Text>}
+      </Stack>
+    </Paper>
+  );
+}
+
+export function DepartmentDetailsPage() {
+  const can = useDepartmentCan();
+  const details = useDetails();
+  const proposals = useProposals();
+  const action = useDepartmentAction();
+
 
   return (
     <Container size="md" py="lg">
@@ -100,21 +120,10 @@ export function DepartmentDetailsPage() {
           </Paper>
         )}
         {can("department.proposal.create") && (
-          <Paper withBorder p="md" component="form" onSubmit={(event) => {
-            event.preventDefault();
-            action.mutate({ path: "proposals", data: { field, value } }, { onSuccess: () => setValue("") });
-          }}>
-            <Stack>
-              <Select label="Official field" value={field} onChange={setField} allowDeselect={false}
-                data={["official_name", "core_policies"].map((key) => ({ value: key, label: label(key) }))} />
-              <Textarea label="Proposed value" required value={value} maxLength={field === "official_name" ? 200 : 8000}
-                onChange={(event) => setValue(event.currentTarget.value)} />
-              <Button type="submit" loading={action.isPending} disabled={!value.trim()}>Submit for approval</Button>
-            </Stack>
-          </Paper>
+          <ProposalForm />
         )}
         {proposals.rows.map((proposal) => (
-          <Paper key={proposal.id} withBorder p="md">
+          <Paper component="article" key={proposal.id} withBorder p="md">
             <Stack>
               <Text fw={600}>{label(proposal.field)} · {proposal.status}</Text>
               <Text style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{proposal.value}</Text>
@@ -131,6 +140,7 @@ export function DepartmentDetailsPage() {
           </Paper>
         ))}
         {action.isError && <ErrorState error={action.error} />}
+        {action.isSuccess && <Text role="status">Proposal saved.</Text>}
         <FeedState query={proposals} empty="There are no official change proposals." />
       </Stack>
     </Container>

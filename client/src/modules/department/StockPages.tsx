@@ -3,19 +3,39 @@ import { useState } from "react";
 
 import { ErrorState } from "../../ui/components/ErrorState";
 import { PageHeader } from "../../ui/components/PageHeader";
-import { useDepartmentAction, useDepartmentFeed } from "./api";
+import { useDepartmentAction, useInventory, useStockRequests } from "./api";
 import { useDepartmentCan } from "./DepartmentLayout";
 import { FeedState } from "./FeedState";
 
-interface Item { id: number; name: string; quantity: number }
-interface StockRequest { id: number; item_name: string; quantity: number; status: string }
-
-export function InventoryPage() {
-  const can = useDepartmentCan();
-  const feed = useDepartmentFeed<Item>("inventory");
+function AddStock() {
   const action = useDepartmentAction();
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState<number | string>(1);
+  return (
+    <Paper withBorder p="md" component="form" onSubmit={(event) => {
+      event.preventDefault();
+      if (!name.trim() || typeof quantity !== "number") return;
+      action.mutate({ path: "inventory", data: { name, quantity } }, {
+        onSuccess: () => { setName(""); setQuantity(1); },
+      });
+    }}>
+      <Stack>
+        <TextInput label="Item name" value={name} required maxLength={160}
+          onChange={(event) => setName(event.currentTarget.value)} />
+        <NumberInput label="Quantity to add" min={1} max={1000000} allowDecimal={false}
+          value={quantity} onChange={setQuantity} required />
+        <Button type="submit" loading={action.isPending}>Add stock</Button>
+      {action.isError && <ErrorState error={action.error} />}
+        {action.isSuccess && <Text role="status">Saved.</Text>}
+      </Stack>
+    </Paper>
+  );
+}
+
+export function InventoryPage() {
+  const can = useDepartmentCan();
+  const feed = useInventory();
+  const action = useDepartmentAction();
   const [requested, setRequested] = useState<number | null>(null);
   const [requestQuantity, setRequestQuantity] = useState<number | string>(1);
 
@@ -24,21 +44,7 @@ export function InventoryPage() {
       <PageHeader title="Department inventory" />
       <Stack>
         {can("department.stock.create") && (
-          <Paper withBorder p="md" component="form" onSubmit={(event) => {
-            event.preventDefault();
-            if (!name.trim() || typeof quantity !== "number") return;
-            action.mutate({ path: "inventory", data: { name, quantity } }, {
-              onSuccess: () => { setName(""); setQuantity(1); },
-            });
-          }}>
-            <Stack>
-              <TextInput label="Item name" value={name} required maxLength={160}
-                onChange={(event) => setName(event.currentTarget.value)} />
-              <NumberInput label="Quantity to add" min={1} max={1000000} allowDecimal={false}
-                value={quantity} onChange={setQuantity} required />
-              <Button type="submit" loading={action.isPending}>Add stock</Button>
-            </Stack>
-          </Paper>
+          <AddStock />
         )}
         {feed.rows.map((item) => (
           <Paper key={item.id} withBorder p="md">
@@ -78,7 +84,7 @@ export function InventoryPage() {
 
 export function StockRequestsPage() {
   const can = useDepartmentCan();
-  const feed = useDepartmentFeed<StockRequest>("stock-requests");
+  const feed = useStockRequests();
   const action = useDepartmentAction();
   const canReview = can("department.stock_request.approve");
   const canIssue = can("department.stock_request.update");
@@ -91,7 +97,7 @@ export function StockRequestsPage() {
       <PageHeader title={canReview || canIssue ? "Stock requests" : "Issued stock history"} />
       <Stack>
         {feed.rows.map((request) => (
-          <Paper key={request.id} withBorder p="md">
+          <Paper component="article" key={request.id} withBorder p="md">
             <Group justify="space-between">
               <Text>{request.item_name} · {request.quantity} · {request.status}</Text>
               {canReview && request.status === "pending" && (
@@ -108,6 +114,7 @@ export function StockRequestsPage() {
           </Paper>
         ))}
         {action.isError && <ErrorState error={action.error} />}
+        {action.isSuccess && <Text role="status">Stock request updated.</Text>}
         <FeedState query={feed} empty="No stock requests to show." />
       </Stack>
     </Container>

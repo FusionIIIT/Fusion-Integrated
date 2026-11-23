@@ -45,7 +45,10 @@ def test_one_overlapping_timetable_slot_commits_when_writes_race(stub_iam):
     actor = make_principal(kind="staff", active_role="deptadmin_cse", modules=["department"],
                            permissions=[UPDATE_TIMETABLE])
     user = UserRef(actor.user_id, "lab-admin", "Lab admin", "staff", department="CSE")
-    stub_iam(users={actor.user_id: user})
+    stub_iam(users={actor.user_id: user, **{
+        uid: UserRef(uid, f"faculty{uid}", "Instructor", "faculty", department="CSE")
+        for uid in (42, 43)
+    }})
     slot = {key: value for key, value in BASE_SLOT.items() if key != "department"}
 
     def insert(instructor_id):
@@ -117,3 +120,89 @@ def test_cookie_authenticated_feedback_requires_csrf(settings, stub_iam):
                            HTTP_X_CSRF_TOKEN=token_for("test-session"))
     assert accepted.status_code == 201
     assert Feedback.objects.count() == 1
+
+
+@pytest.mark.parametrize(("name", "method", "kwargs"), DEPARTMENT_METHODS)
+def test_anonymous_department_requests_require_authentication(name, method, kwargs):
+    response = getattr(APIClient(), method)(reverse(name, kwargs=kwargs))
+    assert response.status_code == 401
+
+
+DEPARTMENT_WRITES = [
+    (name, method, kwargs, pattern.callback.cls.write_permission)
+    for name, method, kwargs in DEPARTMENT_METHODS if method != "get"
+    for pattern in urlpatterns if pattern.name == name
+]
+
+
+@pytest.mark.parametrize(("name", "method", "kwargs", "permission"), DEPARTMENT_WRITES)
+def test_every_write_refuses_invalid_payload_and_throttles(
+    name, method, kwargs, permission, stub_iam, monkeypatch,
+):
+    code = permission[0] if isinstance(permission, tuple) else permission
+    role = next(role for role, grants in ROLE_GRANTS.items() if code in grants)
+    stub_iam(session=make_session(active_role=role, roles=[role], permissions=[code],
+                                  modules=["department"]))
+    monkeypatch.setitem(PrincipalScopedThrottle.THROTTLE_RATES, "department_write", "1/min")
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION="Token test-session")
+    submit = getattr(client, method)
+    url = reverse(name, kwargs=kwargs)
+    assert submit(url, {"unknown_key": 1}, format="json").status_code == 400
+    assert submit(url, {}, format="json").status_code == 429
+
+
+@pytest.mark.parametrize("attributes", [
+    None, {"department": "ECE"}, {"kind": "student"}, {"is_active": False},
+])
+@pytest.mark.django_db
+def test_slot_requires_an_active_faculty_member_in_scope(stub_iam, attributes):
+    from core.api.exceptions import NotFoundError
+
+    actor = make_principal(kind="staff", active_role="deptadmin_cse", modules=["department"],
+                           permissions=[UPDATE_TIMETABLE])
+    users = {actor.user_id: UserRef(actor.user_id, "admin", "Admin", "staff", department="CSE")}
+    if attributes is not None:
+        fields = {"department": "CSE", "kind": "faculty", **attributes}
+        users[42] = UserRef(42, "faculty", "Instructor", **fields)
+    stub_iam(users=users)
+    with pytest.raises(NotFoundError):
+        upload_timetable(actor=actor, slots=[{k: v for k, v in BASE_SLOT.items() if k != "department"}])
+    assert not TimetableSlot.objects.exists()
+
+
+def test_slot_rejects_id_outside_the_storage_range():
+    from modules.department.api.administration import DepartmentTimetableSerializer
+
+    values = {k: v for k, v in BASE_SLOT.items() if k != "department"}
+    serializer = DepartmentTimetableSerializer(data={**values, "instructor_id": 2 ** 31})
+    assert not serializer.is_valid()
+    assert set(serializer.errors) == {"instructor_id"}
+
+
+@pytest.mark.django_db
+def test_direct_service_requires_iam_permission(stub_iam):
+    from core.api.exceptions import PermissionDeniedError
+    from modules.department.services import submit_feedback
+
+    actor = make_principal(kind="faculty", active_role="faculty", modules=["department"])
+    stub_iam(users={actor.user_id: UserRef(actor.user_id, "faculty", "Faculty", "faculty",
+                                           department="CSE")})
+    with pytest.raises(PermissionDeniedError):
+        submit_feedback(actor=actor, content="Review equipment")
+    assert not Feedback.objects.exists()
+
+
+@pytest.mark.django_db
+def test_readiness_explains_missing_configuration_and_checks_registration(settings):
+    from django.core.management import call_command
+    from django.core.management.base import CommandError
+
+    settings.IAM_SERVICE_TOKEN = ""
+    with pytest.raises(CommandError, match="IAM_SERVICE_TOKEN"):
+        call_command("department_readiness")
+    settings.IAM_SERVICE_TOKEN = "test-only-directory-token"
+    with pytest.raises(CommandError, match="seed_modules"):
+        call_command("department_readiness")
+    call_command("seed_modules")
+    call_command("department_readiness")

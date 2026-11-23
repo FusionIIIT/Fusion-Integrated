@@ -1,43 +1,17 @@
 import { Button, Container, Loader, Paper, Stack, Text } from "@mantine/core";
-import { useInfiniteQuery } from "@tanstack/react-query";
 
-import { useAuth } from "../../auth/AuthProvider";
-import { http } from "../../lib/http";
+import { useAnnouncements } from "./api";
 import { ErrorState } from "../../ui/components/ErrorState";
 import { PageHeader } from "../../ui/components/PageHeader";
 import { ManageAnnouncements, PublishAnnouncement } from "./AnnouncementEditor";
 import { useDepartmentCan } from "./DepartmentLayout";
 
-interface Announcement {
-  id: number;
-  content: string;
-  published_at: string;
-}
-
-interface AnnouncementPage {
-  next: string | null;
-  results: Announcement[];
-}
-
 const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 
 export default function AnnouncementsPage() {
-  const { session } = useAuth();
   const can = useDepartmentCan();
-  const query = useInfiniteQuery({
-    queryKey: ["department", "announcements", session?.user.id, session?.active_role],
-    initialPageParam: null as string | null,
-    queryFn: async ({ pageParam, signal }) => (
-      await http.get<AnnouncementPage>("/department/announcements", {
-        params: { cursor: pageParam }, signal,
-      })
-    ).data,
-    getNextPageParam: (page) => page.next
-      ? new URL(page.next, window.location.origin).searchParams.get("cursor")
-      : null,
-    gcTime: 0,
-  });
-  const announcements = query.data?.pages.flatMap((page) => page.results) ?? [];
+  const query = useAnnouncements();
+  const announcements = query.rows;
 
   return (
     <Container size="md" py="lg">

@@ -10,6 +10,7 @@ from modules.department.models import (
     Notice,
     StockItem,
     StockMovement,
+    StockRequest,
     TimetableSlot,
 )
 from modules.department.registry import ROLE_GRANTS
@@ -25,7 +26,8 @@ def role_client(stub_iam):
                            department=department, **attributes)
         stub_iam(session=make_session(user_id=user_id, roles=[role], active_role=role, kind=kind,
                                       modules=["department"], permissions=ROLE_GRANTS[role]),
-                 users={user_id: identity})
+                 users={11: UserRef(11, "faculty", "Instructor", "faculty", department="CSE"),
+                        user_id: identity})
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION="Token test-session")
         return client
@@ -74,6 +76,8 @@ def test_stock_approval_issue_and_rejection(role_client):
     assert post(hod, f"stock-requests/{rejected_id}/action", {"action": "reject"}).status_code == 200
     admin = role_client("deptadmin_cse", kind="staff")
     assert post(admin, f"stock-requests/{approved_id}/action", {"action": "issue"}).status_code == 200
+    for decision in StockRequest.objects.filter(pk__in=[approved_id, rejected_id]):
+        assert decision.decided_by_id == 12 and decision.decided_at is not None
     assert StockItem.objects.get(pk=item_id).quantity == 1
     assert list(StockMovement.objects.order_by("id").values_list("delta", flat=True)) == [4, -3]
 

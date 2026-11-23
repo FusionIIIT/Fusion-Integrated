@@ -1,16 +1,18 @@
 STOCK_TRANSITIONS = {
-    ("pending", "approve"): "approved",
-    ("pending", "reject"): "rejected",
-    ("approved", "issue"): "issued",
+    ("pending", "approve", "hod"): "approved",
+    ("pending", "reject", "hod"): "rejected",
+    ("approved", "issue", "admin"): "issued",
 }
 
 FEEDBACK_TRANSITIONS = {
-    ("new", "review"): "reviewed",
-    ("reviewed", "close"): "closed",
-    ("reviewed", "resolve"): "resolved",
+    ("new", "review", "admin"): "reviewed",
+    ("reviewed", "close", "admin"): "closed",
+    ("reviewed", "close", "hod"): "closed",
+    ("reviewed", "resolve", "admin"): "resolved",
+    ("reviewed", "resolve", "hod"): "resolved",
 }
 
 OFFICIAL_TRANSITIONS = {
-    ("pending", "approve"): "approved",
-    ("pending", "reject"): "rejected",
+    ("pending", "approve", "hod"): "approved",
+    ("pending", "reject", "hod"): "rejected",
 }

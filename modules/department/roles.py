@@ -22,6 +22,15 @@ def acting_role(principal):
     return principal.active_role or principal.kind
 
 
+def office_lane(principal):
+    role = acting_role(principal)
+    if role in ADMIN_DEPARTMENTS:
+        return "admin"
+    if role in HOD_DEPARTMENTS:
+        return "hod"
+    return role
+
+
 def audience_role(principal):
     role = acting_role(principal)
     return "student" if role in STUDENT_ROLES else role

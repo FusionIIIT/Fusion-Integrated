@@ -1,26 +1,21 @@
+import type { Slot } from "./api/types";
 import { Button, Container, FileInput, Group, NumberInput, Paper, Select, Stack, Text, TextInput } from "@mantine/core";
 import { useState } from "react";
 
 import { ErrorState } from "../../ui/components/ErrorState";
 import { PageHeader } from "../../ui/components/PageHeader";
-import { useDepartmentAction, useDepartmentFeed, useDepartmentRecord } from "./api";
+import { useDepartmentAction, useTimetable, useAcademicContext } from "./api";
 import { useDepartmentCan } from "./DepartmentLayout";
 import { FeedState } from "./FeedState";
-
-interface Slot {
-  id: number; title: string; kind: string; term: string; day: number;
-  starts_at: string; ends_at: string; programme: string; batch_year: number;
-  room: string; instructor_id: number;
-}
-interface AcademicContext { programme: string; batch_year: number | null }
 
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 function SlotEditor({ initial, close }: { initial?: Slot; close: () => void }) {
   const action = useDepartmentAction();
-  const [slot, setSlot] = useState(initial ?? {
+  const { id: _id, ...initialFields } = initial ?? {};
+  const [slot, setSlot] = useState<Omit<Slot, "id">>({
     title: "", kind: "class", term: "", day: 0, starts_at: "", ends_at: "", programme: "",
-    batch_year: new Date().getFullYear(), room: "", instructor_id: 0,
+    batch_year: new Date().getFullYear(), room: "", instructor_id: 0, ...initialFields,
   });
   const change = <K extends keyof typeof slot>(key: K, value: (typeof slot)[K]) =>
     setSlot((old) => ({ ...old, [key]: value }));
@@ -40,7 +35,7 @@ function SlotEditor({ initial, close }: { initial?: Slot; close: () => void }) {
         ))}
         <Group grow>
           <Select label="Type" data={[{ value: "class", label: "Class" }, { value: "lab", label: "Lab" }]}
-            value={slot.kind} allowDeselect={false} onChange={(value) => { if (value) change("kind", value); }} />
+            value={slot.kind} allowDeselect={false} onChange={(value) => { if (value === "class" || value === "lab") change("kind", value); }} />
           <Select label="Day" data={days.map((label, index) => ({ label, value: String(index) }))}
             value={String(slot.day)} allowDeselect={false} onChange={(value) => change("day", Number(value))} />
         </Group>
@@ -101,8 +96,8 @@ export default function TimetablePage() {
   const can = useDepartmentCan();
   const editable = can("department.timetable.update");
   const [editor, setEditor] = useState<number | "new" | null>(null);
-  const feed = useDepartmentFeed<Slot>("timetable");
-  const context = useDepartmentRecord<AcademicContext>("academic-context", !editable);
+  const feed = useTimetable();
+  const context = useAcademicContext(!editable);
   return (
     <Container size="md" py="lg">
       <PageHeader title="Academic timetable" />

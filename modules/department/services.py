@@ -13,7 +13,13 @@ from modules.department.models import (
     StockMovement,
     StockRequest,
 )
-from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS, STUDENT_ROLES, acting_role
+from modules.department.roles import (
+    ADMIN_DEPARTMENTS,
+    HOD_DEPARTMENTS,
+    STUDENT_ROLES,
+    acting_role,
+    office_lane,
+)
 from modules.department.selectors import department_for, live_identity
 
 
@@ -27,8 +33,8 @@ def _department(actor, permission, roles):
     return department
 
 
-def _next_state(transitions, current, action):
-    state = transitions.get((current, action))
+def _next_state(transitions, current, action, lane):
+    state = transitions.get((current, action, lane))
     if state is None:
         raise ConflictError("Refresh the record and choose an action allowed in its current state.")
     return state
@@ -68,7 +74,7 @@ def maintain_announcement(*, actor, announcement_id, action, changes=None):
         announcement.save(update_fields=["content", "target_roles", "target_programmes",
                                          "target_batch_years"])
     else:
-        raise ConflictError("Unknown announcement action.")
+        raise ConflictError("Choose edit, hide or delete for this announcement.")
 
 
 @transaction.atomic
@@ -111,7 +117,7 @@ def advance_stock_request(*, actor, request_id, action):
     ).first()
     if request is None:
         raise NotFoundError()
-    state = _next_state(STOCK_TRANSITIONS, request.status, action)
+    state = _next_state(STOCK_TRANSITIONS, request.status, action, office_lane(actor))
     if action == "issue":
         item = StockItem.objects.select_for_update().get(pk=request.item_id)
         if item.quantity < request.quantity:
@@ -120,8 +126,11 @@ def advance_stock_request(*, actor, request_id, action):
         item.save(update_fields=["quantity"])
         StockMovement.objects.create(item=item, request=request, delta=-request.quantity,
                                      actor_id=actor.user_id)
+    else:
+        request.decided_by_id = actor.user_id
+        request.decided_at = timezone.now()
     request.status = state
-    request.save(update_fields=["status"])
+    request.save(update_fields=["status", "decided_by_id", "decided_at"])
     if state in {StockRequest.Status.ISSUED, StockRequest.Status.REJECTED}:
         Notice.objects.create(department=department, user_id=request.user_id,
                               message=f"Stock request #{request.pk} was {state}.")
@@ -150,7 +159,7 @@ def advance_feedback(*, actor, feedback_id, action, category="", close_simple=Fa
     feedback = queryset.first()
     if feedback is None:
         raise NotFoundError()
-    feedback.status = _next_state(FEEDBACK_TRANSITIONS, feedback.status, action)
+    feedback.status = _next_state(FEEDBACK_TRANSITIONS, feedback.status, action, office_lane(actor))
     now = timezone.now()
     if reviewing:
         if not category.strip():
@@ -159,7 +168,9 @@ def advance_feedback(*, actor, feedback_id, action, category="", close_simple=Fa
         feedback.reviewed_at = now
         feedback.reviewed_by_id = actor.user_id
         if close_simple:
-            feedback.status = FEEDBACK_TRANSITIONS[(feedback.status, "close")]
+            feedback.status = _next_state(
+                FEEDBACK_TRANSITIONS, feedback.status, "close", office_lane(actor),
+            )
     if feedback.status in {Feedback.Status.CLOSED, Feedback.Status.RESOLVED}:
         feedback.disposed_at = now
         feedback.disposed_by_id = actor.user_id

@@ -1,14 +1,15 @@
 import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useRoutes } from "react-router-dom";
 import { beforeEach, expect, it, vi } from "vitest";
 
+import { routes } from "./routes";
 import { http } from "../../lib/http";
 import { DepartmentLayout, RequireDepartmentPermission } from "./DepartmentLayout";
 
 vi.mock("../../auth/AuthProvider", () => ({
-  useAuth: () => ({ session: { user: { id: 10 }, active_role: "student" } }),
+  useAuth: () => ({ can: () => true, session: { user: { id: 10 }, active_role: "student" } }),
 }));
 vi.mock("../../lib/http", async (original) => ({
   ...await original<typeof import("../../lib/http")>(), http: { get: vi.fn() },
@@ -53,4 +54,25 @@ it("shows an actionable error when access lookup fails", async () => {
   show();
   expect(await screen.findByText("Could not load this")).toBeInTheDocument();
   expect(screen.queryByText("Protected details")).not.toBeInTheDocument();
+});
+
+function ProductionRoutes() {
+  return useRoutes([{ path: "/department", children: routes }]);
+}
+
+it.each([
+  ["details", "department.details.view"], ["announcements", "department.announcement.view"],
+  ["inventory", "department.stock.view"], ["stock-requests", "department.stock_request.view"],
+  ["feedback", "department.feedback.create"], ["feedback-inbox", "department.feedback.view"],
+  ["notices", "department.notice.view"], ["labs", "department.lab.view"],
+  ["timetable", "department.timetable.view"],
+])("denies the production %s route before mounting the page", async (path, permission) => {
+  vi.mocked(http.get).mockResolvedValue({ data: { permissions: [] } });
+  const route = routes[0]?.children?.find((entry) => entry.path === path);
+  expect(route?.element).toHaveProperty("props.permission", permission);
+  render(<MantineProvider><QueryClientProvider client={new QueryClient()}>
+    <MemoryRouter initialEntries={[`/department/${path}`]}><ProductionRoutes /></MemoryRouter>
+  </QueryClientProvider></MantineProvider>);
+  expect(await screen.findByText("Not available to your role")).toBeInTheDocument();
+  expect(screen.queryAllByRole("button")).toHaveLength(0);
 });

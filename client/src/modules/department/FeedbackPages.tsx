@@ -3,11 +3,9 @@ import { useState } from "react";
 
 import { ErrorState } from "../../ui/components/ErrorState";
 import { PageHeader } from "../../ui/components/PageHeader";
-import { useDepartmentAction, useDepartmentFeed } from "./api";
+import { useDepartmentAction, useFeedback } from "./api";
 import { useDepartmentCan } from "./DepartmentLayout";
 import { FeedState } from "./FeedState";
-
-interface Feedback { id: number; content: string; category: string; status: string }
 
 export function SubmitFeedbackPage() {
   const [content, setContent] = useState("");
@@ -56,7 +54,7 @@ function InitialReview({ id }: { id: number }) {
 
 export function FeedbackInboxPage() {
   const can = useDepartmentCan();
-  const feed = useDepartmentFeed<Feedback>("feedback");
+  const feed = useFeedback();
   const action = useDepartmentAction();
   const dispose = (id: number, decision: string) => action.mutate({
     path: `feedback/${id}/action`, data: { action: decision },
@@ -67,7 +65,7 @@ export function FeedbackInboxPage() {
       <PageHeader title="Feedback inbox" />
       <Stack>
         {feed.rows.map((item) => (
-          <Paper key={item.id} withBorder p="md">
+          <Paper component="article" key={item.id} withBorder p="md">
             <Stack>
               <Text size="sm" c="dimmed">#{item.id} · {item.status}{item.category && ` · ${item.category}`}</Text>
               <Text style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{item.content}</Text>

@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from modules.department import permissions as p
 from modules.department import selectors, services
-from modules.department.api.common import DepartmentAccess
+from modules.department.api.common import CheckedFields, DepartmentAccess
 from modules.department.models import Feedback, Notice, StockItem, StockRequest
 
 
@@ -17,7 +17,7 @@ class InventorySerializer(serializers.ModelSerializer):
         fields = ("id", "name", "quantity")
 
 
-class StockInsertionSerializer(serializers.Serializer):
+class StockInsertionSerializer(CheckedFields, serializers.Serializer):
     name = serializers.CharField(max_length=160)
     quantity = serializers.IntegerField(min_value=1, max_value=1_000_000)
 
@@ -49,8 +49,8 @@ class StockRequestSerializer(serializers.ModelSerializer):
         fields = ("id", "item_name", "quantity", "status", "created_at")
 
 
-class StockRequestWriteSerializer(serializers.Serializer):
-    item_id = serializers.IntegerField(min_value=1)
+class StockRequestWriteSerializer(CheckedFields, serializers.Serializer):
+    item_id = serializers.IntegerField(min_value=1, max_value=9_223_372_036_854_775_807)
     quantity = serializers.IntegerField(min_value=1, max_value=1_000_000)
 
 
@@ -72,7 +72,7 @@ class StockRequestsView(DepartmentAccess, generics.ListCreateAPIView):
         return Response(StockRequestSerializer(row).data, status=status.HTTP_201_CREATED)
 
 
-class StockActionSerializer(serializers.Serializer):
+class StockActionSerializer(CheckedFields, serializers.Serializer):
     action = serializers.ChoiceField(choices=["approve", "reject", "issue"])
 
 
@@ -96,7 +96,7 @@ class FeedbackSerializer(serializers.ModelSerializer):
         fields = ("id", "content", "category", "status", "created_at", "reviewed_at", "disposed_at")
 
 
-class FeedbackSubmissionSerializer(serializers.Serializer):
+class FeedbackSubmissionSerializer(CheckedFields, serializers.Serializer):
     content = serializers.CharField(max_length=8000)
 
 
@@ -126,7 +126,7 @@ class FeedbackView(DepartmentAccess, generics.ListCreateAPIView):
         return Response(FeedbackReceiptSerializer(row).data, status=status.HTTP_201_CREATED)
 
 
-class FeedbackActionSerializer(serializers.Serializer):
+class FeedbackActionSerializer(CheckedFields, serializers.Serializer):
     action = serializers.ChoiceField(choices=["review", "close", "resolve"])
     category = serializers.CharField(max_length=100, required=False)
     close_simple = serializers.BooleanField(default=False)

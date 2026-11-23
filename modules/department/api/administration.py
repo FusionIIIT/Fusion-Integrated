@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from core.api.exceptions import NotFoundError
 from modules.department import administration, selectors
 from modules.department import permissions as p
-from modules.department.api.common import DepartmentAccess
+from modules.department.api.common import CheckedFields, DepartmentAccess
 from modules.department.models import (
     DepartmentDetails,
     DepartmentProposal,
@@ -17,7 +17,7 @@ from modules.department.models import (
 )
 
 
-class LabResourceSerializer(serializers.ModelSerializer):
+class LabResourceSerializer(CheckedFields, serializers.ModelSerializer):
     details = serializers.CharField(max_length=8000)
 
     class Meta:
@@ -43,10 +43,10 @@ class LabResourcesView(DepartmentAccess, generics.ListCreateAPIView):
         return Response(LabResourceSerializer(lab).data)
 
 
-class DepartmentTimetableSerializer(serializers.ModelSerializer):
+class DepartmentTimetableSerializer(CheckedFields, serializers.ModelSerializer):
     day = serializers.IntegerField(min_value=0, max_value=6)
     batch_year = serializers.IntegerField(min_value=1900, max_value=2200)
-    instructor_id = serializers.IntegerField(min_value=1)
+    instructor_id = serializers.IntegerField(min_value=1, max_value=2_147_483_647)
 
     class Meta:
         model = TimetableSlot
@@ -59,7 +59,7 @@ class DepartmentTimetableSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class TimetableUploadSerializer(serializers.Serializer):
+class TimetableUploadSerializer(CheckedFields, serializers.Serializer):
     slots = DepartmentTimetableSerializer(many=True, allow_empty=False, max_length=100)
 
 
@@ -118,7 +118,7 @@ class DepartmentDetailsSerializer(serializers.ModelSerializer):
         fields = ("department", "official_name", "core_policies", "general_information")
 
 
-class GeneralDetailsSerializer(serializers.Serializer):
+class GeneralDetailsSerializer(CheckedFields, serializers.Serializer):
     general_information = serializers.CharField(max_length=8000, allow_blank=True)
 
 
@@ -152,7 +152,7 @@ class DepartmentProposalSerializer(serializers.ModelSerializer):
         fields = ("id", "field", "value", "status", "decided_at")
 
 
-class DepartmentProposalWriteSerializer(serializers.Serializer):
+class DepartmentProposalWriteSerializer(CheckedFields, serializers.Serializer):
     field = serializers.ChoiceField(choices=DepartmentProposal.Field.choices)
     value = serializers.CharField(max_length=8000)
 
@@ -183,7 +183,7 @@ class DepartmentProposalView(DepartmentAccess, generics.ListCreateAPIView):
         return Response(DepartmentProposalSerializer(row).data, status=status.HTTP_201_CREATED)
 
 
-class ProposalDecisionSerializer(serializers.Serializer):
+class ProposalDecisionSerializer(CheckedFields, serializers.Serializer):
     action = serializers.ChoiceField(choices=["approve", "reject"])
 
 

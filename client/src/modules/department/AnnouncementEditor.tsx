@@ -1,17 +1,10 @@
+import type { ManagedAnnouncement } from "./api/types";
 import { Button, Group, Paper, Stack, TagsInput, Text, Textarea } from "@mantine/core";
 import { useState } from "react";
 
 import { ErrorState } from "../../ui/components/ErrorState";
-import { useDepartmentAction, useDepartmentFeed } from "./api";
+import { useDepartmentAction, useManagedAnnouncements } from "./api";
 import { FeedState } from "./FeedState";
-
-interface EditValues {
-  content: string;
-  target_roles: string[];
-  target_programmes: string[];
-  target_batch_years: number[];
-}
-interface ManagedAnnouncement extends EditValues { id: number }
 
 function AnnouncementForm({ initial, onClose }: { initial?: ManagedAnnouncement; onClose: () => void }) {
   const [content, setContent] = useState(initial?.content ?? "");
@@ -59,7 +52,7 @@ export function PublishAnnouncement() {
 }
 
 export function ManageAnnouncements() {
-  const feed = useDepartmentFeed<ManagedAnnouncement>("announcements/managed");
+  const feed = useManagedAnnouncements();
   const action = useDepartmentAction();
   const [editing, setEditing] = useState<number | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -76,7 +69,7 @@ export function ManageAnnouncements() {
       {feed.rows.map((row) => editing === row.id
         ? <AnnouncementForm key={row.id} initial={row} onClose={() => setEditing(null)} />
         : (
-          <Paper key={row.id} p="md" withBorder>
+          <Paper component="article" key={row.id} p="md" withBorder>
             <Stack>
               <Text style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{row.content}</Text>
               {deleteId === row.id ? (

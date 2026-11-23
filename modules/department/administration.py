@@ -2,6 +2,7 @@ from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from core.api.exceptions import ConflictError, NotFoundError
+from fusion_auth.client import get_client
 from modules.department import permissions as p
 from modules.department.domain import OFFICIAL_TRANSITIONS
 from modules.department.models import (
@@ -10,7 +11,7 @@ from modules.department.models import (
     LabResource,
     TimetableSlot,
 )
-from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS
+from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS, office_lane
 from modules.department.services import _department, _next_state
 
 TIMETABLE_OVERLAP_CONSTRAINTS = {
@@ -39,8 +40,19 @@ def _is_timetable_overlap(error):
     return getattr(diag, "constraint_name", None) in TIMETABLE_OVERLAP_CONSTRAINTS
 
 
+def _check_instructors(department, instructor_ids):
+    instructors = get_client().get_users(sorted(instructor_ids))
+    if any(
+        not (user and user.is_active and user.kind == "faculty"
+             and user.department.strip() == department)
+        for user in (instructors.get(user_id) for user_id in instructor_ids)
+    ):
+        raise NotFoundError("Choose an active instructor in your department.")
+
+
 def upload_timetable(*, actor, slots):
     department = _department(actor, p.UPDATE_TIMETABLE, ADMIN_DEPARTMENTS)
+    _check_instructors(department, {slot["instructor_id"] for slot in slots})
     try:
         with transaction.atomic():
             _lock_department(department)
@@ -57,6 +69,7 @@ def upload_timetable(*, actor, slots):
 
 def replace_timetable_slot(*, actor, slot_id, values):
     department = _department(actor, p.UPDATE_TIMETABLE, ADMIN_DEPARTMENTS)
+    _check_instructors(department, {values["instructor_id"]})
     rows = TimetableSlot.objects.select_for_update().filter(pk=slot_id, department=department)
     try:
         with transaction.atomic():
@@ -90,9 +103,9 @@ def propose_official_details(*, actor, field, value):
     department = _department(actor, p.PROPOSE_DETAILS, ADMIN_DEPARTMENTS)
     row = _lock_department(department)
     if field not in DepartmentProposal.Field.values:
-        raise ConflictError("This field is outside the official-change workflow.")
+        raise ConflictError("Choose Official name or Core policies for an official change.")
     if DepartmentProposal.objects.filter(department=row, field=field, status="pending").exists():
-        raise ConflictError("A change to this field is already awaiting review.")
+        raise ConflictError("Wait for the pending change to this field to be decided before submitting another.")
     return DepartmentProposal.objects.create(department=row, field=field, value=value,
                                              proposed_by_id=actor.user_id)
 
@@ -106,10 +119,10 @@ def decide_official_details(*, actor, proposal_id, action):
     proposal = DepartmentProposal.objects.filter(pk=proposal_id, department=row).first()
     if proposal is None:
         raise NotFoundError()
-    proposal.status = _next_state(OFFICIAL_TRANSITIONS, proposal.status, action)
+    proposal.status = _next_state(OFFICIAL_TRANSITIONS, proposal.status, action, office_lane(actor))
     if proposal.status == "approved":
         if proposal.field not in DepartmentProposal.Field.values:
-            raise ConflictError("This field is outside the official-change workflow.")
+            raise ConflictError("Choose Official name or Core policies for an official change.")
         setattr(row, proposal.field, proposal.value)
         row.save(update_fields=[proposal.field])
     proposal.decided_at = timezone.now()

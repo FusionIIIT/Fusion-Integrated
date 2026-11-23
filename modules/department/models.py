@@ -54,6 +54,8 @@ class StockRequest(models.Model):
     user_id = models.PositiveIntegerField(db_index=True)
     quantity = models.PositiveIntegerField()
     status = models.CharField(max_length=12, choices=Status, default=Status.PENDING)
+    decided_by_id = models.PositiveIntegerField(null=True)
+    decided_at = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

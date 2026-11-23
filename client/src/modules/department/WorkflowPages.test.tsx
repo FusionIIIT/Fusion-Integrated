@@ -112,6 +112,7 @@ it("adds stock using the entered quantity", async () => {
   show(<InventoryPage />);
   await userEvent.type(screen.getByLabelText("Item name", { exact: false }), "Cable");
   await userEvent.click(screen.getByRole("button", { name: "Add stock" }));
+  expect(await screen.findByText("Saved.")).toBeInTheDocument();
   await waitFor(() => expect(http.post).toHaveBeenCalledWith("/department/inventory", { name: "Cable", quantity: 1 }));
 });
 
@@ -121,6 +122,7 @@ it("saves a lab profile", async () => {
   await userEvent.type(screen.getByLabelText("Lab name", { exact: false }), "Networks");
   await userEvent.type(screen.getByLabelText("Equipment and resource details", { exact: false }), "Ten PCs");
   await userEvent.click(screen.getByRole("button", { name: "Save lab profile" }));
+  expect(await screen.findByText("Lab profile saved.")).toBeInTheDocument();
   await waitFor(() => expect(http.post).toHaveBeenCalledWith("/department/labs", { name: "Networks", details: "Ten PCs" }));
 });
 
@@ -131,6 +133,7 @@ it("saves general information without changing official fields", async () => {
   await userEvent.clear(input);
   await userEvent.type(input, "Open at nine");
   await userEvent.click(screen.getByRole("button", { name: "Save general information" }));
+  expect(await screen.findByText("General information saved.")).toBeInTheDocument();
   await waitFor(() => expect(http.post).toHaveBeenCalledWith("/department/details", { general_information: "Open at nine" }));
 });
 
@@ -141,6 +144,7 @@ it("approves a pending stock request with the HOD control", async () => {
   ] } });
   show(<StockRequestsPage />);
   await userEvent.click(await screen.findByRole("button", { name: "Approve" }));
+  expect(await screen.findByText("Stock request updated.")).toBeInTheDocument();
   await waitFor(() => expect(http.post).toHaveBeenCalledWith("/department/stock-requests/7/action", { action: "approve" }));
   expect(screen.queryByRole("button", { name: "Issue stock" })).not.toBeInTheDocument();
 });
@@ -181,4 +185,36 @@ it("renders received notices", async () => {
   ] } });
   show(<NoticesPage />);
   expect(await screen.findByText("Stock request #7 was issued.")).toBeInTheDocument();
+});
+
+it("withholds both decisions on a visible pending stock request without approval permission", async () => {
+  vi.mocked(http.get).mockResolvedValue({ data: { next: null, results: [
+    { id: 7, item_name: "Cable", quantity: 1, status: "pending" },
+  ] } });
+  show(<StockRequestsPage />);
+  expect(await screen.findByText("Cable · 1 · pending")).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /approve|reject/i })).not.toBeInTheDocument();
+});
+
+it("submits an official change and clears the proposal after confirmation", async () => {
+  access.permissions = ["department.proposal.create"];
+  show(<DepartmentDetailsPage />);
+  const value = await screen.findByLabelText(/Proposed value/);
+  await userEvent.type(value, "Engineering");
+  await userEvent.click(screen.getByRole("button", { name: "Submit for approval" }));
+  expect(await screen.findByText("Proposal saved.")).toBeInTheDocument();
+  expect(value).toHaveValue("");
+  expect(http.post).toHaveBeenCalledWith("/department/proposals", { field: "official_name", value: "Engineering" });
+});
+
+it.each(["Approve", "Reject"])("confirms the %s decision on a pending official change", async (decision) => {
+  access.permissions = ["department.proposal.approve"];
+  vi.mocked(http.get).mockImplementation(async (url) => ({ data: url === "/department/proposals"
+    ? { next: null, results: [{ id: 3, field: "official_name", value: "Engineering", status: "pending", decided_at: null }] }
+    : { department: "CSE", general_information: "", core_policies: "", official_name: "" },
+  }));
+  show(<DepartmentDetailsPage />);
+  await userEvent.click(await screen.findByRole("button", { name: decision }));
+  expect(await screen.findByText("Proposal saved.")).toBeInTheDocument();
+  expect(http.post).toHaveBeenCalledWith("/department/proposals/3/action", { action: decision.toLowerCase() });
 });

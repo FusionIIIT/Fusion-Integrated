@@ -27,14 +27,15 @@ from modules.department.services import _next_state, advance_stock_request
 ])
 def test_every_state_action_pair(transitions):
     """BR-DEPT-007, BR-DEPT-013, BR-DEPT-017, BR-DEPT-018: terminal states refuse actions."""
-    states = {state for state, _ in transitions} | set(transitions.values())
-    actions = {action for _, action in transitions}
-    for state, action in product(states | {"unknown"}, actions | {"unknown"}):
-        if (state, action) in transitions:
-            assert _next_state(transitions, state, action) == transitions[state, action]
+    states = {state for state, _, _ in transitions} | set(transitions.values())
+    actions = {action for _, action, _ in transitions}
+    for state, action, lane in product(states | {"unknown"}, actions, ("admin", "hod", "faculty")):
+        key = state, action, lane
+        if key in transitions:
+            assert _next_state(transitions, *key) == transitions[key]
         else:
             with pytest.raises(ConflictError):
-                _next_state(transitions, state, action)
+                _next_state(transitions, *key)
 
 
 def test_permission_strings_do_not_drift():
@@ -98,3 +99,60 @@ def test_concurrent_issuance_never_duplicates_or_overdraws(stub_iam, same_reques
     assert StockMovement.objects.get().delta == -1
     assert StockRequest.objects.filter(status="issued").count() == 1
     assert Notice.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_all_department_lists_keep_a_constant_request_query_budget(stub_iam, django_assert_num_queries):
+    """Two page sizes exercise role filtering, pagination and serialization together."""
+    from datetime import time
+
+    from django.urls import reverse
+    from rest_framework.test import APIClient
+
+    from conftest import make_session
+    from modules.department.models import (
+        Announcement,
+        DepartmentDetails,
+        DepartmentProposal,
+        Feedback,
+        LabResource,
+        TimetableSlot,
+    )
+
+    details = DepartmentDetails.objects.create(department="CSE")
+    endpoints = {
+        "department-announcements": "faculty",
+        "department-managed-announcements": "HOD (CSE)",
+        "department-stock-requests": "HOD (CSE)",
+        "department-inventory": "faculty",
+        "department-feedback": "deptadmin_cse",
+        "department-notices": "deptadmin_cse",
+        "department-labs": "faculty",
+        "department-timetable": "deptadmin_cse",
+        "department-proposals": "deptadmin_cse",
+    }
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION="Token query-budget")
+    for i in range(20):
+        Announcement.objects.create(department="CSE", content=f"Seminar {i}")
+        item = StockItem.objects.create(department="CSE", name=f"Item {i}", quantity=10)
+        StockRequest.objects.create(item=item, user_id=11, quantity=1)
+        Feedback.objects.create(department="CSE", user_id=11, content=f"Feedback {i}")
+        Notice.objects.create(department="CSE", audience="admin", message=f"Notice {i}")
+        LabResource.objects.create(department="CSE", name=f"Lab {i}", details="Lab resources")
+        TimetableSlot.objects.create(department="CSE", term=f"Term {i}", day=1, starts_at=time(10),
+                                     ends_at=time(11), programme="BTech", batch_year=2025,
+                                     room="R", instructor_id=12, title="Algorithms", kind="class")
+        DepartmentProposal.objects.create(department=details, field="official_name", value=f"Name {i}",
+                                          proposed_by_id=11, status="approved")
+        if i + 1 not in (2, 20):
+            continue
+        for name, role in endpoints.items():
+            session = make_session(user_id=11, kind="faculty", roles=[role], active_role=role,
+                                   modules=["department"], permissions=ROLE_GRANTS[role])
+            stub_iam(session=session, users={11: UserRef(11, "instructor", "Instructor", "faculty",
+                                                         department="CSE")})
+            with django_assert_num_queries(1):
+                response = client.get(reverse(name), {"limit": 20})
+            assert response.status_code == 200, name
+            assert len(response.json()["results"]) == i + 1, name

@@ -1,13 +1,11 @@
 import { Container, Paper, Stack, Text } from "@mantine/core";
 
 import { PageHeader } from "../../ui/components/PageHeader";
-import { useDepartmentFeed } from "./api";
+import { useNotices } from "./api";
 import { FeedState } from "./FeedState";
 
-interface Notice { id: number; message: string; created_at: string }
-
 export default function NoticesPage() {
-  const feed = useDepartmentFeed<Notice>("notices", 15000);
+  const feed = useNotices(15000);
   return (
     <Container size="sm" py="lg">
       <PageHeader title="Department notifications" />

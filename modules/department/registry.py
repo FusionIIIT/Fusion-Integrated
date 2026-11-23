@@ -71,3 +71,19 @@ ROLE_GRANTS = {
     **dict.fromkeys(HOD_DEPARTMENTS, _HOD),
     **dict.fromkeys(ADMIN_DEPARTMENTS, _ADMIN),
 }
+
+
+def readiness():
+    """Prerequisites shared by seed_modules and the read-only operator check."""
+    from django.conf import settings
+    from django.db import connection
+    from django.db.migrations.executor import MigrationExecutor
+
+    executor = MigrationExecutor(connection)
+    targets = executor.loader.graph.leaf_nodes("department")
+    missing = []
+    if executor.migration_plan(targets):
+        missing.append("Apply outstanding migrations with manage.py migrate.")
+    if not settings.IAM_SERVICE_TOKEN:
+        missing.append("Configure IAM_SERVICE_TOKEN with a directory service credential.")
+    return missing

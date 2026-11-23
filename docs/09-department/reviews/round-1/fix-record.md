@@ -1,6 +1,6 @@
 # Round 1 continuation — 23 November 2026
 
-The [original review](original-review.md) is preserved unedited. It reviewed
+The [original review](https://github.com/LightCreator1007/Fusion-Integrated/blob/fc65686cccb157fe1ab768c4ed57e624a8bb4e58/docs/09-department/reviews/round-1/original-review.md) is preserved unedited. It reviewed
 `8a550b4d3a2f67102bb3bebf44f30d93cf667aea`, stopped official preflight on a global
 instruction file, and separately returned 15 findings. It did not award a score.
 This file records builder work, not an independent verdict.

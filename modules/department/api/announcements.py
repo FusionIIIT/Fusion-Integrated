@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from modules.department import permissions as p
 from modules.department import services
-from modules.department.api.common import DepartmentAccess
+from modules.department.api.common import CheckedFields, DepartmentAccess
 from modules.department.models import Announcement
 from modules.department.roles import ADMIN_DEPARTMENTS, HOD_DEPARTMENTS
 from modules.department.selectors import manageable_announcements, visible_announcements
@@ -19,7 +19,7 @@ class DepartmentAnnouncementSerializer(serializers.ModelSerializer):
         fields = ("id", "content", "published_at")
 
 
-class DepartmentAnnouncementWriteSerializer(serializers.Serializer):
+class DepartmentAnnouncementWriteSerializer(CheckedFields, serializers.Serializer):
     content = serializers.CharField(max_length=8000)
     target_roles = serializers.ListField(child=serializers.ChoiceField(
         choices=["student", "faculty", *HOD_DEPARTMENTS, *ADMIN_DEPARTMENTS]), max_length=20)
@@ -50,7 +50,7 @@ class AnnouncementListView(DepartmentAccess, generics.ListCreateAPIView):
         return Response(DepartmentAnnouncementSerializer(row).data, status=status.HTTP_201_CREATED)
 
 
-class AnnouncementMaintenanceSerializer(serializers.Serializer):
+class AnnouncementMaintenanceSerializer(CheckedFields, serializers.Serializer):
     action = serializers.ChoiceField(choices=["edit", "hide", "delete"])
     announcement = DepartmentAnnouncementWriteSerializer(required=False)
 

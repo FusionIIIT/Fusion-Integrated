@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
@@ -10,6 +12,17 @@ from fusion_auth.permissions import HasModuleGrant
 from modules.department.permissions import VIEW_ANNOUNCEMENT
 from modules.department.registry import ROLE_GRANTS
 from modules.department.roles import acting_role
+
+
+class CheckedFields:
+    def to_internal_value(self, data):
+        if isinstance(data, Mapping):
+            writable = {name for name, field in self.fields.items() if not field.read_only}
+            unexpected = set(data) - writable
+            if unexpected:
+                errors = dict.fromkeys(sorted(unexpected), "Remove this unsupported field.")
+                raise serializers.ValidationError(errors)
+        return super().to_internal_value(data)
 
 
 class IdentityUnavailable(APIException):

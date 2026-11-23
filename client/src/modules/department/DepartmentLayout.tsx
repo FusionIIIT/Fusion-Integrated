@@ -4,12 +4,12 @@ import { createContext, type ReactNode, useContext, useEffect, useRef } from "re
 import { Outlet } from "react-router-dom";
 
 import { useAuth } from "../../auth/AuthProvider";
+import { RequirePermission } from "../../auth/RequirePermission";
 import { errorStatus } from "../../lib/http";
 import { ErrorState } from "../../ui/components/ErrorState";
 import { NotPermitted } from "../../ui/components/NotPermitted";
-import { useDepartmentFeed, useDepartmentRecord } from "./api";
+import { useNotices, useAccess } from "./api";
 
-interface Notice { id: number; message: string }
 const DepartmentPermissions = createContext<readonly string[]>([]);
 
 export function useDepartmentCan() {
@@ -19,11 +19,11 @@ export function useDepartmentCan() {
 
 export function RequireDepartmentPermission({ permission, children }: { permission: string; children: ReactNode }) {
   const can = useDepartmentCan();
-  return can(permission) ? children : <Container size="md" py="lg"><NotPermitted /></Container>;
+  return can(permission) ? <RequirePermission permission={permission}>{children}</RequirePermission> : <Container size="md" py="lg"><NotPermitted /></Container>;
 }
 
 function NoticeObserver() {
-  const feed = useDepartmentFeed<Notice>("notices", 15000);
+  const feed = useNotices(15000);
   const mostRecent = useRef<number | null>(null);
   const firstPage = feed.data?.pages[0]?.results;
 
@@ -42,7 +42,7 @@ function NoticeObserver() {
 
 export function DepartmentLayout() {
   const { session } = useAuth();
-  const access = useDepartmentRecord<{ permissions: string[] }>("access");
+  const access = useAccess();
   if (access.isPending) return <Container size="md" py="lg"><Loader aria-label="Loading Department access" /></Container>;
   if (access.isError) return (
     <Container size="md" py="lg">
