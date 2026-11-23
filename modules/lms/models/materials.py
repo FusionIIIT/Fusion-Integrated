@@ -30,7 +30,10 @@ class CourseMaterial(models.Model):
         verbose_name = "Course Material"
         verbose_name_plural = "Course Materials"
         indexes = [
-            models.Index(fields=["course_id", "status", "release_date"]),
+            models.Index(
+                fields=["course_id", "status", "release_date"],
+                name="idx_lms_mat_crs_st_rel",
+            ),
         ]
 
     def __str__(self) -> str:

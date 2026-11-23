@@ -88,12 +88,7 @@ def lms_course_setup():
 
 
 def test_faculty_course_management_journey(stub_iam, lms_course_setup):
-    """Faculty journey covering UC-LMS-001, UC-LMS-002, UC-LMS-003, UC-LMS-005, UC-LMS-007, UC-LMS-008,
-
-    CFR-LMS-001, CFR-LMS-002, CFR-LMS-003, CFR-LMS-005, CFR-LMS-006, CFR-LMS-007,
-    AFR-LMS-002.1, AFR-LMS-002.2, AFR-LMS-003.1, AFR-LMS-005.1, AFR-LMS-006.1, AFR-LMS-007.1,
-    BW-LMS-01, BW-LMS-02, CW-LMS-01, BR-LMS-010.
-    """
+    """Faculty course management journey covering workspaces, materials, assignments, and announcements."""
     course_id, now = lms_course_setup
     faculty_perms = (
         "lms.workspace.view",
@@ -175,13 +170,7 @@ def test_faculty_course_management_journey(stub_iam, lms_course_setup):
 
 
 def test_student_and_ta_grading_journey(stub_iam, lms_course_setup):
-    """End-to-end journey covering Student submission, TA grading, and Faculty publish.
-
-    UC-LMS-004, UC-LMS-006, UC-LMS-009, UC-LMS-010, UC-LMS-011, UC-LMS-012, UC-LMS-013, UC-LMS-014,
-    CFR-LMS-008, CFR-LMS-009, CFR-LMS-010, CFR-LMS-011, CFR-LMS-012, CFR-LMS-013,
-    BR-LMS-012, BR-LMS-013, BR-LMS-014, BR-LMS-016, BR-LMS-017, BR-LMS-018, BR-LMS-019,
-    BW-LMS-04, BW-LMS-05, CW-LMS-02.
-    """
+    """End-to-end journey covering student submission, TA grading, and faculty publish."""
     course_id, now = lms_course_setup
 
     # Setup published assignment
@@ -321,10 +310,7 @@ def test_student_and_ta_grading_journey(stub_iam, lms_course_setup):
 
 
 def test_observer_isolation_journey(stub_iam, lms_course_setup):
-    """Observer read-only access and strict student data privacy (CFR-LMS-015,
-
-    AFR-LMS-015.1, AFR-LMS-015.2, AFR-LMS-015.3, AFR-LMS-015.4, BR-LMS-003.
-    """
+    """Observer read-only access and strict student data privacy (BR-LMS-003)."""
     course_id, _ = lms_course_setup
     observer_perms = (
         "lms.workspace.view",

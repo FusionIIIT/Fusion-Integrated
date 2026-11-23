@@ -89,8 +89,7 @@ PERMISSIONS = [
     ("lms.grade.publish", "Publish grades and feedback to students"),
 ]
 
-#: System permissions are only for actions performed exclusively by background
-#: workers with no human designation holding them.
+#: System permissions for background workers with no human designation.
 SYSTEM_PERMISSIONS = []
 
 _STUDENT = [

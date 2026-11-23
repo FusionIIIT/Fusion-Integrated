@@ -43,8 +43,7 @@ def test_setup():
         syllabus="Syllabus B",
     )
 
-    # Memberships in Course A
-    # Instructor: user 6001
+    # Instructor membership in Course A: user 6001
     CourseMembership.objects.create(
         course_id=501,
         user_id=6001,

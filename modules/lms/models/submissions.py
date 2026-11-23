@@ -32,7 +32,10 @@ class AssignmentSubmission(models.Model):
         verbose_name = "Assignment Submission"
         verbose_name_plural = "Assignment Submissions"
         indexes = [
-            models.Index(fields=["assignment", "student_id", "submitted_at"]),
+            models.Index(
+                fields=["assignment", "student_id", "submitted_at"],
+                name="idx_lms_subm_asgn_std_sub",
+            ),
         ]
         constraints = [
             models.UniqueConstraint(

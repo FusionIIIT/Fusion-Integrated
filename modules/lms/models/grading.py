@@ -29,7 +29,7 @@ class SubmissionGrade(models.Model):
         verbose_name = "Submission Grade"
         verbose_name_plural = "Submission Grades"
         indexes = [
-            models.Index(fields=["status"]),
+            models.Index(fields=["status"], name="idx_lms_grade_status"),
         ]
         constraints = [
             models.CheckConstraint(

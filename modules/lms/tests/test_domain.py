@@ -16,9 +16,7 @@ from modules.lms.domain.constants import (
     SubmissionType,
 )
 
-# ==============================================================================
 # State Machines
-# ==============================================================================
 
 
 def test_material_fsm_immediate_and_scheduled():
@@ -94,9 +92,7 @@ def test_grade_fsm_publish():
         sm.GradeFSM.publish(GradeStatus.PUBLISHED)
 
 
-# ==============================================================================
 # Rules
-# ==============================================================================
 
 
 def test_rules_is_content_released():
@@ -118,9 +114,7 @@ def test_rules_is_submission_ontime():
     assert rules.is_submission_ontime(submitted_at=now, due_date=past_due) is False
 
 
-# ==============================================================================
 # Calculations
-# ==============================================================================
 
 
 def test_calculations_compute_submission_status():
@@ -142,9 +136,7 @@ def test_calculations_compute_submission_status():
     )
 
 
-# ==============================================================================
 # Validators
-# ==============================================================================
 
 
 def test_validate_material_payload():
@@ -418,9 +410,7 @@ def test_validator_instructions_and_type_failures():
 
 
 def test_ta_authoring_restrictions_br_lms_004():
-    """BR-LMS-004: TA authoring restriction.
-    TAs are strictly barred from creating or modifying assignments, materials, or course details.
-    """
+    """BR-LMS-004: TAs are strictly barred from creating or modifying course content."""
     assert rules.can_author_assignment(CourseRole.INSTRUCTOR) is True
     assert rules.can_author_assignment(CourseRole.TA) is False
     assert rules.can_author_material(CourseRole.INSTRUCTOR) is True
@@ -430,9 +420,7 @@ def test_ta_authoring_restrictions_br_lms_004():
 
 
 def test_announcement_posting_authority_br_lms_007():
-    """BR-LMS-007: Announcement posting authority.
-    Faculty always permitted; TA requires course-level can_post_announcement toggle.
-    """
+    """BR-LMS-007: Faculty always permitted; TA requires can_post_announcement toggle."""
     assert rules.can_post_announcement(CourseRole.INSTRUCTOR, can_post_flag=False) is True
     assert rules.can_post_announcement(CourseRole.TA, can_post_flag=True) is True
     assert rules.can_post_announcement(CourseRole.TA, can_post_flag=False) is False
@@ -441,9 +429,7 @@ def test_announcement_posting_authority_br_lms_007():
 
 
 def test_assignment_required_configuration_br_lms_009():
-    """BR-LMS-009: Assignment required configuration.
-    Validates due date, instructions, points possible, and submission type.
-    """
+    """BR-LMS-009: Validate due date, instructions, points possible, and submission type."""
     now = datetime.now(UTC)
     # Valid configuration passes
     validators.validate_assignment_config(

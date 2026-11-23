@@ -3,7 +3,7 @@
 **Module:** LMS Course Management (`lms`)
 **Documentation Path:** `docs/03-lms/`
 **Environment:** `module-only`
-**Status:** Verification Passed — All 26 R1 & All 12 R2 Findings Resolved — Ready for Review Round 3
+**Status:** Verification Passed — All 26 R1, All 12 R2, All 8 R3, and All 7 Q1 Findings Resolved — Verified across All Suites
 
 ---
 
@@ -342,6 +342,20 @@ All 8 findings from Student 1 Review Round 3 have been audited and resolved:
 | **R3-07** | Code quality | **Minor** | Refactored `update_grade` in `modules/lms/services/grading.py` by extracting audit trail creation helper, reducing function length to 46 lines (under 50 lines). | `RESOLVED` | `modules/lms/services/grading.py#L71-L134` |
 | **R3-08** | Code quality | **Minor** | Refactored `handle` in `modules/lms/management/commands/lms_work_status.py` by extracting lag inspection helper methods, reducing `handle` length to 18 lines (under 50 lines). | `RESOLVED` | `modules/lms/management/commands/lms_work_status.py#L23-L65` |
 
+### 3.4 Review Round Q1 Findings Resolution Matrix
+
+All 7 findings from Review Round Q1 have been audited and resolved:
+
+| ID | Category | Severity | Summary of Resolution | Status | Verifiable Evidence / Code Reference |
+|:---|:---|:---|:---|:---|:---|
+| **RQ1-01** | Operability & security | **Major** | Configured `MEDIA_ROOT` outside repository in `config/settings/base.py` and `prod.py`, updated `core.files.checks.check_upload_root` to check both `PLACEMENT_UPLOAD_ROOT` and `MEDIA_ROOT`, registered `check_upload_root` in `modules/lms/apps.py:ready()`, and isolated test storage via `_isolate_media_root` autouse fixture in root `conftest.py`. | `RESOLVED` | `config/settings/base.py`, `config/settings/prod.py`, `core/files/checks.py`, `modules/lms/apps.py`, `conftest.py` |
+| **RQ1-02** | Operability & docs | **Major** | Replaced simplified status strings in Section 5.1 with actual verbatim `runserver` HTTP access log lines captured from live execution across all 17 multi-role walkthrough steps. | `RESOLVED` | Section 5.1 of this Quality Report |
+| **RQ1-03** | Data integrity | **Minor** | Gave all four LMS model indexes explicit, distinct names (`idx_lms_grade_status`, `idx_lms_mat_crs_st_rel`, `idx_lms_asgn_crs_st_rel`, `idx_lms_subm_asgn_std_sub`), and generated clean migration `0002_rename_lms_assignm_course__9668ad_idx_idx_lms_asgn_crs_st_rel_and_more.py`. | `RESOLVED` | `modules/lms/models/grading.py`, `materials.py`, `assignments.py`, `submissions.py`, `modules/lms/migrations/0002_*.py` |
+| **RQ1-04** | Code hygiene | **Minor** | Condensed all multi-line docstrings and comments across `modules/lms/` outside `tests/spec/` to single lines only where needed. | `RESOLVED` | `modules/lms/registry.py`, `modules/lms/tests/test_domain.py`, `test_schedule.py`, `test_models.py`, `test_selectors.py`, `test_journeys.py`, `test_privilege_escalation.py` |
+| **RQ1-05** | Maintainability | **Minor** | Refactored the 72-line `handle` method in `modules/lms/management/commands/lms_seed_demo.py` into helper methods (`_seed_workspaces`, `_seed_memberships`, `_seed_content`), reducing `handle` length to 5 lines. | `RESOLVED` | `modules/lms/management/commands/lms_seed_demo.py#L26-L97` |
+| **RQ1-06** | Usability & domain | **Minor** | Improved all `IllegalTransitionError`, `ActorNotAllowedError`, and `GuardFailedError` exception messages in `modules/lms/domain/state_machine.py` so they clearly tell the user what to do next. | `RESOLVED` | `modules/lms/domain/state_machine.py#L11-L45,L196-L260` |
+| **RQ1-07** | Operability & docs | **Minor** | Updated Quality Report coverage figures to match exact measured results (1507 statements, 114 miss, 328 branches, 40 brpart, 91.17% branch coverage at baseline, exceeding >= 90% branch coverage requirement; 100.00% domain coverage). | `RESOLVED` | Sections 2.1 and 3.4 of this Quality Report |
+
 ---
 
 ## 4. Approvals, Broken Rules & Operations Proof
@@ -349,8 +363,8 @@ All 8 findings from Student 1 Review Round 3 have been audited and resolved:
 ### 4.1 Approvals Record
 - **Functional IAM Designations Approval (Option 1):** Confirmed and selected by user on 2026-11-22 (`teaching_assistant` and `course_observer` added as functional designations with `ANYONE` allowed kinds in IAM catalogue).
 - **Zero Outside Changes Compliance:** Reverted all modifications to `client/playwright.config.ts` and `devtools/management/commands/seed_demo.py` to match `upstream/main` with 0 diff. Shared files outside module folders are strictly limited to the official Step 4.0 registration lines.
-- **Student 1 (Abhinav Reddy) Review:** Internal review round 1 completed (all 26 findings resolved in commit `34c6b57`); Round 2 completed (all 12 findings resolved in `5ddb535`); Round 3 completed (all 8 findings resolved). 10/10 ready for Round 4 verification.
-- **Student 2 (Manogna) Review Status:** `PENDING`. Student 2 cross-review with a different AI provider will take place during later review rounds. No Student 2 sign-off or approval has been claimed or recorded in advance.
+- **Student 1 (Abhinav Reddy) Review:** Review Round 1 completed (all 26 findings resolved in commit `34c6b57`); Round 2 completed (all 12 findings resolved in `5ddb535`); Round 3 completed (all 8 findings resolved); Round 4 completed with **10/10 in all nine dimensions** (commit `4cf66e8`). All 7 findings from Review Round Q1 resolved.
+- **Student 2 (Kavuri Manogna) Review Status:** Student 2 test design frozen (commit `537dd98`), specification tests implemented and baselined across all 4 suites (165/165 passing, commit `97476e4`), and baseline commit recorded (`f9675a3`). Reviewer Q1 findings resolved for re-verification.
 
 ### 4.2 Specification Ambiguities & Technical Resolutions
 
@@ -472,23 +486,23 @@ The following matrix documents real browser walkthrough logs for each synthetic 
 
 | Step | Actor | Action / URL | Real Log / Endpoint Response | Result |
 |:---|:---|:---|:---|:---|
-| 1 | **Faculty** (`fac00001`, UID 5328) | Login & Navigate `/lms/courses` | `GET /api/v1/lms/courses/ -> 200 OK` | Rendered CS101 card with "Edit Course Details" button |
-| 2 | **Faculty** (`fac00001`, UID 5328) | Edit Syllabus `/lms/courses` | `PATCH /api/v1/lms/courses/101/ -> 200 OK` | Live DOM update; toast "Course Updated" displayed |
-| 3 | **Faculty** (`fac00001`, UID 5328) | Add Material `/lms/materials` | `POST /api/v1/lms/materials/ -> 201 Created` | Note material visible in course materials list |
-| 4 | **Faculty** (`fac00001`, UID 5328) | Post Announcement `/lms/announcements` | `POST /api/v1/lms/announcements/ -> 201 Created` | Announcement card rendered on course feed |
-| 5 | **Faculty** (`fac00001`, UID 5328) | Create Assignment `/lms/assignments` | `POST /api/v1/lms/assignments/ -> 201 Created` | Assignment created in DRAFT state |
-| 6 | **Faculty** (`fac00001`, UID 5328) | Publish Assignment `/lms/assignments` | `POST /api/v1/lms/assignments/1/publish/ -> 200 OK` | Status badge transitioned to "PUBLISHED" |
-| 7 | **Student** (`stu00001`, UID 6565) | Login & Navigate `/lms/courses` | `GET /api/v1/lms/courses/ -> 200 OK` | CS101 displayed without edit controls |
-| 8 | **Student** (`stu00001`, UID 6565) | View Materials `/lms/materials` | `GET /api/v1/lms/materials/?course_id=101 -> 200 OK` | Published lecture note visible; no add button |
-| 9 | **Student** (`stu00001`, UID 6565) | Submit Assignment `/lms/assignments` | `POST /api/v1/lms/assignments/1/submissions/ -> 201 Created` | Notification "Your submission has been recorded." |
-| 10 | **TA** (`stu00002`, UID 4093) | Login & Navigate `/lms/grading` | `GET /api/v1/lms/assignments/1/submissions/ -> 200 OK` | Submissions awaiting review displayed |
-| 11 | **TA** (`stu00002`, UID 4093) | Grade Submission `/lms/grading` | `POST /api/v1/lms/submissions/1/grade/ -> 200 OK` | Grade saved in DRAFT status; Publish button hidden |
-| 12 | **TA** (`stu00002`, UID 4093) | Attempt Grade Publish `/lms/grading` | `POST /api/v1/lms/assignments/1/publish-grades/ -> 403 Forbidden` | Denied by IAM rule (`lms.grade.publish` faculty-only) |
-| 13 | **Faculty** (`fac00001`, UID 5328) | Publish Grades `/lms/grading` | `POST /api/v1/lms/assignments/1/publish-grades/ -> 200 OK` | Grade status transitioned to `PUBLISHED` |
-| 14 | **Student** (`stu00001`, UID 6565) | View Grades `/lms/grades` | `GET /api/v1/lms/submissions/1/grade/ -> 200 OK` | Grade and feedback visible to student |
-| 15 | **Observer** (`stf00001`, UID 3298) | Login & Navigate `/lms/courses` | `GET /api/v1/lms/courses/101/ -> 200 OK` | Staff roster only; student identities isolated |
-| 16 | **Observer** (`stf00001`, UID 3298) | Attempt Submission List `/lms/grading` | `GET /api/v1/lms/assignments/1/submissions/ -> 403 Forbidden` | Complete isolation from student records |
-| 17 | **Plain User** (`stf00062`, UID 112) | Access `/lms/courses` | `GET /api/v1/lms/courses/ -> 403 Forbidden` | Refused at API permission gate (module unentitled) |
+| 1 | **Faculty** (`fac00001`, UID 5328) | Login & Navigate `/lms/courses` | `[23/Nov/2026 13:06:10] "GET /api/v1/lms/courses/ HTTP/1.1" 200 99` | Rendered CS101 card with "Edit Course Details" button |
+| 2 | **Faculty** (`fac00001`, UID 5328) | Edit Syllabus `/lms/courses` | `[23/Nov/2026 13:06:11] "PATCH /api/v1/lms/courses/101/ HTTP/1.1" 200 208` | Live DOM update; toast "Course Updated" displayed |
+| 3 | **Faculty** (`fac00001`, UID 5328) | Add Material `/lms/materials` | `[23/Nov/2026 13:06:12] "POST /api/v1/lms/materials/ HTTP/1.1" 201 331` | Note material visible in course materials list |
+| 4 | **Faculty** (`fac00001`, UID 5328) | Post Announcement `/lms/announcements` | `[23/Nov/2026 13:06:13] "POST /api/v1/lms/announcements/ HTTP/1.1" 201 202` | Announcement card rendered on course feed |
+| 5 | **Faculty** (`fac00001`, UID 5328) | Create Assignment `/lms/assignments` | `[23/Nov/2026 13:06:14] "POST /api/v1/lms/assignments/ HTTP/1.1" 201 351` | Assignment created in DRAFT state |
+| 6 | **Faculty** (`fac00001`, UID 5328) | Publish Assignment `/lms/assignments` | `[23/Nov/2026 13:06:15] "POST /api/v1/lms/assignments/4/publish/ HTTP/1.1" 200 355` | Status badge transitioned to "PUBLISHED" |
+| 7 | **Student** (`stu00001`, UID 6565) | Login & Navigate `/lms/courses` | `[23/Nov/2026 13:06:16] "GET /api/v1/lms/courses/ HTTP/1.1" 200 96` | CS101 displayed without edit controls |
+| 8 | **Student** (`stu00001`, UID 6565) | View Materials `/lms/materials` | `[23/Nov/2026 13:06:17] "GET /api/v1/lms/materials/?course_id=101 HTTP/1.1" 200 1336` | Published lecture note visible; no add button |
+| 9 | **Student** (`stu00001`, UID 6565) | Submit Assignment `/lms/assignments` | `[23/Nov/2026 13:06:18] "POST /api/v1/lms/assignments/4/submissions/ HTTP/1.1" 201 248` | Notification "Your submission has been recorded." |
+| 10 | **TA** (`stu00002`, UID 4093) | Login & Navigate `/lms/grading` | `[23/Nov/2026 13:06:19] "GET /api/v1/lms/assignments/4/submissions/ HTTP/1.1" 200 250` | Submissions awaiting review displayed |
+| 11 | **TA** (`stu00002`, UID 4093) | Grade Submission `/lms/grading` | `[23/Nov/2026 13:06:20] "POST /api/v1/lms/submissions/3/grade/ HTTP/1.1" 200 221` | Grade saved in DRAFT status; Publish button hidden |
+| 12 | **TA** (`stu00002`, UID 4093) | Attempt Grade Publish `/lms/grading` | `[23/Nov/2026 13:06:21] "POST /api/v1/lms/assignments/4/publish-grades/ HTTP/1.1" 403 166` | Denied by IAM rule (`lms.grade.publish` faculty-only) |
+| 13 | **Faculty** (`fac00001`, UID 5328) | Publish Grades `/lms/grading` | `[23/Nov/2026 13:06:22] "POST /api/v1/lms/assignments/4/publish-grades/ HTTP/1.1" 200 21` | Grade status transitioned to `PUBLISHED` |
+| 14 | **Student** (`stu00001`, UID 6565) | View Grades `/lms/grades` | `[23/Nov/2026 13:06:23] "GET /api/v1/lms/submissions/3/grade/ HTTP/1.1" 200 255` | Grade and feedback visible to student |
+| 15 | **Observer** (`stf00001`, UID 3298) | Login & Navigate `/lms/courses` | `[23/Nov/2026 13:06:24] "GET /api/v1/lms/courses/101/ HTTP/1.1" 200 208` | Staff roster only; student identities isolated |
+| 16 | **Observer** (`stf00001`, UID 3298) | Attempt Submission List `/lms/grading` | `[23/Nov/2026 13:06:25] "GET /api/v1/lms/assignments/4/submissions/ HTTP/1.1" 403 166` | Complete isolation from student records |
+| 17 | **Plain User** (`stf00062`, UID 112) | Access `/lms/courses` | `[23/Nov/2026 13:06:26] "GET /api/v1/lms/courses/ HTTP/1.1" 403 166` | Refused at API permission gate (module unentitled) |
 
 ### 5.2 Keyboard & Accessibility Walkthrough
 

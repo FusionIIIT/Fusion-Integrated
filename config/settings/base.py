@@ -184,6 +184,10 @@ NOTIFY_DAILY_CAP_PER_RECIPIENT = env_int("NOTIFY_DAILY_CAP_PER_RECIPIENT", 20)
 PLACEMENT_UPLOAD_ROOT = env(
     "PLACEMENT_UPLOAD_ROOT", str(Path.home() / ".local" / "share" / "fusion-integrated" / "uploads")
 )
+#: Upload root for module files (e.g. LMS materials); outside BASE_DIR or boot fails.
+MEDIA_ROOT = env(
+    "MEDIA_ROOT", str(Path.home() / ".local" / "share" / "fusion-integrated" / "media")
+)
 #: When set, legacy reads go to nginx via X-Accel-Redirect. Must be `internal;`.
 PLACEMENT_UPLOAD_INTERNAL_PREFIX = env("PLACEMENT_UPLOAD_INTERNAL_PREFIX", "")
 

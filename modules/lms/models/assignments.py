@@ -29,7 +29,10 @@ class Assignment(models.Model):
         verbose_name = "Assignment"
         verbose_name_plural = "Assignments"
         indexes = [
-            models.Index(fields=["course_id", "status", "release_date"]),
+            models.Index(
+                fields=["course_id", "status", "release_date"],
+                name="idx_lms_asgn_crs_st_rel",
+            ),
         ]
         constraints = [
             models.CheckConstraint(

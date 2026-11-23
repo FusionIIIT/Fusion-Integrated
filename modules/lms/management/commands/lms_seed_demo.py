@@ -23,7 +23,7 @@ from modules.lms.models import (
 class Command(BaseCommand):
     help = "Seeds idempotent demo workspaces, memberships and content for LMS module."
 
-    def handle(self, *args, **options):
+    def _seed_workspaces(self):
         CourseWorkspace.objects.update_or_create(
             course_id=101,
             defaults={
@@ -33,6 +33,8 @@ class Command(BaseCommand):
                 "schedule_info": "MWF 10:00 - 11:00 AM, Hall 1",
             },
         )
+
+    def _seed_memberships(self):
         CourseMembership.objects.update_or_create(
             course_id=101,
             user_id=5328,
@@ -63,6 +65,8 @@ class Command(BaseCommand):
             user_id=3298,
             defaults={"role": CourseRole.OBSERVER, "status": MembershipStatus.ACTIVE},
         )
+
+    def _seed_content(self):
         CourseAnnouncement.objects.update_or_create(
             course_id=101,
             title="Welcome to CS101",
@@ -94,4 +98,9 @@ class Command(BaseCommand):
                 "created_by": 5328,
             },
         )
+
+    def handle(self, *args, **options):
+        self._seed_workspaces()
+        self._seed_memberships()
+        self._seed_content()
         self.stdout.write(self.style.SUCCESS("LMS demo data loaded successfully"))

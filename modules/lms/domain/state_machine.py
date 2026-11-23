@@ -12,7 +12,11 @@ class IllegalTransitionError(ValueError):
     """Raised when an invalid state transition is attempted."""
 
     def __init__(self, frm: str, to: str, entity: str = "entity", message: str = ""):
-        msg = message or f"Cannot move {entity} from {frm!r} to {to!r}."
+        msg = (
+            message
+            or f"Cannot move {entity} from {frm!r} to {to!r}. "
+            "Check allowed lifecycle transitions or reset the entity to a valid prior state."
+        )
         super().__init__(msg)
         self.frm, self.to, self.entity = frm, to, entity
 
@@ -25,7 +29,11 @@ class ActorNotAllowedError(IllegalTransitionError):
             frm,
             to,
             entity,
-            message=f"Actor {actor!r} cannot move {entity} from {frm!r} to {to!r}.",
+            message=(
+                f"Actor {actor!r} cannot move {entity} from {frm!r} to {to!r}. "
+                "Request an authorized role (instructor or TA) to perform this "
+                "lifecycle transition."
+            ),
         )
         self.actor = actor
 
@@ -38,7 +46,11 @@ class GuardFailedError(IllegalTransitionError):
             "",
             "",
             "entity",
-            message=message or f"Guard condition {guard!r} failed.",
+            message=(
+                message
+                or f"Guard condition {guard!r} failed. Verify that all prerequisite "
+                "conditions and schedules are satisfied before retrying."
+            ),
         )
         self.guard = guard
 
@@ -191,10 +203,15 @@ class MaterialFSM:
                 current_status,
                 MaterialStatus.PUBLISHED,
                 "material",
-                f"Cannot auto-release material in {current_status} status.",
+                f"Cannot auto-release material in {current_status} status. "
+                "Ensure the material is in SCHEDULED status.",
             )
         if release_date and release_date > now:
-            raise GuardFailedError("release_date_reached", "Release time has not yet arrived.")
+            raise GuardFailedError(
+                "release_date_reached",
+                "Release time has not yet arrived. "
+                "Wait until the scheduled release date or update the release timestamp.",
+            )
         resolve_material_transition(current_status, MaterialStatus.PUBLISHED, "SYSTEM")
         return MaterialStatus.PUBLISHED
 
@@ -207,7 +224,8 @@ class AssignmentFSM:
                 current_status,
                 AssignmentStatus.PUBLISHED,
                 "assignment",
-                f"Only DRAFT assignments may be published, got {current_status}.",
+                f"Only DRAFT assignments may be published, got {current_status}. "
+                "Create a new assignment or edit the draft before publishing.",
             )
         target = (
             AssignmentStatus.SCHEDULED
@@ -224,10 +242,15 @@ class AssignmentFSM:
                 current_status,
                 AssignmentStatus.PUBLISHED,
                 "assignment",
-                f"Only SCHEDULED assignments may be auto-released, got {current_status}.",
+                f"Only SCHEDULED assignments may be auto-released, got {current_status}. "
+                "Schedule the assignment or publish it directly.",
             )
         if release_date and release_date > now:
-            raise GuardFailedError("release_date_reached", "Release time has not yet arrived.")
+            raise GuardFailedError(
+                "release_date_reached",
+                "Release time has not yet arrived. "
+                "Wait until the scheduled release date or update the release timestamp.",
+            )
         resolve_assignment_transition(current_status, AssignmentStatus.PUBLISHED, "SYSTEM")
         return AssignmentStatus.PUBLISHED
 
@@ -238,7 +261,8 @@ class AssignmentFSM:
                 current_status,
                 AssignmentStatus.CLOSED,
                 "assignment",
-                f"Cannot close assignment in {current_status} status.",
+                f"Cannot close assignment in {current_status} status. "
+                "Publish or schedule the assignment before closing it.",
             )
         resolve_assignment_transition(current_status, AssignmentStatus.CLOSED, "INSTRUCTOR")
         return AssignmentStatus.CLOSED
@@ -252,7 +276,8 @@ class GradeFSM:
                 current_status,
                 GradeStatus.PUBLISHED,
                 "grade",
-                f"Only DRAFT grades may be published, got {current_status}.",
+                f"Only DRAFT grades may be published, got {current_status}. "
+                "Ensure grades are in draft status before publishing.",
             )
         resolve_grade_transition(current_status, GradeStatus.PUBLISHED, "INSTRUCTOR")
         return GradeStatus.PUBLISHED

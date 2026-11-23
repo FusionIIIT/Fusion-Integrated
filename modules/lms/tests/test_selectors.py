@@ -39,8 +39,7 @@ def workspace_setup():
         syllabus="Consensus, Raft, Paxos",
     )
 
-    # Memberships
-    # Instructor: user 2001
+    # Memberships: Instructor user 2001
     CourseMembership.objects.create(
         course_id=201,
         user_id=2001,
@@ -78,8 +77,7 @@ def workspace_setup():
         status=MembershipStatus.ACTIVE,
     )
 
-    # Materials
-    # Mat 1: Published, immediate
+    # Materials: Mat 1 Published, immediate
     mat_pub = CourseMaterial.objects.create(
         course_id=201,
         title="L1 Distributed Basics",
@@ -108,8 +106,7 @@ def workspace_setup():
         uploaded_by=2001,
     )
 
-    # Assignments
-    # Ass 1: Published
+    # Assignments: Ass 1 Published
     ass_pub = Assignment.objects.create(
         course_id=201,
         title="Lab 1: RPC",
@@ -146,8 +143,7 @@ def workspace_setup():
         content_text="RPC code from Student 2",
     )
 
-    # Grades
-    # Grade for Student 1: Published
+    # Grades: Grade for Student 1 Published
     grade1 = SubmissionGrade.objects.create(
         submission=sub1,
         points_awarded=Decimal("92.00"),
@@ -181,9 +177,7 @@ def workspace_setup():
 
 
 def test_get_user_courses_queryset_br_lms_001(workspace_setup):
-    """BR-LMS-001: Course-specific access control.
-    Principal must be actively registered, assigned, or linked to access the course.
-    """
+    """BR-LMS-001: Principal must be actively registered, assigned, or linked to access the course."""
     p_student = make_principal(user_id=1001)
     p_unrelated = make_principal(user_id=9999)
 
@@ -204,9 +198,7 @@ def test_student_enrollment_governs_access_br_lms_002(workspace_setup):
 
 
 def test_list_published_materials_visibility_br_lms_005(workspace_setup):
-    """BR-LMS-005: Published material visibility.
-    Materials are hidden from students until published and release date reached.
-    """
+    """BR-LMS-005: Materials are hidden from students until published and release date reached."""
     p_student = make_principal(user_id=1001)
     p_instructor = make_principal(user_id=2001, kind="faculty", active_role="faculty")
 
@@ -241,9 +233,7 @@ def test_get_material_detail_failsafe(workspace_setup, monkeypatch):
 
 
 def test_assignment_scoping_br_lms_011(workspace_setup):
-    """BR-LMS-011: Assignment release-date visibility.
-    Assignments are hidden from students prior to release date and while unpublished.
-    """
+    """BR-LMS-011: Assignments are hidden from students prior to release date and while unpublished."""
     p_student = make_principal(user_id=1001)
     p_instructor = make_principal(user_id=2001, kind="faculty", active_role="faculty")
 

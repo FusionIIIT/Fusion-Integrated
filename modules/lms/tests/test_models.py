@@ -88,9 +88,7 @@ def test_course_material_model():
 
 
 def test_course_announcement_model():
-    """BR-LMS-008: Announcement timestamp and audience.
-    Announcements are automatically timestamped upon creation and scoped to course audience.
-    """
+    """BR-LMS-008: Announcements are automatically timestamped upon creation and scoped to course audience."""
     ann = CourseAnnouncement.objects.create(
         course_id=101,
         title="Welcome to CS301",
