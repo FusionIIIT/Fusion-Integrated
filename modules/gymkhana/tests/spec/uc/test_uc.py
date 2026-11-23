@@ -12,6 +12,7 @@ from modules.gymkhana.models.booking import VenueBooking
 from modules.gymkhana.models.budget import ClubBudgetRequest
 from modules.gymkhana.models.club import Club
 from modules.gymkhana.models.membership import ClubMembership
+from modules.gymkhana.models.notification import GymkhanaNotification
 from modules.gymkhana.models.poll import Poll, PollChoice, PollVote
 from modules.gymkhana.models.report import ClubEventReport
 
@@ -72,6 +73,19 @@ def test_UC_002_UC_GYM_001_Alternative_Flow_invalid_assignment(stub_iam, uc_user
     assert Club.objects.count() == count
 
 
+def test_UC_003_UC_GYM_002_Main_Flow_book_session(stub_iam, uc_users):
+    """UC-003 / UC-GYM-002 Main Flow."""
+    club = _club("UC003")
+    client = _client(stub_iam, 101, ("gymkhana.booking.create",))
+    response = client.post("/api/v1/gymkhana/bookings/session/", {
+        "club_id": club.id, "venue": "Hall 1", "booking_date": "2026-12-10",
+        "start_time": "10:00:00", "end_time": "12:00:00", "description": "Practice",
+    }, format="json")
+    assert response.status_code == 201
+    assert VenueBooking.objects.filter(id=response.data["id"], booking_type="session").exists()
+    assert GymkhanaNotification.objects.get().topic == "session.booked"
+
+
 def test_UC_004_UC_GYM_002_Alternative_Flow_slot_conflict(stub_iam, uc_users):
     """UC-004 / UC-GYM-002 Alternative Flow."""
     club = _club("UC004")
@@ -87,6 +101,23 @@ def test_UC_004_UC_GYM_002_Alternative_Flow_slot_conflict(stub_iam, uc_users):
     }, format="json")
     assert response.status_code in (400, 409)
     assert VenueBooking.objects.count() == count
+
+
+def test_UC_005_UC_GYM_003_Main_Flow_book_event(stub_iam, uc_users):
+    """UC-005 / UC-GYM-003 Main Flow."""
+    club = _club("UC005")
+    client = _client(stub_iam, 101, ("gymkhana.booking.create",))
+    response = client.post("/api/v1/gymkhana/bookings/event/", {
+        "club_id": club.id, "name": "Expo", "venue": "Hall 1", "booking_date": "2026-12-10",
+        "start_time": "10:00:00", "end_time": "12:00:00", "description": "Annual expo",
+        "faculty_councillor_id": 201,
+        "poster_file": SimpleUploadedFile("poster.png", b"\x89PNG\r\n\x1a\n", "image/png"),
+    }, format="multipart")
+    assert response.status_code == 201
+    booking = VenueBooking.objects.get(id=response.data["id"])
+    assert booking.booking_type == "event"
+    assert booking.poster_file
+    assert GymkhanaNotification.objects.get().topic == "event.booked"
 
 
 def test_UC_006_UC_GYM_003_Alternative_Flow_cross_type_overlap(stub_iam, uc_users):
@@ -170,6 +201,23 @@ def test_UC_011_UC_GYM_005_Exception_Flow_wrong_club_not_changed(stub_iam, uc_us
     assert response.status_code in (403, 404)
     membership.refresh_from_db()
     assert membership.status == "open"
+
+
+def test_UC_012_UC_GYM_006_Main_Flow_create_poll(stub_iam, uc_users):
+    """UC-012 / UC-GYM-006 Main Flow."""
+    club = _club("UC012")
+    client = _client(stub_iam, 101, ("gymkhana.poll.view", "gymkhana.poll.create"))
+    response = client.post("/api/v1/gymkhana/polls/", {
+        "club_id": club.id, "title": "UC Poll", "description": "Vote",
+        "expires_at": (datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=1)).isoformat(),
+        "choices": ["A", "B"], "target_groups": [{"batch": "2024", "branch": "CSE"}],
+    }, format="json")
+    assert response.status_code == 201
+    poll = Poll.objects.get(id=response.data["id"])
+    assert poll.status == "active"
+    assert poll.choices.count() == 2
+    assert list(poll.target_groups.values_list("batch", "branch")) == [("2024", "CSE")]
+    assert GymkhanaNotification.objects.get().audience == {"targets_of": poll.id}
 
 
 def test_UC_013_UC_GYM_006_Exception_Flow_fewer_than_two_choices(stub_iam, uc_users):

@@ -353,7 +353,7 @@ def test_event_report_missing_file_rejected(stub_iam, confirmed_club):
             "club_id": confirmed_club.id,
             "student_incharge_id": 102,
             "event_name": "No File Event",
-            "event_date": "2027-05-01T10:00:00Z",
+            "event_date": "2026-05-01T10:00:00Z",
             "description": "d",
             # No report_file!
         },

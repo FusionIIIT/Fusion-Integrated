@@ -1,250 +1,246 @@
-# Gymkhana Module Quality Report
+# Gymkhana quality report
 
-**Module Code:** `gymkhana`  
-**Docs Folder:** `docs/09-gymkhana/`  
-**Reference Module:** `modules/placement`  
-**Specification Baseline:** Gymkhana Specs v1.1 SYNCHRONIZED  
-**Builder (Student 1):** Student 1  
-**Reviewer & Approver (Student 2):** Student 2  
+Every number below comes from a run on 24 November 2026, after the last backend change. It replaces an
+earlier report whose claims did not hold.
 
----
+Status: Student 2's written approval and review are **pending** (items 10, 11 and 12).
 
-## 1. Specification Approvals Log
+## 1. Gates
 
-### Phase 2 Blueprint Approval Gate
-- **Date/Time:** 2026-11-23T04:29:58+05:30
-- **Approver:** Student 2 (Specification Reviewer, Tester & Approver)
-- **Approved Items:**
-  1. **Blueprint:** `docs/09-gymkhana/gymkhana-blueprint.md` covering 7 CFRs (`CFR-GYM-001` to `007`), 34 AFRs (`AFR-GYM-001` to `034`), 21 BRs (`BR-GYM-001` to `021`), 12 UCs (`UC-GYM-001` to `012`), and 3 Basis Workflows (`BW-GYM-01` to `03`).
-  2. **Known Gaps:**
-     - Budget requests tracked in open status without online approval/rejection lifecycle (`CFR-GYM-006`, `AFR-GYM-031`).
-     - Membership applications transition open -> confirmed without rejection/cancellation (`CFR-GYM-004`, `AFR-GYM-021`).
-     - Initial configured venues list for `BR-GYM-020`.
-     - Target group batch/branch wildcard resolution (`BR-GYM-013`).
-  3. **Shared-File Registrations:** `config/settings/base.py`, `config/urls.py`, `config/celery.py`, `client/src/app/registry.ts`, `.importlinter`, and `client/e2e/accounts.ts`.
-  4. **Dependencies:** Zero new third-party Python or JavaScript dependencies.
-- **Approval Quote:**
-  > "The `docs/09-gymkhana/gymkhana-blueprint.md` is **APPROVED**. All 7 CFRs, all 34 AFRs, all 21 Business Rules, all 12 Use Cases, and all 3 Basis Workflows are correctly addressed and mapped in the traceability table. The domain models, state machines, permission structure, and endpoint design are consistent with and faithful to the SYNCHRONIZED v1.1 specification baseline. No obligation is missing; no fabricated requirement is introduced; no spec rule is violated."
+`make check`:
 
----
-
-## 2. Gate Verification & Output
-
-### 2.1 Backend Platform Verification (`make check`)
 ```text
-.venv/bin/python manage.py check
-System check identified no issues (0 silenced).
-.venv/bin/python manage.py makemigrations --check --dry-run
 No changes detected
-.venv/bin/ruff check .
 All checks passed!
-.venv/bin/lint-imports
 Contracts: 5 kept, 0 broken.
-.venv/bin/python ops/checks/no_cross_module_fk.py
 no cross-module foreign keys
-.venv/bin/python ops/checks/contracts_are_plural.py
 all contract getters are plural
-.venv/bin/python ops/checks/nav_matches_routes.py
 nav items and client routes agree
-.venv/bin/python manage.py permission_manifest --check
 permission manifest matches the registries
-make schema-check
 openapi schema matches the code
-.venv/bin/python -m pytest -q
-........................................................................ [100%]
-46 passed in 24.73s
+make check exit 0
 ```
 
-### 2.2 Frontend Verification (`make check-client`)
+`make check-client`, its three commands run one after the other:
+
 ```text
-cd client && npm run typecheck && npm test && npm run build
-> typecheck
-> tsc --noEmit && tsc --noEmit -p e2e
-
-> test
-> vitest run
- Test Files  6 passed (6)
-      Tests  38 passed (38)
-
-> build
-> tsc -b && vite build
-✓ 1015 modules transformed.
-✓ built in 3.97s
+tsc --noEmit && tsc --noEmit -p e2e      (no output)
+Test Files  14 passed (14)
+     Tests  96 passed (96)
+built in 3.98s
 ```
 
-### 2.3 Deployment Check
-```text
-DJANGO_SETTINGS_MODULE=config.settings.prod DB_PASSWORD=local-check-only \
-DJANGO_SECRET_KEY=local-check-only-key-long-enough-to-satisfy-the-length-check \
-DJANGO_ALLOWED_HOSTS=local.invalid IAM_SERVICE_TOKEN=local \
-PLACEMENT_UPLOAD_ROOT=/tmp/check-uploads \
-REDIS_CACHE_URL=redis://127.0.0.1:6379/1 REDIS_BROKER_URL=redis://127.0.0.1:6380/0 \
-.venv/bin/python manage.py check --deploy --fail-level WARNING
+The largest Gymkhana chunk is `ClubManagementPage`: 6.89 kB gzip, against a limit of 150 kB.
 
+Deployment check, with the command in Step 7.7:
+
+```text
 System check identified no issues (2 silenced).
 ```
 
----
+## 2. Coverage
 
-## 3. Coverage Analysis
+Measured without the spec tests.
 
-### 3.1 Module Coverage (`--cov=modules/gymkhana --cov-fail-under=90`)
 ```text
-Name                                        Stmts   Miss Branch BrPart  Cover   Missing
----------------------------------------------------------------------------------------
-modules/gymkhana/__init__.py                    0      0      0      0   100%
-modules/gymkhana/api/__init__.py                0      0      0      0   100%
-modules/gymkhana/api/serializers.py           115      1      2      1    98%   167
-modules/gymkhana/api/urls.py                    5      0      0      0   100%
-modules/gymkhana/api/views.py                 222      0      0      0   100%
-modules/gymkhana/apps.py                        4      0      0      0   100%
-modules/gymkhana/contracts.py                  34      0      6      0   100%
-modules/gymkhana/domain/__init__.py             0      0      0      0   100%
-modules/gymkhana/domain/constants.py           14      0      0      0   100%
-modules/gymkhana/domain/exceptions.py           4      0      0      0   100%
-modules/gymkhana/domain/state_machines.py      21      0      6      0   100%
-modules/gymkhana/domain/validation.py          44      0     20      0   100%
-modules/gymkhana/models/__init__.py             7      0      0      0   100%
-modules/gymkhana/models/booking.py             24      1      0      0    96%   46
-modules/gymkhana/models/budget.py              20      1      0      0    95%   35
-modules/gymkhana/models/club.py                31      2      0      0    94%   47, 64
-modules/gymkhana/models/membership.py          20      1      0      0    95%   42
-modules/gymkhana/models/poll.py                46      4      0      0    91%   30, 50, 70, 91
-modules/gymkhana/models/report.py              17      1      0      0    94%   27
-modules/gymkhana/registry.py                    6      0      0      0   100%
-modules/gymkhana/schedule.py                    2      0      0      0   100%
-modules/gymkhana/selectors/__init__.py          0      0      0      0   100%
-modules/gymkhana/selectors/bookings.py         24      0     10      0   100%
-modules/gymkhana/selectors/budgets.py           8      0      2      0   100%
-modules/gymkhana/selectors/clubs.py            14      0      2      0   100%
-modules/gymkhana/selectors/memberships.py      10      0      2      0   100%
-modules/gymkhana/selectors/polls.py            35      0     14      2    96%   61->63, 64->66
-modules/gymkhana/selectors/reports.py           8      0      2      0   100%
-modules/gymkhana/selectors/scoping.py          56      0     26      1    99%   51->54
-modules/gymkhana/services/__init__.py           0      0      0      0   100%
-modules/gymkhana/services/bookings.py          54      7     18      3    86%   68, 73-74, 88, 129, 134-135
-modules/gymkhana/services/budgets.py           25      3      6      3    81%   34, 37, 40
-modules/gymkhana/services/clubs.py             68      4     16      2    93%   34, 59-60, 65
-modules/gymkhana/services/memberships.py       40      3      8      1    92%   62, 68-69
-modules/gymkhana/services/polls.py             61      9     22      5    83%   53, 57, 61-62, 77, 105, 110-111, 121
-modules/gymkhana/services/reports.py           29      6      8      4    73%   33, 36, 39, 44, 48-49
-modules/gymkhana/tasks.py                      11      0      2      0   100%
----------------------------------------------------------------------------------------
-TOTAL                                        1079     43    172     22    95%
-Required test coverage of 90% reached. Total coverage: 94.80%
+--cov=modules/gymkhana --cov-branch --cov-fail-under=90
+TOTAL                  1519     21    224     10    98%
+Required test coverage of 90% reached. Total coverage: 98.22%
+642 passed in 58.53s
+
+--cov=modules/gymkhana/domain --cov-branch --cov-fail-under=95
+TOTAL                   127      1     48      1    99%
+Required test coverage of 95% reached. Total coverage: 98.86%
 ```
 
-### 3.2 Domain Coverage (`--cov=modules/gymkhana/domain --cov-fail-under=95`)
-```text
-Name                                        Stmts   Miss Branch BrPart  Cover   Missing
----------------------------------------------------------------------------------------
-modules/gymkhana/domain/__init__.py             0      0      0      0   100%
-modules/gymkhana/domain/constants.py           14      0      0      0   100%
-modules/gymkhana/domain/exceptions.py           4      0      0      0   100%
-modules/gymkhana/domain/state_machines.py      21      0      6      0   100%
-modules/gymkhana/domain/validation.py          44      0     20      0   100%
----------------------------------------------------------------------------------------
-TOTAL                                          83      0     26      0   100%
-Required test coverage of 95% reached. Total coverage: 100.00%
-```
+## 3. Tests
 
----
+| File in `modules/gymkhana/tests/` | Tests |
+|---|---|
+| `test_access.py` | 40 |
+| `test_api.py` | 8 |
+| `test_client_route_guards.py` | 2 |
+| `test_concurrency.py` | 7 |
+| `test_contracts.py` | 2 |
+| `test_directory_lookups.py` | 8 |
+| `test_domain.py` | 10 |
+| `test_journeys.py` | 38 |
+| `test_models.py` | 5 |
+| `test_notifications.py` | 12 |
+| `test_query_budgets.py` | 6 |
+| `test_schedule.py` | 5 |
+| `test_scoping_isolation.py` | 9 |
+| `test_selectors.py` | 8 |
+| `test_services.py` | 8 |
+| `test_uploads.py` | 17 |
+| `test_validation_rules.py` | 18 |
+| `stress/test_stress_polls_and_voting.py` | 85 |
+| `stress/test_stress_rbac_scoping.py` | 59 |
+| `stress/test_stress_validation_and_fuzzing.py` | 100 |
+| `stress/test_stress_venue_bookings.py` | 195 |
+| **Total** | **642** |
 
-## 4. Test Suite Inventory & Traceability Mapping
+Every live CFR, AFR, UC, BR and BW id is cited by at least one of these tests.
 
-| Test File | Test Count | Scope / Mapped Obligations |
+Journeys in `test_journeys.py`, by use case:
+
+| Use case | Tests beginning |
+|---|---|
+| UC-GYM-001, UC-GYM-011 | `test_uc_gym_001_011_`, `test_uc_gym_001_`, `test_uc_gym_011_` |
+| UC-GYM-002, UC-GYM-003 | `test_uc_gym_002_`, `test_uc_gym_003_`, `test_uc_gym_002_003_` |
+| UC-GYM-004, UC-GYM-005 | `test_uc_gym_004_005_`, `test_uc_gym_004_`, `test_uc_gym_005_` |
+| UC-GYM-006, UC-GYM-007 | `test_uc_gym_006_007_`, `test_uc_gym_006_`, `test_uc_gym_007_` |
+| UC-GYM-008 | `test_uc_gym_008_` |
+| UC-GYM-009 | `test_uc_gym_009_` |
+| UC-GYM-010, UC-GYM-012 | `test_uc_gym_010_012_`, `test_uc_gym_010_` |
+
+## 4. Rules broken on purpose
+
+Each file was copied out, broken, tested and copied back.
+
+| Rule | What was broken | Caught by |
 |---|---|---|
-| `modules/gymkhana/tests/test_domain.py` | 8 | Validation (`BR-GYM-001`, `002`, `003`, `005`, `017`), State transitions (`BW-GYM-01`, `02`, `03`) |
-| `modules/gymkhana/tests/test_models.py` | 12 | Constraints (`BR-GYM-004`, `005`, `009`, `015`, `017`, `018`, `019`) |
-| `modules/gymkhana/tests/test_contracts.py` | 2 | Plural query contracts for directory integration |
-| `modules/gymkhana/tests/test_schedule.py` | 1 | Celery beat task schedule verification |
-| `modules/gymkhana/tests/test_selectors.py` | 7 | Scoping chokepoints (`BR-GYM-010`, `021`), filtering (`BR-GYM-013`, `006`) |
-| `modules/gymkhana/tests/test_services.py` | 7 | Workflows & business rules (`UC-GYM-001` to `012`, `BW-GYM-01` to `03`) |
-| `modules/gymkhana/tests/test_api.py` | 7 | API views & serialization (`UC-GYM-001` to `012`) |
-| `modules/gymkhana/tests/test_client_route_guards.py` | 2 | Client route configuration & permission requirements |
-| **Total Tests** | **46** | **All 7 CFRs, 34 AFRs, 21 BRs, 12 UCs, 3 BWs covered** |
+| BR-GYM-013 | The target-group filter on polls removed | `test_br_gym_013_a_poll_reaches_only_its_own_batch_and_branch` |
+| Acting-role permission gate | The gate always answers yes | `test_acting_as_student_admin_the_student_permissions_do_not_count` |
+| BR-GYM-006 | The venue lock removed | `test_br_gym_006_one_slot_is_booked_once_across_sessions_and_events[True]` |
+| BR-GYM-011 | A confirmed membership may be approved again | `test_uc_gym_005_an_approved_application_is_not_changed_again` |
+| BR-GYM-015 | The already-voted check removed | `test_uc_gym_006_007_a_targeted_student_votes_once` |
 
-### Journey Test Mapping
-- **Journey 1 (Club Lifecycle):** `UC-GYM-001`, `UC-GYM-011`, `UC-GYM-008` (Create Club -> Approve Club -> Change Leadership)
-- **Journey 2 (Venue Bookings):** `UC-GYM-002`, `UC-GYM-003`, `UC-GYM-007` (Book Session -> Book Event -> Cross-Type Venue Conflict Check)
-- **Journey 3 (Membership Lifecycle):** `UC-GYM-004`, `UC-GYM-009` (Apply Membership -> Approve Membership)
-- **Journey 4 (Voting Poll Lifecycle):** `UC-GYM-005`, `UC-GYM-010` (Create Poll with Target Groups -> Cast Atomic Vote -> Automatic Expiration)
-- **Journey 5 (Accountability Tracking):** `UC-GYM-006`, `UC-GYM-012` (Submit Budget Request -> Submit Event Report -> Faculty Review)
+The first attempt at BR-GYM-006 was not caught: on a day with no bookings, inserting the day's row
+already queues them. The test now also covers a day that has its row.
 
----
+## 5. Adversarial pass
 
-## 5. Broken-on-Purpose Rules (Mutation Testing Verification)
+| Question | Found | Now |
+|---|---|---|
+| Can an approver approve their own record? | Yes, a club head who applied to their own club | Refused: `test_br_gym_010_nobody_approves_their_own_application` |
+| Can something appear in its own approval queue? | The head's own application is listed | It cannot be approved by them |
+| Can a balance go negative? | No: budget amounts are zero or more | `test_uc_gym_009_an_invalid_request_is_not_stored` |
+| Can something be back-dated without limit? | A past booking date is accepted; no rule forbids it | Open question in the blueprint |
+| Can a report be dated in the future? | Yes | Refused: `test_uc_gym_010_an_event_may_be_reported_from_the_moment_it_occurs` |
+| Can a required third party be unavailable? | The directory contract does not say whether an account is active | Known gap |
+| Can someone act outside their scope by sending an id? | Student Admin could read every club's event reports | `test_scoping_isolation.py` |
+| Can a closed record still be changed? | No | Repeat approvals and expired votes are refused in `test_journeys.py` |
+| Can the same request take effect twice? | Two bookings could take one slot | `test_concurrency.py`, eight threads each |
+| Does a held role count when not acting as it? | Yes | `test_acting_as_student_an_admin_cannot_approve_a_club` |
+| Can the people search be used to list everyone? | It needs three characters and a role that assigns people | `test_a_people_search_is_never_an_enumeration` |
 
-1. **Rule 1 (`BR-GYM-001`):** Coordinator must be an active student.
-   - *Mutation:* Allow staff user (kind='staff') to be coordinator.
-   - *Caught by:* `test_club_creation_rejects_invalid_roles` -> raises `BadRequestError("User 301 is not a valid student.")`.
-2. **Rule 2 (`BR-GYM-006`):** Cross-type venue exclusivity between session and event bookings.
-   - *Mutation:* Allow overlapping times for different booking types in the same venue.
-   - *Caught by:* `test_cross_type_venue_exclusivity` -> raises `ConflictError("Venue 'Hall 1' is already booked on 2026-12-10 during that time.")`.
-3. **Rule 3 (`BR-GYM-009`):** One active membership application per student per club.
-   - *Mutation:* Permit multiple open applications by the same student for a club.
-   - *Caught by:* `test_membership_lifecycle` -> raises `ConflictError("Student 103 has already applied to this club.")`.
-4. **Rule 4 (`BR-GYM-013`):** Poll voting restricted to targeted batch and branch.
-   - *Mutation:* Permit untargeted student (e.g. batch 2023 when poll targets 2024) to cast vote.
-   - *Caught by:* `test_poll_creation_and_voting` -> raises `PermissionDeniedError("Student is not eligible to vote in this poll.")`.
-5. **Rule 5 (`BR-GYM-017`):** Budget request amount must be strictly non-negative.
-   - *Mutation:* Allow negative budget amounts (e.g. -500).
-   - *Caught by:* `test_budget_request_and_report_submissions` -> raises `BadRequestError("Budget request amount must be non-negative.")`.
+## 6. Security self-audit
 
----
+| Item | Result |
+|---|---|
+| Both gates on every view | `GymkhanaView` sets the module grant and the acting permission; `test_access.py` drives every path |
+| Explicit serializer fields | No `__all__` or `exclude`; server-owned fields are not accepted as input |
+| Scoping on reads and on ids in the body | `selectors/scoping.py`; `test_scoping_isolation.py` |
+| No raw SQL, `eval`, `pickle` or similar | None |
+| Uploads | Size, type and active content are checked, stored privately under a generated name, and served only as scoped attachments. `core/files` offers no byte validation today, so the checks are in the module and use its `sanitise_filename`. Bytes are not matched to the extension: open question |
+| Throttle on every write | `gymkhana_write`; `test_writes_are_throttled_and_reads_are_not` |
+| Logs carry ids only | Yes |
+| Errors carry no trace, SQL or path | Yes, through the platform's handler |
+| Cookie write without `X-CSRF-Token` | 403: `test_a_write_by_cookie_needs_the_csrf_header` |
+| Client | No `dangerouslySetInnerHTML`, no token in storage, every call through `lib/http.ts` |
+| Dependencies | None added |
+| Deployment check | Passes (item 1) |
 
-## 6. Adversarial Architecture Pass
+## 7. Fresh install
 
-- **Concurrency in Poll Voting (`BR-GYM-015`):** If two requests from the same student arrive concurrently, PostgreSQL enforces the `UniqueConstraint(fields=['poll', 'student_id'])` and atomic `F('vote_count') + 1` prevents race conditions or tally corruption.
-- **Race Condition in Venue Overlap (`BR-GYM-006`):** Handled via table-level concurrency control (`select_for_update()`) inside an atomic transaction block before creating any booking.
-- **Privilege Escalation:** Regular students cannot confirm clubs; `approve_club` strictly enforces role `student_admin`.
-- **Information Leakage / IDOR (`BR-GYM-021`):** Faculty councillors can only review reports for clubs to which they are assigned; any attempt to query reports for other clubs returns 404 (NotFoundError) to conceal internal existence.
+On a throwaway database, dropped afterwards.
 
----
+```text
+## migrate zero
+  Unapplying gymkhana.0001_initial... OK
+## seed_modules
+  registered placement_cell (active)
+  registered gymkhana (active)
+2 module(s) registered
+## readiness
+Gymkhana is ready.
+## first user action: create then confirm a club
+login 200
+confirm 200
+confirm without CSRF 403
+[24/Nov/2026 01:02:53] "POST /api/v1/auth/login HTTP/1.1" 200 91
+[24/Nov/2026 01:02:53] "POST /api/v1/gymkhana/clubs/ HTTP/1.1" 201 372
+[24/Nov/2026 01:02:53] "POST /api/v1/gymkhana/clubs/1/confirm/ HTTP/1.1" 200 377
+[24/Nov/2026 01:02:53] "POST /api/v1/gymkhana/clubs/1/confirm/ HTTP/1.1" 403 222
+```
 
-## 7. Security Self-Audit
+The first action was sent over HTTP, not through a browser. The module has no policy to seed. The single
+migration gives the same schema, line for line, as the two it replaced.
 
-- **Authentication:** All API endpoints require valid `IamSessionAuthentication` via Bearer token.
-- **Authorization:** Granular permission flags registered in `registry/permissions.json` and checked via `HasModulePermission` or explicit scoping selectors.
-- **Input Sanitization:** Strings stripped, dates/times validated to prevent inverted intervals, enums validated against domain constants.
-- **File Upload Security:** Files stored via Django `FileField` with media isolation; non-empty uploaded files required for budget requests and event reports.
-- **Rate Limiting:** `gymkhana_write: 60/hour` throttle registered in settings.
+## 8. Browser walkthrough
 
----
+Run by Playwright in installed Chrome, through a temporary configuration that has been deleted: the
+bundled Chromium was not installed. The whole suite, Placement's specs included: `28 passed (1.2m)`.
+A walkthrough by a person is still to be done (Step 10 of the guide).
 
-## 8. Fresh-Install Verification
-
-- Migration `modules/gymkhana/migrations/0001_initial.py` contains all 10 models with zero cross-module foreign keys (`no_cross_module_fk.py` passes).
-- Clean `makemigrations --check --dry-run` confirms zero unmanaged schema drift.
-
----
-
-## 9. Browser Walkthrough
-
-| Route | Role | Expected View | Verification |
-|---|---|---|---|
-| `/gymkhana/clubs` | Any authenticated user | Confirmed clubs list & card view | Verified |
-| `/gymkhana/memberships` | Student | My club membership status list | Verified |
-| `/gymkhana/polls` | Student | Active eligible polls & voting cards | Verified |
-| `/gymkhana/calendar` | Any authenticated user | Venue bookings & scheduled events | Verified |
-| `/gymkhana/manage` | Club Head | Leadership, bookings, reports, budgets | Verified |
-| `/gymkhana/admin` | Student Admin | Club approval workflow & all clubs | Verified |
-| `/gymkhana/faculty-reports` | Faculty Councillor | Assigned club event reports | Verified |
-
----
-
-## 10. Scheduled Tasks Verification
-
-- Celery task `gymkhana.expire_polls` registered in `schedule.py` and scheduled in `config/celery.py` (runs hourly).
-- Manual task execution verified: queries polls where `status='active'` and `expires_at < now`, updates them to `'expired'`, and returns number of closed polls.
-
----
-
-## 11. Review Rounds Scorecard
-
-| Round | Commit | Score | Verdict | Notes |
+| Role | Account | Use case | Result | Spec in `client/e2e/gymkhana/` |
 |---|---|---|---|---|
-| Round 1 | `da21557` | 10/10 | Step 7 Baseline Reached | All CI gates green, 94.8% module coverage, 100% domain coverage |
-| Step 8 Baseline | `da21557` | - | Spec Tests Baseline | 115 passed, 2 failed (`BR-032`, `WF-010`), 7 skipped. Triaged in `triage.md` |
-| Round Q1 | `(current)` | 10/10 | VERDICT: 10/10 | Fixed expired poll status (400 Bad Request). 117/117 spec tests pass, 0 skips, 0 open triage rows |
+| Student Admin | `stu00002` | UC-GYM-001, UC-GYM-011 | Pass | `clubs.spec.ts` |
+| Student, then club head | `stu00001`, `stu00003` | UC-GYM-004, UC-GYM-005 | Pass | `clubs.spec.ts` |
+| Club head | `stu00003` | UC-GYM-008 | Pass | `clubs.spec.ts` |
+| Club head | `stu00003` | UC-GYM-002, UC-GYM-003 | Pass | `activities.spec.ts` |
+| Club head, then student | `stu00003`, `stu00001` | UC-GYM-006, UC-GYM-007 | Pass | `activities.spec.ts` |
+| Club head | `stu00003` | UC-GYM-009, and once by keyboard alone | Pass | `activities.spec.ts` |
+| Club head, then councillor | `stu00003`, `fac00001` | UC-GYM-010, UC-GYM-012 | Pass | `activities.spec.ts` |
+| Plain student | `stu00001` | Five open pages open; two guarded pages are refused | Pass | `pages.spec.ts` |
+| Faculty | `fac00001` | Four guarded pages are refused | Pass | `pages.spec.ts` |
 
+Server log of that run; no 500 and no traceback:
+
+```text
+"POST /api/v1/gymkhana/clubs/ HTTP/1.1" 201 391
+"POST /api/v1/gymkhana/clubs/29/confirm/ HTTP/1.1" 200 396
+"POST /api/v1/gymkhana/bookings/session/ HTTP/1.1" 201 351
+"POST /api/v1/gymkhana/bookings/event/ HTTP/1.1" 409 192
+"POST /api/v1/gymkhana/bookings/event/ HTTP/1.1" 201 374
+"POST /api/v1/gymkhana/polls/ HTTP/1.1" 201 417
+"POST /api/v1/gymkhana/polls/5/vote/ HTTP/1.1" 200 416
+"POST /api/v1/gymkhana/budgets/ HTTP/1.1" 201 273
+"POST /api/v1/gymkhana/reports/ HTTP/1.1" 201 347
+"POST /api/v1/gymkhana/memberships/apply/ HTTP/1.1" 201 261
+"POST /api/v1/gymkhana/memberships/5/approve/ HTTP/1.1" 200 303
+"POST /api/v1/gymkhana/clubs/36/leadership/ HTTP/1.1" 200 396
+```
+
+The 409 is the event that tries to take a booked slot. The run before this one failed UC-GYM-005: a
+student saw a cached status for up to 30 seconds after a decision. Lists are now fetched again whenever
+a page opens.
+
+## 9. Scheduled tasks
+
+Run by hand with `manage.py gymkhana_run_tasks`, with mail kept in memory.
+
+| Task | What changed |
+|---|---|
+| `gymkhana.expire_polls` | `polls expired: 1`: the overdue poll went from `active` to `expired`. A second run expired 0 |
+| `gymkhana.deliver_notifications` | `notifications sent: 500`, its batch limit, then 500 more on a second run |
+
+## 10. Known gaps
+
+Listed in the blueprint, Steps 3.8 and "Revision 2". **None has a recorded acceptance yet.**
+
+| Spec id | Gap |
+|---|---|
+| BR-GYM-001, BR-GYM-002 | "Valid" checks the person's kind; the directory contract does not say whether an account is active |
+| BR-GYM-013 | The poll audience is read from an endpoint that also returns CPI; only ids are kept |
+| AFR-GYM-014 | The event poster is optional, pending the reading of FR-015 |
+| BR-GYM-018, BR-GYM-019 | Files are stored under `PLACEMENT_UPLOAD_ROOT`, another module's setting |
+
+## 11. Approvals
+
+| Approval | Record |
+|---|---|
+| Blueprint | Pending. `gymkhana-blueprint-review-s2.md` is not signed by a person, and predates Revision 2 |
+| Known gaps | Pending |
+| Files outside the module: `config/settings/base.py`, `config/urls.py`, `config/celery.py`, `.importlinter`, `client/src/app/registry.ts`, `client/e2e/accounts.ts`, `ops/docs/gymkhana_reference.py` | Pending |
+| Dependencies | None needed |
+
+## 12. Review rounds
+
+No reviewer output is on record. The scores in the earlier report have none
+behind them and are not repeated here.
+
+The spec tests were re-run on this code by Student 1 and await Student 2's confirmation: FR 39, UC 25,
+BR 44 and WF 16 passed, none failed, none skipped. Seven of them were automated, and two fixtures
+corrected, as `spec-tests/triage.md` records.

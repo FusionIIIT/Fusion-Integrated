@@ -12,6 +12,7 @@ from modules.gymkhana.models.booking import VenueBooking
 from modules.gymkhana.models.budget import ClubBudgetRequest
 from modules.gymkhana.models.club import Club
 from modules.gymkhana.models.membership import ClubMembership
+from modules.gymkhana.models.notification import GymkhanaNotification
 from modules.gymkhana.models.poll import Poll, PollChoice, PollVote
 from modules.gymkhana.models.report import ClubEventReport
 
@@ -381,6 +382,31 @@ def test_FR_013_CFR_GYM_003_AFR_GYM_012_session_event_overlap_rejected(
     assert VenueBooking.objects.count() == count
 
 
+def test_FR_014_CFR_GYM_003_AFR_GYM_013_session_booking_queues_notification(
+    stub_iam, gymkhana_users
+):
+    """FR-014 / CFR-GYM-003 / AFR-GYM-013."""
+    club = _club()
+    client = _client(stub_iam, 101, ("gymkhana.booking.create",))
+    response = client.post(
+        "/api/v1/gymkhana/bookings/session/",
+        {
+            "club_id": club.id,
+            "venue": "Hall 1",
+            "booking_date": "2026-12-15",
+            "start_time": "10:00:00",
+            "end_time": "12:00:00",
+            "name": "Session",
+            "description": "Practice",
+        },
+        format="json",
+    )
+    assert response.status_code == 201
+    queued = GymkhanaNotification.objects.get()
+    assert (queued.topic, queued.status) == ("session.booked", "pending")
+    assert queued.audience == {"members_of": club.id}
+
+
 def test_FR_015_CFR_GYM_003_AFR_GYM_014_club_head_books_event(
     stub_iam, gymkhana_users
 ):
@@ -403,6 +429,32 @@ def test_FR_015_CFR_GYM_003_AFR_GYM_014_club_head_books_event(
     )
     assert response.status_code == 201
     assert VenueBooking.objects.filter(id=response.data["id"], booking_type="event").exists()
+
+
+def test_FR_016_CFR_GYM_003_AFR_GYM_015_event_booking_queues_notification(
+    stub_iam, gymkhana_users
+):
+    """FR-016 / CFR-GYM-003 / AFR-GYM-015."""
+    club = _club()
+    client = _client(stub_iam, 101, ("gymkhana.booking.create",))
+    response = client.post(
+        "/api/v1/gymkhana/bookings/event/",
+        {
+            "club_id": club.id,
+            "venue": "Hall 2",
+            "booking_date": "2026-12-16",
+            "start_time": "14:00:00",
+            "end_time": "16:00:00",
+            "name": "Annual Event",
+            "description": "Event",
+            "faculty_councillor_id": 201,
+        },
+        format="json",
+    )
+    assert response.status_code == 201
+    queued = GymkhanaNotification.objects.get()
+    assert (queued.topic, queued.status) == ("event.booked", "pending")
+    assert queued.audience == {"members_of": club.id}
 
 
 def test_FR_017_CFR_GYM_004_AFR_GYM_016_student_applies_confirmed_club(
@@ -593,6 +645,32 @@ def test_FR_026_CFR_GYM_005_AFR_GYM_024_fewer_than_two_choices_rejected(
     )
     assert response.status_code == 400
     assert Poll.objects.count() == count
+
+
+def test_FR_027_CFR_GYM_005_AFR_GYM_025_poll_creation_queues_notification(
+    stub_iam, gymkhana_users
+):
+    """FR-027 / CFR-GYM-005 / AFR-GYM-025."""
+    club = _club()
+    client = _client(stub_iam, 101, ("gymkhana.poll.view", "gymkhana.poll.create"))
+    response = client.post(
+        "/api/v1/gymkhana/polls/",
+        {
+            "club_id": club.id,
+            "title": "Captain",
+            "description": "Vote",
+            "expires_at": (
+                datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=2)
+            ).isoformat(),
+            "choices": ["Alice", "Bob"],
+            "target_groups": [{"batch": "2024", "branch": "CSE"}],
+        },
+        format="json",
+    )
+    assert response.status_code == 201
+    queued = GymkhanaNotification.objects.get()
+    assert (queued.topic, queued.status) == ("poll.created", "pending")
+    assert queued.audience == {"targets_of": response.data["id"]}
 
 
 def test_FR_028_CFR_GYM_005_AFR_GYM_026_eligible_student_accesses_active_poll(

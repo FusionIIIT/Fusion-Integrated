@@ -451,7 +451,7 @@ def test_assigned_faculty_sees_club_reports(stub_iam, world):
             "club_id": club.id,
             "student_incharge_id": 102,
             "event_name": "Test Event",
-            "event_date": "2027-03-01T10:00:00Z",
+            "event_date": "2026-03-01T10:00:00Z",
             "description": "d",
             "report_file": dummy_file,
         },

@@ -591,15 +591,12 @@ def test_poll_title_variations(stub_iam, club_and_head, title, expect_ok):
 # L. No target_groups → defaults to all/all
 # ---------------------------------------------------------------------------
 
-def test_poll_no_target_groups_defaults_all(stub_iam, club_and_head):
-    """Creating poll without target_groups should default to all/all and allow any student to vote."""
-    club = club_and_head
-    client = _as(stub_iam, 101, HEAD_PERMS)
-
-    res = client.post(
+def test_poll_without_target_groups_is_refused(stub_iam, club_and_head):
+    """BW-GYM-02 transition 1 requires valid target groups."""
+    res = _as(stub_iam, 101, HEAD_PERMS).post(
         "/api/v1/gymkhana/polls/",
         {
-            "club_id": club.id,
+            "club_id": club_and_head.id,
             "title": "No Target Groups",
             "description": "d",
             "expires_at": _future(),
@@ -607,22 +604,7 @@ def test_poll_no_target_groups_defaults_all(stub_iam, club_and_head):
         },
         format="json",
     )
-    assert res.status_code == 201
-    poll_id = res.data["id"]
-    choice_id = res.data["choices"][0]["id"]
-
-    voter_uid = 950
-    if not UserRef.objects.filter(user_id=voter_uid).exists():
-        UserRef.objects.create(
-            user_id=voter_uid, username="v950", display_name="V950", kind="student", is_active=True
-        )
-    voter = _as(stub_iam, voter_uid, VOTER_PERMS)
-    vote_res = voter.post(
-        f"/api/v1/gymkhana/polls/{poll_id}/vote/",
-        {"choice_id": choice_id},
-        format="json",
-    )
-    assert vote_res.status_code == 200, f"expected 200, got {vote_res.status_code}: {vote_res.data}"
+    assert res.status_code == 400
 
 
 # ---------------------------------------------------------------------------

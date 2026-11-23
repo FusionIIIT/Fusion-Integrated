@@ -12,6 +12,7 @@ from modules.gymkhana.models.booking import VenueBooking
 from modules.gymkhana.models.budget import ClubBudgetRequest
 from modules.gymkhana.models.club import Club
 from modules.gymkhana.models.membership import ClubMembership
+from modules.gymkhana.models.notification import GymkhanaNotification
 from modules.gymkhana.models.poll import Poll, PollChoice, PollTargetGroup, PollVote
 from modules.gymkhana.models.report import ClubEventReport
 
@@ -407,8 +408,25 @@ def test_BR_028_BR_GYM_012_one_choice_rejected(stub_iam, br_users):
     assert Poll.objects.count() == count
 
 
+def test_BR_029_BR_GYM_013_poll_notification_scoped_to_target_group(stub_iam, br_users):
+    """BR-029 / BR-GYM-013 — poll notification sent only to target batch/branch."""
+    club = _club("BR029")
+    client = _client(stub_iam, 101, ("gymkhana.poll.view", "gymkhana.poll.create"))
+    response = client.post("/api/v1/gymkhana/polls/", {
+        "club_id": club.id, "title": "BR029",
+        "expires_at": (datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=1)).isoformat(),
+        "choices": ["A", "B"], "target_groups": [{"batch": "2024", "branch": "CSE"}],
+    }, format="json")
+    assert response.status_code == 201
+    poll_id = response.data["id"]
+    assert GymkhanaNotification.objects.get().audience == {"targets_of": poll_id}
+    groups = PollTargetGroup.objects.filter(poll_id=poll_id).values_list("batch", "branch")
+    assert list(groups) == [("2024", "CSE")]
+
+
 def test_BR_030_BR_GYM_014_eligible_student_accesses_active_poll(stub_iam, br_users):
     """BR-030 / BR-GYM-014 — eligible student in target group can access active poll."""
+    UserRef.objects.filter(user_id=103).update(batch_year=2024, discipline="CSE")
     club = _club("BR030")
     poll = Poll.objects.create(club=club, created_by_id=101, title="BR030",
         expires_at=datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=1),
@@ -423,6 +441,7 @@ def test_BR_030_BR_GYM_014_eligible_student_accesses_active_poll(stub_iam, br_us
 
 def test_BR_031_BR_GYM_014_ineligible_student_cannot_vote(stub_iam, br_users):
     """BR-031 / BR-GYM-014 — ineligible student wrong batch/branch cannot vote."""
+    UserRef.objects.filter(user_id=103).update(batch_year=2023, discipline="ECE")
     club = _club("BR031")
     poll = Poll.objects.create(club=club, created_by_id=101, title="BR031",
         expires_at=datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=1),
