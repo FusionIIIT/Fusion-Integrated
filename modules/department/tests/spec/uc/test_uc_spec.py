@@ -367,12 +367,21 @@ def test_uc_014_02_hod_oversight_non_terminal(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Elective offerings"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
+    path = f"{BASE}/feedback/{fb['id']}/action"
+    reviewed = admin.post(path, {"action": "review", "category": "Facilities"}, format="json")
+    assert reviewed.status_code == 200
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
-    res = hod.get(f"{BASE}/feedback")
-    assert res.status_code == 200
-    assert any(f["id"] == fb["id"] and f["status"] == "reviewed" for f in res.json()["results"])
+    notes = "Discuss at the next department meeting"
+    recorded = hod.post(path, {"action": "record_oversight", "oversight_notes": notes}, format="json")
+    assert recorded.status_code == 200
+    feed = hod.get(f"{BASE}/feedback")
+    assert feed.status_code == 200
+    row = next(item for item in feed.json()["results"] if item["id"] == fb["id"])
+    assert row["status"] == "reviewed"
+    assert row["oversight_at"]
+    assert row["oversight_notes"] == notes
+    assert row["disposed_at"] is None
 
 
 def test_uc_017_01_manage_lab_profiles_main(spec_client):

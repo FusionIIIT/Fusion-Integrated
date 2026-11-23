@@ -9,6 +9,7 @@ from django.db import IntegrityError, transaction
 from modules.department.models import (
     Announcement,
     DepartmentDetails,
+    DepartmentProposal,
     Feedback,
     LabResource,
     StockItem,
@@ -749,3 +750,5 @@ def test_fr_060_headship_cannot_be_independently_edited(spec_client):
         "value": "Fake HOD"
     }, format="json")
     assert res.status_code == 400
+    assert [detail["field"] for detail in res.json()["error"]["details"]] == ["field"]
+    assert not DepartmentProposal.objects.exists()
