@@ -1,0 +1,326 @@
+[
+  {
+    "test_id": "T001",
+    "source_id": "HM-UC-001 Main Flow",
+    "purpose": "Validate that a Super Admin can successfully create a new hostel master record.",
+    "preconditions": "Super Admin is authenticated and has no existing hostel with the same identifier.",
+    "action_or_input": "Submit a create‑hostel request with valid hostel details.",
+    "expected_result": "System creates the hostel record and returns a success confirmation.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T002",
+    "source_id": "HM-UC-002 Main Flow",
+    "purpose": "Ensure Super Admin can bind a Warden role to a hostel.",
+    "preconditions": "Super Admin is authenticated; hostel record exists; Warden user exists.",
+    "action_or_input": "Assign the Warden role to the hostel via the role‑binding interface.",
+    "expected_result": "Role binding is recorded and the Warden gains access to hostel‑specific functions.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T003",
+    "source_id": "HM-UC-005 Main Flow",
+    "purpose": "Verify that a Student can view their current room allocation.",
+    "preconditions": "Student is logged in and has an active room assignment.",
+    "action_or_input": "Navigate to the \"Room Allocation\" view.",
+    "expected_result": "The interface displays the student's current room details.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T004",
+    "source_id": "HM-UC-006 Main Flow",
+    "purpose": "Confirm that a Student can submit a new accommodation request.",
+    "preconditions": "Student is authenticated and has no pending request.",
+    "action_or_input": "Fill and submit the accommodation request form with valid data.",
+    "expected_result": "System records the request and returns a submission acknowledgment.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T005",
+    "source_id": "HM-UC-009 Main Flow",
+    "purpose": "Validate room‑vacation update by Super Admin.",
+    "preconditions": "Super Admin authenticated; room currently occupied.",
+    "action_or_input": "Mark the room as vacant through the room‑management UI.",
+    "expected_result": "Room status changes to vacant and occupancy count is decremented.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T006",
+    "source_id": "HM-UC-011 Main Flow",
+    "purpose": "Check that a Student can view historical room allocation records.",
+    "preconditions": "Student authenticated; student has past room assignments.",
+    "action_or_input": "Access the \"Allocation History\" section.",
+    "expected_result": "A list of previous room assignments is displayed.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T007",
+    "source_id": "HM-UC-012 Main Flow",
+    "purpose": "Ensure that a Student can submit a leave request.",
+    "preconditions": "Student logged in; no existing pending leave request.",
+    "action_or_input": "Complete and submit the leave request form with valid dates.",
+    "expected_result": "Leave request is recorded and a confirmation is shown.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T008",
+    "source_id": "HM-UC-013 Main Flow",
+    "purpose": "Validate that a caretaker can approve a leave request.",
+    "preconditions": "Caretaker authenticated; a pending leave request exists.",
+    "action_or_input": "Approve the pending leave request via the approval interface.",
+    "expected_result": "Leave request status changes to Approved and the student is notified.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T009",
+    "source_id": "HM-UC-014 Main Flow",
+    "purpose": "Confirm that a caretaker can reject a leave request.",
+    "preconditions": "Caretaker logged in; pending leave request present.",
+    "action_or_input": "Reject the leave request providing a rejection reason.",
+    "expected_result": "Leave request status changes to Rejected and the student receives the reason.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T010",
+    "source_id": "HM-UC-015 Approve Path",
+    "purpose": "Verify successful approval of a room re‑allocation request.",
+    "preconditions": "Super Admin authenticated; re‑allocation request pending approval.",
+    "action_or_input": "Approve the re‑allocation request.",
+    "expected_result": "Room assignments are updated according to the request and a success message is shown.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T011",
+    "source_id": "HM-UC-015 Reject Path",
+    "purpose": "Verify that a rejected re‑allocation request leaves assignments unchanged.",
+    "preconditions": "Super Admin authenticated; re‑allocation request pending.",
+    "action_or_input": "Reject the request with a justification.",
+    "expected_result": "No changes to room assignments; request status becomes Rejected and reason is recorded.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T012",
+    "source_id": "HM-UC-016 Main Flow",
+    "purpose": "Ensure that a student can view a guest‑room booking form.",
+    "preconditions": "Student logged in; guest‑room feature enabled.",
+    "action_or_input": "Navigate to the \"Guest Room Booking\" page.",
+    "expected_result": "The booking form is displayed with available dates and rooms.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T013",
+    "source_id": "HM-UC-017 Main Flow",
+    "purpose": "Validate that a student can submit a guest‑room booking.",
+    "preconditions": "Student authenticated; valid booking details entered.",
+    "action_or_input": "Submit the guest‑room booking request.",
+    "expected_result": "Booking is recorded, room availability is updated, and confirmation is shown.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T014",
+    "source_id": "HM-UC-018 Resolve Path",
+    "purpose": "Confirm that a caretaker can resolve a complaint.",
+    "preconditions": "Caretaker logged in; complaint in 'Open' state.",
+    "action_or_input": "Mark the complaint as Resolved with a resolution note.",
+    "expected_result": "Complaint status becomes Resolved and the student receives notification.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T015",
+    "source_id": "HM-UC-018 Update Path",
+    "purpose": "Verify that a caretaker can update complaint details.",
+    "preconditions": "Caretaker authenticated; complaint exists.",
+    "action_or_input": "Edit the complaint description and save.",
+    "expected_result": "Complaint information is updated and audit trail records the change.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T016",
+    "source_id": "HM-UC-018 Escalate Path",
+    "purpose": "Check that a caretaker can escalate a complaint to a higher authority.",
+    "preconditions": "Caretaker logged in; complaint requires escalation.",
+    "action_or_input": "Escalate the complaint, optionally adding comments.",
+    "expected_result": "Complaint status changes to Escalated and senior staff are notified.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T017",
+    "source_id": "HM-UC-019 Main Flow",
+    "purpose": "Validate that a Super Admin can generate a hostel occupancy report.",
+    "preconditions": "Super Admin authenticated.",
+    "action_or_input": "Request the occupancy report for a given date range.",
+    "expected_result": "System returns a report containing current occupancy statistics.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T018",
+    "source_id": "HM-UC-020 Main Flow",
+    "purpose": "Ensure that a caretaker can record a fine for a student.",
+    "preconditions": "Caretaker logged in; student has an infraction.",
+    "action_or_input": "Create a fine entry with amount and reason for the student.",
+    "expected_result": "Fine is stored, student balance updates, and a notification is sent.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T019",
+    "source_id": "HM-UC-021 Approve Path",
+    "purpose": "Verify approval of a fine payment by the student.",
+    "preconditions": "Student authenticated; outstanding fine exists.",
+    "action_or_input": "Submit payment for the fine and confirm.",
+    "expected_result": "Fine status changes to Paid and receipt is generated.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T020",
+    "source_id": "HM-UC-021 Reject Path",
+    "purpose": "Validate handling of a failed fine payment.",
+    "preconditions": "Student authenticated; fine pending payment.",
+    "action_or_input": "Attempt payment with insufficient funds.",
+    "expected_result": "Payment fails, fine remains Unpaid, and an error message is shown.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T021",
+    "source_id": "HM-UC-022 Main Flow",
+    "purpose": "Confirm that a caretaker can view guard shift schedules.",
+    "preconditions": "Caretaker logged in.",
+    "action_or_input": "Open the \"Guard Shift\" schedule page.",
+    "expected_result": "Schedule list with shift times and assigned guards is displayed.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T022",
+    "source_id": "HM-UC-023 Main Flow",
+    "purpose": "Validate that a caretaker can add a new guard shift.",
+    "preconditions": "Caretaker authenticated; shift details prepared.",
+    "action_or_input": "Create a new guard shift entry with date, time, and guard name.",
+    "expected_result": "Shift is saved and appears in the schedule list.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T023",
+    "source_id": "HM-UC-024 Approve Path",
+    "purpose": "Verify that a Super Admin can approve a new hostel activation request.",
+    "preconditions": "Super Admin logged in; activation request pending.",
+    "action_or_input": "Approve the activation request.",
+    "expected_result": "Hostel status changes to Active and a confirmation is sent.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T024",
+    "source_id": "HM-UC-024 Reject Path",
+    "purpose": "Verify that a Super Admin can reject a hostel activation request.",
+    "preconditions": "Super Admin authenticated; activation request pending.",
+    "action_or_input": "Reject the request with a reason.",
+    "expected_result": "Hostel remains Inactive; request status becomes Rejected and reason recorded.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T025",
+    "source_id": "HM-UC-026 Main Flow",
+    "purpose": "Ensure that a Student can view hostel notices.",
+    "preconditions": "Student logged in.",
+    "action_or_input": "Navigate to the \"Notices\" section.",
+    "expected_result": "List of current hostel notices is displayed.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T026",
+    "source_id": "HM-UC-027 Main Flow",
+    "purpose": "Validate that a Super Admin can post a new hostel notice.",
+    "preconditions": "Super Admin authenticated.",
+    "action_or_input": "Create a notice with title and content and publish.",
+    "expected_result": "Notice appears in the notices list for all students.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T027",
+    "source_id": "HM-UC-028 Main Flow",
+    "purpose": "Confirm that a caretaker can acknowledge a student complaint.",
+    "preconditions": "Caretaker logged in; complaint in 'New' state.",
+    "action_or_input": "Mark the complaint as Acknowledged.",
+    "expected_result": "Complaint status changes to Acknowledged and student is notified.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T028",
+    "source_id": "HM-UC-030 Main Flow",
+    "purpose": "Verify that a student can request an extended stay.",
+    "preconditions": "Student authenticated; current stay end date approaching.",
+    "action_or_input": "Submit an extended‑stay request with new end date.",
+    "expected_result": "Request is recorded and pending approval.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T029",
+    "source_id": "HM-UC-031 Main Flow",
+    "purpose": "Validate that a Super Admin can publish a hostel‑wide announcement.",
+    "preconditions": "Super Admin authenticated.",
+    "action_or_input": "Create announcement content and publish it.",
+    "expected_result": "Announcement is visible to all users in the announcements feed.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T030",
+    "source_id": "HM-UC-031 Publish Path",
+    "purpose": "Check that publishing an announcement respects role permissions.",
+    "preconditions": "Caretaker authenticated; attempts to publish announcement.",
+    "action_or_input": "Attempt to publish announcement.",
+    "expected_result": "System rejects the action with an authorization error.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T031",
+    "source_id": "HM-UC-032 Main Flow",
+    "purpose": "Ensure that a student can view their fine history.",
+    "preconditions": "Student logged in; at least one fine previously recorded.",
+    "action_or_input": "Open the \"Fine History\" page.",
+    "expected_result": "List of past fines with statuses and amounts is displayed.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T032",
+    "source_id": "HM-UC-033 Main Flow",
+    "purpose": "Validate that a caretaker can generate a guard shift report.",
+    "preconditions": "Caretaker authenticated.",
+    "action_or_input": "Request shift report for a specific date range.",
+    "expected_result": "Report PDF with shift details is generated and downloadable.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T033",
+    "source_id": "HM-UC-036 Main Flow",
+    "purpose": "Confirm that a student can submit a room‑maintenance request.",
+    "preconditions": "Student logged in; room assigned.",
+    "action_or_input": "Fill maintenance request form and submit.",
+    "expected_result": "Request is logged and maintenance team receives notification.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T034",
+    "source_id": "HM-UC-037 Main Flow",
+    "purpose": "Validate that a caretaker can update room‑maintenance request status.",
+    "preconditions": "Caretaker authenticated; maintenance request in 'Open' state.",
+    "action_or_input": "Change status to 'In Progress' and add notes.",
+    "expected_result": "Request status updates and notes are saved.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T035",
+    "source_id": "HM-UC-038 Main Flow",
+    "purpose": "Ensure that a student receives a notification when their room‑maintenance request is completed.",
+    "preconditions": "Student logged in; request status changed to 'Completed'.",
+    "action_or_input": "Check notifications page.",
+    "expected_result": "Notification about completed maintenance is displayed.",
+    "test_type": "Functional"
+  },
+  {
+    "test_id": "T036",
+    "source_id": "HM-UC-039 Main Flow",
+    "purpose": "Validate that a Super Admin can deactivate a hostel record.",
+    "preconditions": "Super Admin authenticated; hostel currently active.",
+    "action_or_input": "Select the hostel and trigger deactivation.",
+    "expected_result": "Hostel status changes to Inactive and related access is revoked.",
+    "test_type": "Functional"
+  }
+]

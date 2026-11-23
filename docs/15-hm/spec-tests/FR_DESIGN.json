@@ -1,0 +1,353 @@
+[
+  {
+    "test_id": "TC-CFR-001-01",
+    "source_id": "CFR-HM-001",
+    "purpose": "Verify Super Admin can create a hostel record",
+    "preconditions": "Authenticated as Super Admin; no existing hostel with code 'HM001'",
+    "action_or_input": "POST /api/v1/hm/hostels {\"code\": \"HM001\", \"name\": \"Alpha Hostel\", \"active\": true}",
+    "expected_result": "HTTP 201 Created; response contains the created hostel with matching fields",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-002-01",
+    "source_id": "CFR-HM-002",
+    "purpose": "Verify Super Admin can activate and deactivate a hostel",
+    "preconditions": "Authenticated as Super Admin; hostel 'HM001' exists and is active",
+    "action_or_input": "PATCH /api/v1/hm/hostels/HM001 {\"active\": false}",
+    "expected_result": "HTTP 200 OK; hostel 'active' flag set to false",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-003-01",
+    "source_id": "CFR-HM-003",
+    "purpose": "Verify Student can submit an accommodation request",
+    "preconditions": "Authenticated as Student; student_id = 1001; hostel 'HM001' exists",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests {\"student_id\": 1001, \"hostel_id\": \"HM001\", \"details\": \"Need a room\"}",
+    "expected_result": "HTTP 201 Created; accommodation request status = 'Submitted'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-004-01",
+    "source_id": "CFR-HM-004",
+    "purpose": "Verify Super Admin can record initial room allotment",
+    "preconditions": "Authenticated as Super Admin; accommodation request id = 2001 exists in 'Submitted' state; room 'R101' exists with capacity > 0",
+    "action_or_input": "POST /api/v1/hm/accommodation-requests/2001/allot {\"room_id\": \"R101\"}",
+    "expected_result": "HTTP 200 OK; request status = 'Room Allotted'; room occupancy increased by 1",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-005-01",
+    "source_id": "CFR-HM-005",
+    "purpose": "Verify Student can view own room allocation history",
+    "preconditions": "Authenticated as Student (student_id 1001); at least one room assignment exists for the student",
+    "action_or_input": "GET /api/v1/hm/room-assignments?student_id=1001",
+    "expected_result": "HTTP 200 OK; response includes list of assignments with correct room IDs and timestamps",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-006-01",
+    "source_id": "CFR-HM-006",
+    "purpose": "Verify Caretaker can maintain room availability and occupancy",
+    "preconditions": "Authenticated as Caretaker assigned to hostel 'HM001'; room 'R101' exists",
+    "action_or_input": "PATCH /api/v1/hm/rooms/R101 {\"capacity\": 4}",
+    "expected_result": "HTTP 200 OK; room capacity updated to 4; occupancy unchanged",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-007-01",
+    "source_id": "CFR-HM-007",
+    "purpose": "Verify Caretaker can record individual room exchange",
+    "preconditions": "Authenticated as Caretaker; student A assigned to room R101; student B assigned to room R102; both rooms belong to same hostel",
+    "action_or_input": "POST /api/v1/hm/room-assignments/EXCHANGE {\"from_room_id\": \"R101\", \"to_room_id\": \"R102\", \"student_from_id\": 1001, \"student_to_id\": 1002}",
+    "expected_result": "HTTP 200 OK; assignments swapped; occupancy unchanged; history records exchange event",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-008-01",
+    "source_id": "CFR-HM-008",
+    "purpose": "Verify Warden can review room assignments and occupancy patterns",
+    "preconditions": "Authenticated as Warden assigned to hostel 'HM001'; multiple assignments exist",
+    "action_or_input": "GET /api/v1/hm/room-assignments?hostel_id=HM001",
+    "expected_result": "HTTP 200 OK; response contains assignment list with occupancy summary",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-009-01",
+    "source_id": "CFR-HM-009",
+    "purpose": "Verify Caretaker can record attendance for a student",
+    "preconditions": "Authenticated as Caretaker; student_id 1005 enrolled",
+    "action_or_input": "POST /api/v1/hm/attendance {\"student_id\": 1005, \"date\": \"2026-11-22\", \"status\": \"present\"}",
+    "expected_result": "HTTP 201 Created; attendance record stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-010-01",
+    "source_id": "CFR-HM-010",
+    "purpose": "Verify Student can view own attendance record",
+    "preconditions": "Authenticated as Student (student_id 1005); attendance record for 2026-11-22 exists",
+    "action_or_input": "GET /api/v1/hm/attendance?student_id=1005&date=2026-11-22",
+    "expected_result": "HTTP 200 OK; response shows attendance status 'present'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-011-01",
+    "source_id": "CFR-HM-011",
+    "purpose": "Verify Attendance procedure scope is respected (no out‑of‑scope update)",
+    "preconditions": "Authenticated as Caretaker; attendance record id = 3001 exists",
+    "action_or_input": "PATCH /api/v1/hm/attendance/3001 {\"status\": \"absent\"}",
+    "expected_result": "HTTP 403 Forbidden; update not allowed per specification",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-CFR-012-01",
+    "source_id": "CFR-HM-012",
+    "purpose": "Verify Student can submit a leave request",
+    "preconditions": "Authenticated as Student (student_id 1001); no pending leave request",
+    "action_or_input": "POST /api/v1/hm/leave-requests {\"student_id\": 1001, \"reason\": \"Medical\", \"start_date\": \"2026-12-01\", \"end_date\": \"2026-12-05\"}",
+    "expected_result": "HTTP 201 Created; leave request status = 'Submitted'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-013-01",
+    "source_id": "CFR-HM-013",
+    "purpose": "Verify Caretaker can approve a leave request",
+    "preconditions": "Authenticated as Caretaker assigned to student's hostel; leave request id = 4001 in 'Submitted' state",
+    "action_or_input": "POST /api/v1/hm/leave-requests/4001/decision {\"decision\": \"approve\"}",
+    "expected_result": "HTTP 200 OK; leave request status = 'Approved'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-014-01",
+    "source_id": "CFR-HM-014",
+    "purpose": "Verify leave records are retained and visible to Warden",
+    "preconditions": "Authenticated as Warden; leave request id = 4001 approved",
+    "action_or_input": "GET /api/v1/hm/leave-requests/4001",
+    "expected_result": "HTTP 200 OK; response includes full leave history with approval timestamp",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-015-01",
+    "source_id": "CFR-HM-015",
+    "purpose": "Verify external leave policy is not enforced inside HM",
+    "preconditions": "Authenticated as Caretaker; leave request with policy‑specific field omitted",
+    "action_or_input": "POST /api/v1/hm/leave-requests {\"student_id\": 1001, \"reason\": \"Family\", \"start_date\": \"2026-12-10\", \"end_date\": \"2026-12-12\"}",
+    "expected_result": "HTTP 201 Created; request accepted without policy validation",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-016-01",
+    "source_id": "CFR-HM-016",
+    "purpose": "Verify Student can submit a complaint",
+    "preconditions": "Authenticated as Student (student_id 1001)",
+    "action_or_input": "POST /api/v1/hm/complaints {\"student_id\": 1001, \"category\": \"Noise\", \"description\": \"Loud music at night\"}",
+    "expected_result": "HTTP 201 Created; complaint status = 'Submitted'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-017-01",
+    "source_id": "CFR-HM-017",
+    "purpose": "Verify Caretaker can resolve a complaint",
+    "preconditions": "Authenticated as Caretaker; complaint id = 5001 in 'Submitted' state",
+    "action_or_input": "POST /api/v1/hm/complaints/5001/events {\"action\": \"resolve\", \"notes\": \"Issue fixed\"}",
+    "expected_result": "HTTP 200 OK; complaint status = 'Resolved'; event appended to history",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-018-01",
+    "source_id": "CFR-HM-018",
+    "purpose": "Verify complaints are scoped to hostels only",
+    "preconditions": "Authenticated as Student; attempt to submit complaint with hostel_id referencing non‑hostel entity",
+    "action_or_input": "POST /api/v1/hm/complaints {\"student_id\": 1001, \"hostel_id\": \"NONHOSTEL\", \"category\": \"Other\", \"description\": \"Test\"}",
+    "expected_result": "HTTP 400 Bad Request; validation error indicating invalid hostel scope",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-CFR-019-01",
+    "source_id": "CFR-HM-019",
+    "purpose": "Verify Student can submit a guest‑room booking request",
+    "preconditions": "Authenticated as Student (student_id 1001); guest room 'G101' available",
+    "action_or_input": "POST /api/v1/hm/guest-bookings {\"student_id\": 1001, \"guest_room_id\": \"G101\", \"start\": \"2026-12-15\", \"end\": \"2026-12-20\"}",
+    "expected_result": "HTTP 201 Created; booking status = 'Submitted'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-020-01",
+    "source_id": "CFR-HM-020",
+    "purpose": "Verify Caretaker can approve a guest‑room booking request",
+    "preconditions": "Authenticated as Caretaker; booking id = 6001 in 'Submitted' state; room available for requested period",
+    "action_or_input": "POST /api/v1/hm/guest-bookings/6001/decision {\"decision\": \"approve\"}",
+    "expected_result": "HTTP 200 OK; booking status = 'Approved'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-021-01",
+    "source_id": "CFR-HM-021",
+    "purpose": "Verify Student can view own guest‑room booking status",
+    "preconditions": "Authenticated as Student (student_id 1001); booking id = 6001 exists",
+    "action_or_input": "GET /api/v1/hm/guest-bookings/6001",
+    "expected_result": "HTTP 200 OK; response shows status 'Approved'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-022-01",
+    "source_id": "CFR-HM-022",
+    "purpose": "Verify Student can submit an extended‑stay request",
+    "preconditions": "Authenticated as Student (student_id 1001)",
+    "action_or_input": "POST /api/v1/hm/extended-stays {\"student_id\": 1001, \"start\": \"2026-12-25\", \"end\": \"2027-01-05\"}",
+    "expected_result": "HTTP 201 Created; extended‑stay status = 'Submitted'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-023-01",
+    "source_id": "CFR-HM-023",
+    "purpose": "Verify Warden can approve an extended‑stay request",
+    "preconditions": "Authenticated as Warden; extended‑stay id = 7001 in 'Submitted' state",
+    "action_or_input": "POST /api/v1/hm/extended-stays/7001/decision {\"decision\": \"approve\"}",
+    "expected_result": "HTTP 200 OK; extended‑stay status = 'Approved'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-024-01",
+    "source_id": "CFR-HM-024",
+    "purpose": "Verify fine record creation by Caretaker",
+    "preconditions": "Authenticated as Caretaker; student_id 1001",
+    "action_or_input": "POST /api/v1/hm/fines {\"student_id\": 1001, \"reason\": \"Damage\", \"amount\": 150.00, \"date\": \"2026-11-20\"}",
+    "expected_result": "HTTP 201 Created; fine record stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-025-01",
+    "source_id": "CFR-HM-025",
+    "purpose": "Verify fine payment is out of scope (negative test)",
+    "preconditions": "Authenticated as Student; fine id = 8001 exists",
+    "action_or_input": "POST /api/v1/hm/fines/8001/pay {\"amount\": 150.00}",
+    "expected_result": "HTTP 404 Not Found or 403 Forbidden; payment endpoint not implemented",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-CFR-026-01",
+    "source_id": "CFR-HM-026",
+    "purpose": "Verify Caretaker can create inventory item",
+    "preconditions": "Authenticated as Caretaker; item_name = \"Projector\"",
+    "action_or_input": "POST /api/v1/hm/inventory {\"name\": \"Projector\", \"quantity\": 5}",
+    "expected_result": "HTTP 201 Created; inventory item stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-027-01",
+    "source_id": "CFR-HM-027",
+    "purpose": "Verify procurement is out of scope (negative test)",
+    "preconditions": "Authenticated as Caretaker",
+    "action_or_input": "POST /api/v1/hm/inventory/purchase {\"item_id\": 9001, \"quantity\": 10}",
+    "expected_result": "HTTP 404 Not Found; endpoint not available",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-CFR-028-01",
+    "source_id": "CFR-HM-028",
+    "purpose": "Verify Warden can create guard‑shift record",
+    "preconditions": "Authenticated as Warden; shift_date = \"2026-12-01\"",
+    "action_or_input": "POST /api/v1/hm/guard-shifts {\"date\": \"2026-12-01\", \"start_time\": \"22:00\", \"end_time\": \"06:00\"}",
+    "expected_result": "HTTP 201 Created; guard‑shift stored",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-029-01",
+    "source_id": "CFR-HM-029",
+    "purpose": "Verify security admin scope is not exposed (negative test)",
+    "preconditions": "Authenticated as Student",
+    "action_or_input": "GET /api/v1/hm/security-admins",
+    "expected_result": "HTTP 403 Forbidden; endpoint not accessible",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-CFR-030-01",
+    "source_id": "CFR-HM-030",
+    "purpose": "Verify Caretaker can publish a notice",
+    "preconditions": "Authenticated as Caretaker assigned to hostel 'HM001'",
+    "action_or_input": "POST /api/v1/hm/notices {\"hostel_id\": \"HM001\", \"title\": \"Inspection\", \"content\": \"Room inspection on 5th\"}",
+    "expected_result": "HTTP 201 Created; notice status = 'Draft'",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-031-01",
+    "source_id": "CFR-HM-031",
+    "purpose": "Verify Student can view published notices",
+    "preconditions": "Authenticated as Student; notice id = 10001 is published and visible to student's hostel",
+    "action_or_input": "GET /api/v1/hm/notices/10001",
+    "expected_result": "HTTP 200 OK; notice details returned",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-032-01",
+    "source_id": "CFR-HM-032",
+    "purpose": "Verify report generation endpoint works for Super Admin",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "GET /api/v1/hm/reports/occupancy-summary",
+    "expected_result": "HTTP 200 OK; response contains aggregated occupancy data",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-033-01",
+    "source_id": "CFR-HM-033",
+    "purpose": "Validate advanced analytics endpoint is not exposed (negative)",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "GET /api/v1/hm/analytics/predictive",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-CFR-034-01",
+    "source_id": "CFR-HM-034",
+    "purpose": "Validate notification production is blocked until contract approved",
+    "preconditions": "Authenticated as System; attempt to enqueue notification event",
+    "action_or_input": "POST /api/v1/hm/notifications {\"event\": \"room_allotment\", \"payload\": {...}}",
+    "expected_result": "HTTP 403 Forbidden; feature blocked per specification",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-CFR-035-01",
+    "source_id": "CFR-HM-035",
+    "purpose": "Validate Student access is limited to assigned hostel",
+    "preconditions": "Authenticated as Student assigned to hostel 'HM001'; attempt to access hostel 'HM002' data",
+    "action_or_input": "GET /api/v1/hm/hostels/HM002",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-CFR-036-01",
+    "source_id": "CFR-HM-036",
+    "purpose": "Validate Super Admin has institution‑level access",
+    "preconditions": "Authenticated as Super Admin",
+    "action_or_input": "GET /api/v1/hm/hostels",
+    "expected_result": "HTTP 200 OK; list of all hostels returned",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-037-01",
+    "source_id": "CFR-HM-037",
+    "purpose": "Validate time‑bound role validity is enforced only when dates configured",
+    "preconditions": "Authenticated as Caretaker; role binding for Warden has start_date in future",
+    "action_or_input": "GET /api/v1/hm/hostel-role-bindings?user_id=2001",
+    "expected_result": "HTTP 200 OK; binding returned as inactive (not yet effective)",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-038-01",
+    "source_id": "CFR-HM-038",
+    "purpose": "Validate new role holder can view pending records after reassignment",
+    "preconditions": "Care taker role reassigned from user 2001 to user 2002; pending complaint id = 5001 belongs to hostel 'HM001'",
+    "action_or_input": "GET /api/v1/hm/complaints?hostel_id=HM001",
+    "expected_result": "HTTP 200 OK; pending complaint appears for new caretaker",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-CFR-039-01",
+    "source_id": "CFR-HM-039",
+    "purpose": "Validate RBAC restricts access to unrelated hostels",
+    "preconditions": "Authenticated as Caretaker for hostel 'HM001'; attempt to read hostel 'HM002' data",
+    "action_or_input": "GET /api/v1/hm/hostels/HM002",
+    "expected_result": "HTTP 404 Not Found",
+    "test_type": "negative"
+  }
+]

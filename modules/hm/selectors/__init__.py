@@ -1,0 +1,36 @@
+# Selectors package
+from modules.hm.selectors.scoping import (
+    scope_hostels,
+    scope_role_bindings,
+    scope_rooms,
+    scope_accommodation_requests,
+    scope_room_assignments,
+    scope_attendance,
+    scope_leave_requests,
+    scope_complaints,
+    scope_guest_bookings,
+    scope_extended_stays,
+    scope_fines,
+    scope_inventory,
+    scope_guard_shifts,
+    scope_notices,
+    get_assigned_hostel_ids_for_user,
+)
+
+__all__ = [
+    "scope_hostels",
+    "scope_role_bindings",
+    "scope_rooms",
+    "scope_accommodation_requests",
+    "scope_room_assignments",
+    "scope_attendance",
+    "scope_leave_requests",
+    "scope_complaints",
+    "scope_guest_bookings",
+    "scope_extended_stays",
+    "scope_fines",
+    "scope_inventory",
+    "scope_guard_shifts",
+    "scope_notices",
+    "get_assigned_hostel_ids_for_user",
+]
