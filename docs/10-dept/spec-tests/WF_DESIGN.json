@@ -1,0 +1,146 @@
+[
+  {
+    "test_id": "TEST-WF-001",
+    "source_id": "BW-DEPT-01 approval-and-issuance-path",
+    "purpose": "Verify basis workflow BW-DEPT-01: stock request approved by HOD and issued by Dept_Admin.",
+    "preconditions": "Inventory item exists with sufficient quantity. Faculty, HOD, Dept_Admin users exist.",
+    "action_or_input": "Step 1: Faculty requests stock -> Step 2: HOD approves -> Step 3: Dept_Admin issues.",
+    "expected_result": "Request transitions from None -> Pending HOD Approval -> Approved for Issuance -> Issued; inventory decremented; movement logged.",
+    "test_type": "basis_workflow"
+  },
+  {
+    "test_id": "TEST-WF-002",
+    "source_id": "BW-DEPT-02 rejection-path",
+    "purpose": "Verify basis workflow BW-DEPT-02: stock request rejected by HOD.",
+    "preconditions": "Inventory item exists. Faculty and HOD users exist.",
+    "action_or_input": "Step 1: Faculty requests stock -> Step 2: HOD rejects with remarks.",
+    "expected_result": "Request transitions from None -> Pending HOD Approval -> Rejected; requesting faculty notified; terminal state.",
+    "test_type": "basis_workflow"
+  },
+  {
+    "test_id": "TEST-WF-003",
+    "source_id": "CW-DEPT-01 composite-stock-approved-path",
+    "purpose": "Verify composite workflow CW-DEPT-01 path A: shared request progression through approved issuance.",
+    "preconditions": "Inventory item available with quantity=10.",
+    "action_or_input": "Faculty requests quantity=4 -> HOD approves -> Dept_Admin issues.",
+    "expected_result": "Terminal state Issued; final inventory is 6; audit movements logged for stock issuance.",
+    "test_type": "composite_workflow"
+  },
+  {
+    "test_id": "TEST-WF-004",
+    "source_id": "CW-DEPT-01 composite-stock-rejected-path",
+    "purpose": "Verify composite workflow CW-DEPT-01 path B: shared request progression ending in HOD rejection.",
+    "preconditions": "Inventory item available with quantity=10.",
+    "action_or_input": "Faculty requests quantity=3 -> HOD rejects.",
+    "expected_result": "Terminal state Rejected; inventory unchanged at 10; no issuance movement logged.",
+    "test_type": "composite_workflow"
+  },
+  {
+    "test_id": "TEST-WF-005",
+    "source_id": "BW-DEPT-03 admin-disposition-path",
+    "purpose": "Verify basis workflow BW-DEPT-03: feedback submitted, reviewed by Dept_Admin, and closed by Dept_Admin.",
+    "preconditions": "Student or Faculty authenticated. Dept_Admin authenticated.",
+    "action_or_input": "Step 1: User submits feedback -> Step 2: Dept_Admin reviews & categorizes -> Step 3: Dept_Admin closes simple issue.",
+    "expected_result": "Feedback transitions from None -> New -> Under Review / Categorized -> Closed; submitter notified.",
+    "test_type": "basis_workflow"
+  },
+  {
+    "test_id": "TEST-WF-006",
+    "source_id": "BW-DEPT-04 hod-oversight-path",
+    "purpose": "Verify basis workflow BW-DEPT-04: feedback submitted, reviewed by Dept_Admin, and resolved with HOD oversight.",
+    "preconditions": "Student submits feedback. Dept_Admin and HOD authenticated.",
+    "action_or_input": "Step 1: User submits feedback -> Step 2: Dept_Admin initial review -> Step 3: HOD oversight and resolution.",
+    "expected_result": "Feedback transitions from None -> New -> Under Review / Categorized -> Resolved; submitter notified.",
+    "test_type": "basis_workflow"
+  },
+  {
+    "test_id": "TEST-WF-007",
+    "source_id": "CW-DEPT-02 composite-feedback-admin-path",
+    "purpose": "Verify composite workflow CW-DEPT-02 path 3A: Dept_Admin disposition after initial review.",
+    "preconditions": "Student feedback submitted into New state.",
+    "action_or_input": "Dept_Admin reviews, categorizes, and disposes as Resolved/Closed.",
+    "expected_result": "Feedback reaches terminal Resolved/Closed state directly through Dept_Admin disposition.",
+    "test_type": "composite_workflow"
+  },
+  {
+    "test_id": "TEST-WF-008",
+    "source_id": "CW-DEPT-02 composite-feedback-hod-path",
+    "purpose": "Verify composite workflow CW-DEPT-02 path 3B: HOD oversight and disposition after Dept_Admin initial review.",
+    "preconditions": "Feedback submitted and initial review completed by Dept_Admin.",
+    "action_or_input": "HOD accesses oversight queue and applies terminal resolution.",
+    "expected_result": "Feedback reaches terminal Resolved/Closed state through HOD oversight.",
+    "test_type": "composite_workflow"
+  },
+  {
+    "test_id": "TEST-WF-009",
+    "source_id": "BW-DEPT-05 official-change-approved-path",
+    "purpose": "Verify basis workflow BW-DEPT-05: Dept_Admin proposes official department change, HOD approves, change becomes effective.",
+    "preconditions": "Dept_Admin and HOD authenticated. Current department detail effective.",
+    "action_or_input": "Step 1: Dept_Admin proposes official change -> Step 2: HOD approves official change.",
+    "expected_result": "Change transitions from Current -> Pending HOD Approval -> Updated official data effective.",
+    "test_type": "basis_workflow"
+  },
+  {
+    "test_id": "TEST-WF-010",
+    "source_id": "BW-DEPT-06 official-change-rejected-path",
+    "purpose": "Verify basis workflow BW-DEPT-06: Dept_Admin proposes official department change, HOD rejects, current data retained.",
+    "preconditions": "Dept_Admin and HOD authenticated. Current department detail effective.",
+    "action_or_input": "Step 1: Dept_Admin proposes official change -> Step 2: HOD rejects official change.",
+    "expected_result": "Change transitions from Current -> Pending HOD Approval -> Rejected; current department data retained.",
+    "test_type": "basis_workflow"
+  },
+  {
+    "test_id": "TEST-WF-011",
+    "source_id": "CW-DEPT-03 composite-official-change-approved",
+    "purpose": "Verify composite workflow CW-DEPT-03 path 2A: official department change lifecycle with approval.",
+    "preconditions": "Dept_Admin proposes official change.",
+    "action_or_input": "Proposal created -> HOD approves proposal.",
+    "expected_result": "Updated official data becomes effective and published.",
+    "test_type": "composite_workflow"
+  },
+  {
+    "test_id": "TEST-WF-012",
+    "source_id": "CW-DEPT-03 composite-official-change-rejected",
+    "purpose": "Verify composite workflow CW-DEPT-03 path 2B: official department change lifecycle with rejection.",
+    "preconditions": "Dept_Admin proposes official change.",
+    "action_or_input": "Proposal created -> HOD rejects proposal.",
+    "expected_result": "Proposal rejected and existing official department data retained.",
+    "test_type": "composite_workflow"
+  },
+  {
+    "test_id": "TEST-WF-013",
+    "source_id": "BW-DEPT-07 hod-reassignment-headship-sync",
+    "purpose": "Verify basis workflow BW-DEPT-07: HOD role reassignment and Headship synchronization.",
+    "preconditions": "Current HOD assignment active. Institute Admin authenticated.",
+    "action_or_input": "Step 1: Institute Admin records HOD reassignment -> Step 2: System applies effective transition.",
+    "expected_result": "Incoming HOD active; outgoing access revoked; incoming access granted; displayed Headship synchronized.",
+    "test_type": "basis_workflow"
+  },
+  {
+    "test_id": "TEST-WF-014",
+    "source_id": "BW-DEPT-08 admin-reassignment-access-transition",
+    "purpose": "Verify basis workflow BW-DEPT-08: Dept_Admin role reassignment and access transition.",
+    "preconditions": "Current Dept_Admin assignment active. Institute Admin authenticated.",
+    "action_or_input": "Step 1: Institute Admin records Dept_Admin reassignment -> Step 2: System applies effective transition.",
+    "expected_result": "Incoming Dept_Admin active; outgoing access revoked; incoming access granted.",
+    "test_type": "basis_workflow"
+  },
+  {
+    "test_id": "TEST-WF-015",
+    "source_id": "CW-DEPT-04 composite-hod-reassignment-path",
+    "purpose": "Verify composite workflow CW-DEPT-04 path 1A/2A: HOD reassignment lifecycle.",
+    "preconditions": "Institute Admin records valid HOD reassignment.",
+    "action_or_input": "Transition reaches effective time and executes.",
+    "expected_result": "Incoming HOD activated, outgoing revoked, Headship synchronized to incoming HOD.",
+    "test_type": "composite_workflow"
+  },
+  {
+    "test_id": "TEST-WF-016",
+    "source_id": "CW-DEPT-04 composite-admin-reassignment-path",
+    "purpose": "Verify composite workflow CW-DEPT-04 path 1B/2B: Dept_Admin reassignment lifecycle.",
+    "preconditions": "Institute Admin records valid Dept_Admin reassignment.",
+    "action_or_input": "Transition reaches effective time and executes.",
+    "expected_result": "Incoming Dept_Admin activated, outgoing revoked, unique active Dept_Admin preserved.",
+    "test_type": "composite_workflow"
+  }
+]

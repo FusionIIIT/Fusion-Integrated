@@ -1,0 +1,686 @@
+[
+  {
+    "test_id": "TEST-FR-001",
+    "source_id": "AFR-DEPT-001 faculty-publish",
+    "purpose": "Verify Faculty can create and publish department announcements.",
+    "preconditions": "Faculty user is authenticated in CSE department.",
+    "action_or_input": "Faculty posts announcement with title, content, target_role=ALL, target_program=ALL, target_year=0.",
+    "expected_result": "Announcement is created in active state with publication timestamp.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-002",
+    "source_id": "AFR-DEPT-001 admin-publish",
+    "purpose": "Verify Dept_Admin can create and publish department announcements.",
+    "preconditions": "Dept_Admin user is authenticated in CSE department.",
+    "action_or_input": "Dept_Admin posts announcement with title, content, target_role=STUDENT, target_program=BTech, target_year=2.",
+    "expected_result": "Announcement is created in active state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-003",
+    "source_id": "AFR-DEPT-001 hod-publish",
+    "purpose": "Verify HOD can create and publish department announcements.",
+    "preconditions": "HOD user is authenticated in CSE department.",
+    "action_or_input": "HOD posts announcement with title, content, target_role=FACULTY, target_program=ALL, target_year=0.",
+    "expected_result": "Announcement is created in active state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-004",
+    "source_id": "AFR-DEPT-001 unauthorized-student",
+    "purpose": "Verify Student is denied from creating announcements.",
+    "preconditions": "Student user is authenticated.",
+    "action_or_input": "Student attempts to post announcement.",
+    "expected_result": "Action is refused (403 Forbidden) and no announcement is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-005",
+    "source_id": "AFR-DEPT-046 announcement-notification",
+    "purpose": "Verify relevant Students and Faculty receive notification when a new announcement is published.",
+    "preconditions": "Announcement created with target_role=STUDENT, target_program=BTech, target_year=3.",
+    "action_or_input": "System publishes the targeted announcement.",
+    "expected_result": "Notification dispatch event or record is generated for targeted users.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-006",
+    "source_id": "CFR-DEPT-001 targeted-announcement",
+    "purpose": "Verify announcement publication with full targeting scope criteria.",
+    "preconditions": "Dept_Admin is authenticated.",
+    "action_or_input": "Dept_Admin creates announcement targeting role=STUDENT, program=BTech, academic_year=4.",
+    "expected_result": "Announcement is saved with exact targeting parameters.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-007",
+    "source_id": "AFR-DEPT-002 filter-matching",
+    "purpose": "Verify announcement visibility filter matches viewer role, program, and academic year.",
+    "preconditions": "Announcements A (target: STUDENT/BTech/2) and B (target: FACULTY/ALL/0) exist.",
+    "action_or_input": "BTech 2nd year Student queries announcement list.",
+    "expected_result": "Only Announcement A is returned; Announcement B is filtered out.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-008",
+    "source_id": "AFR-DEPT-003 view-relevant-announcements",
+    "purpose": "Verify authenticated department user views all announcements relevant to them.",
+    "preconditions": "Announcement C targeting ALL roles in department CSE exists.",
+    "action_or_input": "CSE Faculty requests announcement list.",
+    "expected_result": "Announcement C is included in the response.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-009",
+    "source_id": "CFR-DEPT-002 deliver-relevant",
+    "purpose": "Verify that out-of-scope announcements are not visible to users with non-matching program/year.",
+    "preconditions": "Announcement D targeting MTech year 1 exists.",
+    "action_or_input": "BTech year 3 student requests announcement list.",
+    "expected_result": "Announcement D is not returned in results.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-FR-010",
+    "source_id": "AFR-DEPT-004 hod-edit-announcement",
+    "purpose": "Verify HOD can edit any active department announcement.",
+    "preconditions": "Active announcement created by Faculty exists.",
+    "action_or_input": "HOD updates announcement title and content.",
+    "expected_result": "Announcement content is updated successfully.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-011",
+    "source_id": "AFR-DEPT-005 hod-hide-announcement",
+    "purpose": "Verify HOD can hide an active department announcement.",
+    "preconditions": "Active announcement exists and is visible.",
+    "action_or_input": "HOD sets status to HIDDEN or calls hide action.",
+    "expected_result": "Announcement is hidden and no longer visible to normal users.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-012",
+    "source_id": "AFR-DEPT-006 hod-delete-announcement",
+    "purpose": "Verify HOD can delete an active department announcement.",
+    "preconditions": "Active announcement exists.",
+    "action_or_input": "HOD deletes announcement.",
+    "expected_result": "Announcement is removed or marked deleted, and no longer appears in listings.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-013",
+    "source_id": "CFR-DEPT-003 non-hod-announcement-maintenance",
+    "purpose": "Verify non-HOD actor cannot edit, hide, or delete announcements.",
+    "preconditions": "Active announcement exists. Student and Faculty users authenticated.",
+    "action_or_input": "Faculty attempts to delete announcement.",
+    "expected_result": "Request is refused (403 Forbidden) and announcement remains active.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-014",
+    "source_id": "AFR-DEPT-007 admin-insert-stock",
+    "purpose": "Verify Dept_Admin can insert stock records into department inventory.",
+    "preconditions": "Dept_Admin is authenticated in CSE department.",
+    "action_or_input": "Dept_Admin adds item 'Microcontroller Kit', quantity=25, location='Lab 101'.",
+    "expected_result": "Inventory item is created with initial quantity 25.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-015",
+    "source_id": "AFR-DEPT-008 maintain-inventory-state",
+    "purpose": "Verify system maintains current inventory state and available quantity.",
+    "preconditions": "Inventory item exists with quantity 25.",
+    "action_or_input": "Query inventory list for CSE department.",
+    "expected_result": "Returns current quantity=25 and active state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-016",
+    "source_id": "AFR-DEPT-014 immutable-log-insertion",
+    "purpose": "Verify stock insertion creates an entry in immutable stock-movement log.",
+    "preconditions": "Dept_Admin inserts stock item quantity=10.",
+    "action_or_input": "Query stock movement logs.",
+    "expected_result": "Movement log records action INSERT, quantity=10, timestamp, and actor Dept_Admin.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-017",
+    "source_id": "CFR-DEPT-004 inventory-audit-trail",
+    "purpose": "Verify inventory records and movement audit trails cannot be altered by normal operations.",
+    "preconditions": "Movement log entry exists.",
+    "action_or_input": "Attempt update or delete on movement log endpoint.",
+    "expected_result": "Action is refused (405 Method Not Allowed or 403 Forbidden).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-018",
+    "source_id": "AFR-DEPT-009 faculty-request-stock",
+    "purpose": "Verify Faculty can submit stock request for department inventory items.",
+    "preconditions": "Faculty authenticated, inventory item has available quantity 10.",
+    "action_or_input": "Faculty submits request for quantity=3 with purpose 'Project'.",
+    "expected_result": "Stock request created in 'PENDING_HOD' status.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-019",
+    "source_id": "AFR-DEPT-010 validate-stock-quantity-sufficient",
+    "purpose": "Verify requested quantity is validated against current inventory at submission.",
+    "preconditions": "Inventory item has available quantity=5.",
+    "action_or_input": "Faculty requests quantity=5.",
+    "expected_result": "Request accepted and advances to Pending HOD Approval.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-020",
+    "source_id": "AFR-DEPT-010 validate-stock-quantity-insufficient",
+    "purpose": "Verify requested quantity exceeding available inventory is rejected at submission.",
+    "preconditions": "Inventory item has available quantity=5.",
+    "action_or_input": "Faculty requests quantity=6.",
+    "expected_result": "Request refused (400 Bad Request) and not advanced to HOD approval.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-021",
+    "source_id": "AFR-DEPT-011 hod-approve-stock",
+    "purpose": "Verify HOD can approve a pending Faculty stock request.",
+    "preconditions": "Stock request is in 'PENDING_HOD' state. HOD is authenticated.",
+    "action_or_input": "HOD calls approve on the stock request.",
+    "expected_result": "Request transitions to 'APPROVED_FOR_ISSUANCE'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-022",
+    "source_id": "AFR-DEPT-011 hod-reject-stock",
+    "purpose": "Verify HOD can reject a pending Faculty stock request.",
+    "preconditions": "Stock request is in 'PENDING_HOD' state. HOD is authenticated.",
+    "action_or_input": "HOD calls reject on the stock request with remarks.",
+    "expected_result": "Request transitions to 'REJECTED' state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-023",
+    "source_id": "AFR-DEPT-012 admin-issue-approved-stock",
+    "purpose": "Verify Dept_Admin can issue stock for HOD-approved request.",
+    "preconditions": "Stock request is in 'APPROVED_FOR_ISSUANCE'. Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin marks request as issued.",
+    "expected_result": "Request transitions to 'ISSUED'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-024",
+    "source_id": "AFR-DEPT-012 admin-issue-unapproved-stock",
+    "purpose": "Verify Dept_Admin cannot issue stock for request that is not approved by HOD.",
+    "preconditions": "Stock request is in 'PENDING_HOD'. Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin attempts to mark request as issued.",
+    "expected_result": "Request is refused (400 Bad Request or 409 Conflict) and remains unissued.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-025",
+    "source_id": "AFR-DEPT-013 decrement-inventory-on-issue",
+    "purpose": "Verify inventory quantity automatically decrements when approved stock is issued.",
+    "preconditions": "Item initial quantity=10. Approved request for quantity=3.",
+    "action_or_input": "Dept_Admin issues the request.",
+    "expected_result": "Inventory quantity becomes 7.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-026",
+    "source_id": "AFR-DEPT-015 immutable-log-issuance",
+    "purpose": "Verify stock issuance creates immutable movement log entry.",
+    "preconditions": "Stock request for quantity=3 is issued.",
+    "action_or_input": "Query stock movement logs.",
+    "expected_result": "Log contains entry with action ISSUE, quantity=3, actor Dept_Admin.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-027",
+    "source_id": "AFR-DEPT-041 notify-admin-on-stock-request",
+    "purpose": "Verify system notifies Dept_Admin when new stock request is submitted.",
+    "preconditions": "Faculty submits valid stock request.",
+    "action_or_input": "Check notification dispatches.",
+    "expected_result": "Notification sent to Dept_Admin for new request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-028",
+    "source_id": "AFR-DEPT-042 notify-hod-on-stock-authorization",
+    "purpose": "Verify system notifies HOD when stock request requires HOD authorization.",
+    "preconditions": "Stock request enters PENDING_HOD state.",
+    "action_or_input": "Check notification dispatches.",
+    "expected_result": "Notification sent to HOD.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-029",
+    "source_id": "AFR-DEPT-043 notify-faculty-on-stock-outcome",
+    "purpose": "Verify system notifies requesting Faculty when stock request reaches Issued or Rejected outcome.",
+    "preconditions": "Request is rejected by HOD or issued by Dept_Admin.",
+    "action_or_input": "Outcome action executed.",
+    "expected_result": "Notification sent to requesting Faculty.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-030",
+    "source_id": "CFR-DEPT-005 stock-request-lifecycle",
+    "purpose": "Verify full lifecycle of stock request from creation to final outcome.",
+    "preconditions": "Inventory item available.",
+    "action_or_input": "Faculty requests -> HOD approves -> Dept_Admin issues.",
+    "expected_result": "Status progresses through PENDING_HOD -> APPROVED_FOR_ISSUANCE -> ISSUED.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-031",
+    "source_id": "AFR-DEPT-016 faculty-issued-stock-history",
+    "purpose": "Verify Faculty can view their own relevant issued-stock history.",
+    "preconditions": "Faculty A has issued request; Faculty B has issued request.",
+    "action_or_input": "Faculty A requests their stock history.",
+    "expected_result": "Faculty A sees their own issued stock history, excluding Faculty B's records.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-032",
+    "source_id": "CFR-DEPT-006 issued-stock-history-access",
+    "purpose": "Verify unauthorized user cannot access other faculty members' issued-stock history.",
+    "preconditions": "Student is authenticated.",
+    "action_or_input": "Student attempts to access faculty issued-stock history.",
+    "expected_result": "Access is refused (403 Forbidden).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-033",
+    "source_id": "AFR-DEPT-017 student-submit-feedback",
+    "purpose": "Verify Student can submit department feedback.",
+    "preconditions": "Student is authenticated in CSE department.",
+    "action_or_input": "Student posts feedback with title, description, category='ACADEMIC'.",
+    "expected_result": "Feedback is created in 'NEW' status.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-034",
+    "source_id": "AFR-DEPT-017 faculty-submit-feedback",
+    "purpose": "Verify Faculty can submit department feedback.",
+    "preconditions": "Faculty is authenticated in CSE department.",
+    "action_or_input": "Faculty posts feedback with title, description, category='FACILITY'.",
+    "expected_result": "Feedback is created in 'NEW' status.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-035",
+    "source_id": "AFR-DEPT-018 feedback-confidentiality",
+    "purpose": "Verify submitted feedback is confidential and inaccessible to unauthorized department users.",
+    "preconditions": "Student A submits feedback.",
+    "action_or_input": "Student B attempts to view Student A's feedback.",
+    "expected_result": "Access is refused (403 Forbidden or 404 Not Found) and feedback is not disclosed.",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-FR-036",
+    "source_id": "AFR-DEPT-044 notify-admin-on-feedback",
+    "purpose": "Verify system notifies Dept_Admin when new feedback is submitted.",
+    "preconditions": "Feedback submitted.",
+    "action_or_input": "Check notification logs/dispatches.",
+    "expected_result": "Notification generated for Dept_Admin.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-037",
+    "source_id": "CFR-DEPT-007 submit-confidential-feedback",
+    "purpose": "Verify feedback submission creates initial New record with confidentiality flags.",
+    "preconditions": "Authenticated user submits feedback.",
+    "action_or_input": "Submit feedback payload.",
+    "expected_result": "Created with status NEW, Dept_Admin notified.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-038",
+    "source_id": "AFR-DEPT-019 admin-initial-review",
+    "purpose": "Verify Dept_Admin can perform initial review of newly submitted feedback.",
+    "preconditions": "Feedback is in 'NEW' status. Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin reviews feedback and updates status to 'UNDER_REVIEW'.",
+    "expected_result": "Feedback status updated to 'UNDER_REVIEW'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-039",
+    "source_id": "AFR-DEPT-020 admin-categorize-feedback",
+    "purpose": "Verify Dept_Admin can categorize feedback during initial review.",
+    "preconditions": "Feedback in 'NEW' status.",
+    "action_or_input": "Dept_Admin assigns category 'INFRASTRUCTURE' during review.",
+    "expected_result": "Feedback category updated to 'INFRASTRUCTURE'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-040",
+    "source_id": "AFR-DEPT-021 admin-close-simple-issue",
+    "purpose": "Verify Dept_Admin can close a simple feedback issue during initial review.",
+    "preconditions": "Feedback is in initial review.",
+    "action_or_input": "Dept_Admin marks feedback as 'CLOSED' with resolution remarks.",
+    "expected_result": "Feedback status becomes 'CLOSED'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-041",
+    "source_id": "AFR-DEPT-022 admin-resolve-feedback",
+    "purpose": "Verify Dept_Admin can mark feedback as Resolved.",
+    "preconditions": "Feedback is 'UNDER_REVIEW'. Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin sets status to 'RESOLVED' with notes.",
+    "expected_result": "Feedback status becomes 'RESOLVED'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-042",
+    "source_id": "AFR-DEPT-022 hod-resolve-feedback",
+    "purpose": "Verify HOD can mark feedback as Resolved.",
+    "preconditions": "Feedback is 'UNDER_REVIEW'. HOD authenticated.",
+    "action_or_input": "HOD sets status to 'RESOLVED'.",
+    "expected_result": "Feedback status becomes 'RESOLVED'.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-043",
+    "source_id": "AFR-DEPT-023 hod-feedback-oversight",
+    "purpose": "Verify HOD can access feedback after initial review for oversight and resolution.",
+    "preconditions": "Feedback is 'UNDER_REVIEW'. HOD authenticated.",
+    "action_or_input": "HOD retrieves feedback details and oversight queue.",
+    "expected_result": "Feedback details accessible to HOD.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-044",
+    "source_id": "AFR-DEPT-045 notify-submitter-feedback-terminal",
+    "purpose": "Verify system notifies feedback submitter when feedback is marked Resolved or Closed.",
+    "preconditions": "Feedback transitioned to 'RESOLVED' or 'CLOSED'.",
+    "action_or_input": "Terminal status transition executed.",
+    "expected_result": "Notification dispatched to submitter.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-045",
+    "source_id": "CFR-DEPT-008 review-resolve-feedback",
+    "purpose": "Verify unauthorized user cannot perform feedback review or disposition.",
+    "preconditions": "Student or Faculty user authenticated.",
+    "action_or_input": "Student attempts to close or resolve feedback.",
+    "expected_result": "Action refused (403 Forbidden).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-046",
+    "source_id": "AFR-DEPT-024 admin-manage-profiles",
+    "purpose": "Verify Dept_Admin can manage Faculty, Student, and Alumni profile records.",
+    "preconditions": "Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin updates profile details (e.g. office_location, bio, research_interests).",
+    "expected_result": "Profile is updated successfully.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-047",
+    "source_id": "CFR-DEPT-009 manage-user-profiles",
+    "purpose": "Verify non-admin cannot modify department user profiles.",
+    "preconditions": "Student is authenticated.",
+    "action_or_input": "Student attempts to update another user's profile.",
+    "expected_result": "Action refused (403 Forbidden).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-048",
+    "source_id": "AFR-DEPT-025 student-view-profile-basic",
+    "purpose": "Verify Students can view only basic permitted profile information for peers and Faculty.",
+    "preconditions": "Student queries profile directory.",
+    "action_or_input": "Student views peer or faculty profile.",
+    "expected_result": "Basic fields (name, email, role, department) returned; sensitive fields masked.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-049",
+    "source_id": "AFR-DEPT-026 faculty-view-student-enrolled",
+    "purpose": "Verify Faculty can view detailed profile information for Students in their courses.",
+    "preconditions": "Student is enrolled in Faculty course.",
+    "action_or_input": "Faculty requests student profile with course relationship.",
+    "expected_result": "Detailed academic profile information returned.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-050",
+    "source_id": "AFR-DEPT-027 faculty-view-peers-alumni",
+    "purpose": "Verify Faculty can view permitted limited-scope profile info for Faculty and Alumni.",
+    "preconditions": "Faculty queries faculty or alumni profile.",
+    "action_or_input": "Faculty views peer profile.",
+    "expected_result": "Limited-scope profile information returned; sensitive fields excluded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-051",
+    "source_id": "AFR-DEPT-028 admin-hod-full-profile-sensitive-masked",
+    "purpose": "Verify HOD and Dept_Admin view full profiles except privacy-protected sensitive data.",
+    "preconditions": "Dept_Admin or HOD authenticated.",
+    "action_or_input": "Requests department user profile.",
+    "expected_result": "Full administrative profile returned; phone/emergency contacts protected per privacy policy.",
+    "test_type": "security"
+  },
+  {
+    "test_id": "TEST-FR-052",
+    "source_id": "CFR-DEPT-010 enforce-profile-visibility",
+    "purpose": "Verify profile visibility matrix enforcement across roles.",
+    "preconditions": "Profiles exist across categories.",
+    "action_or_input": "Different actors query same profile.",
+    "expected_result": "Response fields adapt strictly according to viewer role and relationship.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-053",
+    "source_id": "AFR-DEPT-029 admin-upload-timetable",
+    "purpose": "Verify Dept_Admin can upload class and lab timetables.",
+    "preconditions": "Dept_Admin authenticated. Slot data has no conflicts.",
+    "action_or_input": "Dept_Admin uploads new timetable entries.",
+    "expected_result": "Timetable entries saved successfully.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-054",
+    "source_id": "AFR-DEPT-030 admin-modify-timetable",
+    "purpose": "Verify Dept_Admin can modify existing class and lab timetables.",
+    "preconditions": "Timetable entry exists. Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin updates room or instructor for non-overlapping slot.",
+    "expected_result": "Timetable modification saved successfully.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-055",
+    "source_id": "AFR-DEPT-031 detect-timetable-conflict-block",
+    "purpose": "Verify system detects overlapping timetable slots and blocks saving.",
+    "preconditions": "Timetable slot exists for Room L101 on Monday 10:00-11:00.",
+    "action_or_input": "Dept_Admin attempts to add overlapping slot in Room L101 on Monday 10:30-11:30.",
+    "expected_result": "Save is blocked (400 Bad Request or 409 Conflict) and conflict details returned.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-056",
+    "source_id": "CFR-DEPT-011 conflict-free-timetable",
+    "purpose": "Verify conflict-free timetable upload and modification workflow.",
+    "preconditions": "Non-overlapping timetable entries submitted.",
+    "action_or_input": "Dept_Admin submits schedule.",
+    "expected_result": "Schedule saved without errors.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-057",
+    "source_id": "AFR-DEPT-034 admin-update-lab-profiles",
+    "purpose": "Verify Dept_Admin can update department lab equipment and resource profile details.",
+    "preconditions": "Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin updates lab capacity, equipment list, and supervisor.",
+    "expected_result": "Lab resource profile updated successfully.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-058",
+    "source_id": "AFR-DEPT-035 faculty-view-lab-resources",
+    "purpose": "Verify Faculty can view department lab resource profiles for planning.",
+    "preconditions": "Lab resource profile exists.",
+    "action_or_input": "Faculty requests lab resource profiles.",
+    "expected_result": "Lab details, equipment list, and availability returned.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-059",
+    "source_id": "CFR-DEPT-012 manage-view-lab-resources",
+    "purpose": "Verify non-admin cannot modify lab resource profiles.",
+    "preconditions": "Faculty is authenticated.",
+    "action_or_input": "Faculty attempts to update lab resource profile.",
+    "expected_result": "Action refused (403 Forbidden).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-060",
+    "source_id": "AFR-DEPT-036 student-view-academic-program",
+    "purpose": "Verify Students can view department academic program information.",
+    "preconditions": "Student is authenticated.",
+    "action_or_input": "Student requests department academic programs list.",
+    "expected_result": "Academic program details (degree, curriculum, credits) returned.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-061",
+    "source_id": "AFR-DEPT-037 student-view-timetable",
+    "purpose": "Verify Students can view applicable class/lab timetable information.",
+    "preconditions": "Timetable entries published for BTech program.",
+    "action_or_input": "Student queries timetable for their program and semester.",
+    "expected_result": "Applicable schedule grid returned.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-062",
+    "source_id": "CFR-DEPT-013 student-academic-info",
+    "purpose": "Verify student academic program and timetable views are read-only.",
+    "preconditions": "Student is authenticated.",
+    "action_or_input": "Student attempts to modify timetable or program information.",
+    "expected_result": "Action refused (403 Forbidden or 405 Method Not Allowed).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-063",
+    "source_id": "AFR-DEPT-038 admin-update-general-dept-info",
+    "purpose": "Verify Dept_Admin can update general department information.",
+    "preconditions": "Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin updates description, contact_email, website.",
+    "expected_result": "General department information updated immediately.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-064",
+    "source_id": "CFR-DEPT-014 general-dept-info-update",
+    "purpose": "Verify non-admin cannot update general department info.",
+    "preconditions": "Faculty is authenticated.",
+    "action_or_input": "Faculty attempts to update general department information.",
+    "expected_result": "Action refused (403 Forbidden).",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-065",
+    "source_id": "AFR-DEPT-039 official-change-pending-hod",
+    "purpose": "Verify proposed official department-detail change remains pending until HOD approval.",
+    "preconditions": "Dept_Admin proposes official change (e.g. department name or core policy).",
+    "action_or_input": "Dept_Admin submits official change proposal.",
+    "expected_result": "Change created with status 'PENDING_HOD'; live department detail remains unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-066",
+    "source_id": "AFR-DEPT-040 hod-approve-official-change",
+    "purpose": "Verify HOD can approve a pending official department-detail change.",
+    "preconditions": "Official change proposal is in 'PENDING_HOD'. HOD authenticated.",
+    "action_or_input": "HOD approves the official change proposal.",
+    "expected_result": "Proposal status becomes 'APPROVED' and department detail updates live.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-067",
+    "source_id": "AFR-DEPT-040 hod-reject-official-change",
+    "purpose": "Verify HOD can reject a pending official department-detail change.",
+    "preconditions": "Official change proposal is in 'PENDING_HOD'. HOD authenticated.",
+    "action_or_input": "HOD rejects the proposal with remarks.",
+    "expected_result": "Proposal status becomes 'REJECTED' and current department detail is retained.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-068",
+    "source_id": "CFR-DEPT-015 official-change-headship-exclusion",
+    "purpose": "Verify Headship identity is excluded from official department-detail proposal path.",
+    "preconditions": "Dept_Admin attempts to propose official change.",
+    "action_or_input": "Dept_Admin attempts to change Headship identity via official detail proposal.",
+    "expected_result": "Field is rejected as non-editable in this path.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-069",
+    "source_id": "AFR-DEPT-047 institute-admin-role-assignment",
+    "purpose": "Verify Central Institute Admin can assign Dept_Admin and HOD roles.",
+    "preconditions": "Institute Admin authenticated. Target employee exists.",
+    "action_or_input": "Institute Admin assigns HOD role to employee for validity period.",
+    "expected_result": "Role assignment is recorded successfully.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-070",
+    "source_id": "AFR-DEPT-048 role-validity-interval",
+    "purpose": "Verify system maintains time-bounded validity period for HOD and Dept_Admin assignments.",
+    "preconditions": "Role assignment created with start_date and end_date.",
+    "action_or_input": "Query role assignment details.",
+    "expected_result": "Returns effective validity interval.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-071",
+    "source_id": "AFR-DEPT-049 revoke-outgoing-role-access",
+    "purpose": "Verify outgoing role holder's access is immediately revoked when reassignment takes effect.",
+    "preconditions": "Reassignment effective date is reached.",
+    "action_or_input": "Trigger role transition. Outgoing HOD attempts HOD action.",
+    "expected_result": "Action is refused (403 Forbidden).",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TEST-FR-072",
+    "source_id": "AFR-DEPT-050 grant-incoming-role-access",
+    "purpose": "Verify incoming role holder's access is immediately granted when reassignment takes effect.",
+    "preconditions": "Reassignment effective date is reached.",
+    "action_or_input": "Trigger role transition. Incoming HOD performs HOD action.",
+    "expected_result": "Action succeeds.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "TEST-FR-073",
+    "source_id": "AFR-DEPT-051 unique-active-hod",
+    "purpose": "Verify system enforces exactly one active HOD role assignment at any time.",
+    "preconditions": "Department already has an active HOD assignment.",
+    "action_or_input": "Attempt to create a concurrent active HOD assignment without transition.",
+    "expected_result": "Creation blocked (400 Bad Request or 409 Conflict) violating uniqueness.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-074",
+    "source_id": "AFR-DEPT-052 unique-active-admin",
+    "purpose": "Verify system enforces exactly one active Dept_Admin role assignment at any time.",
+    "preconditions": "Department already has an active Dept_Admin assignment.",
+    "action_or_input": "Attempt to create a concurrent active Dept_Admin assignment without transition.",
+    "expected_result": "Creation blocked (400 Bad Request or 409 Conflict) violating uniqueness.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-FR-075",
+    "source_id": "AFR-DEPT-053 derive-displayed-headship",
+    "purpose": "Verify displayed Headship is derived directly from the current active HOD role assignment.",
+    "preconditions": "Active HOD assignment is User Prof. X.",
+    "action_or_input": "Query department public details.",
+    "expected_result": "Displayed Headship identity matches Prof. X.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TEST-FR-076",
+    "source_id": "CFR-DEPT-016 maintain-dept-roles",
+    "purpose": "Verify non-institute-admin cannot assign department roles.",
+    "preconditions": "HOD or Dept_Admin is authenticated.",
+    "action_or_input": "Attempts to assign HOD or Dept_Admin role.",
+    "expected_result": "Action refused (403 Forbidden).",
+    "test_type": "negative"
+  }
+]

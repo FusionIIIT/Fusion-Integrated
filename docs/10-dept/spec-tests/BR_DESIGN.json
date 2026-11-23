@@ -1,0 +1,407 @@
+[
+  {
+    "test_id": "TEST-BR-001",
+    "source_id": "BR-DEPT-001 permitted",
+    "purpose": "Verify Faculty, Dept_Admin, and HOD are permitted to create department announcements.",
+    "preconditions": "Faculty, Dept_Admin, or HOD user authenticated.",
+    "action_or_input": "Actor submits announcement creation request.",
+    "expected_result": "Announcement created and published successfully.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-002",
+    "source_id": "BR-DEPT-001 prohibited",
+    "purpose": "Verify other roles (e.g. Student) are prohibited from creating announcements.",
+    "preconditions": "Student user is authenticated.",
+    "action_or_input": "Student attempts to submit announcement creation request.",
+    "expected_result": "Request is refused with 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-003",
+    "source_id": "BR-DEPT-002 matching-scope",
+    "purpose": "Verify announcement is visible when viewer matches role, program, and academic year targeting.",
+    "preconditions": "Announcement targeting role=STUDENT, program=BTech, academic_year=3 exists.",
+    "action_or_input": "BTech 3rd year student retrieves announcement list.",
+    "expected_result": "Targeted announcement is included in results.",
+    "test_type": "data_visibility"
+  },
+  {
+    "test_id": "TEST-BR-004",
+    "source_id": "BR-DEPT-002 non-matching-scope",
+    "purpose": "Verify announcement is filtered out when viewer does not match targeting criteria.",
+    "preconditions": "Announcement targeting role=FACULTY, program=ALL, academic_year=0 exists.",
+    "action_or_input": "Student retrieves announcement list.",
+    "expected_result": "Announcement is excluded from results.",
+    "test_type": "data_visibility"
+  },
+  {
+    "test_id": "TEST-BR-005",
+    "source_id": "BR-DEPT-003 valid-completeness",
+    "purpose": "Verify publication succeeds when required content and target-scope are provided.",
+    "preconditions": "Actor is authorized.",
+    "action_or_input": "Submits announcement with complete title, content, target_role, target_program, target_year.",
+    "expected_result": "Announcement published successfully.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-006",
+    "source_id": "BR-DEPT-003 missing-content",
+    "purpose": "Verify publication is blocked when required content is missing.",
+    "preconditions": "Actor is authorized.",
+    "action_or_input": "Submits announcement with blank title or content.",
+    "expected_result": "Publication blocked with 400 Bad Request.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-007",
+    "source_id": "BR-DEPT-004 permitted-hod",
+    "purpose": "Verify only HOD may edit, hide, or delete active department announcements.",
+    "preconditions": "Active announcement exists. HOD authenticated.",
+    "action_or_input": "HOD performs edit, hide, or delete operation.",
+    "expected_result": "Operation succeeds and announcement status/content updates.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-008",
+    "source_id": "BR-DEPT-004 prohibited-non-hod",
+    "purpose": "Verify non-HOD actors are denied from editing, hiding, or deleting active announcements.",
+    "preconditions": "Active announcement exists. Dept_Admin or Faculty authenticated.",
+    "action_or_input": "Non-HOD actor attempts to edit, hide, or delete announcement.",
+    "expected_result": "Request is refused with 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-009",
+    "source_id": "BR-DEPT-005 permitted-faculty",
+    "purpose": "Verify Faculty is permitted to submit stock requests for department inventory.",
+    "preconditions": "Faculty user authenticated; inventory item exists.",
+    "action_or_input": "Faculty submits stock request.",
+    "expected_result": "Stock request created in Pending HOD Approval state.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-010",
+    "source_id": "BR-DEPT-005 prohibited-non-faculty",
+    "purpose": "Verify non-Faculty actors (e.g. Student) are denied from submitting stock requests.",
+    "preconditions": "Student user authenticated; inventory item exists.",
+    "action_or_input": "Student attempts to submit stock request.",
+    "expected_result": "Request is refused with 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-011",
+    "source_id": "BR-DEPT-006 permitted-hod",
+    "purpose": "Verify only HOD may approve or reject pending stock requests.",
+    "preconditions": "Pending stock request exists. HOD authenticated.",
+    "action_or_input": "HOD approves or rejects the request.",
+    "expected_result": "Request transitions to Approved for Issuance or Rejected.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-012",
+    "source_id": "BR-DEPT-006 prohibited-non-hod",
+    "purpose": "Verify non-HOD actors are denied from deciding on stock requests.",
+    "preconditions": "Pending stock request exists. Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin attempts to approve or reject the request.",
+    "expected_result": "Request is refused with 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-013",
+    "source_id": "BR-DEPT-007 permitted-approved-issuance",
+    "purpose": "Verify Dept_Admin may issue stock for HOD-approved stock request.",
+    "preconditions": "Stock request has HOD approval (status=APPROVED_FOR_ISSUANCE). Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin marks request as issued.",
+    "expected_result": "Request status becomes ISSUED, quantity decremented, movement logged.",
+    "test_type": "workflow_authorization"
+  },
+  {
+    "test_id": "TEST-BR-014",
+    "source_id": "BR-DEPT-007 prohibited-unapproved",
+    "purpose": "Verify Dept_Admin cannot issue stock for request lacking HOD approval.",
+    "preconditions": "Stock request is in PENDING_HOD or REJECTED status. Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin attempts to mark request as issued.",
+    "expected_result": "Request refused (400 Bad Request or 409 Conflict) and remains unissued.",
+    "test_type": "workflow_authorization"
+  },
+  {
+    "test_id": "TEST-BR-015",
+    "source_id": "BR-DEPT-007 prohibited-non-admin",
+    "purpose": "Verify non-Dept_Admin actor cannot issue stock.",
+    "preconditions": "Stock request is approved for issuance. Faculty authenticated.",
+    "action_or_input": "Faculty attempts to mark request as issued.",
+    "expected_result": "Request refused with 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-016",
+    "source_id": "BR-DEPT-008 permitted-student-faculty",
+    "purpose": "Verify authenticated Students and Faculty may submit feedback.",
+    "preconditions": "Student or Faculty authenticated.",
+    "action_or_input": "Actor submits feedback.",
+    "expected_result": "Feedback accepted in New state.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-017",
+    "source_id": "BR-DEPT-008 prohibited-unauthenticated",
+    "purpose": "Verify unauthenticated or unauthorized actor cannot submit feedback.",
+    "preconditions": "Unauthenticated client.",
+    "action_or_input": "Attempts feedback submission.",
+    "expected_result": "Request refused with 401 Unauthorized or 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-018",
+    "source_id": "BR-DEPT-009 permitted-admin-simple-closure",
+    "purpose": "Verify Dept_Admin may close simple feedback issue during initial review.",
+    "preconditions": "Feedback in initial review. Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin marks feedback as Closed.",
+    "expected_result": "Feedback transitions to CLOSED.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-019",
+    "source_id": "BR-DEPT-009 permitted-admin-hod-resolution",
+    "purpose": "Verify Dept_Admin or HOD may mark feedback as Resolved or Closed.",
+    "preconditions": "Feedback is Under Review. HOD or Dept_Admin authenticated.",
+    "action_or_input": "Actor marks feedback as Resolved.",
+    "expected_result": "Feedback transitions to RESOLVED.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-020",
+    "source_id": "BR-DEPT-009 prohibited-non-authority",
+    "purpose": "Verify submitter or unauthorized actor cannot mark feedback Resolved or Closed.",
+    "preconditions": "Feedback is Under Review. Student authenticated.",
+    "action_or_input": "Student attempts to mark feedback as Resolved.",
+    "expected_result": "Request refused with 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-021",
+    "source_id": "BR-DEPT-010 permitted-conflict-free",
+    "purpose": "Verify conflict-free timetable changes are permitted to save.",
+    "preconditions": "Slot has no time/room conflicts.",
+    "action_or_input": "Dept_Admin submits timetable entry.",
+    "expected_result": "Timetable entry saved successfully.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-022",
+    "source_id": "BR-DEPT-010 prohibited-slot-overlap",
+    "purpose": "Verify overlapping timetable slot is blocked and not saved.",
+    "preconditions": "Slot in Room 101 on Mon 09:00-10:00 already exists.",
+    "action_or_input": "Dept_Admin submits overlapping slot in Room 101 on Mon 09:30-10:30.",
+    "expected_result": "Save is blocked (400 Bad Request or 409 Conflict) and no overlapping entry persisted.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-023",
+    "source_id": "BR-DEPT-011 routed-pending-hod",
+    "purpose": "Verify proposed official department detail remains pending and does not become effective until HOD approval.",
+    "preconditions": "Dept_Admin authenticated. Current department name is 'Old Dept'.",
+    "action_or_input": "Dept_Admin proposes official change to 'New Dept'.",
+    "expected_result": "Proposal is in Pending HOD Approval state; current department name remains 'Old Dept'.",
+    "test_type": "workflow_authorization"
+  },
+  {
+    "test_id": "TEST-BR-024",
+    "source_id": "BR-DEPT-011 headship-excluded",
+    "purpose": "Verify Headship identity is excluded from official detail proposal path.",
+    "preconditions": "Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin attempts to change department head identity via official detail proposal.",
+    "expected_result": "Request is rejected as unsupported/immutable in this path.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-025",
+    "source_id": "BR-DEPT-012 permitted-faculty-scope",
+    "purpose": "Verify Faculty resource views are limited to explicitly permitted department resource information.",
+    "preconditions": "Faculty authenticated.",
+    "action_or_input": "Faculty views lab resource profiles and own issued stock history.",
+    "expected_result": "Permitted lab profiles and own stock history returned.",
+    "test_type": "data_visibility"
+  },
+  {
+    "test_id": "TEST-BR-026",
+    "source_id": "BR-DEPT-012 prohibited-out-of-scope",
+    "purpose": "Verify Faculty cannot view department resource information outside Faculty scope.",
+    "preconditions": "Faculty authenticated.",
+    "action_or_input": "Faculty attempts to query administrative or other faculty stock requests.",
+    "expected_result": "Out-of-scope data is not disclosed (403 Forbidden or filtered out).",
+    "test_type": "data_visibility"
+  },
+  {
+    "test_id": "TEST-BR-027",
+    "source_id": "BR-DEPT-013 permitted-hod",
+    "purpose": "Verify only HOD may approve or reject pending official department-detail change.",
+    "preconditions": "Official change proposal in Pending HOD Approval. HOD authenticated.",
+    "action_or_input": "HOD approves or rejects the proposal.",
+    "expected_result": "Decision recorded; if approved, detail becomes effective; if rejected, detail retained.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-028",
+    "source_id": "BR-DEPT-013 prohibited-non-hod",
+    "purpose": "Verify non-HOD actor cannot decide on pending official department-detail change.",
+    "preconditions": "Official change proposal exists. Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin attempts to approve or reject the official change proposal.",
+    "expected_result": "Request refused with 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-029",
+    "source_id": "BR-DEPT-015 permitted-sufficient-inventory",
+    "purpose": "Verify stock request enters pending approval when requested quantity is available in current inventory.",
+    "preconditions": "Current inventory quantity is 10.",
+    "action_or_input": "Faculty submits request for quantity 10.",
+    "expected_result": "Validation passes; request enters Pending HOD Approval.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-030",
+    "source_id": "BR-DEPT-015 prohibited-insufficient-inventory",
+    "purpose": "Verify stock request is blocked when requested quantity exceeds current inventory.",
+    "preconditions": "Current inventory quantity is 10.",
+    "action_or_input": "Faculty submits request for quantity 11.",
+    "expected_result": "Request blocked at submission (400 Bad Request) and does not enter HOD approval.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-031",
+    "source_id": "BR-DEPT-016 audit-log-created",
+    "purpose": "Verify stock insertion and issuance create immutable movement log entries.",
+    "preconditions": "Dept_Admin inserts stock item and later issues approved request.",
+    "action_or_input": "Inspect movement log records.",
+    "expected_result": "Immutable movement logs exist for both INSERT and ISSUE operations.",
+    "test_type": "audit_constraint"
+  },
+  {
+    "test_id": "TEST-BR-032",
+    "source_id": "BR-DEPT-016 audit-log-immutable",
+    "purpose": "Verify stock movement log cannot be altered or deleted through normal module operations.",
+    "preconditions": "Movement log record exists.",
+    "action_or_input": "Attempt PATCH, PUT, or DELETE on movement log record.",
+    "expected_result": "Operation refused (405 Method Not Allowed or 403 Forbidden).",
+    "test_type": "audit_constraint"
+  },
+  {
+    "test_id": "TEST-BR-033",
+    "source_id": "BR-DEPT-017 permitted-confidential-view",
+    "purpose": "Verify feedback is visible only to submitter, Dept_Admin, and HOD.",
+    "preconditions": "Student A submits feedback. Dept_Admin and HOD authenticated.",
+    "action_or_input": "Student A, Dept_Admin, and HOD request the feedback item.",
+    "expected_result": "Feedback content is accessible to all three authorized actors.",
+    "test_type": "data_visibility"
+  },
+  {
+    "test_id": "TEST-BR-034",
+    "source_id": "BR-DEPT-017 prohibited-peer-view",
+    "purpose": "Verify feedback content is not exposed to other department users/peers.",
+    "preconditions": "Student A submits feedback.",
+    "action_or_input": "Student B attempts to retrieve Student A's feedback item.",
+    "expected_result": "Access refused (403 Forbidden or 404 Not Found); confidential feedback withheld.",
+    "test_type": "data_visibility"
+  },
+  {
+    "test_id": "TEST-BR-035",
+    "source_id": "BR-DEPT-018 admin-initial-review-required",
+    "purpose": "Verify newly submitted feedback must undergo initial review by Dept_Admin.",
+    "preconditions": "Feedback in 'New' state. Dept_Admin authenticated.",
+    "action_or_input": "Dept_Admin performs initial review and assigns category.",
+    "expected_result": "Status becomes 'Under Review / Categorized' and feedback is now accessible for HOD oversight.",
+    "test_type": "workflow_routing"
+  },
+  {
+    "test_id": "TEST-BR-036",
+    "source_id": "BR-DEPT-018 hod-oversight-sequence",
+    "purpose": "Verify HOD acts on feedback after Dept_Admin initial review.",
+    "preconditions": "Feedback in 'Under Review'. HOD authenticated.",
+    "action_or_input": "HOD performs oversight resolution.",
+    "expected_result": "Feedback is resolved or closed.",
+    "test_type": "workflow_routing"
+  },
+  {
+    "test_id": "TEST-BR-037",
+    "source_id": "BR-DEPT-019 student-visibility",
+    "purpose": "Verify Students receive basic permitted peer/Faculty profile information.",
+    "preconditions": "Student queries peer or faculty profile.",
+    "action_or_input": "Student requests profile details.",
+    "expected_result": "Basic permitted fields returned; phone and sensitive contacts excluded.",
+    "test_type": "data_visibility"
+  },
+  {
+    "test_id": "TEST-BR-038",
+    "source_id": "BR-DEPT-019 faculty-student-enrolled-visibility",
+    "purpose": "Verify Faculty receives detailed profile information for students in their courses.",
+    "preconditions": "Student enrolled in Faculty course.",
+    "action_or_input": "Faculty queries student profile.",
+    "expected_result": "Detailed academic student profile returned.",
+    "test_type": "data_visibility"
+  },
+  {
+    "test_id": "TEST-BR-039",
+    "source_id": "BR-DEPT-019 admin-hod-visibility-privacy-masked",
+    "purpose": "Verify HOD and Dept_Admin receive full profiles excluding privacy-protected sensitive data.",
+    "preconditions": "Dept_Admin or HOD queries user profile.",
+    "action_or_input": "Retrieve profile details.",
+    "expected_result": "Full administrative profile returned; privacy-protected sensitive fields masked.",
+    "test_type": "data_visibility"
+  },
+  {
+    "test_id": "TEST-BR-040",
+    "source_id": "BR-DEPT-021 permitted-institute-admin",
+    "purpose": "Verify central Institute Admin is authorized to assign HOD and Dept_Admin roles.",
+    "preconditions": "Institute Admin authenticated.",
+    "action_or_input": "Institute Admin creates role assignment for department.",
+    "expected_result": "Role assignment is recorded; displayed Headship synchronizes with active HOD.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-041",
+    "source_id": "BR-DEPT-021 prohibited-local-authority",
+    "purpose": "Verify local department actors are denied from assigning HOD and Dept_Admin roles.",
+    "preconditions": "HOD or Dept_Admin authenticated.",
+    "action_or_input": "Attempts role assignment creation.",
+    "expected_result": "Request refused with 403 Forbidden.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-042",
+    "source_id": "BR-DEPT-022 single-active-role-permitted",
+    "purpose": "Verify department maintains exactly one active HOD and one active Dept_Admin assignment.",
+    "preconditions": "Department has one active HOD and one active Dept_Admin.",
+    "action_or_input": "Query active role assignments for department.",
+    "expected_result": "Exactly one active record returned for each role.",
+    "test_type": "cardinality_constraint"
+  },
+  {
+    "test_id": "TEST-BR-043",
+    "source_id": "BR-DEPT-022 duplicate-active-role-blocked",
+    "purpose": "Verify creating concurrent active assignment without transition is blocked.",
+    "preconditions": "Active HOD assignment exists.",
+    "action_or_input": "Attempt to create second active HOD assignment overlapping same validity interval without transition.",
+    "expected_result": "Creation blocked (400 Bad Request or 409 Conflict) preserving cardinality.",
+    "test_type": "cardinality_constraint"
+  },
+  {
+    "test_id": "TEST-BR-044",
+    "source_id": "BR-DEPT-023 tenure-interval-enforced",
+    "purpose": "Verify role assignment tenure validity interval is recorded and enforced.",
+    "preconditions": "Role assignment created with start_date and end_date.",
+    "action_or_input": "Check tenure validity interval and expiration status.",
+    "expected_result": "Interval is enforced; role is active only within defined date window.",
+    "test_type": "temporal_constraint"
+  },
+  {
+    "test_id": "TEST-BR-045",
+    "source_id": "BR-DEPT-024 immediate-transition-applied",
+    "purpose": "Verify outgoing role access is revoked and incoming access is granted immediately upon effective transition.",
+    "preconditions": "Reassignment effective date is reached.",
+    "action_or_input": "Execute effective role transition.",
+    "expected_result": "Outgoing user role access revoked; incoming user role access granted; no overlap.",
+    "test_type": "lifecycle_authorization"
+  }
+]
