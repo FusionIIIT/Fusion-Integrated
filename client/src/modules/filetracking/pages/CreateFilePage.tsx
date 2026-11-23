@@ -50,10 +50,10 @@ export default function CreateFilePage() {
           });
           navigate(isDraft ? "/filetracking/inbox" : "/filetracking/outbox");
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           notifications.show({
             color: "red",
-            message: err?.response?.data?.error?.message || "Failed to create file.",
+            message: err.message || "Failed to create file.",
           });
         },
       }

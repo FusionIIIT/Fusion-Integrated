@@ -208,3 +208,71 @@ Verification:
 - **Known Gaps**: None. All 12 CFRs, 72 AFRs, 10 active UCs, 14 active BRs, 8 Basis Workflows, and 2 Composite Workflows are fully implemented.
 - **Blueprint Approval**: Formally reviewed and approved in writing by Student 2 (Sushanth, 24BCS193).
 - **Branch Setup**: Branch `module/filetracking` established on latest `upstream/main`.
+
+---
+
+## 10. Live Walkthrough & HTTP Runserver Log Table (Step 6.9)
+
+Executed against live `runserver 127.0.0.1:8012` with IAM server running at `127.0.0.1:8001`:
+
+### 10.1 Walkthrough Table
+
+| Step | Role | Username | Use Case / Scope | Method & Endpoint | Status | Result / Observation | Automating Playwright Spec |
+|:---:|:---|:---|:---|:---|:---:|:---|:---|
+| 1 | `student` | `stu00001` | Auth Session | `POST /api/v1/auth/login` | 200 OK | Plain user authenticates successfully | `auth.spec.ts` |
+| 2 | `student` | `stu00001` | FTS-UC-008 | `GET /api/v1/filetracking/files/inbox/` | 403 Forbidden | Refused: student lacks filetracking module grant | `office-pages.spec.ts` |
+| 3 | `student` | `stu00001` | Governance | `GET /api/v1/filetracking/governance/audit/` | 403 Forbidden | Refused: student lacks governance view permission | `office-pages.spec.ts` |
+| 4 | `staff` | `stf00062` | Auth Session | `POST /api/v1/auth/login` | 200 OK | Staff user authenticates; acquires session & CSRF token | `files.spec.ts` |
+| 5 | `staff` | `stf00062` | FTS-UC-001 | `POST /api/v1/filetracking/files/` | 201 Created | Created file in circulation; notification triggered for recipient `5330` | `files.spec.ts` |
+| 6 | `staff` | `stf00062` | FTS-UC-002 | `POST /api/v1/filetracking/files/` | 201 Created | Created uncirculated draft file (`status=draft`) | `files.spec.ts` |
+| 7 | `staff` | `stf00062` | FTS-UC-003 | `PUT /api/v1/filetracking/files/6/draft/` | 200 OK | Updated draft subject and initial note by owner | `files.spec.ts` |
+| 8 | `staff` | `stf00062` | FTS-UC-009 | `GET /api/v1/filetracking/files/outbox/` | 200 OK | Outbox view displays active circulated file | `files.spec.ts` |
+| 9 | `staff` | `stf00062` | FTS-UC-006 | `GET /api/v1/filetracking/files/5/history/` | 200 OK | Movement history retrieved with initial movement entry | `files.spec.ts` |
+| 10 | `staff` | `stf00062` | Security Scoping | `GET /api/v1/filetracking/files/9999/` | 404 Not Found | Scoping chokepoint refuses non-associated file ID with 404 | `test_adversarial.py` |
+| 11 | `staff` | `stf00062` | Security CSRF | `POST /api/v1/filetracking/files/` | 403 Forbidden | Cookie-authenticated write without `X-CSRF-Token` refused | `test_adversarial.py` |
+| 12 | `Dean Academic` | `fac00018` | Auth Session | `POST /api/v1/auth/login` | 200 OK | Dean Academic authenticates | `files.spec.ts` |
+| 13 | `Dean Academic` | `fac00018` | FTS-UC-008 | `GET /api/v1/filetracking/files/inbox/` | 200 OK | Inbox view shows incoming file from staff member | `files.spec.ts` |
+| 14 | `Dean Academic` | `fac00018` | FTS-UC-004 | `POST /api/v1/filetracking/files/5/forward/` | 200 OK | Forwarded file to Associate Dean (`5349`) | `files.spec.ts` |
+| 15 | `faculty` | `fac00090` | FTS-UC-005 | `POST /api/v1/filetracking/files/5/return/` | 200 OK | Associate Dean returns file back to Dean Academic | `files.spec.ts` |
+| 16 | `staff` | `stf00062` | FTS-UC-007 | `POST /api/v1/filetracking/files/5/archive/` | 200 OK | Creator owner archives completed file | `files.spec.ts` |
+| 17 | `staff` | `stf00062` | FTS-UC-010 | `GET /api/v1/filetracking/files/archived/` | 200 OK | Archived files view lists permanently preserved file | `files.spec.ts` |
+
+### 10.2 Actual `runserver` HTTP Log Lines
+```
+[23/Nov/2026 13:54:49] "POST /api/v1/auth/login HTTP/1.1" 200 91
+Forbidden: /api/v1/filetracking/files/inbox/
+2026-11-23 13:54:49 WARNING django.request Forbidden: /api/v1/filetracking/files/inbox/
+[23/Nov/2026 13:54:49] "GET /api/v1/filetracking/files/inbox/ HTTP/1.1" 403 158
+Forbidden: /api/v1/filetracking/governance/audit/
+2026-11-23 13:54:49 WARNING django.request Forbidden: /api/v1/filetracking/governance/audit/
+[23/Nov/2026 13:54:49] "GET /api/v1/filetracking/governance/audit/ HTTP/1.1" 403 158
+[23/Nov/2026 13:54:49] "POST /api/v1/auth/login HTTP/1.1" 200 91
+2026-11-23 13:54:50 INFO fusion.filetracking.notify Notification triggered: file.received for user 5330
+[23/Nov/2026 13:54:50] "POST /api/v1/filetracking/files/ HTTP/1.1" 201 770
+[23/Nov/2026 13:54:50] "POST /api/v1/filetracking/files/ HTTP/1.1" 201 442
+[23/Nov/2026 13:54:50] "PUT /api/v1/filetracking/files/6/draft/ HTTP/1.1" 200 454
+[23/Nov/2026 13:54:50] "GET /api/v1/filetracking/files/outbox/ HTTP/1.1" 200 749
+[23/Nov/2026 13:54:50] "GET /api/v1/filetracking/files/5/history/ HTTP/1.1" 200 295
+Not Found: /api/v1/filetracking/files/9999/
+2026-11-23 13:54:50 WARNING django.request Not Found: /api/v1/filetracking/files/9999/
+[23/Nov/2026 13:54:50] "GET /api/v1/filetracking/files/9999/ HTTP/1.1" 404 119
+Forbidden: /api/v1/filetracking/files/
+2026-11-23 13:54:50 WARNING django.request Forbidden: /api/v1/filetracking/files/
+[23/Nov/2026 13:54:50] "POST /api/v1/filetracking/files/ HTTP/1.1" 403 222
+[23/Nov/2026 13:54:50] "POST /api/v1/auth/login HTTP/1.1" 200 91
+[23/Nov/2026 13:54:50] "GET /api/v1/filetracking/files/inbox/ HTTP/1.1" 200 749
+2026-11-23 13:54:50 INFO fusion.filetracking.notify Notification triggered: file.forwarded for user 5349
+[23/Nov/2026 13:54:50] "POST /api/v1/filetracking/files/5/forward/ HTTP/1.1" 200 308
+[23/Nov/2026 13:54:50] "POST /api/v1/auth/login HTTP/1.1" 200 91
+2026-11-23 13:54:50 INFO fusion.filetracking.notify Notification triggered: file.returned for user 5330
+[23/Nov/2026 13:54:50] "POST /api/v1/filetracking/files/5/return/ HTTP/1.1" 200 316
+2026-11-23 13:54:50 INFO fusion.filetracking.notify Notification triggered: file.returned for user 5349
+[23/Nov/2026 13:54:50] "POST /api/v1/filetracking/files/5/return/ HTTP/1.1" 200 310
+2026-11-23 13:54:50 INFO fusion.filetracking.notify Notification triggered: file.archived for user 112
+[23/Nov/2026 13:54:51] "POST /api/v1/filetracking/files/5/archive/ HTTP/1.1" 200 2002
+[23/Nov/2026 13:54:51] "GET /api/v1/filetracking/files/archived/ HTTP/1.1" 200 388
+```
+
+### 10.3 Keyboard Accessibility Flow
+The complete draft creation and circulation workflow was walked through using keyboard only (`Tab` for navigation, `Space` for checkbox toggling, and `Enter` for form submission). All inputs carry clear semantic HTML `<label>` bindings and autofocus behavior. Zero accessibility or focus trap defects observed.
+
