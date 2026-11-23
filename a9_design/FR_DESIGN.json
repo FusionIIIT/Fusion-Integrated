@@ -1,0 +1,1234 @@
+[
+  {
+    "test_id": "TC-FR-001",
+    "source_id": "AFR-MMS-001 BLOCKED",
+    "purpose": "BLOCKED: A system-wide scope statement with no finite operation or exhaustive acceptance oracle; no unsupported behavior may be invented.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-002",
+    "source_id": "AFR-MMS-100 BLOCKED",
+    "purpose": "BLOCKED: Excluded external domains have no MMS operations/interfaces specified for a finite negative test.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-003",
+    "source_id": "AFR-MMS-101 BLOCKED",
+    "purpose": "BLOCKED: No policy-administration behavior is specified; institution values are inputs, not MMS-defined outputs.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-004",
+    "source_id": "AFR-MMS-002 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Admin to assign the Mess Caretaker role to a specific institute employee.",
+    "preconditions": [
+      "The institute employee directory contains employee E-CARET-01. A Mess Admin is authenticated."
+    ],
+    "action_or_input": "As the Mess Admin, assign the Mess Caretaker role to employee E-CARET-01.",
+    "expected_result": "The assignment is recorded with employee E-CARET-01 as the assigned Mess Caretaker.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-005",
+    "source_id": "AFR-MMS-003 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Admin to assign the Mess Warden role to a specific institute employee.",
+    "preconditions": [
+      "The institute employee directory contains employee E-WARD-01. A Mess Admin is authenticated."
+    ],
+    "action_or_input": "As the Mess Admin, assign the Mess Warden role to employee E-WARD-01.",
+    "expected_result": "The assignment is recorded with employee E-WARD-01 as the assigned Mess Warden.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-006",
+    "source_id": "AFR-MMS-004 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Admin to reassign the active Mess Caretaker or Mess Warden when required, including during an active mess cycle.",
+    "preconditions": [
+      "A mess cycle is active. Employee E-CARET-01 is the active Caretaker; E-CARET-02 is an institute employee. A Mess Admin is authenticated."
+    ],
+    "action_or_input": "During the active cycle, reassign the Caretaker role from E-CARET-01 to E-CARET-02.",
+    "expected_result": "MMS records the reassignment and identifies E-CARET-02 as the active Caretaker from the recorded reassignment time.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-007",
+    "source_id": "AFR-MMS-005 Specified condition",
+    "purpose": "Specified condition: MMS shall maintain exactly one active Mess Caretaker at a time.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Exercise a valid boundary input and the expressly prohibited side, if defined by the requirement.",
+    "expected_result": "MMS shall maintain exactly one active Mess Caretaker at a time.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-008",
+    "source_id": "AFR-MMS-006 Specified condition",
+    "purpose": "Specified condition: MMS shall maintain exactly one active Mess Warden at a time.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Exercise a valid boundary input and the expressly prohibited side, if defined by the requirement.",
+    "expected_result": "MMS shall maintain exactly one active Mess Warden at a time.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-009",
+    "source_id": "AFR-MMS-096 Required outcome",
+    "purpose": "Required outcome: MMS Caretaker and Warden role assignments shall be time-bound for specified durations.",
+    "preconditions": [
+      "The employee directory contains E-CARET-01 and E-WARD-01. A Mess Admin is authenticated; the role-assignment request supplies explicit start and end timestamps."
+    ],
+    "action_or_input": "Assign Caretaker to E-CARET-01 and Warden to E-WARD-01, each with the supplied start and end timestamps; read both assignments.",
+    "expected_result": "Both role records retain their supplied start and end timestamps, making each assignment time-bound; no duration policy is inferred.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-010",
+    "source_id": "AFR-MMS-097 Required outcome",
+    "purpose": "Required outcome: A mid-cycle Caretaker or Warden reassignment shall take effect immediately in MMS from the recorded reassignment time.",
+    "preconditions": [
+      "A mess cycle is active and E-CARET-01 is the active Caretaker. The reassignment request records timestamp T during the cycle."
+    ],
+    "action_or_input": "Reassign the Caretaker role to institute employee E-CARET-02 at timestamp T, then inspect the active assignment at T.",
+    "expected_result": "The active Caretaker from timestamp T is E-CARET-02; the effective time shown is T.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-011",
+    "source_id": "AFR-MMS-098 State outcome",
+    "purpose": "State outcome: From the effective time of a Caretaker reassignment, pending operational requests shall become visible to and actionable by the newly assigned active Mess Caretaker.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Drive the stated event and inspect persisted status/history.",
+    "expected_result": "From the effective time of a Caretaker reassignment, pending operational requests shall become visible to and actionable by the newly assigned active Mess Caretaker.",
+    "test_type": "state"
+  },
+  {
+    "test_id": "TC-FR-012",
+    "source_id": "AFR-MMS-099 Required outcome",
+    "purpose": "Required outcome: MMS shall consume institute employee identities needed for Mess Admin, Caretaker, and Warden role assignment without owning employee master-data management.",
+    "preconditions": [
+      "The directory service returns institute employees E-ADMIN-01, E-CARET-01, and E-WARD-01. MMS role assignment is available."
+    ],
+    "action_or_input": "Use those three directory identities as inputs to the Mess Admin, Caretaker, and Warden role-assignment flows, then inspect MMS-owned data boundaries.",
+    "expected_result": "MMS accepts the directory identities for the stated role assignments; employee master records remain in the institute directory and are not created or managed by MMS.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-013",
+    "source_id": "AFR-MMS-007 Prohibited behavior",
+    "purpose": "Prohibited behavior: MMS shall prevent the Mess Admin from accessing operational mess data, including student requests, billing details, rebate details, special-food requests, vacation responses, and feedback entries.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Attempt only the explicitly prohibited action described by this requirement.",
+    "expected_result": "Refuse the action without prohibited disclosure or invalid state change.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-FR-014",
+    "source_id": "AFR-MMS-012 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to open a registration window for a mess cycle or other designated period.",
+    "preconditions": [
+      "A Mess Caretaker is authenticated and a mess cycle exists."
+    ],
+    "action_or_input": "As the Caretaker, open the registration window for the existing mess cycle.",
+    "expected_result": "MMS records that cycle’s registration window as open.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-015",
+    "source_id": "AFR-MMS-013 Open-window registration accepted",
+    "purpose": "Open-window registration accepted",
+    "preconditions": [
+      "An open registration window exists; Student is eligible."
+    ],
+    "action_or_input": "Submit a valid Student registration request while the window is open.",
+    "expected_result": "MMS accepts and records the request for Caretaker decision.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-016",
+    "source_id": "AFR-MMS-013 Closed-window registration refused",
+    "purpose": "Closed-window registration refused",
+    "preconditions": [
+      "No registration window is open; Student is otherwise eligible."
+    ],
+    "action_or_input": "Submit a valid request outside an open window.",
+    "expected_result": "Refuse the request and create no registration request.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-017",
+    "source_id": "AFR-MMS-015 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to approve or reject each submitted registration request.",
+    "preconditions": [
+      "A registration request from Student S-REG-01 is submitted and awaits a Caretaker decision. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "As the active Caretaker, decide on S-REG-01’s request once using Approve, then repeat with a separate pending request using Reject.",
+    "expected_result": "MMS records the Caretaker’s chosen decision on each corresponding submitted registration request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-018",
+    "source_id": "AFR-MMS-014 Required outcome",
+    "purpose": "Required outcome: MMS shall allow a Student to submit a deregistration request at any time while registered for mess service.",
+    "preconditions": [
+      "Student S-REG-02 has an active mess registration. The Student is authenticated."
+    ],
+    "action_or_input": "As S-REG-02, submit a deregistration request.",
+    "expected_result": "MMS records a deregistration request for S-REG-02.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-019",
+    "source_id": "AFR-MMS-016 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to approve or reject each submitted deregistration request.",
+    "preconditions": [
+      "Two registered Students have pending deregistration requests. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Decide Approve on one request and Reject on the other.",
+    "expected_result": "MMS records the active Caretaker’s respective decision against each request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-020",
+    "source_id": "AFR-MMS-017 Required outcome",
+    "purpose": "Required outcome: MMS shall record the Caretaker’s decision on a deregistration request when the decision is made.",
+    "preconditions": [
+      "A deregistration request from Student S-DEREG-01 is pending. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Record a decision on S-DEREG-01’s request and immediately read the request record.",
+    "expected_result": "The request record shows the Caretaker decision made in this action.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-021",
+    "source_id": "AFR-MMS-018 Required outcome",
+    "purpose": "Required outcome: For an approved deregistration request, MMS shall make the mess-service effect start from the next calendar day.",
+    "preconditions": [
+      "Student S-DEREG-02 is registered. The test clock is D; the active Caretaker can decide requests."
+    ],
+    "action_or_input": "Submit a deregistration request for S-DEREG-02, have the Caretaker approve it on day D, and inspect its effective date.",
+    "expected_result": "The recorded mess-service deregistration effect begins on the next calendar day after D.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-022",
+    "source_id": "AFR-MMS-019 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Warden to view operational student requests for supervisory oversight, including registration and deregistration requests.",
+    "preconditions": [
+      "A registration request and a deregistration request are pending for registered Students. A Mess Warden is authenticated."
+    ],
+    "action_or_input": "As the Warden, open the operational request list and inspect both pending requests.",
+    "expected_result": "The Warden can view the registration and deregistration requests for supervisory oversight.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-023",
+    "source_id": "AFR-MMS-020 Prohibited behavior",
+    "purpose": "Prohibited behavior: MMS shall prevent the Mess Warden from approving, rejecting, registering, deregistering, or otherwise deciding operational student requests.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Attempt only the explicitly prohibited action described by this requirement.",
+    "expected_result": "Refuse the action without prohibited disclosure or invalid state change.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-FR-024",
+    "source_id": "AFR-MMS-011 State outcome",
+    "purpose": "State outcome: MMS shall allow a Student to track the status and history of the Student’s submitted MMS requests.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Drive the stated event and inspect persisted status/history.",
+    "expected_result": "MMS shall allow a Student to track the status and history of the Student’s submitted MMS requests.",
+    "test_type": "state"
+  },
+  {
+    "test_id": "TC-FR-025",
+    "source_id": "AFR-MMS-021 State outcome",
+    "purpose": "State outcome: MMS shall maintain request status and request history for registration and deregistration requests.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Drive the stated event and inspect persisted status/history.",
+    "expected_result": "MMS shall maintain request status and request history for registration and deregistration requests.",
+    "test_type": "state"
+  },
+  {
+    "test_id": "TC-FR-026",
+    "source_id": "AFR-MMS-022 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger a system-generated email notification to the Student when a registration or deregistration request is submitted.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger a system-generated email notification to the Student when a registration or deregistration request is submitted.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-027",
+    "source_id": "AFR-MMS-023 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger a system-generated email notification to the Student when a registration or deregistration request is approved or rejected.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger a system-generated email notification to the Student when a registration or deregistration request is approved or rejected.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-028",
+    "source_id": "AFR-MMS-008 Required outcome",
+    "purpose": "Required outcome: MMS shall allow a Student to view the weekly mess menu.",
+    "preconditions": [
+      "A weekly menu exists with at least one published menu entry. Student S-MENU-01 is authenticated."
+    ],
+    "action_or_input": "As S-MENU-01, open the weekly mess menu.",
+    "expected_result": "MMS returns the weekly menu to Student S-MENU-01.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-029",
+    "source_id": "AFR-MMS-024 Required outcome",
+    "purpose": "Required outcome: MMS shall store the weekly mess menu in a day-wise and meal-wise structure covering breakfast, lunch, and dinner.",
+    "preconditions": [
+      "A weekly menu is submitted with entries for Monday breakfast, Monday lunch, and Monday dinner."
+    ],
+    "action_or_input": "Save the weekly menu and read its stored day/meal entries.",
+    "expected_result": "The stored menu associates each submitted item with its day and meal, including the three submitted Monday meal slots.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-030",
+    "source_id": "AFR-MMS-025 Required outcome",
+    "purpose": "Required outcome: MMS shall allow Students to view the weekly mess menu according to their access rights.",
+    "preconditions": [
+      "A weekly menu exists. Student S-MENU-02 is authenticated with the Student menu-view permission."
+    ],
+    "action_or_input": "As S-MENU-02, request the weekly menu.",
+    "expected_result": "The permitted Student can view the weekly menu.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-031",
+    "source_id": "AFR-MMS-026 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to view the weekly mess menu.",
+    "preconditions": [
+      "A weekly menu exists. Employee E-CARET-03 is the active Caretaker."
+    ],
+    "action_or_input": "As the active Caretaker, request the weekly menu.",
+    "expected_result": "The Caretaker can view the weekly menu.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-032",
+    "source_id": "AFR-MMS-027 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Warden to view the weekly mess menu.",
+    "preconditions": [
+      "A weekly menu exists. Employee E-WARD-02 is the active Warden."
+    ],
+    "action_or_input": "As the active Warden, request the weekly menu.",
+    "expected_result": "The Warden can view the weekly menu.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-033",
+    "source_id": "AFR-MMS-028 BLOCKED",
+    "purpose": "BLOCKED: Mess Admin menu visibility conflicts between PS §§3.2.1 and 3.3.2 (ISS-MMS-012).",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-034",
+    "source_id": "AFR-MMS-029 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to add weekly mess menu items.",
+    "preconditions": [
+      "A Mess Caretaker is authenticated. The current weekly menu has a Monday lunch slot available for an item."
+    ],
+    "action_or_input": "Add the item “Lentil soup” to Monday lunch and read that menu slot.",
+    "expected_result": "The Monday lunch menu contains the added “Lentil soup” item.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-035",
+    "source_id": "AFR-MMS-030 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to delete weekly mess menu items.",
+    "preconditions": [
+      "A weekly menu contains “Lentil soup” in Monday lunch. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Delete the “Lentil soup” Monday lunch item and read the menu.",
+    "expected_result": "The deleted item is absent from Monday lunch.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-036",
+    "source_id": "AFR-MMS-031 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to modify weekly mess menu items.",
+    "preconditions": [
+      "A weekly menu contains “Lentil soup” in Monday lunch. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Change that menu item’s text to “Vegetable soup” and read the slot.",
+    "expected_result": "The Monday lunch item is “Vegetable soup” and no longer has the prior “Lentil soup” text.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-037",
+    "source_id": "AFR-MMS-032 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger system-generated email notifications to Students when the weekly menu is updated.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger system-generated email notifications to Students when the weekly menu is updated.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-038",
+    "source_id": "AFR-MMS-009 Required outcome",
+    "purpose": "Required outcome: MMS shall allow a Student to view the Student’s monthly mess bills.",
+    "preconditions": [
+      "Student S-BILL-01 has a monthly mess bill. The Student is authenticated."
+    ],
+    "action_or_input": "As S-BILL-01, request the Student’s monthly mess bills.",
+    "expected_result": "MMS displays the monthly mess bill belonging to S-BILL-01.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-039",
+    "source_id": "AFR-MMS-033 Required outcome",
+    "purpose": "Required outcome: MMS shall generate mess bills using a calendar-month billing cycle.",
+    "preconditions": [
+      "Billing inputs include served days and applicable charge/deduction records spanning 31 January and 1 February."
+    ],
+    "action_or_input": "Generate bills for January and February and inspect each bill’s billing period.",
+    "expected_result": "January and February records are separate calendar-month bills; the January bill does not include 1 February and the February bill does not include 31 January.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-040",
+    "source_id": "AFR-MMS-034 Required outcome",
+    "purpose": "Required outcome: MMS shall include daily-rate charges for served days in monthly bill computation.",
+    "preconditions": [
+      "Student S-BILL-02 has a served-day record and a supplied daily-rate input for a billing month."
+    ],
+    "action_or_input": "Generate S-BILL-02’s monthly bill and inspect its charge components.",
+    "expected_result": "The bill includes the daily-rate charge associated with the served day; the test asserts no rate value beyond its supplied input.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-041",
+    "source_id": "AFR-MMS-035 Required outcome",
+    "purpose": "Required outcome: MMS shall include charges for approved special meals or add-ons in monthly bill computation.",
+    "preconditions": [
+      "A billing fixture contains an approved special-meal/add-on record and its charge input supplied by the controlling fixture; no amount is defined by this case."
+    ],
+    "action_or_input": "Generate the Student’s monthly bill and inspect whether the approved special-meal/add-on charge component is included.",
+    "expected_result": "The generated bill includes the supplied charge component for the approved special meal/add-on; this case asserts no charge source or value.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-042",
+    "source_id": "AFR-MMS-036 Required outcome",
+    "purpose": "Required outcome: MMS shall deduct approved rebates in monthly bill computation.",
+    "preconditions": [
+      "Student S-BILL-03 has an approved rebate record and a monthly bill fixture with other applicable entries."
+    ],
+    "action_or_input": "Generate S-BILL-03’s bill and inspect its rebate component.",
+    "expected_result": "The approved rebate is deducted in the bill computation; no date-modification or cancellation policy is inferred.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-043",
+    "source_id": "AFR-MMS-037 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to review system-generated monthly mess bills before publication.",
+    "preconditions": [
+      "A system-generated monthly bill exists in draft/unpublished state. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "As the active Caretaker, open the generated bill for review before publication.",
+    "expected_result": "The Caretaker can view the generated bill in its pre-publication review state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-044",
+    "source_id": "AFR-MMS-038 Required outcome",
+    "purpose": "Required outcome: MMS shall require the Mess Caretaker to finalize monthly mess bills before publication.",
+    "preconditions": [
+      "A generated monthly bill has not been finalized or published. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Attempt to publish the bill without first finalizing it, then inspect publication state.",
+    "expected_result": "The bill is not published before Caretaker finalization.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-045",
+    "source_id": "AFR-MMS-039 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to publish finalized monthly mess bills.",
+    "preconditions": [
+      "A monthly bill has been finalized by the active Caretaker and is unpublished."
+    ],
+    "action_or_input": "As the active Caretaker, publish the finalized bill.",
+    "expected_result": "MMS records the finalized monthly bill as published.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-046",
+    "source_id": "AFR-MMS-040 Required outcome",
+    "purpose": "Required outcome: MMS shall allow a Student to view the Student’s published monthly mess bill.",
+    "preconditions": [
+      "Student S-BILL-04 has a published monthly bill. The Student is authenticated."
+    ],
+    "action_or_input": "As S-BILL-04, open the published monthly bill.",
+    "expected_result": "MMS displays S-BILL-04’s published bill.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-047",
+    "source_id": "AFR-MMS-041 Required outcome",
+    "purpose": "Required outcome: MMS shall allow a Student to view the Student’s outstanding mess balance maintained within MMS.",
+    "preconditions": [
+      "Student S-BILL-05 has an outstanding balance recorded in MMS. The Student is authenticated."
+    ],
+    "action_or_input": "As S-BILL-05, request the outstanding mess balance.",
+    "expected_result": "MMS displays the outstanding balance recorded for S-BILL-05.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-048",
+    "source_id": "AFR-MMS-042 BLOCKED",
+    "purpose": "BLOCKED: The exclusions define no MMS action or interface to exercise.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-049",
+    "source_id": "AFR-MMS-043 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger a system-generated email notification to Students when monthly bills are published.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger a system-generated email notification to Students when monthly bills are published.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-050",
+    "source_id": "AFR-MMS-044 Required outcome",
+    "purpose": "Required outcome: MMS shall allow a Student to submit text feedback related to mess services.",
+    "preconditions": [
+      "Student S-FB-01 is authenticated."
+    ],
+    "action_or_input": "Submit the text “Meal service feedback” as mess-service feedback.",
+    "expected_result": "MMS accepts and records the submitted feedback text for S-FB-01.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-051",
+    "source_id": "AFR-MMS-045 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to view Student feedback entries for operational review, record keeping, and analysis.",
+    "preconditions": [
+      "Student S-FB-02 has submitted the text “Meal service feedback.” The active Caretaker is authenticated."
+    ],
+    "action_or_input": "As the active Caretaker, open the Student feedback entries.",
+    "expected_result": "The feedback entry submitted by S-FB-02 is visible to the Caretaker for operational review.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-052",
+    "source_id": "AFR-MMS-046 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Warden to view Student feedback entries for supervisory oversight, record keeping, and analysis.",
+    "preconditions": [
+      "Student S-FB-03 has submitted the text “Meal service feedback.” The active Warden is authenticated."
+    ],
+    "action_or_input": "As the active Warden, open the Student feedback entries.",
+    "expected_result": "The feedback entry submitted by S-FB-03 is visible to the Warden for supervisory oversight.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-053",
+    "source_id": "AFR-MMS-047 Required outcome",
+    "purpose": "Required outcome: MMS shall store Student feedback entries with relevant record information.",
+    "preconditions": [
+      "Student S-FB-04 submits feedback text “Meal service feedback”; the feedback record is available for inspection."
+    ],
+    "action_or_input": "Read the stored feedback record and its associated record information after submission.",
+    "expected_result": "MMS retains the submitted text together with the record information present on the feedback entry; this case does not assume additional fields.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-054",
+    "source_id": "AFR-MMS-048 BLOCKED",
+    "purpose": "BLOCKED: No feedback-resolution action or workflow is defined.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-055",
+    "source_id": "AFR-MMS-049 Required outcome",
+    "purpose": "Required outcome: MMS shall allow a Student to submit a mess rebate request.",
+    "preconditions": [
+      "Student S-REB-01 is authenticated."
+    ],
+    "action_or_input": "Submit a rebate request for S-REB-01.",
+    "expected_result": "MMS records a rebate request associated with S-REB-01.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-056",
+    "source_id": "AFR-MMS-050 Required outcome",
+    "purpose": "Required outcome: A rebate request shall capture a reason, start date, and end date.",
+    "preconditions": [
+      "Student S-REB-02 submits a rebate request with reason “medical”, start date R, and end date E."
+    ],
+    "action_or_input": "Read the submitted rebate request.",
+    "expected_result": "The request contains the submitted reason “medical”, start date R, and end date E.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-057",
+    "source_id": "AFR-MMS-051 Allowed rebate reasons accepted",
+    "purpose": "Allowed rebate reasons accepted",
+    "preconditions": [
+      "A registered Student may submit a rebate request."
+    ],
+    "action_or_input": "Submit each allowed reason; provide explanation for other.",
+    "expected_result": "Each allowed reason is accepted with its stated required fields.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-058",
+    "source_id": "AFR-MMS-051 Other without explanation refused",
+    "purpose": "Other without explanation refused",
+    "preconditions": [
+      "A registered Student may submit a rebate request."
+    ],
+    "action_or_input": "Submit reason other without explanation.",
+    "expected_result": "Refuse the request and create no rebate request.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-059",
+    "source_id": "AFR-MMS-052 Three-day minimum accepted",
+    "purpose": "Three-day minimum accepted",
+    "preconditions": [
+      "A registered Student may submit a rebate request."
+    ],
+    "action_or_input": "Submit a request lasting exactly 3 days.",
+    "expected_result": "The minimum-duration rule accepts the request.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-060",
+    "source_id": "AFR-MMS-052 Below three-day minimum refused",
+    "purpose": "Below three-day minimum refused",
+    "preconditions": [
+      "A registered Student may submit a rebate request."
+    ],
+    "action_or_input": "Submit a request lasting fewer than 3 days.",
+    "expected_result": "Refuse the request and create no rebate request.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-061",
+    "source_id": "AFR-MMS-053 One-calendar-day rebate lead time accepted",
+    "purpose": "One-calendar-day rebate lead time accepted",
+    "preconditions": [
+      "A registered Student may submit a rebate request."
+    ],
+    "action_or_input": "Submit at least 1 calendar day before the start date.",
+    "expected_result": "The lead-time rule accepts the request.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-062",
+    "source_id": "AFR-MMS-053 Insufficient rebate lead time refused",
+    "purpose": "Insufficient rebate lead time refused",
+    "preconditions": [
+      "A registered Student may submit a rebate request."
+    ],
+    "action_or_input": "Submit less than 1 calendar day before the start date.",
+    "expected_result": "Refuse the request and create no rebate request.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-063",
+    "source_id": "AFR-MMS-054 Non-overlapping rebate request accepted",
+    "purpose": "Non-overlapping rebate request accepted",
+    "preconditions": [
+      "The Student has an existing rebate request."
+    ],
+    "action_or_input": "Submit a request whose date range does not overlap it.",
+    "expected_result": "Accept the non-overlapping request.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-064",
+    "source_id": "AFR-MMS-054 Overlapping rebate request refused",
+    "purpose": "Overlapping rebate request refused",
+    "preconditions": [
+      "The Student has an existing rebate request."
+    ],
+    "action_or_input": "Submit another request with overlapping dates.",
+    "expected_result": "Refuse the request and preserve the existing request.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-065",
+    "source_id": "AFR-MMS-055 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to approve or reject a rebate request.",
+    "preconditions": [
+      "A rebate request is pending. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Decide Approve on one pending rebate request and Reject on a second pending request.",
+    "expected_result": "MMS records the Caretaker’s selected approve/reject decision for each rebate request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-066",
+    "source_id": "AFR-MMS-056 BLOCKED",
+    "purpose": "BLOCKED: Permitted rebate-date changes depend on external policy whose limits and outcomes are unspecified.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-067",
+    "source_id": "AFR-MMS-057 BLOCKED",
+    "purpose": "BLOCKED: Allowed rebate-date changes before approval depend on unspecified external policy (ISS-MMS rebate-date rules).",
+    "preconditions": [
+      "A rebate request is pending approval with submitted dates R through E."
+    ],
+    "action_or_input": "Determine whether an approved-date change is allowed before approval under the supplied institution policy; if that policy is absent, do not execute a speculative change.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-068",
+    "source_id": "AFR-MMS-058 State outcome",
+    "purpose": "State outcome: MMS shall allow Students to track rebate request status as Pending, Approved, or Rejected.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Drive the stated event and inspect persisted status/history.",
+    "expected_result": "MMS shall allow Students to track rebate request status as Pending, Approved, or Rejected.",
+    "test_type": "state"
+  },
+  {
+    "test_id": "TC-FR-069",
+    "source_id": "AFR-MMS-059 State outcome",
+    "purpose": "State outcome: MMS shall automatically apply approved rebate adjustments to the corresponding monthly mess bill.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Drive the stated event and inspect persisted status/history.",
+    "expected_result": "MMS shall automatically apply approved rebate adjustments to the corresponding monthly mess bill.",
+    "test_type": "state"
+  },
+  {
+    "test_id": "TC-FR-070",
+    "source_id": "AFR-MMS-060 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger a system-generated email notification to the Student when a rebate request is submitted.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger a system-generated email notification to the Student when a rebate request is submitted.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-071",
+    "source_id": "AFR-MMS-061 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger a system-generated email notification to the Student when a rebate request is approved or rejected.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger a system-generated email notification to the Student when a rebate request is approved or rejected.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-072",
+    "source_id": "AFR-MMS-062 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to create a vacation food continuity survey for an upcoming institute vacation.",
+    "preconditions": [
+      "The institute vacation record for upcoming vacation V exists. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "As the Caretaker, create a vacation food-continuity survey linked to V.",
+    "expected_result": "MMS records a food-continuity survey for upcoming vacation V.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-073",
+    "source_id": "AFR-MMS-063 Survey availability follows current registration",
+    "purpose": "Survey availability follows current registration",
+    "preconditions": [
+      "A survey is open; one Student is registered and another is not."
+    ],
+    "action_or_input": "Check access/recipient status for both Students.",
+    "expected_result": "The registered Student receives/accesses the survey; the unregistered Student does not.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-FR-074",
+    "source_id": "AFR-MMS-065 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to set a response deadline for each vacation food continuity survey.",
+    "preconditions": [
+      "A vacation food-continuity survey exists. The active Caretaker is authenticated and supplies deadline D."
+    ],
+    "action_or_input": "Set the response deadline for the survey to supplied deadline D and read the survey.",
+    "expected_result": "The survey records the response deadline D supplied by the Caretaker; no default deadline is inferred.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-075",
+    "source_id": "AFR-MMS-068 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger system-generated email notification when a vacation food continuity survey is created.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger system-generated email notification when a vacation food continuity survey is created.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-076",
+    "source_id": "AFR-MMS-069 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger system-generated email reminders for vacation food continuity surveys; reminder timing is not specified by the frozen PS.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger system-generated email reminders for vacation food continuity surveys; reminder timing is not specified by the frozen PS.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-077",
+    "source_id": "AFR-MMS-064 Yes response accepted",
+    "purpose": "Yes response accepted",
+    "preconditions": [
+      "Student is registered; survey is open and before deadline."
+    ],
+    "action_or_input": "Submit the literal response Yes.",
+    "expected_result": "Record the Student response as Yes.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-078",
+    "source_id": "AFR-MMS-064 No response accepted",
+    "purpose": "No response accepted",
+    "preconditions": [
+      "Student is registered; survey is open and before deadline."
+    ],
+    "action_or_input": "Submit the literal response No.",
+    "expected_result": "Record the Student response as No.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-079",
+    "source_id": "AFR-MMS-064 Unsupported vacation response refused",
+    "purpose": "Unsupported vacation response refused",
+    "preconditions": [
+      "Student is registered; survey is open."
+    ],
+    "action_or_input": "Submit a response other than Yes or No.",
+    "expected_result": "Refuse it and create no response record.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-080",
+    "source_id": "AFR-MMS-066 Default No for nonresponse",
+    "purpose": "Default No for nonresponse",
+    "preconditions": [
+      "Registered Student has not responded by the deadline."
+    ],
+    "action_or_input": "Apply the specified deadline default.",
+    "expected_result": "Record No for that Student.",
+    "test_type": "state"
+  },
+  {
+    "test_id": "TC-FR-081",
+    "source_id": "AFR-MMS-067 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to view the vacation survey response summary for operational planning.",
+    "preconditions": [
+      "A vacation survey has response records: one Yes and one No. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Open the survey response summary.",
+    "expected_result": "The Caretaker can view a summary reflecting the seeded Yes and No responses.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-082",
+    "source_id": "AFR-MMS-070 Required outcome",
+    "purpose": "Required outcome: MMS shall allow a Student to submit a special food request due to illness or a personal event.",
+    "preconditions": [
+      "Student S-SF-01 is authenticated; the request is due to illness and satisfies the stated submission timing."
+    ],
+    "action_or_input": "Submit a special-food request for S-SF-01 with reason illness and the needed meal/date details supplied by the Student.",
+    "expected_result": "MMS records S-SF-01’s special-food request as a request; no charge amount is asserted.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-083",
+    "source_id": "AFR-MMS-071 One-calendar-day special-food lead time accepted",
+    "purpose": "One-calendar-day special-food lead time accepted",
+    "preconditions": [
+      "Student has a qualifying reason."
+    ],
+    "action_or_input": "Submit exactly 1 calendar day before the requested date.",
+    "expected_result": "Accept the request under the stated lead-time rule.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-084",
+    "source_id": "AFR-MMS-071 Insufficient special-food lead time refused",
+    "purpose": "Insufficient special-food lead time refused",
+    "preconditions": [
+      "Student has a qualifying reason."
+    ],
+    "action_or_input": "Submit less than 1 calendar day before the requested date.",
+    "expected_result": "Refuse the request and create no request record.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-FR-085",
+    "source_id": "AFR-MMS-075 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger a system-generated email notification to the Student when a special food request is submitted.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger a system-generated email notification to the Student when a special food request is submitted.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-086",
+    "source_id": "AFR-MMS-072 BLOCKED",
+    "purpose": "BLOCKED: the institution-defined special-food decision period has no supplied value (ISS-MMS-013).",
+    "preconditions": [
+      "A special-food request is pending. No institution-approved decision-period value is available."
+    ],
+    "action_or_input": "Obtain the institution-defined decision-period value before testing the deadline; no deadline result can be asserted while that value is unresolved.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-087",
+    "source_id": "AFR-MMS-073 Default rejection after supplied institution period",
+    "purpose": "Default rejection after supplied institution period",
+    "preconditions": [
+      "A request is Requested; its decision period is supplied by institutional policy; no decision occurs before expiry."
+    ],
+    "action_or_input": "Advance to after that supplied period and apply default handling.",
+    "expected_result": "Record Rejected by default; assume no numeric duration.",
+    "test_type": "state"
+  },
+  {
+    "test_id": "TC-FR-088",
+    "source_id": "AFR-MMS-076 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger a system-generated email notification to the Student when a special food request is approved or rejected.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger a system-generated email notification to the Student when a special food request is approved or rejected.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-089",
+    "source_id": "AFR-MMS-074 State outcome",
+    "purpose": "State outcome: MMS shall maintain special food request history and status so the Student can track the request.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Drive the stated event and inspect persisted status/history.",
+    "expected_result": "MMS shall maintain special food request history and status so the Student can track the request.",
+    "test_type": "state"
+  },
+  {
+    "test_id": "TC-FR-090",
+    "source_id": "AFR-MMS-077 BLOCKED",
+    "purpose": "BLOCKED: Approved special-food requests are chargeable, but the charge source and value are not supplied.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-091",
+    "source_id": "AFR-MMS-078 Required outcome",
+    "purpose": "Required outcome: MMS shall track special food requests using the states Requested, Approved, Rejected, Served, and Cancelled.",
+    "preconditions": [
+      "A special-food request is created and approved through the specified request flow."
+    ],
+    "action_or_input": "Inspect its status history through each status whose actor/transition is explicitly defined; do not attempt unresolved Served/Cancelled transitions.",
+    "expected_result": "MMS tracks the explicitly exercised Requested, Approved, and Rejected statuses. Served/Cancelled actor behavior remains separately blocked under ISS-MMS-014.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-092",
+    "source_id": "AFR-MMS-079 BLOCKED",
+    "purpose": "BLOCKED: The transition guard is defined, but the PS does not assign the Served/Cancelled actor (ISS-MMS-014).",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-093",
+    "source_id": "AFR-MMS-080 BLOCKED",
+    "purpose": "BLOCKED: Fulfillment notifications depend on an update with unresolved actor authorization (ISS-MMS-014).",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-094",
+    "source_id": "AFR-MMS-010 Required outcome",
+    "purpose": "Required outcome: MMS shall allow a Student to view mess-service announcements relevant to the Student.",
+    "preconditions": [
+      "Student S-ANN-01 is an intended recipient of a published mess-service announcement. The Student is authenticated."
+    ],
+    "action_or_input": "As S-ANN-01, open relevant mess-service announcements.",
+    "expected_result": "MMS displays the mess-service announcement relevant to S-ANN-01.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-095",
+    "source_id": "AFR-MMS-081 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to publish mess-related announcements.",
+    "preconditions": [
+      "The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Publish the announcement text “Dining hall closes at 8 PM” as a mess-related announcement.",
+    "expected_result": "MMS records the announcement as published by the Caretaker.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-096",
+    "source_id": "AFR-MMS-082 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Warden to publish mess-related announcements.",
+    "preconditions": [
+      "The active Warden is authenticated."
+    ],
+    "action_or_input": "Publish the announcement text “Dining hall closes at 8 PM” as a mess-related announcement.",
+    "expected_result": "MMS records the announcement as published by the Warden.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-097",
+    "source_id": "AFR-MMS-083 Notification trigger",
+    "purpose": "Notification trigger: MMS shall trigger a system-generated email notification to Students when a new announcement is published.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Cause the stated event and inspect the MMS notification event/recipient; do not test delivery infrastructure.",
+    "expected_result": "MMS shall trigger a system-generated email notification to Students when a new announcement is published.",
+    "test_type": "notification"
+  },
+  {
+    "test_id": "TC-FR-098",
+    "source_id": "AFR-MMS-084 State outcome",
+    "purpose": "State outcome: MMS shall maintain announcement history relevant to mess services.",
+    "preconditions": [
+      "Use the actors, data, and explicit preconditions in the frozen specifications; institution-defined values are supplied as inputs only."
+    ],
+    "action_or_input": "Drive the stated event and inspect persisted status/history.",
+    "expected_result": "MMS shall maintain announcement history relevant to mess services.",
+    "test_type": "state"
+  },
+  {
+    "test_id": "TC-FR-099",
+    "source_id": "AFR-MMS-085 Known actors view announcement history",
+    "purpose": "Known actors view announcement history",
+    "preconditions": [
+      "Announcement history contains an entry."
+    ],
+    "action_or_input": "Read history as Student, active Caretaker, and active Warden.",
+    "expected_result": "Each stated non-Admin actor can view history.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-FR-100",
+    "source_id": "AFR-MMS-085 BLOCKED",
+    "purpose": "BLOCKED: Admin history permission unresolved",
+    "preconditions": [
+      "Announcement history contains an entry."
+    ],
+    "action_or_input": "Resolve whether Mess Admin access conflicts with its operational-data boundary.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-101",
+    "source_id": "AFR-MMS-086 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Warden to view and search registered Student lists.",
+    "preconditions": [
+      "Two Students, S-LIST-01 and S-LIST-02, are registered for mess service. The active Warden is authenticated."
+    ],
+    "action_or_input": "As the Warden, open the registered Student list and search for S-LIST-02.",
+    "expected_result": "The Warden can view the registered Student list and locate S-LIST-02 in it.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-102",
+    "source_id": "AFR-MMS-087 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Warden to view and search rebate summaries.",
+    "preconditions": [
+      "A rebate request exists for registered Student S-REB-03. The active Warden is authenticated."
+    ],
+    "action_or_input": "As the Warden, open rebate summaries and search for S-REB-03’s summary.",
+    "expected_result": "The Warden can view and search rebate summaries, including the seeded summary for S-REB-03.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-103",
+    "source_id": "AFR-MMS-088 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Warden to view and search vacation survey response summaries.",
+    "preconditions": [
+      "A vacation survey has one Yes response from S-VAC-01 and one No response from S-VAC-02. The active Warden is authenticated."
+    ],
+    "action_or_input": "As the Warden, open and search the vacation response summary for S-VAC-01.",
+    "expected_result": "The Warden can view and search the response summary, and the returned summary reflects the seeded Yes/No responses.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-104",
+    "source_id": "AFR-MMS-089 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to generate registration trend reports.",
+    "preconditions": [
+      "Registration requests for two periods are present. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Generate a registration trend report over the periods containing those records.",
+    "expected_result": "MMS returns a registration trend report based on the seeded registration records.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-105",
+    "source_id": "AFR-MMS-090 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to generate special meal logs.",
+    "preconditions": [
+      "Special-food request records include one request in an explicitly recorded status. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Generate the special-meal log and inspect the entry for that request.",
+    "expected_result": "MMS returns a special-meal log containing the seeded request and its recorded status.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-106",
+    "source_id": "AFR-MMS-091 Required outcome",
+    "purpose": "Required outcome: MMS shall allow the Mess Caretaker to generate billing summary reports.",
+    "preconditions": [
+      "Monthly billing records exist for two Students. The active Caretaker is authenticated."
+    ],
+    "action_or_input": "Generate a billing summary report and inspect the seeded records in the report.",
+    "expected_result": "MMS returns a billing summary report reflecting the available seeded billing records; no external accounting or settlement result is asserted.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-FR-107",
+    "source_id": "AFR-MMS-092 BLOCKED",
+    "purpose": "BLOCKED: No finite report-field taxonomy is defined; named report obligations are covered by AFR-MMS-086–091.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-108",
+    "source_id": "AFR-MMS-093 BLOCKED",
+    "purpose": "BLOCKED: No external-report action or interface is specified for a finite negative test.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-109",
+    "source_id": "AFR-MMS-094 BLOCKED",
+    "purpose": "BLOCKED: Positive event notifications are tested at their AFRs; no unlisted event is named for an additional negative test.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-110",
+    "source_id": "AFR-MMS-095 BLOCKED",
+    "purpose": "BLOCKED: External email-delivery infrastructure is outside MMS ownership; no MMS operation or result is specified.",
+    "preconditions": [
+      "Requirement is in scope."
+    ],
+    "action_or_input": "Determine whether an observable action/result can be derived without adding policy or interface details.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-111",
+    "source_id": "CFR-MMS-014 exact-deadline response precedence",
+    "purpose": "BLOCKED: the specifications do not define whether an explicit response submitted exactly at the deadline takes precedence over default No.",
+    "preconditions": [
+      "A registered Student has not yet responded; the survey deadline is reached."
+    ],
+    "action_or_input": "Submit an explicit Yes/No at the exact deadline and determine precedence only after the specification is clarified.",
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-FR-112",
+    "source_id": "CFR-MMS-017 cancellation billing treatment",
+    "purpose": "BLOCKED: billing treatment after an Approved special-food request becomes Cancelled is unresolved (ISS-MMS-015).",
+    "preconditions": [
+      "A special-food request was Approved and later marked Cancelled."
+    ],
+    "action_or_input": "Inspect the related bill only after the institution supplies cancellation-billing policy.",
+    "expected_result": null,
+    "test_type": "blocked"
+  }
+]

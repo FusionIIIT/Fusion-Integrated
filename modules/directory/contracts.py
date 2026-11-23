@@ -48,6 +48,15 @@ def get_users(user_ids: Sequence[int]) -> dict[int, UserDTO]:
     return {r.user_id: _to_dto(r) for r in UserRef.objects.filter(user_id__in=ids)}
 
 
+def get_active_student_ids() -> list[int]:
+    """Return all active student IDs deterministically, sorted."""
+    return list(
+        UserRef.objects.filter(kind="student", is_active=True)
+        .order_by("user_id")
+        .values_list("user_id", flat=True)
+    )
+
+
 def user_ids_in_discipline(discipline: str) -> list[int]:
     return list(
         UserRef.objects.filter(discipline=discipline, kind="student", is_active=True)
