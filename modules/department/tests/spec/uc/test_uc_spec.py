@@ -397,19 +397,30 @@ def test_uc_017_01_manage_lab_profiles_main(spec_client):
 def test_uc_017_02_manage_lab_profiles_validation_failure(spec_client):
     """UC-017-02 | UC-DEPT-017 Alternative Flow Validation Failure."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    res = admin.post(f"{BASE}/labs", {
-        "name": "",
-        "details": ""
-    }, format="json")
+    lab = LabResource.objects.create(department="CSE", name="Embedded Systems", details="Existing details")
+    res = admin.post(f"{BASE}/labs", {"name": lab.name, "details": ""}, format="json")
     assert res.status_code == 400
+    assert [detail["field"] for detail in res.json()["error"]["details"]] == ["details"]
+    lab.refresh_from_db()
+    assert lab.details == "Existing details"
 
 
 def test_uc_018_01_view_academic_info_main(spec_client):
     """UC-018-01 | UC-DEPT-018 Main Success Scenario."""
+    admin, _ = spec_client("deptadmin_cse", user_id=14)
+    slot = {"term": "Sem 1", "day": 1, "starts_at": "08:00:00", "ends_at": "09:00:00",
+            "title": "Discrete Math", "kind": "class", "room": "Hall 1", "instructor_id": 11,
+            "programme": "BTech", "batch_year": 2024}
+    next_cohort = {**slot, "room": "Hall 2", "day": 2, "batch_year": 2025}
+    published = admin.post(f"{BASE}/timetable", {"slots": [slot, next_cohort]}, format="json")
+    assert published.status_code == 201
     student, _ = spec_client("student", user_id=12, programme="BTech", batch_year=2024)
     res = student.get(f"{BASE}/academic-context")
     assert res.status_code == 200
-    assert "programme" in res.json()
+    assert res.json() == {"programme": "BTech", "batch_year": 2024}
+    timetable = student.get(f"{BASE}/timetable")
+    assert timetable.status_code == 200
+    assert [item["id"] for item in timetable.json()["results"]] == [published.json()[0]["id"]]
 
 
 def test_uc_018_02_view_academic_info_unavailable(spec_client):

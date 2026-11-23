@@ -31,6 +31,7 @@ def test_wf_001_01_stock_request_approved_and_issued(spec_client):
     iss = admin.post(f"{BASE}/stock-requests/{req['id']}/action", {"action": "issue"}, format="json").json()
     assert iss["status"] == "issued"
     assert StockItem.objects.get(id=item["id"]).quantity == 8
+    assert StockMovement.objects.get(request_id=req["id"]).delta == -2
 
 
 def test_wf_002_01_stock_request_rejected_by_hod(spec_client):
@@ -116,13 +117,18 @@ def test_wf_006_02_feedback_composite_hod_branch(spec_client):
     """WF-006-02 | CW-DEPT-02 Feedback Handling Composite Lifecycle HOD Oversight Branch."""
     faculty, _ = spec_client("faculty", user_id=11)
     fb = faculty.post(f"{BASE}/feedback", {"content": "CW-02 HOD Branch"}, format="json").json()
+    assert fb["status"] == "new"
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
+    path = f"{BASE}/feedback/{fb['id']}/action"
+    reviewed = admin.post(path, {"action": "review", "category": "Facilities"}, format="json")
+    assert reviewed.status_code == 200
+    assert reviewed.json()["status"] == "reviewed"
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
-    res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve"}, format="json").json()
-    assert res["status"] == "resolved"
+    resolved = hod.post(path, {"action": "resolve"}, format="json")
+    assert resolved.status_code == 200
+    assert resolved.json()["status"] == "resolved"
 
 
 def test_wf_007_01_official_change_approved(spec_client):
@@ -156,6 +162,7 @@ def test_wf_009_01_official_change_composite_approved(spec_client):
     hod, _ = spec_client("HOD (CSE)", user_id=13)
     app = hod.post(f"{BASE}/proposals/{prop['id']}/action", {"action": "approve"}, format="json").json()
     assert app["status"] == "approved"
+    assert DepartmentDetails.objects.get(department="CSE").official_name == "CW Approved Name"
 
 
 def test_wf_009_02_official_change_composite_rejected(spec_client):

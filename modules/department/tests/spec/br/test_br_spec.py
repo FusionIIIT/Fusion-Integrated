@@ -10,7 +10,9 @@ from rest_framework.test import APIClient
 
 from modules.department.models import (
     LabResource,
+    StockItem,
     StockMovement,
+    StockRequest,
 )
 
 pytestmark = pytest.mark.django_db
@@ -202,6 +204,9 @@ def test_br_007_02_unapproved_issuance_prohibited(spec_client):
 
     res = admin.post(f"{BASE}/stock-requests/{req['id']}/action", {"action": "issue"}, format="json")
     assert res.status_code == 409
+    assert StockRequest.objects.get(pk=req["id"]).status == "pending"
+    assert StockItem.objects.get(pk=item["id"]).quantity == 5
+    assert not StockMovement.objects.filter(request_id=req["id"]).exists()
 
 
 def test_br_007_03_non_admin_issuance_prohibited(spec_client):
