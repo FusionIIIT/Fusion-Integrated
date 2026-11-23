@@ -1,0 +1,200 @@
+[
+  {
+    "test_id": "TC-WF-01",
+    "source_id": "BW-DEPT-01 approved-and-issued path (CW-DEPT-01 steps 1-2A-3)",
+    "purpose": "Verify the complete stock request lifecycle from Faculty request through HOD approval to Dept_Admin issuance, including inventory decrement, immutable issue logging, and notifications.",
+    "preconditions": "A department exists with an active Faculty user, an active HOD, and an active Dept_Admin. An inventory item exists in the department with current quantity 10. No stock request exists yet.",
+    "action_or_input": "1. Faculty submits a stock request for quantity 3 of the inventory item (UC-DEPT-004). 2. HOD approves the pending stock request (UC-DEPT-005). 3. Dept_Admin allocates and marks the approved stock request as Issued (UC-DEPT-006).",
+    "expected_result": "1. After submission, the request transitions to 'Pending HOD Approval', Dept_Admin is notified of the new stock request, and HOD is notified that authorization is required. 2. After HOD approval, the request transitions to 'Approved for Issuance'. 3. After Dept_Admin issuance, the request transitions to 'Issued', inventory quantity is automatically decremented from 10 to 7, an immutable stock-issue log entry is recorded, the requesting Faculty is notified of the 'Issued' outcome, and the Faculty can view the issued-stock record in history.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-02",
+    "source_id": "BW-DEPT-02 hod-rejected path (CW-DEPT-01 steps 1-2B)",
+    "purpose": "Verify the stock request lifecycle when HOD rejects a valid Faculty stock request, ensuring terminal Rejected state, Faculty notification, and unchanged inventory.",
+    "preconditions": "A department exists with an active Faculty user, an active HOD, and an active Dept_Admin. An inventory item exists in the department with current quantity 10. No stock request exists yet.",
+    "action_or_input": "1. Faculty submits a stock request for quantity 4 of the inventory item (UC-DEPT-004). 2. HOD rejects the pending stock request (UC-DEPT-005).",
+    "expected_result": "1. After submission, the request transitions to 'Pending HOD Approval'. 2. After HOD rejection, the request transitions to 'Rejected', the requesting Faculty is notified of the 'Rejected' outcome, inventory quantity remains 10, and no stock-issue log entry is created.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-03",
+    "source_id": "CW-DEPT-01 step 1 insufficient-inventory guard (BR-DEPT-015)",
+    "purpose": "Verify that a Faculty stock request exceeding current available inventory is blocked at request-time validation and does not transition to Pending HOD Approval.",
+    "preconditions": "A department exists with an active Faculty user and an active HOD. An inventory item exists in the department with current quantity 5.",
+    "action_or_input": "Faculty submits a stock request for quantity 6 of the inventory item (UC-DEPT-004).",
+    "expected_result": "The request is rejected due to insufficient inventory and does not enter 'Pending HOD Approval'. No HOD approval notification is triggered and inventory quantity remains 5.",
+    "test_type": "negative_workflow"
+  },
+  {
+    "test_id": "TC-WF-04",
+    "source_id": "CW-DEPT-01 step 1 unauthorized-requester guard (BR-DEPT-005)",
+    "purpose": "Verify that a non-Faculty actor cannot initiate a stock request into Pending HOD Approval.",
+    "preconditions": "A department exists with an authenticated Student user (and an active Dept_Admin). An inventory item exists in the department with current quantity 10.",
+    "action_or_input": "The Student attempts to submit a stock request for quantity 1 of the inventory item (UC-DEPT-004).",
+    "expected_result": "The action is denied due to insufficient role authorization. No stock request is created and no transition to 'Pending HOD Approval' occurs.",
+    "test_type": "negative_workflow"
+  },
+  {
+    "test_id": "TC-WF-05",
+    "source_id": "CW-DEPT-01 step 2 unauthorized-approver guard (BR-DEPT-006)",
+    "purpose": "Verify that a non-HOD actor cannot approve or reject a stock request in Pending HOD Approval.",
+    "preconditions": "A stock request submitted by a Faculty member is in 'Pending HOD Approval' state. An active Dept_Admin and the requesting Faculty user are authenticated.",
+    "action_or_input": "Dept_Admin attempts to approve the stock request (UC-DEPT-005).",
+    "expected_result": "The approval attempt is denied. The stock request remains in 'Pending HOD Approval' and does not transition to 'Approved for Issuance'.",
+    "test_type": "negative_workflow"
+  },
+  {
+    "test_id": "TC-WF-06",
+    "source_id": "CW-DEPT-01 step 3 unapproved-issuance guard (BR-DEPT-007)",
+    "purpose": "Verify that Dept_Admin cannot issue stock for a request that has not been approved by HOD (Pending HOD Approval or Rejected).",
+    "preconditions": "A department has an inventory item with current quantity 10, an active Dept_Admin, one stock request in 'Pending HOD Approval' state, and another stock request in 'Rejected' state.",
+    "action_or_input": "1. Dept_Admin attempts to issue the stock request in 'Pending HOD Approval' (UC-DEPT-006). 2. Dept_Admin attempts to issue the stock request in 'Rejected' state (UC-DEPT-006).",
+    "expected_result": "Both issuance attempts are blocked. Neither request transitions to 'Issued', their respective states remain 'Pending HOD Approval' and 'Rejected', inventory quantity remains 10, and no stock-issue log entry is recorded.",
+    "test_type": "negative_workflow"
+  },
+  {
+    "test_id": "TC-WF-07",
+    "source_id": "BW-DEPT-03 dept-admin-closed path (CW-DEPT-02 steps 1-2-3A)",
+    "purpose": "Verify the feedback lifecycle where a Student submits feedback, Dept_Admin performs mandatory initial review and categorization, and Dept_Admin closes the feedback.",
+    "preconditions": "A department exists with an authenticated Student and an active Dept_Admin. No feedback record exists yet.",
+    "action_or_input": "1. Student submits confidential feedback (UC-DEPT-007). 2. Dept_Admin performs initial review and categorizes the feedback (UC-DEPT-008). 3. Dept_Admin selects terminal outcome 'Closed' (UC-DEPT-008).",
+    "expected_result": "1. Feedback transitions to 'New' and Dept_Admin is notified. 2. After initial review and categorization, feedback transitions to 'Under Review / Categorized'. 3. After Dept_Admin disposition, feedback transitions to terminal state 'Closed' and the submitting Student is notified.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-08",
+    "source_id": "BW-DEPT-03 dept-admin-resolved path (CW-DEPT-02 steps 1-2-3A)",
+    "purpose": "Verify the feedback lifecycle where a Faculty member submits feedback, Dept_Admin performs initial review and categorization, and Dept_Admin resolves the feedback.",
+    "preconditions": "A department exists with an authenticated Faculty user and an active Dept_Admin. No feedback record exists yet.",
+    "action_or_input": "1. Faculty submits confidential feedback (UC-DEPT-007). 2. Dept_Admin performs initial review and categorizes the feedback (UC-DEPT-008). 3. Dept_Admin selects terminal outcome 'Resolved' (UC-DEPT-008).",
+    "expected_result": "1. Feedback transitions to 'New' and Dept_Admin is notified. 2. After initial review and categorization, feedback transitions to 'Under Review / Categorized'. 3. After Dept_Admin disposition, feedback transitions to terminal state 'Resolved' and the submitting Faculty is notified.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-09",
+    "source_id": "BW-DEPT-04 hod-oversight-resolved path (CW-DEPT-02 steps 1-2-3B)",
+    "purpose": "Verify the feedback lifecycle where a Student submits feedback, Dept_Admin completes required initial review, and HOD performs oversight and resolves the feedback.",
+    "preconditions": "A department exists with an authenticated Student, an active Dept_Admin, and an active HOD. No feedback record exists yet.",
+    "action_or_input": "1. Student submits confidential feedback (UC-DEPT-007). 2. Dept_Admin performs initial review and categorizes the feedback without closing it (UC-DEPT-008). 3. HOD accesses the reviewed feedback for oversight and marks it 'Resolved' (UC-DEPT-014).",
+    "expected_result": "1. Feedback transitions to 'New' and Dept_Admin is notified. 2. After Dept_Admin initial review, feedback transitions to 'Under Review / Categorized'. 3. HOD is able to access the feedback after initial review, transitions it to terminal state 'Resolved', and the submitting Student is notified.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-10",
+    "source_id": "BW-DEPT-04 hod-oversight-closed path (CW-DEPT-02 steps 1-2-3B)",
+    "purpose": "Verify the feedback lifecycle where a Faculty member submits feedback, Dept_Admin completes required initial review, and HOD performs oversight and closes the feedback.",
+    "preconditions": "A department exists with an authenticated Faculty user, an active Dept_Admin, and an active HOD. No feedback record exists yet.",
+    "action_or_input": "1. Faculty submits confidential feedback (UC-DEPT-007). 2. Dept_Admin performs initial review and categorizes the feedback without closing it (UC-DEPT-008). 3. HOD accesses the reviewed feedback for oversight and marks it 'Closed' (UC-DEPT-014).",
+    "expected_result": "1. Feedback transitions to 'New' and Dept_Admin is notified. 2. After Dept_Admin initial review, feedback transitions to 'Under Review / Categorized'. 3. HOD transitions the feedback to terminal state 'Closed' and the submitting Faculty is notified.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-11",
+    "source_id": "CW-DEPT-02 step 1 ineligible-submitter guard (BR-DEPT-008)",
+    "purpose": "Verify that an unauthenticated user cannot submit confidential feedback.",
+    "preconditions": "A department exists. The requester is not authenticated.",
+    "action_or_input": "An unauthenticated client attempts to submit feedback (UC-DEPT-007).",
+    "expected_result": "Submission is rejected. No feedback record is created and no notification is sent to Dept_Admin.",
+    "test_type": "negative_workflow"
+  },
+  {
+    "test_id": "TC-WF-12",
+    "source_id": "CW-DEPT-02 step 3B premature-hod-oversight guard (BR-DEPT-018)",
+    "purpose": "Verify that HOD cannot access, resolve, or close feedback before Dept_Admin has performed the mandatory initial review.",
+    "preconditions": "A Student has submitted feedback that is currently in 'New' state. Dept_Admin has not yet performed initial review. An active HOD is authenticated.",
+    "action_or_input": "HOD attempts to access and resolve or close the 'New' feedback directly (UC-DEPT-014).",
+    "expected_result": "The action is blocked because mandatory Dept_Admin initial review has not been completed. The feedback remains in 'New' state and no terminal notification is sent to the submitter.",
+    "test_type": "negative_workflow"
+  },
+  {
+    "test_id": "TC-WF-13",
+    "source_id": "BW-DEPT-05 official-change-approved path (CW-DEPT-03 steps 1-2A)",
+    "purpose": "Verify that an official department-detail change proposed by Dept_Admin remains pending until HOD approves it, after which the updated official data becomes effective.",
+    "preconditions": "A department exists with current effective official Name 'Computer Science' and Core Policies 'Policy v1', an active Dept_Admin, and an active HOD.",
+    "action_or_input": "1. Dept_Admin proposes an official department-detail change updating Name to 'Computer Science and Engineering' (UC-DEPT-010). 2. HOD approves the pending official change (UC-DEPT-012).",
+    "expected_result": "1. After proposal, the change transitions to 'Pending HOD Approval' while the currently effective department Name remains 'Computer Science'. 2. After HOD approval, the proposal transitions to 'Updated official data effective' and the department's effective Name is updated to 'Computer Science and Engineering'.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-14",
+    "source_id": "BW-DEPT-06 official-change-rejected path (CW-DEPT-03 steps 1-2B)",
+    "purpose": "Verify that when HOD rejects an official department-detail proposal, the proposal transitions to Rejected and the current effective department data is retained unchanged.",
+    "preconditions": "A department exists with current effective official Core Policies 'Policy v1', an active Dept_Admin, and an active HOD.",
+    "action_or_input": "1. Dept_Admin proposes an official department-detail change updating Core Policies to 'Policy v2' (UC-DEPT-010). 2. HOD rejects the pending official change (UC-DEPT-012).",
+    "expected_result": "1. After proposal, the change transitions to 'Pending HOD Approval'. 2. After HOD rejection, the proposal transitions to 'Rejected; current data retained' and the department's effective Core Policies remain 'Policy v1'.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-15",
+    "source_id": "CW-DEPT-03 step 1 general-detail-bypass path (BR-DEPT-011)",
+    "purpose": "Verify that a general (non-official) department-detail update by Dept_Admin takes effect immediately without entering the HOD-approval workflow.",
+    "preconditions": "A department exists with current general department information, an active Dept_Admin, and an active HOD.",
+    "action_or_input": "Dept_Admin updates a general (non-official) department information field (UC-DEPT-010).",
+    "expected_result": "The updated general department information becomes effective immediately without creating a 'Pending HOD Approval' request and without requiring HOD approval.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-16",
+    "source_id": "CW-DEPT-03 headship-exclusion boundary",
+    "purpose": "Verify that department Headship identity cannot be proposed or modified through the official department-detail change workflow and remains derived solely from the active HOD role assignment.",
+    "preconditions": "A department exists with an active HOD (Employee A) whose identity is displayed as department Headship, an active Dept_Admin, and another employee (Employee B).",
+    "action_or_input": "Dept_Admin attempts to update or propose an official department-detail change setting department Headship identity to Employee B (UC-DEPT-010).",
+    "expected_result": "The attempt is rejected/blocked. No 'Pending HOD Approval' proposal for Headship is created, and the displayed department Headship remains Employee A.",
+    "test_type": "negative_workflow"
+  },
+  {
+    "test_id": "TC-WF-17",
+    "source_id": "CW-DEPT-03 step 2 unauthorized-approver guard (BR-DEPT-013)",
+    "purpose": "Verify that a non-HOD actor cannot approve or reject a pending official department-detail change.",
+    "preconditions": "An official department-detail proposal (e.g., changing Core Policies from 'Policy v1' to 'Policy v2') is in 'Pending HOD Approval' state. An active Dept_Admin is authenticated.",
+    "action_or_input": "Dept_Admin attempts to approve the pending official department-detail change (UC-DEPT-012).",
+    "expected_result": "The approval attempt is denied. The proposal remains in 'Pending HOD Approval' and effective Core Policies remain 'Policy v1'.",
+    "test_type": "negative_workflow"
+  },
+  {
+    "test_id": "TC-WF-18",
+    "source_id": "BW-DEPT-07 hod-reassignment-and-headship-sync path (CW-DEPT-04 steps 1A-2A)",
+    "purpose": "Verify the complete HOD role reassignment lifecycle from Institute Admin assignment recording through effective System access transition and automatic Headship synchronization.",
+    "preconditions": "A department has Employee A as the sole active HOD (and displayed Headship), Employee B as an eligible institute employee, and an authenticated Institute Admin.",
+    "action_or_input": "1. Institute Admin records a valid time-bound HOD reassignment transferring the HOD role from Employee A to Employee B with a valid tenure (UC-DEPT-020). 2. The recorded HOD reassignment reaches its effective time and the System applies the role transition (UC-DEPT-022).",
+    "expected_result": "1. After recording, the reassignment enters 'Valid HOD reassignment recorded for effective transition'. 2. Upon becoming effective, Employee B becomes the sole active HOD, Employee A's HOD access is immediately revoked (e.g., Employee A can no longer approve pending stock requests or official department changes), Employee B's HOD access is immediately granted, and the displayed department Headship is automatically synchronized to Employee B.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-19",
+    "source_id": "BW-DEPT-08 dept-admin-reassignment-and-access-transition path (CW-DEPT-04 steps 1B-2B)",
+    "purpose": "Verify the complete Dept_Admin role reassignment lifecycle from Institute Admin assignment recording through effective System access transition.",
+    "preconditions": "A department has Employee C as the sole active Dept_Admin, Employee D as an eligible institute employee, and an authenticated Institute Admin.",
+    "action_or_input": "1. Institute Admin records a valid time-bound Dept_Admin reassignment transferring the Dept_Admin role from Employee C to Employee D with a valid tenure (UC-DEPT-020). 2. The recorded Dept_Admin reassignment reaches its effective time and the System applies the role transition (UC-DEPT-022).",
+    "expected_result": "1. After recording, the reassignment enters 'Valid Dept_Admin reassignment recorded for effective transition'. 2. Upon becoming effective, Employee D becomes the sole active Dept_Admin, Employee C's Dept_Admin access is immediately revoked (e.g., Employee C can no longer issue approved stock or perform initial feedback review), and Employee D's Dept_Admin access is immediately granted.",
+    "test_type": "positive_workflow"
+  },
+  {
+    "test_id": "TC-WF-20",
+    "source_id": "CW-DEPT-04 step 1 unauthorized-role-assignment guard (BR-DEPT-021)",
+    "purpose": "Verify that a department actor other than Institute Admin cannot assign or reassign the HOD or Dept_Admin role.",
+    "preconditions": "A department has an active HOD (Employee A), an active Dept_Admin (Employee C), and an eligible institute employee (Employee B).",
+    "action_or_input": "The current HOD (Employee A) attempts to record a HOD role reassignment to Employee B (UC-DEPT-020).",
+    "expected_result": "The assignment attempt is rejected. No reassignment is recorded, Employee A remains the sole active HOD, and department Headship remains unchanged.",
+    "test_type": "negative_workflow"
+  },
+  {
+    "test_id": "TC-WF-21",
+    "source_id": "CW-DEPT-04 step 1 invalid-tenure guard (BR-DEPT-022)",
+    "purpose": "Verify that Institute Admin cannot record a HOD or Dept_Admin role reassignment without a valid time-bound tenure.",
+    "preconditions": "A department has an active HOD (Employee A), an eligible institute employee (Employee B), and an authenticated Institute Admin.",
+    "action_or_input": "Institute Admin attempts to record a HOD reassignment to Employee B with an invalid tenure (end date earlier than start date, or missing tenure end date) (UC-DEPT-020).",
+    "expected_result": "The reassignment is rejected due to invalid tenure. No reassignment is recorded for effective transition and Employee A remains the sole active HOD.",
+    "test_type": "negative_workflow"
+  },
+  {
+    "test_id": "TC-WF-22",
+    "source_id": "CW-DEPT-04 step 1 unique-active-role guard (BR-DEPT-023)",
+    "purpose": "Verify that Institute Admin cannot create an overlapping concurrent active HOD or Dept_Admin assignment that violates the single-active-holder-per-department invariant.",
+    "preconditions": "A department has Employee A as the active HOD and Employee C as the active Dept_Admin for the current tenure period, plus eligible employees Employee B and Employee D, and an authenticated Institute Admin.",
+    "action_or_input": "1. Institute Admin attempts to add Employee B as a second concurrently active HOD without ending/replacing Employee A's active HOD tenure (UC-DEPT-020). 2. Institute Admin attempts to add Employee D as a second concurrently active Dept_Admin without ending/replacing Employee C's active Dept_Admin tenure (UC-DEPT-020).",
+    "expected_result": "Both overlapping assignments are rejected. Exactly one active HOD (Employee A) and exactly one active Dept_Admin (Employee C) remain for the department.",
+    "test_type": "negative_workflow"
+  }
+]
