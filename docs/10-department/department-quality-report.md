@@ -607,6 +607,13 @@ Also from Student 2, on WhatsApp, 2026-11-23 03:26 IST:
 This answers the six questions raised in review rounds 1–3 (blueprint, "Questions raised in
 review"). Each answer keeps the current behaviour, so no code changed for them.
 
+After review round 6, from Student 2, on WhatsApp, 2026-11-23 18:05 IST:
+
+> "I accept the round 6 fixes for R6-01 to R6-05, with nothing waived. On the reviewer's questions: (1) keep Q14, no self-decision guard on stock requests; (2) the 50-line limit applies to functions, not to describe blocks in tests; (3) a failed email's stored error must not keep an address, as built."
+
+This is the written fix-or-waive decision after six rounds: every round 6 finding is fixed, none is
+waived, and the three round 6 questions are answered as proposed (§12).
+
 No dependency was added.
 
 ## 12. Review rounds
@@ -706,15 +713,14 @@ What round 6 found, and what changed:
 | R6-05 | A test queues the same notice twice and finds one row. |
 | Round 6 question 3 | Proposed and built: a failed send stores its error with every address replaced by `[address]`; tested. |
 
-**After round 6: fix or waive.** Student 1 proposes fixing every round 6 finding (done above) and
-waiving none. The round 6 questions have these proposed answers. **They await Student 2's written
-decision**, which will be recorded in §11 before round 7:
+**After round 6: fix or waive.** Every round 6 finding is fixed above and none is waived. Student 2
+approved this, and the answers below, in writing on 2026-11-23 18:05 IST (§11):
 
-| Question | Proposed answer |
+| Question | Answer |
 |---|---|
 | 1. May an HOD decide a stock request they made while acting as faculty? | Keep Q14 as approved: no self-decision guard; the request and the decision are both in the audit trail. |
 | 2. Does the 50-line limit apply to a test file's `describe(...)` block? | No: it groups short tests and is not itself a function; every `it` and every function is 50 lines or fewer. |
-| 3. Should `last_error` keep a recipient address? | No; built as above, and reverted if Student 2 decides otherwise. |
+| 3. Should `last_error` keep a recipient address? | No; built as above. |
 
 The six approver questions from rounds 1, 2 and 3 were answered by Student 2 on 2026-11-23 (§11);
 every answer keeps the current behaviour.

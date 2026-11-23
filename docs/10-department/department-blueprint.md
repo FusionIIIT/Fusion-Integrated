@@ -654,6 +654,7 @@ No new dependency is planned.
 | Q1..Q14 rulings: every proposal as written | Student 2 | 2026-11-22, 19:41 IST | same message |
 | Changes outside module folders (§8 list) | Student 2 | 2026-11-22, 19:41 IST | same message |
 | Six questions raised in review rounds 1–3 (below): every proposal as written | Student 2 | 2026-11-23, 03:26 IST | WhatsApp message to Student 1: "I agree with all six proposed answers: (1) HOD sees all department announcements, (2) Faculty relevance by role only, (3) notes visible to the submitter, (4) notes allowed after closure, (5) no notice to the outgoing holder, (6) ready with vacancy warnings." [roll number omitted] |
+| Round 6 fix-or-waive decision: R6-01 to R6-05 fixed, none waived; Q14 kept; 50-line limit is for functions; no address in stored mail errors | Student 2 | 2026-11-23, 18:05 IST | WhatsApp message to Student 1: "I accept the round 6 fixes for R6-01 to R6-05, with nothing waived. On the reviewer's questions: (1) keep Q14, no self-decision guard on stock requests; (2) the 50-line limit applies to functions, not to describe blocks in tests; (3) a failed email's stored error must not keep an address, as built." |
 
 ## Questions raised in review (rounds 1–3), answered
 
