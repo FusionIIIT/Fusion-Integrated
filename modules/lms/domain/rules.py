@@ -18,6 +18,14 @@ def require_role(role, allowed):
         )
 
 
+def independent_grader(grader_user_id, owner_user_id):
+    if grader_user_id == owner_user_id:
+        raise RuleViolation(
+            "Ask another authorized grader to handle your submission.",
+            "CANNOT_GRADE_OWN_SUBMISSION",
+        )
+
+
 def nonempty(value, label):
     if not value.strip():
         raise RuleViolation(f"Enter a nonempty {label.lower()}.")

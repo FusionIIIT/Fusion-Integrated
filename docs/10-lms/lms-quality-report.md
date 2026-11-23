@@ -1,9 +1,25 @@
 # LMS implementation quality report
 
+## Step 8 — DEF-LMS-01 follow-up
+
+The self-grading defect handed off by Student 2 is fixed locally on the partner's
+spec baseline `600a6469438611af71c2081d2d21ffa2a7d0a503`. Owner grading mutations now return
+422 / CANNOT_GRADE_OWN_SUBMISSION before any grade/audit changes. Current backend
+verification: 388 LMS cases, including all 163 partner cases, passed;
+module branch coverage 98.64% and domain 100%.
+Both reserved spec-test directories are present from partner commits and remained
+byte-for-byte unchanged by this fix. [Full defect response](DEF-LMS-01.md).
+
+Round 3 reviewed f09c49d with 13 open findings; no 10/10 verdict or Q1 result is
+claimed. This update resolves DEF-LMS-01 only. The remainder below is the historical
+Round 2 correction record, retained as evidence of that earlier revision.
+
+## Historical Round 2 correction record
+
 Record date: 23 November 2026 (IST). Scope: Student 1 builder corrections after
 completed Round 2 on `92b4ed5f563494c372bd543af4fb5bbc4ea6505a`.
 
-**Current status:** all 17 Round 2 findings have corresponding builder corrections
+**Historical status:** all 17 Round 2 findings have corresponding builder corrections
 below. The corrected revision has not had a subsequent independent review.
 PR #628 remains draft. Step 8 remains on hold, and neither reserved spec-test
 directory has been created or touched. No independent final score is claimed.

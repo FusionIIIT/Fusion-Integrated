@@ -19,6 +19,7 @@ def save_grade(scope, submission_id, data=None, *, release=False):
     target = get_object_or_404(
         scoping.submissions(scope).select_for_update(of=("self",)), pk=target.pk
     )
+    rules.independent_grader(scope.user_id, target.user_id)
     grade = Grade.objects.filter(submission=target).select_for_update().first()
     old = {
         "points": grade.points if grade else None,

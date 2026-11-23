@@ -62,6 +62,31 @@ The same transaction writes an immutable `GradeAuditLog` with `submission_id`, F
 
 **Source relationship:** PS §3.6, BR-LMS-019, UC-LMS-012. Actor/time audit is the original obligation; Faculty-only authority, retained Released state and explicit before/after fields are adopted clarifications/extensions. They must not be falsely attributed to unchanged BR-LMS-019 alone.
 
+## D-07 — Grader and submission owner must differ
+
+The DEF-LMS-01 handoff forwarded by the user on 23 November 2026 supplies this
+explicit policy clarification: an actor grading a submission must not own that
+submission. The handoff associates it with BR-LMS-015 and UC-LMS-012 and the
+partner tests TEST-BR-038 and TEST-UC-038.
+
+The unchanged BR-LMS-015 sentence authorizes and attributes Faculty/TA grading;
+it does not explicitly prohibit self-grading. The preserved 22 November blueprint
+approval also has no such sentence. This record adopts the current forwarded
+ruling without retroactively changing either source or the original approval.
+It resolves the self-grading question recorded by the Round 3 reviewer.
+
+Every grading mutation, including creation, editing and release, requires
+`grader_user_id != submission.user_id`. This applies when the same person has
+both Student and Faculty/TA associations in the same offering, regardless of the
+selected grading role. After locking and re-reading the scoped submission, the
+service returns HTTP 422 with `CANNOT_GRADE_OWN_SUBMISSION` on equality, before
+any grade/audit write. Submission, existing grade and audit rows remain unchanged.
+An independent authorized grader can still grade normally. Other role, state,
+course-scope and release restrictions remain required.
+
+**Authority:** the current explicit DEF-LMS-01 policy handoff forwarded by the
+user; an adopted clarification, not a quotation added to the original v1.0 BR.
+
 ## Common API classification adopted in the ruling
 
 All module endpoints use `/api/v1/lms/`. Apply the existing error envelope and these categories deliberately:
