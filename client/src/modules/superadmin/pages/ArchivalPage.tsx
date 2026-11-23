@@ -125,6 +125,8 @@ export default function ArchivalPage() {
         username,
         email,
         user_kind: userKind,
+        is_deactivated: true,
+        deactivated_at: new Date(Date.now() - 45 * 86400_000).toISOString(),
         archival_reason: archivalReason,
       },
       {

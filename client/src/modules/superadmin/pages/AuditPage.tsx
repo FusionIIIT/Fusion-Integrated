@@ -74,7 +74,7 @@ export default function AuditPage() {
         action={(
           <Button
             component="a"
-            href={`/api/v1/superadmin/audit/export${search || action ? `?${new URLSearchParams({ ...(search ? { actor_username: search } : {}), ...(action ? { action } : {}) }).toString()}` : ""}`}
+            href={`/api/v1/superadmin/audit/export/${search || action ? `?${new URLSearchParams({ ...(search ? { actor_username: search } : {}), ...(action ? { action } : {}) }).toString()}` : ""}`}
             download="superadmin-audit-logs.csv"
             leftSection={<TbDownload size={16} />}
             variant="light"

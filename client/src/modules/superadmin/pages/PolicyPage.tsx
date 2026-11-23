@@ -96,7 +96,7 @@ export default function PolicyPage() {
 
       <Card padding="lg" withBorder>
         <DataTable<PolicyParameter>
-          rows={data?.results ?? []}
+          rows={Array.isArray(data) ? data : (data?.results ?? [])}
           loading={isPending}
           columns={[
             ...COLUMNS,

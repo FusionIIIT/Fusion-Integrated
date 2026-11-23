@@ -1,3 +1,4 @@
+import { stateFile } from "../support/session";
 import {
   actAs,
   expect,
@@ -21,12 +22,13 @@ test.describe("superadmin: interactive user journeys", () => {
     await sidebar(page).getByRole("link", { name: "System Policies" }).click();
     await expect(page.getByRole("heading", { name: "System Policies", level: 2 })).toBeVisible();
 
-    const rowSupersede = page.getByRole("button", { name: "Supersede" }).first();
+    await expect(page.getByRole("table")).toBeVisible();
+    const rowSupersede = page.getByRole("button", { name: "Supersede", exact: true }).first();
     if (await rowSupersede.isVisible()) {
       await rowSupersede.click();
     } else {
       await page.getByRole("button", { name: /supersede parameter/i }).click();
-      const keyInput = page.getByRole("dialog").getByLabel(/^Parameter key/i);
+      const keyInput = page.getByRole("dialog").getByRole("textbox", { name: /^Parameter key/i });
       await keyInput.click();
       await page.getByRole("option", { name: "archival.reversibility_window_days" }).click();
     }
@@ -39,7 +41,7 @@ test.describe("superadmin: interactive user journeys", () => {
     const superseded = page.waitForResponse(
       (r) => r.url().includes("/api/v1/superadmin/policy/parameters") && r.request().method() === "POST",
     );
-    await dialog.getByRole("button", { name: "Supersede" }).click();
+    await dialog.getByRole("button", { name: "Supersede", exact: true }).click();
     expect((await superseded).ok()).toBe(true);
 
     await expect(dialog).toBeHidden();
@@ -49,6 +51,7 @@ test.describe("superadmin: interactive user journeys", () => {
 
   test("2. purge governance: UI dataset archival, dual-auth initiation, it_head approval, and execution", async ({
     page,
+    browser,
   }) => {
     const archiveTitle = uniqueName("Expired Departmental Records");
     const purgeReason = uniqueName("Retention period elapsed");
@@ -105,28 +108,33 @@ test.describe("superadmin: interactive user journeys", () => {
     await expect(purgeRow).toBeVisible();
     await expect(purgeRow).toContainText(/pending it head/i);
 
-    // Step 3: actAs it_head approves the request
-    await actAs(page, "itHead");
-    await page.goto("/superadmin/purge");
-    const itHeadRow = page.getByRole("row").filter({ hasText: purgeReason });
-    await expect(itHeadRow).toBeVisible();
-    await itHeadRow.getByRole("button", { name: "Approve" }).click();
+    // Step 3: it_head account (stf00200) approves the request
+    const itContext = await browser.newContext({ storageState: stateFile("itHead") });
+    const itPage = await itContext.newPage();
+    try {
+      await itPage.goto("/superadmin/purge");
+      await actAs(itPage, "itHead");
+      const itHeadRow = itPage.getByRole("row").filter({ hasText: purgeReason });
+      await expect(itHeadRow).toBeVisible();
+      await itHeadRow.getByRole("button", { name: "Approve" }).click();
 
-    const decisionDialog = page.getByRole("dialog");
-    await expect(decisionDialog).toBeVisible();
-    await decisionDialog.getByLabel(/^Comments/i).fill("Authorized by IT Head after audit.");
+      const decisionDialog = itPage.getByRole("dialog");
+      await expect(decisionDialog).toBeVisible();
+      await decisionDialog.getByLabel(/^Comments/i).fill("Authorized by IT Head after audit.");
 
-    const approved = page.waitForResponse(
-      (r) => r.url().includes("/decision/") && r.request().method() === "POST",
-    );
-    await decisionDialog.getByRole("button", { name: "Approve" }).click();
-    expect((await approved).ok()).toBe(true);
-    await expect(decisionDialog).toBeHidden();
-    await expect(itHeadRow).toContainText(/approved/i);
+      const approved = itPage.waitForResponse(
+        (r) => r.url().includes("/decision/") && r.request().method() === "POST",
+      );
+      await decisionDialog.getByRole("button", { name: "Approve" }).click();
+      expect((await approved).ok()).toBe(true);
+      await expect(decisionDialog).toBeHidden();
+      await expect(itHeadRow).toContainText(/approved/i);
+    } finally {
+      await itContext.close();
+    }
 
-    // Step 4: actAs super_admin executes the permanent purge
-    await actAs(page, "superAdmin");
-    await page.goto("/superadmin/purge");
+    // Step 4: super_admin executes the permanent purge
+    await page.reload();
     const superAdminRow = page.getByRole("row").filter({ hasText: purgeReason });
     await expect(superAdminRow).toBeVisible();
     await superAdminRow.getByRole("button", { name: "Execute Purge" }).click();
@@ -249,13 +257,10 @@ test.describe("superadmin: interactive user journeys", () => {
     await expect(table).toBeVisible();
     await expect(table.getByRole("row").filter({ hasText: "stf00100" }).first()).toBeVisible();
 
-    const exportResponse = page.waitForResponse(
-      (r) => r.url().includes("/api/v1/superadmin/audit/export") && r.status() === 200,
-    );
     const downloadPromise = page.waitForEvent("download");
     await page.getByRole("link", { name: "Export CSV" }).click();
-    expect((await exportResponse).ok()).toBe(true);
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toContain("audit");
+    expect(await download.path()).toBeTruthy();
   });
 });

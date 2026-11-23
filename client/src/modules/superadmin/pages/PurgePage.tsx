@@ -33,7 +33,7 @@ const COLUMNS: Column<PurgeRequest>[] = [
     header: "Status",
     render: (r) => (
       <Badge color={STATUS_COLOR[r.status] ?? "gray"} variant="light">
-        {r.status.replace("_", " ")}
+        {r.status.replaceAll("_", " ")}
       </Badge>
     ),
   },

@@ -9,7 +9,7 @@ test.describe("superadmin: guarded route deep-links", () => {
   for (const path of SUPERADMIN_PAGES) {
     test(`a student navigating to /superadmin/${path} is refused by route guard`, async ({ page }) => {
       await page.goto(`/superadmin/${path}`);
-      await expect(page.getByText("Not available to your role")).toBeVisible();
+      await expect(page.getByText("module it belongs to is not enabled for your role")).toBeVisible();
       await expect(page.getByRole("main").getByRole("button")).toHaveCount(0);
     });
   }

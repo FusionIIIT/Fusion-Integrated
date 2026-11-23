@@ -50,6 +50,7 @@ export function useArchiveUser() {
       email: string;
       user_kind: string;
       is_deactivated?: boolean;
+      deactivated_at?: string;
       has_pending_transactions?: boolean;
       archival_reason: string;
     }) =>
