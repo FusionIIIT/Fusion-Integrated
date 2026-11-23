@@ -9,6 +9,6 @@ class LmsConfig(AppConfig):
     def ready(self):
         from django.core.checks import register
 
-        from core.files.checks import check_upload_root
+        from modules.lms.checks import check_lms_upload_root
 
-        register(check_upload_root)
+        register(check_lms_upload_root)

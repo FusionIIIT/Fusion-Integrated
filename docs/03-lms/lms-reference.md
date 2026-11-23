@@ -46,7 +46,7 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 | `AFR-LMS-006.1` | Faculty create assignments for assigned courses | `services` | [services/assignments.py:20](../../modules/lms/services/assignments.py#L20) | `VERIFIED` |
 | `AFR-LMS-006.2` | Capture required assignment configuration (due date, instructions, points, type) | `domain` | [domain/validators.py:43](../../modules/lms/domain/validators.py#L43) | `VERIFIED` |
 | `AFR-LMS-006.3` | Allow Faculty to edit assignment details | `services` | [services/assignments.py:61](../../modules/lms/services/assignments.py#L61) | `VERIFIED` |
-| `AFR-LMS-006.4` | Maintain assignment in Draft state before explicit publication | `domain` | [domain/state_machine.py:86](../../modules/lms/domain/state_machine.py#L86) | `VERIFIED` |
+| `AFR-LMS-006.4` | Maintain assignment in Draft state before explicit publication | `domain` | [domain/state_machine.py:98](../../modules/lms/domain/state_machine.py#L98) | `VERIFIED` |
 | `AFR-LMS-007.1` | Faculty publish draft assignments | `services` | [services/assignments.py:101](../../modules/lms/services/assignments.py#L101) | `VERIFIED` |
 | `AFR-LMS-007.2` | Apply release-date visibility control | `selectors` | [selectors/assignments.py:19](../../modules/lms/selectors/assignments.py#L19) | `VERIFIED` |
 | `AFR-LMS-007.3` | Release scheduled assignment when release time is reached | `tasks` | [tasks.py:23](../../modules/lms/tasks.py#L23) | `VERIFIED` |
@@ -58,7 +58,7 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 | `AFR-LMS-010.1` | Faculty grades individual student submissions | `services` | [services/grading.py:28](../../modules/lms/services/grading.py#L28) | `VERIFIED` |
 | `AFR-LMS-010.2` | TA grades student submissions for assigned course | `domain` | [domain/rules.py:58](../../modules/lms/domain/rules.py#L58) | `VERIFIED` |
 | `AFR-LMS-010.3` | Accurately attribute all grading actions to acting user | `models` | [models/grading.py:22](../../modules/lms/models/grading.py#L22) | `VERIFIED` |
-| `AFR-LMS-011.1` | Hold grades in Draft state upon grading | `domain` | [domain/state_machine.py:128](../../modules/lms/domain/state_machine.py#L128) | `VERIFIED` |
+| `AFR-LMS-011.1` | Hold grades in Draft state upon grading | `domain` | [domain/state_machine.py:140](../../modules/lms/domain/state_machine.py#L140) | `VERIFIED` |
 | `AFR-LMS-011.2` | Prevent students from viewing unreleased draft grades | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
 | `AFR-LMS-011.3` | Allow Faculty to release grades and feedback to students | `services` | [services/grading.py:139](../../modules/lms/services/grading.py#L139) | `VERIFIED` |
 | `AFR-LMS-012.1` | Student views own released grade and feedback | `selectors` | [selectors/grading.py:17](../../modules/lms/selectors/grading.py#L17) | `VERIFIED` |
@@ -108,7 +108,7 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 | `BR-LMS-007` | Announcement posting authority | `domain` | [domain/rules.py:34](../../modules/lms/domain/rules.py#L34) | `VERIFIED` |
 | `BR-LMS-008` | Announcement timestamp and audience | `models` | [models/announcements.py:8](../../modules/lms/models/announcements.py#L8) | `VERIFIED` |
 | `BR-LMS-009` | Assignment required configuration | `domain` | [domain/validators.py:43](../../modules/lms/domain/validators.py#L43) | `VERIFIED` |
-| `BR-LMS-010` | Assignment draft-before-publication | `domain` | [domain/state_machine.py:86](../../modules/lms/domain/state_machine.py#L86) | `VERIFIED` |
+| `BR-LMS-010` | Assignment draft-before-publication | `domain` | [domain/state_machine.py:98](../../modules/lms/domain/state_machine.py#L98) | `VERIFIED` |
 | `BR-LMS-011` | Assignment release-date visibility | `selectors` | [selectors/assignments.py:19](../../modules/lms/selectors/assignments.py#L19) | `VERIFIED` |
 | `BR-LMS-012` | Submission-type conformity | `domain` | [domain/validators.py:79](../../modules/lms/domain/validators.py#L79) | `VERIFIED` |
 | `BR-LMS-013` | Baseline on-time submission | `domain` | [domain/rules.py:10](../../modules/lms/domain/rules.py#L10) | `VERIFIED` |
@@ -123,10 +123,10 @@ Total items verified: 15 CFRs, 47 AFRs, 15 UCs, 19 BRs, 7 Workflows (103 total).
 
 | ID | Description | Layer | Source File & Line | Status |
 |:---|:---|:---|:---|:---|
-| `BW-LMS-01` | Scheduled Course Material Release | `domain` | [domain/state_machine.py:56](../../modules/lms/domain/state_machine.py#L56) | `VERIFIED` |
-| `BW-LMS-02` | Assignment Immediate Release and On-Time Submission | `domain` | [domain/state_machine.py:86](../../modules/lms/domain/state_machine.py#L86) | `VERIFIED` |
+| `BW-LMS-01` | Scheduled Course Material Release | `domain` | [domain/state_machine.py:68](../../modules/lms/domain/state_machine.py#L68) | `VERIFIED` |
+| `BW-LMS-02` | Assignment Immediate Release and On-Time Submission | `domain` | [domain/state_machine.py:98](../../modules/lms/domain/state_machine.py#L98) | `VERIFIED` |
 | `BW-LMS-03` | Assignment Scheduled Release and On-Time Submission | `tasks` | [tasks.py:14](../../modules/lms/tasks.py#L14) | `VERIFIED` |
-| `BW-LMS-04` | Faculty Grading and Grade Release | `domain` | [domain/state_machine.py:128](../../modules/lms/domain/state_machine.py#L128) | `VERIFIED` |
+| `BW-LMS-04` | Faculty Grading and Grade Release | `domain` | [domain/state_machine.py:140](../../modules/lms/domain/state_machine.py#L140) | `VERIFIED` |
 | `BW-LMS-05` | TA Grading and Faculty Grade Release | `services` | [services/grading.py:28](../../modules/lms/services/grading.py#L28) | `VERIFIED` |
-| `CW-LMS-01` | Assignment Publication and Submission | `domain` | [domain/state_machine.py:158](../../modules/lms/domain/state_machine.py#L158) | `VERIFIED` |
-| `CW-LMS-02` | Grading and Grade Release | `domain` | [domain/state_machine.py:167](../../modules/lms/domain/state_machine.py#L167) | `VERIFIED` |
+| `CW-LMS-01` | Assignment Publication and Submission | `domain` | [domain/state_machine.py:170](../../modules/lms/domain/state_machine.py#L170) | `VERIFIED` |
+| `CW-LMS-02` | Grading and Grade Release | `domain` | [domain/state_machine.py:179](../../modules/lms/domain/state_machine.py#L179) | `VERIFIED` |

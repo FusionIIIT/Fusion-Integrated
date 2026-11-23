@@ -3,7 +3,7 @@
 **Module:** LMS Course Management (`lms`)
 **Documentation Path:** `docs/03-lms/`
 **Environment:** `module-only`
-**Status:** Verification Passed — All 26 R1, All 12 R2, All 8 R3, and All 7 Q1 Findings Resolved — Verified across All Suites
+**Status:** Verification Passed — All 26 R1, All 12 R2, All 8 R3, All 7 Q1, and All 4 Q2 Findings Resolved — Verified across All Suites
 
 ---
 
@@ -160,7 +160,7 @@ Running 21 tests using 8 workers
 ### 2.1 Overall LMS Coverage (`pytest --cov=modules.lms --cov-branch`)
 
 ```bash
-$ .venv/bin/pytest modules/lms --cov=modules/lms --cov-branch --cov-report=term-missing --cov-fail-under=90
+$ .venv/bin/pytest modules/lms --ignore=modules/lms/tests/spec --cov=modules/lms --cov-branch --cov-report=term-missing --cov-fail-under=90
 ================================ tests coverage ================================
 _______________ coverage: platform linux, python 3.12.3-final-0 ________________
 
@@ -172,7 +172,8 @@ modules/lms/api/permissions.py                                18      1      6  
 modules/lms/api/serializers.py                                60      0      0      0   100%
 modules/lms/api/urls.py                                        3      0      0      0   100%
 modules/lms/api/views.py                                     386     41     74      8    89%   67, 86, 89, 120-121, 147-148, 166, 179, 209-210, 244-245, 259, 268, 293, 328-329, 352-353, 371, 384, 400-401, 423-424, 469-470, 510-511, 568, 590-591, 612-613, 626-627, 639-642
-modules/lms/apps.py                                            5      0      0      0   100%
+modules/lms/apps.py                                            9      0      0      0   100%
+modules/lms/checks.py                                         26      2      8      0    94%   28-29
 modules/lms/contracts.py                                      55      0     12      1    99%   93->96
 modules/lms/domain/__init__.py                                 3      0      0      0   100%
 modules/lms/domain/calculations.py                             8      0      4      0   100%
@@ -183,17 +184,7 @@ modules/lms/domain/validators.py                              39      0     28  
 modules/lms/management/__init__.py                             0      0      0      0   100%
 modules/lms/management/commands/__init__.py                    0      0      0      0   100%
 modules/lms/management/commands/lms_scheduled_release.py      10      0      0      0   100%
-modules/lms/management/commands/lms_work_status.py            35      1      8      1    95%   65
-modules/lms/models/__init__.py                                 7      0      0      0   100%
-modules/lms/models/announcements.py                           16      0      0      0   100%
-modules/lms/models/assignments.py                             26      0      0      0   100%
-modules/lms/models/grading.py                                 39      0      0      0   100%
-modules/lms/models/materials.py                               26      0      0      0   100%
-modules/lms/models/submissions.py                             23      0      0      0   100%
-modules/lms/models/workspace.py                               34      0      0      0   100%
-modules/lms/registry.py                                       10      0      0      0   100%
-modules/lms/management/commands/lms_scheduled_release.py      10      0      0      0   100%
-modules/lms/management/commands/lms_seed_demo.py              17     17      0      0     0%   1-97
+modules/lms/management/commands/lms_seed_demo.py              23     23      0      0     0%   1-106
 modules/lms/management/commands/lms_work_status.py            39      1      8      1    96%   51
 modules/lms/models/__init__.py                                 7      0      0      0   100%
 modules/lms/models/announcements.py                           16      0      0      0   100%
@@ -221,9 +212,9 @@ modules/lms/services/submissions.py                           46      5     16  
 modules/lms/services/workspace.py                             22      0      4      0   100%
 modules/lms/tasks.py                                          13      0      0      0   100%
 ------------------------------------------------------------------------------------------------------
-TOTAL                                                       1507    114    328     40    91%
-Required test coverage of 90% reached. Total coverage: 91.17%
-78 passed in 10.93s
+TOTAL                                                       1543    122    336     40    91%
+Required test coverage of 90% reached. Total coverage: 90.95%
+79 passed in 8.48s
 ```
 
 ### 2.2 Domain Coverage (`pytest --cov=modules.lms.domain --cov-branch`)
@@ -268,8 +259,8 @@ Required test coverage of 95% reached. Total coverage: 100.00%
 | `test_patch_permission.py` | 2 | Verification of `lms.workspace.update` permission for PATCH with assigned instructor session (R1-14, R2-03) |
 | `test_management_commands.py` | 2 | Verification of `lms_scheduled_release` and `lms_work_status` CLI commands (R1-20) |
 | `test_journeys.py` | 4 | Complete end-to-end multi-role HTTP user journeys including materials & announcements retrieval (`UC-LMS-004`, `UC-LMS-006`, R2-02) |
-| `test_coverage_expansion.py` | 9 | Edge case coverage across services, selectors, views, downloads, and error branches (R1-01) |
-| **Total Backend Tests** | **78** | **100% Pass Rate** |
+| `test_coverage_expansion.py` | 10 | Edge case coverage across services, selectors, views, downloads, media upload root check, and error branches (R1-01, RQ2-02) |
+| **Total Backend Tests** | **79** | **100% Pass Rate** |
 
 ---
 
@@ -356,15 +347,26 @@ All 7 findings from Review Round Q1 have been audited and resolved:
 | **RQ1-06** | Usability & domain | **Minor** | Improved all `IllegalTransitionError`, `ActorNotAllowedError`, and `GuardFailedError` exception messages in `modules/lms/domain/state_machine.py` so they clearly tell the user what to do next. | `RESOLVED` | `modules/lms/domain/state_machine.py#L11-L45,L196-L260` |
 | **RQ1-07** | Operability & docs | **Minor** | Updated Quality Report coverage figures to match exact measured results (1507 statements, 114 miss, 328 branches, 40 brpart, 91.17% branch coverage at baseline, exceeding >= 90% branch coverage requirement; 100.00% domain coverage). | `RESOLVED` | Sections 2.1 and 3.4 of this Quality Report |
 
+### 3.5 Review Round Q2 Findings Resolution Matrix
+
+All 4 findings from Review Round Q2 have been audited and resolved:
+
+| ID | Category | Severity | Summary of Resolution | Status | Verifiable Evidence / Code Reference |
+|:---|:---|:---|:---|:---|:---|
+| **RQ2-01** | Architecture | **Blocker** | Restored root `conftest.py` to match `upstream/main` with zero diff. Relocated `_isolate_media_root` autouse fixture to newly created `modules/lms/tests/conftest.py`, ensuring LMS tests isolate `MEDIA_ROOT` using temporary storage without modifying shared root configuration or leaking files. | `RESOLVED` | `conftest.py` (0 diff vs upstream/main), `modules/lms/tests/conftest.py` |
+| **RQ2-02** | Architecture | **Blocker** | Restored shared `core/files/checks.py` to match `upstream/main` with zero diff. Implemented dedicated LMS upload-root system check `check_lms_upload_root` (`lms.files.E001`, `lms.files.W001`) in `modules/lms/checks.py` and registered it via `modules/lms/apps.py:ready()`. | `RESOLVED` | `core/files/checks.py` (0 diff vs upstream/main), `modules/lms/checks.py`, `modules/lms/apps.py` |
+| **RQ2-03** | Documentation | **Major** | Regenerated `docs/03-lms/lms-reference.md` via `.venv/bin/python ops/docs/lms_reference.py`, updating line references for `domain/state_machine.py`. Verified that running the script multiple times is strictly idempotent (`git status --porcelain` produces 0 diff). | `RESOLVED` | `ops/docs/lms_reference.py`, `docs/03-lms/lms-reference.md` |
+| **RQ2-04** | Operability & docs | **Minor** | Regenerated coverage table in Section 2.1 from fresh pytest execution, removing duplicated file rows. Accurately reported current measured metrics: 1543 statements, 122 missed, 336 branches, 40 partial, 90.95% branch coverage (exceeding >= 90% requirement) across 79 tests. | `RESOLVED` | Section 2.1 of this Quality Report |
+
 ---
 
 ## 4. Approvals, Broken Rules & Operations Proof
 
 ### 4.1 Approvals Record
 - **Functional IAM Designations Approval (Option 1):** Confirmed and selected by user on 2026-11-22 (`teaching_assistant` and `course_observer` added as functional designations with `ANYONE` allowed kinds in IAM catalogue).
-- **Zero Outside Changes Compliance:** Reverted all modifications to `client/playwright.config.ts` and `devtools/management/commands/seed_demo.py` to match `upstream/main` with 0 diff. Shared files outside module folders are strictly limited to the official Step 4.0 registration lines.
-- **Student 1 (Abhinav Reddy) Review:** Review Round 1 completed (all 26 findings resolved in commit `34c6b57`); Round 2 completed (all 12 findings resolved in `5ddb535`); Round 3 completed (all 8 findings resolved); Round 4 completed with **10/10 in all nine dimensions** (commit `4cf66e8`). All 7 findings from Review Round Q1 resolved.
-- **Student 2 (Kavuri Manogna) Review Status:** Student 2 test design frozen (commit `537dd98`), specification tests implemented and baselined across all 4 suites (165/165 passing, commit `97476e4`), and baseline commit recorded (`f9675a3`). Reviewer Q1 findings resolved for re-verification.
+- **Zero Outside Changes Compliance:** Restored root `conftest.py` and `core/files/checks.py` to match `upstream/main` with 0 diff. Reverted all modifications to `client/playwright.config.ts` and `devtools/management/commands/seed_demo.py` to match `upstream/main` with 0 diff. Shared files outside module folders are strictly limited to official registration lines and settings.
+- **Student 1 (Abhinav Reddy) Review:** Review Round 1 completed (all 26 findings resolved in commit `34c6b57`); Round 2 completed (all 12 findings resolved in `5ddb535`); Round 3 completed (all 8 findings resolved); Round 4 completed with **10/10 in all nine dimensions** (commit `4cf66e8`). All 7 findings from Review Round Q1 resolved. All 4 findings from Review Round Q2 resolved.
+- **Student 2 (Kavuri Manogna) Review Status:** Student 2 test design frozen (commit `537dd98`), specification tests implemented and baselined across all 4 suites (165/165 passing, commit `97476e4`), and baseline commit recorded (`f9675a3`). Reviewer Q1 and Q2 findings resolved for re-verification.
 
 ### 4.2 Specification Ambiguities & Technical Resolutions
 

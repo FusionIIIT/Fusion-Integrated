@@ -440,3 +440,24 @@ def test_selectors_submissions_and_grades(stub_iam):
     # list_course_grades
     grades = selectors.list_course_grades(asg.id, p_inst)
     assert isinstance(grades, list)
+
+
+def test_lms_upload_root_check(tmp_path, settings):
+    from modules.lms.checks import check_lms_upload_root
+
+    settings.MEDIA_ROOT = None
+    assert check_lms_upload_root(None) == []
+
+    settings.MEDIA_ROOT = str(settings.BASE_DIR / "inside_repo")
+    errors = check_lms_upload_root(None)
+    assert any(e.id == "lms.files.E001" for e in errors)
+
+    valid_dir = tmp_path / "valid_media"
+    valid_dir.mkdir(parents=True, exist_ok=True)
+    valid_dir.chmod(0o700)
+    settings.MEDIA_ROOT = str(valid_dir)
+    assert check_lms_upload_root(None) == []
+
+    valid_dir.chmod(0o755)
+    warnings = check_lms_upload_root(None)
+    assert any(w.id == "lms.files.W001" for w in warnings)
