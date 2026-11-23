@@ -4,7 +4,7 @@
 **Bounded Context:** System Administration Governance  
 **Environment:** `Fusion-Integrated` (branch `module/superadmin`)  
 **Date:** 2026-11-22  
-**Status:** All layers complete, all 12 quality gates satisfied, 153/153 backend tests green (93.35% module branch coverage, 97.74% domain branch coverage). Zero findings open.
+**Status:** All layers complete, all 12 quality gates satisfied, 205/205 backend tests green (153 module + 52 spec tests; 93.39% module branch coverage, 97.74% domain branch coverage) and 19/19 Playwright E2E tests green. Zero findings open.
 
 ---
 
@@ -41,10 +41,10 @@ Every standing architecture check has been executed and confirmed passing with z
 
 ## 3. Test Suite Summary & Journey Coverage
 
-- **Total Backend Tests:** 148
-- **Passed:** 148 (100%)
+- **Total Backend Tests:** 205 (153 module tests + 52 specification tests)
+- **Passed:** 205 (100%)
 - **Failed:** 0
-- **Total Line & Branch Coverage:** 93.62% (Domain: 98.82%)
+- **Total Line & Branch Coverage:** 93.39% (Domain: 97.74%)
 
 ### Test File Distribution
 
@@ -132,9 +132,9 @@ modules/superadmin/services/notifications.py                           7      0 
 modules/superadmin/services/purge.py                                  85      6     12      4    90%   46, 48, 94, 154, 158-159
 modules/superadmin/tasks.py                                           20      5      2      1    73%   13, 19, 28-30
 --------------------------------------------------------------------------------------------------------------
-TOTAL                                                               1018     49    142     19    94%
-Required test coverage of 90% reached. Total coverage: 93.62%
-148 passed in 5.25s
+TOTAL                                                               1036     53    144     19    93%
+Required test coverage of 90% reached. Total coverage: 93.39%
+205 passed in 9.16s
 ```
 
 ### 2. Pure Domain Branch Coverage (`--cov-fail-under=95`)
@@ -157,9 +157,9 @@ modules/superadmin/domain/exceptions.py           36      2      0      0    94%
 modules/superadmin/domain/state_machine.py        25      0      8      0   100%
 modules/superadmin/domain/validators.py           22      0     12      0   100%
 ------------------------------------------------------------------------------------------
-TOTAL                                            142      2     28      0    99%
-Required test coverage of 95% reached. Total coverage: 98.82%
-148 passed in 5.09s
+TOTAL                                            147      3     30      1    98%
+Required test coverage of 95% reached. Total coverage: 97.74%
+205 passed in 9.22s
 ```
 
 ---
@@ -225,13 +225,13 @@ Six Vitest / Testing Library test files cover all pages and hooks (`36 passed` a
 - TypeScript typecheck: `tsc --noEmit` passed with 0 errors.
 - Vitest suite: `36 passed` across the 6 superadmin unit test files (`74 passed` total across all 12 client test files).
 - **Frontend Code-Splitting & Bundle Budget (`make check-client`):**
-  - `routes-*.js`: `1.76 kB` (`0.73 kB` gzip)
+  - `routes-*.js`: `1.80 kB` (`0.75 kB` gzip)
   - `DashboardPage-*.js`: `1.84 kB` (`0.75 kB` gzip)
-  - `ArchivalPage-*.js`: `2.71 kB` (`1.30 kB` gzip)
-  - `AuditPage-*.js`: `2.81 kB` (`1.36 kB` gzip)
-  - `PolicyPage-*.js`: `3.32 kB` (`1.57 kB` gzip)
+  - `ArchivalPage-*.js`: `7.66 kB` (`2.51 kB` gzip)
+  - `AuditPage-*.js`: `2.82 kB` (`1.36 kB` gzip)
+  - `PolicyPage-*.js`: `3.34 kB` (`1.58 kB` gzip)
   - `PurgePage-*.js`: `4.98 kB` (`1.85 kB` gzip)
-  - Total Super Admin lazy module chunks: `17.42 kB` raw / `7.56 kB` gzip (well below the `150 kB` gzip budget; `index-*.js` at `163.06 kB` gzip is the shared React/Mantine shell).
+  - Total Super Admin lazy module chunks: `22.44 kB` raw / `8.80 kB` gzip (well below the `150 kB` gzip budget; `index-*.js` at `163.06 kB` gzip is the shared React/Mantine shell).
 
 ---
 
