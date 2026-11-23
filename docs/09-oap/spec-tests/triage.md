@@ -3,7 +3,7 @@
 Student 1 (git author name): Nirvan Jain
 Student 2 (git author name): Rounak Agarwal
 Design commit (hash and subject): 179f020c60b23c057260537c608fc0f6037e72ba Freeze spec test designs (FR, UC, BR, WF)
-Baseline commit (hash and subject): pending (baseline commit)
+Baseline commit (hash and subject): cd2c584742a78f6ea49a18d1844bfe1009149479 Add spec test suites (FR, UC, BR, WF), baseline results, and triage log
 Student 1's 10/10 commit the baseline ran on (hash): 0044813b501239464b9f75eebef87e2d0c166d7c
 
 ## Results
