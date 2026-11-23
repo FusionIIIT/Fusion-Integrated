@@ -104,11 +104,14 @@ def cast_vote(
     if not poll:
         raise NotFoundError(f"Poll {poll_id} not found.")
 
+    if poll.status != POLL_STATUS_ACTIVE:
+        raise BadRequestError("Voting is only allowed on active polls.")
+
     now = datetime.datetime.now(datetime.UTC)
     try:
         validate_poll_active(poll.expires_at, now)
     except DomainError as exc:
-        raise ConflictError(str(exc)) from exc
+        raise BadRequestError(str(exc)) from exc
 
     if not is_student_targeted(poll, student_batch, student_branch):
         raise PermissionDeniedError("You are not in the target group for this poll.")
