@@ -119,30 +119,158 @@ def test_tc_009_main_psm_uc_009_main_success_scenario():
 
 def test_tc_009_a1_psm_uc_009_alternative_a1():
     """TC-009-A1; source_id: PSM-UC-009 Alternative A1."""
-    pytest.skip(
-        "NOT_AUTOMATED: A8_BASE has no interface to apply a verified inventory correction below an active reservation; adjustment validation blocks it first."
+    policy.seed_default_policy()
+    ps = _actor(37111, "ps_admin")
+    item = stock.create_stock_item(actor=ps, sku="UC9-RESERVED", name="Reserved stock")
+    location = stock.create_stock_location(
+        actor=ps, code="UC9-RESERVED", name="CSE Store", department="CSE"
     )
+    stock.record_adjustment(
+        actor=ps, item_id=item.pk, location_id=location.pk, quantity_delta=6,
+        reason="Opening balance", entry_type="opening",
+    )
+    ind = _indent(37112, item_id=item.pk, quantity=4)
+    da = _actor(37113, "deptadmin_cse")
+    stock.check_and_reserve(actor=da, indent_id=ind.pk)
+
+    with pytest.raises(ConflictError) as refused:
+        stock.record_adjustment(
+            actor=ps, item_id=item.pk, location_id=location.pk, quantity_delta=-3,
+            reason="Attempted correction below active reservation",
+        )
+    assert refused.value.status_code == 409
+    on_hand, reserved = stock._current_balance(item, location)
+    assert on_hand == 6 and reserved == 4
+    assert StockLedgerEntry.objects.filter(item=item).count() == 1
 
 
-def test_tc_003_a2_psm_uc_003_alternative_a2():
+def test_tc_003_a2_psm_uc_003_alternative_a2(stub_iam):
     """TC-003-A2; source_id: PSM-UC-003 Alternative A2."""
-    pytest.skip(
-        "NOT_AUTOMATED: the indent status API serializer does not expose SLA reminder, escalation, or discrepancy status for this assertion."
+    from rest_framework.test import APIClient
+
+    from conftest import make_session
+    from modules.psm import registry
+
+    policy.seed_default_policy()
+    employee = _actor(37201, "staff")
+    indent = _indent(37201)
+    Indent.objects.filter(pk=indent.pk).update(
+        sla_reminded_at=timezone.now(), sla_escalated_at=timezone.now()
     )
+    _emp, _ps, _vendor, po_indent, po = _po_context(37210)
+    grn = receipts.record_grn(
+        actor=_emp, purchase_order_id=po.pk, received_quantity=2,
+        accepted_quantity=1, rejected_quantity=1,
+    )
+    discrepancies.report_discrepancy(
+        actor=_emp, grn_id=grn.pk, discrepancy_type="damage", affected_quantity=1,
+        description="Damaged unit", requested_resolution="return",
+    )
+    # Attach the open discrepancy to this indent for its status detail.
+    assert po_indent.pk != indent.pk
+
+    stub_iam(make_session(
+        user_id=employee.user_id, kind="staff", active_role="staff",
+        roles=("staff",), modules=("psm",),
+        permissions=tuple(registry.ROLE_GRANTS["staff"]),
+    ))
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION=f"Token uc-{employee.user_id}")
+    response = client.get(f"/api/v1/psm/indents/{indent.pk}")
+    assert response.status_code == 200, response.data
+    assert response.data["sla_reminder_active"] is True
+    assert response.data["sla_escalation_active"] is True
+    assert response.data["has_open_discrepancy"] is False
+    assert "sla_reminded_at" not in response.data
+    assert "open_discrepancy_cases" not in response.data
+
+    auditor = _actor(37203, "Auditor")
+    stub_iam(make_session(
+        user_id=auditor.user_id, kind="staff", active_role="Auditor",
+        roles=("Auditor",), modules=("psm",),
+        permissions=tuple(registry.ROLE_GRANTS["Auditor"]),
+    ))
+    client.credentials(HTTP_AUTHORIZATION=f"Token uc-{auditor.user_id}")
+    response = client.get(f"/api/v1/psm/indents/{po_indent.pk}")
+    assert response.status_code == 200, response.data
+    assert response.data["sla_reminder_active"] is False
+    assert response.data["sla_escalation_active"] is False
+    assert response.data["has_open_discrepancy"] is True
+    assert response.data["sla_reminded_at"] is None
+    assert response.data["open_discrepancy_cases"]
 
 
-def test_tc_007_a2_psm_uc_007_alternative_a2():
+def test_tc_007_a2_psm_uc_007_alternative_a2(stub_iam):
     """TC-007-A2; source_id: PSM-UC-007 Alternative A2."""
-    pytest.skip(
-        "NOT_AUTOMATED: A8_BASE stock checks read the local database and provide no supported unavailable-stock-service state to exercise."
+    from unittest.mock import patch
+
+    from rest_framework.test import APIClient
+
+    from conftest import make_session
+    from core.api.exceptions import DomainError
+
+    policy.seed_default_policy()
+    ps = _actor(37211, "ps_admin")
+    item = stock.create_stock_item(actor=ps, sku="UC7-UNAVAILABLE", name="Unavailable read")
+    location = stock.create_stock_location(
+        actor=ps, code="UC7-UNAVAILABLE", name="CSE Store", department="CSE"
     )
+    stock.record_adjustment(
+        actor=ps, item_id=item.pk, location_id=location.pk, quantity_delta=5,
+        reason="Opening balance", entry_type="opening",
+    )
+    ind = _indent(37212, item_id=item.pk)
+    da = _actor(37213, "deptadmin_cse")
+    stub_iam(make_session(
+        user_id=da.user_id, kind="staff", active_role="deptadmin_cse",
+        roles=("deptadmin_cse",), modules=("psm",),
+        permissions=tuple(registry.ROLE_GRANTS["deptadmin_cse"]),
+    ))
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION=f"Token uc-{da.user_id}")
+
+    with patch(
+        "modules.psm.services.stock.stock_balances_for_item",
+        side_effect=DomainError("Stock service unavailable", code="stock_unavailable"),
+    ):
+        unavailable = client.post(f"/api/v1/psm/indents/{ind.pk}/stock-check", {}, format="json")
+    assert unavailable.status_code == 422
+    assert unavailable.data["error"]["code"] == "stock_unavailable"
+    ind.refresh_from_db()
+    assert ind.status == "submitted"
+    assert not StockReservation.objects.filter(indent_id=ind.pk, status="active").exists()
 
 
-def test_tc_014_a1_psm_uc_014_alternative_a1():
+def test_tc_014_a1_psm_uc_014_alternative_a1(stub_iam):
     """TC-014-A1; source_id: PSM-UC-014 Alternative A1."""
-    pytest.skip(
-        "NOT_AUTOMATED: A8_BASE audit access is granted role-wide and has no per-record scope input to represent excluded audit records."
-    )
+    from rest_framework.test import APIClient
+
+    from conftest import make_session
+
+    policy.seed_default_policy()
+    ps = _actor(37221, "ps_admin")
+    stock.create_stock_item(actor=ps, sku="UC14-AUDIT", name="Audited item")
+    client = APIClient()
+    employee = _actor(37222, "faculty")
+    stub_iam(make_session(
+        user_id=employee.user_id, kind="faculty", active_role="faculty",
+        roles=("faculty",), modules=("psm",),
+        permissions=tuple(registry.ROLE_GRANTS["faculty"]),
+    ))
+    client.credentials(HTTP_AUTHORIZATION=f"Token uc-{employee.user_id}")
+    refused = client.get("/api/v1/psm/audit")
+    assert refused.status_code == 403
+
+    auditor = _actor(37223, "Auditor")
+    stub_iam(make_session(
+        user_id=auditor.user_id, kind="staff", active_role="Auditor",
+        roles=("Auditor",), modules=("psm",),
+        permissions=tuple(registry.ROLE_GRANTS["Auditor"]),
+    ))
+    client.credentials(HTTP_AUTHORIZATION=f"Token uc-{auditor.user_id}")
+    allowed = client.get("/api/v1/psm/audit")
+    assert allowed.status_code == 200, allowed.data
+    assert allowed.data["results"]
 
 
 def test_tc_015_a1_psm_uc_015_alternative_a1():
@@ -445,6 +573,28 @@ def test_tc_035_a1_psm_uc_035_alternative_a1():
 
 def test_tc_035_a2_psm_uc_035_alternative_a2():
     """TC-035-A2; source_id: PSM-UC-035 Alternative A2."""
-    pytest.skip(
-        "NOT_AUTOMATED: the scheduled-report runner has no failure injection or logged-failure path; report generation errors propagate without a failed log."
+    from unittest.mock import patch
+
+    from modules.psm.selectors import reports as report_sel
+
+    policy.seed_default_policy()
+    authorized = _actor(38211, "ps_admin")
+    schedule = reports.create_schedule(
+        actor=authorized, name="Failing scheduled report",
+        report_type="operational", cadence="daily",
     )
+    ReportSchedule.objects.filter(pk=schedule.pk).update(
+        next_run_at=timezone.now() - timedelta(minutes=1)
+    )
+    with patch.object(
+        report_sel, "build_report_rows", side_effect=RuntimeError("Simulated report query failure")
+    ):
+        assert reports.run_due_schedules() == 0
+
+    assert not ReportGenerationLog.objects.filter(
+        schedule=schedule, trigger_type="scheduled", status="succeeded"
+    ).exists()
+    failed = ReportGenerationLog.objects.get(
+        schedule=schedule, trigger_type="scheduled", status="failed"
+    )
+    assert "Simulated report query failure" in failed.error_message

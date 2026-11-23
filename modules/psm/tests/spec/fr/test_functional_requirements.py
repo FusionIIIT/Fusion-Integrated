@@ -216,10 +216,33 @@ def _case007():
 
 
 def _case008():
-    pytest.skip(
-        "NOT_AUTOMATED: the available edit operation submits a draft as part of saving, "
-        "so the specified editable-before-submission state cannot be inspected."
+    emp, *_ = _ctx()
+    obj = indents.create_indent(
+        actor=emp,
+        department="CSE",
+        item_description="Draft equipment",
+        quantity=1,
+        estimated_cost=Decimal("1000.00"),
+        justification="Initial draft",
+        submit=False,
     )
+    assert obj.status == "draft"
+
+    first = indents.modify_indent(
+        actor=emp, indent_id=obj.pk, item_description="Revised equipment", quantity=2
+    )
+    assert first.status == "draft" and first.version == 2
+    second = indents.modify_indent(
+        actor=emp, indent_id=obj.pk, estimated_cost=Decimal("2500.00"), justification="Revised need"
+    )
+    assert second.status == "draft" and second.version == 3
+    second.refresh_from_db()
+    assert second.status == "draft"
+    assert second.item_description == "Revised equipment"
+    assert second.quantity == 2 and second.estimated_cost == Decimal("2500.00")
+    assert second.justification == "Revised need"
+    submitted = indents.submit_indent(actor=emp, indent_id=second.pk)
+    assert submitted.status == "submitted" and submitted.submitted_at is not None
 
 
 def _case009():
