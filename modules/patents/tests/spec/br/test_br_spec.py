@@ -1,10 +1,10 @@
 """Spec tests for patents — BR strategy (Prompt B).
 Generated from frozen BR_DESIGN.json. Each test keeps its test_id and source_id in its docstring.
 """
-import pytest
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from modules.patents.models import ApplicationDocument, CoInventor, PatentApplication, ReviewDecision
+import pytest
 
 @pytest.fixture
 def app(db):
