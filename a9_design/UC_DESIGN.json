@@ -1,0 +1,2142 @@
+[
+  {
+    "test_id": "TC-UC-001",
+    "source_id": "MMS-UC-001 Main Success Scenario, steps 1-4: make a role assignment",
+    "purpose": "Verify Mess Admin selects an institute employee, role, and specified duration and MMS records the time-bound role assignment while maintaining the active-role constraint.",
+    "preconditions": [
+      "Mess Admin is authorized for role assignment.",
+      "The employee identity exists in institutional master data.",
+      "The selected role has no conflicting active assignment for the effective period."
+    ],
+    "action_or_input": {
+      "actor": "Mess Admin",
+      "input": {
+        "employee": "EMP-A",
+        "role": "Mess Caretaker",
+        "duration": "A specified future duration"
+      }
+    },
+    "expected_result": "MMS records the assignment for the specified duration; exactly one active Caretaker and one active Warden remain active.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-002",
+    "source_id": "MMS-UC-001 Main Success Scenario, step 5: immediate mid-cycle reassignment and pending-request transfer",
+    "purpose": "Verify a mid-cycle Caretaker reassignment is effective from its recorded time and pending Caretaker-owned requests become visible and actionable to the new Caretaker.",
+    "preconditions": [
+      "A Caretaker is active during a mess cycle.",
+      "Pending operational requests are owned by the Caretaker workflow.",
+      "A replacement institute employee identity exists."
+    ],
+    "action_or_input": {
+      "actor": "Mess Admin, followed by newly assigned Mess Caretaker",
+      "input": {
+        "replacement_employee": "EMP-B",
+        "action": "Reassign the active Caretaker mid-cycle, then view and act on a pending request"
+      }
+    },
+    "expected_result": "Reassignment is effective immediately from its recorded time; the new Caretaker can see and act on the pending request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-003",
+    "source_id": "MMS-UC-001 Alternative Flow A1: conflicting role assignment",
+    "purpose": "Verify MMS prevents a role assignment that would violate exactly-one-active-role cardinality for its effective period.",
+    "preconditions": [
+      "An active role assignment exists for the applicable effective period."
+    ],
+    "action_or_input": {
+      "actor": "Mess Admin",
+      "input": {
+        "action": "Assign a second concurrent active incumbent for the same role without a valid replacement"
+      }
+    },
+    "expected_result": "MMS prevents the conflicting assignment and leaves existing valid assignments unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-004",
+    "source_id": "MMS-UC-001 Alternative Flow A2: unavailable employee identity",
+    "purpose": "Verify MMS does not record an assignment when required employee identity data is unavailable from institutional master data.",
+    "preconditions": [
+      "The selected employee identity is unavailable from institutional master data."
+    ],
+    "action_or_input": {
+      "actor": "Mess Admin",
+      "input": {
+        "action": "Assign an operational role to the employee whose required identity is unavailable"
+      }
+    },
+    "expected_result": "MMS does not record the assignment.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-005",
+    "source_id": "MMS-UC-001 Exception Flow: unauthorized role-management action",
+    "purpose": "Verify an actor other than Mess Admin cannot assign or reassign operational roles and that no invalid state change is committed.",
+    "preconditions": [
+      "An existing valid assignment is recorded."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Attempt to assign or reassign an operational role"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; existing assignments and history remain intact.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-006",
+    "source_id": "MMS-UC-002 Main Success Scenario, steps 1-4: open a registration window",
+    "purpose": "Verify an active Caretaker opens a cycle registration window and MMS permits student registration submissions during that window.",
+    "preconditions": [
+      "The Caretaker is active for the period."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker, followed by Student",
+      "input": {
+        "cycle_or_period": "A designated mess cycle",
+        "window": "A specified registration window"
+      }
+    },
+    "expected_result": "MMS records the window as open and permits Student registration submissions for it.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-007",
+    "source_id": "MMS-UC-002 Alternative Flow A1: missing required window information",
+    "purpose": "Verify a window is not opened when required window information is missing.",
+    "preconditions": [
+      "Caretaker is active for the period."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Submit window setup without identifying the required cycle/designated period or window information"
+      }
+    },
+    "expected_result": "MMS does not open the window and requests correction.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-008",
+    "source_id": "MMS-UC-002 Exception Flow: unauthorized window setup",
+    "purpose": "Verify a non-Caretaker cannot open a registration window and no invalid state change is committed.",
+    "preconditions": [
+      "No new window has been opened for the scenario."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Attempt to open a registration window"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; no window is opened.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-009",
+    "source_id": "MMS-UC-003 Main Success Scenario, steps 1-7: submit registration during an open window",
+    "purpose": "Verify a Student submits required registration details during an open window and receives a Pending request with a submission notification.",
+    "preconditions": [
+      "Student is authenticated.",
+      "A registration window is open.",
+      "The required registration details are available."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Submit a mess registration request using the required details for the open window"
+      }
+    },
+    "expected_result": "MMS validates the open window, records the request as Pending, and sends the submission notification to the Student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-010",
+    "source_id": "MMS-UC-003 Alternative Flow A1: no registration window is open",
+    "purpose": "Verify a Student cannot submit a registration request when no window is open.",
+    "preconditions": [
+      "Student is authenticated.",
+      "No registration window is open."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Submit a mess registration request"
+      }
+    },
+    "expected_result": "MMS prevents submission and does not create a request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-011",
+    "source_id": "MMS-UC-003 Alternative Flow A2: required registration details missing",
+    "purpose": "Verify MMS asks for correction and does not record a request when required registration details are missing.",
+    "preconditions": [
+      "Student is authenticated.",
+      "A registration window is open."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Submit registration with required details omitted"
+      },
+      "unresolved_reason": "The specification does not enumerate the required registration-detail fields or identify which omission constitutes this alternative. Do not invent a field set or input shape."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-012",
+    "source_id": "MMS-UC-003 Exception Flow: unauthorized registration submission",
+    "purpose": "Verify a non-Student actor cannot submit a Student registration request and no request state is changed.",
+    "preconditions": [
+      "A registration window is open."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Attempt to submit a Student registration request"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; no Student request is created.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-013",
+    "source_id": "MMS-UC-004 Main Success Scenario, steps 1-6: approve a registration request",
+    "purpose": "Verify Caretaker review displays request details/history, records approval, updates status, and notifies the Student.",
+    "preconditions": [
+      "A registration request exists in Pending status."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Approve the selected Pending registration request"
+      }
+    },
+    "expected_result": "MMS records the approval, updates the request to Approved, and sends the decision notification to the Student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-014",
+    "source_id": "MMS-UC-004 Main Success Scenario, steps 4-6: reject a registration request",
+    "purpose": "Verify Caretaker can reject a Pending registration request and the decision is recorded and notified.",
+    "preconditions": [
+      "A registration request exists in Pending status."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Reject the selected Pending registration request"
+      }
+    },
+    "expected_result": "MMS records Rejected status and sends the decision notification to the Student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-015",
+    "source_id": "MMS-UC-004 Alternative Flow A1: request is no longer Pending",
+    "purpose": "Verify MMS prevents a duplicate decision on a registration request that is no longer Pending.",
+    "preconditions": [
+      "A registration request exists but has already left Pending status."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Attempt another approval or rejection"
+      }
+    },
+    "expected_result": "MMS prevents the duplicate decision; the existing decision and history remain unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-016",
+    "source_id": "MMS-UC-004 Exception Flow: unauthorized decision",
+    "purpose": "Verify Warden oversight does not confer registration decision authority.",
+    "preconditions": [
+      "A registration request exists in Pending status."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "decision": "Attempt to approve or reject the request"
+      }
+    },
+    "expected_result": "MMS rejects the action; request status and history remain unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-017",
+    "source_id": "MMS-UC-005 Main Success Scenario, steps 1-5: submit deregistration",
+    "purpose": "Verify a currently registered Student confirms deregistration and MMS records a Pending request and sends submission notification.",
+    "preconditions": [
+      "Student is currently registered for mess service."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Confirm and submit a mess deregistration request"
+      }
+    },
+    "expected_result": "MMS records the request as Pending and sends the submission notification to the Student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-018",
+    "source_id": "MMS-UC-005 Alternative Flow A1: Student is not currently registered",
+    "purpose": "Verify MMS prevents deregistration submission by a Student who is not currently registered.",
+    "preconditions": [
+      "Student is not currently registered for mess service."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Submit a deregistration request"
+      }
+    },
+    "expected_result": "MMS prevents submission and creates no deregistration request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-019",
+    "source_id": "MMS-UC-005 Exception Flow: unauthorized deregistration submission",
+    "purpose": "Verify a non-Student actor cannot submit a Student deregistration request.",
+    "preconditions": [
+      "A Student enrollment exists."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Attempt to submit a deregistration request for a Student"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected and no request state is changed.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-020",
+    "source_id": "MMS-UC-006 Main Success Scenario, steps 1-6: approve deregistration",
+    "purpose": "Verify Caretaker review records approval immediately, notifies the Student, and leaves service effect pending until the next-calendar-day event.",
+    "preconditions": [
+      "A deregistration request exists in Pending status."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Approve the selected Pending deregistration request"
+      }
+    },
+    "expected_result": "MMS records the decision and notification; the request enters Approved — Awaiting Effective Date, while deregistration effect is deferred to MMS-UC-027.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-021",
+    "source_id": "MMS-UC-006 Main Success Scenario, steps 4-6: reject deregistration",
+    "purpose": "Verify Caretaker can reject a Pending deregistration request and the Student remains registered.",
+    "preconditions": [
+      "A deregistration request exists in Pending status.",
+      "The Student is currently registered."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Reject the selected Pending deregistration request"
+      }
+    },
+    "expected_result": "MMS records Rejected status, sends the decision notification, and the Student remains registered.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-022",
+    "source_id": "MMS-UC-006 Alternative Flow A1: request is no longer Pending",
+    "purpose": "Verify MMS prevents a duplicate decision on a deregistration request that is no longer Pending.",
+    "preconditions": [
+      "A deregistration request has already been decided."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Attempt another approval or rejection"
+      }
+    },
+    "expected_result": "MMS prevents the duplicate decision and preserves the prior decision/history.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-023",
+    "source_id": "MMS-UC-006 Exception Flow: unauthorized decision",
+    "purpose": "Verify Warden oversight does not confer deregistration decision authority.",
+    "preconditions": [
+      "A deregistration request exists in Pending status."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "decision": "Attempt to approve or reject the request"
+      }
+    },
+    "expected_result": "MMS rejects the action; request status and history remain unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-024",
+    "source_id": "MMS-UC-007 Main Success Scenario, steps 1-4: operational request oversight",
+    "purpose": "Verify Warden can view or filter permitted operational student requests, including registration and deregistration requests, without operational decision actions.",
+    "preconditions": [
+      "Operational student requests exist."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "action": "Open the operational-request oversight view and view/filter request details"
+      }
+    },
+    "expected_result": "MMS displays permitted oversight records and does not expose approval, rejection, registration, deregistration, or other operational decision actions; no request state changes.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-025",
+    "source_id": "MMS-UC-007 Alternative Flow A1 and Exception Flow: Warden attempts a decision action",
+    "purpose": "Verify a Warden decision attempt is blocked without changing operational request state.",
+    "preconditions": [
+      "A Pending operational student request exists."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "action": "Attempt to approve, reject, register, deregister, or otherwise decide the request"
+      }
+    },
+    "expected_result": "MMS blocks the action; the request and its recorded history remain unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-026",
+    "source_id": "MMS-UC-008 Main Success Scenario, steps 1-6: add, modify, delete, validate, publish/update",
+    "purpose": "Verify Caretaker can maintain the weekly day-wise/meal-wise menu, publish the valid structure, and trigger student notifications.",
+    "preconditions": [
+      "Caretaker is active."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "operations": [
+          "Add a menu item",
+          "Modify a menu item",
+          "Delete a menu item",
+          "Publish/update the weekly menu"
+        ]
+      }
+    },
+    "expected_result": "MMS validates and records the published/updated weekly menu; it is visible to authorized viewers and menu-update notifications are sent to Students.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-027",
+    "source_id": "MMS-UC-008 Alternative Flow A1: incomplete or invalid menu structure",
+    "purpose": "Verify MMS requests correction and does not commit an incomplete or invalid weekly menu.",
+    "preconditions": [
+      "Caretaker is active.",
+      "A valid prior menu, if any, is recorded."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Submit a weekly menu with a missing or invalid day/meal structure"
+      }
+    },
+    "expected_result": "MMS asks for correction; no invalid menu state is committed and prior valid records remain intact.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-028",
+    "source_id": "MMS-UC-008 Exception Flow: unauthorized menu maintenance",
+    "purpose": "Verify a Student cannot add, modify, delete, publish, or update the weekly menu.",
+    "preconditions": [
+      "A valid weekly menu exists."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Attempt an operational menu-maintenance action"
+      }
+    },
+    "expected_result": "MMS rejects the unauthorized action; the existing valid menu remains unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-029",
+    "source_id": "MMS-UC-009 Main Success Scenario, steps 1-3: Student view",
+    "purpose": "Verify Student can view the weekly menu by day and breakfast, lunch, and dinner.",
+    "preconditions": [
+      "A weekly menu exists or the view is available."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Open the weekly menu and view its details"
+      }
+    },
+    "expected_result": "MMS displays the day-wise breakfast, lunch, and dinner menu.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-030",
+    "source_id": "MMS-UC-009 Main Success Scenario, steps 1-3: Caretaker view",
+    "purpose": "Verify Mess Caretaker can view the weekly menu details.",
+    "preconditions": [
+      "A weekly menu exists or the view is available."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Open the weekly menu and view its details"
+      }
+    },
+    "expected_result": "MMS displays the day-wise breakfast, lunch, and dinner menu.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-031",
+    "source_id": "MMS-UC-009 Main Success Scenario, steps 1-3: Warden view",
+    "purpose": "Verify Mess Warden can view the weekly menu details.",
+    "preconditions": [
+      "A weekly menu exists or the view is available."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "action": "Open the weekly menu and view its details"
+      }
+    },
+    "expected_result": "MMS displays the day-wise breakfast, lunch, and dinner menu.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-032",
+    "source_id": "MMS-UC-009 Alternative Flow A1: Mess Admin visibility",
+    "purpose": "Determine whether Mess Admin may view the weekly menu.",
+    "preconditions": [
+      "A weekly menu exists."
+    ],
+    "action_or_input": {
+      "actor": "Mess Admin",
+      "input": {
+        "action": "Open the weekly menu"
+      },
+      "unresolved_reason": "The UC explicitly leaves Mess Admin menu visibility unfixed because the frozen problem statement conflicts between menu visibility and the Admin's operational-data boundary."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-033",
+    "source_id": "MMS-UC-009 Exception Flow: unauthorized menu view",
+    "purpose": "Verify rejection of a menu-view request by an actor who lacks the applicable view right.",
+    "preconditions": [
+      "A weekly menu exists."
+    ],
+    "action_or_input": {
+      "actor": null,
+      "input": {
+        "action": "Attempt to view the weekly menu without applicable access rights"
+      },
+      "unresolved_reason": "The UC says access is according to actor rights but does not identify a denied actor for this view; Mess Admin's access is explicitly unresolved, and no additional actor role may be invented."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-034",
+    "source_id": "MMS-UC-010 Main Success Scenario, steps 1-6: review, finalize, and publish",
+    "purpose": "Verify Caretaker reviews generated bill details, finalizes, publishes, and MMS makes published bills available to Students with publication notification.",
+    "preconditions": [
+      "MMS-UC-030 generated monthly bills for the applicable calendar-month cycle."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Review generated bill details and computation results, finalize, then publish"
+      }
+    },
+    "expected_result": "MMS publishes the finalized bills, makes them available to Students, and triggers bill-publication notification.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-035",
+    "source_id": "MMS-UC-010 Alternative Flow A1: generated bill not finalized",
+    "purpose": "Verify a generated bill is not published when Caretaker does not finalize it.",
+    "preconditions": [
+      "A generated bill is available for review."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Do not finalize the generated bill; attempt or allow publication processing"
+      }
+    },
+    "expected_result": "MMS does not publish that bill.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-036",
+    "source_id": "MMS-UC-010 Exception Flow: unauthorized bill finalization/publication",
+    "purpose": "Verify a Student cannot finalize or publish operational monthly bills.",
+    "preconditions": [
+      "A generated bill exists."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Attempt to finalize or publish the bill"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; the bill remains in its previously recorded state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-037",
+    "source_id": "MMS-UC-011 Main Success Scenario, steps 1-4: view bills and balance",
+    "purpose": "Verify Student views monthly bills, outstanding balance, and bill details.",
+    "preconditions": [
+      "The Student has bill or balance information in MMS."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Open billing section and view available monthly bills and balance"
+      }
+    },
+    "expected_result": "MMS displays the Student's monthly bills, outstanding balance, and bill details.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-038",
+    "source_id": "MMS-UC-011 Alternative Flow A1: no bill exists for a month",
+    "purpose": "Verify MMS displays no bill for a month with no bill record.",
+    "preconditions": [
+      "No bill exists for the selected month."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "View monthly bills including the month with no bill"
+      }
+    },
+    "expected_result": "MMS displays no bill for that month.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-039",
+    "source_id": "MMS-UC-011 Exception Flow: access another Student's billing information",
+    "purpose": "Verify a Student cannot access another Student's monthly bills or balance.",
+    "preconditions": [
+      "A bill or balance belongs to Student A."
+    ],
+    "action_or_input": {
+      "actor": "Student B",
+      "input": {
+        "action": "Attempt to view Student A's bill or outstanding balance"
+      }
+    },
+    "expected_result": "The unauthorized access is rejected and no data belonging to Student A is disclosed.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-040",
+    "source_id": "MMS-UC-012 Main Success Scenario, steps 1-4: submit text feedback",
+    "purpose": "Verify Student enters and submits text feedback and MMS stores the entry.",
+    "preconditions": [
+      "Student is authenticated."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "feedback": "Non-empty text related to mess services"
+      }
+    },
+    "expected_result": "MMS stores the feedback entry for Caretaker and Warden monitoring/reporting.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-041",
+    "source_id": "MMS-UC-012 Alternative Flow A1: feedback text is empty",
+    "purpose": "Verify empty feedback is not stored and MMS asks the Student for text input.",
+    "preconditions": [
+      "Student is authenticated."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "feedback": ""
+      }
+    },
+    "expected_result": "MMS asks for text input and does not store an empty feedback entry.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-042",
+    "source_id": "MMS-UC-012 Exception Flow: unauthorized feedback submission",
+    "purpose": "Verify a non-Student actor cannot submit feedback on behalf of a Student.",
+    "preconditions": [
+      "No feedback is submitted in the scenario."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Attempt to submit Student feedback"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; no feedback entry is added.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-043",
+    "source_id": "MMS-UC-013 Main Success Scenario, steps 1-3: Caretaker views feedback",
+    "purpose": "Verify Caretaker can view and review stored feedback entries according to role access.",
+    "preconditions": [
+      "Feedback entries exist."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Open the feedback list and review entries"
+      }
+    },
+    "expected_result": "MMS displays the stored feedback entries according to Caretaker access; viewing does not change records.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-044",
+    "source_id": "MMS-UC-013 Main Success Scenario, steps 1-3: Warden views feedback",
+    "purpose": "Verify Warden can view and review stored feedback entries for supervisory oversight.",
+    "preconditions": [
+      "Feedback entries exist."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "action": "Open the feedback list and review entries"
+      }
+    },
+    "expected_result": "MMS displays the stored feedback entries according to Warden access; viewing does not change records.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-045",
+    "source_id": "MMS-UC-013 Alternative Flow A1: no feedback exists",
+    "purpose": "Verify MMS displays an empty feedback list when no entries exist.",
+    "preconditions": [
+      "No feedback entries exist."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker or Mess Warden",
+      "input": {
+        "action": "Open the feedback list"
+      }
+    },
+    "expected_result": "MMS displays an empty feedback list.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-046",
+    "source_id": "MMS-UC-013 Exception Flow: unauthorized feedback view",
+    "purpose": "Verify an actor without the stated feedback-view role cannot view feedback entries.",
+    "preconditions": [
+      "Feedback entries exist."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Attempt to open the Caretaker/Warden feedback review view"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; feedback entries remain unchanged and undisclosed.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-047",
+    "source_id": "MMS-UC-014 Main Success Scenario, steps 1-6: valid medical rebate",
+    "purpose": "Verify a registered Student can submit a valid medical rebate request and it becomes Pending with submission notification.",
+    "preconditions": [
+      "Student is registered.",
+      "Date range meets minimum duration, lead-time, and non-overlap requirements."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason": "medical",
+        "start_date": "A compliant date",
+        "end_date": "At least three consecutive days from start"
+      }
+    },
+    "expected_result": "MMS records the rebate as Pending and sends the submission notification.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-048",
+    "source_id": "MMS-UC-014 Main Success Scenario, steps 2-5: valid institute-leave reason",
+    "purpose": "Verify institute leave is an accepted rebate reason category for a valid request.",
+    "preconditions": [
+      "Student is registered.",
+      "Date range is otherwise valid and non-overlapping."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason": "institute leave",
+        "start_date": "A compliant date",
+        "end_date": "At least three consecutive days from start"
+      }
+    },
+    "expected_result": "MMS records the valid request as Pending.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-049",
+    "source_id": "MMS-UC-014 Main Success Scenario, steps 2-5: valid family-function reason",
+    "purpose": "Verify family function is an accepted rebate reason category for a valid request.",
+    "preconditions": [
+      "Student is registered.",
+      "Date range is otherwise valid and non-overlapping."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason": "family function",
+        "start_date": "A compliant date",
+        "end_date": "At least three consecutive days from start"
+      }
+    },
+    "expected_result": "MMS records the valid request as Pending.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-050",
+    "source_id": "MMS-UC-014 Main Success Scenario, steps 2-5 and Problem Statement §3.3.5: other reason with explanation",
+    "purpose": "Verify the other rebate category is accepted when an explanation is supplied.",
+    "preconditions": [
+      "Student is registered.",
+      "Date range is otherwise valid and non-overlapping."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason": "other",
+        "explanation": "A non-empty explanation",
+        "start_date": "A compliant date",
+        "end_date": "At least three consecutive days from start"
+      }
+    },
+    "expected_result": "MMS records the valid request as Pending with the accompanying explanation.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-051",
+    "source_id": "MMS-UC-014 Alternative Flow A1: rebate duration below three days",
+    "purpose": "Verify a rebate request shorter than three days is rejected.",
+    "preconditions": [
+      "Student is registered."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason": "medical",
+        "duration": "Fewer than three days"
+      }
+    },
+    "expected_result": "MMS rejects submission and does not create a Pending rebate request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-052",
+    "source_id": "MMS-UC-014 Alternative Flow A2: start date less than one calendar day ahead",
+    "purpose": "Verify a rebate request submitted less than one calendar day before its start date is rejected.",
+    "preconditions": [
+      "Student is registered."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason": "medical",
+        "start_date": "The current calendar date or otherwise less than one calendar day ahead",
+        "duration": "At least three days"
+      }
+    },
+    "expected_result": "MMS rejects submission and does not create a Pending rebate request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-053",
+    "source_id": "MMS-UC-014 Alternative Flow A3: overlapping rebate request",
+    "purpose": "Verify an overlapping rebate request for the same Student is rejected.",
+    "preconditions": [
+      "Student is registered.",
+      "An existing rebate request overlaps the proposed date range."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason": "A permitted category",
+        "date_range": "A range overlapping the existing rebate"
+      }
+    },
+    "expected_result": "MMS rejects submission and preserves the existing request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-054",
+    "source_id": "MMS-UC-014 Problem Statement §3.3.5: other reason without mandatory explanation",
+    "purpose": "Verify MMS requires an explanation when the other rebate category is selected.",
+    "preconditions": [
+      "Student is registered.",
+      "Date range is otherwise valid."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason": "other",
+        "explanation": "Omitted or empty"
+      }
+    },
+    "expected_result": "MMS rejects the request because the required explanation is absent.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-055",
+    "source_id": "MMS-UC-014 Exception Flow: unauthorized rebate submission",
+    "purpose": "Verify an actor other than Student cannot submit a rebate request as a Student.",
+    "preconditions": [
+      "No new rebate request is created in the scenario."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Attempt to submit a Student rebate request"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; no rebate request is added.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-056",
+    "source_id": "MMS-UC-015 Main Success Scenario, steps 1-7: approve rebate using submitted dates",
+    "purpose": "Verify Caretaker reviews a Pending rebate, records approval, uses approved dates for automatic billing adjustment, and notifies the Student.",
+    "preconditions": [
+      "A rebate request exists in Pending status.",
+      "No date modification is needed."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Approve the Pending request using its submitted date range"
+      }
+    },
+    "expected_result": "MMS records Approved status, uses those dates for automatic billing adjustment, and triggers the decision notification.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-057",
+    "source_id": "MMS-UC-015 Main Success Scenario, steps 4-7: reject rebate",
+    "purpose": "Verify Caretaker can reject a Pending rebate request and MMS records and notifies the decision.",
+    "preconditions": [
+      "A rebate request exists in Pending status."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Reject the Pending request"
+      }
+    },
+    "expected_result": "MMS records Rejected status and triggers the decision notification to the Student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-058",
+    "source_id": "MMS-UC-015 Main Success Scenario, step 3: modify dates before approval where policy permits",
+    "purpose": "Verify modified rebate dates are permitted and become the approved dates used for billing adjustment.",
+    "preconditions": [
+      "A rebate request exists in Pending status.",
+      "External mess policy permits the proposed date modification."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Modify requested dates, then approve"
+      },
+      "unresolved_reason": "The specifications condition date changes on external mess policy but do not define its permitted limits or rules. No modified date range or acceptance outcome can be asserted."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-059",
+    "source_id": "MMS-UC-015 Alternative Flow A1: request is no longer Pending",
+    "purpose": "Verify MMS prevents a second Caretaker decision on a rebate request that is no longer Pending.",
+    "preconditions": [
+      "A rebate request has already been decided."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Attempt a second approval or rejection"
+      }
+    },
+    "expected_result": "MMS prevents the duplicate decision and preserves prior status/history.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-060",
+    "source_id": "MMS-UC-015 Exception Flow: unauthorized rebate decision",
+    "purpose": "Verify Warden oversight does not grant authority to approve, reject, or modify rebate dates.",
+    "preconditions": [
+      "A rebate request exists in Pending status."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "action": "Attempt to decide or modify the rebate request"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; status and dates remain unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-061",
+    "source_id": "MMS-UC-016 Main Success Scenario, steps 1-4: create survey and notify registered Students",
+    "purpose": "Verify Caretaker identifies an upcoming vacation, sets a deadline, creates a survey for currently registered Students only, and triggers survey-creation notification.",
+    "preconditions": [
+      "An upcoming institute vacation exists as institutional context.",
+      "Currently registered Students exist."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "vacation": "The upcoming institute vacation",
+        "response_deadline": "A specified deadline"
+      }
+    },
+    "expected_result": "MMS creates the survey, makes it available only to currently registered Students until the deadline, and triggers the creation notification.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-062",
+    "source_id": "MMS-UC-016 Alternative Flow A1: no response deadline supplied",
+    "purpose": "Verify MMS does not create a vacation survey when no response deadline is supplied.",
+    "preconditions": [
+      "An upcoming institute vacation exists."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "vacation": "The upcoming institute vacation",
+        "response_deadline": null
+      }
+    },
+    "expected_result": "MMS does not create the survey.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-063",
+    "source_id": "MMS-UC-016 Alternative Flow A2: reminder timing/cadence",
+    "purpose": "Determine the reminder timing/cadence associated with survey creation.",
+    "preconditions": [
+      "A survey is being created."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Request or observe the reminder schedule"
+      },
+      "unresolved_reason": "Reminder timing/cadence is explicitly unspecified. MMS-UC-031 models a reminder event but does not supply a schedule."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-064",
+    "source_id": "MMS-UC-016 Exception Flow: unauthorized survey creation",
+    "purpose": "Verify a non-Caretaker cannot create the operational vacation survey.",
+    "preconditions": [
+      "No survey is created in the scenario."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Attempt to create a vacation food continuity survey"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; no survey is created.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-065",
+    "source_id": "MMS-UC-017 Main Success Scenario, steps 1-5: explicit Yes response",
+    "purpose": "Verify a currently registered Student submits and MMS records an explicit Yes response while the survey is open.",
+    "preconditions": [
+      "Student is currently registered.",
+      "The survey is open."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "response": "Yes"
+      }
+    },
+    "expected_result": "MMS records the explicit Yes response before the deadline.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-066",
+    "source_id": "MMS-UC-017 Main Success Scenario, steps 1-5: explicit No response",
+    "purpose": "Verify a currently registered Student submits and MMS records an explicit No response while the survey is open.",
+    "preconditions": [
+      "Student is currently registered.",
+      "The survey is open."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "response": "No"
+      }
+    },
+    "expected_result": "MMS records the explicit No response before the deadline.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-067",
+    "source_id": "MMS-UC-017 Alternative Flow A1: Student is not currently registered",
+    "purpose": "Verify an unregistered Student cannot submit a vacation-survey response.",
+    "preconditions": [
+      "The survey is open.",
+      "Student is not currently registered."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "response": "Yes or No"
+      }
+    },
+    "expected_result": "MMS prevents response submission and records no response for that Student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-068",
+    "source_id": "MMS-UC-017 Alternative Flow A1: survey is not open",
+    "purpose": "Verify a Student cannot submit a response to a survey that is not open.",
+    "preconditions": [
+      "Student is currently registered.",
+      "The survey is closed or otherwise not open."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "response": "Yes or No"
+      }
+    },
+    "expected_result": "MMS prevents response submission and records no response.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-069",
+    "source_id": "MMS-UC-017 Exception Flow: response outside the specified Yes/No choices",
+    "purpose": "Verify MMS does not record a response value other than the specified Yes or No.",
+    "preconditions": [
+      "Student is currently registered.",
+      "The survey is open."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "response": "A value other than Yes or No"
+      }
+    },
+    "expected_result": "The invalid response is rejected; no invalid response is recorded.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-070",
+    "source_id": "MMS-UC-017 Exception Flow: unauthorized survey response",
+    "purpose": "Verify a non-Student actor cannot submit a Student survey response.",
+    "preconditions": [
+      "A survey is open."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Attempt to submit a response as a Student"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; response records are unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-071",
+    "source_id": "MMS-UC-018 Main Success Scenario, steps 1-3: review survey response list and summary",
+    "purpose": "Verify Caretaker views recorded Yes, No, and default-No responses and their summary without changing survey state.",
+    "preconditions": [
+      "A vacation survey exists.",
+      "Responses may include explicit and default-No records."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Open the survey response view and review records and summary"
+      }
+    },
+    "expected_result": "MMS displays the recorded response list and summary; survey and response state do not change.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-072",
+    "source_id": "MMS-UC-018 Alternative Flow A1: no responses exist",
+    "purpose": "Verify MMS displays the available empty/zero response summary.",
+    "preconditions": [
+      "A survey exists.",
+      "No responses exist."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Open the survey response view"
+      }
+    },
+    "expected_result": "MMS displays the available empty/zero response summary.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-073",
+    "source_id": "MMS-UC-018 Exception Flow; AFR-MMS-088; Problem Statement §3.3.9",
+    "purpose": "Verify the Warden can view and search vacation survey response summaries as explicitly required by Problem Statement §3.3.9 and AFR-MMS-088.",
+    "preconditions": [
+      "A vacation survey exists.",
+      "Its responses include Yes from S-VAC-01 and No from S-VAC-02.",
+      "The authenticated user is the active Mess Warden."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "action": "Open and search the vacation response summary for S-VAC-01"
+      }
+    },
+    "expected_result": "MMS displays the vacation response summary to the Warden, allows the search, and returns the seeded Yes and No response totals.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-074",
+    "source_id": "MMS-UC-019 Main Success Scenario, steps 1-5: illness request",
+    "purpose": "Verify Student can submit an illness-related special-food request meeting the one-calendar-day lead-time rule and MMS records history and triggers submission notification.",
+    "preconditions": [
+      "Student is authenticated.",
+      "Requested date is at least one calendar day ahead."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason/context": "Illness",
+        "requested_date": "At least one calendar day ahead"
+      }
+    },
+    "expected_result": "MMS records the request as Requested, maintains request history, and triggers the Student submission notification.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-075",
+    "source_id": "MMS-UC-019 Main Success Scenario, steps 1-5: personal-event request",
+    "purpose": "Verify Student can submit a personal-event special-food request meeting the one-calendar-day lead-time rule.",
+    "preconditions": [
+      "Student is authenticated.",
+      "Requested date is at least one calendar day ahead."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason/context": "Personal event",
+        "requested_date": "At least one calendar day ahead"
+      }
+    },
+    "expected_result": "MMS records the request as Requested, maintains request history, and triggers the Student submission notification.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-076",
+    "source_id": "MMS-UC-019 Alternative Flow A1: insufficient lead time",
+    "purpose": "Verify MMS rejects a special-food request submitted less than one calendar day before the requested date.",
+    "preconditions": [
+      "Student is authenticated."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "reason/context": "Illness or personal event",
+        "requested_date": "Less than one calendar day ahead"
+      }
+    },
+    "expected_result": "MMS rejects submission and does not record a Requested special-food request.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-077",
+    "source_id": "MMS-UC-019 Exception Flow: unauthorized special-food request",
+    "purpose": "Verify a non-Student actor cannot submit a special-food request as a Student.",
+    "preconditions": [
+      "No new request is created in the scenario."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Attempt to submit a Student special-food request"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; no request is added.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-078",
+    "source_id": "MMS-UC-020 Main Success Scenario, steps 1-4: approve within stipulated period",
+    "purpose": "Verify Caretaker may approve a Requested special-food request within the applicable institution-defined period and the outcome is recorded and notified.",
+    "preconditions": [
+      "A special-food request exists in Requested state.",
+      "The institution-defined decision period has not expired."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Approve the Requested request within the applicable period"
+      }
+    },
+    "expected_result": "MMS records Approved status and triggers the applicable decision notification to the Student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-079",
+    "source_id": "MMS-UC-020 Main Success Scenario, steps 3-4: reject within stipulated period",
+    "purpose": "Verify Caretaker may reject a Requested special-food request within the applicable institution-defined period.",
+    "preconditions": [
+      "A special-food request exists in Requested state.",
+      "The institution-defined decision period has not expired."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Reject the Requested request within the applicable period"
+      }
+    },
+    "expected_result": "MMS records Rejected status and triggers the applicable decision notification to the Student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-080",
+    "source_id": "MMS-UC-020 Alternative Flow A1: request is no longer Requested",
+    "purpose": "Verify MMS prevents a second decision on a special-food request no longer in Requested state.",
+    "preconditions": [
+      "A special-food request has already been approved or rejected."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision": "Attempt another approval or rejection"
+      }
+    },
+    "expected_result": "MMS prevents a second decision and preserves the recorded outcome/history.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-081",
+    "source_id": "MMS-UC-020 Alternative Flow A2: exact stipulated decision-period value",
+    "purpose": "Verify the numeric boundary for the special-food decision deadline.",
+    "preconditions": [
+      "A special-food request is Requested."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "decision_time": "A specific elapsed-hours boundary"
+      },
+      "unresolved_reason": "The problem statement mentions 12 hours as intended, but the UC specification leaves the period institution-defined. No numeric deadline or boundary result can be asserted."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-082",
+    "source_id": "MMS-UC-020 Exception Flow: unauthorized special-food decision",
+    "purpose": "Verify an actor without Caretaker decision authority cannot approve or reject a special-food request.",
+    "preconditions": [
+      "A special-food request exists in Requested state."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "decision": "Attempt approval or rejection"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; status and history remain unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-083",
+    "source_id": "MMS-UC-021 Main Success Scenario, steps 1-5: Approved to Served",
+    "purpose": "Verify the UC-specified Caretaker records Served from Approved and triggers the fulfillment-status notification.",
+    "preconditions": [
+      "A special-food request is Approved."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker (as named by MMS-UC-021)",
+      "input": {
+        "transition": "Approved to Served"
+      }
+    },
+    "expected_result": "MMS records Served and triggers the applicable fulfillment-status notification to the Student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-084",
+    "source_id": "MMS-UC-021 Main Success Scenario, steps 1-5: Approved to Cancelled",
+    "purpose": "Verify the UC-specified Caretaker records Cancelled from Approved and triggers the fulfillment-status notification.",
+    "preconditions": [
+      "A special-food request is Approved."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker (as named by MMS-UC-021)",
+      "input": {
+        "transition": "Approved to Cancelled"
+      }
+    },
+    "expected_result": "MMS records Cancelled and triggers the applicable fulfillment-status notification to the Student.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-085",
+    "source_id": "MMS-UC-021 Alternative Flow A1: current request state is not Approved",
+    "purpose": "Verify MMS prevents a Served or Cancelled transition from a state other than Approved.",
+    "preconditions": [
+      "A special-food request exists in a state other than Approved."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker (as named by MMS-UC-021)",
+      "input": {
+        "transition": "Attempt Approved-only Served or Cancelled transition"
+      }
+    },
+    "expected_result": "MMS prevents the transition and preserves the prior state/history.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-086",
+    "source_id": "MMS-UC-021 Exception Flow: actor authority for fulfillment updates",
+    "purpose": "Verify which actor is authorized to update fulfillment status.",
+    "preconditions": [
+      "A special-food request is Approved."
+    ],
+    "action_or_input": {
+      "actor": null,
+      "input": {
+        "transition": "Attempt to set Served or Cancelled"
+      },
+      "unresolved_reason": "The use case names Caretaker, but its note says fulfillment ownership is not explicit in the Problem Statement (ISS-MMS-014). A separate actor-authorization expectation cannot be independently asserted."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-087",
+    "source_id": "MMS-UC-021 Problem Statement §3.3.7: billing treatment after Cancelled",
+    "purpose": "Determine whether a Cancelled special-food request is chargeable or otherwise affects monthly billing.",
+    "preconditions": [
+      "A special-food request was Approved and then marked Cancelled."
+    ],
+    "action_or_input": {
+      "actor": "Not specified",
+      "input": {
+        "action": "Generate or inspect the corresponding monthly bill"
+      },
+      "unresolved_reason": "The use case and Problem Statement explicitly leave billing treatment after Cancelled unresolved (ISS-MMS-015)."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-088",
+    "source_id": "MMS-UC-022 Main Success Scenario, steps 1-4: Caretaker publishes",
+    "purpose": "Verify active Caretaker can publish a mess announcement, preserve it in history, and trigger new-announcement notification to Students.",
+    "preconditions": [
+      "Caretaker is active and authorized to publish."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "announcement": "Mess-related announcement content"
+      }
+    },
+    "expected_result": "MMS records the announcement in history and triggers the notification to Students.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-089",
+    "source_id": "MMS-UC-022 Main Success Scenario, steps 1-4: Warden publishes",
+    "purpose": "Verify active Warden can publish a mess announcement, preserve it in history, and trigger new-announcement notification to Students.",
+    "preconditions": [
+      "Warden is active and authorized to publish."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "announcement": "Mess-related announcement content"
+      }
+    },
+    "expected_result": "MMS records the announcement in history and triggers the notification to Students.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-090",
+    "source_id": "MMS-UC-022 Alternative Flow A1 and Exception Flow: non-Caretaker/Warden publication",
+    "purpose": "Verify an actor other than the active Caretaker or Warden cannot publish an announcement.",
+    "preconditions": [
+      "No announcement is published in the scenario."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Attempt to publish a mess announcement"
+      }
+    },
+    "expected_result": "MMS prevents publication; no announcement/history entry or notification is created.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-091",
+    "source_id": "MMS-UC-023 Main Success Scenario, steps 1-3: Student view",
+    "purpose": "Verify Student views mess-relevant announcement history and details subject to access rights.",
+    "preconditions": [
+      "Announcement history exists."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Open announcement history and view details"
+      }
+    },
+    "expected_result": "MMS displays mess-relevant announcement history according to Student access rights.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-092",
+    "source_id": "MMS-UC-023 Main Success Scenario, steps 1-3: Caretaker/Warden view",
+    "purpose": "Verify Caretaker and Warden can view announcement history according to their access rights.",
+    "preconditions": [
+      "Announcement history exists."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker and Mess Warden, separately",
+      "input": {
+        "action": "Open announcement history and view details"
+      }
+    },
+    "expected_result": "MMS displays mess-relevant announcement history according to each actor's access rights.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-093",
+    "source_id": "MMS-UC-023 Alternative Flow A1: no announcement exists",
+    "purpose": "Verify MMS displays an empty announcement history when no announcements exist.",
+    "preconditions": [
+      "No announcement history exists."
+    ],
+    "action_or_input": {
+      "actor": "An actor authorized to view announcement history",
+      "input": {
+        "action": "Open announcement history"
+      }
+    },
+    "expected_result": "MMS displays empty history.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-094",
+    "source_id": "MMS-UC-023 Alternative Flow/Exception Flow: Mess Admin announcement-history access",
+    "purpose": "Determine whether Mess Admin may view announcement history.",
+    "preconditions": [
+      "Announcement history exists."
+    ],
+    "action_or_input": {
+      "actor": "Mess Admin",
+      "input": {
+        "action": "Open announcement history"
+      },
+      "unresolved_reason": "The UC says all actors view subject to access rights and interprets Admin access through those rights, while the Problem Statement limits Admin to role management and denies operational-data access. No explicit announcement-history permission outcome is specified."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-095",
+    "source_id": "MMS-UC-023 Exception Flow: actor lacks announcement-history access",
+    "purpose": "Verify an unauthorized actor is denied access without changing history.",
+    "preconditions": [
+      "Announcement history exists."
+    ],
+    "action_or_input": {
+      "actor": null,
+      "input": {
+        "action": "Attempt to view announcement history without applicable access rights"
+      },
+      "unresolved_reason": "Apart from the explicitly ambiguous Mess Admin case, the specifications do not identify a denied actor for announcement history; no additional actor role or permission boundary is invented."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-096",
+    "source_id": "MMS-UC-024 Main Success Scenario, steps 1-4: registered student list",
+    "purpose": "Verify Warden can select and view the registered Student list within MMS scope.",
+    "preconditions": [
+      "Registered-student report data exists in MMS."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "report": "Registered student list",
+        "action": "View or search report data"
+      }
+    },
+    "expected_result": "MMS displays the selected supervisory report data within MMS scope.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-097",
+    "source_id": "MMS-UC-024 Main Success Scenario, steps 1-4: rebate summary",
+    "purpose": "Verify Warden can select and view the rebate summary.",
+    "preconditions": [
+      "Rebate-summary data exists in MMS."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "report": "Rebate summary",
+        "action": "View or search report data"
+      }
+    },
+    "expected_result": "MMS displays the selected supervisory report data within MMS scope.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-098",
+    "source_id": "MMS-UC-024 Main Success Scenario, steps 1-4: vacation response summary",
+    "purpose": "Verify Warden can select and view the vacation survey response summary.",
+    "preconditions": [
+      "Vacation-response summary data exists in MMS."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "report": "Vacation response summary",
+        "action": "View or search report data"
+      }
+    },
+    "expected_result": "MMS displays the selected supervisory report data within MMS scope.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-099",
+    "source_id": "MMS-UC-024 Alternative Flow A1: requested report data unavailable",
+    "purpose": "Verify MMS displays no data when the requested supervisory report data is unavailable.",
+    "preconditions": [
+      "The requested report data is unavailable."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "report": "Any specified supervisory report with no available data"
+      }
+    },
+    "expected_result": "MMS displays no data.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-100",
+    "source_id": "MMS-UC-024 Exception Flow: unauthorized supervisory-report access",
+    "purpose": "Verify a non-Warden actor cannot access supervisory reports.",
+    "preconditions": [
+      "Supervisory report data exists."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "action": "Attempt to view/search supervisory reports"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; report data is not disclosed or changed.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-101",
+    "source_id": "MMS-UC-025 Main Success Scenario, steps 1-4: registration trend report",
+    "purpose": "Verify Caretaker selects and generates the registration trend report.",
+    "preconditions": [
+      "Registration trend report data exists in MMS."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "report": "Registration trend"
+      }
+    },
+    "expected_result": "MMS generates the selected operational report within MMS scope.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-102",
+    "source_id": "MMS-UC-025 Main Success Scenario, steps 1-4: special meal log",
+    "purpose": "Verify Caretaker selects and generates the special meal log.",
+    "preconditions": [
+      "Special meal log data exists in MMS."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "report": "Special meal log"
+      }
+    },
+    "expected_result": "MMS generates the selected operational report within MMS scope.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-103",
+    "source_id": "MMS-UC-025 Main Success Scenario, steps 1-4: billing summary",
+    "purpose": "Verify Caretaker selects and generates the billing summary.",
+    "preconditions": [
+      "Billing summary data exists in MMS."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "report": "Billing summary"
+      }
+    },
+    "expected_result": "MMS generates the selected operational report within MMS scope.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-104",
+    "source_id": "MMS-UC-025 Alternative Flow A1: operational report data unavailable",
+    "purpose": "Verify MMS displays no data when selected operational-report data is unavailable.",
+    "preconditions": [
+      "The selected operational report data is unavailable."
+    ],
+    "action_or_input": {
+      "actor": "Mess Caretaker",
+      "input": {
+        "report": "A specified operational report with no available data"
+      }
+    },
+    "expected_result": "MMS displays no data.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-105",
+    "source_id": "MMS-UC-025 Exception Flow: unauthorized operational-report access",
+    "purpose": "Verify a non-Caretaker actor cannot generate Caretaker operational reports.",
+    "preconditions": [
+      "Operational report data exists."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "action": "Attempt to generate a Caretaker operational report"
+      }
+    },
+    "expected_result": "The unauthorized action is rejected; report data is not disclosed or changed.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-106",
+    "source_id": "MMS-UC-026 Main Success Scenario, steps 1-4: Student's own requests",
+    "purpose": "Verify Student can view their submitted MMS requests with current status and recorded history.",
+    "preconditions": [
+      "Student has submitted one or more MMS requests."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Open request status/history view"
+      }
+    },
+    "expected_result": "MMS displays the Student's own submitted requests, current status, and recorded history.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-107",
+    "source_id": "MMS-UC-026 Alternative Flow A1: no submitted requests",
+    "purpose": "Verify MMS displays an empty request history when the Student has submitted no requests.",
+    "preconditions": [
+      "Student has submitted no MMS requests."
+    ],
+    "action_or_input": {
+      "actor": "Student",
+      "input": {
+        "action": "Open request status/history view"
+      }
+    },
+    "expected_result": "MMS displays an empty request history.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-108",
+    "source_id": "MMS-UC-026 Alternative Flow A2 and Exception Flow: access another Student's request history",
+    "purpose": "Verify a Student cannot access another Student's request history.",
+    "preconditions": [
+      "Student A has one or more submitted requests."
+    ],
+    "action_or_input": {
+      "actor": "Student B",
+      "input": {
+        "action": "Attempt to view Student A's request history"
+      }
+    },
+    "expected_result": "MMS prevents access; Student A's request data/history is not disclosed or changed.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-109",
+    "source_id": "MMS-UC-027 Main Success Scenario, steps 1-4: apply next-calendar-day effect",
+    "purpose": "Verify MMS activates an approved deregistration at the start of the next calendar day and records lifecycle state/history.",
+    "preconditions": [
+      "A deregistration request is Approved — Awaiting Effective Date.",
+      "The next calendar day after approval has begun."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Next calendar day begins after Caretaker approval"
+      }
+    },
+    "expected_result": "MMS makes deregistration effective from the next calendar day and records the resulting lifecycle state/history.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-110",
+    "source_id": "MMS-UC-027 Alternative Flow A1: request is no longer eligible",
+    "purpose": "Verify MMS does not apply the transition if the request has validly changed to a state no longer eligible.",
+    "preconditions": [
+      "The request is no longer in an eligible approved-awaiting-effect state."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Process next-day deregistration for the now-ineligible request"
+      }
+    },
+    "expected_result": "MMS does not apply the deregistration transition.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-111",
+    "source_id": "MMS-UC-027 Exception Flow: event-processing failure",
+    "purpose": "Verify a processing failure cannot create a partial or contradictory registration state.",
+    "preconditions": [
+      "A request is Approved — Awaiting Effective Date.",
+      "The event processing attempt fails before completion."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Simulate processing failure during the transition"
+      }
+    },
+    "expected_result": "The previous approval and registration state remain consistently recorded and available for recovery; no contradictory partial state is committed.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-112",
+    "source_id": "MMS-UC-028 Main Success Scenario, steps 1-4: default-No for nonresponders",
+    "purpose": "Verify at the configured deadline MMS records No for each currently registered Student without a response and exposes defaults in the summary.",
+    "preconditions": [
+      "Survey exists with response deadline set and reached.",
+      "At least one currently registered Student has no recorded response."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Configured response deadline is reached"
+      }
+    },
+    "expected_result": "MMS records default No for each eligible nonresponder and makes those defaults available in the response summary.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-113",
+    "source_id": "MMS-UC-028 Alternative Flow A1: explicit response exists",
+    "purpose": "Verify an explicit Yes or No response is not overwritten by deadline processing.",
+    "preconditions": [
+      "A currently registered Student has explicitly responded Yes or No.",
+      "The survey deadline is reached."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Process deadline for a survey with an explicit response"
+      }
+    },
+    "expected_result": "The explicit response remains unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-114",
+    "source_id": "MMS-UC-028 Alternative Flow A2: no eligible nonresponders",
+    "purpose": "Verify no default response is created if no currently registered Student lacks a response.",
+    "preconditions": [
+      "Every currently registered Student has an explicit response, or there are no applicable nonresponders.",
+      "The survey deadline is reached."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Process the survey deadline"
+      }
+    },
+    "expected_result": "No default response record is created.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-115",
+    "source_id": "MMS-UC-028 Exception Flow: processing failure",
+    "purpose": "Verify failure handling does not overwrite explicit responses or create duplicate response records.",
+    "preconditions": [
+      "Survey deadline processing is in progress.",
+      "Explicit responses and/or eligible missing responses exist."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Simulate a processing failure while applying default responses"
+      }
+    },
+    "expected_result": "Explicit responses are not overwritten and duplicate response records are not created.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-116",
+    "source_id": "MMS-UC-029 Main Success Scenario, steps 1-5: default rejection after configured period",
+    "purpose": "Verify an undecided Requested special-food request is default-rejected after the stipulated institution-defined period, with history and Student notification.",
+    "preconditions": [
+      "A special-food request remains Requested.",
+      "No Caretaker decision was recorded within the stipulated period.",
+      "The configured decision period has elapsed."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "The stipulated institution-defined decision period expires"
+      }
+    },
+    "expected_result": "MMS changes the request to Rejected (Default), records the lifecycle/history update, and triggers rejection-outcome notification.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-117",
+    "source_id": "MMS-UC-029 Alternative Flow A1: Caretaker already decided",
+    "purpose": "Verify default rejection is not applied when Caretaker has already approved or rejected the request.",
+    "preconditions": [
+      "A special-food request has already been explicitly approved or rejected.",
+      "The stipulated period has expired."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Run default-rejection processing"
+      }
+    },
+    "expected_result": "MMS does not perform default rejection and preserves the explicit decision.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-118",
+    "source_id": "MMS-UC-029 Exception Flow: processing failure / duplicate decision",
+    "purpose": "Verify a processing failure cannot create both an explicit and a default decision for one request.",
+    "preconditions": [
+      "A Requested special-food request is at its configured decision deadline.",
+      "A processing failure occurs during default rejection."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Simulate a processing failure during default rejection"
+      }
+    },
+    "expected_result": "No duplicate explicit/default decision is recorded; the request remains in its last valid state with no duplicate decision.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-119",
+    "source_id": "MMS-UC-029 Notes/TODO: numeric stipulated-period boundary",
+    "purpose": "Determine the exact elapsed-time boundary for automatic default rejection.",
+    "preconditions": [
+      "A special-food request remains Requested."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "elapsed_time": "A specific numeric boundary such as the intended-hours threshold"
+      },
+      "unresolved_reason": "The exact special-food decision period is institution-defined and is not frozen by the specifications (ISS-MMS-013)."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-120",
+    "source_id": "MMS-UC-030 Main Success Scenario, steps 1-5: generate monthly bills",
+    "purpose": "Verify event-triggered generation uses applicable served-day/daily-rate data, approved special-meal/add-on charges, and approved rebate deductions, then creates Generated bills for Caretaker review.",
+    "preconditions": [
+      "The calendar-month billing event is due.",
+      "Applicable served-day, daily-rate, approved special-meal/add-on, and approved rebate data are available."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Calendar-month bill-generation event with the specified source billing components"
+      }
+    },
+    "expected_result": "MMS generates bill records in Generated state for Caretaker review; no bill is published by this UC.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-121",
+    "source_id": "MMS-UC-030 Alternative Flow A1: required billing input unavailable",
+    "purpose": "Verify a bill with unavailable required input is not marked ready for Caretaker finalization.",
+    "preconditions": [
+      "The calendar-month billing event is due.",
+      "Required data for the affected bill is unavailable."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Generate bills with required input unavailable for an affected Student"
+      }
+    },
+    "expected_result": "MMS does not mark the affected bill as ready for Caretaker finalization.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-122",
+    "source_id": "MMS-UC-030 Exception Flow: computation or data-access failure",
+    "purpose": "Verify a computation/data-access failure cannot publish an incomplete or unfinalized bill and does not alter source billing data.",
+    "preconditions": [
+      "Monthly bill generation is in progress.",
+      "A computation or data-access failure occurs."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Simulate computation or data-access failure during bill generation"
+      }
+    },
+    "expected_result": "No incomplete or unfinalized bill is published; source billing data remains unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-123",
+    "source_id": "MMS-UC-031 Main Success Scenario, steps 1-3: reminder event for open survey",
+    "purpose": "Verify a reminder event for an open survey identifies applicable currently registered Students and triggers the survey reminder notification without changing survey/response records.",
+    "preconditions": [
+      "An open vacation survey exists.",
+      "Currently registered Students are applicable recipients.",
+      "An institution-defined reminder event occurs."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Institution-defined reminder event while survey remains open"
+      }
+    },
+    "expected_result": "MMS triggers the system-generated reminder for applicable registered Students through external email infrastructure; survey and response records remain unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-124",
+    "source_id": "MMS-UC-031 Alternative Flow A1: survey is no longer open",
+    "purpose": "Verify MMS does not trigger an open-survey reminder after the survey is no longer open.",
+    "preconditions": [
+      "The survey is closed or no longer open.",
+      "A reminder event occurs."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event": "Attempt reminder processing for the closed survey"
+      }
+    },
+    "expected_result": "MMS does not trigger an open-survey reminder; survey and response records remain unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-125",
+    "source_id": "MMS-UC-031 Exception Flow: external email delivery failure",
+    "purpose": "Verify external email-delivery failure handling.",
+    "preconditions": [
+      "An open-survey reminder has been triggered."
+    ],
+    "action_or_input": {
+      "actor": "External email infrastructure",
+      "input": {
+        "event": "External delivery failure"
+      },
+      "unresolved_reason": "The specification explicitly states external email-delivery failure handling is outside MMS scope unless separately specified."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-126",
+    "source_id": "MMS-UC-031 Notes/TODO: reminder event timing/cadence",
+    "purpose": "Determine the timing or cadence that causes a vacation-survey reminder event.",
+    "preconditions": [
+      "A vacation survey is open."
+    ],
+    "action_or_input": {
+      "actor": "MMS event-triggered processing",
+      "input": {
+        "event_time": "A proposed reminder schedule"
+      },
+      "unresolved_reason": "Reminder timing/cadence is institution-defined and unspecified (ISS-MMS-019); no schedule is inferred."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-UC-127",
+    "source_id": "MMS-UC-001 Success Postcondition and Problem Statement §3.2.1 / §3.3.11: Mess Admin operational-data boundary",
+    "purpose": "Verify Mess Admin has no access to operational mess data, including student requests, billing, rebates, special-food requests, vacation responses, and feedback.",
+    "preconditions": [
+      "Operational mess records exist."
+    ],
+    "action_or_input": {
+      "actor": "Mess Admin",
+      "input": {
+        "action": "Attempt to access operational mess data"
+      }
+    },
+    "expected_result": "MMS blocks operational-data access; records are not disclosed or changed.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-UC-128",
+    "source_id": "MMS-UC-008 Exception Flow: menu maintenance by non-Caretaker viewer",
+    "purpose": "Verify Warden menu-view access does not permit operational menu maintenance.",
+    "preconditions": [
+      "A valid weekly menu exists."
+    ],
+    "action_or_input": {
+      "actor": "Mess Warden",
+      "input": {
+        "action": "Attempt to add, modify, delete, publish, or update menu items"
+      }
+    },
+    "expected_result": "MMS rejects the unauthorized maintenance action; the existing valid menu remains unchanged.",
+    "test_type": "functional"
+  }
+]

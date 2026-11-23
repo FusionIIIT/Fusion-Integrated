@@ -90,6 +90,7 @@ PLATFORM_MODULES = [
 # See docs/03-platform/module-authoring-guide.md to add one.
 DOMAIN_MODULES = [
     "modules.placement",
+    "modules.mms",
 ]
 
 INSTALLED_APPS = (DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -274,3 +275,25 @@ LOGGING = {
         "fusion": {"level": env("FUSION_LOG_LEVEL", "INFO"), "propagate": True},
     },
 }
+
+
+def _load_mms_decision_hours():
+    from django.core.exceptions import ImproperlyConfigured
+
+    raw = env("MMS_SPECIAL_FOOD_DECISION_HOURS")
+    if raw is None:
+        return None
+    try:
+        val = int(raw)
+    except ValueError:
+        raise ImproperlyConfigured(
+            "MMS_SPECIAL_FOOD_DECISION_HOURS must be a positive integer if set."
+        ) from None
+    if val <= 0:
+        raise ImproperlyConfigured(
+            "MMS_SPECIAL_FOOD_DECISION_HOURS must be a positive integer if set."
+        )
+    return val
+
+
+MMS_SPECIAL_FOOD_DECISION_HOURS = _load_mms_decision_hours()

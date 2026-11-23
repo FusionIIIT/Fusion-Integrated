@@ -1,0 +1,1812 @@
+[
+  {
+    "test_id": "TC-BR-001",
+    "source_id": "BR-MMS-001 Determine whether MMS remains within every function and integration in its stated scope without asserting unlisted behavior.",
+    "purpose": "Determine whether MMS remains within every function and integration in its stated scope without asserting unlisted behavior.",
+    "preconditions": [
+      "Problem Statement scope is authoritative."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "scope": "All MMS artifacts, screens, integrations, and excluded functions"
+      },
+      "steps": [
+        "Compare the complete MMS surface against the bounded list of functions and explicit integrations in the Problem Statement."
+      ],
+      "blocked_reason": "The rule is a system-wide scope boundary but does not define a finite acceptance oracle for absence of every out-of-scope function. No unlisted feature or endpoint may be invented for a negative test."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-002",
+    "source_id": "BR-MMS-002 Verify role assignment can use an available institutional employee identity without changing that identity data.",
+    "purpose": "Verify role assignment can use an available institutional employee identity without changing that identity data.",
+    "preconditions": [
+      "A current institute employee identity is supplied by the institutional source.",
+      "Mess Admin is authorized to assign roles."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "employee_identity": "Available institutional employee record",
+        "role": "Caretaker or Warden",
+        "duration": "Specified duration"
+      },
+      "steps": [
+        "Assign the employee to a mess role using the supplied identity.",
+        "Compare the source employee identity before and after the assignment."
+      ]
+    },
+    "expected_result": "The role assignment is recorded using the supplied employee identity; employee master data is not changed by the role assignment.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-003",
+    "source_id": "BR-MMS-002 Verify a role assignment is not recorded when the required employee identity is unavailable.",
+    "purpose": "Verify a role assignment is not recorded when the required employee identity is unavailable.",
+    "preconditions": [
+      "The selected employee identity is unavailable from institutional master data.",
+      "Mess Admin attempts an assignment."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "employee_identity": "Unavailable"
+      },
+      "steps": [
+        "Attempt to assign an operational role to the employee whose identity is unavailable.",
+        "Inspect role-assignment records."
+      ]
+    },
+    "expected_result": "No role assignment is recorded for the unavailable employee.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-004",
+    "source_id": "BR-MMS-002 Verify the complete employee master-data ownership boundary.",
+    "purpose": "Verify the complete employee master-data ownership boundary.",
+    "preconditions": [
+      "Employee identity is owned by the institutional source."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "action": "Attempt to create, edit, or delete employee master data through MMS"
+      },
+      "steps": [
+        "Determine the precise MMS behavior for employee master-data management."
+      ],
+      "blocked_reason": "The specifications state MMS does not own employee master data but do not define a specific employee-management operation or rejection response to exercise. No API/action is inferred."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-005",
+    "source_id": "BR-MMS-003 Verify exactly one active Caretaker remains after a mid-cycle reassignment.",
+    "purpose": "Verify exactly one active Caretaker remains after a mid-cycle reassignment.",
+    "preconditions": [
+      "A Caretaker assignment is active.",
+      "Mess Admin can reassign the role to an eligible employee."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "role": "Caretaker",
+        "action": "Mid-cycle reassignment"
+      },
+      "steps": [
+        "Reassign the active Caretaker to another eligible employee.",
+        "Inspect active Caretaker assignments at the recorded reassignment time."
+      ]
+    },
+    "expected_result": "Exactly one Caretaker is active: the replacement; the prior assignment is no longer active.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-006",
+    "source_id": "BR-MMS-004 Verify exactly one active Warden remains after a mid-cycle reassignment.",
+    "purpose": "Verify exactly one active Warden remains after a mid-cycle reassignment.",
+    "preconditions": [
+      "A Warden assignment is active.",
+      "Mess Admin can reassign the role to an eligible employee."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "role": "Warden",
+        "action": "Mid-cycle reassignment"
+      },
+      "steps": [
+        "Reassign the active Warden to another eligible employee.",
+        "Inspect active Warden assignments at the recorded reassignment time."
+      ]
+    },
+    "expected_result": "Exactly one Warden is active: the replacement; the prior assignment is no longer active.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-007",
+    "source_id": "BR-MMS-005 Verify Mess Admin cannot access student requests.",
+    "purpose": "Verify Mess Admin cannot access student requests.",
+    "preconditions": [
+      "At least one student request exists.",
+      "Actor is Mess Admin."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "resource": "Student requests"
+      },
+      "steps": [
+        "Attempt to view operational student request data as Mess Admin."
+      ]
+    },
+    "expected_result": "Access is prevented and request data is not disclosed or changed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-008",
+    "source_id": "BR-MMS-005 Verify Mess Admin cannot access billing or feedback data.",
+    "purpose": "Verify Mess Admin cannot access billing or feedback data.",
+    "preconditions": [
+      "A bill and a feedback entry exist.",
+      "Actor is Mess Admin."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "resources": [
+          "Billing details",
+          "Feedback entries"
+        ]
+      },
+      "steps": [
+        "Attempt to view billing details as Mess Admin.",
+        "Attempt to view feedback entries as Mess Admin."
+      ]
+    },
+    "expected_result": "Both requests are prevented; neither resource is disclosed or changed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-009",
+    "source_id": "BR-MMS-006 Verify a mid-cycle Caretaker reassignment is effective immediately from its recorded time.",
+    "purpose": "Verify a mid-cycle Caretaker reassignment is effective immediately from its recorded time.",
+    "preconditions": [
+      "A Caretaker is active during a mess cycle.",
+      "A replacement employee is eligible."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "role": "Caretaker",
+        "effective_time": "Recorded reassignment time within the cycle"
+      },
+      "steps": [
+        "Reassign the Caretaker mid-cycle.",
+        "Check authorization using the previous and replacement assignments immediately before and at/after the recorded reassignment time."
+      ]
+    },
+    "expected_result": "The replacement assignment is effective in MMS from its recorded reassignment time, with no deferred cycle-end activation.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-010",
+    "source_id": "BR-MMS-006 Verify a mid-cycle Warden reassignment is effective immediately from its recorded time.",
+    "purpose": "Verify a mid-cycle Warden reassignment is effective immediately from its recorded time.",
+    "preconditions": [
+      "A Warden is active during a mess cycle.",
+      "A replacement employee is eligible."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "role": "Warden",
+        "effective_time": "Recorded reassignment time within the cycle"
+      },
+      "steps": [
+        "Reassign the Warden mid-cycle.",
+        "Check the active Warden assignment immediately around the recorded reassignment time."
+      ]
+    },
+    "expected_result": "The new Warden assignment takes effect immediately in MMS from the recorded time.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-011",
+    "source_id": "BR-MMS-007 Verify pending Caretaker-owned operational requests transfer in visibility and actionability to the newly assigned Caretaker.",
+    "purpose": "Verify pending Caretaker-owned operational requests transfer in visibility and actionability to the newly assigned Caretaker.",
+    "preconditions": [
+      "A pending operational request is owned by the Caretaker role.",
+      "A Caretaker reassignment has been recorded."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "request_status": "Pending",
+        "request_owner": "Caretaker role"
+      },
+      "steps": [
+        "Reassign the Caretaker.",
+        "As the newly assigned Caretaker, view and perform an allowed decision on the pending request."
+      ]
+    },
+    "expected_result": "The new active Caretaker can see and act on the pending role-owned request.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-012",
+    "source_id": "BR-MMS-008 Verify the active Caretaker can open a registration window for a designated cycle or period.",
+    "purpose": "Verify the active Caretaker can open a registration window for a designated cycle or period.",
+    "preconditions": [
+      "The actor holds the active Caretaker assignment.",
+      "A mess cycle/designated period is identified."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "cycle_or_period": "A designated mess cycle or period",
+        "window": "Specified opening and closing period"
+      },
+      "steps": [
+        "Submit a registration-window opening action as the active Caretaker.",
+        "Inspect the resulting window."
+      ]
+    },
+    "expected_result": "The registration window is recorded as opened for the designated cycle or period.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-013",
+    "source_id": "BR-MMS-008 Verify a non-active Caretaker cannot open a registration window.",
+    "purpose": "Verify a non-active Caretaker cannot open a registration window.",
+    "preconditions": [
+      "The actor is not the active Caretaker.",
+      "No target window has already been opened."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actor": "Non-active role holder",
+        "action": "Open registration window"
+      },
+      "steps": [
+        "Attempt to open the designated registration window."
+      ]
+    },
+    "expected_result": "The action is rejected and no window is opened.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-014",
+    "source_id": "BR-MMS-009 Verify Student registration is accepted while the registration window is open.",
+    "purpose": "Verify Student registration is accepted while the registration window is open.",
+    "preconditions": [
+      "A registration window is open.",
+      "The actor is a Student."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "submission_time": "Within the open interval"
+      },
+      "steps": [
+        "Submit a registration request during the open interval.",
+        "Inspect the created request."
+      ]
+    },
+    "expected_result": "MMS allows the Student registration request during the open window.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-015",
+    "source_id": "BR-MMS-009 Verify Student registration is rejected when no registration window is open.",
+    "purpose": "Verify Student registration is rejected when no registration window is open.",
+    "preconditions": [
+      "The actor is a Student.",
+      "No registration window is open."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "submission_time": "Outside any open interval"
+      },
+      "steps": [
+        "Submit a registration request.",
+        "Inspect request records."
+      ]
+    },
+    "expected_result": "MMS prevents submission and creates no registration request.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-016",
+    "source_id": "BR-MMS-010 Verify the active Caretaker can approve a registration request and the decision is recorded.",
+    "purpose": "Verify the active Caretaker can approve a registration request and the decision is recorded.",
+    "preconditions": [
+      "A registration request is Pending.",
+      "The actor is the active Caretaker."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "request_type": "Registration",
+        "decision": "Approve"
+      },
+      "steps": [
+        "Approve the pending registration request as the active Caretaker.",
+        "Inspect its status and decision record."
+      ]
+    },
+    "expected_result": "The request is approved and its decision is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-017",
+    "source_id": "BR-MMS-010 Verify the active Caretaker can reject a deregistration request and the Student remains registered pending any other stated lifecycle effect.",
+    "purpose": "Verify the active Caretaker can reject a deregistration request and the Student remains registered pending any other stated lifecycle effect.",
+    "preconditions": [
+      "A deregistration request is Pending for a currently registered Student.",
+      "The actor is the active Caretaker."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "request_type": "Deregistration",
+        "decision": "Reject"
+      },
+      "steps": [
+        "Reject the pending deregistration request.",
+        "Inspect the decision and registration state."
+      ]
+    },
+    "expected_result": "The request is rejected; the request is not approved for next-day deregistration.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-018",
+    "source_id": "BR-MMS-010 Verify Warden oversight access does not permit approval or rejection of registration or deregistration requests.",
+    "purpose": "Verify Warden oversight access does not permit approval or rejection of registration or deregistration requests.",
+    "preconditions": [
+      "A request is Pending.",
+      "The actor is Warden."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "request_types": [
+          "Registration",
+          "Deregistration"
+        ],
+        "actions": [
+          "Approve",
+          "Reject"
+        ]
+      },
+      "steps": [
+        "Attempt request decisions as Warden for each request type.",
+        "Inspect statuses and histories."
+      ]
+    },
+    "expected_result": "Warden cannot approve or reject either request type; request state and history remain unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-019",
+    "source_id": "BR-MMS-011 Verify Warden can view operational student requests for oversight without changing them.",
+    "purpose": "Verify Warden can view operational student requests for oversight without changing them.",
+    "preconditions": [
+      "Operational student requests exist.",
+      "The actor is Warden."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "request_status": "Pending"
+      },
+      "steps": [
+        "Open the operational-request oversight view as Warden.",
+        "Compare request status and history before and after viewing."
+      ]
+    },
+    "expected_result": "Permitted request details are viewable; viewing does not alter status or history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-020",
+    "source_id": "BR-MMS-012 Verify a currently registered Student can submit a deregistration request when a registration window is not open.",
+    "purpose": "Verify a currently registered Student can submit a deregistration request when a registration window is not open.",
+    "preconditions": [
+      "The actor is currently registered.",
+      "No registration window is open."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "action": "Submit deregistration"
+      },
+      "steps": [
+        "Submit a deregistration request outside any registration window.",
+        "Inspect the resulting request."
+      ]
+    },
+    "expected_result": "The Student may submit the deregistration request; registration-window state does not prevent it.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-021",
+    "source_id": "BR-MMS-012 Verify an unregistered Student cannot submit a meaningful deregistration request.",
+    "purpose": "Verify an unregistered Student cannot submit a meaningful deregistration request.",
+    "preconditions": [
+      "The actor is not currently registered."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "action": "Submit deregistration"
+      },
+      "steps": [
+        "Attempt to submit a deregistration request.",
+        "Inspect request records."
+      ]
+    },
+    "expected_result": "No meaningful deregistration request is accepted for a Student who is not registered.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-022",
+    "source_id": "BR-MMS-013 Verify an approved deregistration becomes effective on the next calendar day after Caretaker approval.",
+    "purpose": "Verify an approved deregistration becomes effective on the next calendar day after Caretaker approval.",
+    "preconditions": [
+      "A deregistration request is Pending for a registered Student.",
+      "The active Caretaker approves it at a known time within a stated calendar date."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "approval_time": "Mid-calendar-day, avoiding a date-boundary instant"
+      },
+      "steps": [
+        "Approve the deregistration request.",
+        "Inspect the scheduled effective date and registration state before and from the next calendar day."
+      ]
+    },
+    "expected_result": "The request's deregistration effect starts from the next calendar day after approval, not at the approval instant.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-023",
+    "source_id": "BR-MMS-014 Verify a weekly menu contains day-wise entries for breakfast, lunch, and dinner.",
+    "purpose": "Verify a weekly menu contains day-wise entries for breakfast, lunch, and dinner.",
+    "preconditions": [
+      "A weekly menu is submitted for publication."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "days": "Each of the seven days in the week",
+        "meals": [
+          "Breakfast",
+          "Lunch",
+          "Dinner"
+        ]
+      },
+      "steps": [
+        "Submit a menu with an entry for each required day and meal.",
+        "Read the stored/published menu and enumerate its day-meal pairs."
+      ]
+    },
+    "expected_result": "The menu is stored with all seven days represented separately for breakfast, lunch, and dinner.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-024",
+    "source_id": "BR-MMS-014 Verify an incomplete weekly day/meal structure is not published as a complete menu.",
+    "purpose": "Verify an incomplete weekly day/meal structure is not published as a complete menu.",
+    "preconditions": [
+      "A valid menu already exists for the target week."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "omission": "One required day-meal entry"
+      },
+      "steps": [
+        "Submit a menu omitting one required day-meal entry.",
+        "Inspect the published menu and prior valid menu."
+      ]
+    },
+    "expected_result": "The incomplete structure is not committed as a valid published weekly menu; the prior valid menu remains available.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-025",
+    "source_id": "BR-MMS-015 Verify publication of a weekly menu update triggers a system-generated notification event to Students.",
+    "purpose": "Verify publication of a weekly menu update triggers a system-generated notification event to Students.",
+    "preconditions": [
+      "A weekly menu update is ready to publish.",
+      "Student recipients are identified for the event."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "event": "Published menu update",
+        "recipients": "Students"
+      },
+      "steps": [
+        "Publish a weekly menu update.",
+        "Inspect the notification trigger/event records for Student recipients."
+      ]
+    },
+    "expected_result": "MMS triggers system-generated email notifications to Students for the published menu update; this test ends at the trigger and does not assert external delivery.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-026",
+    "source_id": "BR-MMS-015 Verify an unsuccessful or unpublished menu submission does not count as a published menu update notification trigger.",
+    "purpose": "Verify an unsuccessful or unpublished menu submission does not count as a published menu update notification trigger.",
+    "preconditions": [
+      "A valid menu exists.",
+      "A proposed update is rejected before publication."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "event": "Rejected, unpublished menu update"
+      },
+      "steps": [
+        "Submit a menu update that is not published.",
+        "Inspect notification triggers for the rejected submission."
+      ]
+    },
+    "expected_result": "No menu-update notification is triggered for an update that was not published.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-027",
+    "source_id": "BR-MMS-016 Verify billing periods follow calendar months rather than a rolling period or non-calendar cycle.",
+    "purpose": "Verify billing periods follow calendar months rather than a rolling period or non-calendar cycle.",
+    "preconditions": [
+      "Billing inputs are supplied for two adjacent calendar months.",
+      "Inputs include service facts associated with each month."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "periods": "Two consecutive named calendar months, including their month boundary"
+      },
+      "steps": [
+        "Generate bills for both supplied periods.",
+        "Compare the bill period identifiers and included input period with the calendar-month boundaries."
+      ]
+    },
+    "expected_result": "Bills are generated on the calendar-month cycle, with each bill associated with its corresponding month.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-028",
+    "source_id": "BR-MMS-017 Verify all three specified billing components contribute to the monthly bill computation.",
+    "purpose": "Verify all three specified billing components contribute to the monthly bill computation.",
+    "preconditions": [
+      "A monthly billing period and Student are eligible for billing.",
+      "Rate, served days, approved special-food charge, and approved rebate deduction are supplied inputs."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "daily_rate": "10.00 (test input, not a policy assertion)",
+        "served_days": 20,
+        "approved_special_food_charges": "15.00 (provided charge input)",
+        "approved_rebate_deduction": "30.00 (provided deduction input)"
+      },
+      "steps": [
+        "Generate the monthly bill using the supplied components.",
+        "Compare the resulting total to daily_rate multiplied by served_days, plus approved special-food charges, less approved rebate deduction."
+      ]
+    },
+    "expected_result": "The bill includes all specified components; for the example inputs, the computed amount is 185.00 before any separately specified treatment.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-029",
+    "source_id": "BR-MMS-018 Verify a generated bill cannot be published to Students before Caretaker review and finalization, and can be published after finalization.",
+    "purpose": "Verify a generated bill cannot be published to Students before Caretaker review and finalization, and can be published after finalization.",
+    "preconditions": [
+      "A bill is generated and not finalized.",
+      "Actor is the active Caretaker."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "bill_state_sequence": [
+          "Generated",
+          "Finalized",
+          "Published"
+        ]
+      },
+      "steps": [
+        "Attempt publication while the bill is Generated and unfinalized.",
+        "Review and finalize the bill as Caretaker.",
+        "Publish it and inspect Student availability."
+      ]
+    },
+    "expected_result": "The bill is not published before Caretaker finalization; after review/finalization, publication to Students is permitted.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-030",
+    "source_id": "BR-MMS-019 Verify an approved rebate is applied as a deduction to the corresponding monthly bill.",
+    "purpose": "Verify an approved rebate is applied as a deduction to the corresponding monthly bill.",
+    "preconditions": [
+      "A rebate request has Approved status and approved dates in a billed month.",
+      "Rate and served days are provided."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "rebate_status": "Approved",
+        "period": "Month overlapping the approved rebate dates"
+      },
+      "steps": [
+        "Generate the corresponding monthly bill.",
+        "Inspect its rebate deduction and total."
+      ]
+    },
+    "expected_result": "The bill applies the deduction for the approved rebate according to the supplied bill inputs and approved dates.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-031",
+    "source_id": "BR-MMS-019 Verify Pending and Rejected rebate requests do not adjust monthly bills.",
+    "purpose": "Verify Pending and Rejected rebate requests do not adjust monthly bills.",
+    "preconditions": [
+      "Comparable billing inputs are available for two scenarios.",
+      "One rebate is Pending in the first scenario and Rejected in the second."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "rebate_statuses": [
+          "Pending",
+          "Rejected"
+        ]
+      },
+      "steps": [
+        "Generate each scenario's bill using equivalent service and rate inputs.",
+        "Compare rebate deductions against the scenario without an approved rebate."
+      ]
+    },
+    "expected_result": "Neither Pending nor Rejected rebate changes the monthly bill; no rebate deduction is applied for either status.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-032",
+    "source_id": "BR-MMS-020 Verify Student text feedback is stored and visible to the Caretaker.",
+    "purpose": "Verify Student text feedback is stored and visible to the Caretaker.",
+    "preconditions": [
+      "A Student is authenticated.",
+      "A non-empty feedback message is provided."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "feedback": "Text related to mess services"
+      },
+      "steps": [
+        "Submit Student feedback.",
+        "As Caretaker, view the feedback entries."
+      ]
+    },
+    "expected_result": "The feedback is stored and visible to the Caretaker for monitoring/reporting; no resolution outcome is implied.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-033",
+    "source_id": "BR-MMS-020 Verify Student text feedback is visible to the Warden for supervisory monitoring/reporting.",
+    "purpose": "Verify Student text feedback is visible to the Warden for supervisory monitoring/reporting.",
+    "preconditions": [
+      "A feedback entry exists.",
+      "Actor is Warden."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "feedback": "Stored Student text feedback"
+      },
+      "steps": [
+        "View feedback entries as Warden.",
+        "Compare feedback records before and after viewing."
+      ]
+    },
+    "expected_result": "The Warden can view the stored feedback; viewing does not imply a complaint-resolution workflow or alter the record.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-034",
+    "source_id": "BR-MMS-021 Verify a rebate request shorter than three days is rejected.",
+    "purpose": "Verify a rebate request shorter than three days is rejected.",
+    "preconditions": [
+      "A registered Student submits a rebate request with otherwise valid data."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "duration": "Fewer than three days"
+      },
+      "steps": [
+        "Submit the short-duration request.",
+        "Inspect the response and rebate records."
+      ]
+    },
+    "expected_result": "MMS rejects the request and does not record it as Pending.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-035",
+    "source_id": "BR-MMS-021 Verify a request meeting the stated minimum three-day duration is not rejected for being below the minimum.",
+    "purpose": "Verify a request meeting the stated minimum three-day duration is not rejected for being below the minimum.",
+    "preconditions": [
+      "A registered Student submits a request with valid reason and lead time."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "duration": "Three consecutive calendar days"
+      },
+      "steps": [
+        "Submit a request covering three consecutive calendar days.",
+        "Inspect whether it is accepted or rejected specifically for minimum duration."
+      ]
+    },
+    "expected_result": "MMS does not reject the request for having fewer than three days; the stated minimum is met.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-036",
+    "source_id": "BR-MMS-022 Verify a rebate request submitted at least one calendar day before its start date satisfies the lead-time rule.",
+    "purpose": "Verify a rebate request submitted at least one calendar day before its start date satisfies the lead-time rule.",
+    "preconditions": [
+      "A registered Student submits a valid rebate duration and reason."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "start_date": "The next calendar day or later relative to submission date"
+      },
+      "steps": [
+        "Submit a rebate request with start date at least one calendar day ahead.",
+        "Inspect whether it is rejected for insufficient lead time."
+      ]
+    },
+    "expected_result": "MMS does not reject the request for failing the specified one-calendar-day lead time.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-037",
+    "source_id": "BR-MMS-022 Verify a rebate request with less than one calendar day of lead time is rejected.",
+    "purpose": "Verify a rebate request with less than one calendar day of lead time is rejected.",
+    "preconditions": [
+      "A registered Student submits an otherwise valid rebate request."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "start_date": "Current calendar date or otherwise less than one calendar day after submission"
+      },
+      "steps": [
+        "Submit the request with insufficient lead time.",
+        "Inspect request records."
+      ]
+    },
+    "expected_result": "MMS rejects the request and does not create a Pending rebate.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-038",
+    "source_id": "BR-MMS-023 Verify a new rebate request whose date range overlaps an existing request is prevented.",
+    "purpose": "Verify a new rebate request whose date range overlaps an existing request is prevented.",
+    "preconditions": [
+      "A Student has an existing Pending or Approved rebate request.",
+      "A second request overlaps at least one date of the first."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "existing_range": "Valid rebate interval",
+        "new_range": "Interval sharing at least one date with existing range"
+      },
+      "steps": [
+        "Submit the overlapping second request.",
+        "Inspect both requests."
+      ]
+    },
+    "expected_result": "MMS prevents the overlapping request and preserves the existing request.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-039",
+    "source_id": "BR-MMS-023 Verify non-overlapping rebate requests are not rejected by the non-overlap rule.",
+    "purpose": "Verify non-overlapping rebate requests are not rejected by the non-overlap rule.",
+    "preconditions": [
+      "A Student has an existing rebate request.",
+      "A second otherwise valid request has a disjoint date range."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "new_range": "Valid range with no shared dates"
+      },
+      "steps": [
+        "Submit the second non-overlapping request.",
+        "Inspect the response and both requests."
+      ]
+    },
+    "expected_result": "The second request is not rejected for overlap; the first remains unchanged.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-040",
+    "source_id": "BR-MMS-024 Verify each specified rebate reason is accepted when all other requirements are met, including an explanation for Other.",
+    "purpose": "Verify each specified rebate reason is accepted when all other requirements are met, including an explanation for Other.",
+    "preconditions": [
+      "Student is currently registered.",
+      "Dates meet the duration and lead-time requirements."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "reason_cases": [
+          {
+            "reason": "Medical"
+          },
+          {
+            "reason": "Institute leave"
+          },
+          {
+            "reason": "Family function"
+          },
+          {
+            "reason": "Other",
+            "explanation": "Non-empty explanation"
+          }
+        ]
+      },
+      "steps": [
+        "Submit one otherwise valid request for each listed reason.",
+        "Inspect the recorded reason and explanation."
+      ]
+    },
+    "expected_result": "The four specified categories are accepted as reasons when the stated requirements are met; Other retains its supplied explanation.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-041",
+    "source_id": "BR-MMS-024 Verify a missing reason, an unsupported reason, or Other without an explanation is not accepted.",
+    "purpose": "Verify a missing reason, an unsupported reason, or Other without an explanation is not accepted.",
+    "preconditions": [
+      "Student is currently registered.",
+      "All other rebate fields are valid."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "invalid_cases": [
+          "Reason omitted",
+          "Reason outside the four named categories",
+          "Other with omitted or empty explanation"
+        ]
+      },
+      "steps": [
+        "Submit each invalid reason case separately.",
+        "Inspect whether a rebate request is created."
+      ]
+    },
+    "expected_result": "MMS requires a supported reason and requires an explanation for Other; invalid cases are not recorded as valid Pending requests.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-042",
+    "source_id": "BR-MMS-025 Verify the dates on an approved request without date modification are the dates used for billing adjustment.",
+    "purpose": "Verify the dates on an approved request without date modification are the dates used for billing adjustment.",
+    "preconditions": [
+      "A rebate is Pending with valid submitted dates.",
+      "The active Caretaker approves it without modifying dates.",
+      "A bill covers the approved date period."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "date_action": "No modification",
+        "billing_period": "Corresponding month"
+      },
+      "steps": [
+        "Approve the rebate using the submitted dates.",
+        "Generate/inspect the corresponding bill adjustment."
+      ]
+    },
+    "expected_result": "The approved submitted dates are the dates used for the billing adjustment.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-043",
+    "source_id": "BR-MMS-025 Determine acceptance limits and billing effects when Caretaker modifies rebate dates before approval.",
+    "purpose": "Determine acceptance limits and billing effects when Caretaker modifies rebate dates before approval.",
+    "preconditions": [
+      "A Pending rebate request exists.",
+      "An external mess policy would have to define permitted modifications."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "action": "Modify requested dates before approval"
+      },
+      "steps": [
+        "Attempt to establish permitted modified dates and the resulting approved dates."
+      ],
+      "blocked_reason": "The specifications condition date changes on external mess policy but do not define permitted ranges, limits, or acceptance outcomes. No modified date range or expected result can be asserted."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-044",
+    "source_id": "BR-MMS-026 Verify vacation survey notifications/availability are limited to currently registered Students.",
+    "purpose": "Verify vacation survey notifications/availability are limited to currently registered Students.",
+    "preconditions": [
+      "A vacation survey is created.",
+      "There is at least one currently registered Student and one not currently registered Student."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "student_states": [
+          "Currently registered",
+          "Not currently registered"
+        ]
+      },
+      "steps": [
+        "Create the survey for an upcoming vacation.",
+        "Inspect the intended survey recipients/availability for both Student states."
+      ]
+    },
+    "expected_result": "Only currently registered Students receive the survey; a non-registered Student is excluded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-045",
+    "source_id": "BR-MMS-027 Verify a registered Student who does not respond before the deadline receives a default No response.",
+    "purpose": "Verify a registered Student who does not respond before the deadline receives a default No response.",
+    "preconditions": [
+      "A survey and response deadline exist.",
+      "The Student is currently registered and has not responded before the deadline."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "response": "No response before deadline"
+      },
+      "steps": [
+        "Process the survey at its response deadline.",
+        "Inspect the Student's recorded response."
+      ]
+    },
+    "expected_result": "MMS records No as the default response for the registered nonresponding Student.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-046",
+    "source_id": "BR-MMS-027 Verify an explicit response submitted before the deadline is not replaced by default No.",
+    "purpose": "Verify an explicit response submitted before the deadline is not replaced by default No.",
+    "preconditions": [
+      "A registered Student has explicitly answered before the survey deadline."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "explicit_responses": [
+          "Yes",
+          "No"
+        ]
+      },
+      "steps": [
+        "Process the survey deadline for each explicit-response scenario.",
+        "Inspect the recorded response."
+      ]
+    },
+    "expected_result": "The explicit Yes or No remains the response; default No applies only to Students who did not respond before the deadline.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-047",
+    "source_id": "BR-MMS-027 Determine the outcome for a response submitted exactly at the response-deadline instant.",
+    "purpose": "Determine the outcome for a response submitted exactly at the response-deadline instant.",
+    "preconditions": [
+      "A response deadline has an exact timestamp.",
+      "A Student submission is timestamped exactly at that instant."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "submission_time": "Exactly the response-deadline instant"
+      },
+      "steps": [
+        "Submit/process the response at the exact deadline boundary.",
+        "Determine whether it counts as before the deadline or as nonresponse."
+      ],
+      "blocked_reason": "The specifications say 'before the deadline' and default at the deadline but do not state whether a response at the exact deadline instant is timely. No boundary convention is assumed."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-048",
+    "source_id": "BR-MMS-028 Verify a special-food request submitted at least one calendar day before its requested date is allowed by the lead-time rule.",
+    "purpose": "Verify a special-food request submitted at least one calendar day before its requested date is allowed by the lead-time rule.",
+    "preconditions": [
+      "Actor is a Student.",
+      "Request has an allowed context: illness or personal event."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "requested_date": "At least one calendar day after submission"
+      },
+      "steps": [
+        "Submit a special-food request with the specified lead time.",
+        "Inspect whether it is rejected for insufficient lead time."
+      ]
+    },
+    "expected_result": "The request is not rejected for violating the one-calendar-day lead-time rule.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-BR-049",
+    "source_id": "BR-MMS-028 Verify a special-food request submitted less than one calendar day before its requested date is not allowed.",
+    "purpose": "Verify a special-food request submitted less than one calendar day before its requested date is not allowed.",
+    "preconditions": [
+      "Actor is a Student.",
+      "Request otherwise has an allowed context."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "requested_date": "Same calendar date as submission or less than one calendar day ahead"
+      },
+      "steps": [
+        "Submit the insufficient-lead-time request.",
+        "Inspect request records."
+      ]
+    },
+    "expected_result": "MMS rejects the request and does not record it as Requested.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-050",
+    "source_id": "BR-MMS-029 Verify the institution-defined timeout threshold and default-rejection boundary.",
+    "purpose": "Verify the institution-defined timeout threshold and default-rejection boundary.",
+    "preconditions": [
+      "A special-food request is Requested.",
+      "The institution has not supplied the decision-period value."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "decision_period": "Unspecified; source only notes 12 hours as intended"
+      },
+      "steps": [
+        "Determine the exact elapsed time at which default rejection occurs and the behavior at that boundary."
+      ],
+      "blocked_reason": "The exact decision period is institution-defined and is not specified. The intended 12-hour reference is explicitly not a frozen policy value; no numeric threshold or exact-boundary result may be asserted."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-051",
+    "source_id": "BR-MMS-030 Verify charges for approved special-food requests are added to the Student monthly bill.",
+    "purpose": "Verify charges for approved special-food requests are added to the Student monthly bill.",
+    "preconditions": [
+      "A special-food request is Approved and has a charge amount supplied by the applicable policy/input source.",
+      "A bill is generated for the corresponding month."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "charge": "Externally supplied approved-request charge X"
+      },
+      "steps": [
+        "Generate the corresponding monthly bill.",
+        "Compare its special-food charge component with the approved request charge."
+      ]
+    },
+    "expected_result": "The approved special-food charge X is included in the Student's monthly bill; this test does not define the charge amount.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-052",
+    "source_id": "BR-MMS-030 Determine whether a charge is reversed or suppressed after an approved special-food request is later Cancelled.",
+    "purpose": "Determine whether a charge is reversed or suppressed after an approved special-food request is later Cancelled.",
+    "preconditions": [
+      "A special-food request was Approved and charged, then marked Cancelled."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "state_sequence": [
+          "Approved",
+          "Cancelled"
+        ],
+        "bill_period": "Period containing requested date"
+      },
+      "steps": [
+        "Generate or inspect the corresponding monthly bill.",
+        "Determine whether the charge is retained, reversed, or suppressed."
+      ],
+      "blocked_reason": "The specifications explicitly leave billing treatment after Cancelled unresolved (ISS-MMS-015). No charge outcome may be invented."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-053",
+    "source_id": "BR-MMS-031 Verify Request and decision states are tracked as Requested followed by Approved or Rejected.",
+    "purpose": "Verify Request and decision states are tracked as Requested followed by Approved or Rejected.",
+    "preconditions": [
+      "A Student submits a valid special-food request.",
+      "The active Caretaker makes one decision."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "state_paths": [
+          "Requested to Approved",
+          "Requested to Rejected"
+        ]
+      },
+      "steps": [
+        "Submit a request and inspect its initial status/history.",
+        "Run separate approval and rejection scenarios and inspect each resulting status/history."
+      ]
+    },
+    "expected_result": "The request begins as Requested and the Caretaker decision is recorded as Approved or Rejected in the applicable scenario.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-054",
+    "source_id": "BR-MMS-031 Verify who may perform Served/Cancelled transitions and whether invalid pre-approval transitions are rejected.",
+    "purpose": "Verify who may perform Served/Cancelled transitions and whether invalid pre-approval transitions are rejected.",
+    "preconditions": [
+      "A special-food request is in a known state."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "candidate_transitions": [
+          "Requested to Served",
+          "Requested to Cancelled",
+          "Approved to Served",
+          "Approved to Cancelled"
+        ]
+      },
+      "steps": [
+        "Exercise the specified fulfillment-state transitions and determine the actor permitted to record them."
+      ],
+      "blocked_reason": "The Problem Statement does not explicitly assign the actor who records Served or Cancelled (ISS-MMS-014). A reliable actor/action test cannot be derived without inventing authorization or invocation behavior; resolve the actor before asserting these transitions."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-055",
+    "source_id": "BR-MMS-032 Verify the active Caretaker may publish a mess-related announcement.",
+    "purpose": "Verify the active Caretaker may publish a mess-related announcement.",
+    "preconditions": [
+      "The actor holds the active Caretaker role.",
+      "Announcement content is provided."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actor": "Active Caretaker",
+        "announcement": "Mess-related announcement content"
+      },
+      "steps": [
+        "Publish the announcement as the active Caretaker.",
+        "Inspect the announcement history."
+      ]
+    },
+    "expected_result": "The announcement is published and recorded in history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-056",
+    "source_id": "BR-MMS-032 Verify the active Warden may publish a mess-related announcement as announcement owner.",
+    "purpose": "Verify the active Warden may publish a mess-related announcement as announcement owner.",
+    "preconditions": [
+      "The actor holds the active Warden role.",
+      "Announcement content is provided."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actor": "Active Warden",
+        "announcement": "Mess-related announcement content"
+      },
+      "steps": [
+        "Publish the announcement as the active Warden.",
+        "Inspect the announcement history."
+      ]
+    },
+    "expected_result": "The announcement is published and recorded in history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-057",
+    "source_id": "BR-MMS-032 Verify only active Caretaker or active Warden can publish announcements.",
+    "purpose": "Verify only active Caretaker or active Warden can publish announcements.",
+    "preconditions": [
+      "An announcement is not yet published.",
+      "Actors include Student and a non-active Caretaker or Warden."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actors": [
+          "Student",
+          "Non-active Caretaker",
+          "Non-active Warden"
+        ]
+      },
+      "steps": [
+        "Attempt to publish as each actor.",
+        "Inspect announcement history and notification triggers."
+      ]
+    },
+    "expected_result": "Publication is rejected for actors who are not the active Caretaker or active Warden; no announcement is added for rejected attempts.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-058",
+    "source_id": "BR-MMS-033 Verify published mess-relevant announcements are maintained in history and viewable by Student, Caretaker, and Warden according to stated access rights.",
+    "purpose": "Verify published mess-relevant announcements are maintained in history and viewable by Student, Caretaker, and Warden according to stated access rights.",
+    "preconditions": [
+      "At least one mess-relevant announcement has been published.",
+      "Student, active Caretaker, and Warden actors are available."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actors": [
+          "Student",
+          "Caretaker",
+          "Warden"
+        ],
+        "history": "One or more published announcements"
+      },
+      "steps": [
+        "Inspect announcement history as each named actor.",
+        "Compare returned history with the published announcement records."
+      ]
+    },
+    "expected_result": "Announcement history is maintained and viewable by the named actors according to their access rights; viewing does not alter history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-059",
+    "source_id": "BR-MMS-033 Determine Mess Admin access to announcement history.",
+    "purpose": "Determine Mess Admin access to announcement history.",
+    "preconditions": [
+      "Announcement history exists.",
+      "Actor is Mess Admin."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "action": "View announcement history"
+      },
+      "steps": [
+        "Attempt to view announcement history as Mess Admin."
+      ],
+      "blocked_reason": "The Problem Statement says all MMS actors may view history according to access rights but also restricts Mess Admin to role-management and denies operational-data access. Announcement-history access is not explicitly resolved; no permission outcome is assumed."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-060",
+    "source_id": "BR-MMS-034 Verify Warden can view the specified supervisory reports.",
+    "purpose": "Verify Warden can view the specified supervisory reports.",
+    "preconditions": [
+      "The actor is Warden.",
+      "Report data is available."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "reports": [
+          "Registered student list",
+          "Rebate summary",
+          "Vacation survey response summary"
+        ]
+      },
+      "steps": [
+        "Request each specified supervisory report as Warden.",
+        "Inspect the report category and returned MMS data."
+      ]
+    },
+    "expected_result": "Warden can view the specified supervisory reports within MMS scope.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-061",
+    "source_id": "BR-MMS-034 Verify Caretaker cannot access supervisory reports restricted to Warden.",
+    "purpose": "Verify Caretaker cannot access supervisory reports restricted to Warden.",
+    "preconditions": [
+      "Supervisory report data exists.",
+      "Actor is Caretaker."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "report": "One of the specified supervisory reports"
+      },
+      "steps": [
+        "Attempt to request a supervisory report as Caretaker."
+      ]
+    },
+    "expected_result": "Access to the Warden-restricted supervisory report is prevented and the report data is not disclosed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-062",
+    "source_id": "BR-MMS-034 Verify Caretaker may generate the specified operational reports.",
+    "purpose": "Verify Caretaker may generate the specified operational reports.",
+    "preconditions": [
+      "The actor is active Caretaker.",
+      "Operational report data is available."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "reports": [
+          "Registration trends",
+          "Special meal logs",
+          "Billing summaries"
+        ]
+      },
+      "steps": [
+        "Request each specified operational report as Caretaker.",
+        "Inspect the returned report category and MMS data."
+      ]
+    },
+    "expected_result": "Caretaker can generate the specified operational reports within MMS scope.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-063",
+    "source_id": "BR-MMS-034 Verify Warden cannot access operational reports restricted to Caretaker.",
+    "purpose": "Verify Warden cannot access operational reports restricted to Caretaker.",
+    "preconditions": [
+      "Operational report data exists.",
+      "Actor is Warden."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "report": "One of the specified operational reports"
+      },
+      "steps": [
+        "Attempt to request an operational report as Warden."
+      ]
+    },
+    "expected_result": "Access to the Caretaker-restricted operational report is prevented and the report data is not disclosed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-064",
+    "source_id": "BR-MMS-035 Verify MMS triggers notifications for registration and deregistration request submissions and their approval/rejection decisions.",
+    "purpose": "Verify MMS triggers notifications for registration and deregistration request submissions and their approval/rejection decisions.",
+    "preconditions": [
+      "Student request scenarios can be performed.",
+      "MMS notification trigger records are observable."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "events": [
+          "Registration submission",
+          "Deregistration submission",
+          "Registration approval or rejection",
+          "Deregistration approval or rejection"
+        ]
+      },
+      "steps": [
+        "Perform each listed submission and decision event.",
+        "Inspect notification triggers and intended Student recipients."
+      ]
+    },
+    "expected_result": "MMS triggers system-generated email notifications for each listed request event; external delivery is not asserted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-065",
+    "source_id": "BR-MMS-035 Verify MMS triggers notifications for rebate submission and decision events.",
+    "purpose": "Verify MMS triggers notifications for rebate submission and decision events.",
+    "preconditions": [
+      "A Student can submit a rebate and the Caretaker can decide it.",
+      "Notification trigger records are observable."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "events": [
+          "Rebate submission",
+          "Rebate approval or rejection"
+        ]
+      },
+      "steps": [
+        "Submit and decide a rebate request in separate lifecycle steps.",
+        "Inspect triggers and Student recipient for each event."
+      ]
+    },
+    "expected_result": "MMS triggers the specified submission and decision notifications to the Student.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-066",
+    "source_id": "BR-MMS-035 Verify MMS triggers notifications for special-food submission, decision, and applicable fulfillment updates.",
+    "purpose": "Verify MMS triggers notifications for special-food submission, decision, and applicable fulfillment updates.",
+    "preconditions": [
+      "Special-food lifecycle events can be performed.",
+      "Notification trigger records are observable."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "events": [
+          "Request submission",
+          "Decision outcome",
+          "Fulfillment-related update where applicable"
+        ]
+      },
+      "steps": [
+        "Perform the specified special-food lifecycle events where an actor and transition are defined.",
+        "Inspect trigger records for the Student."
+      ]
+    },
+    "expected_result": "MMS triggers notifications for the listed special-food submission and decision events and applicable fulfillment updates; external delivery is not asserted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-067",
+    "source_id": "BR-MMS-035 Verify MMS triggers notifications for vacation survey creation and reminders.",
+    "purpose": "Verify MMS triggers notifications for vacation survey creation and reminders.",
+    "preconditions": [
+      "Survey creation and an institution-defined reminder event are available.",
+      "Notification triggers are observable."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "events": [
+          "Survey creation",
+          "Reminder for an open survey"
+        ]
+      },
+      "steps": [
+        "Create a survey and inspect its notification trigger.",
+        "When the specified reminder event occurs for an open survey, inspect its trigger."
+      ]
+    },
+    "expected_result": "MMS triggers the specified survey-creation and reminder notifications; the reminder schedule itself and external delivery are not asserted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-068",
+    "source_id": "BR-MMS-035 Verify MMS triggers notifications for published menu updates, monthly bill publication, and new announcements.",
+    "purpose": "Verify MMS triggers notifications for published menu updates, monthly bill publication, and new announcements.",
+    "preconditions": [
+      "Each specified event is completed successfully.",
+      "Notification trigger records are observable."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "events": [
+          "Published menu update",
+          "Monthly bill publication",
+          "New announcement"
+        ]
+      },
+      "steps": [
+        "Perform each event and inspect its corresponding notification trigger and intended Student recipients."
+      ]
+    },
+    "expected_result": "MMS triggers the listed event notifications; this test does not assert external email delivery.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-069",
+    "source_id": "BR-MMS-035 Verify behavior when external email delivery fails after an MMS notification trigger.",
+    "purpose": "Verify behavior when external email delivery fails after an MMS notification trigger.",
+    "preconditions": [
+      "An explicitly listed MMS notification event has triggered.",
+      "External email delivery fails."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "event": "External email delivery failure"
+      },
+      "steps": [
+        "Observe the external delivery failure and determine the required MMS handling."
+      ],
+      "blocked_reason": "The BR and Problem Statement explicitly place external email delivery and unspecified delivery-failure handling outside MMS. No delivery retry, status, or user-facing outcome is specified."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-070",
+    "source_id": "BR-MMS-036 Verify the full boundary between MMS behavior and institutional policy definition.",
+    "purpose": "Verify the full boundary between MMS behavior and institutional policy definition.",
+    "preconditions": [
+      "Institutional policy owns rates, vacation periods, and employee appointment policy."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "policy_areas": [
+          "Rates",
+          "Vacation periods",
+          "Employee appointment policy"
+        ]
+      },
+      "steps": [
+        "Determine the complete set of policy-definition behaviors that MMS must reject versus values it may consume as inputs."
+      ],
+      "blocked_reason": "The rule assigns policy ownership externally but does not define policy-administration actions, interfaces, or a complete test oracle for non-ownership. Values used as inputs are testable only when supplied; no specific policy-management behavior is invented."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-071",
+    "source_id": "BR-MMS-038 Verify Student may view the weekly menu.",
+    "purpose": "Verify Student may view the weekly menu.",
+    "preconditions": [
+      "A weekly menu has been published.",
+      "Actor is Student."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actor": "Student",
+        "menu": "Published weekly menu"
+      },
+      "steps": [
+        "View the weekly menu as Student.",
+        "Compare displayed day-wise meal entries with the published menu."
+      ]
+    },
+    "expected_result": "Student may view the weekly menu.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-072",
+    "source_id": "BR-MMS-038 Verify the active Caretaker may view the weekly menu.",
+    "purpose": "Verify the active Caretaker may view the weekly menu.",
+    "preconditions": [
+      "A weekly menu has been published.",
+      "Actor is active Caretaker."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actor": "Caretaker",
+        "menu": "Published weekly menu"
+      },
+      "steps": [
+        "View the weekly menu as Caretaker."
+      ]
+    },
+    "expected_result": "Caretaker may view the weekly menu.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-073",
+    "source_id": "BR-MMS-038 Verify the Warden may view the weekly menu.",
+    "purpose": "Verify the Warden may view the weekly menu.",
+    "preconditions": [
+      "A weekly menu has been published.",
+      "Actor is Warden."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actor": "Warden",
+        "menu": "Published weekly menu"
+      },
+      "steps": [
+        "View the weekly menu as Warden."
+      ]
+    },
+    "expected_result": "Warden may view the weekly menu.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-074",
+    "source_id": "BR-MMS-038 Determine whether Mess Admin can view the weekly menu.",
+    "purpose": "Determine whether Mess Admin can view the weekly menu.",
+    "preconditions": [
+      "A weekly menu has been published.",
+      "Actor is Mess Admin."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "action": "View weekly menu"
+      },
+      "steps": [
+        "Attempt to view the weekly menu as Mess Admin."
+      ],
+      "blocked_reason": "BR-MMS-038 is marked Needs Clarification. The Problem Statement says Mess Admin may view menus according to access rights but also denies operational-data access. The conflict is expressly unresolved (ISS-MMS-012)."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-075",
+    "source_id": "BR-MMS-039 Verify the Caretaker can add, modify, and delete weekly menu items.",
+    "purpose": "Verify the Caretaker can add, modify, and delete weekly menu items.",
+    "preconditions": [
+      "Actor is active Caretaker.",
+      "A weekly menu exists or can be created."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "operations": [
+          "Add item",
+          "Modify item",
+          "Delete item"
+        ]
+      },
+      "steps": [
+        "Perform each listed maintenance operation as Caretaker.",
+        "Inspect the saved weekly menu after each operation."
+      ]
+    },
+    "expected_result": "Caretaker may add, delete, or modify menu items and the resulting weekly menu reflects the operation.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-076",
+    "source_id": "BR-MMS-039 Verify actors other than the Caretaker cannot add, modify, or delete weekly menu items.",
+    "purpose": "Verify actors other than the Caretaker cannot add, modify, or delete weekly menu items.",
+    "preconditions": [
+      "A valid weekly menu exists.",
+      "Actors include Student, Warden, and Mess Admin."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actors": [
+          "Student",
+          "Warden",
+          "Mess Admin"
+        ],
+        "operations": [
+          "Add",
+          "Modify",
+          "Delete"
+        ]
+      },
+      "steps": [
+        "Attempt each menu-maintenance operation using each non-Caretaker actor.",
+        "Inspect the original menu after each attempt."
+      ]
+    },
+    "expected_result": "Only Caretaker is permitted to maintain menu items; non-Caretaker attempts are rejected and the existing valid menu remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-077",
+    "source_id": "BR-MMS-040 Verify a Student can view only that Student's actor-visible MMS bills and outstanding balance.",
+    "purpose": "Verify a Student can view only that Student's actor-visible MMS bills and outstanding balance.",
+    "preconditions": [
+      "Student A and Student B have distinct bill records.",
+      "At least one bill is actor-visible to Student A."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actor": "Student A",
+        "records": [
+          "Student A bill",
+          "Student B bill"
+        ]
+      },
+      "steps": [
+        "View bills and balance as Student A.",
+        "Inspect response records and balance source."
+      ]
+    },
+    "expected_result": "Only Student A's actor-visible MMS bill information and outstanding balance are returned; Student B's data is not disclosed.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-078",
+    "source_id": "BR-MMS-040 Determine cross-system behavior for payment collection and accounting or payroll balances.",
+    "purpose": "Determine cross-system behavior for payment collection and accounting or payroll balances.",
+    "preconditions": [
+      "An external payment/accounting system holds financial data."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "external_functions": [
+          "Payment collection",
+          "Accounting settlement",
+          "Payroll/accounting operations"
+        ]
+      },
+      "steps": [
+        "Determine what MMS must display or do with external financial operations."
+      ],
+      "blocked_reason": "These functions are expressly outside MMS unless handled by another Fusion module. The specifications do not define cross-system balance, synchronization, or payment behavior to assert."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-079",
+    "source_id": "BR-MMS-041 Verify the exact accepted spelling, casing, and serialization of the Yes/No response values.",
+    "purpose": "Verify the exact accepted spelling, casing, and serialization of the Yes/No response values.",
+    "preconditions": [
+      "A Student is currently registered and a survey is open."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "candidate_values": [
+          "Yes",
+          "No",
+          "yes",
+          "no"
+        ]
+      },
+      "steps": [
+        "Submit the specified choices and determine whether casing or transport representation affects acceptance."
+      ],
+      "blocked_reason": "The specifications constrain the semantic choices to Yes or No but do not specify casing, wire format, or normalization. Only the two semantic choices and rejection of other choices are asserted by the testable cases."
+    },
+    "expected_result": null,
+    "test_type": "blocked"
+  },
+  {
+    "test_id": "TC-BR-080",
+    "source_id": "BR-MMS-041 Verify a Student can submit the semantic Yes response.",
+    "purpose": "Verify a Student can submit the semantic Yes response.",
+    "preconditions": [
+      "Student is currently registered.",
+      "Vacation survey is open before its response deadline."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "response": "Yes"
+      },
+      "steps": [
+        "Submit Yes as the Student.",
+        "Inspect the recorded semantic response."
+      ]
+    },
+    "expected_result": "MMS records an affirmative Yes response.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-081",
+    "source_id": "BR-MMS-041 Verify a Student can submit the semantic No response.",
+    "purpose": "Verify a Student can submit the semantic No response.",
+    "preconditions": [
+      "Student is currently registered.",
+      "Vacation survey is open before its response deadline."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "response": "No"
+      },
+      "steps": [
+        "Submit No as the Student.",
+        "Inspect the recorded semantic response."
+      ]
+    },
+    "expected_result": "MMS records a negative No response.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-082",
+    "source_id": "BR-MMS-041 Verify a value other than Yes or No is rejected and not recorded as a response.",
+    "purpose": "Verify a value other than Yes or No is rejected and not recorded as a response.",
+    "preconditions": [
+      "Student is currently registered.",
+      "Vacation survey is open."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "response": "A value other than Yes or No"
+      },
+      "steps": [
+        "Submit a non-Yes/No response.",
+        "Inspect response records."
+      ]
+    },
+    "expected_result": "The invalid choice is rejected and no invalid response is recorded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-BR-083",
+    "source_id": "BR-MMS-042 Verify a Student can view status and history for that Student's own submitted requests.",
+    "purpose": "Verify a Student can view status and history for that Student's own submitted requests.",
+    "preconditions": [
+      "Student A has submitted at least one MMS request with status/history recorded."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actor": "Student A",
+        "request_owner": "Student A"
+      },
+      "steps": [
+        "Open request status/history as Student A.",
+        "Compare the returned status and history with the submitted request."
+      ]
+    },
+    "expected_result": "MMS displays the Student's own request status and history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-BR-084",
+    "source_id": "BR-MMS-042 Verify Student B cannot view Student A's request status or history.",
+    "purpose": "Verify Student B cannot view Student A's request status or history.",
+    "preconditions": [
+      "Student A has a request with status/history recorded.",
+      "Student B is authenticated."
+    ],
+    "action_or_input": {
+      "test_data": {
+        "actor": "Student B",
+        "target_owner": "Student A"
+      },
+      "steps": [
+        "Attempt to retrieve Student A's request status/history as Student B.",
+        "Inspect the response for disclosure of Student A's request data."
+      ]
+    },
+    "expected_result": "Student A's request status and history are not disclosed to Student B.",
+    "test_type": "negative"
+  }
+]

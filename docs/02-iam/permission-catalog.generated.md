@@ -13,6 +13,23 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `mms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `mms.student.use` | Use student mess services | `student` |
+| `mms.operations.view` | View mess operational services | `mess_caretaker`, `mess_warden` |
+| `mms.operations.manage` | Manage mess operational services | `mess_caretaker` |
+| `mms.requests.review` | Decide student mess requests | `mess_caretaker` |
+| `mms.menu.manage` | Maintain weekly menu | `mess_caretaker` |
+| `mms.billing.manage` | Generate, finalize and publish bills | `mess_caretaker` |
+| `mms.feedback.view` | Review student feedback | `mess_caretaker`, `mess_warden` |
+| `mms.surveys.manage` | Manage vacation surveys | `mess_caretaker` |
+| `mms.announcements.publish` | Publish mess announcements | `mess_caretaker`, `mess_warden` |
+| `mms.reports.warden` | View supervisory reports | `mess_warden` |
+| `mms.reports.caretaker` | Generate operational reports | `mess_caretaker` |
+| `mms.roles.manage` | Assign mess roles | `mess_admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

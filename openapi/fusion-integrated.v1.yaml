@@ -105,6 +105,686 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/mms/announcements:
+    get:
+      operationId: v1_mms_announcements_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MmsAnnouncement'
+          description: ''
+    post:
+      operationId: v1_mms_announcements_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MmsAnnouncement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MmsAnnouncement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MmsAnnouncement'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MmsAnnouncement'
+          description: ''
+  /api/v1/mms/billing-inputs:
+    post:
+      operationId: v1_mms_billing_inputs_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bill'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Bill'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Bill'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+  /api/v1/mms/billing-students:
+    get:
+      operationId: v1_mms_billing_students_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+  /api/v1/mms/bills:
+    get:
+      operationId: v1_mms_bills_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+  /api/v1/mms/bills/{bill_id}/{action}:
+    post:
+      operationId: v1_mms_bills_create
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: bill_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bill'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Bill'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Bill'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+  /api/v1/mms/feedback:
+    get:
+      operationId: v1_mms_feedback_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+    post:
+      operationId: v1_mms_feedback_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+  /api/v1/mms/menu:
+    get:
+      operationId: v1_mms_menu_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuWeek'
+          description: ''
+    post:
+      operationId: v1_mms_menu_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuWeek'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MenuWeek'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MenuWeek'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuWeek'
+          description: ''
+  /api/v1/mms/overview:
+    get:
+      operationId: v1_mms_overview_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/mms/rebates:
+    get:
+      operationId: v1_mms_rebates_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rebate'
+          description: ''
+    post:
+      operationId: v1_mms_rebates_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rebate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rebate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rebate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rebate'
+          description: ''
+  /api/v1/mms/rebates/{request_id}/decision:
+    post:
+      operationId: v1_mms_rebates_decision_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rebate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rebate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rebate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rebate'
+          description: ''
+  /api/v1/mms/registration-windows:
+    get:
+      operationId: v1_mms_registration_windows_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationWindow'
+          description: ''
+    post:
+      operationId: v1_mms_registration_windows_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationWindow'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegistrationWindow'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegistrationWindow'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationWindow'
+          description: ''
+  /api/v1/mms/reports:
+    get:
+      operationId: v1_mms_reports_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+  /api/v1/mms/requests:
+    get:
+      operationId: v1_mms_requests_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentRequest'
+          description: ''
+    post:
+      operationId: v1_mms_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentRequest'
+          description: ''
+  /api/v1/mms/requests/{request_id}/decision:
+    post:
+      operationId: v1_mms_requests_decision_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentRequest'
+          description: ''
+  /api/v1/mms/roles:
+    get:
+      operationId: v1_mms_roles_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+    post:
+      operationId: v1_mms_roles_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RoleAssignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleAssignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignment'
+          description: ''
+  /api/v1/mms/special-food:
+    get:
+      operationId: v1_mms_special_food_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialFood'
+          description: ''
+    post:
+      operationId: v1_mms_special_food_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialFood'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpecialFood'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpecialFood'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialFood'
+          description: ''
+  /api/v1/mms/special-food/{request_id}/decision:
+    post:
+      operationId: v1_mms_special_food_decision_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialFood'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpecialFood'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpecialFood'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialFood'
+          description: ''
+  /api/v1/mms/special-food/{request_id}/fulfillment:
+    post:
+      operationId: v1_mms_special_food_fulfillment_create
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecialFood'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpecialFood'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpecialFood'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecialFood'
+          description: ''
+  /api/v1/mms/student-status:
+    get:
+      operationId: v1_mms_student_status_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentRequest'
+          description: ''
+  /api/v1/mms/vacation-surveys:
+    get:
+      operationId: v1_mms_vacation_surveys_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VacationSurvey'
+          description: ''
+    post:
+      operationId: v1_mms_vacation_surveys_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VacationSurvey'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VacationSurvey'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VacationSurvey'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VacationSurvey'
+          description: ''
+  /api/v1/mms/vacation-surveys/{survey_id}/remind:
+    post:
+      operationId: v1_mms_vacation_surveys_remind_create
+      parameters:
+      - in: path
+        name: survey_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VacationSurvey'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VacationSurvey'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VacationSurvey'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VacationSurvey'
+          description: ''
+  /api/v1/mms/vacation-surveys/{survey_id}/responses:
+    get:
+      operationId: v1_mms_vacation_surveys_responses_retrieve
+      parameters:
+      - in: path
+        name: survey_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VacationResponse'
+          description: ''
+    post:
+      operationId: v1_mms_vacation_surveys_responses_create
+      parameters:
+      - in: path
+        name: survey_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VacationResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VacationResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VacationResponse'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VacationResponse'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -1993,6 +2673,86 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    Bill:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        year:
+          type: integer
+          readOnly: true
+        month:
+          type: integer
+          readOnly: true
+        daily_rate:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+          readOnly: true
+        served_days:
+          type: integer
+          readOnly: true
+        special_food_charges:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        rebate_deduction:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,2})?$
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/BillStatusEnum'
+          readOnly: true
+        finalized_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        finalized_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - daily_rate
+      - finalized_at
+      - finalized_by_user_id
+      - id
+      - month
+      - published_at
+      - rebate_deduction
+      - served_days
+      - special_food_charges
+      - status
+      - total
+      - user_id
+      - year
+    BillStatusEnum:
+      enum:
+      - generated
+      - finalized
+      - published
+      type: string
+      description: |-
+        * `generated` - Generated
+        * `finalized` - Finalized
+        * `published` - Published
     BulkOutcome:
       type: object
       properties:
@@ -2315,6 +3075,24 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DayEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      description: |-
+        * `0` - Monday
+        * `1` - Tuesday
+        * `2` - Wednesday
+        * `3` - Thursday
+        * `4` - Friday
+        * `5` - Saturday
+        * `6` - Sunday
     Detail:
       type: object
       properties:
@@ -2422,6 +3200,27 @@ components:
       required:
       - fee_reference
       - season
+      - user_id
+    Feedback:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - message
       - user_id
     IncidentRecorded:
       type: object
@@ -2663,6 +3462,90 @@ components:
       required:
       - password
       - username
+    MealEnum:
+      enum:
+      - breakfast
+      - lunch
+      - dinner
+      type: string
+      description: |-
+        * `breakfast` - Breakfast
+        * `lunch` - Lunch
+        * `dinner` - Dinner
+    MenuEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        day:
+          allOf:
+          - $ref: '#/components/schemas/DayEnum'
+          minimum: 0
+          maximum: 32767
+        meal:
+          $ref: '#/components/schemas/MealEnum'
+        item:
+          type: string
+          maxLength: 200
+      required:
+      - day
+      - id
+      - meal
+    MenuWeek:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        week_start:
+          type: string
+          format: date
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuEntry'
+          readOnly: true
+      required:
+      - entries
+      - id
+      - published_at
+      - week_start
+    MmsAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        published_by_user_id:
+          type: integer
+          readOnly: true
+        published_by_role:
+          type: string
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - id
+      - published_at
+      - published_by_role
+      - published_by_user_id
+      - title
     ModeEnum:
       enum:
       - online
@@ -3201,6 +4084,107 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    Rebate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/RebateReasonEnum'
+          readOnly: true
+        explanation:
+          type: string
+          readOnly: true
+        starts_on:
+          type: string
+          format: date
+          readOnly: true
+        ends_on:
+          type: string
+          format: date
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/RebateStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/RebateHistory'
+          readOnly: true
+      required:
+      - created_at
+      - decided_at
+      - decided_by_user_id
+      - ends_on
+      - explanation
+      - history
+      - id
+      - reason
+      - starts_on
+      - status
+      - user_id
+    RebateHistory:
+      type: object
+      properties:
+        status:
+          type: string
+          maxLength: 12
+        actor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        note:
+          type: string
+          maxLength: 300
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - at
+      - status
+    RebateReasonEnum:
+      enum:
+      - medical
+      - institute_leave
+      - family_function
+      - other
+      type: string
+      description: |-
+        * `medical` - Medical
+        * `institute_leave` - Institute leave
+        * `family_function` - Family function
+        * `other` - Other
+    RebateStatusEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4450,108 @@ components:
       - message
       - reason
       - route
+    RegistrationWindow:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cycle:
+          type: string
+          maxLength: 100
+        opens_at:
+          type: string
+          format: date-time
+        closes_at:
+          type: string
+          format: date-time
+        opened_by_user_id:
+          type: integer
+          readOnly: true
+        is_open:
+          type: boolean
+          readOnly: true
+      required:
+      - closes_at
+      - cycle
+      - id
+      - is_open
+      - opened_by_user_id
+      - opens_at
+    RequestHistory:
+      type: object
+      properties:
+        status:
+          type: string
+          maxLength: 32
+        actor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        note:
+          type: string
+          maxLength: 300
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - at
+      - status
+    ResponseEnum:
+      enum:
+      - 'yes'
+      - 'no'
+      type: string
+      description: |-
+        * `yes` - Yes
+        * `no` - No
+    RoleAssignment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        is_current:
+          type: boolean
+          readOnly: true
+        assigned_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by_user_id
+      - created_at
+      - ends_at
+      - id
+      - is_current
+      - role
+      - starts_at
+      - user_id
+    RoleEnum:
+      enum:
+      - caretaker
+      - warden
+      type: string
+      description: |-
+        * `caretaker` - Mess Caretaker
+        * `warden` - Mess Warden
     RoundOutcome:
       type: object
       properties:
@@ -3663,6 +4749,106 @@ components:
       description: |-
         * `campus` - Through the Placement Cell
         * `off_campus` - Off campus (rules 5 and 24)
+    SpecialFood:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/SpecialFoodReasonEnum'
+          readOnly: true
+        details:
+          type: string
+          readOnly: true
+        requested_for:
+          type: string
+          format: date
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SpecialFoodStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        charge_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpecialFoodHistory'
+          readOnly: true
+      required:
+      - charge_amount
+      - created_at
+      - decided_at
+      - decided_by_user_id
+      - details
+      - history
+      - id
+      - reason
+      - requested_for
+      - status
+      - user_id
+    SpecialFoodHistory:
+      type: object
+      properties:
+        status:
+          type: string
+          maxLength: 12
+        actor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - at
+      - status
+    SpecialFoodReasonEnum:
+      enum:
+      - illness
+      - personal_event
+      type: string
+      description: |-
+        * `illness` - Illness
+        * `personal_event` - Personal event
+    SpecialFoodStatusEnum:
+      enum:
+      - requested
+      - approved
+      - rejected
+      - served
+      - cancelled
+      type: string
+      description: |-
+        * `requested` - Requested
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `served` - Served
+        * `cancelled` - Cancelled
     StaffStats:
       type: object
       description: PC-UC-011/012. Operational figures, staff only.
@@ -3691,6 +4877,84 @@ components:
       required:
       - available
       - season
+    StudentRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/StudentRequestKindEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StudentRequestStatusEnum'
+          readOnly: true
+          default: pending
+        window_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        effective_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestHistory'
+          readOnly: true
+      required:
+      - created_at
+      - decided_at
+      - decided_by_user_id
+      - effective_at
+      - history
+      - id
+      - kind
+      - status
+      - user_id
+      - window_id
+    StudentRequestKindEnum:
+      enum:
+      - registration
+      - deregistration
+      type: string
+      description: |-
+        * `registration` - Registration
+        * `deregistration` - Deregistration
+    StudentRequestStatusEnum:
+      enum:
+      - pending
+      - approved
+      - approved_awaiting_effect
+      - rejected
+      - effective
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `approved_awaiting_effect` - Approved - awaiting effective date
+        * `rejected` - Rejected
+        * `effective` - Effective
     SubmitOfferLetter:
       type: object
       properties:
@@ -3814,6 +5078,65 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    VacationResponse:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        response:
+          allOf:
+          - $ref: '#/components/schemas/ResponseEnum'
+          readOnly: true
+        is_default:
+          type: boolean
+          readOnly: true
+        responded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - is_default
+      - responded_at
+      - response
+      - user_id
+    VacationSurvey:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        vacation_starts_on:
+          type: string
+          format: date
+          readOnly: true
+        vacation_ends_on:
+          type: string
+          format: date
+          readOnly: true
+        deadline:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - created_by_user_id
+      - deadline
+      - id
+      - title
+      - vacation_ends_on
+      - vacation_starts_on
     WaiveIncident:
       type: object
       properties:
