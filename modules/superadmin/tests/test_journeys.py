@@ -264,18 +264,18 @@ def test_journey_uc_sa_017_view_archived_records_and_detail(stub_iam):
     assert rec.archival_reason == "Graduated."
 
     # BR-SA-020: Unrelated module role without superadmin grant is isolated (HTTP 403)
-    stub_iam.register(
-        "token_other_mod",
-        Principal(
+    stub_iam(
+        make_session(
             user_id=205,
-            username="acad_staff",
+            kind="staff",
+            roles=("academic_admin",),
             active_role="academic_admin",
             permissions=("academics.view",),
             modules=("academics",),
-        ),
+        )
     )
     other_client = APIClient()
-    other_client.credentials(HTTP_AUTHORIZATION="Token token_other_mod")
+    other_client.credentials(HTTP_AUTHORIZATION="Token token_205")
     assert other_client.get("/api/v1/superadmin/archival/users/").status_code == 403
     assert other_client.get(f"/api/v1/superadmin/archival/users/{rec.user_id}/").status_code == 403
     assert other_client.get("/api/v1/superadmin/archival/datasets/").status_code == 403
