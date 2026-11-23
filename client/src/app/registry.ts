@@ -17,4 +17,9 @@ export const MODULE_REGISTRY: Record<string, ModuleManifest> = {
     basePath: "/placement",
     load: () => import("../modules/placement/routes"),
   },
+  iwd: {
+    code: "iwd",
+    basePath: "/iwd",
+    load: () => import("../modules/iwd/routes"),
+  },
 };

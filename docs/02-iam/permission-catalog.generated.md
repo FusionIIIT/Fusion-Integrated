@@ -13,6 +13,22 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `iwd`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `iwd.complaint.create` | Submit a maintenance complaint | `faculty`, `staff`, `student` |
+| `iwd.complaint.view` | View submitted or assigned maintenance complaints | `faculty`, `iwd_accounts`, `iwd_admin`, `iwd_auditor`, `iwd_dean`, `iwd_department_head`, `iwd_director`, `iwd_engineer`, `staff`, `student` |
+| `iwd.complaint.update` | Record technical assessment or execution progress | `iwd_engineer` |
+| `iwd.estimate.create` | Prepare and submit repair cost estimates | `iwd_engineer` |
+| `iwd.estimate.review` | Review and decide on repair estimates across approval tiers | `iwd_admin`, `iwd_department_head`, `iwd_director` |
+| `iwd.inventory.manage` | Check inventory levels and coordinate material issues or procurement | `iwd_admin` |
+| `iwd.work.verify` | Verify completed physical repair work quality | `iwd_department_head` |
+| `iwd.bill.create` | Submit final repair bills and invoices | `iwd_engineer` |
+| `iwd.bill.review` | Audit and approve bills for payment settlement | `iwd_accounts`, `iwd_auditor`, `iwd_director` |
+| `iwd.feedback.create` | Submit feedback, ratings, and post-repair incident reports | `faculty`, `staff`, `student` |
+| `iwd.feedback.view` | View recorded feedback for quality monitoring | `iwd_admin`, `iwd_auditor`, `iwd_dean`, `iwd_department_head`, `iwd_director`, `iwd_engineer` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
