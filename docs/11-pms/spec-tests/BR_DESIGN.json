@@ -1,0 +1,1280 @@
+[
+  {
+    "test_id": "TEST-BR-001",
+    "source_id": "BR-PMS-003 positive",
+    "purpose": "Verify BR-PMS-003 (Reporting): Applicants may access report information only for their own patent applications.",
+    "preconditions": "User is authorized as Applicant. When a user requests the affected PMS function or data.",
+    "action_or_input": "Invoke operation governed by BR-PMS-003 under valid conditions",
+    "expected_result": "System enforces Applicants may access report information only for their own patent applications.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-002",
+    "source_id": "BR-PMS-003 condition-false",
+    "purpose": "Verify BR-PMS-003 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Applicants may access report information only for their own patent applications.",
+    "action_or_input": "Attempt operation violating BR-PMS-003 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-003",
+    "source_id": "BR-PMS-005 positive",
+    "purpose": "Verify BR-PMS-005 (Reporting): Directors may access PMS reports and analytics only within their authorized PMS scope.",
+    "preconditions": "User is authorized as Director. When a user requests the affected PMS function or data.",
+    "action_or_input": "Invoke operation governed by BR-PMS-005 under valid conditions",
+    "expected_result": "System enforces Directors may access PMS reports and analytics only within their authorized PMS scope.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-004",
+    "source_id": "BR-PMS-005 condition-false",
+    "purpose": "Verify BR-PMS-005 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Directors may access PMS reports and analytics only within their authorized PMS ",
+    "action_or_input": "Attempt operation violating BR-PMS-005 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-005",
+    "source_id": "BR-PMS-006 positive",
+    "purpose": "Verify BR-PMS-006 (Oversight): Director workflow-oversight access is limited to application workflows in the Director's domain.",
+    "preconditions": "User is authorized as Director. When a user requests the affected PMS function or data.",
+    "action_or_input": "Invoke operation governed by BR-PMS-006 under valid conditions",
+    "expected_result": "System enforces Director workflow-oversight access is limited to application workflows in the Director's domain.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-006",
+    "source_id": "BR-PMS-006 condition-false",
+    "purpose": "Verify BR-PMS-006 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Director workflow-oversight access is limited to application workflows in the Di",
+    "action_or_input": "Attempt operation violating BR-PMS-006 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-007",
+    "source_id": "BR-PMS-014 positive",
+    "purpose": "Verify BR-PMS-014 (Document validation): Application supporting documents accepted for submission must be PDF files.",
+    "preconditions": "User is authorized as Applicant. When the affected data/submission/change is validated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-014 under valid conditions",
+    "expected_result": "System enforces Application supporting documents accepted for submission must be PDF files.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-008",
+    "source_id": "BR-PMS-014 condition-false",
+    "purpose": "Verify BR-PMS-014 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Application supporting documents accepted for submission must be PDF files.",
+    "action_or_input": "Attempt operation violating BR-PMS-014 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-009",
+    "source_id": "BR-PMS-015 positive",
+    "purpose": "Verify BR-PMS-015 (Document validation): An application document must be under 50 MB to be accepted.",
+    "preconditions": "User is authorized as Applicant. When the affected data/submission/change is validated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-015 under valid conditions",
+    "expected_result": "System enforces An application document must be under 50 MB to be accepted.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-010",
+    "source_id": "BR-PMS-015 condition-false",
+    "purpose": "Verify BR-PMS-015 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating An application document must be under 50 MB to be accepted.",
+    "action_or_input": "Attempt operation violating BR-PMS-015 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-011",
+    "source_id": "BR-PMS-016 positive",
+    "purpose": "Verify BR-PMS-016 (Document validation): A submitted application document must pass malware validation before it is accepted.",
+    "preconditions": "User is authorized as PMS. When the affected data/submission/change is validated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-016 under valid conditions",
+    "expected_result": "System enforces A submitted application document must pass malware validation before it is accepted.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-012",
+    "source_id": "BR-PMS-016 condition-false",
+    "purpose": "Verify BR-PMS-016 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating A submitted application document must pass malware validation before it is accep",
+    "action_or_input": "Attempt operation violating BR-PMS-016 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-013",
+    "source_id": "BR-PMS-017 positive",
+    "purpose": "Verify BR-PMS-017 (Application validation): Required application fields must be complete before PMS accepts the application submission.",
+    "preconditions": "User is authorized as Applicant. When the affected data/submission/change is validated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-017 under valid conditions",
+    "expected_result": "System enforces Required application fields must be complete before PMS accepts the application submission.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-014",
+    "source_id": "BR-PMS-017 condition-false",
+    "purpose": "Verify BR-PMS-017 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Required application fields must be complete before PMS accepts the application ",
+    "action_or_input": "Attempt operation violating BR-PMS-017 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-015",
+    "source_id": "BR-PMS-020 positive",
+    "purpose": "Verify BR-PMS-020 (Agreement prerequisite): Inventor agreements must be completed before external filing.",
+    "preconditions": "User is authorized as Applicant / Attorney. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-020 under valid conditions",
+    "expected_result": "System enforces Inventor agreements must be completed before external filing.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-016",
+    "source_id": "BR-PMS-020 condition-false",
+    "purpose": "Verify BR-PMS-020 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Inventor agreements must be completed before external filing.",
+    "action_or_input": "Attempt operation violating BR-PMS-020 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-017",
+    "source_id": "BR-PMS-022 positive",
+    "purpose": "Verify BR-PMS-022 (Assignment): Automatic Director assignment may be used only when configured assignment rules are available, and it must apply the sam",
+    "preconditions": "User is authorized as PCC_ADMIN / Director. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-022 under valid conditions",
+    "expected_result": "System enforces Automatic Director assignment may be used only when configured assignment rules are available, and it must apply the same governing assignment criteria.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-018",
+    "source_id": "BR-PMS-022 condition-false",
+    "purpose": "Verify BR-PMS-022 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Automatic Director assignment may be used only when configured assignment rules ",
+    "action_or_input": "Attempt operation violating BR-PMS-022 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-019",
+    "source_id": "BR-PMS-023 positive",
+    "purpose": "Verify BR-PMS-023 (Assignment rule): Director expertise matching with the application domain is an assignment criterion.",
+    "preconditions": "User is authorized as PCC_ADMIN. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-023 under valid conditions",
+    "expected_result": "System enforces Director expertise matching with the application domain is an assignment criterion.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-020",
+    "source_id": "BR-PMS-024 positive",
+    "purpose": "Verify BR-PMS-024 (Assignment rule): Director workload balance is an assignment criterion.",
+    "preconditions": "User is authorized as PCC_ADMIN. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-024 under valid conditions",
+    "expected_result": "System enforces Director workload balance is an assignment criterion.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-021",
+    "source_id": "BR-PMS-025 positive",
+    "purpose": "Verify BR-PMS-025 (Conflict of interest): PMS must perform a conflict-of-interest check before Director assignment.",
+    "preconditions": "User is authorized as PCC_ADMIN / Director. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-025 under valid conditions",
+    "expected_result": "System enforces PMS must perform a conflict-of-interest check before Director assignment.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-022",
+    "source_id": "BR-PMS-026 positive",
+    "purpose": "Verify BR-PMS-026 (Conflict of interest): A Director must not review an application in which that Director is listed as an inventor.",
+    "preconditions": "User is authorized as Director. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-026 under valid conditions",
+    "expected_result": "System enforces A Director must not review an application in which that Director is listed as an inventor.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-023",
+    "source_id": "BR-PMS-027 positive",
+    "purpose": "Verify BR-PMS-027 (Conflict of interest): PCC_ADMIN must not act as reviewer for an application in which PCC_ADMIN is listed as an inventor.",
+    "preconditions": "User is authorized as PCC_ADMIN. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-027 under valid conditions",
+    "expected_result": "System enforces PCC_ADMIN must not act as reviewer for an application in which PCC_ADMIN is listed as an inventor.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-024",
+    "source_id": "BR-PMS-029 positive",
+    "purpose": "Verify BR-PMS-029 (Decision): A Director review decision must be exactly one of: Approve, Reject, or Needs Revision.",
+    "preconditions": "User is authorized as Director. When the affected decision/opinion is finalized.",
+    "action_or_input": "Invoke operation governed by BR-PMS-029 under valid conditions",
+    "expected_result": "System enforces A Director review decision must be exactly one of: Approve, Reject, or Needs Revision.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-025",
+    "source_id": "BR-PMS-029 condition-false",
+    "purpose": "Verify BR-PMS-029 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating A Director review decision must be exactly one of: Approve, Reject, or Needs Rev",
+    "action_or_input": "Attempt operation violating BR-PMS-029 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-026",
+    "source_id": "BR-PMS-030 positive",
+    "purpose": "Verify BR-PMS-030 (Decision validation): Every Director review decision must include a justification of at least 50 characters.",
+    "preconditions": "User is authorized as Director. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-030 under valid conditions",
+    "expected_result": "System enforces Every Director review decision must include a justification of at least 50 characters.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-027",
+    "source_id": "BR-PMS-030 condition-false",
+    "purpose": "Verify BR-PMS-030 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Every Director review decision must include a justification of at least 50 chara",
+    "action_or_input": "Attempt operation violating BR-PMS-030 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-028",
+    "source_id": "BR-PMS-031 positive",
+    "purpose": "Verify BR-PMS-031 (Review deadline): Director review must be completed within 15 business days of assignment.",
+    "preconditions": "User is authorized as Director. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-031 under valid conditions",
+    "expected_result": "System enforces Director review must be completed within 15 business days of assignment.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-029",
+    "source_id": "BR-PMS-033 positive",
+    "purpose": "Verify BR-PMS-033 (Revision): Application revision is permitted when the application status is Needs Revision.",
+    "preconditions": "User is authorized as Applicant. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-033 under valid conditions",
+    "expected_result": "System enforces Application revision is permitted when the application status is Needs Revision.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-030",
+    "source_id": "BR-PMS-033 condition-false",
+    "purpose": "Verify BR-PMS-033 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Application revision is permitted when the application status is Needs Revision.",
+    "action_or_input": "Attempt operation violating BR-PMS-033 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-031",
+    "source_id": "BR-PMS-034 positive",
+    "purpose": "Verify BR-PMS-034 (Revision): Application revision is permitted when the application status is Rejected.",
+    "preconditions": "User is authorized as Applicant. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-034 under valid conditions",
+    "expected_result": "System enforces Application revision is permitted when the application status is Rejected.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-032",
+    "source_id": "BR-PMS-034 condition-false",
+    "purpose": "Verify BR-PMS-034 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Application revision is permitted when the application status is Rejected.",
+    "action_or_input": "Attempt operation violating BR-PMS-034 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-033",
+    "source_id": "BR-PMS-035 positive",
+    "purpose": "Verify BR-PMS-035 (Revision deadline): A revised application must be resubmitted within 60 days from the relevant rejection or revision-request decision date.",
+    "preconditions": "User is authorized as Applicant. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-035 under valid conditions",
+    "expected_result": "System enforces A revised application must be resubmitted within 60 days from the relevant rejection or revision-request decision date.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-034",
+    "source_id": "BR-PMS-036 positive",
+    "purpose": "Verify BR-PMS-036 (Revision validation): A resubmitted revision must address the recorded Director feedback.",
+    "preconditions": "User is authorized as Applicant / Director. When the affected data/submission/change is validated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-036 under valid conditions",
+    "expected_result": "System enforces A resubmitted revision must address the recorded Director feedback.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-035",
+    "source_id": "BR-PMS-036 condition-false",
+    "purpose": "Verify BR-PMS-036 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating A resubmitted revision must address the recorded Director feedback.",
+    "action_or_input": "Attempt operation violating BR-PMS-036 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-036",
+    "source_id": "BR-PMS-038 positive",
+    "purpose": "Verify BR-PMS-038 (Status update): When the applicable 60-day resubmission period expires without valid resubmission, PMS changes the application status to",
+    "preconditions": "User is authorized as Applicant. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-038 under valid conditions",
+    "expected_result": "System enforces When the applicable 60-day resubmission period expires without valid resubmission, PMS changes the application status to Expired.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-037",
+    "source_id": "BR-PMS-038 condition-false",
+    "purpose": "Verify BR-PMS-038 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating When the applicable 60-day resubmission period expires without valid resubmissio",
+    "action_or_input": "Attempt operation violating BR-PMS-038 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-038",
+    "source_id": "BR-PMS-040 positive",
+    "purpose": "Verify BR-PMS-040 (Attorney assignment): Only PCC_ADMIN may assign an Attorney to an Approved application.",
+    "preconditions": "User is authorized as PCC_ADMIN. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-040 under valid conditions",
+    "expected_result": "System enforces Only PCC_ADMIN may assign an Attorney to an Approved application.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-039",
+    "source_id": "BR-PMS-041 positive",
+    "purpose": "Verify BR-PMS-041 (Attorney panel rule): An assigned Attorney must be selected from the approved panel unless an institutional exception is recorded or allowed.",
+    "preconditions": "User is authorized as PCC_ADMIN. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-041 under valid conditions",
+    "expected_result": "System enforces An assigned Attorney must be selected from the approved panel unless an institutional exception is recorded or allowed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-040",
+    "source_id": "BR-PMS-041 condition-false",
+    "purpose": "Verify BR-PMS-041 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating An assigned Attorney must be selected from the approved panel unless an institut",
+    "action_or_input": "Attempt operation violating BR-PMS-041 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-041",
+    "source_id": "BR-PMS-042 positive",
+    "purpose": "Verify BR-PMS-042 (Assignment criterion): Attorney expertise matching the application domain is an assignment criterion.",
+    "preconditions": "User is authorized as PCC_ADMIN. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-042 under valid conditions",
+    "expected_result": "System enforces Attorney expertise matching the application domain is an assignment criterion.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-042",
+    "source_id": "BR-PMS-043 positive",
+    "purpose": "Verify BR-PMS-043 (Assignment criterion): Attorney current workload is an assignment criterion.",
+    "preconditions": "User is authorized as PCC_ADMIN. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-043 under valid conditions",
+    "expected_result": "System enforces Attorney current workload is an assignment criterion.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-043",
+    "source_id": "BR-PMS-044 positive",
+    "purpose": "Verify BR-PMS-044 (Conflict of interest): PMS must perform a conflict-of-interest check before Attorney assignment.",
+    "preconditions": "User is authorized as PCC_ADMIN / Attorney. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-044 under valid conditions",
+    "expected_result": "System enforces PMS must perform a conflict-of-interest check before Attorney assignment.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-044",
+    "source_id": "BR-PMS-045 positive",
+    "purpose": "Verify BR-PMS-045 (Preference rule): Applicant Attorney preference may be considered only when the preferred Attorney is in the approved panel.",
+    "preconditions": "User is authorized as Applicant / PCC_ADMIN. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-045 under valid conditions",
+    "expected_result": "System enforces Applicant Attorney preference may be considered only when the preferred Attorney is in the approved panel.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-045",
+    "source_id": "BR-PMS-045 condition-false",
+    "purpose": "Verify BR-PMS-045 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Applicant Attorney preference may be considered only when the preferred Attorney",
+    "action_or_input": "Attempt operation violating BR-PMS-045 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-046",
+    "source_id": "BR-PMS-046 positive",
+    "purpose": "Verify BR-PMS-046 (Opinion validation): A finalized Attorney patentability opinion must contain exactly one recommendation: File Patent, Do Not File, or Needs A",
+    "preconditions": "User is authorized as Attorney. When the affected decision/opinion is finalized.",
+    "action_or_input": "Invoke operation governed by BR-PMS-046 under valid conditions",
+    "expected_result": "System enforces A finalized Attorney patentability opinion must contain exactly one recommendation: File Patent, Do Not File, or Needs Amendment.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-047",
+    "source_id": "BR-PMS-046 condition-false",
+    "purpose": "Verify BR-PMS-046 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating A finalized Attorney patentability opinion must contain exactly one recommendati",
+    "action_or_input": "Attempt operation violating BR-PMS-046 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-048",
+    "source_id": "BR-PMS-048 positive",
+    "purpose": "Verify BR-PMS-048 (Budget data): Budget information must include filing fees.",
+    "preconditions": "User is authorized as Director. When the affected data value, schedule, audit record, or version is produced.",
+    "action_or_input": "Invoke operation governed by BR-PMS-048 under valid conditions",
+    "expected_result": "System enforces Budget information must include filing fees.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-049",
+    "source_id": "BR-PMS-049 positive",
+    "purpose": "Verify BR-PMS-049 (Budget data): Budget information must include attorney fees.",
+    "preconditions": "User is authorized as Director. When the affected data value, schedule, audit record, or version is produced.",
+    "action_or_input": "Invoke operation governed by BR-PMS-049 under valid conditions",
+    "expected_result": "System enforces Budget information must include attorney fees.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-050",
+    "source_id": "BR-PMS-050 positive",
+    "purpose": "Verify BR-PMS-050 (Budget data): Budget information must include administrative costs.",
+    "preconditions": "User is authorized as Director. When the affected data value, schedule, audit record, or version is produced.",
+    "action_or_input": "Invoke operation governed by BR-PMS-050 under valid conditions",
+    "expected_result": "System enforces Budget information must include administrative costs.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-051",
+    "source_id": "BR-PMS-051 positive",
+    "purpose": "Verify BR-PMS-051 (Budget escalation): When total patent cost exceeds the configured threshold, PMS must route/escalate the case to the applicable higher autho",
+    "preconditions": "User is authorized as Director / PCC_ADMIN. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-051 under valid conditions",
+    "expected_result": "System enforces When total patent cost exceeds the configured threshold, PMS must route/escalate the case to the applicable higher authority.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-052",
+    "source_id": "BR-PMS-052 positive",
+    "purpose": "Verify BR-PMS-052 (Budget approval rule): Budget approval is permitted only when the application status is Approved.",
+    "preconditions": "User is authorized as Director. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-052 under valid conditions",
+    "expected_result": "System enforces Budget approval is permitted only when the application status is Approved.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-053",
+    "source_id": "BR-PMS-052 condition-false",
+    "purpose": "Verify BR-PMS-052 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Budget approval is permitted only when the application status is Approved.",
+    "action_or_input": "Attempt operation violating BR-PMS-052 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-054",
+    "source_id": "BR-PMS-053 positive",
+    "purpose": "Verify BR-PMS-053 (Budget validation): Where budget-availability information is available to PMS, budget availability must be validated before approval.",
+    "preconditions": "User is authorized as Director. When the affected data/submission/change is validated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-053 under valid conditions",
+    "expected_result": "System enforces Where budget-availability information is available to PMS, budget availability must be validated before approval.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-055",
+    "source_id": "BR-PMS-053 condition-false",
+    "purpose": "Verify BR-PMS-053 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Where budget-availability information is available to PMS, budget availability m",
+    "action_or_input": "Attempt operation violating BR-PMS-053 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-056",
+    "source_id": "BR-PMS-055 positive",
+    "purpose": "Verify BR-PMS-055 (Format validation): Where corresponding validation rules are available, the filing package must satisfy the applicable patent-office format ",
+    "preconditions": "User is authorized as Attorney. When the affected data/submission/change is validated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-055 under valid conditions",
+    "expected_result": "System enforces Where corresponding validation rules are available, the filing package must satisfy the applicable patent-office format standards before PMS records compliant readiness.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-057",
+    "source_id": "BR-PMS-055 condition-false",
+    "purpose": "Verify BR-PMS-055 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Where corresponding validation rules are available, the filing package must sati",
+    "action_or_input": "Attempt operation violating BR-PMS-055 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-058",
+    "source_id": "BR-PMS-056 positive",
+    "purpose": "Verify BR-PMS-056 (International filing rule): An international filing must include additional justification recorded in PMS.",
+    "preconditions": "User is authorized as Attorney. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-056 under valid conditions",
+    "expected_result": "System enforces An international filing must include additional justification recorded in PMS.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-059",
+    "source_id": "BR-PMS-056 condition-false",
+    "purpose": "Verify BR-PMS-056 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating An international filing must include additional justification recorded in PMS.",
+    "action_or_input": "Attempt operation violating BR-PMS-056 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-060",
+    "source_id": "BR-PMS-059 positive",
+    "purpose": "Verify BR-PMS-059 (Post-grant rule): Post-grant tracking is activated only when patent status is Granted.",
+    "preconditions": "User is authorized as Attorney / Director. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-059 under valid conditions",
+    "expected_result": "System enforces Post-grant tracking is activated only when patent status is Granted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-061",
+    "source_id": "BR-PMS-059 condition-false",
+    "purpose": "Verify BR-PMS-059 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Post-grant tracking is activated only when patent status is Granted.",
+    "action_or_input": "Attempt operation violating BR-PMS-059 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-062",
+    "source_id": "BR-PMS-060 positive",
+    "purpose": "Verify BR-PMS-060 (Maintenance schedule): Where applicable schedule rules are available, the maintenance-fee schedule is determined from grant date and jurisdicti",
+    "preconditions": "User is authorized as Attorney / Director. When the affected data value, schedule, audit record, or version is produced.",
+    "action_or_input": "Invoke operation governed by BR-PMS-060 under valid conditions",
+    "expected_result": "System enforces Where applicable schedule rules are available, the maintenance-fee schedule is determined from grant date and jurisdiction.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-063",
+    "source_id": "BR-PMS-060 condition-false",
+    "purpose": "Verify BR-PMS-060 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Where applicable schedule rules are available, the maintenance-fee schedule is d",
+    "action_or_input": "Attempt operation violating BR-PMS-060 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-064",
+    "source_id": "BR-PMS-061 positive",
+    "purpose": "Verify BR-PMS-061 (Renewal decision rule): An explicit Renew or Do Not Renew decision is required before each maintenance deadline.",
+    "preconditions": "User is authorized as Director. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-061 under valid conditions",
+    "expected_result": "System enforces An explicit Renew or Do Not Renew decision is required before each maintenance deadline.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-065",
+    "source_id": "BR-PMS-065 positive",
+    "purpose": "Verify BR-PMS-065 (Response submission): An office-action response must be recorded as submitted within the applicable deadline unless a permitted extension appl",
+    "preconditions": "User is authorized as Attorney. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-065 under valid conditions",
+    "expected_result": "System enforces An office-action response must be recorded as submitted within the applicable deadline unless a permitted extension applies.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-066",
+    "source_id": "BR-PMS-065 condition-false",
+    "purpose": "Verify BR-PMS-065 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating An office-action response must be recorded as submitted within the applicable de",
+    "action_or_input": "Attempt operation violating BR-PMS-065 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-067",
+    "source_id": "BR-PMS-066 positive",
+    "purpose": "Verify BR-PMS-066 (Deadline tracking): Office-action response deadline tracking is automated only where applicable deadline data/rules are available to PMS.",
+    "preconditions": "User is authorized as Attorney / Applicant. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-066 under valid conditions",
+    "expected_result": "System enforces Office-action response deadline tracking is automated only where applicable deadline data/rules are available to PMS.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-068",
+    "source_id": "BR-PMS-066 condition-false",
+    "purpose": "Verify BR-PMS-066 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Office-action response deadline tracking is automated only where applicable dead",
+    "action_or_input": "Attempt operation violating BR-PMS-066 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-069",
+    "source_id": "BR-PMS-067 positive",
+    "purpose": "Verify BR-PMS-067 (Withdrawal): Withdrawal is permitted only before the filing stage.",
+    "preconditions": "User is authorized as Applicant. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-067 under valid conditions",
+    "expected_result": "System enforces Withdrawal is permitted only before the filing stage.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-070",
+    "source_id": "BR-PMS-067 condition-false",
+    "purpose": "Verify BR-PMS-067 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Withdrawal is permitted only before the filing stage.",
+    "action_or_input": "Attempt operation violating BR-PMS-067 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-071",
+    "source_id": "BR-PMS-068 positive",
+    "purpose": "Verify BR-PMS-068 (Withdrawal validation): Withdrawal is permitted only when the current application status is withdrawal-eligible under the applicable PMS rule/co",
+    "preconditions": "User is authorized as Applicant. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-068 under valid conditions",
+    "expected_result": "System enforces Withdrawal is permitted only when the current application status is withdrawal-eligible under the applicable PMS rule/configuration.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-072",
+    "source_id": "BR-PMS-068 condition-false",
+    "purpose": "Verify BR-PMS-068 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Withdrawal is permitted only when the current application status is withdrawal-e",
+    "action_or_input": "Attempt operation violating BR-PMS-068 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-073",
+    "source_id": "BR-PMS-069 positive",
+    "purpose": "Verify BR-PMS-069 (Withdrawal validation): A withdrawal request must include an Applicant-provided reason.",
+    "preconditions": "User is authorized as Applicant. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-069 under valid conditions",
+    "expected_result": "System enforces A withdrawal request must include an Applicant-provided reason.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-074",
+    "source_id": "BR-PMS-069 condition-false",
+    "purpose": "Verify BR-PMS-069 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating A withdrawal request must include an Applicant-provided reason.",
+    "action_or_input": "Attempt operation violating BR-PMS-069 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-075",
+    "source_id": "BR-PMS-070 positive",
+    "purpose": "Verify BR-PMS-070 (Withdrawal consent): Co-inventor consent for withdrawal must be recorded when the applicable process requires such consent.",
+    "preconditions": "User is authorized as Applicant / Co-inventor. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-070 under valid conditions",
+    "expected_result": "System enforces Co-inventor consent for withdrawal must be recorded when the applicable process requires such consent.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-076",
+    "source_id": "BR-PMS-070 condition-false",
+    "purpose": "Verify BR-PMS-070 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Co-inventor consent for withdrawal must be recorded when the applicable process ",
+    "action_or_input": "Attempt operation violating BR-PMS-070 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-077",
+    "source_id": "BR-PMS-073 positive",
+    "purpose": "Verify BR-PMS-073 (Inventor validation): Inventor information must pass PMS validation before the change is accepted.",
+    "preconditions": "User is authorized as Applicant. When the affected data/submission/change is validated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-073 under valid conditions",
+    "expected_result": "System enforces Inventor information must pass PMS validation before the change is accepted.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-078",
+    "source_id": "BR-PMS-073 condition-false",
+    "purpose": "Verify BR-PMS-073 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Inventor information must pass PMS validation before the change is accepted.",
+    "action_or_input": "Attempt operation violating BR-PMS-073 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-079",
+    "source_id": "BR-PMS-074 positive",
+    "purpose": "Verify BR-PMS-074 (Ownership validation): Inventor ownership percentages must pass PMS validation before the change is accepted.",
+    "preconditions": "User is authorized as Applicant. When the affected data/submission/change is validated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-074 under valid conditions",
+    "expected_result": "System enforces Inventor ownership percentages must pass PMS validation before the change is accepted.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-080",
+    "source_id": "BR-PMS-074 condition-false",
+    "purpose": "Verify BR-PMS-074 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Inventor ownership percentages must pass PMS validation before the change is acc",
+    "action_or_input": "Attempt operation violating BR-PMS-074 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-081",
+    "source_id": "BR-PMS-075 positive",
+    "purpose": "Verify BR-PMS-075 (Consent rule): Required inventor consent must be obtained before filing.",
+    "preconditions": "User is authorized as Applicant / Co-inventor. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-075 under valid conditions",
+    "expected_result": "System enforces Required inventor consent must be obtained before filing.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-082",
+    "source_id": "BR-PMS-075 condition-false",
+    "purpose": "Verify BR-PMS-075 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Required inventor consent must be obtained before filing.",
+    "action_or_input": "Attempt operation violating BR-PMS-075 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-083",
+    "source_id": "BR-PMS-076 positive",
+    "purpose": "Verify BR-PMS-076 (Electronic signature): Electronic signatures for inventor consent/agreement may be collected only where legally permitted and configured.",
+    "preconditions": "User is authorized as Applicant / Co-inventor. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-076 under valid conditions",
+    "expected_result": "System enforces Electronic signatures for inventor consent/agreement may be collected only where legally permitted and configured.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-084",
+    "source_id": "BR-PMS-076 condition-false",
+    "purpose": "Verify BR-PMS-076 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Electronic signatures for inventor consent/agreement may be collected only where",
+    "action_or_input": "Attempt operation violating BR-PMS-076 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-085",
+    "source_id": "BR-PMS-077 positive",
+    "purpose": "Verify BR-PMS-077 (Electronic signature validation): Electronic-signature validation applies only where legally permitted and configured.",
+    "preconditions": "User is authorized as Applicant / Co-inventor. When the affected data/submission/change is validated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-077 under valid conditions",
+    "expected_result": "System enforces Electronic-signature validation applies only where legally permitted and configured.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-086",
+    "source_id": "BR-PMS-077 condition-false",
+    "purpose": "Verify BR-PMS-077 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Electronic-signature validation applies only where legally permitted and configu",
+    "action_or_input": "Attempt operation violating BR-PMS-077 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-087",
+    "source_id": "BR-PMS-078 positive",
+    "purpose": "Verify BR-PMS-078 (Agreement prerequisite): Inventor agreements must be complete before filing.",
+    "preconditions": "User is authorized as Applicant / Attorney. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-078 under valid conditions",
+    "expected_result": "System enforces Inventor agreements must be complete before filing.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-088",
+    "source_id": "BR-PMS-078 condition-false",
+    "purpose": "Verify BR-PMS-078 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Inventor agreements must be complete before filing.",
+    "action_or_input": "Attempt operation violating BR-PMS-078 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-089",
+    "source_id": "BR-PMS-082 positive",
+    "purpose": "Verify BR-PMS-082 (Document versioning): PMS assigns automatic version numbers to new document versions.",
+    "preconditions": "User is authorized as Applicant / Attorney. When the affected data value, schedule, audit record, or version is produced.",
+    "action_or_input": "Invoke operation governed by BR-PMS-082 under valid conditions",
+    "expected_result": "System enforces PMS assigns automatic version numbers to new document versions.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-090",
+    "source_id": "BR-PMS-084 positive",
+    "purpose": "Verify BR-PMS-084 (Document access): Access to previous document versions is limited by applicable role and application-status access rules.",
+    "preconditions": "User is authorized as Applicant / Director / Attorney. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-084 under valid conditions",
+    "expected_result": "System enforces Access to previous document versions is limited by applicable role and application-status access rules.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-091",
+    "source_id": "BR-PMS-084 condition-false",
+    "purpose": "Verify BR-PMS-084 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Access to previous document versions is limited by applicable role and applicati",
+    "action_or_input": "Attempt operation violating BR-PMS-084 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-092",
+    "source_id": "BR-PMS-086 positive",
+    "purpose": "Verify BR-PMS-086 (Access control): Document access is controlled by user role and application status.",
+    "preconditions": "User is authorized as Applicant / Director / Attorney / PCC_ADMIN. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-086 under valid conditions",
+    "expected_result": "System enforces Document access is controlled by user role and application status.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-093",
+    "source_id": "BR-PMS-086 condition-false",
+    "purpose": "Verify BR-PMS-086 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Document access is controlled by user role and application status.",
+    "action_or_input": "Attempt operation violating BR-PMS-086 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-094",
+    "source_id": "BR-PMS-087 positive",
+    "purpose": "Verify BR-PMS-087 (Document edit rule): Applicants may edit application documents only while the application status is Needs Revision.",
+    "preconditions": "User is authorized as Applicant. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-087 under valid conditions",
+    "expected_result": "System enforces Applicants may edit application documents only while the application status is Needs Revision.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-095",
+    "source_id": "BR-PMS-087 condition-false",
+    "purpose": "Verify BR-PMS-087 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Applicants may edit application documents only while the application status is N",
+    "action_or_input": "Attempt operation violating BR-PMS-087 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-096",
+    "source_id": "BR-PMS-088 positive",
+    "purpose": "Verify BR-PMS-088 (Request routing): Licensing/technology-transfer requests are routed to the appropriate committee or Director according to the applicable i",
+    "preconditions": "User is authorized as Applicant / Director. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-088 under valid conditions",
+    "expected_result": "System enforces Licensing/technology-transfer requests are routed to the appropriate committee or Director according to the applicable institutional process.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-097",
+    "source_id": "BR-PMS-091 positive",
+    "purpose": "Verify BR-PMS-091 (License records): License records are subject to confidentiality controls.",
+    "preconditions": "User is authorized as Director / PCC_ADMIN. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-091 under valid conditions",
+    "expected_result": "System enforces License records are subject to confidentiality controls.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-098",
+    "source_id": "BR-PMS-091 condition-false",
+    "purpose": "Verify BR-PMS-091 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating License records are subject to confidentiality controls.",
+    "action_or_input": "Attempt operation violating BR-PMS-091 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-099",
+    "source_id": "BR-PMS-092 positive",
+    "purpose": "Verify BR-PMS-092 (Appeal): Only an application in Rejected status is eligible for an Applicant appeal.",
+    "preconditions": "User is authorized as Applicant. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-092 under valid conditions",
+    "expected_result": "System enforces Only an application in Rejected status is eligible for an Applicant appeal.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-100",
+    "source_id": "BR-PMS-092 condition-false",
+    "purpose": "Verify BR-PMS-092 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Only an application in Rejected status is eligible for an Applicant appeal.",
+    "action_or_input": "Attempt operation violating BR-PMS-092 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-101",
+    "source_id": "BR-PMS-093 positive",
+    "purpose": "Verify BR-PMS-093 (Appeal deadline): An appeal must be filed within the applicable configured or institutionally defined allowed period.",
+    "preconditions": "User is authorized as Applicant. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-093 under valid conditions",
+    "expected_result": "System enforces An appeal must be filed within the applicable configured or institutionally defined allowed period.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-102",
+    "source_id": "BR-PMS-094 positive",
+    "purpose": "Verify BR-PMS-094 (Appeal validation): An appeal must include Applicant-provided grounds and justification.",
+    "preconditions": "User is authorized as Applicant. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-094 under valid conditions",
+    "expected_result": "System enforces An appeal must include Applicant-provided grounds and justification.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-103",
+    "source_id": "BR-PMS-094 condition-false",
+    "purpose": "Verify BR-PMS-094 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating An appeal must include Applicant-provided grounds and justification.",
+    "action_or_input": "Attempt operation violating BR-PMS-094 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-104",
+    "source_id": "BR-PMS-095 positive",
+    "purpose": "Verify BR-PMS-095 (Appeal decision): A Director appeal outcome must be exactly one of: Uphold Rejection, Remand for Amendment, or Modify Decision.",
+    "preconditions": "User is authorized as Director. When the affected decision/opinion is finalized.",
+    "action_or_input": "Invoke operation governed by BR-PMS-095 under valid conditions",
+    "expected_result": "System enforces A Director appeal outcome must be exactly one of: Uphold Rejection, Remand for Amendment, or Modify Decision.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-105",
+    "source_id": "BR-PMS-095 condition-false",
+    "purpose": "Verify BR-PMS-095 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating A Director appeal outcome must be exactly one of: Uphold Rejection, Remand for A",
+    "action_or_input": "Attempt operation violating BR-PMS-095 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-106",
+    "source_id": "BR-PMS-097 positive",
+    "purpose": "Verify BR-PMS-097 (Deadline tracking): PMS calculates/monitors the Director review deadline using the applicable review-deadline rule.",
+    "preconditions": "User is authorized as Director / PCC_ADMIN. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-097 under valid conditions",
+    "expected_result": "System enforces PMS calculates/monitors the Director review deadline using the applicable review-deadline rule.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-107",
+    "source_id": "BR-PMS-098 positive",
+    "purpose": "Verify BR-PMS-098 (Deadline tracking): PMS calculates/monitors the revision deadline using the applicable revision-deadline rule.",
+    "preconditions": "User is authorized as Applicant / Director. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-098 under valid conditions",
+    "expected_result": "System enforces PMS calculates/monitors the revision deadline using the applicable revision-deadline rule.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-108",
+    "source_id": "BR-PMS-099 positive",
+    "purpose": "Verify BR-PMS-099 (Deadline tracking): PMS calculates/monitors office-action response deadlines only where applicable deadline rules/data are available.",
+    "preconditions": "User is authorized as Attorney / Applicant. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-099 under valid conditions",
+    "expected_result": "System enforces PMS calculates/monitors office-action response deadlines only where applicable deadline rules/data are available.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-109",
+    "source_id": "BR-PMS-099 condition-false",
+    "purpose": "Verify BR-PMS-099 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating PMS calculates/monitors office-action response deadlines only where applicable d",
+    "action_or_input": "Attempt operation violating BR-PMS-099 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-110",
+    "source_id": "BR-PMS-100 positive",
+    "purpose": "Verify BR-PMS-100 (Deadline tracking): PMS calculates/monitors maintenance-fee deadlines only where applicable jurisdictional schedule rules/data are available",
+    "preconditions": "User is authorized as Attorney / Director. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-100 under valid conditions",
+    "expected_result": "System enforces PMS calculates/monitors maintenance-fee deadlines only where applicable jurisdictional schedule rules/data are available.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-111",
+    "source_id": "BR-PMS-100 condition-false",
+    "purpose": "Verify BR-PMS-100 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating PMS calculates/monitors maintenance-fee deadlines only where applicable jurisdic",
+    "action_or_input": "Attempt operation violating BR-PMS-100 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-112",
+    "source_id": "BR-PMS-101 positive",
+    "purpose": "Verify BR-PMS-101 (Deadline notification): Where applicable, PMS generates an alert 30 days before a tracked deadline.",
+    "preconditions": "User is authorized as Relevant stakeholder. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-101 under valid conditions",
+    "expected_result": "System enforces Where applicable, PMS generates an alert 30 days before a tracked deadline.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-113",
+    "source_id": "BR-PMS-101 condition-false",
+    "purpose": "Verify BR-PMS-101 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Where applicable, PMS generates an alert 30 days before a tracked deadline.",
+    "action_or_input": "Attempt operation violating BR-PMS-101 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-114",
+    "source_id": "BR-PMS-102 positive",
+    "purpose": "Verify BR-PMS-102 (Deadline notification): Where applicable, PMS generates an alert 15 days before a tracked deadline.",
+    "preconditions": "User is authorized as Relevant stakeholder. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-102 under valid conditions",
+    "expected_result": "System enforces Where applicable, PMS generates an alert 15 days before a tracked deadline.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-115",
+    "source_id": "BR-PMS-102 condition-false",
+    "purpose": "Verify BR-PMS-102 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Where applicable, PMS generates an alert 15 days before a tracked deadline.",
+    "action_or_input": "Attempt operation violating BR-PMS-102 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-116",
+    "source_id": "BR-PMS-103 positive",
+    "purpose": "Verify BR-PMS-103 (Deadline notification): Where applicable, PMS generates an alert 5 days before a tracked deadline.",
+    "preconditions": "User is authorized as Relevant stakeholder. When the affected deadline/timed event becomes applicable.",
+    "action_or_input": "Invoke operation governed by BR-PMS-103 under valid conditions",
+    "expected_result": "System enforces Where applicable, PMS generates an alert 5 days before a tracked deadline.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-117",
+    "source_id": "BR-PMS-103 condition-false",
+    "purpose": "Verify BR-PMS-103 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Where applicable, PMS generates an alert 5 days before a tracked deadline.",
+    "action_or_input": "Attempt operation violating BR-PMS-103 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-118",
+    "source_id": "BR-PMS-104 positive",
+    "purpose": "Verify BR-PMS-104 (Escalation): A missed tracked deadline triggers escalation according to the configured escalation chain.",
+    "preconditions": "User is authorized as PCC_ADMIN / relevant stakeholder. When the affected assignment, routing, or escalation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-104 under valid conditions",
+    "expected_result": "System enforces A missed tracked deadline triggers escalation according to the configured escalation chain.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-119",
+    "source_id": "BR-PMS-116 positive",
+    "purpose": "Verify BR-PMS-116 (Scope boundary): PMS responsibility for email notifications is limited to triggering system-generated emails; external delivery infrastru",
+    "preconditions": "User is authorized as PMS / external email service. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-116 under valid conditions",
+    "expected_result": "System enforces PMS responsibility for email notifications is limited to triggering system-generated emails; external delivery infrastructure is outside PMS.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-120",
+    "source_id": "BR-PMS-116 condition-false",
+    "purpose": "Verify BR-PMS-116 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating PMS responsibility for email notifications is limited to triggering system-gener",
+    "action_or_input": "Attempt operation violating BR-PMS-116 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-121",
+    "source_id": "BR-PMS-121 positive",
+    "purpose": "Verify BR-PMS-121 (Audit log): Where applicable, audit records include user ID, action type, timestamp, application ID, previous state, and new state.",
+    "preconditions": "User is authorized as PCC_ADMIN / compliance reviewer. When the affected data value, schedule, audit record, or version is produced.",
+    "action_or_input": "Invoke operation governed by BR-PMS-121 under valid conditions",
+    "expected_result": "System enforces Where applicable, audit records include user ID, action type, timestamp, application ID, previous state, and new state.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-122",
+    "source_id": "BR-PMS-121 condition-false",
+    "purpose": "Verify BR-PMS-121 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Where applicable, audit records include user ID, action type, timestamp, applica",
+    "action_or_input": "Attempt operation violating BR-PMS-121 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-123",
+    "source_id": "BR-PMS-122 positive",
+    "purpose": "Verify BR-PMS-122 (Audit log): Critical PMS operations create immutable audit records.",
+    "preconditions": "User is authorized as PCC_ADMIN / compliance reviewer. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-122 under valid conditions",
+    "expected_result": "System enforces Critical PMS operations create immutable audit records.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-124",
+    "source_id": "BR-PMS-122 condition-false",
+    "purpose": "Verify BR-PMS-122 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Critical PMS operations create immutable audit records.",
+    "action_or_input": "Attempt operation violating BR-PMS-122 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-125",
+    "source_id": "BR-PMS-126 positive",
+    "purpose": "Verify BR-PMS-126 (Access control): A valid PMS role assignment is required before a user may access patent-management functions.",
+    "preconditions": "User is authorized as Applicant / Director / PCC_ADMIN / Attorney. When a user requests the affected PMS function or data.",
+    "action_or_input": "Invoke operation governed by BR-PMS-126 under valid conditions",
+    "expected_result": "System enforces A valid PMS role assignment is required before a user may access patent-management functions.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-126",
+    "source_id": "BR-PMS-126 condition-false",
+    "purpose": "Verify BR-PMS-126 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating A valid PMS role assignment is required before a user may access patent-manageme",
+    "action_or_input": "Attempt operation violating BR-PMS-126 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-127",
+    "source_id": "BR-PMS-127 positive",
+    "purpose": "Verify BR-PMS-127 (Sequential workflow rule): Attorney assignment must not occur before Director approval is recorded.",
+    "preconditions": "User is authorized as PCC_ADMIN / Attorney. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-127 under valid conditions",
+    "expected_result": "System enforces Attorney assignment must not occur before Director approval is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-128",
+    "source_id": "BR-PMS-127 condition-false",
+    "purpose": "Verify BR-PMS-127 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Attorney assignment must not occur before Director approval is recorded.",
+    "action_or_input": "Attempt operation violating BR-PMS-127 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-129",
+    "source_id": "BR-PMS-128 positive",
+    "purpose": "Verify BR-PMS-128 (Sequential workflow rule): External filing must not occur until required approvals and budget allocation are complete.",
+    "preconditions": "User is authorized as Attorney / Director. When the affected state-changing action is requested or lifecycle condition is evaluated.",
+    "action_or_input": "Invoke operation governed by BR-PMS-128 under valid conditions",
+    "expected_result": "System enforces External filing must not occur until required approvals and budget allocation are complete.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-130",
+    "source_id": "BR-PMS-128 condition-false",
+    "purpose": "Verify BR-PMS-128 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating External filing must not occur until required approvals and budget allocation ar",
+    "action_or_input": "Attempt operation violating BR-PMS-128 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-131",
+    "source_id": "BR-PMS-130 positive",
+    "purpose": "Verify BR-PMS-130 (Confidentiality): Confidential patent information is protected by role-based access control.",
+    "preconditions": "User is authorized as Applicant / Director / PCC_ADMIN / Attorney. When a user requests the affected PMS function or data.",
+    "action_or_input": "Invoke operation governed by BR-PMS-130 under valid conditions",
+    "expected_result": "System enforces Confidential patent information is protected by role-based access control.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-132",
+    "source_id": "BR-PMS-130 condition-false",
+    "purpose": "Verify BR-PMS-130 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Confidential patent information is protected by role-based access control.",
+    "action_or_input": "Attempt operation violating BR-PMS-130 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-133",
+    "source_id": "BR-PMS-131 positive",
+    "purpose": "Verify BR-PMS-131 (Role management): PMS maintains exactly one active PCC_ADMIN oversight role.",
+    "preconditions": "User is authorized as PCC_ADMIN. When a user requests the affected PMS function or data.",
+    "action_or_input": "Invoke operation governed by BR-PMS-131 under valid conditions",
+    "expected_result": "System enforces PMS maintains exactly one active PCC_ADMIN oversight role.",
+    "test_type": "validation"
+  },
+  {
+    "test_id": "TEST-BR-134",
+    "source_id": "BR-PMS-131 condition-false",
+    "purpose": "Verify BR-PMS-131 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating PMS maintains exactly one active PCC_ADMIN oversight role.",
+    "action_or_input": "Attempt operation violating BR-PMS-131 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TEST-BR-135",
+    "source_id": "BR-PMS-138 positive",
+    "purpose": "Verify BR-PMS-138 (Scope boundary): Patent-office systems are external; PMS may validate, record, track, notify, log, or report based on filing/status/commu",
+    "preconditions": "User is authorized as Patent office systems. Whenever PMS interacts with or records data from the stated external boundary.",
+    "action_or_input": "Invoke operation governed by BR-PMS-138 under valid conditions",
+    "expected_result": "System enforces Patent-office systems are external; PMS may validate, record, track, notify, log, or report based on filing/status/communication data but does not control patent-office processing or decisions.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-136",
+    "source_id": "BR-PMS-139 positive",
+    "purpose": "Verify BR-PMS-139 (Scope boundary): Financial systems and payment/accounting execution are external; PMS may record, validate, approve, track, log, or excha",
+    "preconditions": "User is authorized as Financial systems. Whenever PMS interacts with or records data from the stated external boundary.",
+    "action_or_input": "Invoke operation governed by BR-PMS-139 under valid conditions",
+    "expected_result": "System enforces Financial systems and payment/accounting execution are external; PMS may record, validate, approve, track, log, or exchange financial metadata where integration is available.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-137",
+    "source_id": "BR-PMS-139 condition-false",
+    "purpose": "Verify BR-PMS-139 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Financial systems and payment/accounting execution are external; PMS may record,",
+    "action_or_input": "Attempt operation violating BR-PMS-139 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-BR-138",
+    "source_id": "BR-PMS-140 positive",
+    "purpose": "Verify BR-PMS-140 (Scope boundary): Document-management systems are external; PMS owns only the document/version/access/audit behavior explicitly represente",
+    "preconditions": "User is authorized as Document management system. Whenever PMS interacts with or records data from the stated external boundary.",
+    "action_or_input": "Invoke operation governed by BR-PMS-140 under valid conditions",
+    "expected_result": "System enforces Document-management systems are external; PMS owns only the document/version/access/audit behavior explicitly represented within PMS or an available integration.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-139",
+    "source_id": "BR-PMS-141 positive",
+    "purpose": "Verify BR-PMS-141 (Scope boundary): External prior-art databases are query sources and are not PMS-owned repositories.",
+    "preconditions": "User is authorized as Prior-art databases. Whenever PMS interacts with or records data from the stated external boundary.",
+    "action_or_input": "Invoke operation governed by BR-PMS-141 under valid conditions",
+    "expected_result": "System enforces External prior-art databases are query sources and are not PMS-owned repositories.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-140",
+    "source_id": "BR-PMS-142 positive",
+    "purpose": "Verify BR-PMS-142 (Scope boundary): PMS must not treat external patent-office filing success as internally controlled beyond recording submitted filing deta",
+    "preconditions": "User is authorized as Attorney / patent office systems. Whenever PMS interacts with or records data from the stated external boundary.",
+    "action_or_input": "Invoke operation governed by BR-PMS-142 under valid conditions",
+    "expected_result": "System enforces PMS must not treat external patent-office filing success as internally controlled beyond recording submitted filing details and confirmations.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-141",
+    "source_id": "BR-PMS-146 positive",
+    "purpose": "Verify BR-PMS-146 (Applicant office-action response approval condition): Applicant review and approval of an office-action response is required only when the applicable process requires Applica",
+    "preconditions": "User is authorized as Office-action response handling. Whenever the affected operation is attempted.",
+    "action_or_input": "Invoke operation governed by BR-PMS-146 under valid conditions",
+    "expected_result": "System enforces Applicant review and approval of an office-action response is required only when the applicable process requires Applicant review.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-BR-142",
+    "source_id": "BR-PMS-146 condition-false",
+    "purpose": "Verify BR-PMS-146 refusal when condition or authorization fails",
+    "preconditions": "Condition or actor violating Applicant review and approval of an office-action response is required only when",
+    "action_or_input": "Attempt operation violating BR-PMS-146 rule constraint",
+    "expected_result": "System refuses the operation with appropriate error and state remains unchanged",
+    "test_type": "negative"
+  }
+]

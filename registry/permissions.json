@@ -278,6 +278,418 @@
         "placement_cell.application.auto_withdraw",
         "placement_cell.offer.expire"
       ]
+    },
+    "pms": {
+      "grants": {
+        "faculty": [
+          "pms.appeal.create",
+          "pms.application.create",
+          "pms.application.update",
+          "pms.application.view",
+          "pms.document.create",
+          "pms.document.view",
+          "pms.inventor.update",
+          "pms.licensing_request.create",
+          "pms.licensing_request.view",
+          "pms.office_action_response.approve",
+          "pms.prior_art.create",
+          "pms.prior_art.view",
+          "pms.report.view",
+          "pms.withdrawal.create"
+        ],
+        "pms_attorney": [
+          "pms.application.view",
+          "pms.assessment.create",
+          "pms.attorney_assignment.review",
+          "pms.budget.create",
+          "pms.communication.create",
+          "pms.document.create",
+          "pms.document.view",
+          "pms.filing.create",
+          "pms.legal_advice.create",
+          "pms.legal_request.create",
+          "pms.maintenance.update",
+          "pms.office_action_response.create",
+          "pms.office_action_response.update",
+          "pms.prior_art.create",
+          "pms.prior_art.view"
+        ],
+        "pms_director": [
+          "pms.appeal.review",
+          "pms.application.view",
+          "pms.audit_log.view",
+          "pms.budget.approve",
+          "pms.document.view",
+          "pms.licensing_request.review",
+          "pms.licensing_request.view",
+          "pms.prior_art.view",
+          "pms.renewal.approve",
+          "pms.report.export",
+          "pms.report.view",
+          "pms.report_definition.create",
+          "pms.review.approve",
+          "pms.workflow.view"
+        ],
+        "pms_pcc_admin": [
+          "pms.application.view",
+          "pms.attorney.assign",
+          "pms.attorney_panel.update",
+          "pms.audit_log.export",
+          "pms.audit_log.view",
+          "pms.director_profile.update",
+          "pms.document.create",
+          "pms.document.update",
+          "pms.document.view",
+          "pms.escalation.review",
+          "pms.licensing_request.review",
+          "pms.licensing_request.view",
+          "pms.policy.publish",
+          "pms.prior_art.view",
+          "pms.renewal.assign",
+          "pms.report.export",
+          "pms.report.view",
+          "pms.report_definition.create",
+          "pms.review.assign",
+          "pms.workflow.view"
+        ],
+        "staff": [
+          "pms.appeal.create",
+          "pms.application.create",
+          "pms.application.update",
+          "pms.application.view",
+          "pms.document.create",
+          "pms.document.view",
+          "pms.inventor.update",
+          "pms.licensing_request.create",
+          "pms.licensing_request.view",
+          "pms.office_action_response.approve",
+          "pms.prior_art.create",
+          "pms.prior_art.view",
+          "pms.report.view",
+          "pms.withdrawal.create"
+        ],
+        "student": [
+          "pms.appeal.create",
+          "pms.application.create",
+          "pms.application.update",
+          "pms.application.view",
+          "pms.document.create",
+          "pms.document.view",
+          "pms.inventor.update",
+          "pms.licensing_request.create",
+          "pms.licensing_request.view",
+          "pms.office_action_response.approve",
+          "pms.prior_art.create",
+          "pms.prior_art.view",
+          "pms.report.view",
+          "pms.withdrawal.create"
+        ]
+      },
+      "module_grants": [
+        "faculty",
+        "pms_attorney",
+        "pms_director",
+        "pms_pcc_admin",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/pms",
+        "icon": "Lightbulb",
+        "items": [
+          {
+            "code": "pms.applications",
+            "icon": "FileText",
+            "label": "My Applications",
+            "required_permission": "pms.application.create",
+            "sort_order": 10,
+            "to": "/pms/applications"
+          },
+          {
+            "code": "pms.reviews",
+            "icon": "Gavel",
+            "label": "Reviews",
+            "required_permission": "pms.review.approve",
+            "sort_order": 20,
+            "to": "/pms/reviews"
+          },
+          {
+            "code": "pms.cases",
+            "icon": "Briefcase",
+            "label": "Assigned Cases",
+            "required_permission": "pms.attorney_assignment.review",
+            "sort_order": 30,
+            "to": "/pms/cases"
+          },
+          {
+            "code": "pms.assignments",
+            "icon": "UserSwitch",
+            "label": "Assignments",
+            "required_permission": "pms.review.assign",
+            "sort_order": 40,
+            "to": "/pms/assignments"
+          },
+          {
+            "code": "pms.monitoring",
+            "icon": "Alarm",
+            "label": "Deadlines & Escalations",
+            "required_permission": "pms.escalation.review",
+            "sort_order": 50,
+            "to": "/pms/monitoring"
+          },
+          {
+            "code": "pms.oversight",
+            "icon": "Binoculars",
+            "label": "Oversight",
+            "required_permission": "pms.workflow.view",
+            "sort_order": 60,
+            "to": "/pms/oversight"
+          },
+          {
+            "code": "pms.prior_art",
+            "icon": "MagnifyingGlass",
+            "label": "Prior Art Search",
+            "required_permission": "pms.prior_art.create",
+            "sort_order": 70,
+            "to": "/pms/prior-art"
+          },
+          {
+            "code": "pms.licensing",
+            "icon": "Handshake",
+            "label": "Licensing",
+            "required_permission": "pms.licensing_request.view",
+            "sort_order": 80,
+            "to": "/pms/licensing"
+          },
+          {
+            "code": "pms.reports",
+            "icon": "ChartBar",
+            "label": "Reports",
+            "required_permission": "pms.report.view",
+            "sort_order": 90,
+            "to": "/pms/reports"
+          },
+          {
+            "code": "pms.audit",
+            "icon": "ListMagnifyingGlass",
+            "label": "Audit Log",
+            "required_permission": "pms.audit_log.view",
+            "sort_order": 100,
+            "to": "/pms/audit"
+          },
+          {
+            "code": "pms.directors",
+            "icon": "UsersThree",
+            "label": "Directors",
+            "required_permission": "pms.director_profile.update",
+            "sort_order": 110,
+            "to": "/pms/directors"
+          },
+          {
+            "code": "pms.attorney_panel",
+            "icon": "Scales",
+            "label": "Attorney Panel",
+            "required_permission": "pms.attorney_panel.update",
+            "sort_order": 120,
+            "to": "/pms/attorney-panel"
+          },
+          {
+            "code": "pms.settings",
+            "icon": "GearSix",
+            "label": "Settings",
+            "required_permission": "pms.policy.publish",
+            "sort_order": 130,
+            "to": "/pms/settings"
+          }
+        ],
+        "label": "Patent Management",
+        "nav_section": "Research",
+        "sort_order": 40,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "pms.application.view",
+          "label": "See applications within one's scope"
+        },
+        {
+          "code": "pms.application.create",
+          "label": "Draft and submit a patent application"
+        },
+        {
+          "code": "pms.application.update",
+          "label": "Edit and resubmit one's own application"
+        },
+        {
+          "code": "pms.inventor.update",
+          "label": "Maintain an application's inventors and agreements"
+        },
+        {
+          "code": "pms.withdrawal.create",
+          "label": "Withdraw one's own application"
+        },
+        {
+          "code": "pms.appeal.create",
+          "label": "Appeal a rejection"
+        },
+        {
+          "code": "pms.appeal.review",
+          "label": "Decide an appeal"
+        },
+        {
+          "code": "pms.review.assign",
+          "label": "Assign or reassign an application to a Director"
+        },
+        {
+          "code": "pms.review.approve",
+          "label": "Record a review decision on an assigned application"
+        },
+        {
+          "code": "pms.director_profile.update",
+          "label": "Maintain Directors' expertise areas"
+        },
+        {
+          "code": "pms.attorney_panel.update",
+          "label": "Maintain the approved attorney panel"
+        },
+        {
+          "code": "pms.attorney.assign",
+          "label": "Assign an attorney to an approved application"
+        },
+        {
+          "code": "pms.attorney_assignment.review",
+          "label": "Accept or decline an attorney assignment"
+        },
+        {
+          "code": "pms.assessment.create",
+          "label": "Record a patentability assessment"
+        },
+        {
+          "code": "pms.legal_request.create",
+          "label": "Ask the applicant for information or an extension"
+        },
+        {
+          "code": "pms.legal_advice.create",
+          "label": "Record legal advice"
+        },
+        {
+          "code": "pms.budget.create",
+          "label": "Propose a filing and prosecution budget"
+        },
+        {
+          "code": "pms.budget.approve",
+          "label": "Approve or reject a budget"
+        },
+        {
+          "code": "pms.filing.create",
+          "label": "Record an external patent filing"
+        },
+        {
+          "code": "pms.communication.create",
+          "label": "Record a patent-office communication"
+        },
+        {
+          "code": "pms.office_action_response.create",
+          "label": "Prepare an office-action response"
+        },
+        {
+          "code": "pms.office_action_response.update",
+          "label": "Record a response's submission or extension"
+        },
+        {
+          "code": "pms.office_action_response.approve",
+          "label": "Approve a response as the applicant"
+        },
+        {
+          "code": "pms.maintenance.update",
+          "label": "Track maintenance and record maintenance actions"
+        },
+        {
+          "code": "pms.renewal.approve",
+          "label": "Decide Renew or Do Not Renew"
+        },
+        {
+          "code": "pms.renewal.assign",
+          "label": "Reassign a renewal decision to another Director"
+        },
+        {
+          "code": "pms.document.view",
+          "label": "Read application documents within one's scope"
+        },
+        {
+          "code": "pms.document.create",
+          "label": "Upload a document or a new version"
+        },
+        {
+          "code": "pms.document.update",
+          "label": "Change a document's sensitivity level"
+        },
+        {
+          "code": "pms.prior_art.view",
+          "label": "See prior-art references within one's scope"
+        },
+        {
+          "code": "pms.prior_art.create",
+          "label": "Search prior art and attach references"
+        },
+        {
+          "code": "pms.licensing_request.view",
+          "label": "See licensing requests within one's scope"
+        },
+        {
+          "code": "pms.licensing_request.create",
+          "label": "Submit a licensing or technology-transfer request"
+        },
+        {
+          "code": "pms.licensing_request.review",
+          "label": "Route, negotiate and record licensing agreements"
+        },
+        {
+          "code": "pms.escalation.review",
+          "label": "Monitor deadlines and handle escalations"
+        },
+        {
+          "code": "pms.workflow.view",
+          "label": "See workflow oversight"
+        },
+        {
+          "code": "pms.report.view",
+          "label": "See reports within one's scope"
+        },
+        {
+          "code": "pms.report.export",
+          "label": "Export reports"
+        },
+        {
+          "code": "pms.report_definition.create",
+          "label": "Save and schedule report definitions"
+        },
+        {
+          "code": "pms.audit_log.view",
+          "label": "See audit logs within one's scope"
+        },
+        {
+          "code": "pms.audit_log.export",
+          "label": "Export audit logs"
+        },
+        {
+          "code": "pms.policy.publish",
+          "label": "Publish a new PMS settings version"
+        },
+        {
+          "code": "pms.deadline.manage",
+          "label": "Scheduled sweep: expire, alert and escalate deadlines"
+        },
+        {
+          "code": "pms.routing.assign",
+          "label": "Scheduled automatic assignment of Directors"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "pms.deadline.manage",
+        "pms.routing.assign"
+      ]
     }
   },
   "publisher": "integrated",

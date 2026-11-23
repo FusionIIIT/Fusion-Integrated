@@ -1,0 +1,596 @@
+[
+  {
+    "test_id": "TEST-UC-001",
+    "source_id": "UC-PMS-001 Main Flow",
+    "purpose": "Verify UC-PMS-001 (Submit Patent Application) main success flow",
+    "preconditions": "Actor is logged in as Applicant with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Submit Patent Application",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-002",
+    "source_id": "UC-PMS-001 Alternative A1",
+    "purpose": "Verify UC-PMS-001 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-001",
+    "action_or_input": "Trigger Submit Patent Application with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-003",
+    "source_id": "UC-PMS-002 Main Flow",
+    "purpose": "Verify UC-PMS-002 (Track Application Status and History) main success flow",
+    "preconditions": "Actor is logged in as Applicant with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Track Application Status and History",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-004",
+    "source_id": "UC-PMS-002 Alternative A1",
+    "purpose": "Verify UC-PMS-002 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-002",
+    "action_or_input": "Trigger Track Application Status and History with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-005",
+    "source_id": "UC-PMS-003 Main Flow",
+    "purpose": "Verify UC-PMS-003 (Manage Co-Inventors and Agreements) main success flow",
+    "preconditions": "Actor is logged in as Applicant with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Manage Co-Inventors and Agreements",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-006",
+    "source_id": "UC-PMS-003 Alternative A1",
+    "purpose": "Verify UC-PMS-003 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-003",
+    "action_or_input": "Trigger Manage Co-Inventors and Agreements with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-007",
+    "source_id": "UC-PMS-004 Main Flow",
+    "purpose": "Verify UC-PMS-004 (Search and Attach Prior Art) main success flow",
+    "preconditions": "Actor is logged in as Applicant or Attorney with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Search and Attach Prior Art",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-008",
+    "source_id": "UC-PMS-004 Alternative A1",
+    "purpose": "Verify UC-PMS-004 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-004",
+    "action_or_input": "Trigger Search and Attach Prior Art with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-009",
+    "source_id": "UC-PMS-005 Main Flow",
+    "purpose": "Verify UC-PMS-005 (Revise and Resubmit Application) main success flow",
+    "preconditions": "Actor is logged in as Applicant with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Revise and Resubmit Application",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-010",
+    "source_id": "UC-PMS-005 Alternative A1",
+    "purpose": "Verify UC-PMS-005 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-005",
+    "action_or_input": "Trigger Revise and Resubmit Application with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-011",
+    "source_id": "UC-PMS-006 Main Flow",
+    "purpose": "Verify UC-PMS-006 (Withdraw Patent Application) main success flow",
+    "preconditions": "Actor is logged in as Applicant with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Withdraw Patent Application",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-012",
+    "source_id": "UC-PMS-006 Alternative A1",
+    "purpose": "Verify UC-PMS-006 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-006",
+    "action_or_input": "Trigger Withdraw Patent Application with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-013",
+    "source_id": "UC-PMS-007 Main Flow",
+    "purpose": "Verify UC-PMS-007 (Assign Application to Director) main success flow",
+    "preconditions": "Actor is logged in as PCC_ADMIN with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Assign Application to Director",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-014",
+    "source_id": "UC-PMS-007 Alternative A1",
+    "purpose": "Verify UC-PMS-007 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-007",
+    "action_or_input": "Trigger Assign Application to Director with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-015",
+    "source_id": "UC-PMS-008 Main Flow",
+    "purpose": "Verify UC-PMS-008 (Review Patent Application) main success flow",
+    "preconditions": "Actor is logged in as Director with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Review Patent Application",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-016",
+    "source_id": "UC-PMS-008 Alternative A1",
+    "purpose": "Verify UC-PMS-008 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-008",
+    "action_or_input": "Trigger Review Patent Application with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-017",
+    "source_id": "UC-PMS-009 Main Flow",
+    "purpose": "Verify UC-PMS-009 (Review and Decide Patent Budget) main success flow",
+    "preconditions": "Actor is logged in as Director with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Review and Decide Patent Budget",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-018",
+    "source_id": "UC-PMS-009 Alternative A1",
+    "purpose": "Verify UC-PMS-009 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-009",
+    "action_or_input": "Trigger Review and Decide Patent Budget with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-019",
+    "source_id": "UC-PMS-010 Main Flow",
+    "purpose": "Verify UC-PMS-010 (Assign Attorney to Approved Application) main success flow",
+    "preconditions": "Actor is logged in as PCC_ADMIN with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Assign Attorney to Approved Application",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-020",
+    "source_id": "UC-PMS-010 Alternative A1",
+    "purpose": "Verify UC-PMS-010 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-010",
+    "action_or_input": "Trigger Assign Attorney to Approved Application with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-021",
+    "source_id": "UC-PMS-011 Main Flow",
+    "purpose": "Verify UC-PMS-011 (Accept or Decline Attorney Assignment) main success flow",
+    "preconditions": "Actor is logged in as Attorney with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Accept or Decline Attorney Assignment",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-022",
+    "source_id": "UC-PMS-011 Alternative A1",
+    "purpose": "Verify UC-PMS-011 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-011",
+    "action_or_input": "Trigger Accept or Decline Attorney Assignment with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-023",
+    "source_id": "UC-PMS-012 Main Flow",
+    "purpose": "Verify UC-PMS-012 (Conduct Patentability Assessment) main success flow",
+    "preconditions": "Actor is logged in as Attorney with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Conduct Patentability Assessment",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-024",
+    "source_id": "UC-PMS-012 Alternative A1",
+    "purpose": "Verify UC-PMS-012 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-012",
+    "action_or_input": "Trigger Conduct Patentability Assessment with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-025",
+    "source_id": "UC-PMS-013 Main Flow",
+    "purpose": "Verify UC-PMS-013 (Prepare and Record External Patent Filing) main success flow",
+    "preconditions": "Actor is logged in as Attorney with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Prepare and Record External Patent Filing",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-026",
+    "source_id": "UC-PMS-013 Alternative A1",
+    "purpose": "Verify UC-PMS-013 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-013",
+    "action_or_input": "Trigger Prepare and Record External Patent Filing with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-027",
+    "source_id": "UC-PMS-014 Main Flow",
+    "purpose": "Verify UC-PMS-014 (Record Patent Office Communication) main success flow",
+    "preconditions": "Actor is logged in as Attorney with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Record Patent Office Communication",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-028",
+    "source_id": "UC-PMS-014 Alternative A1",
+    "purpose": "Verify UC-PMS-014 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-014",
+    "action_or_input": "Trigger Record Patent Office Communication with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-029",
+    "source_id": "UC-PMS-015 Main Flow",
+    "purpose": "Verify UC-PMS-015 (Respond to Office Action) main success flow",
+    "preconditions": "Actor is logged in as Attorney with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Respond to Office Action",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-030",
+    "source_id": "UC-PMS-015 Alternative A1",
+    "purpose": "Verify UC-PMS-015 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-015",
+    "action_or_input": "Trigger Respond to Office Action with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-031",
+    "source_id": "UC-PMS-016 Main Flow",
+    "purpose": "Verify UC-PMS-016 (Monitor Deadlines and Escalations) main success flow",
+    "preconditions": "Actor is logged in as PCC_ADMIN with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Monitor Deadlines and Escalations",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-032",
+    "source_id": "UC-PMS-016 Alternative A1",
+    "purpose": "Verify UC-PMS-016 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-016",
+    "action_or_input": "Trigger Monitor Deadlines and Escalations with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-033",
+    "source_id": "UC-PMS-017 Main Flow",
+    "purpose": "Verify UC-PMS-017 (Manage Post-Grant Tracking and Maintenance) main success flow",
+    "preconditions": "Actor is logged in as Attorney with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Manage Post-Grant Tracking and Maintenance",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-034",
+    "source_id": "UC-PMS-017 Alternative A1",
+    "purpose": "Verify UC-PMS-017 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-017",
+    "action_or_input": "Trigger Manage Post-Grant Tracking and Maintenance with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-035",
+    "source_id": "UC-PMS-018 Main Flow",
+    "purpose": "Verify UC-PMS-018 (Make Maintenance Renewal Decision) main success flow",
+    "preconditions": "Actor is logged in as Director with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Make Maintenance Renewal Decision",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-036",
+    "source_id": "UC-PMS-018 Alternative A1",
+    "purpose": "Verify UC-PMS-018 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-018",
+    "action_or_input": "Trigger Make Maintenance Renewal Decision with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-037",
+    "source_id": "UC-PMS-019 Main Flow",
+    "purpose": "Verify UC-PMS-019 (Manage Document Versions) main success flow",
+    "preconditions": "Actor is logged in as Applicant (also Attorney/Director/PCC_ADMIN when authorized) with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Manage Document Versions",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-038",
+    "source_id": "UC-PMS-019 Alternative A1",
+    "purpose": "Verify UC-PMS-019 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-019",
+    "action_or_input": "Trigger Manage Document Versions with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-039",
+    "source_id": "UC-PMS-020 Main Flow",
+    "purpose": "Verify UC-PMS-020 (Submit Licensing or Technology-Transfer Request) main success flow",
+    "preconditions": "Actor is logged in as Applicant with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Submit Licensing or Technology-Transfer Request",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-040",
+    "source_id": "UC-PMS-020 Alternative A1",
+    "purpose": "Verify UC-PMS-020 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-020",
+    "action_or_input": "Trigger Submit Licensing or Technology-Transfer Request with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-041",
+    "source_id": "UC-PMS-021 Main Flow",
+    "purpose": "Verify UC-PMS-021 (Review Licensing or Technology-Transfer Request) main success flow",
+    "preconditions": "Actor is logged in as Director with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Review Licensing or Technology-Transfer Request",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-042",
+    "source_id": "UC-PMS-021 Alternative A1",
+    "purpose": "Verify UC-PMS-021 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-021",
+    "action_or_input": "Trigger Review Licensing or Technology-Transfer Request with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-043",
+    "source_id": "UC-PMS-022 Main Flow",
+    "purpose": "Verify UC-PMS-022 (File Appeal Against Rejection) main success flow",
+    "preconditions": "Actor is logged in as Applicant with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for File Appeal Against Rejection",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-044",
+    "source_id": "UC-PMS-022 Alternative A1",
+    "purpose": "Verify UC-PMS-022 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-022",
+    "action_or_input": "Trigger File Appeal Against Rejection with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-045",
+    "source_id": "UC-PMS-023 Main Flow",
+    "purpose": "Verify UC-PMS-023 (Review Appeal) main success flow",
+    "preconditions": "Actor is logged in as Director with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Review Appeal",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-046",
+    "source_id": "UC-PMS-023 Alternative A1",
+    "purpose": "Verify UC-PMS-023 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-023",
+    "action_or_input": "Trigger Review Appeal with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-047",
+    "source_id": "UC-PMS-024 Main Flow",
+    "purpose": "Verify UC-PMS-024 (Generate System-Wide PMS Reports and Analytics) main success flow",
+    "preconditions": "Actor is logged in as PCC_ADMIN with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Generate System-Wide PMS Reports and Analytics",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-048",
+    "source_id": "UC-PMS-024 Alternative A1",
+    "purpose": "Verify UC-PMS-024 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-024",
+    "action_or_input": "Trigger Generate System-Wide PMS Reports and Analytics with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-049",
+    "source_id": "UC-PMS-025 Main Flow",
+    "purpose": "Verify UC-PMS-025 (Manage PMS Roles and Configuration) main success flow",
+    "preconditions": "Actor is logged in as PCC_ADMIN with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Manage PMS Roles and Configuration",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-050",
+    "source_id": "UC-PMS-025 Alternative A1",
+    "purpose": "Verify UC-PMS-025 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-025",
+    "action_or_input": "Trigger Manage PMS Roles and Configuration with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-051",
+    "source_id": "UC-PMS-026 Main Flow",
+    "purpose": "Verify UC-PMS-026 (Maintain Attorney Panel and Expertise Mappings) main success flow",
+    "preconditions": "Actor is logged in as PCC_ADMIN with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Maintain Attorney Panel and Expertise Mappings",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-052",
+    "source_id": "UC-PMS-026 Alternative A1",
+    "purpose": "Verify UC-PMS-026 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-026",
+    "action_or_input": "Trigger Maintain Attorney Panel and Expertise Mappings with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-053",
+    "source_id": "UC-PMS-027 Main Flow",
+    "purpose": "Verify UC-PMS-027 (Monitor Workflow and Handle Exceptional Cases) main success flow",
+    "preconditions": "Actor is logged in as PCC_ADMIN with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Monitor Workflow and Handle Exceptional Cases",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-054",
+    "source_id": "UC-PMS-027 Alternative A1",
+    "purpose": "Verify UC-PMS-027 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-027",
+    "action_or_input": "Trigger Monitor Workflow and Handle Exceptional Cases with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-055",
+    "source_id": "UC-PMS-028 Main Flow",
+    "purpose": "Verify UC-PMS-028 (View Audit Trail and Compliance Logs) main success flow",
+    "preconditions": "Actor is logged in as PCC_ADMIN with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for View Audit Trail and Compliance Logs",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-056",
+    "source_id": "UC-PMS-028 Alternative A1",
+    "purpose": "Verify UC-PMS-028 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-028",
+    "action_or_input": "Trigger View Audit Trail and Compliance Logs with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-057",
+    "source_id": "UC-PMS-029 Main Flow",
+    "purpose": "Verify UC-PMS-029 (Review Office-Action Response) main success flow",
+    "preconditions": "Actor is logged in as Applicant with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Review Office-Action Response",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-058",
+    "source_id": "UC-PMS-029 Alternative A1",
+    "purpose": "Verify UC-PMS-029 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-029",
+    "action_or_input": "Trigger Review Office-Action Response with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-059",
+    "source_id": "UC-PMS-030 Main Flow",
+    "purpose": "Verify UC-PMS-030 (View Own Application Reports) main success flow",
+    "preconditions": "Actor is logged in as Applicant with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for View Own Application Reports",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-060",
+    "source_id": "UC-PMS-030 Alternative A1",
+    "purpose": "Verify UC-PMS-030 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-030",
+    "action_or_input": "Trigger View Own Application Reports with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-061",
+    "source_id": "UC-PMS-031 Main Flow",
+    "purpose": "Verify UC-PMS-031 (View PMS Reports and Analytics) main success flow",
+    "preconditions": "Actor is logged in as Director with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for View PMS Reports and Analytics",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-062",
+    "source_id": "UC-PMS-031 Alternative A1",
+    "purpose": "Verify UC-PMS-031 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-031",
+    "action_or_input": "Trigger View PMS Reports and Analytics with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-063",
+    "source_id": "UC-PMS-032 Main Flow",
+    "purpose": "Verify UC-PMS-032 (View Application Workflow Oversight) main success flow",
+    "preconditions": "Actor is logged in as Director with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for View Application Workflow Oversight",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-064",
+    "source_id": "UC-PMS-032 Alternative A1",
+    "purpose": "Verify UC-PMS-032 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-032",
+    "action_or_input": "Trigger View Application Workflow Oversight with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TEST-UC-065",
+    "source_id": "UC-PMS-033 Main Flow",
+    "purpose": "Verify UC-PMS-033 (Record Patent Legal Advice) main success flow",
+    "preconditions": "Actor is logged in as Attorney with required role and prerequisites satisfied",
+    "action_or_input": "Execute main flow steps for Record Patent Legal Advice",
+    "expected_result": "Operation succeeds, state changes as specified, audit log and notifications triggered",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TEST-UC-066",
+    "source_id": "UC-PMS-033 Alternative A1",
+    "purpose": "Verify UC-PMS-033 refusal when inputs/permissions are invalid",
+    "preconditions": "Caller lacks permission or provides invalid input for UC-PMS-033",
+    "action_or_input": "Trigger Record Patent Legal Advice with invalid inputs",
+    "expected_result": "Action refused with 4xx status, no state change",
+    "test_type": "negative"
+  }
+]
