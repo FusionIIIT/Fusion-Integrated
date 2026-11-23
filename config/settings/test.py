@@ -1,6 +1,7 @@
 from .dev import *
 
 DEBUG = False
+PMS_MALWARE_SCANNER = "clamd"
 # Tests never reach the real IAM — fusion_auth is stubbed via responses/monkeypatch.
 IAM_BASE_URL = "http://iam.test"
 IAM_SERVICE_TOKEN = "test-token"  # noqa: S105 — test fixture, never a real credential
