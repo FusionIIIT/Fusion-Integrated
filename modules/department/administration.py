@@ -105,7 +105,9 @@ def propose_official_details(*, actor, field, value):
     if field not in DepartmentProposal.Field.values:
         raise ConflictError("Choose Official name or Core policies for an official change.")
     if DepartmentProposal.objects.filter(department=row, field=field, status="pending").exists():
-        raise ConflictError("Wait for the pending change to this field to be decided before submitting another.")
+        raise ConflictError(
+            "Wait for the pending change to this field to be decided before submitting another."
+        )
     return DepartmentProposal.objects.create(department=row, field=field, value=value,
                                              proposed_by_id=actor.user_id)
 
