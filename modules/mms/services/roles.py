@@ -56,26 +56,21 @@ def assign(*, actor, role: str, user_id: int, starts_at=None, ends_at=None):
     current = list(RoleAssignment.objects.select_for_update().filter(
         role=role, is_current=True).order_by("-starts_at"))
     effective_now = starts_at <= now
+    retiring = []
     for row in current:
-        if effective_now:
-            overlaps = row.starts_at < ends_at and row.ends_at > starts_at
+        overlaps = row.starts_at < ends_at and row.ends_at > starts_at
+        if not overlaps or row.user_id == user_id:
+            continue
+        if effective_now and row.starts_at <= starts_at < row.ends_at:
+            retiring.append(row)
         else:
-            overlaps = row.starts_at < ends_at and row.ends_at > starts_at
-        if overlaps and row.user_id != user_id:
             raise ConflictError("A current assignment for this role already exists.",
                                 code="assignment_conflict")
     if effective_now:
-        for row in current:
-            if row.user_id != user_id:
-                continue
+        for row in retiring:
             row.ends_at = starts_at
             row.is_current = False
             row.save(update_fields=["ends_at", "is_current", "updated_at"])
-        RoleAssignment.objects.filter(
-            role=role, is_current=True, starts_at__lte=now, ends_at__gt=now
-        ).exclude(user_id=user_id).update(ends_at=now, updated_at=now)
-        RoleAssignment.objects.filter(role=role, is_current=True).exclude(
-            user_id=user_id).update(is_current=False, updated_at=now)
     try:
         with transaction.atomic():
             return RoleAssignment.objects.create(

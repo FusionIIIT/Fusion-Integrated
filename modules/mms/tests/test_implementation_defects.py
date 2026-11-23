@@ -9,7 +9,9 @@ from modules.directory import contracts as directory
 from modules.mms.models import (
     Enrollment,
     Feedback,
+    RegistrationWindow,
     RoleAssignment,
+    StudentRequest,
     VacationResponse,
     VacationSurvey,
 )
@@ -34,7 +36,7 @@ def _client(stub_iam, user_id, permissions, kind="student",
     return client
 
 
-def test_role_reassignment_rejects_conflicting_current_assignment(
+def test_midcycle_role_reassignment_retires_incumbent_at_effective_time(
         stub_iam, monkeypatch):
     monkeypatch.setattr(directory, "get_users",
                         lambda ids: {uid: object() for uid in ids})
@@ -49,15 +51,62 @@ def test_role_reassignment_rejects_conflicting_current_assignment(
     client = _client(
         stub_iam, 101, ("mms.roles.manage",), kind="staff",
         active_role="mess_admin")
+    effective_at = now - timedelta(hours=1)
     response = client.post("/api/v1/mms/roles", {
         "role": "caretaker",
         "user_id": 303,
-        "starts_at": (now - timedelta(hours=1)).isoformat(),
+        "starts_at": effective_at.isoformat(),
         "ends_at": (now + timedelta(days=30)).isoformat(),
     }, format="json")
 
-    assert response.status_code == 409
-    assert RoleAssignment.objects.get(role="caretaker", is_current=True).user_id == 202
+    assert response.status_code == 201
+    incumbent = RoleAssignment.objects.get(role="caretaker", user_id=202)
+    replacement = RoleAssignment.objects.get(role="caretaker", user_id=303)
+    assert incumbent.ends_at == effective_at
+    assert incumbent.is_current is False
+    assert replacement.starts_at == effective_at
+    assert replacement.is_current is True
+    assert RoleAssignment.objects.filter(
+        role="caretaker", is_current=True).count() == 1
+
+
+def test_reassigned_caretaker_can_see_and_act_on_pending_requests(
+        stub_iam, monkeypatch):
+    monkeypatch.setattr(directory, "get_users",
+                        lambda ids: {uid: object() for uid in ids})
+    monkeypatch.setattr(directory, "held_employee_ids", lambda: {202, 303})
+    now = timezone.now()
+    RoleAssignment.objects.create(
+        role="caretaker", user_id=202, starts_at=now - timedelta(days=1),
+        ends_at=now + timedelta(days=30), is_current=True,
+        assigned_by_user_id=101)
+    window = RegistrationWindow.objects.create(
+        cycle="current", opens_at=now - timedelta(days=1),
+        closes_at=now + timedelta(days=1), opened_by_user_id=101)
+    request = StudentRequest.objects.create(
+        user_id=1001, kind="registration", window=window)
+    manager = _client(
+        stub_iam, 101, ("mms.roles.manage",), kind="staff",
+        active_role="mess_admin")
+    reassignment = manager.post("/api/v1/mms/roles", {
+        "role": "caretaker", "user_id": 303,
+        "starts_at": now.isoformat(),
+        "ends_at": (now + timedelta(days=30)).isoformat(),
+    }, format="json")
+    assert reassignment.status_code == 201
+
+    caretaker = _client(
+        stub_iam, 303, ("mms.operations.view", "mms.requests.review"),
+        kind="faculty", active_role="mess_caretaker")
+    listing = caretaker.get("/api/v1/mms/requests")
+    assert listing.status_code == 200
+    assert request.pk in {item["id"] for item in listing.json()["results"]}
+
+    decision = caretaker.post(
+        f"/api/v1/mms/requests/{request.pk}/decision",
+        {"approve": True}, format="json")
+    assert decision.status_code == 200
+    assert decision.json()["status"] == "approved"
 
 
 def test_menu_accepts_deletion_with_fewer_entries(stub_iam):
