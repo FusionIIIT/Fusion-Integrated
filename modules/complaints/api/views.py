@@ -191,6 +191,10 @@ class ComplaintProgressView(APIView):
         except ComplaintDomainError as e:
             _handle_domain_error(e)
 
+        # Refresh the complaint to include newly created transitions
+        updated.refresh_from_db()
+        # Prefetch transitions for serialization
+        updated = type(updated).objects.prefetch_related('transitions').get(pk=updated.pk)
         return Response(ComplaintDetailSerializer(updated).data)
 
 
