@@ -7,6 +7,29 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `badms`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `badms.backup.view` | View backup status, history, and schedules | `Director`, `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Super Admin`, `SysAdmin`, `acadadmin` |
+| `badms.backup.manage` | Trigger manual backups and configure local schedules | `Director`, `Super Admin`, `SysAdmin`, `acadadmin` |
+| `badms.backup_policy.manage` | Define global backup schedules and default policies | `Director`, `Super Admin` |
+| `badms.archival.view` | View secure archival requests and status | `Director`, `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `IT Security`, `Super Admin`, `SysAdmin`, `acadadmin`, `faculty`, `staff`, `student` |
+| `badms.archival.create` | Submit secure archival requests | `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `faculty`, `staff`, `student` |
+| `badms.archival.approve` | Approve or reject archival requests within department | `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `badms.archival.review` | Review and assign authoritative data classification | `SysAdmin`, `acadadmin` |
+| `badms.archival.manage` | Execute special archival operations | `Director`, `Super Admin` |
+| `badms.storage.view` | View storage extension requests and quota status | `Director`, `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Super Admin`, `SysAdmin`, `acadadmin`, `faculty`, `staff`, `student` |
+| `badms.storage.create` | Submit storage extension requests | `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `faculty`, `staff`, `student` |
+| `badms.storage.approve` | Approve or reject storage extension requests within department | `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `badms.restoration.view` | View data restoration requests and history | `Director`, `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Super Admin`, `SysAdmin`, `acadadmin`, `faculty`, `staff`, `student` |
+| `badms.restoration.create` | Submit data restoration requests | `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `faculty`, `staff`, `student` |
+| `badms.restoration.approve` | Approve or reject sensitive data restoration requests | `SysAdmin`, `acadadmin` |
+| `badms.restoration.restore` | Execute technical data restoration | `SysAdmin`, `acadadmin` |
+| `badms.security.manage` | Configure encryption for sensitive archives and security policies | `IT Security` |
+| `badms.audit.view` | View system audit logs and data activity history | `Director`, `IT Security`, `Super Admin`, `SysAdmin`, `acadadmin` |
+| `badms.report.view` | View department data management and operational reports | `Director`, `HOD`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `IT Security`, `Super Admin`, `SysAdmin`, `acadadmin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |

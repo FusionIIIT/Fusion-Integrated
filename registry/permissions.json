@@ -1,5 +1,340 @@
 {
   "modules": {
+    "badms": {
+      "grants": {
+        "Director": [
+          "badms.archival.manage",
+          "badms.archival.view",
+          "badms.audit.view",
+          "badms.backup.manage",
+          "badms.backup.view",
+          "badms.backup_policy.manage",
+          "badms.report.view",
+          "badms.restoration.view",
+          "badms.storage.view"
+        ],
+        "HOD": [
+          "badms.archival.approve",
+          "badms.archival.create",
+          "badms.archival.view",
+          "badms.backup.view",
+          "badms.report.view",
+          "badms.restoration.create",
+          "badms.restoration.view",
+          "badms.storage.approve",
+          "badms.storage.create",
+          "badms.storage.view"
+        ],
+        "HOD (CSE)": [
+          "badms.archival.approve",
+          "badms.archival.create",
+          "badms.archival.view",
+          "badms.backup.view",
+          "badms.report.view",
+          "badms.restoration.create",
+          "badms.restoration.view",
+          "badms.storage.approve",
+          "badms.storage.create",
+          "badms.storage.view"
+        ],
+        "HOD (Design)": [
+          "badms.archival.approve",
+          "badms.archival.create",
+          "badms.archival.view",
+          "badms.backup.view",
+          "badms.report.view",
+          "badms.restoration.create",
+          "badms.restoration.view",
+          "badms.storage.approve",
+          "badms.storage.create",
+          "badms.storage.view"
+        ],
+        "HOD (ECE)": [
+          "badms.archival.approve",
+          "badms.archival.create",
+          "badms.archival.view",
+          "badms.backup.view",
+          "badms.report.view",
+          "badms.restoration.create",
+          "badms.restoration.view",
+          "badms.storage.approve",
+          "badms.storage.create",
+          "badms.storage.view"
+        ],
+        "HOD (Liberal Arts)": [
+          "badms.archival.approve",
+          "badms.archival.create",
+          "badms.archival.view",
+          "badms.backup.view",
+          "badms.report.view",
+          "badms.restoration.create",
+          "badms.restoration.view",
+          "badms.storage.approve",
+          "badms.storage.create",
+          "badms.storage.view"
+        ],
+        "HOD (ME)": [
+          "badms.archival.approve",
+          "badms.archival.create",
+          "badms.archival.view",
+          "badms.backup.view",
+          "badms.report.view",
+          "badms.restoration.create",
+          "badms.restoration.view",
+          "badms.storage.approve",
+          "badms.storage.create",
+          "badms.storage.view"
+        ],
+        "HOD (NS)": [
+          "badms.archival.approve",
+          "badms.archival.create",
+          "badms.archival.view",
+          "badms.backup.view",
+          "badms.report.view",
+          "badms.restoration.create",
+          "badms.restoration.view",
+          "badms.storage.approve",
+          "badms.storage.create",
+          "badms.storage.view"
+        ],
+        "IT Security": [
+          "badms.archival.view",
+          "badms.audit.view",
+          "badms.report.view",
+          "badms.security.manage"
+        ],
+        "Super Admin": [
+          "badms.archival.manage",
+          "badms.archival.view",
+          "badms.audit.view",
+          "badms.backup.manage",
+          "badms.backup.view",
+          "badms.backup_policy.manage",
+          "badms.report.view",
+          "badms.restoration.view",
+          "badms.storage.view"
+        ],
+        "SysAdmin": [
+          "badms.archival.review",
+          "badms.archival.view",
+          "badms.audit.view",
+          "badms.backup.manage",
+          "badms.backup.view",
+          "badms.report.view",
+          "badms.restoration.approve",
+          "badms.restoration.restore",
+          "badms.restoration.view",
+          "badms.storage.view"
+        ],
+        "acadadmin": [
+          "badms.archival.review",
+          "badms.archival.view",
+          "badms.audit.view",
+          "badms.backup.manage",
+          "badms.backup.view",
+          "badms.report.view",
+          "badms.restoration.approve",
+          "badms.restoration.restore",
+          "badms.restoration.view",
+          "badms.storage.view"
+        ],
+        "faculty": [
+          "badms.archival.create",
+          "badms.archival.view",
+          "badms.restoration.create",
+          "badms.restoration.view",
+          "badms.storage.create",
+          "badms.storage.view"
+        ],
+        "staff": [
+          "badms.archival.create",
+          "badms.archival.view",
+          "badms.restoration.create",
+          "badms.restoration.view",
+          "badms.storage.create",
+          "badms.storage.view"
+        ],
+        "student": [
+          "badms.archival.create",
+          "badms.archival.view",
+          "badms.restoration.create",
+          "badms.restoration.view",
+          "badms.storage.create",
+          "badms.storage.view"
+        ]
+      },
+      "module_grants": [
+        "Director",
+        "HOD",
+        "HOD (CSE)",
+        "HOD (Design)",
+        "HOD (ECE)",
+        "HOD (Liberal Arts)",
+        "HOD (ME)",
+        "HOD (NS)",
+        "IT Security",
+        "Super Admin",
+        "SysAdmin",
+        "acadadmin",
+        "faculty",
+        "staff",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/badms",
+        "icon": "Database",
+        "items": [
+          {
+            "code": "badms.backups",
+            "icon": "HardDrives",
+            "label": "Backups",
+            "required_permission": "badms.backup.view",
+            "sort_order": 10,
+            "to": "/badms/backups"
+          },
+          {
+            "code": "badms.schedules",
+            "icon": "CalendarCheck",
+            "label": "Backup Schedules",
+            "required_permission": "badms.backup.view",
+            "sort_order": 20,
+            "to": "/badms/schedules"
+          },
+          {
+            "code": "badms.archival_requests",
+            "icon": "Archive",
+            "label": "Secure Archival",
+            "required_permission": "badms.archival.view",
+            "sort_order": 30,
+            "to": "/badms/archival-requests"
+          },
+          {
+            "code": "badms.storage_extensions",
+            "icon": "CloudArrowUp",
+            "label": "Storage Extensions",
+            "required_permission": "badms.storage.view",
+            "sort_order": 40,
+            "to": "/badms/storage-extensions"
+          },
+          {
+            "code": "badms.restorations",
+            "icon": "ArrowCounterClockwise",
+            "label": "Restorations",
+            "required_permission": "badms.restoration.view",
+            "sort_order": 50,
+            "to": "/badms/restorations"
+          },
+          {
+            "code": "badms.audit_logs",
+            "icon": "ShieldCheck",
+            "label": "Audit Logs",
+            "required_permission": "badms.audit.view",
+            "sort_order": 60,
+            "to": "/badms/audit-logs"
+          },
+          {
+            "code": "badms.reports",
+            "icon": "ChartBar",
+            "label": "Reports",
+            "required_permission": "badms.report.view",
+            "sort_order": 70,
+            "to": "/badms/reports"
+          },
+          {
+            "code": "badms.security_policies",
+            "icon": "LockKey",
+            "label": "Security Policies",
+            "required_permission": "badms.security.manage",
+            "sort_order": 80,
+            "to": "/badms/security-policies"
+          }
+        ],
+        "label": "Backup & Database Archive Management System",
+        "nav_section": "Administration",
+        "sort_order": 15,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "badms.backup.view",
+          "label": "View backup status, history, and schedules"
+        },
+        {
+          "code": "badms.backup.manage",
+          "label": "Trigger manual backups and configure local schedules"
+        },
+        {
+          "code": "badms.backup_policy.manage",
+          "label": "Define global backup schedules and default policies"
+        },
+        {
+          "code": "badms.archival.view",
+          "label": "View secure archival requests and status"
+        },
+        {
+          "code": "badms.archival.create",
+          "label": "Submit secure archival requests"
+        },
+        {
+          "code": "badms.archival.approve",
+          "label": "Approve or reject archival requests within department"
+        },
+        {
+          "code": "badms.archival.review",
+          "label": "Review and assign authoritative data classification"
+        },
+        {
+          "code": "badms.archival.manage",
+          "label": "Execute special archival operations"
+        },
+        {
+          "code": "badms.storage.view",
+          "label": "View storage extension requests and quota status"
+        },
+        {
+          "code": "badms.storage.create",
+          "label": "Submit storage extension requests"
+        },
+        {
+          "code": "badms.storage.approve",
+          "label": "Approve or reject storage extension requests within department"
+        },
+        {
+          "code": "badms.restoration.view",
+          "label": "View data restoration requests and history"
+        },
+        {
+          "code": "badms.restoration.create",
+          "label": "Submit data restoration requests"
+        },
+        {
+          "code": "badms.restoration.approve",
+          "label": "Approve or reject sensitive data restoration requests"
+        },
+        {
+          "code": "badms.restoration.restore",
+          "label": "Execute technical data restoration"
+        },
+        {
+          "code": "badms.security.manage",
+          "label": "Configure encryption for sensitive archives and security policies"
+        },
+        {
+          "code": "badms.audit.view",
+          "label": "View system audit logs and data activity history"
+        },
+        {
+          "code": "badms.report.view",
+          "label": "View department data management and operational reports"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": [
+        "badms.backup.auto_execute",
+        "badms.failure.auto_escalate",
+        "badms.storage.auto_monitor"
+      ]
+    },
     "directory": {
       "grants": {
         "Dean Academic": [

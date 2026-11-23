@@ -1,0 +1,191 @@
+[
+  {
+    "test_id": "BR-DESIGN-001",
+    "source_id": "BR-BA-001",
+    "purpose": "Verify the manual backup trigger authorization business rule.",
+    "preconditions": "An authenticated actor attempts to trigger a manual backup.",
+    "action_or_input": "Attempt POST /api/v1/badms/backups/manual/ as SysAdmin, Super Admin, and a role without backup-manage authority.",
+    "expected_result": "SysAdmin and Super Admin may trigger the backup; an unauthorized role is denied and no backup is created.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-DESIGN-002",
+    "source_id": "BR-BA-002",
+    "purpose": "Verify the respective hod approval for secure archival business rule.",
+    "preconditions": "A secure archival request is pending and its requester's department is known.",
+    "action_or_input": "Attempt to decide the request as the requester's department HoD and as a different department's HoD.",
+    "expected_result": "Only the HoD of the requester's department may decide the request; other HoDs are denied.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-DESIGN-003",
+    "source_id": "BR-BA-003",
+    "purpose": "Verify the it security encryption authority business rule.",
+    "preconditions": "A request is classified Sensitive and awaits encryption configuration.",
+    "action_or_input": "Attempt to configure encryption as an authorized IT Security Team member and as a non-IT-Security actor.",
+    "expected_result": "Only authorized IT Security Team members may configure encryption; unauthorized attempts are denied.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-DESIGN-004",
+    "source_id": "BR-BA-004",
+    "purpose": "Verify the sysadmin authoritative classification business rule.",
+    "preconditions": "A secure-archival request has received HoD approval.",
+    "action_or_input": "Attempt to assign one of Critical, Sensitive, Routine, or Archival as an authorized SysAdmin and as an unauthorized actor.",
+    "expected_result": "An authorized SysAdmin can assign the authoritative classification after HoD approval; unauthorized classification is denied.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-DESIGN-005",
+    "source_id": "BR-BA-005",
+    "purpose": "Verify the sensitive restoration approval business rule.",
+    "preconditions": "A restoration request concerns data classified Sensitive.",
+    "action_or_input": "Attempt to proceed with restoration before SysAdmin approval, then approve as SysAdmin and proceed.",
+    "expected_result": "Sensitive-data restoration cannot proceed before SysAdmin approval; approval is required first.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-DESIGN-006",
+    "source_id": "BR-BA-006",
+    "purpose": "Verify the initial data classification and default business rule.",
+    "preconditions": "A user submits data for archival; test once with a classification and once with the classification omitted.",
+    "action_or_input": "Submit an archival request with an explicit initial classification, then submit one without a classification.",
+    "expected_result": "Submitted data carries its initial classification; when omitted, BADMS assigns Routine by default.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-DESIGN-007",
+    "source_id": "BR-BA-007",
+    "purpose": "Verify the sensitive data encryption business rule.",
+    "preconditions": "Data is classified Sensitive and is being prepared for storage and transfer.",
+    "action_or_input": "Configure encryption for the Sensitive data and inspect the encryption applied at rest and in transit.",
+    "expected_result": "Sensitive data is encrypted using AES-256 at rest and in transit; blueprint identifies AES-256-GCM.",
+    "test_type": "security"
+  },
+  {
+    "test_id": "BR-DESIGN-008",
+    "source_id": "BR-BA-008",
+    "purpose": "Verify the retention by classification business rule.",
+    "preconditions": "Institute-defined retention policies exist for the applicable classifications.",
+    "action_or_input": "Assign authoritative classifications and resolve the retention policy for each classified item.",
+    "expected_result": "Retention rules are selected according to authoritative data classification and institute-defined policy; durations come from configured policy.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-DESIGN-009",
+    "source_id": "BR-BA-009",
+    "purpose": "Verify the hod approval for storage extension business rule.",
+    "preconditions": "A storage-extension request is pending and the actor has or lacks HoD approval authority.",
+    "action_or_input": "Attempt to decide the request as the respective HoD and as a generic administrator without the required permission.",
+    "expected_result": "The request requires a HoD decision; generic administrator authority alone is insufficient.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-DESIGN-010",
+    "source_id": "BR-BA-010",
+    "purpose": "Verify the hod department scope business rule.",
+    "preconditions": "Requests and reports exist in at least two departments; actor is a HoD for one department.",
+    "action_or_input": "Access or act on an item from the HoD's own department and then an item from another department.",
+    "expected_result": "The HoD can access or act only on own-department requests and reports; cross-department access is denied (404 per blueprint).",
+    "test_type": "security"
+  },
+  {
+    "test_id": "BR-DESIGN-011",
+    "source_id": "BR-BA-011",
+    "purpose": "Verify the local schedule overrides global business rule.",
+    "preconditions": "A valid institution-wide global schedule exists; a valid local schedule may exist for the tested dataset.",
+    "action_or_input": "Resolve the effective schedule first with a valid local dataset schedule and then without one.",
+    "expected_result": "The valid local schedule overrides the global schedule for that dataset; otherwise the global schedule applies.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-DESIGN-012",
+    "source_id": "BR-BA-012",
+    "purpose": "Verify the schedule parameter validation business rule.",
+    "preconditions": "A backup schedule is being created or modified.",
+    "action_or_input": "Submit valid parameters, invalid parameters, and a conflicting schedule including invalid cron syntax where applicable.",
+    "expected_result": "Only schedules passing parameter and conflict validation are applied; invalid or conflicting parameters are rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-DESIGN-013",
+    "source_id": "BR-BA-013",
+    "purpose": "Verify the scheduled repository reachability business rule.",
+    "preconditions": "A scheduled automatic backup is due; repository endpoint health can be varied.",
+    "action_or_input": "Execute the scheduled backup once with the repository reachable and once with the repository endpoint unreachable.",
+    "expected_result": "Scheduled backup succeeds only when its relevant repository is reachable; an unreachable endpoint causes failure.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-DESIGN-014",
+    "source_id": "BR-BA-014",
+    "purpose": "Verify the backup failure alert sla business rule.",
+    "preconditions": "A backup has entered Failed state and the SysAdmin notification channel is configured.",
+    "action_or_input": "Trigger or simulate a backup failure and measure time until the SysAdmin is alerted.",
+    "expected_result": "BADMS alerts the SysAdmin within five minutes of the backup failure.",
+    "test_type": "timing"
+  },
+  {
+    "test_id": "BR-DESIGN-015",
+    "source_id": "BR-BA-015",
+    "purpose": "Verify the repeated failure escalation business rule.",
+    "preconditions": "A backup has three consecutive failures; escalation recipient is the Director of IT.",
+    "action_or_input": "Cause three consecutive backup failures and inspect escalation notification and recipient.",
+    "expected_result": "After three consecutive failures, BADMS escalates the condition to the Director of IT.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-DESIGN-016",
+    "source_id": "BR-BA-016",
+    "purpose": "Verify the storage-extension usage validation business rule.",
+    "preconditions": "A user's authoritative storage quota and current usage are available.",
+    "action_or_input": "Submit a storage-extension request using usage below quota, at quota, and beyond quota conditions.",
+    "expected_result": "The request is validated against the user's current storage usage and quota before submission is accepted.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-DESIGN-017",
+    "source_id": "BR-BA-017",
+    "purpose": "Verify the storage-extension decision criteria business rule.",
+    "preconditions": "A storage-extension request includes the user's justification and relevant department context; infrastructure and policy information are available to the HoD.",
+    "action_or_input": "Have the HoD review the request considering available storage infrastructure, departmental policies, and the user's justification before deciding.",
+    "expected_result": "The decision process considers all three stated criteria: infrastructure availability, departmental policy, and user justification.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-DESIGN-018",
+    "source_id": "BR-BA-018",
+    "purpose": "Verify the special archival super admin authority business rule.",
+    "preconditions": "A special archival request originates offline from an authority and Sensitive research data requires special archival.",
+    "action_or_input": "Attempt the special archival operation as Super Admin and as a non-Super-Admin actor.",
+    "expected_result": "Only the Super Admin may perform the special archival operation in BADMS, regardless of which authority originated the offline request.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-DESIGN-019",
+    "source_id": "BR-BA-019",
+    "purpose": "Verify the super admin global backup authority business rule.",
+    "preconditions": "Institution-wide global backup schedules or default backup policies need to be defined.",
+    "action_or_input": "Attempt to define or update global backup schedules/defaults as Super Admin and as a lower-privileged role.",
+    "expected_result": "Only the Super Admin has the stated highest authority to define institution-wide global backup schedules and default backup policies.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-DESIGN-020",
+    "source_id": "BR-BA-020",
+    "purpose": "Verify the protected information access scope business rule.",
+    "preconditions": "Audit logs, request status, backup status, or reports exist across multiple users/departments with different access scopes.",
+    "action_or_input": "Request protected information within the actor's authorized scope and then request information outside that scope.",
+    "expected_result": "Only information within the actor's authorized scope is shown; HoD access is restricted to the HoD's department and out-of-scope access returns 404 per blueprint.",
+    "test_type": "security"
+  },
+  {
+    "test_id": "BR-DESIGN-021",
+    "source_id": "BR-BA-021",
+    "purpose": "Verify the it security security/rbac authority business rule.",
+    "preconditions": "Central IAM RBAC administration and BADMS security-policy management are available.",
+    "action_or_input": "Attempt RBAC permission management through central IAM and security-policy configuration as authorized IT Security members and unauthorized actors.",
+    "expected_result": "RBAC management is owned exclusively by central IAM; only authorized IT Security Team members may manage assigned security policies and controls.",
+    "test_type": "authorization"
+  }
+]

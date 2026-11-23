@@ -1,0 +1,209 @@
+[
+  {
+    "test_id": "UC-DESIGN-001",
+    "source_id": "BA-UC-001",
+    "purpose": "Verify the trigger manual backup use case.",
+    "preconditions": "An authenticated actor with backup-manage permission and a configured backup target.",
+    "action_or_input": "Submit a valid manual-backup request to POST /api/v1/badms/backups/manual/.",
+    "expected_result": "A point-in-time backup operation is created and a BackupRecord is returned with HTTP 201.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-002",
+    "source_id": "BA-UC-002",
+    "purpose": "Verify the submit secure archival request use case.",
+    "preconditions": "An authenticated user has data eligible for archival and the required metadata is available.",
+    "action_or_input": "Submit a valid archival request to POST /api/v1/badms/archival-requests/.",
+    "expected_result": "The archival request is created with its submitted data and metadata and HTTP 201 is returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-003",
+    "source_id": "BA-UC-003",
+    "purpose": "Verify the decide secure archival request use case.",
+    "preconditions": "A pending archival request belongs to the HoD's own department; actor is that department's HoD.",
+    "action_or_input": "Approve or reject the request through POST /api/v1/badms/archival-requests/{id}/decide/.",
+    "expected_result": "The decision is recorded for the HoD's own-department request and the updated request is returned.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-004",
+    "source_id": "BA-UC-004",
+    "purpose": "Verify the classify secure archival data use case.",
+    "preconditions": "An archival request has been approved; actor has SysAdmin classification authority.",
+    "action_or_input": "Submit an authoritative classification through POST /api/v1/badms/archival-requests/{id}/classify/.",
+    "expected_result": "The request receives the authoritative classification used to determine security and retention treatment.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-005",
+    "source_id": "BA-UC-005",
+    "purpose": "Verify the configure sensitive-data encryption use case.",
+    "preconditions": "An approved archival request is classified Sensitive; actor has IT Security authority.",
+    "action_or_input": "Configure encryption through POST /api/v1/badms/archival-requests/{id}/configure-encryption/.",
+    "expected_result": "Required encryption is configured and an encrypted archive is created for the Sensitive data.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-006",
+    "source_id": "BA-UC-006",
+    "purpose": "Verify the execute scheduled automatic backup use case.",
+    "preconditions": "An effective backup schedule is due and the backup task infrastructure is available.",
+    "action_or_input": "Run evaluate_and_dispatch_due_backups for the due schedule.",
+    "expected_result": "The backup defined by the effective schedule is executed without user intervention.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-007",
+    "source_id": "BA-UC-007",
+    "purpose": "Verify the submit storage-extension request use case.",
+    "preconditions": "The user's storage quota is full and the user is authenticated.",
+    "action_or_input": "Submit a valid request to POST /api/v1/badms/storage-extensions/.",
+    "expected_result": "A storage-extension request is submitted for additional storage.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-008",
+    "source_id": "BA-UC-008",
+    "purpose": "Verify the decide storage-extension request use case.",
+    "preconditions": "A pending storage-extension request belongs to the HoD's own department; actor is that department's HoD.",
+    "action_or_input": "Approve or reject the request through POST /api/v1/badms/storage-extensions/{id}/decide/.",
+    "expected_result": "The HoD's decision is recorded for the request in their own department.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-009",
+    "source_id": "BA-UC-009",
+    "purpose": "Verify the configure local backup schedule use case.",
+    "preconditions": "Actor has SysAdmin authority and a dataset is available for scheduling.",
+    "action_or_input": "Create or update a dataset-specific local schedule through the local schedule API.",
+    "expected_result": "The local automated backup schedule is created or updated for the specified dataset.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-010",
+    "source_id": "BA-UC-010",
+    "purpose": "Verify the perform special archival operation use case.",
+    "preconditions": "An offline request from an authority has been received; actor is Super Admin; Sensitive research data requires extended storage.",
+    "action_or_input": "Submit the special archival operation to POST /api/v1/badms/archival-requests/special/.",
+    "expected_result": "The special archival operation for the Sensitive research data is performed and recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-011",
+    "source_id": "BA-UC-011",
+    "purpose": "Verify the define global backup schedules and defaults use case.",
+    "preconditions": "Actor is Super Admin and institution-wide backup policy settings are available.",
+    "action_or_input": "Create or update global schedules/defaults through the global schedule API.",
+    "expected_result": "Institution-wide global backup schedules and default backup policies are set.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-012",
+    "source_id": "BA-UC-012",
+    "purpose": "Verify the view audit logs and activity history use case.",
+    "preconditions": "Actor is SysAdmin and audit records exist.",
+    "action_or_input": "Request GET /api/v1/badms/audit-logs/.",
+    "expected_result": "Operational audit logs and activity histories are returned for review.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-013",
+    "source_id": "BA-UC-013",
+    "purpose": "Verify the audit data activity and review security reports use case.",
+    "preconditions": "Actor is IT Security and security-related activity records exist.",
+    "action_or_input": "Request GET /api/v1/badms/audit-logs/security/.",
+    "expected_result": "Security activity records and security-related reports are returned for inspection.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-014",
+    "source_id": "BA-UC-014",
+    "purpose": "Verify the view backup history and status use case.",
+    "preconditions": "Actor is authenticated and backup operations exist within the actor's visibility scope.",
+    "action_or_input": "Request GET /api/v1/badms/backups/.",
+    "expected_result": "The actor receives current backup status and history limited to records visible to them.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-015",
+    "source_id": "BA-UC-015",
+    "purpose": "Verify the track request status use case.",
+    "preconditions": "Actor is authenticated and archival requests exist within the actor's visibility scope.",
+    "action_or_input": "Request GET /api/v1/badms/archival-requests/.",
+    "expected_result": "The actor receives the status and history of archival requests within their permitted scope.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-016",
+    "source_id": "BA-UC-016",
+    "purpose": "Verify the request data restoration use case.",
+    "preconditions": "Archived data is available and actor is permitted to request its restoration.",
+    "action_or_input": "Submit a restoration request to POST /api/v1/badms/restorations/.",
+    "expected_result": "A data-restoration request is created for the archived data.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-017",
+    "source_id": "BA-UC-017",
+    "purpose": "Verify the approve sensitive data restoration use case.",
+    "preconditions": "A pending restoration request concerns data classified Sensitive; actor is SysAdmin.",
+    "action_or_input": "Approve or reject the request through POST /api/v1/badms/restorations/{id}/approve/.",
+    "expected_result": "The Sensitive-data restoration approval decision is recorded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-018",
+    "source_id": "BA-UC-018",
+    "purpose": "Verify the execute data restoration use case.",
+    "preconditions": "All required approvals and standard checks for a restoration request are satisfied; actor is SysAdmin.",
+    "action_or_input": "Execute the restoration through POST /api/v1/badms/restorations/{id}/execute/.",
+    "expected_result": "The archived data is technically restored after the required approvals and checks.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-019",
+    "source_id": "BA-UC-019",
+    "purpose": "Verify the manage rbac permissions use case.",
+    "preconditions": "Central IAM administration is available; actor is authorized in the Fusion_System_Administrator console.",
+    "action_or_input": "Manage user role-based permissions through the central IAM Administration Console.",
+    "expected_result": "Permissions are managed centrally; BADMS relies on its published permissions manifest and does not create local RBAC tables.",
+    "test_type": "integration"
+  },
+  {
+    "test_id": "UC-DESIGN-020",
+    "source_id": "BA-UC-020",
+    "purpose": "Verify the define and enforce security policies use case.",
+    "preconditions": "Actor is IT Security and institution security policy settings are available.",
+    "action_or_input": "Create or update security policies through POST/PUT /api/v1/badms/security-policies/.",
+    "expected_result": "Institution security policies governing encryption, access, and related controls are configured and enforced.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-021",
+    "source_id": "BA-UC-021",
+    "purpose": "Verify the view department data-management reports use case.",
+    "preconditions": "Actor is HoD and department report data exists for the actor's own department.",
+    "action_or_input": "Request GET /api/v1/badms/reports/department/.",
+    "expected_result": "Department operational reports are returned scoped to the HoD's own department.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-022",
+    "source_id": "BA-UC-022",
+    "purpose": "Verify the monitor storage thresholds use case.",
+    "preconditions": "Authoritative user quota balances exist and the storage-monitoring task is available.",
+    "action_or_input": "Run monitor_storage_thresholds against the authoritative quota balances.",
+    "expected_result": "Storage usage is checked against applicable thresholds and the threshold/full-quota condition is maintained.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "UC-DESIGN-023",
+    "source_id": "BA-UC-023",
+    "purpose": "Verify the record audit event use case.",
+    "preconditions": "An auditable user, administrative, system, or security event occurs.",
+    "action_or_input": "Invoke services/audit.py::record_audit_event with the event details.",
+    "expected_result": "A structured AuditEvent record is persisted for the auditable event.",
+    "test_type": "positive"
+  }
+]
