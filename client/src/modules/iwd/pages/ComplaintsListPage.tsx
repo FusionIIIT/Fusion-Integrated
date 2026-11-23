@@ -69,21 +69,38 @@ export default function ComplaintsListPage() {
         />
 
         <DataTable<Complaint>
-          records={filtered}
-          fetching={loading}
-          totalRecords={filtered.length}
-          recordsPerPage={10}
-          page={1}
-          onPageChange={() => {}}
-          onRowClick={({ record }) => navigate(`/iwd/complaints/${record.id}`)}
+          rows={filtered}
+          loading={loading}
+          rowKey={(c) => c.id}
+          empty={{ title: "No complaints found", description: "Submit a new maintenance request above." }}
           columns={[
-            { accessor: "id", title: "#", width: 70 },
-            { accessor: "category", title: "Category", width: 120 },
-            { accessor: "location", title: "Location" },
             {
-              accessor: "urgency",
-              title: "Urgency",
-              width: 110,
+              key: "id",
+              header: "#",
+              render: (c) => (
+                <Text
+                  fw={600}
+                  c="blue"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate(`/iwd/complaints/${c.id}`)}
+                >
+                  #{c.id}
+                </Text>
+              ),
+            },
+            {
+              key: "category",
+              header: "Category",
+              render: (c) => c.category,
+            },
+            {
+              key: "location",
+              header: "Location",
+              render: (c) => c.location,
+            },
+            {
+              key: "urgency",
+              header: "Urgency",
               render: (c) => (
                 <Badge
                   color={
@@ -99,9 +116,8 @@ export default function ComplaintsListPage() {
               ),
             },
             {
-              accessor: "status",
-              title: "Status",
-              width: 180,
+              key: "status",
+              header: "Status",
               render: (c) => (
                 <Badge
                   color={
@@ -117,9 +133,8 @@ export default function ComplaintsListPage() {
               ),
             },
             {
-              accessor: "created_at",
-              title: "Submitted",
-              width: 140,
+              key: "created_at",
+              header: "Submitted",
               render: (c) => new Date(c.created_at).toLocaleDateString(),
             },
           ]}

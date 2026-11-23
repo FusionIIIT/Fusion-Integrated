@@ -56,26 +56,34 @@ export default function ApprovalsPage() {
       />
 
       <DataTable<Complaint>
-        records={complaints}
-        fetching={loading}
-        totalRecords={complaints.length}
-        recordsPerPage={10}
-        page={1}
-        onPageChange={() => {}}
+        rows={complaints}
+        loading={loading}
+        rowKey={(c) => c.id}
+        empty={{ title: "No pending approvals", description: "All estimates and escalations have been processed." }}
         columns={[
-          { accessor: "id", title: "#", width: 70 },
-          { accessor: "category", title: "Category", width: 120 },
-          { accessor: "location", title: "Location" },
           {
-            accessor: "status",
-            title: "Approval Stage",
-            width: 250,
+            key: "id",
+            header: "#",
+            render: (c) => `#${c.id}`,
+          },
+          {
+            key: "category",
+            header: "Category",
+            render: (c) => c.category,
+          },
+          {
+            key: "location",
+            header: "Location",
+            render: (c) => c.location,
+          },
+          {
+            key: "status",
+            header: "Approval Stage",
             render: (c) => <Badge color="yellow">{c.status}</Badge>,
           },
           {
-            accessor: "actions",
-            title: "Actions",
-            width: 220,
+            key: "actions",
+            header: "Actions",
             render: (c) => (
               <Group gap="xs">
                 {c.status === "Low-Cost Review Pending" && (

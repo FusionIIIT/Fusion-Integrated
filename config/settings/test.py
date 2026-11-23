@@ -12,7 +12,7 @@ CACHES = {
     "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "test"}
 }
 
-if os.getenv("USE_SQLITE", "1") == "1":
+if os.getenv("USE_SQLITE") == "1":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",

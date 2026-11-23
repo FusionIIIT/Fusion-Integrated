@@ -65,7 +65,7 @@ paths:
           description: ''
   /api/v1/iwd/complaints/:
     get:
-      operationId: v1_iwd_complaints_retrieve
+      operationId: v1_iwd_complaints_list
       description: Return complaints scoped to the requesting principal's role.
       tags:
       - v1
@@ -73,20 +73,42 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Complaint'
+          description: ''
     post:
       operationId: v1_iwd_complaints_create
       description: Submit a new maintenance complaint with automatic engineer assignment.
       tags:
       - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Complaint'
+        required: true
       security:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
   /api/v1/iwd/complaints/{id}/:
     get:
-      operationId: v1_iwd_complaints_retrieve_2
+      operationId: v1_iwd_complaints_detail
       description: Retrieve a scoped complaint record or return 404 if inaccessible.
       parameters:
       - in: path
@@ -100,10 +122,14 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
   /api/v1/iwd/complaints/{id}/assess/:
     post:
-      operationId: v1_iwd_complaints_assess_create
+      operationId: v1_iwd_complaints_assess
       description: Record technical assessment.
       parameters:
       - in: path
@@ -117,10 +143,14 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
   /api/v1/iwd/complaints/{id}/audit/:
     post:
-      operationId: v1_iwd_complaints_audit_create
+      operationId: v1_iwd_complaints_audit_bill
       description: Audit and validate final bill.
       parameters:
       - in: path
@@ -134,11 +164,15 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalBill'
+          description: ''
   /api/v1/iwd/complaints/{id}/complete-work/:
     post:
-      operationId: v1_iwd_complaints_complete_work_create
-      description: Mark repair work complete.
+      operationId: v1_iwd_complaints_complete_work
+      description: Mark repair work completed.
       parameters:
       - in: path
         name: id
@@ -151,11 +185,15 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
   /api/v1/iwd/complaints/{id}/estimates/:
     post:
-      operationId: v1_iwd_complaints_estimates_create
-      description: Submit repair cost estimate.
+      operationId: v1_iwd_complaints_submit_estimate
+      description: Submit a cost and time estimate.
       parameters:
       - in: path
         name: id
@@ -164,14 +202,30 @@ paths:
         required: true
       tags:
       - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Estimate'
+        required: true
       security:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
   /api/v1/iwd/complaints/{id}/feedback/:
     post:
-      operationId: v1_iwd_complaints_feedback_create
+      operationId: v1_iwd_complaints_feedback
       description: Submit feedback on resolved complaint.
       parameters:
       - in: path
@@ -181,14 +235,30 @@ paths:
         required: true
       tags:
       - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplaintFeedback'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ComplaintFeedback'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ComplaintFeedback'
+        required: true
       security:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplaintFeedback'
+          description: ''
   /api/v1/iwd/complaints/{id}/final-bill/:
     post:
-      operationId: v1_iwd_complaints_final_bill_create
+      operationId: v1_iwd_complaints_final_bill
       description: Submit final repair bill packet.
       parameters:
       - in: path
@@ -198,15 +268,31 @@ paths:
         required: true
       tags:
       - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FinalBill'
+        required: true
       security:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalBill'
+          description: ''
   /api/v1/iwd/complaints/{id}/flag-urgent/:
     post:
-      operationId: v1_iwd_complaints_flag_urgent_create
-      description: Flag complaint as urgent.
+      operationId: v1_iwd_complaints_flag_urgent
+      description: Flag active complaint as urgent.
       parameters:
       - in: path
         name: id
@@ -219,10 +305,14 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
   /api/v1/iwd/complaints/{id}/issue-material/:
     post:
-      operationId: v1_iwd_complaints_issue_material_create
+      operationId: v1_iwd_complaints_issue_material
       description: Check stock and issue materials.
       parameters:
       - in: path
@@ -236,10 +326,14 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
   /api/v1/iwd/complaints/{id}/resubmit/:
     post:
-      operationId: v1_iwd_complaints_resubmit_create
+      operationId: v1_iwd_complaints_resubmit_estimate
       description: Modify and resubmit rejected estimate.
       parameters:
       - in: path
@@ -253,10 +347,14 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
   /api/v1/iwd/complaints/{id}/review-director/:
     post:
-      operationId: v1_iwd_complaints_review_director_create
+      operationId: v1_iwd_complaints_review_director
       description: Review high-cost or forwarded estimate.
       parameters:
       - in: path
@@ -270,10 +368,14 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
   /api/v1/iwd/complaints/{id}/review-low-cost/:
     post:
-      operationId: v1_iwd_complaints_review_low_cost_create
+      operationId: v1_iwd_complaints_review_low_cost
       description: Review low-cost estimate.
       parameters:
       - in: path
@@ -287,11 +389,15 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
   /api/v1/iwd/complaints/{id}/review-mid-range/:
     post:
-      operationId: v1_iwd_complaints_review_mid_range_create
-      description: Review mid-range estimate.
+      operationId: v1_iwd_complaints_review_mid_range
+      description: Department Head decision on mid-range estimate.
       parameters:
       - in: path
         name: id
@@ -304,11 +410,15 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Estimate'
+          description: ''
   /api/v1/iwd/complaints/{id}/review-urgent/:
     post:
-      operationId: v1_iwd_complaints_review_urgent_create
-      description: Review fast-track urgent flag.
+      operationId: v1_iwd_complaints_review_urgent
+      description: Review urgent escalation.
       parameters:
       - in: path
         name: id
@@ -321,10 +431,14 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
   /api/v1/iwd/complaints/{id}/settle/:
     post:
-      operationId: v1_iwd_complaints_settle_create
+      operationId: v1_iwd_complaints_settle_payment
       description: Approve or record settlement.
       parameters:
       - in: path
@@ -338,11 +452,15 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalBill'
+          description: ''
   /api/v1/iwd/complaints/{id}/verify/:
     post:
-      operationId: v1_iwd_complaints_verify_create
-      description: Verify completed repair work.
+      operationId: v1_iwd_complaints_verify_work
+      description: Conduct physical verification.
       parameters:
       - in: path
         name: id
@@ -355,10 +473,14 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Complaint'
+          description: ''
   /api/v1/iwd/inventory/:
     get:
-      operationId: v1_iwd_inventory_retrieve
+      operationId: v1_iwd_inventory_list
       description: List all inventory items.
       tags:
       - v1
@@ -366,17 +488,39 @@ paths:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+          description: ''
     post:
       operationId: v1_iwd_inventory_create
       description: Add new inventory item.
       tags:
       - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        required: true
       security:
       - iamSession: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2396,6 +2540,14 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - Civil
+      - Electrical
+      type: string
+      description: |-
+        * `Civil` - Civil
+        * `Electrical` - Electrical
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2576,6 +2728,113 @@ components:
         * `prospect` - Prospect
         * `active` - Active
         * `blacklisted` - Blacklisted
+    Complaint:
+      type: object
+      description: Serializer for maintenance complaints.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        requester_user_id:
+          type: integer
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        location:
+          type: string
+          maxLength: 255
+        urgency:
+          $ref: '#/components/schemas/UrgencyEnum'
+        remarks:
+          type: string
+        assigned_engineer_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        status:
+          type: string
+          readOnly: true
+        assessment_details:
+          type: string
+        assessment_date:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_urgent_escalated:
+          type: boolean
+        urgent_remarks:
+          type: string
+        is_resolved:
+          type: boolean
+          readOnly: true
+        resolved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        rework_count:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        audit_trails:
+          type: array
+          items:
+            $ref: '#/components/schemas/DecisionAuditTrail'
+          readOnly: true
+      required:
+      - assessment_date
+      - assigned_engineer_id
+      - audit_trails
+      - category
+      - created_at
+      - id
+      - is_resolved
+      - location
+      - requester_user_id
+      - resolved_at
+      - rework_count
+      - status
+      - updated_at
+    ComplaintFeedback:
+      type: object
+      description: Serializer for complaint feedback.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        complaint:
+          type: integer
+        employee_user_id:
+          type: integer
+          readOnly: true
+        rating:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        comments:
+          type: string
+        post_repair_issue:
+          type: boolean
+        post_repair_remarks:
+          type: string
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - complaint
+      - employee_user_id
+      - id
+      - rating
+      - submitted_at
     ConductIncident:
       type: object
       properties:
@@ -2629,6 +2888,55 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    CostBandEnum:
+      enum:
+      - LOW
+      - MID
+      - HIGH
+      type: string
+      description: |-
+        * `LOW` - Low (< Rs.25,000)
+        * `MID` - Mid (Rs.25,000 - Rs.2.5 Lakh)
+        * `HIGH` - High (> Rs.2.5 Lakh)
+    DecisionAuditTrail:
+      type: object
+      description: Serializer for immutable workflow audit trails.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        actor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        actor_role:
+          type: string
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        previous_state:
+          type: string
+          readOnly: true
+        new_state:
+          type: string
+          readOnly: true
+        remarks:
+          type: string
+          readOnly: true
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor_role
+      - actor_user_id
+      - id
+      - new_state
+      - previous_state
+      - remarks
+      - timestamp
     Detail:
       type: object
       properties:
@@ -2721,6 +3029,72 @@ components:
       - season_decision
       - semester
       - standing
+    Estimate:
+      type: object
+      description: Serializer for repair estimates.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        complaint:
+          type: integer
+        engineer_user_id:
+          type: integer
+          readOnly: true
+        estimated_time_days:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        materials_details:
+          type: string
+        total_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        cost_band:
+          allOf:
+          - $ref: '#/components/schemas/CostBandEnum'
+          readOnly: true
+        committee_outcome:
+          type: string
+        committee_approved:
+          type: boolean
+          nullable: true
+        dept_head_decision:
+          type: string
+          maxLength: 50
+        dept_head_remarks:
+          type: string
+        director_decision:
+          type: string
+          maxLength: 50
+        director_remarks:
+          type: string
+        rejection_reason:
+          type: string
+        resubmission_count:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - complaint
+      - cost_band
+      - created_at
+      - engineer_user_id
+      - id
+      - resubmission_count
+      - status
+      - updated_at
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2737,6 +3111,69 @@ components:
       - fee_reference
       - season
       - user_id
+    FinalBill:
+      type: object
+      description: Serializer for final bills and audit records.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        complaint:
+          type: integer
+        engineer_user_id:
+          type: integer
+          readOnly: true
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        auditor_status:
+          type: string
+          readOnly: true
+        auditor_remarks:
+          type: string
+          readOnly: true
+        audited_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        director_approved:
+          type: boolean
+          readOnly: true
+        director_approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        settled:
+          type: boolean
+          readOnly: true
+        settled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        settlement_reference:
+          type: string
+          maxLength: 100
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - audited_at
+      - auditor_remarks
+      - auditor_status
+      - complaint
+      - created_at
+      - director_approved
+      - director_approved_at
+      - engineer_user_id
+      - id
+      - settled
+      - settled_at
+      - total_amount
     IncidentRecorded:
       type: object
       properties:
@@ -2822,6 +3259,33 @@ components:
         * `tech` - Technical interview
         * `hr` - HR interview
         * `other` - Other
+    InventoryItem:
+      type: object
+      description: Serializer for inventory items.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        category:
+          type: string
+          maxLength: 50
+        stock_quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        unit:
+          type: string
+          maxLength: 50
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+      required:
+      - id
+      - name
     JobPosting:
       type: object
       properties:
@@ -4083,6 +4547,18 @@ components:
       - application_id
       - redacted
       - results
+    UrgencyEnum:
+      enum:
+      - Low
+      - Medium
+      - High
+      - Urgent
+      type: string
+      description: |-
+        * `Low` - Low
+        * `Medium` - Medium
+        * `High` - High
+        * `Urgent` - Urgent
     UserRef:
       type: object
       properties:

@@ -76,20 +76,29 @@ export default function InventoryPage() {
       />
 
       <DataTable<InventoryItem>
-        records={items}
-        fetching={loading}
-        totalRecords={items.length}
-        recordsPerPage={15}
-        page={1}
-        onPageChange={() => {}}
+        rows={items}
+        loading={loading}
+        rowKey={(it) => it.id}
+        empty={{ title: "No inventory items", description: "Add maintenance parts and supplies above." }}
         columns={[
-          { accessor: "id", title: "#", width: 70 },
-          { accessor: "name", title: "Item Name" },
-          { accessor: "category", title: "Category", width: 140 },
           {
-            accessor: "stock_quantity",
-            title: "Available Quantity",
-            width: 160,
+            key: "id",
+            header: "#",
+            render: (it) => `#${it.id}`,
+          },
+          {
+            key: "name",
+            header: "Item Name",
+            render: (it) => it.name,
+          },
+          {
+            key: "category",
+            header: "Category",
+            render: (it) => it.category,
+          },
+          {
+            key: "stock_quantity",
+            header: "Available Quantity",
             render: (it) => (
               <Badge color={it.stock_quantity > 0 ? "teal" : "red"}>
                 {it.stock_quantity} {it.unit}
@@ -97,9 +106,8 @@ export default function InventoryPage() {
             ),
           },
           {
-            accessor: "unit_price",
-            title: "Unit Price (INR)",
-            width: 140,
+            key: "unit_price",
+            header: "Unit Price (INR)",
             render: (it) => `Rs. ${it.unit_price}`,
           },
         ]}

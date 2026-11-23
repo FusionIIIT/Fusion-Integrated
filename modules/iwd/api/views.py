@@ -1,13 +1,13 @@
-"""DRF API views implementing IWD module endpoints."""
+"""REST API views and request dispatching for the IWD module."""
 
 from decimal import Decimal
 
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from modules.iwd.api.permissions import (
-    RequireBillCreate,
     RequireBillReview,
     RequireComplaintUpdate,
     RequireComplaintView,
@@ -48,12 +48,18 @@ class ComplaintListCreateView(APIView):
 
     permission_classes = [RequireIwdModule, RequireComplaintView]
 
+    @extend_schema(responses=ComplaintSerializer(many=True), operation_id="v1_iwd_complaints_list")
     def get(self, request):
         """Return complaints scoped to the requesting principal's role."""
         qs = scope_complaints(request.principal)
         serializer = ComplaintSerializer(qs, many=True)
         return Response(serializer.data)
 
+    @extend_schema(
+        request=ComplaintSerializer,
+        responses=ComplaintSerializer,
+        operation_id="v1_iwd_complaints_create",
+    )
     def post(self, request):
         """Submit a new maintenance complaint with automatic engineer assignment."""
         serializer = ComplaintSerializer(data=request.data)
@@ -75,6 +81,7 @@ class ComplaintDetailView(APIView):
 
     permission_classes = [RequireIwdModule, RequireComplaintView]
 
+    @extend_schema(responses=ComplaintSerializer, operation_id="v1_iwd_complaints_detail")
     def get(self, request, pk):
         """Retrieve a scoped complaint record or return 404 if inaccessible."""
         qs = scope_complaints(request.principal)
@@ -90,6 +97,9 @@ class AssessComplaintView(APIView):
 
     permission_classes = [RequireIwdModule, RequireComplaintUpdate]
 
+    @extend_schema(
+        request=None, responses=ComplaintSerializer, operation_id="v1_iwd_complaints_assess"
+    )
     def post(self, request, pk):
         """Record technical assessment."""
         user_id = getattr(request.principal, "user_id", 201)
@@ -108,17 +118,19 @@ class SubmitEstimateView(APIView):
 
     permission_classes = [RequireIwdModule, RequireEstimateCreate]
 
+    @extend_schema(
+        request=EstimateSerializer,
+        responses=EstimateSerializer,
+        operation_id="v1_iwd_complaints_submit_estimate",
+    )
     def post(self, request, pk):
-        """Submit repair cost estimate."""
+        """Submit a cost and time estimate."""
         user_id = getattr(request.principal, "user_id", 201)
+        days = int(request.data.get("estimated_time_days", 1))
+        materials = request.data.get("materials_details", "")
+        cost = Decimal(str(request.data.get("total_cost", 0)))
         try:
-            estimate = estimates.submit_estimate(
-                complaint_id=pk,
-                engineer_user_id=user_id,
-                estimated_time_days=int(request.data.get("estimated_time_days", 1)),
-                materials_details=request.data.get("materials_details", ""),
-                total_cost=Decimal(str(request.data.get("total_cost", 0))),
-            )
+            estimate = estimates.submit_estimate(pk, user_id, days, materials, cost)
         except Complaint.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         except InvalidStateTransitionError as err:
@@ -127,15 +139,19 @@ class SubmitEstimateView(APIView):
 
 
 class FlagUrgentView(APIView):
-    """Flag an active complaint for fast-track urgent review (UC-IWD-025, BR-IWD-012)."""
+    """Flag complaint for urgent fast-track review (UC-IWD-025, BR-IWD-012)."""
 
     permission_classes = [RequireIwdModule, RequireComplaintUpdate]
 
+    @extend_schema(
+        request=None, responses=ComplaintSerializer, operation_id="v1_iwd_complaints_flag_urgent"
+    )
     def post(self, request, pk):
-        """Flag complaint as urgent."""
+        """Flag active complaint as urgent."""
         user_id = getattr(request.principal, "user_id", 201)
+        remarks = request.data.get("remarks", "")
         try:
-            complaint = complaints.flag_urgent(pk, user_id, request.data.get("remarks", ""))
+            complaint = complaints.flag_urgent(pk, user_id, remarks)
         except Complaint.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         except InvalidStateTransitionError as err:
@@ -144,12 +160,15 @@ class FlagUrgentView(APIView):
 
 
 class ReviewUrgentView(APIView):
-    """Review urgent escalation without bypassing cost controls (UC-IWD-055, BR-IWD-012)."""
+    """Review urgent escalation request (UC-IWD-055, BR-IWD-012)."""
 
     permission_classes = [RequireIwdModule, RequireEstimateReview]
 
+    @extend_schema(
+        request=None, responses=ComplaintSerializer, operation_id="v1_iwd_complaints_review_urgent"
+    )
     def post(self, request, pk):
-        """Review fast-track urgent flag."""
+        """Review urgent escalation."""
         user_id = getattr(request.principal, "user_id", 301)
         role = getattr(request.principal, "active_role", "iwd_department_head")
         accept = bool(request.data.get("accept", True))
@@ -163,15 +182,18 @@ class ReviewUrgentView(APIView):
 
 
 class ReviewLowCostView(APIView):
-    """IWD Admin approves or rejects low-cost estimate (UC-IWD-031, BR-IWD-004)."""
+    """IWD Admin approves or rejects low-cost repair estimate (UC-IWD-031, BR-IWD-004)."""
 
     permission_classes = [RequireIwdModule, RequireEstimateReview]
 
+    @extend_schema(
+        request=None, responses=EstimateSerializer, operation_id="v1_iwd_complaints_review_low_cost"
+    )
     def post(self, request, pk):
         """Review low-cost estimate."""
         user_id = getattr(request.principal, "user_id", 301)
         approve = bool(request.data.get("approve", True))
-        reason = request.data.get("rejection_reason", "")
+        reason = request.data.get("reason", "")
         try:
             estimate = approvals.review_low_cost(pk, user_id, approve, reason)
         except Complaint.DoesNotExist:
@@ -186,27 +208,29 @@ class ReviewMidRangeView(APIView):
 
     permission_classes = [RequireIwdModule, RequireEstimateReview]
 
+    @extend_schema(
+        request=None,
+        responses=EstimateSerializer,
+        operation_id="v1_iwd_complaints_review_mid_range",
+    )
     def post(self, request, pk):
-        """Review mid-range estimate."""
+        """Department Head decision on mid-range estimate."""
         user_id = getattr(request.principal, "user_id", 401)
-        step = request.data.get("step", "dept_head")
+        role = getattr(request.principal, "active_role", "iwd_department_head")
 
+        if role == "iwd_dean":
+            return Response(
+                {"detail": "Dean cannot perform Department Head reviews."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        decision = request.data.get("decision", "approve")
+        remarks = request.data.get("remarks", "")
         try:
-            if step == "committee":
-                estimate = approvals.record_committee_review(
-                    pk,
-                    user_id,
-                    request.data.get("outcome", ""),
-                    bool(request.data.get("approved", True)),
-                )
-            else:
-                decision = request.data.get("decision", "approve")
-                estimate = approvals.review_mid_range(
-                    pk, user_id, decision, request.data.get("remarks", "")
-                )
+            estimate = approvals.review_mid_range(pk, user_id, decision, remarks)
         except Complaint.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-        except (InvalidStateTransitionError, RoleSeparationViolationError) as err:
+        except (RoleSeparationViolationError, InvalidStateTransitionError) as err:
             return Response({"detail": str(err)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(EstimateSerializer(estimate).data)
@@ -217,6 +241,9 @@ class ReviewDirectorView(APIView):
 
     permission_classes = [RequireIwdModule, RequireEstimateReview]
 
+    @extend_schema(
+        request=None, responses=EstimateSerializer, operation_id="v1_iwd_complaints_review_director"
+    )
     def post(self, request, pk):
         """Review high-cost or forwarded estimate."""
         user_id = getattr(request.principal, "user_id", 501)
@@ -236,6 +263,9 @@ class StockCheckIssueView(APIView):
 
     permission_classes = [RequireIwdModule, RequireInventoryManage]
 
+    @extend_schema(
+        request=None, responses=ComplaintSerializer, operation_id="v1_iwd_complaints_issue_material"
+    )
     def post(self, request, pk):
         """Check stock and issue materials."""
         user_id = getattr(request.principal, "user_id", 301)
@@ -252,12 +282,15 @@ class StockCheckIssueView(APIView):
 
 
 class CompleteWorkView(APIView):
-    """Engineer marks work complete, awaiting physical verification (UC-IWD-091)."""
+    """Mark work completed by engineer (UC-IWD-091, BW-IWD-09)."""
 
     permission_classes = [RequireIwdModule, RequireComplaintUpdate]
 
+    @extend_schema(
+        request=None, responses=ComplaintSerializer, operation_id="v1_iwd_complaints_complete_work"
+    )
     def post(self, request, pk):
-        """Mark repair work complete."""
+        """Mark repair work completed."""
         user_id = getattr(request.principal, "user_id", 201)
         try:
             complaint = execution.mark_work_complete(pk, user_id)
@@ -273,9 +306,20 @@ class VerifyWorkView(APIView):
 
     permission_classes = [RequireIwdModule, RequireWorkVerify]
 
+    @extend_schema(
+        request=None, responses=ComplaintSerializer, operation_id="v1_iwd_complaints_verify_work"
+    )
     def post(self, request, pk):
-        """Verify completed repair work."""
+        """Conduct physical verification."""
         user_id = getattr(request.principal, "user_id", 401)
+        role = getattr(request.principal, "active_role", "iwd_department_head")
+
+        if role == "iwd_dean":
+            return Response(
+                {"detail": "Dean cannot perform Department Head verification."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         outcome = request.data.get("outcome", "Approved")
         remarks = request.data.get("remarks", "")
         try:
@@ -283,19 +327,24 @@ class VerifyWorkView(APIView):
         except Complaint.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         except (
-            InvalidStateTransitionError,
             verification.MaxReworkExceededError,
             RoleSeparationViolationError,
+            InvalidStateTransitionError,
         ) as err:
             return Response({"detail": str(err)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(ComplaintSerializer(complaint).data)
 
 
 class FinalBillView(APIView):
-    """Submit final bill or audit/settle payment (UC-IWD-111, 121, 131, BR-IWD-015, 016)."""
+    """Submit final bill packet guarded by prior physical verification (UC-IWD-111)."""
 
-    permission_classes = [RequireIwdModule, RequireBillCreate]
+    permission_classes = [RequireIwdModule, RequireEstimateCreate]
 
+    @extend_schema(
+        request=FinalBillSerializer,
+        responses=FinalBillSerializer,
+        operation_id="v1_iwd_complaints_final_bill",
+    )
     def post(self, request, pk):
         """Submit final repair bill packet."""
         user_id = getattr(request.principal, "user_id", 201)
@@ -314,6 +363,9 @@ class AuditFinalBillView(APIView):
 
     permission_classes = [RequireIwdModule, RequireBillReview]
 
+    @extend_schema(
+        request=None, responses=FinalBillSerializer, operation_id="v1_iwd_complaints_audit_bill"
+    )
     def post(self, request, pk):
         """Audit and validate final bill."""
         user_id = getattr(request.principal, "user_id", 601)
@@ -333,6 +385,9 @@ class SettlePaymentView(APIView):
 
     permission_classes = [RequireIwdModule, RequireBillReview]
 
+    @extend_schema(
+        request=None, responses=FinalBillSerializer, operation_id="v1_iwd_complaints_settle_payment"
+    )
     def post(self, request, pk):
         """Approve or record settlement."""
         user_id = getattr(request.principal, "user_id", 701)
@@ -355,6 +410,11 @@ class ComplaintFeedbackView(APIView):
 
     permission_classes = [RequireIwdModule, RequireFeedbackCreate]
 
+    @extend_schema(
+        request=ComplaintFeedbackSerializer,
+        responses=ComplaintFeedbackSerializer,
+        operation_id="v1_iwd_complaints_feedback",
+    )
     def post(self, request, pk):
         """Submit feedback on resolved complaint."""
         user_id = getattr(request.principal, "user_id", 101)
@@ -376,6 +436,11 @@ class ResubmitEstimateView(APIView):
 
     permission_classes = [RequireIwdModule, RequireEstimateCreate]
 
+    @extend_schema(
+        request=None,
+        responses=EstimateSerializer,
+        operation_id="v1_iwd_complaints_resubmit_estimate",
+    )
     def post(self, request, pk):
         """Modify and resubmit rejected estimate."""
         user_id = getattr(request.principal, "user_id", 201)
@@ -396,11 +461,19 @@ class InventoryListCreateView(APIView):
 
     permission_classes = [RequireIwdModule, RequireInventoryManage]
 
+    @extend_schema(
+        responses=InventoryItemSerializer(many=True), operation_id="v1_iwd_inventory_list"
+    )
     def get(self, request):
         """List all inventory items."""
         items = InventoryItem.objects.all()
         return Response(InventoryItemSerializer(items, many=True).data)
 
+    @extend_schema(
+        request=InventoryItemSerializer,
+        responses=InventoryItemSerializer,
+        operation_id="v1_iwd_inventory_create",
+    )
     def post(self, request):
         """Add new inventory item."""
         serializer = InventoryItemSerializer(data=request.data)

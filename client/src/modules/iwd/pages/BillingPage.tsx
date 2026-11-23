@@ -72,20 +72,29 @@ export default function BillingPage() {
       />
 
       <DataTable<Complaint>
-        records={complaints}
-        fetching={loading}
-        totalRecords={complaints.length}
-        recordsPerPage={10}
-        page={1}
-        onPageChange={() => {}}
+        rows={complaints}
+        loading={loading}
+        rowKey={(c) => c.id}
+        empty={{ title: "No settlement records", description: "No bills currently pending audit or settlement." }}
         columns={[
-          { accessor: "id", title: "#", width: 70 },
-          { accessor: "category", title: "Category", width: 120 },
-          { accessor: "location", title: "Location" },
           {
-            accessor: "status",
-            title: "Financial State",
-            width: 220,
+            key: "id",
+            header: "#",
+            render: (c) => `#${c.id}`,
+          },
+          {
+            key: "category",
+            header: "Category",
+            render: (c) => c.category,
+          },
+          {
+            key: "location",
+            header: "Location",
+            render: (c) => c.location,
+          },
+          {
+            key: "status",
+            header: "Financial State",
             render: (c) => (
               <Badge color={c.status === "Settled" ? "teal" : "blue"}>
                 {c.status}
@@ -93,9 +102,8 @@ export default function BillingPage() {
             ),
           },
           {
-            accessor: "actions",
-            title: "Actions",
-            width: 240,
+            key: "actions",
+            header: "Actions",
             render: (c) => (
               <Group gap="xs">
                 {c.status === "Audit Pending" && can("iwd.bill.review") && (
