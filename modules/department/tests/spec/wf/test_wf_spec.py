@@ -22,7 +22,7 @@ def test_wf_001_01_stock_request_approved_and_issued(spec_client):
 
     faculty, _ = spec_client("faculty", user_id=11)
     req = faculty.post(f"{BASE}/stock-requests", {"item_id": item["id"], "quantity": 2}, format="json").json()
-    assert req["status"] == "pending_hod"
+    assert req["status"] == "pending"
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
     app = hod.post(f"{BASE}/stock-requests/{req['id']}/action", {"action": "approve"}, format="json").json()
@@ -60,7 +60,7 @@ def test_wf_003_01_stock_composite_approved_branch(spec_client):
 
     iss = admin.post(f"{BASE}/stock-requests/{req['id']}/action", {"action": "issue"}, format="json").json()
     assert iss["status"] == "issued"
-    assert StockMovement.objects.filter(stock_item_id=item["id"], kind="issue").exists()
+    assert StockMovement.objects.filter(item_id=item["id"], request_id=req["id"]).exists()
 
 
 def test_wf_003_02_stock_composite_rejected_branch(spec_client):
@@ -83,8 +83,8 @@ def test_wf_004_01_feedback_disposed_by_admin(spec_client):
     assert fb["status"] == "new"
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
-    cls = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "close", "resolution_notes": "Resolved by admin"}, format="json").json()
+    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
+    cls = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "close"}, format="json").json()
     assert cls["status"] == "closed"
 
 
@@ -94,10 +94,10 @@ def test_wf_005_01_feedback_disposed_with_hod_oversight(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "BW-04 Major issue"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
+    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
-    res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve", "resolution_notes": "Resolved by HOD"}, format="json").json()
+    res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve"}, format="json").json()
     assert res["status"] == "resolved"
 
 
@@ -107,8 +107,8 @@ def test_wf_006_01_feedback_composite_admin_branch(spec_client):
     fb = faculty.post(f"{BASE}/feedback", {"content": "CW-02 Admin Branch"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
-    cls = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "close", "resolution_notes": "Closed"}, format="json").json()
+    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
+    cls = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "close"}, format="json").json()
     assert cls["status"] == "closed"
 
 
@@ -118,40 +118,40 @@ def test_wf_006_02_feedback_composite_hod_branch(spec_client):
     fb = faculty.post(f"{BASE}/feedback", {"content": "CW-02 HOD Branch"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
+    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
-    res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve", "resolution_notes": "Resolved"}, format="json").json()
+    res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve"}, format="json").json()
     assert res["status"] == "resolved"
 
 
 def test_wf_007_01_official_change_approved(spec_client):
     """WF-007-01 | BW-DEPT-05 Official Department Change Approved Path."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    prop = admin.post(f"{BASE}/proposals", {"field": "name", "value": "New Department Name"}, format="json").json()
-    assert prop["status"] == "pending_hod"
+    prop = admin.post(f"{BASE}/proposals", {"field": "official_name", "value": "New Department Name"}, format="json").json()
+    assert prop["status"] == "pending"
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
     app = hod.post(f"{BASE}/proposals/{prop['id']}/action", {"action": "approve"}, format="json").json()
     assert app["status"] == "approved"
-    assert DepartmentDetails.objects.get(department="CSE").name == "New Department Name"
+    assert DepartmentDetails.objects.get(department="CSE").official_name == "New Department Name"
 
 
 def test_wf_008_01_official_change_rejected(spec_client):
     """WF-008-01 | BW-DEPT-06 Official Department Change Rejected Path."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    prop = admin.post(f"{BASE}/proposals", {"field": "name", "value": "Rejected Name"}, format="json").json()
+    prop = admin.post(f"{BASE}/proposals", {"field": "official_name", "value": "Rejected Name"}, format="json").json()
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
     rej = hod.post(f"{BASE}/proposals/{prop['id']}/action", {"action": "reject"}, format="json").json()
     assert rej["status"] == "rejected"
-    assert DepartmentDetails.objects.get(department="CSE").name != "Rejected Name"
+    assert DepartmentDetails.objects.get(department="CSE").official_name != "Rejected Name"
 
 
 def test_wf_009_01_official_change_composite_approved(spec_client):
     """WF-009-01 | CW-DEPT-03 Official Department Change Composite Lifecycle Approved Branch."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    prop = admin.post(f"{BASE}/proposals", {"field": "name", "value": "CW Approved Name"}, format="json").json()
+    prop = admin.post(f"{BASE}/proposals", {"field": "official_name", "value": "CW Approved Name"}, format="json").json()
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
     app = hod.post(f"{BASE}/proposals/{prop['id']}/action", {"action": "approve"}, format="json").json()
@@ -161,7 +161,7 @@ def test_wf_009_01_official_change_composite_approved(spec_client):
 def test_wf_009_02_official_change_composite_rejected(spec_client):
     """WF-009-02 | CW-DEPT-03 Official Department Change Composite Lifecycle Rejected Branch."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    prop = admin.post(f"{BASE}/proposals", {"field": "name", "value": "CW Rejected Name"}, format="json").json()
+    prop = admin.post(f"{BASE}/proposals", {"field": "official_name", "value": "CW Rejected Name"}, format="json").json()
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
     rej = hod.post(f"{BASE}/proposals/{prop['id']}/action", {"action": "reject"}, format="json").json()

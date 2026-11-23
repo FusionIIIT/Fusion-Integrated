@@ -122,7 +122,7 @@ def test_uc_004_01_request_stock_main(spec_client):
         "item_id": item["id"],
         "quantity": 1}, format="json")
     assert res.status_code == 201
-    assert res.json()["status"] == "pending_hod"
+    assert res.json()["status"] == "pending"
 
 
 def test_uc_004_02_request_stock_insufficient(spec_client):
@@ -134,7 +134,7 @@ def test_uc_004_02_request_stock_insufficient(spec_client):
     res = faculty.post(f"{BASE}/stock-requests", {
         "item_id": item["id"],
         "quantity": 2}, format="json")
-    assert res.status_code == 400
+    assert res.status_code == 409
 
 
 def test_uc_005_01_approve_stock_request(spec_client):
@@ -203,9 +203,9 @@ def test_uc_008_01_initial_review_categorization(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Course syllabus question"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
+    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
     assert res.status_code == 200
-    assert res.json()["status"] == "under_review"
+    assert res.json()["status"] == "reviewed"
 
 
 def test_uc_008_02_initial_review_simple_closure(spec_client):
@@ -214,7 +214,7 @@ def test_uc_008_02_initial_review_simple_closure(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Simple room key question"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "close", "resolution_notes": "Answered"}, format="json")
+    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities", "close_simple": True}, format="json")
     assert res.status_code == 200
     assert res.json()["status"] == "closed"
 
@@ -225,8 +225,8 @@ def test_uc_008_03_initial_review_resolved_disposition(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Lab door locked during slot"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
-    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve", "resolution_notes": "Unlocked and keys replaced"}, format="json")
+    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
+    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve"}, format="json")
     assert res.status_code == 200
     assert res.json()["status"] == "resolved"
 
@@ -285,11 +285,11 @@ def test_uc_010_02_update_department_details_official_proposal(spec_client):
     """UC-010-02 | UC-DEPT-010 Main Success Scenario Official Change Proposal."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
     res = admin.post(f"{BASE}/proposals", {
-        "field": "name",
+        "field": "official_name",
         "value": "Department of Artificial Intelligence"
     }, format="json")
     assert res.status_code == 201
-    assert res.json()["status"] == "pending_hod"
+    assert res.json()["status"] == "pending"
 
 
 def test_uc_010_03_update_department_details_validation_failure(spec_client):
@@ -304,7 +304,7 @@ def test_uc_010_03_update_department_details_validation_failure(spec_client):
 
 def test_uc_011_01_view_department_resources_main(spec_client):
     """UC-011-01 | UC-DEPT-011 Main Success Scenario."""
-    LabResource.objects.create(department="CSE", lab_name="Networking Lab", equipment_details="Cisco switches")
+    LabResource.objects.create(department="CSE", name="Networking Lab", details="Cisco switches")
     faculty, _ = spec_client("faculty", user_id=11)
     res = faculty.get(f"{BASE}/labs")
     assert res.status_code == 200
@@ -323,7 +323,7 @@ def test_uc_012_01_approve_official_change(spec_client):
     """UC-012-01 | UC-DEPT-012 Main Success Scenario Approved."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
     prop = admin.post(f"{BASE}/proposals", {
-        "field": "name",
+        "field": "official_name",
         "value": "CSE Department Official"
     }, format="json").json()
 
@@ -337,7 +337,7 @@ def test_uc_012_02_reject_official_change(spec_client):
     """UC-012-02 | UC-DEPT-012 Alternative Flow Rejected."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
     prop = admin.post(f"{BASE}/proposals", {
-        "field": "name",
+        "field": "official_name",
         "value": "Rejected Proposal"
     }, format="json").json()
 
@@ -353,10 +353,10 @@ def test_uc_014_01_hod_oversight_resolution(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Wifi drops in lab"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
+    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
-    res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve", "resolution_notes": "AP replaced"}, format="json")
+    res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve"}, format="json")
     assert res.status_code == 200
     assert res.json()["status"] == "resolved"
 
@@ -367,12 +367,12 @@ def test_uc_014_02_hod_oversight_non_terminal(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Elective offerings"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
+    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
     res = hod.get(f"{BASE}/feedback")
     assert res.status_code == 200
-    assert any(f["id"] == fb["id"] and f["status"] == "under_review" for f in res.json()["results"])
+    assert any(f["id"] == fb["id"] and f["status"] == "reviewed" for f in res.json()["results"])
 
 
 def test_uc_015_01_view_profiles_student():

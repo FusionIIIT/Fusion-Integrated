@@ -4,12 +4,16 @@ Source: FR_DESIGN.json (60 test cases)
 Obligations: CFR-DEPT-001..016, AFR-DEPT-001..031, 034..053
 """
 import pytest
+from django.db import IntegrityError, transaction
 
 from modules.department.models import (
     Announcement,
+    DepartmentDetails,
+    Feedback,
     LabResource,
     StockItem,
     StockMovement,
+    StockRequest,
 )
 
 pytestmark = pytest.mark.django_db
@@ -34,15 +38,21 @@ def test_fr_002_publication_notifications(spec_client):
     faculty, _ = spec_client("faculty", user_id=11)
     res = faculty.post(f"{BASE}/announcements", {
         "content": "Seminar for Students",
-        "target_roles": ["student"],
+        "target_roles": ["student", "faculty"],
         "target_programmes": ["BTech"],
         "target_batch_years": [2024]
     }, format="json")
     assert res.status_code == 201
 
-    student, _ = spec_client("student", user_id=12, programme="BTech", batch_year=2024)
-    notices = student.get(f"{BASE}/notices").json()["results"]
-    assert any("Seminar for Students" in n["content"] for n in notices)
+    for role, user_id in (("student", 12), ("faculty", 11)):
+        matching, _ = spec_client(role, user_id=user_id, programme="BTech", batch_year=2024)
+        outside, _ = spec_client(role, user_id=user_id + 20, programme="BTech", batch_year=2023)
+        notices = matching.get(f"{BASE}/notices")
+        assert notices.status_code == 200
+        assert len(notices.json()["results"]) == 1
+        excluded = outside.get(f"{BASE}/notices")
+        assert excluded.status_code == 200
+        assert excluded.json()["results"] == []
 
 
 def test_fr_003_audience_filters(spec_client):
@@ -85,17 +95,18 @@ def test_fr_004_relevant_announcement_access(spec_client):
 def test_fr_005_hod_edits_active_announcement(spec_client):
     """FR-005 | AFR-DEPT-004 HOD edits an active announcement (CFR-DEPT-003)."""
     faculty, _ = spec_client("faculty", user_id=11)
-    ann = faculty.post(f"{BASE}/announcements", {
-        "content": "Initial Text",
-        "target_roles": [],
-        "target_programmes": [],
-        "target_batch_years": []
-    }, format="json").json()
+    original = {"content": "Initial Text", "target_roles": [], "target_programmes": [], "target_batch_years": []}
+    created = faculty.post(f"{BASE}/announcements", original, format="json")
+    assert created.status_code == 201
+    announcement_id = created.json()["id"]
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
-    res = hod.get(f"{BASE}/announcements/managed")
-    assert res.status_code == 200
-    assert any(a["id"] == ann["id"] for a in res.json()["results"])
+    response = hod.post(f"{BASE}/announcements/{announcement_id}/action", {
+        "action": "edit",
+        "announcement": {**original, "content": "Updated Text"},
+    }, format="json")
+    assert response.status_code == 204
+    assert Announcement.objects.get(pk=announcement_id).content == "Updated Text"
 
 
 def test_fr_006_hod_hides_active_announcement(spec_client):
@@ -161,9 +172,16 @@ def test_fr_010_immutable_insertion_log(spec_client):
         "quantity": 10}, format="json")
     item_id = res.json()["id"]
 
-    log = StockMovement.objects.filter(stock_item_id=item_id, kind="receipt").first()
+    log = StockMovement.objects.filter(item_id=item_id, request__isnull=True).first()
     assert log is not None
-    assert log.quantity_delta == 10
+    assert log.delta == 10
+    original_delta = log.delta
+    movements = StockMovement.objects.filter(pk=log.pk)
+    with pytest.raises(IntegrityError), transaction.atomic():
+        movements.update(delta=original_delta * 2)
+    with pytest.raises(IntegrityError), transaction.atomic():
+        movements.delete()
+    assert movements.get().delta == original_delta
 
 
 def test_fr_011_faculty_submits_request(spec_client):
@@ -176,7 +194,7 @@ def test_fr_011_faculty_submits_request(spec_client):
         "item_id": item["id"],
         "quantity": 5}, format="json")
     assert res.status_code == 201
-    assert res.json()["status"] == "pending_hod"
+    assert res.json()["status"] == "pending"
 
 
 def test_fr_012_request_quantity_equal_availability(spec_client):
@@ -189,7 +207,7 @@ def test_fr_012_request_quantity_equal_availability(spec_client):
         "item_id": item["id"],
         "quantity": 10}, format="json")
     assert res.status_code == 201
-    assert res.json()["status"] == "pending_hod"
+    assert res.json()["status"] == "pending"
 
 
 def test_fr_013_request_quantity_above_availability(spec_client):
@@ -201,7 +219,9 @@ def test_fr_013_request_quantity_above_availability(spec_client):
     res = faculty.post(f"{BASE}/stock-requests", {
         "item_id": item["id"],
         "quantity": 6}, format="json")
-    assert res.status_code == 400
+    assert res.status_code == 409
+    assert not StockRequest.objects.filter(item_id=item["id"]).exists()
+    assert StockItem.objects.get(pk=item["id"]).quantity == 5
 
 
 def test_fr_014_both_hod_decisions(spec_client):
@@ -242,13 +262,23 @@ def test_fr_015_approved_issuance(spec_client):
 def test_fr_016_issuance_requires_prior_approval(spec_client):
     """FR-016 | AFR-DEPT-012 Issuance requires prior approval (CFR-DEPT-005)."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    item = admin.post(f"{BASE}/inventory", {"name": "Flash drives", "quantity": 20}, format="json").json()
-
+    inventory = admin.post(f"{BASE}/inventory", {"name": "Flash drives", "quantity": 20}, format="json")
+    assert inventory.status_code == 201
+    item_id = inventory.json()["id"]
     faculty, _ = spec_client("faculty", user_id=11)
-    req = faculty.post(f"{BASE}/stock-requests", {"item_id": item["id"], "quantity": 2}, format="json").json()
+    hod, _ = spec_client("HOD (CSE)", user_id=13)
 
-    res_iss = admin.post(f"{BASE}/stock-requests/{req['id']}/action", {"action": "issue"}, format="json")
-    assert res_iss.status_code == 409
+    for expected_state in ("pending", "rejected"):
+        response = faculty.post(f"{BASE}/stock-requests", {"item_id": item_id, "quantity": 2}, format="json")
+        assert response.status_code == 201
+        request_id = response.json()["id"]
+        if expected_state == "rejected":
+            decision = hod.post(f"{BASE}/stock-requests/{request_id}/action", {"action": "reject"}, format="json")
+            assert decision.status_code == 200
+        issuance = admin.post(f"{BASE}/stock-requests/{request_id}/action", {"action": "issue"}, format="json")
+        assert issuance.status_code == 409
+        assert StockRequest.objects.get(pk=request_id).status == expected_state
+        assert StockItem.objects.get(pk=item_id).quantity == 20
 
 
 def test_fr_017_issuance_deducts_quantity(spec_client):
@@ -279,9 +309,16 @@ def test_fr_018_immutable_issuance_log(spec_client):
     hod.post(f"{BASE}/stock-requests/{req['id']}/action", {"action": "approve"}, format="json")
     admin.post(f"{BASE}/stock-requests/{req['id']}/action", {"action": "issue"}, format="json")
 
-    m = StockMovement.objects.filter(stock_item_id=item["id"], kind="issue").first()
+    m = StockMovement.objects.filter(item_id=item["id"], request_id=req["id"]).first()
     assert m is not None
-    assert m.quantity_delta == -3
+    assert m.delta == -3
+    original_delta = m.delta
+    movements = StockMovement.objects.filter(pk=m.pk)
+    with pytest.raises(IntegrityError), transaction.atomic():
+        movements.update(delta=original_delta * 2)
+    with pytest.raises(IntegrityError), transaction.atomic():
+        movements.delete()
+    assert movements.get().delta == original_delta
 
 
 def test_fr_019_new_request_alerts_admin(spec_client):
@@ -293,7 +330,7 @@ def test_fr_019_new_request_alerts_admin(spec_client):
     faculty.post(f"{BASE}/stock-requests", {"item_id": item["id"], "quantity": 5}, format="json")
 
     admin_notices = admin.get(f"{BASE}/notices").json()["results"]
-    assert any("stock" in n["content"].lower() for n in admin_notices)
+    assert any("stock" in n["message"].lower() for n in admin_notices)
 
 
 def test_fr_020_approval_request_alerts_hod(spec_client):
@@ -306,30 +343,51 @@ def test_fr_020_approval_request_alerts_hod(spec_client):
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
     hod_notices = hod.get(f"{BASE}/notices").json()["results"]
-    assert any("stock" in n["content"].lower() for n in hod_notices)
+    assert any("stock" in n["message"].lower() for n in hod_notices)
 
 
 def test_fr_021_requester_receives_final_outcome(spec_client):
     """FR-021 | AFR-DEPT-043 Requester receives both kinds of final outcome (CFR-DEPT-005)."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    item = admin.post(f"{BASE}/inventory", {"name": "USB Hubs", "quantity": 20}, format="json").json()
-
-    faculty, _ = spec_client("faculty", user_id=11)
-    req = faculty.post(f"{BASE}/stock-requests", {"item_id": item["id"], "quantity": 1}, format="json").json()
-
+    inventory = admin.post(f"{BASE}/inventory", {"name": "USB Hubs", "quantity": 20}, format="json")
+    assert inventory.status_code == 201
     hod, _ = spec_client("HOD (CSE)", user_id=13)
-    hod.post(f"{BASE}/stock-requests/{req['id']}/action", {"action": "reject"}, format="json")
 
-    fac_notices = faculty.get(f"{BASE}/notices").json()["results"]
-    assert any("rejected" in n["content"].lower() for n in fac_notices)
+    requesters = []
+    for user_id, outcome in ((11, "issued"), (21, "rejected")):
+        faculty, _ = spec_client("faculty", user_id=user_id)
+        submitted = faculty.post(f"{BASE}/stock-requests", {
+            "item_id": inventory.json()["id"], "quantity": 1,
+        }, format="json")
+        assert submitted.status_code == 201
+        request_id = submitted.json()["id"]
+        path = f"{BASE}/stock-requests/{request_id}/action"
+        decision = hod.post(path, {"action": "approve" if outcome == "issued" else "reject"}, format="json")
+        assert decision.status_code == 200
+        if outcome == "issued":
+            assert admin.post(path, {"action": "issue"}, format="json").status_code == 200
+        requesters.append((faculty, request_id, outcome))
+
+    for faculty, request_id, outcome in requesters:
+        notices = faculty.get(f"{BASE}/notices")
+        assert notices.status_code == 200
+        assert [row["message"] for row in notices.json()["results"]] == [
+            f"Stock request #{request_id} was {outcome}.",
+        ]
 
 
 def test_fr_022_faculty_issued_history(spec_client):
     """FR-022 | AFR-DEPT-016 Faculty issued history is relevant (CFR-DEPT-006)."""
+    own = StockItem.objects.create(department="CSE", name="Adapter", quantity=10)
+    other = StockItem.objects.create(department="CSE", name="Cable", quantity=10)
+    issued = StockRequest.objects.create(item=own, user_id=11, quantity=1, status="issued")
+    StockRequest.objects.create(item=other, user_id=21, quantity=1, status="issued")
+    StockRequest.objects.create(item=own, user_id=11, quantity=1, status="pending")
+
     faculty, _ = spec_client("faculty", user_id=11)
-    res = faculty.get(f"{BASE}/stock-requests")
-    assert res.status_code == 200
-    assert "results" in res.json()
+    response = faculty.get(f"{BASE}/stock-requests")
+    assert response.status_code == 200
+    assert [row["id"] for row in response.json()["results"]] == [issued.pk]
 
 
 def test_fr_023_both_feedback_submitters(spec_client):
@@ -348,9 +406,17 @@ def test_fr_024_feedback_confidentiality(spec_client):
     student1, _ = spec_client("student", user_id=12)
     fb = student1.post(f"{BASE}/feedback", {"content": "Confidential matter"}, format="json").json()
 
+    handler, _ = spec_client("deptadmin_cse", user_id=14)
+    inbox = handler.get(f"{BASE}/feedback")
+    assert inbox.status_code == 200
+    assert [(row["id"], row["content"]) for row in inbox.json()["results"]] == [
+        (fb["id"], "Confidential matter"),
+    ]
+
     student2, _ = spec_client("student", user_id=22)
-    feed2 = student2.get(f"{BASE}/feedback").json()["results"]
-    assert not any(f["id"] == fb["id"] for f in feed2)
+    response = student2.get(f"{BASE}/feedback")
+    assert response.status_code == 403
+    assert fb["id"] not in [row["id"] for row in response.json().get("results", [])]
 
 
 def test_fr_025_new_feedback_alerts_admin(spec_client):
@@ -360,7 +426,7 @@ def test_fr_025_new_feedback_alerts_admin(spec_client):
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
     notices = admin.get(f"{BASE}/notices").json()["results"]
-    assert any("feedback" in n["content"].lower() for n in notices)
+    assert any("feedback" in n["message"].lower() for n in notices)
 
 
 def test_fr_026_initial_feedback_review(spec_client):
@@ -369,9 +435,10 @@ def test_fr_026_initial_feedback_review(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Exam scheduling conflict"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
+    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
     assert res.status_code == 200
-    assert res.json()["status"] == "under_review"
+    assert res.json()["status"] == "reviewed"
+    assert res.json()["reviewed_at"] is not None
 
 
 def test_fr_027_initial_review_categorization(spec_client):
@@ -380,7 +447,7 @@ def test_fr_027_initial_review_categorization(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Projector not working in 101"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
+    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
     assert res.status_code == 200
     assert res.json()["category"] == "Facilities"
 
@@ -391,7 +458,7 @@ def test_fr_028_close_simple_issue_in_initial_review(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Need extra whiteboard marker"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "close", "resolution_notes": "Provided"}, format="json")
+    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities", "close_simple": True}, format="json")
     assert res.status_code == 200
     assert res.json()["status"] == "closed"
 
@@ -399,21 +466,19 @@ def test_fr_028_close_simple_issue_in_initial_review(spec_client):
 def test_fr_029_both_reviewers_terminal_states(spec_client):
     """FR-029 | AFR-DEPT-022 Both reviewers can reach both terminal states (CFR-DEPT-008)."""
     student, _ = spec_client("student", user_id=12)
-    fb1 = student.post(f"{BASE}/feedback", {"content": "Item 1"}, format="json").json()
-    fb2 = student.post(f"{BASE}/feedback", {"content": "Item 2"}, format="json").json()
-
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb1['id']}/action", {"action": "categorize"}, format="json")
-    admin.post(f"{BASE}/feedback/{fb2['id']}/action", {"action": "categorize"}, format="json")
-
-    res_res = admin.post(f"{BASE}/feedback/{fb1['id']}/action", {"action": "resolve", "resolution_notes": "Done"}, format="json")
-    assert res_res.status_code == 200
-    assert res_res.json()["status"] == "resolved"
-
     hod, _ = spec_client("HOD (CSE)", user_id=13)
-    res_cls = hod.post(f"{BASE}/feedback/{fb2['id']}/action", {"action": "close", "resolution_notes": "Closed"}, format="json")
-    assert res_cls.status_code == 200
-    assert res_cls.json()["status"] == "closed"
+
+    for reviewer in (admin, hod):
+        for action, outcome in (("close", "closed"), ("resolve", "resolved")):
+            submission = student.post(f"{BASE}/feedback", {"content": "Feedback item"}, format="json")
+            assert submission.status_code == 201
+            path = f"{BASE}/feedback/{submission.json()['id']}/action"
+            reviewed = admin.post(path, {"action": "review", "category": "Facilities"}, format="json")
+            assert reviewed.status_code == 200
+            disposition = reviewer.post(path, {"action": action}, format="json")
+            assert disposition.status_code == 200
+            assert disposition.json()["status"] == outcome
 
 
 def test_fr_030_hod_action_requires_initial_review(spec_client):
@@ -422,8 +487,10 @@ def test_fr_030_hod_action_requires_initial_review(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Brand new feedback"}, format="json").json()
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
-    res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve", "resolution_notes": "Premature"}, format="json")
-    assert res.status_code in [400, 409]
+    for action in ("resolve", "close"):
+        res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": action}, format="json")
+        assert res.status_code == 404
+    assert Feedback.objects.get(pk=fb["id"]).status == "new"
 
 
 def test_fr_031_hod_oversight_starts_after_initial_review(spec_client):
@@ -431,10 +498,14 @@ def test_fr_031_hod_oversight_starts_after_initial_review(spec_client):
     student, _ = spec_client("student", user_id=12)
     fb = student.post(f"{BASE}/feedback", {"content": "Feedback for oversight"}, format="json").json()
 
-    admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
-
     hod, _ = spec_client("HOD (CSE)", user_id=13)
+    before = hod.get(f"{BASE}/feedback")
+    assert before.status_code == 200
+    assert before.json()["results"] == []
+
+    admin, _ = spec_client("deptadmin_cse", user_id=14)
+    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
+
     res = hod.get(f"{BASE}/feedback")
     assert res.status_code == 200
     assert any(f["id"] == fb["id"] for f in res.json()["results"])
@@ -442,14 +513,25 @@ def test_fr_031_hod_oversight_starts_after_initial_review(spec_client):
 
 def test_fr_032_submitter_notified_on_disposition(spec_client):
     """FR-032 | AFR-DEPT-045 Submitter notified on resolution and closure (CFR-DEPT-008)."""
-    student, _ = spec_client("student", user_id=12)
-    fb = student.post(f"{BASE}/feedback", {"content": "Classroom projector"}, format="json").json()
-
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "close", "resolution_notes": "Fixed"}, format="json")
+    submitters = []
+    for user_id, action, outcome in ((12, "close", "closed"), (22, "resolve", "resolved")):
+        student, _ = spec_client("student", user_id=user_id)
+        submission = student.post(f"{BASE}/feedback", {"content": "Classroom projector"}, format="json")
+        assert submission.status_code == 201
+        feedback_id = submission.json()["id"]
+        path = f"{BASE}/feedback/{feedback_id}/action"
+        reviewed = admin.post(path, {"action": "review", "category": "Facilities"}, format="json")
+        assert reviewed.status_code == 200
+        assert admin.post(path, {"action": action}, format="json").status_code == 200
+        submitters.append((student, feedback_id, outcome))
 
-    notices = student.get(f"{BASE}/notices").json()["results"]
-    assert any("feedback" in n["content"].lower() for n in notices)
+    for student, feedback_id, outcome in submitters:
+        notices = student.get(f"{BASE}/notices")
+        assert notices.status_code == 200
+        assert [row["message"] for row in notices.json()["results"]] == [
+            f"Feedback #{feedback_id} was {outcome}.",
+        ]
 
 
 def test_fr_033_department_profile_management():
@@ -514,7 +596,7 @@ def test_fr_041_modify_timetables(spec_client):
             "programme": "BTech", "batch_year": 2024
         }]
     }, format="json").json()
-    slot_id = upload["results"][0]["id"]
+    slot_id = upload[0]["id"]
 
     res_mod = admin.put(f"{BASE}/timetable/{slot_id}", {
         "term": "Sem 1", "day": 2,
@@ -573,7 +655,7 @@ def test_fr_043_block_overlapping_timetable_edits(spec_client):
             }
         ]
     }, format="json").json()
-    slot2_id = res["results"][1]["id"]
+    slot2_id = res[1]["id"]
 
     res_bad_edit = admin.put(f"{BASE}/timetable/{slot2_id}", {
         "term": "Sem 1", "day": 4,
@@ -583,6 +665,9 @@ def test_fr_043_block_overlapping_timetable_edits(spec_client):
         "programme": "BTech", "batch_year": 2024
     }, format="json")
     assert res_bad_edit.status_code == 409
+    after = admin.get(f"{BASE}/timetable")
+    assert after.status_code == 200
+    assert {slot["id"]: slot for slot in after.json()["results"]} == {slot["id"]: slot for slot in res}
 
 
 def test_fr_044_update_lab_resource_details(spec_client):
@@ -597,7 +682,7 @@ def test_fr_044_update_lab_resource_details(spec_client):
 
 def test_fr_045_faculty_can_view_lab_profiles(spec_client):
     """FR-045 | AFR-DEPT-035 Faculty can view lab profiles (CFR-DEPT-012)."""
-    LabResource.objects.create(department="CSE", lab_name="AI Lab", equipment_details="GPUs")
+    LabResource.objects.create(department="CSE", name="AI Lab", details="GPUs")
     faculty, _ = spec_client("faculty", user_id=11)
     res = faculty.get(f"{BASE}/labs")
     assert res.status_code == 200
@@ -643,23 +728,24 @@ def test_fr_048_general_department_detail_update(spec_client):
 
 def test_fr_049_pending_official_detail_stays_unpublished(spec_client):
     """FR-049 | AFR-DEPT-039 Pending official detail stays unpublished (CFR-DEPT-015)."""
+    DepartmentDetails.objects.create(department="CSE", official_name="Original computing department")
     admin, _ = spec_client("deptadmin_cse", user_id=14)
     res = admin.post(f"{BASE}/proposals", {
-        "field": "name",
+        "field": "official_name",
         "value": "School of Computing"
     }, format="json")
     assert res.status_code == 201
-    assert res.json()["status"] == "pending_hod"
+    assert res.json()["status"] == "pending"
 
     det = admin.get(f"{BASE}/details").json()
-    assert det.get("name") != "School of Computing"
+    assert det["official_name"] == "Original computing department"
 
 
 def test_fr_050_approved_official_change_effective(spec_client):
     """FR-050 | AFR-DEPT-040 Approved official change becomes effective (CFR-DEPT-015)."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
     prop = admin.post(f"{BASE}/proposals", {
-        "field": "name",
+        "field": "official_name",
         "value": "Department of Computer Science"
     }, format="json").json()
 
@@ -669,14 +755,15 @@ def test_fr_050_approved_official_change_effective(spec_client):
     assert res_app.json()["status"] == "approved"
 
     det = admin.get(f"{BASE}/details").json()
-    assert det["name"] == "Department of Computer Science"
+    assert det["official_name"] == "Department of Computer Science"
 
 
 def test_fr_051_rejected_official_change_retains_data(spec_client):
     """FR-051 | AFR-DEPT-040 Rejected official change retains current data (CFR-DEPT-015)."""
+    DepartmentDetails.objects.create(department="CSE", official_name="Original department name")
     admin, _ = spec_client("deptadmin_cse", user_id=14)
     prop = admin.post(f"{BASE}/proposals", {
-        "field": "name",
+        "field": "official_name",
         "value": "Bogus Name"
     }, format="json").json()
 
@@ -686,7 +773,7 @@ def test_fr_051_rejected_official_change_retains_data(spec_client):
     assert res_rej.json()["status"] == "rejected"
 
     det = admin.get(f"{BASE}/details").json()
-    assert det.get("name") != "Bogus Name"
+    assert det["official_name"] == "Original department name"
 
 
 def test_fr_052_central_authority_assigns_roles():

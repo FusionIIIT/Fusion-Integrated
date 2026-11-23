@@ -5,7 +5,7 @@ Source: BR_DESIGN.json (46 test cases)
 Obligations: BR-DEPT-001..013, 015..019, 021..024
 """
 import pytest
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from rest_framework.test import APIClient
 
 from modules.department.models import (
@@ -243,9 +243,9 @@ def test_br_009_01_authorized_terminal_feedback_disposition(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Lab setup issue"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
+    admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
 
-    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve", "resolution_notes": "Resolved"}, format="json")
+    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve"}, format="json")
     assert res.status_code == 200
     assert res.json()["status"] == "resolved"
 
@@ -256,7 +256,7 @@ def test_br_009_02_simple_issue_closure_by_admin(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Query about lab timings"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "close", "resolution_notes": "Answered directly"}, format="json")
+    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities", "close_simple": True}, format="json")
     assert res.status_code == 200
     assert res.json()["status"] == "closed"
 
@@ -266,7 +266,7 @@ def test_br_009_03_unauthorized_feedback_disposition_prohibited(spec_client):
     student, _ = spec_client("student", user_id=12)
     fb = student.post(f"{BASE}/feedback", {"content": "General issue"}, format="json").json()
 
-    res = student.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "close", "resolution_notes": "Self close"}, format="json")
+    res = student.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "close"}, format="json")
     assert res.status_code == 403
 
 
@@ -314,11 +314,11 @@ def test_br_011_01_official_change_remains_pending(spec_client):
     """BR-011-01 | BR-DEPT-011 Official Change Remains Pending Until Approval."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
     res = admin.post(f"{BASE}/proposals", {
-        "field": "name",
+        "field": "official_name",
         "value": "Department of Computer Science & Engineering"
     }, format="json")
     assert res.status_code == 201
-    assert res.json()["status"] == "pending_hod"
+    assert res.json()["status"] == "pending"
 
 
 def test_br_011_02_general_change_effective_without_approval(spec_client):
@@ -333,7 +333,7 @@ def test_br_011_02_general_change_effective_without_approval(spec_client):
 
 def test_br_012_01_department_resource_scope_permitted(spec_client):
     """BR-012-01 | BR-DEPT-012 Department Resource Scope Permitted."""
-    LabResource.objects.create(department="CSE", lab_name="Software Lab", equipment_details="Desktops")
+    LabResource.objects.create(department="CSE", name="Software Lab", details="Desktops")
     faculty, _ = spec_client("faculty", user_id=11)
     res = faculty.get(f"{BASE}/labs")
     assert res.status_code == 200
@@ -342,7 +342,7 @@ def test_br_012_01_department_resource_scope_permitted(spec_client):
 
 def test_br_012_02_cross_department_resource_refused(spec_client):
     """BR-012-02 | BR-DEPT-012 Cross-Department Resource Access Refused."""
-    LabResource.objects.create(department="ME", lab_name="Workshop", equipment_details="Lathes")
+    LabResource.objects.create(department="ME", name="Workshop", details="Lathes")
     faculty, _ = spec_client("faculty", user_id=11, department="CSE")
     res = faculty.get(f"{BASE}/labs")
     assert res.status_code == 200
@@ -352,7 +352,7 @@ def test_br_012_02_cross_department_resource_refused(spec_client):
 def test_br_013_01_hod_official_decision_permitted(spec_client):
     """BR-013-01 | BR-DEPT-013 HOD Official Update Decision Authority."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    prop = admin.post(f"{BASE}/proposals", {"field": "name", "value": "CSE Dept"}, format="json").json()
+    prop = admin.post(f"{BASE}/proposals", {"field": "official_name", "value": "CSE Dept"}, format="json").json()
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
     res = hod.post(f"{BASE}/proposals/{prop['id']}/action", {"action": "approve"}, format="json")
@@ -363,7 +363,7 @@ def test_br_013_01_hod_official_decision_permitted(spec_client):
 def test_br_013_02_non_hod_official_decision_prohibited(spec_client):
     """BR-013-02 | BR-DEPT-013 Non-HOD Official Decision Prohibited."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    prop = admin.post(f"{BASE}/proposals", {"field": "name", "value": "CSE Dept"}, format="json").json()
+    prop = admin.post(f"{BASE}/proposals", {"field": "official_name", "value": "CSE Dept"}, format="json").json()
 
     faculty, _ = spec_client("faculty", user_id=11)
     res = faculty.post(f"{BASE}/proposals/{prop['id']}/action", {"action": "approve"}, format="json")
@@ -387,7 +387,7 @@ def test_br_015_02_exceeding_quantity_refusal(spec_client):
 
     faculty, _ = spec_client("faculty", user_id=11)
     res = faculty.post(f"{BASE}/stock-requests", {"item_id": item["id"], "quantity": 11}, format="json")
-    assert res.status_code == 400
+    assert res.status_code == 409
 
 
 def test_br_016_01_audit_log_created(spec_client):
@@ -395,20 +395,24 @@ def test_br_016_01_audit_log_created(spec_client):
     admin, _ = spec_client("deptadmin_cse", user_id=14)
     item = admin.post(f"{BASE}/inventory", {"name": "Monitors", "quantity": 12}, format="json").json()
 
-    movement = StockMovement.objects.filter(stock_item_id=item["id"]).first()
+    movement = StockMovement.objects.filter(item_id=item["id"]).first()
     assert movement is not None
-    assert movement.quantity_delta == 12
+    assert movement.delta == 12
+    assert movement.actor_id == 14
+    assert movement.created_at is not None
 
 
 def test_br_016_02_movement_log_immutability(spec_client):
     """BR-016-02 | BR-DEPT-016 Movement Log Immutability Enforcement."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
     item = admin.post(f"{BASE}/inventory", {"name": "Cables", "quantity": 5}, format="json").json()
-    movement = StockMovement.objects.filter(stock_item_id=item["id"]).first()
-
-    with pytest.raises(IntegrityError):
-        movement.quantity_delta = 99
-        movement.save()
+    movements = StockMovement.objects.filter(item_id=item["id"])
+    assert movements.get().delta == 5
+    with pytest.raises(IntegrityError), transaction.atomic():
+        movements.update(delta=99)
+    with pytest.raises(IntegrityError), transaction.atomic():
+        movements.delete()
+    assert movements.get().delta == 5
 
 
 def test_br_017_01_authorized_feedback_access(spec_client):
@@ -427,8 +431,9 @@ def test_br_017_02_third_party_feedback_refused(spec_client):
     fb = student1.post(f"{BASE}/feedback", {"content": "Secret note"}, format="json").json()
 
     student2, _ = spec_client("student", user_id=22)
-    feed2 = student2.get(f"{BASE}/feedback").json()["results"]
-    assert not any(f["id"] == fb["id"] for f in feed2)
+    response = student2.get(f"{BASE}/feedback")
+    assert response.status_code == 403
+    assert fb["id"] not in [row["id"] for row in response.json().get("results", [])]
 
 
 def test_br_018_01_mandatory_admin_initial_review(spec_client):
@@ -437,9 +442,9 @@ def test_br_018_01_mandatory_admin_initial_review(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Needs triage"}, format="json").json()
 
     admin, _ = spec_client("deptadmin_cse", user_id=14)
-    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "categorize"}, format="json")
+    res = admin.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "review", "category": "Facilities"}, format="json")
     assert res.status_code == 200
-    assert res.json()["status"] == "under_review"
+    assert res.json()["status"] == "reviewed"
 
 
 def test_br_018_02_hod_action_pre_review_restraint(spec_client):
@@ -448,8 +453,8 @@ def test_br_018_02_hod_action_pre_review_restraint(spec_client):
     fb = student.post(f"{BASE}/feedback", {"content": "Direct HOD attempt"}, format="json").json()
 
     hod, _ = spec_client("HOD (CSE)", user_id=13)
-    res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve", "resolution_notes": "Premature"}, format="json")
-    assert res.status_code in [400, 409]
+    res = hod.post(f"{BASE}/feedback/{fb['id']}/action", {"action": "resolve"}, format="json")
+    assert res.status_code == 404
 
 
 def test_br_019_01_student_permitted_basic_profile():
