@@ -37,6 +37,71 @@ from modules.superadmin.services.audit import record_audit_event
 from modules.superadmin.services.notifications import queue_notification
 
 
+def _validate_and_check_archival_eligibility(
+    *,
+    user_id: int,
+    institute_id: str,
+    email: str,
+    is_deactivated: bool,
+    deactivated_at: timezone.datetime | None,
+    has_pending_transactions: bool,
+    now: timezone.datetime,
+) -> None:
+    try:
+        validate_institute_id(institute_id)
+        validate_institute_email(email)
+    except PureDomainError as exc:
+        raise DomainError(exc.message, code=exc.code) from exc
+
+    if ArchivedUserRecord.objects.filter(user_id=user_id).exists():
+        raise ConflictError("This user is already archived.", code="user_already_archived")
+
+    verdict = assess_user_archival_eligibility(
+        is_deactivated=is_deactivated,
+        deactivated_at=deactivated_at,
+        has_pending_transactions=has_pending_transactions,
+        min_deactivation_days=30,
+        now=now,
+    )
+    if not verdict.is_eligible:
+        raise DomainError(verdict.reason, code="archival_ineligible")
+
+
+def _emit_user_archived_effects(
+    principal: Principal,
+    *,
+    user_id: int,
+    institute_id: str,
+    username: str,
+    email: str,
+    archival_reason: str,
+    reversible_until: timezone.datetime,
+) -> None:
+    record_audit_event(
+        actor_id=principal.user_id,
+        actor_username=principal.username,
+        actor_role=principal.active_role or "super_admin",
+        action=AUDIT_ACTION_USER_ARCHIVED,
+        target_id=str(user_id),
+        target_type="user",
+        reason=archival_reason,
+        context_metadata={
+            "institute_id": institute_id,
+            "reversible_until": reversible_until.isoformat(),
+        },
+    )
+    queue_notification(
+        recipient_id=user_id,
+        recipient_email=email,
+        template_code="user_archived",
+        subject="Notice: Your IIITDMJ Account Has Been Placed in Archival",
+        body=(
+            f"Your account ({username}) was archived. "
+            f"Restoration is possible until {reversible_until.date()}."
+        ),
+    )
+
+
 @transaction.atomic
 def archive_user(
     principal: Principal,
@@ -52,28 +117,17 @@ def archive_user(
     archival_reason: str,
     metadata_snapshot: dict[str, Any] | None = None,
 ) -> ArchivedUserRecord:
-    # Validates identity formats before processing
-    try:
-        validate_institute_id(institute_id)
-        validate_institute_email(email)
-    except PureDomainError as exc:
-        raise DomainError(exc.message, code=exc.code) from exc
-
-    if ArchivedUserRecord.objects.filter(user_id=user_id).exists():
-        raise ConflictError("This user is already archived.", code="user_already_archived")
-
     now = timezone.now()
-    window_days = int(get_active_policy_value(CONFIG_KEY_REVERSIBILITY_WINDOW_DAYS) or 30)
-    verdict = assess_user_archival_eligibility(
+    _validate_and_check_archival_eligibility(
+        user_id=user_id,
+        institute_id=institute_id,
+        email=email,
         is_deactivated=is_deactivated,
         deactivated_at=deactivated_at,
         has_pending_transactions=has_pending_transactions,
-        min_deactivation_days=30,
         now=now,
     )
-    if not verdict.is_eligible:
-        raise DomainError(verdict.reason, code="archival_ineligible")
-
+    window_days = int(get_active_policy_value(CONFIG_KEY_REVERSIBILITY_WINDOW_DAYS) or 30)
     reversible_until = calculate_reversible_deadline(now, window_days)
     record = ArchivedUserRecord.objects.create(
         user_id=user_id,
@@ -88,30 +142,14 @@ def archive_user(
         archival_reason=archival_reason,
         metadata_snapshot=metadata_snapshot or {},
     )
-
-    record_audit_event(
-        actor_id=principal.user_id,
-        actor_username=principal.username,
-        actor_role=principal.active_role or "super_admin",
-        action=AUDIT_ACTION_USER_ARCHIVED,
-        target_id=str(user_id),
-        target_type="user",
-        reason=archival_reason,
-        context_metadata={
-            "institute_id": institute_id,
-            "reversible_until": reversible_until.isoformat(),
-        },
-    )
-
-    queue_notification(
-        recipient_id=user_id,
-        recipient_email=email,
-        template_code="user_archived",
-        subject="Notice: Your IIITDMJ Account Has Been Placed in Archival",
-        body=(
-            f"Your account ({username}) was archived. "
-            f"Restoration is possible until {reversible_until.date()}."
-        ),
+    _emit_user_archived_effects(
+        principal,
+        user_id=user_id,
+        institute_id=institute_id,
+        username=username,
+        email=email,
+        archival_reason=archival_reason,
+        reversible_until=reversible_until,
     )
     return record
 

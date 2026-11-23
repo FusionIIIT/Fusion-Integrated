@@ -213,17 +213,17 @@ All 5 contract getters and mutations are plural and pure. `domain/` contains zer
   5. `AuditPage.tsx`: Searchable and filterable immutable event table.
 
 ### Unit Tests
-Six Vitest / Testing Library test files cover all pages and hooks (`71 passed` in Vitest):
-- `api/hooks.test.tsx`: Tests all 11 data-access hooks, mutations, and query parameters.
+Six Vitest / Testing Library test files cover all pages and hooks (`36 passed` across the 6 Super Admin test files; `74 passed` total across all 12 client test files in `make check-client`):
+- `api/hooks.test.tsx`: Tests data-access hooks, mutations, and query parameters.
 - `pages/DashboardPage.test.tsx`: Covers loading (`Loader`), 500 error state (`ErrorState`), and metrics rendering.
-- `pages/ArchivalPage.test.tsx`: Covers loading, empty state, 500 error, status-hidden controls for permanent records, and restore flow via `getByRole`.
+- `pages/ArchivalPage.test.tsx`: Covers loading, empty state, 500 error, status-hidden controls for permanent records, user archival & restore modals, and historical dataset archive creation & restoration via `getByRole`.
 - `pages/PurgePage.test.tsx`: Covers loading, empty state, 500 error, status-hidden controls, IT Head approval modal, and execute confirmation.
 - `pages/PolicyPage.test.tsx`: Covers loading, empty state, 500 error, and parameter superseding form.
 - `pages/AuditPage.test.tsx`: Covers loading, empty state, 500 error, search input filter, and action filter.
 
 ### Client Check & Build Chunk Budget (`make check-client`)
 - TypeScript typecheck: `tsc --noEmit` passed with 0 errors.
-- Vitest suite: `71 passed` across 6 superadmin unit test suites.
+- Vitest suite: `36 passed` across the 6 superadmin unit test files (`74 passed` total across all 12 client test files).
 - **Frontend Code-Splitting & Bundle Budget (`make check-client`):**
   - `routes-*.js`: `1.76 kB` (`0.73 kB` gzip)
   - `DashboardPage-*.js`: `1.84 kB` (`0.75 kB` gzip)

@@ -47,29 +47,44 @@ test.describe("superadmin: interactive user journeys", () => {
     await expect(row).toBeVisible();
   });
 
-  test("2. purge governance: dual-auth initiation, it_head approval, and super_admin execution", async ({ page }) => {
-    // Ensure an eligible dataset archive exists with expired retention
+  test("2. purge governance: UI dataset archival, dual-auth initiation, it_head approval, and execution", async ({
+    page,
+  }) => {
     const archiveTitle = uniqueName("Expired Departmental Records");
-    const archiveRes = await page.request.post("/api/v1/superadmin/archival/datasets/", {
-      data: {
-        dataset_category: "compliance",
-        title: archiveTitle,
-        date_range_start: "2018-01-01",
-        date_range_end: "2018-12-31",
-        record_count: 50,
-        backup_file_path: "/backups/compliance_2018.tar.gz",
-        backup_checksum: "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
-        retention_expires_at: "2020-01-01",
-      },
-    });
-    expect(archiveRes.ok()).toBe(true);
-    const archive = await archiveRes.json();
     const purgeReason = uniqueName("Retention period elapsed");
 
-    // Phase 1: super_admin initiates purge request
+    // Step 1: Create eligible historical dataset archive through the Archival Governance UI
     await page.goto("/");
     await actAs(page, "superAdmin");
     await openModuleNav(page, "System Administration");
+    await sidebar(page).getByRole("link", { name: "Archival Governance" }).click();
+    await expect(page.getByRole("heading", { name: "Archival Governance", level: 2 })).toBeVisible();
+
+    await page.getByRole("button", { name: /Archive Dataset/i }).click();
+    const dsDialog = page.getByRole("dialog");
+    await expect(dsDialog).toBeVisible();
+    await dsDialog.getByLabel(/^Dataset category/i).fill("compliance");
+    await dsDialog.getByLabel(/^Dataset title/i).fill(archiveTitle);
+    await dsDialog.getByLabel(/^Date range start/i).fill("2018-01-01");
+    await dsDialog.getByLabel(/^Date range end/i).fill("2018-12-31");
+    await dsDialog.getByLabel(/^Record count/i).fill("50");
+    await dsDialog.getByLabel(/^Backup file path/i).fill("/backups/compliance_2018.tar.gz");
+    await dsDialog.getByLabel(/^Backup SHA-256 checksum/i).fill(
+      "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
+    );
+    await dsDialog.getByLabel(/^Retention expires at/i).fill("2020-01-01");
+
+    const dsCreated = page.waitForResponse(
+      (r) => r.url().includes("/api/v1/superadmin/archival/datasets") && r.request().method() === "POST",
+    );
+    await dsDialog.getByRole("button", { name: /Confirm Archive Dataset/i }).click();
+    const dsRes = await dsCreated;
+    expect(dsRes.ok()).toBe(true);
+    const archive = await dsRes.json();
+    await expect(dsDialog).toBeHidden();
+    await expect(page.getByRole("row").filter({ hasText: archiveTitle })).toBeVisible();
+
+    // Step 2: super_admin initiates purge request in Purge Authorization UI
     await sidebar(page).getByRole("link", { name: "Purge Authorization" }).click();
     await expect(page.getByRole("heading", { name: "Purge Authorization", level: 2 })).toBeVisible();
 
@@ -90,7 +105,7 @@ test.describe("superadmin: interactive user journeys", () => {
     await expect(purgeRow).toBeVisible();
     await expect(purgeRow).toContainText(/pending it head/i);
 
-    // Phase 2: actAs it_head approves the request
+    // Step 3: actAs it_head approves the request
     await actAs(page, "itHead");
     await page.goto("/superadmin/purge");
     const itHeadRow = page.getByRole("row").filter({ hasText: purgeReason });
@@ -109,7 +124,7 @@ test.describe("superadmin: interactive user journeys", () => {
     await expect(decisionDialog).toBeHidden();
     await expect(itHeadRow).toContainText(/approved/i);
 
-    // Phase 3: actAs super_admin executes the permanent purge
+    // Step 4: actAs super_admin executes the permanent purge
     await actAs(page, "superAdmin");
     await page.goto("/superadmin/purge");
     const superAdminRow = page.getByRole("row").filter({ hasText: purgeReason });
@@ -127,23 +142,9 @@ test.describe("superadmin: interactive user journeys", () => {
     await expect(superAdminRow).toContainText(/purged/i);
   });
 
-  test("3. archival governance: super admin restores a reversible archived user", async ({ page }) => {
-    // Seed a reversible user
+  test("3. archival governance: super admin archives and restores a user through the UI", async ({ page }) => {
     const uid = Math.floor(20000 + (Date.now() % 50000));
     const uname = `user_${uid}`;
-    const userRes = await page.request.post("/api/v1/superadmin/archival/users/", {
-      data: {
-        user_id: uid,
-        institute_id: `INST-${uid}`,
-        username: uname,
-        email: `${uname}@iiitdmj.ac.in`,
-        user_kind: "student",
-        is_deactivated: true,
-        has_pending_transactions: false,
-        archival_reason: "Graduation archival",
-      },
-    });
-    expect(userRes.ok()).toBe(true);
 
     await page.goto("/");
     await actAs(page, "superAdmin");
@@ -151,9 +152,25 @@ test.describe("superadmin: interactive user journeys", () => {
     await sidebar(page).getByRole("link", { name: "Archival Governance" }).click();
     await expect(page.getByRole("heading", { name: "Archival Governance", level: 2 })).toBeVisible();
 
+    await page.getByRole("button", { name: /Archive User/i }).click();
+    const archiveDialog = page.getByRole("dialog");
+    await expect(archiveDialog).toBeVisible();
+    await archiveDialog.getByLabel(/^User ID/i).fill(String(uid));
+    await archiveDialog.getByLabel(/^Institute ID/i).fill(`2021BCS${uid}`);
+    await archiveDialog.getByLabel(/^Username/i).fill(uname);
+    await archiveDialog.getByLabel(/^Institute Email/i).fill(`${uname}@iiitdmj.ac.in`);
+    await archiveDialog.getByLabel(/^Archival reason/i).fill("Graduation archival");
+
+    const archived = page.waitForResponse(
+      (r) => r.url().includes("/api/v1/superadmin/archival/users") && r.request().method() === "POST",
+    );
+    await archiveDialog.getByRole("button", { name: /Confirm Archive User/i }).click();
+    expect((await archived).ok()).toBe(true);
+    await expect(archiveDialog).toBeHidden();
+
     const userRow = page.getByRole("row").filter({ hasText: uname });
     await expect(userRow).toBeVisible();
-    await userRow.getByRole("button", { name: "Restore" }).click();
+    await userRow.getByRole("button", { name: /^Restore$/i }).click();
 
     const restoreDialog = page.getByRole("dialog");
     await expect(restoreDialog).toBeVisible();
@@ -168,7 +185,51 @@ test.describe("superadmin: interactive user journeys", () => {
     await expect(userRow).toContainText(/restored/i);
   });
 
-  test("4. compliance audit: super admin filters audit logs by actor username", async ({ page }) => {
+  test("4. historical archive lifecycle: create, list, and restore historical dataset archive through UI", async ({
+    page,
+  }) => {
+    const archiveTitle = uniqueName("Historical Semester Records");
+
+    await page.goto("/");
+    await actAs(page, "superAdmin");
+    await openModuleNav(page, "System Administration");
+    await sidebar(page).getByRole("link", { name: "Archival Governance" }).click();
+    await expect(page.getByRole("heading", { name: "Archival Governance", level: 2 })).toBeVisible();
+
+    await page.getByRole("button", { name: /Archive Dataset/i }).click();
+    const dsDialog = page.getByRole("dialog");
+    await expect(dsDialog).toBeVisible();
+    await dsDialog.getByLabel(/^Dataset category/i).fill("academics");
+    await dsDialog.getByLabel(/^Dataset title/i).fill(archiveTitle);
+    await dsDialog.getByLabel(/^Date range start/i).fill("2019-01-01");
+    await dsDialog.getByLabel(/^Date range end/i).fill("2019-12-31");
+    await dsDialog.getByLabel(/^Record count/i).fill("120");
+    await dsDialog.getByLabel(/^Backup file path/i).fill("/backups/academics_2019.tar.gz");
+    await dsDialog.getByLabel(/^Backup SHA-256 checksum/i).fill(
+      "b1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
+    );
+    await dsDialog.getByLabel(/^Retention expires at/i).fill("2028-01-01");
+
+    const created = page.waitForResponse(
+      (r) => r.url().includes("/api/v1/superadmin/archival/datasets") && r.request().method() === "POST",
+    );
+    await dsDialog.getByRole("button", { name: /Confirm Archive Dataset/i }).click();
+    expect((await created).ok()).toBe(true);
+    await expect(dsDialog).toBeHidden();
+
+    const dsRow = page.getByRole("row").filter({ hasText: archiveTitle });
+    await expect(dsRow).toBeVisible();
+    await expect(dsRow).toContainText(/archived/i);
+
+    const restored = page.waitForResponse(
+      (r) => r.url().includes("/api/v1/superadmin/archival/history/") && r.url().includes("/restore/"),
+    );
+    await dsRow.getByRole("button", { name: /Restore Dataset/i }).click();
+    expect((await restored).ok()).toBe(true);
+    await expect(dsRow).toContainText(/restored/i);
+  });
+
+  test("5. compliance audit: super admin filters audit logs by actor username", async ({ page }) => {
     await page.goto("/");
     await actAs(page, "superAdmin");
     await openModuleNav(page, "System Administration");

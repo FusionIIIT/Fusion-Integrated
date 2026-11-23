@@ -243,6 +243,43 @@ def test_journey_uc_sa_017_view_archived_records_and_detail(stub_iam):
     resp_404 = client.get("/api/v1/superadmin/archival/users/999999/")
     assert resp_404.status_code == 404
 
+    # BR-SA-020: Archived records exposed through the archive interface are read-only
+    for mut_call in (
+        lambda: client.put(
+            f"/api/v1/superadmin/archival/users/{rec.user_id}/",
+            {"archival_reason": "Tampered"},
+            format="json",
+        ),
+        lambda: client.patch(
+            f"/api/v1/superadmin/archival/users/{rec.user_id}/",
+            {"archival_reason": "Tampered"},
+            format="json",
+        ),
+        lambda: client.delete(f"/api/v1/superadmin/archival/users/{rec.user_id}/"),
+    ):
+        resp_mut = mut_call()
+        assert resp_mut.status_code == 405
+
+    rec.refresh_from_db()
+    assert rec.archival_reason == "Graduated."
+
+    # BR-SA-020: Unrelated module role without superadmin grant is isolated (HTTP 403)
+    stub_iam.register(
+        "token_other_mod",
+        Principal(
+            user_id=205,
+            username="acad_staff",
+            active_role="academic_admin",
+            permissions=("academics.view",),
+            modules=("academics",),
+        ),
+    )
+    other_client = APIClient()
+    other_client.credentials(HTTP_AUTHORIZATION="Token token_other_mod")
+    assert other_client.get("/api/v1/superadmin/archival/users/").status_code == 403
+    assert other_client.get(f"/api/v1/superadmin/archival/users/{rec.user_id}/").status_code == 403
+    assert other_client.get("/api/v1/superadmin/archival/datasets/").status_code == 403
+
 
 # -- UC-SA-018: Restore Archived User Account (Within Reversibility Window) ----
 def test_journey_uc_sa_018_restore_archived_user(stub_iam):

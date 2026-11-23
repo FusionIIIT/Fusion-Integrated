@@ -77,6 +77,61 @@ def create_purge_request(
     return req
 
 
+def _transition_purge_decision(
+    req: PurgeRequest, principal: Principal, *, approve: bool
+) -> str:
+    action = "approve_purge" if approve else "reject_purge"
+    actor_role = principal.active_role or ""
+    try:
+        return PurgeStateMachine.transition(
+            req.status,
+            action,
+            actor_role,
+            requester_id=req.requested_by,
+            authorizer_id=principal.user_id,
+        )
+    except SelfApprovalForbiddenError as exc:
+        raise ConflictError(exc.message, code="self_approval_forbidden") from exc
+    except InvalidStateTransitionError as exc:
+        raise ConflictError(exc.message, code=exc.code) from exc
+    except PureDomainError as exc:
+        raise DomainError(exc.message, code=exc.code) from exc
+
+
+def _apply_and_audit_purge_decision(
+    req: PurgeRequest,
+    principal: Principal,
+    *,
+    next_status: str,
+    approve: bool,
+    comments: str,
+) -> None:
+    req.status = next_status
+    req.it_head_id = principal.user_id
+    req.it_head_decision_at = timezone.now()
+    req.it_head_comments = comments
+    req.save(
+        update_fields=[
+            "status",
+            "it_head_id",
+            "it_head_decision_at",
+            "it_head_comments",
+            "updated_at",
+        ]
+    )
+    audit_action = AUDIT_ACTION_PURGE_APPROVED if approve else AUDIT_ACTION_PURGE_REJECTED
+    record_audit_event(
+        actor_id=principal.user_id,
+        actor_username=principal.username,
+        actor_role=principal.active_role or "it_head",
+        action=audit_action,
+        target_id=str(req.id),
+        target_type="purge_request",
+        reason=comments,
+        context_metadata={"archive_id": req.archive_id, "approved": approve},
+    )
+
+
 @transaction.atomic
 def decide_purge_request(
     principal: Principal,
@@ -94,48 +149,9 @@ def decide_purge_request(
     if req is None:
         raise NotFoundError(f"Purge request {request_id} not found.")
 
-    action = "approve_purge" if approve else "reject_purge"
-    actor_role = principal.active_role or ""
-    try:
-        next_status = PurgeStateMachine.transition(
-            req.status,
-            action,
-            actor_role,
-            requester_id=req.requested_by,
-            authorizer_id=principal.user_id,
-        )
-    except SelfApprovalForbiddenError as exc:
-        raise ConflictError(exc.message, code="self_approval_forbidden") from exc
-    except InvalidStateTransitionError as exc:
-        raise ConflictError(exc.message, code=exc.code) from exc
-    except PureDomainError as exc:
-        raise DomainError(exc.message, code=exc.code) from exc
-
-    now = timezone.now()
-    req.status = next_status
-    req.it_head_id = principal.user_id
-    req.it_head_decision_at = now
-    req.it_head_comments = comments
-    req.save(
-        update_fields=[
-            "status",
-            "it_head_id",
-            "it_head_decision_at",
-            "it_head_comments",
-            "updated_at",
-        ]
-    )
-
-    audit_action = AUDIT_ACTION_PURGE_APPROVED if approve else AUDIT_ACTION_PURGE_REJECTED
-    record_audit_event(
-        actor_id=principal.user_id,
-        actor_username=principal.username,
-        actor_role=principal.active_role or "it_head",
-        action=audit_action,
-        target_id=str(req.id),
-        target_type="purge_request",
-        reason=comments,
-        context_metadata={"archive_id": req.archive_id, "approved": approve},
+    next_status = _transition_purge_decision(req, principal, approve=approve)
+    _apply_and_audit_purge_decision(
+        req, principal, next_status=next_status, approve=approve, comments=comments
     )
     return req
 

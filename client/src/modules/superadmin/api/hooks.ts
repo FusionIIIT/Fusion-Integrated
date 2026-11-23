@@ -40,11 +40,59 @@ export function useArchivedUsers(filters?: Record<string, unknown>) {
   });
 }
 
+export function useArchiveUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      user_id: number;
+      institute_id: string;
+      username: string;
+      email: string;
+      user_kind: string;
+      is_deactivated?: boolean;
+      has_pending_transactions?: boolean;
+      archival_reason: string;
+    }) =>
+      (await http.post<ArchivedUser>(`${BASE}/archival/users/`, {
+        is_deactivated: true,
+        has_pending_transactions: false,
+        ...data,
+      })).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY, "archived-users"] }),
+  });
+}
+
 export function useHistoricalArchives(filters?: Record<string, unknown>) {
   return useQuery({
     queryKey: keys.historicalArchives(filters),
     queryFn: async () =>
       (await http.get<Page<HistoricalArchive>>(`${BASE}/archival/datasets/`, { params: filters })).data,
+  });
+}
+
+export function useCreateHistoricalArchive() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      dataset_category: string;
+      title: string;
+      date_range_start: string;
+      date_range_end: string;
+      record_count: number;
+      backup_file_path: string;
+      backup_checksum: string;
+      retention_expires_at: string;
+    }) => (await http.post<HistoricalArchive>(`${BASE}/archival/datasets/`, data)).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY, "historical-archives"] }),
+  });
+}
+
+export function useRestoreHistoricalArchive() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) =>
+      (await http.post<HistoricalArchive>(`${BASE}/archival/history/${id}/restore/`, {})).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY, "historical-archives"] }),
   });
 }
 
