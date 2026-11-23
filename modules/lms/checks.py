@@ -7,7 +7,7 @@ import stat
 from pathlib import Path
 
 from django.conf import settings
-from django.core.checks import Error, Warning  # noqa: A004
+from django.core import checks
 
 LMS_UPLOADS_IN_REPO = "lms.files.E001"
 LMS_UPLOADS_WORLD_READABLE = "lms.files.W001"
@@ -30,7 +30,7 @@ def check_lms_upload_root(app_configs, **kwargs):
 
     if resolved == base or base in resolved.parents:
         errors.append(
-            Error(
+            checks.Error(
                 f"MEDIA_ROOT ({resolved}) is inside the project directory ({base}).",
                 hint="Uploaded materials and submissions must sit outside the "
                 "repository, such as ~/.local/share/fusion-integrated/media in "
@@ -43,7 +43,7 @@ def check_lms_upload_root(app_configs, **kwargs):
         mode = os.stat(resolved).st_mode
         if mode & (stat.S_IROTH | stat.S_IXOTH):
             errors.append(
-                Warning(
+                checks.Warning(
                     f"MEDIA_ROOT ({resolved}) is readable by other users on this host.",
                     hint="chmod 700 the directory. Individual files are written "
                     "0600, but a traversable parent leaks their names.",
