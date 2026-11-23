@@ -969,3 +969,56 @@ def test_r2_02_03_04_07_queue_ordering_replacement_mismatch_overflow_and_bounds(
     )
     assert r_ov3.status_code == 400
     assert r_ov3.json()["error"]["code"] == "validation_error"
+
+    # RQ1-01 & RQ1-02: draft edits stay draft until explicit submit; SLA & discrepancy indicators respect role scope.
+    from modules.psm.models import Indent
+
+    src_ind = indents.create_indent(
+        actor=p_emp,
+        department="CSE",
+        item_description="Oscilloscope Probe",
+        quantity=1,
+        estimated_cost=Decimal("2500.00"),
+        justification="Lab testing",
+    )
+    rep_draft = indents.repeat_as_draft(actor=p_emp, indent_id=src_ind.pk)
+    assert rep_draft.status == "draft"
+    edited_draft = indents.modify_indent(
+        actor=p_emp,
+        indent_id=rep_draft.pk,
+        item_description="Edited Oscilloscope Probe",
+        quantity=4,
+    )
+    assert edited_draft.status == "draft"
+    assert edited_draft.indent_number is None and edited_draft.submitted_at is None
+    assert edited_draft.version == 2
+    submitted_rep = indents.submit_indent(actor=p_emp, indent_id=edited_draft.pk)
+    assert submitted_rep.status == "submitted" and submitted_rep.indent_number is not None
+
+    now = timezone.now()
+    Indent.objects.filter(pk=submitted_rep.pk).update(sla_reminded_at=now, sla_escalated_at=now)
+    c_emp = _client(stub_iam, uid=9101, role="faculty")
+    r_emp_sla = c_emp.get(f"/api/v1/psm/indents/{submitted_rep.pk}")
+    assert r_emp_sla.status_code == 200
+    assert r_emp_sla.json()["sla_reminder_active"] is True
+    assert r_emp_sla.json()["sla_escalation_active"] is True
+    assert "sla_reminded_at" not in r_emp_sla.json()
+    assert "sla_escalated_at" not in r_emp_sla.json()
+
+    c_da = _client(stub_iam, uid=9102, role="deptadmin_cse")
+    r_da_sla = c_da.get(f"/api/v1/psm/indents/{submitted_rep.pk}")
+    assert r_da_sla.status_code == 200
+    assert r_da_sla.json()["sla_reminded_at"] is not None
+    assert r_da_sla.json()["sla_escalated_at"] is not None
+
+    c_ps = _client(stub_iam, uid=9104, role="ps_admin")
+    r_ps_disc = c_ps.get(f"/api/v1/psm/indents/{po1.indent_id}")
+    assert r_ps_disc.status_code == 200
+    assert r_ps_disc.json()["has_open_discrepancy"] is True
+    assert r_ps_disc.json()["open_discrepancy_cases"][0]["case_number"] == case1.case_number
+
+    c_dir = _client(stub_iam, uid=9105, role="Director")
+    r_dir_disc = c_dir.get(f"/api/v1/psm/indents/{po1.indent_id}")
+    assert r_dir_disc.status_code == 200
+    assert r_dir_disc.json()["has_open_discrepancy"] is True
+    assert "open_discrepancy_cases" not in r_dir_disc.json()

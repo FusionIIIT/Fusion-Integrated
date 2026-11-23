@@ -61,6 +61,20 @@ def test_plain_faculty_submits_tracks_modifies_repeats_and_withdraws(stub_iam):
     assert r_rep.data["status"] == "draft"
     assert r_rep.data["id"] != indent_id
 
+    draft_id = r_rep.data["id"]
+    r_draft_mod = client.patch(f"/api/v1/psm/indents/{draft_id}", {"quantity": 15}, format="json")
+    assert r_draft_mod.status_code == 200
+    assert r_draft_mod.data["status"] == "draft"
+    assert r_draft_mod.data["indent_number"] is None
+    assert r_draft_mod.data["submitted_at"] is None
+    assert r_draft_mod.data["quantity"] == 15
+
+    r_draft_sub = client.post(f"/api/v1/psm/indents/{draft_id}/submit", {}, format="json")
+    assert r_draft_sub.status_code == 200
+    assert r_draft_sub.data["status"] == "submitted"
+    assert r_draft_sub.data["indent_number"].startswith("IND-")
+    assert r_draft_sub.data["submitted_at"] is not None
+
     r_wd = client.post(
         f"/api/v1/psm/indents/{indent_id}/withdraw", {"reason": "No longer needed"}, format="json"
     )

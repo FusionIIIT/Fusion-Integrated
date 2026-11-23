@@ -2175,6 +2175,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/IndentRead'
           description: ''
+  /api/v1/psm/indents/{indent_id}/submit:
+    post:
+      operationId: v1_psm_indents_submit_create
+      summary: Submit an own draft indent (PSM-UC-001, AFR-PSM-011)
+      parameters:
+      - in: path
+        name: indent_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - psm
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndentRead'
+          description: ''
   /api/v1/psm/indents/{indent_id}/withdraw:
     post:
       operationId: v1_psm_indents_withdraw_create
@@ -2597,6 +2618,23 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/v1/psm/reports/logs:
+    get:
+      operationId: v1_psm_reports_logs_list
+      summary: List scoped interactive and scheduled report generation logs (BR-PSM-024)
+      tags:
+      - psm
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportGenerationLog'
+          description: ''
   /api/v1/psm/reports/schedules:
     get:
       operationId: v1_psm_reports_schedules_list
@@ -2671,6 +2709,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportScheduleRead'
+          description: ''
+  /api/v1/psm/reports/schedules/{schedule_id}/run:
+    post:
+      operationId: v1_psm_reports_schedules_run_create
+      summary: Execute a visible active scheduled report immediately (PSM-UC-035)
+      parameters:
+      - in: path
+        name: schedule_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - psm
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportGenerationLog'
           description: ''
   /api/v1/psm/stock/adjustments:
     post:
@@ -4488,6 +4547,31 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        sla_reminder_active:
+          type: boolean
+          readOnly: true
+        sla_escalation_active:
+          type: boolean
+          readOnly: true
+        has_open_discrepancy:
+          type: boolean
+          readOnly: true
+        sla_reminded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        sla_escalated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        open_discrepancy_cases:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
         rejection_reason:
           type: string
           readOnly: true
@@ -4511,16 +4595,22 @@ components:
       - duplicate_of_indent_id
       - duplicate_reviewed
       - estimated_cost
+      - has_open_discrepancy
       - id
       - indent_number
       - is_duplicate_flagged
       - item_description
       - item_id
       - justification
+      - open_discrepancy_cases
       - priority
       - procurement_method
       - quantity
       - rejection_reason
+      - sla_escalated_at
+      - sla_escalation_active
+      - sla_reminded_at
+      - sla_reminder_active
       - status
       - submitted_at
       - transitions
@@ -4588,6 +4678,31 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        sla_reminder_active:
+          type: boolean
+          readOnly: true
+        sla_escalation_active:
+          type: boolean
+          readOnly: true
+        has_open_discrepancy:
+          type: boolean
+          readOnly: true
+        sla_reminded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        sla_escalated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        open_discrepancy_cases:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
         rejection_reason:
           type: string
           readOnly: true
@@ -4601,16 +4716,22 @@ components:
       - duplicate_of_indent_id
       - duplicate_reviewed
       - estimated_cost
+      - has_open_discrepancy
       - id
       - indent_number
       - is_duplicate_flagged
       - item_description
       - item_id
       - justification
+      - open_discrepancy_cases
       - priority
       - procurement_method
       - quantity
       - rejection_reason
+      - sla_escalated_at
+      - sla_escalation_active
+      - sla_reminded_at
+      - sla_reminder_active
       - status
       - submitted_at
       - user_id
@@ -6221,6 +6342,53 @@ components:
           additionalProperties: {}
       required:
       - report_type
+    ReportGenerationLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        report_type:
+          type: string
+          readOnly: true
+        trigger_type:
+          type: string
+          readOnly: true
+        schedule_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        schedule_name:
+          type: string
+          nullable: true
+          readOnly: true
+        export_format:
+          type: string
+          readOnly: true
+        row_count:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        error_message:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - error_message
+      - export_format
+      - id
+      - report_type
+      - row_count
+      - schedule_id
+      - schedule_name
+      - status
+      - trigger_type
     ReportScheduleCreate:
       type: object
       properties:

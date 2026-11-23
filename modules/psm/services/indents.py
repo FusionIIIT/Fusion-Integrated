@@ -115,9 +115,18 @@ def transition_indent(
     return indent
 
 
-def _submit_created_indent(actor, indent: Indent, dup_window_days: int, now) -> None:
-    """Submit a newly created indent, snapshot v1, and notify requestor."""
+def _finalize_indent_submission(
+    actor, indent: Indent, dup_window_days: int, now, target_ver: int
+) -> None:
+    """Assign number, flag duplicates, transition to submitted, snapshot, and notify."""
     dup_id = _check_duplicate(indent, dup_window_days, now)
+    extra = {
+        "version": target_ver,
+        "indent_number": indent.indent_number or next_number("IND"),
+        "submitted_at": indent.submitted_at or now,
+        "is_duplicate_flagged": dup_id is not None,
+        "duplicate_of_indent_id": dup_id,
+    }
     transition_indent(
         indent=indent,
         to_status=sm.SUBMITTED,
@@ -125,24 +134,27 @@ def _submit_created_indent(actor, indent: Indent, dup_window_days: int, now) -> 
         actor_lane=sm.EMPLOYEE,
         action="indent.submitted",
         reason="Submitted by requestor",
-        extra_updates={
-            "indent_number": next_number("IND"),
-            "submitted_at": now,
-            "is_duplicate_flagged": dup_id is not None,
-            "duplicate_of_indent_id": dup_id,
-        },
+        extra_updates=extra,
     )
     IndentVersion.objects.create(
-        indent=indent, version=1, snapshot=_indent_snapshot(indent), actor_user_id=actor.user_id
+        indent=indent,
+        version=target_ver,
+        snapshot=_indent_snapshot(indent),
+        actor_user_id=actor.user_id,
     )
     enqueue_notification(
         topic="indent.submitted",
-        dedupe_key=f"indent.submitted:{indent.pk}:v1",
+        dedupe_key=f"indent.submitted:{indent.pk}:v{target_ver}",
         recipient_user_id=actor.user_id,
         subject=f"Indent {indent.indent_number} submitted",
         body=f"Indent for {indent.item_description} (qty {indent.quantity}) submitted.",
         payload={"indent_id": indent.pk, "duplicate_flagged": indent.is_duplicate_flagged},
     )
+
+
+def _submit_created_indent(actor, indent: Indent, dup_window_days: int, now) -> None:
+    """Submit a newly created indent, snapshot v1, and notify requestor."""
+    _finalize_indent_submission(actor, indent, dup_window_days, now, 1)
 
 
 def _apply_indent_changes(indent: Indent, changes: dict) -> None:
@@ -215,9 +227,42 @@ def create_indent(
     return indent
 
 
+def _save_draft_edit(actor, indent: Indent, next_ver: int) -> Indent:
+    """Persist an edit on a draft indent without transitioning to submitted."""
+    indent.version = next_ver
+    indent.save(
+        update_fields=[
+            "department",
+            "item",
+            "item_description",
+            "quantity",
+            "estimated_cost",
+            "justification",
+            "version",
+            "updated_at",
+        ]
+    )
+    IndentVersion.objects.create(
+        indent=indent,
+        version=next_ver,
+        snapshot=_indent_snapshot(indent),
+        actor_user_id=actor.user_id,
+    )
+    audit_record(
+        actor=actor,
+        action="indent.modified",
+        target_type="indent",
+        target_id=indent.pk,
+        from_state=sm.DRAFT,
+        to_state=sm.DRAFT,
+        details={"reason": f"Modified draft to version {next_ver}"},
+    )
+    return indent
+
+
 @transaction.atomic
 def modify_indent(*, actor, indent_id: int, **changes) -> Indent:
-    """Modify an own pending indent and create a new version (PSM-UC-023, BW-PSM-07)."""
+    """Modify an own draft or pending indent and create a new version (PSM-UC-023, AFR-PSM-011)."""
     spec = policy_to_spec(require_active_policy())
     indent = Indent.objects.select_for_update().filter(pk=indent_id, user_id=actor.user_id).first()
     if indent is None:
@@ -225,9 +270,12 @@ def modify_indent(*, actor, indent_id: int, **changes) -> Indent:
     with translate_errors():
         ir.ensure_state_permissible(indent.status, spec.modifiable_states, "modify")
     _apply_indent_changes(indent, changes)
+    next_ver = indent.version + 1
+    if indent.status == sm.DRAFT:
+        # Keep draft indents in draft so submission remains an explicit action (AFR-PSM-011).
+        return _save_draft_edit(actor, indent, next_ver)
     now = timezone.now()
     dup_id = _check_duplicate(indent, spec.duplicate_window_days, now)
-    next_ver = indent.version + 1
     extra = {
         "version": next_ver,
         "is_duplicate_flagged": dup_id is not None,
@@ -257,6 +305,21 @@ def modify_indent(*, actor, indent_id: int, **changes) -> Indent:
         version=next_ver,
         snapshot=_indent_snapshot(indent),
         actor_user_id=actor.user_id,
+    )
+    return indent
+
+
+@transaction.atomic
+def submit_indent(*, actor, indent_id: int) -> Indent:
+    """Explicitly submit an own draft indent for approval routing (PSM-UC-001, AFR-PSM-011)."""
+    spec = policy_to_spec(require_active_policy())
+    indent = Indent.objects.select_for_update().filter(pk=indent_id, user_id=actor.user_id).first()
+    if indent is None:
+        raise NotFoundError("Indent not found.")
+    _apply_indent_changes(indent, {})
+    target_ver = indent.version + 1 if indent.versions.exists() else indent.version
+    _finalize_indent_submission(
+        actor, indent, spec.duplicate_window_days, timezone.now(), target_ver
     )
     return indent
 

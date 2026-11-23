@@ -211,6 +211,38 @@ class ReportScheduleUpdateView(APIView):
         return Response(ser.ReportScheduleReadSerializer(obj).data)
 
 
+class ReportScheduleRunView(APIView):
+    permission_classes = [HasModuleGrant("psm"), HasPermission("psm.report.create")]
+    throttle_scope = "psm_write"
+
+    @extend_schema(
+        tags=["psm"],
+        summary="Execute a visible active scheduled report immediately (PSM-UC-035)",
+        request=None,
+        responses={200: ser.ReportGenerationLogSerializer},
+    )
+    def post(self, request, schedule_id: int):
+        log_row = reports.run_schedule_now(actor=request.principal, schedule_id=schedule_id)
+        return Response(ser.ReportGenerationLogSerializer(log_row).data)
+
+
+class ReportGenerationLogListView(APIView):
+    permission_classes = [
+        HasModuleGrant("psm"),
+        HasPermission("psm.report.view", "psm.financial_report.view"),
+    ]
+
+    @extend_schema(
+        tags=["psm"],
+        summary="List scoped interactive and scheduled report generation logs (BR-PSM-024)",
+        responses={200: ser.ReportGenerationLogSerializer(many=True)},
+    )
+    def get(self, request):
+        return _paginate(
+            request, scoping.report_logs_for(request.principal), ser.ReportGenerationLogSerializer
+        )
+
+
 class AuditLogListView(APIView):
     permission_classes = [HasModuleGrant("psm"), HasPermission("psm.audit.view")]
 

@@ -127,3 +127,49 @@ def test_management_commands_and_contracts():
     assert contracts.get_pending_receipt_obligations([]) == {}
     summaries = contracts.get_indent_summaries([7001])
     assert 7001 in summaries and summaries[7001].open_count == 0
+
+
+def test_due_schedule_failure_logs_failed_and_never_records_success(monkeypatch):
+    # PSM-UC-035 Alternative A2: generation failure logs failed status without recording success.
+    from modules.psm.models import PsmAuditLog
+    from modules.psm.selectors import reports as report_sel
+
+    policy.seed_default_policy()
+    p_ps = make_principal(
+        user_id=7010,
+        kind="staff",
+        active_role="ps_admin",
+        roles=("ps_admin",),
+        permissions=tuple(registry.ROLE_GRANTS["ps_admin"]),
+    )
+    sched = reports.create_schedule(
+        actor=p_ps, name="Failing Ops", report_type="operational", cadence="daily"
+    )
+    ReportSchedule.objects.filter(pk=sched.pk).update(
+        next_run_at=timezone.now() - timedelta(minutes=5)
+    )
+
+    def _boom(*args, **kwargs):
+        raise RuntimeError("Simulated report query failure")
+
+    monkeypatch.setattr(report_sel, "build_report_rows", _boom)
+    assert reports.run_due_schedules() == 0
+    sched.refresh_from_db()
+    assert sched.last_run_at is None
+    assert (
+        ReportGenerationLog.objects.filter(
+            schedule=sched, trigger_type="scheduled", status="succeeded"
+        ).count()
+        == 0
+    )
+    failed = ReportGenerationLog.objects.filter(
+        schedule=sched, trigger_type="scheduled", status="failed"
+    ).first()
+    assert failed is not None
+    assert "Simulated report query failure" in failed.error_message
+    assert PsmAuditLog.objects.filter(
+        action="report.schedule_failed", target_type="report_schedule", target_id=sched.pk
+    ).exists()
+    assert PsmNotification.objects.filter(
+        recipient_user_id=7010, topic="report.schedule_failed"
+    ).exists()

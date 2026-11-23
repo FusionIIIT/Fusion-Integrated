@@ -202,6 +202,7 @@ def _seed_rows(start: int, end: int):
         "/api/v1/psm/discrepancies",
         "/api/v1/psm/invoices",
         "/api/v1/psm/reports/schedules",
+        "/api/v1/psm/reports/logs",
         "/api/v1/psm/audit",
         "/api/v1/psm/notifications",
         "/api/v1/psm/policy",

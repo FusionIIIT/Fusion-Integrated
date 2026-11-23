@@ -10,16 +10,23 @@ import { ErrorState } from "../../../ui/components/ErrorState";
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
 import {
-  useCreateReportSchedule, useExportReportCsv, useGenerateReport, useReportSchedules,
+  useCreateReportSchedule,
+  useExportReportCsv,
+  useGenerateReport,
+  useReportLogs,
+  useReportSchedules,
+  useRunReportSchedule,
 } from "../api/hooks";
-import type { ReportResult, ReportSchedule } from "../api/types";
+import type { ReportGenerationLog, ReportResult, ReportSchedule } from "../api/types";
 
 export default function ReportsPage() {
   const { can } = useAuth();
   const schedules = useReportSchedules();
+  const logs = useReportLogs();
   const generate = useGenerateReport();
   const exportCsv = useExportReportCsv();
   const createSched = useCreateReportSchedule();
+  const runSched = useRunReportSchedule();
 
   const [reportType, setReportType] = useState("operational");
   const [result, setResult] = useState<ReportResult | null>(null);
@@ -94,7 +101,70 @@ export default function ReportsPage() {
               { key: "name", header: "Schedule", render: (r) => r.name },
               { key: "type", header: "Report Type", render: (r) => r.report_type },
               { key: "cadence", header: "Cadence", render: (r) => r.cadence },
+              {
+                key: "last_run",
+                header: "Last Run",
+                render: (r) => (r.last_run_at ? new Date(r.last_run_at).toLocaleString() : "—"),
+              },
               { key: "active", header: "State", render: (r) => <Badge color={r.is_active ? "green" : "gray"}>{r.is_active ? "Active" : "Paused"}</Badge> },
+              {
+                key: "action",
+                header: "Actions",
+                render: (r) =>
+                  can("psm.report.create") && r.is_active ? (
+                    <Button
+                      size="xs"
+                      variant="light"
+                      loading={runSched.isPending}
+                      onClick={() =>
+                        runSched.mutate(r.id, {
+                          onSuccess: (log) =>
+                            notifications.show({
+                              color: "green",
+                              title: "Scheduled report ran",
+                              message: `Generated ${log.report_type} log #${log.id} (${log.row_count} row(s)).`,
+                            }),
+                          onError: (e) =>
+                            notifications.show({
+                              color: "red",
+                              title: "Scheduled run failed",
+                              message: errorMessage(e),
+                            }),
+                        })
+                      }
+                    >
+                      Run now
+                    </Button>
+                  ) : (
+                    "—"
+                  ),
+              },
+            ]}
+          />
+        </Card>
+
+        <Card padding="lg">
+          <Title order={4} mb="sm">Report Generation Logs</Title>
+          <DataTable<ReportGenerationLog>
+            rows={logs.data?.results ?? []}
+            loading={logs.isPending}
+            rowKey={(r) => r.id}
+            empty={{ title: "No report runs logged yet." }}
+            columns={[
+              { key: "id", header: "Log ID", render: (r) => `#${r.id}` },
+              { key: "type", header: "Report Type", render: (r) => r.report_type },
+              { key: "trigger", header: "Trigger", render: (r) => r.trigger_type },
+              { key: "schedule", header: "Schedule", render: (r) => r.schedule_name ?? "—" },
+              { key: "rows", header: "Rows", render: (r) => r.row_count },
+              {
+                key: "status",
+                header: "Status",
+                render: (r) => (
+                  <Badge color={r.status === "succeeded" ? "green" : r.status === "blocked" ? "yellow" : "red"}>
+                    {r.status}
+                  </Badge>
+                ),
+              },
             ]}
           />
         </Card>

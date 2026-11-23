@@ -1,9 +1,10 @@
 # Role-based queryset scoping for PSM; out-of-scope IDs yield 404 (BR-PSM-020).
 from __future__ import annotations
 
-from django.db.models import Q, QuerySet
+from django.db.models import Exists, OuterRef, Q, QuerySet
 
 from modules.directory import contracts as directory
+from modules.psm.domain import state_machine as sm
 from modules.psm.models import (
     DiscrepancyCase,
     GoodsReceiptNote,
@@ -14,6 +15,7 @@ from modules.psm.models import (
     PsmNotification,
     PsmPolicy,
     PurchaseOrder,
+    ReportGenerationLog,
     ReportSchedule,
     StockItem,
     StockLocation,
@@ -85,8 +87,16 @@ def _own_id(actor) -> int | None:
 
 
 def indents_for(actor) -> QuerySet[Indent]:
-    """Scope indents by acting role: institute-wide, department, or own."""
-    base = Indent.objects.select_related("item", "policy")
+    """Scope indents by acting role and annotate active discrepancy status."""
+    open_disc = DiscrepancyCase.objects.filter(
+        status__in=(sm.DISC_OPEN, sm.DISC_REPLACEMENT_AWAITED)
+    ).filter(
+        Q(grn__purchase_order__indent_id=OuterRef("pk"))
+        | Q(grn__internal_issue__indent_id=OuterRef("pk"))
+    )
+    base = Indent.objects.select_related("item", "policy").annotate(
+        has_open_discrepancy=Exists(open_disc)
+    )
     if is_institute_wide(actor):
         return base
     dept = actor_department(actor)
@@ -98,6 +108,41 @@ def indents_for(actor) -> QuerySet[Indent]:
             else base.filter(department__iexact=dept)
         )
     return base.filter(user_id=own) if own is not None else base.none()
+
+
+def open_discrepancies_by_indent(indent_ids: list[int]) -> dict[int, list[dict]]:
+    """Batch-fetch active discrepancy summaries keyed by indent_id in a single query."""
+    if not indent_ids:
+        return {}
+    rows = (
+        DiscrepancyCase.objects.filter(status__in=(sm.DISC_OPEN, sm.DISC_REPLACEMENT_AWAITED))
+        .filter(
+            Q(grn__purchase_order__indent_id__in=indent_ids)
+            | Q(grn__internal_issue__indent_id__in=indent_ids)
+        )
+        .values(
+            "id",
+            "case_number",
+            "status",
+            "discrepancy_type",
+            "grn__purchase_order__indent_id",
+            "grn__internal_issue__indent_id",
+        )
+    )
+    grouped: dict[int, list[dict]] = {}
+    for r in rows:
+        iid = r["grn__purchase_order__indent_id"] or r["grn__internal_issue__indent_id"]
+        if iid is None:
+            continue
+        grouped.setdefault(iid, []).append(
+            {
+                "id": r["id"],
+                "case_number": r["case_number"],
+                "status": r["status"],
+                "discrepancy_type": r["discrepancy_type"],
+            }
+        )
+    return grouped
 
 
 def stock_locations_for(actor) -> QuerySet[StockLocation]:
@@ -258,6 +303,19 @@ def report_schedules_for(actor) -> QuerySet[ReportSchedule]:
         return base
     own = _own_id(actor)
     return base.filter(created_by_user_id=own) if own is not None else base.none()
+
+
+def report_logs_for(actor) -> QuerySet[ReportGenerationLog]:
+    """Scope report generation logs by role, financial permission, and schedule ownership."""
+    base = ReportGenerationLog.objects.select_related("schedule")
+    if not getattr(actor, "has_permission", lambda _: False)("psm.financial_report.view"):
+        base = base.exclude(report_type="financial")
+    if is_institute_wide(actor):
+        return base
+    own = _own_id(actor)
+    if own is None:
+        return base.none()
+    return base.filter(Q(schedule__created_by_user_id=own) | Q(actor_user_id=own))
 
 
 def active_stock_items() -> QuerySet[StockItem]:

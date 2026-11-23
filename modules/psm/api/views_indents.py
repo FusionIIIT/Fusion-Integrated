@@ -13,10 +13,20 @@ from modules.psm.selectors import scoping
 from modules.psm.services import approvals, indents, procurement, stock
 
 
+def _indent_ctx(request, objs) -> dict:
+    actor = request.principal
+    items = list(objs) if isinstance(objs, (list, tuple)) else [objs]
+    can_disc = any(actor.has_permission(p) for p in ser._DISC_DETAIL_PERMS)
+    ids = [o.pk for o in items]
+    disc_map = scoping.open_discrepancies_by_indent(ids) if can_disc and ids else {}
+    return {"actor": actor, "open_discrepancies_by_indent": disc_map}
+
+
 def _paginate(request, qs, serializer_cls):
     paginator = CursorPagination()
     page = paginator.paginate_queryset(qs, request)
-    return paginator.get_paginated_response(serializer_cls(page, many=True).data)
+    ctx = _indent_ctx(request, page) if issubclass(serializer_cls, ser.IndentReadSerializer) else {}
+    return paginator.get_paginated_response(serializer_cls(page, many=True, context=ctx).data)
 
 
 class IndentListCreateView(APIView):
@@ -56,15 +66,23 @@ class IndentListCreateView(APIView):
             qs = qs.filter(department__iexact=dept_f)
         if request.query_params.get("queue") == "1":
             # Order approval queues by criticality first (BR-PSM-014, AFR-PSM-025).
-            qs = qs.annotate(
-                priority_rank=Case(
-                    When(priority__in=("urgent", "critical"), then=0),
-                    When(priority="high", then=1),
-                    default=2,
-                    output_field=IntegerField(),
-                )
-            ).order_by("priority_rank", "current_stage_since", "id")
-            return Response({"results": ser.IndentReadSerializer(qs[:100], many=True).data})
+            rows = list(
+                qs.annotate(
+                    priority_rank=Case(
+                        When(priority__in=("urgent", "critical"), then=0),
+                        When(priority="high", then=1),
+                        default=2,
+                        output_field=IntegerField(),
+                    )
+                ).order_by("priority_rank", "current_stage_since", "id")[:100]
+            )
+            return Response(
+                {
+                    "results": ser.IndentReadSerializer(
+                        rows, many=True, context=_indent_ctx(request, rows)
+                    ).data
+                }
+            )
         return _paginate(request, qs, ser.IndentReadSerializer)
 
     @extend_schema(
@@ -89,7 +107,10 @@ class IndentListCreateView(APIView):
         s = ser.IndentCreateSerializer(data=request.data)
         s.is_valid(raise_exception=True)
         obj = indents.create_indent(actor=request.principal, **s.validated_data)
-        return Response(ser.IndentReadSerializer(obj).data, status=status.HTTP_201_CREATED)
+        return Response(
+            ser.IndentReadSerializer(obj, context=_indent_ctx(request, obj)).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class IndentDetailView(APIView):
@@ -116,7 +137,7 @@ class IndentDetailView(APIView):
         )
         if obj is None:
             raise NotFoundError("Indent not found.")
-        return Response(ser.IndentDetailSerializer(obj).data)
+        return Response(ser.IndentDetailSerializer(obj, context=_indent_ctx(request, obj)).data)
 
     @extend_schema(
         tags=["psm"],
@@ -130,7 +151,22 @@ class IndentDetailView(APIView):
         obj = indents.modify_indent(
             actor=request.principal, indent_id=indent_id, **s.validated_data
         )
-        return Response(ser.IndentReadSerializer(obj).data)
+        return Response(ser.IndentReadSerializer(obj, context=_indent_ctx(request, obj)).data)
+
+
+class IndentSubmitView(APIView):
+    permission_classes = [HasModuleGrant("psm"), HasPermission("psm.indent.create")]
+    throttle_scope = "psm_write"
+
+    @extend_schema(
+        tags=["psm"],
+        summary="Submit an own draft indent (PSM-UC-001, AFR-PSM-011)",
+        request=None,
+        responses={200: ser.IndentReadSerializer},
+    )
+    def post(self, request, indent_id: int):
+        obj = indents.submit_indent(actor=request.principal, indent_id=indent_id)
+        return Response(ser.IndentReadSerializer(obj, context=_indent_ctx(request, obj)).data)
 
 
 class IndentWithdrawView(APIView):
@@ -149,7 +185,7 @@ class IndentWithdrawView(APIView):
         obj = indents.withdraw_indent(
             actor=request.principal, indent_id=indent_id, reason=s.validated_data["reason"]
         )
-        return Response(ser.IndentReadSerializer(obj).data)
+        return Response(ser.IndentReadSerializer(obj, context=_indent_ctx(request, obj)).data)
 
 
 class IndentRepeatView(APIView):
@@ -164,7 +200,10 @@ class IndentRepeatView(APIView):
     )
     def post(self, request, indent_id: int):
         obj = indents.repeat_as_draft(actor=request.principal, indent_id=indent_id)
-        return Response(ser.IndentReadSerializer(obj).data, status=status.HTTP_201_CREATED)
+        return Response(
+            ser.IndentReadSerializer(obj, context=_indent_ctx(request, obj)).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class IndentStockCheckView(APIView):
@@ -179,7 +218,7 @@ class IndentStockCheckView(APIView):
     )
     def post(self, request, indent_id: int):
         indent, reservation = stock.check_and_reserve(actor=request.principal, indent_id=indent_id)
-        data = ser.IndentReadSerializer(indent).data
+        data = ser.IndentReadSerializer(indent, context=_indent_ctx(request, indent)).data
         data["reservation_id"] = reservation.pk if reservation else None
         return Response(data)
 
@@ -200,7 +239,7 @@ class IndentDeptAdminReviewView(APIView):
         obj = approvals.dept_admin_review(
             actor=request.principal, indent_id=indent_id, **s.validated_data
         )
-        return Response(ser.IndentReadSerializer(obj).data)
+        return Response(ser.IndentReadSerializer(obj, context=_indent_ctx(request, obj)).data)
 
 
 class IndentHodRecommendView(APIView):
@@ -219,7 +258,7 @@ class IndentHodRecommendView(APIView):
         obj = approvals.hod_recommend(
             actor=request.principal, indent_id=indent_id, **s.validated_data
         )
-        return Response(ser.IndentReadSerializer(obj).data)
+        return Response(ser.IndentReadSerializer(obj, context=_indent_ctx(request, obj)).data)
 
 
 class IndentProcurementReviewView(APIView):
@@ -238,7 +277,7 @@ class IndentProcurementReviewView(APIView):
         obj = procurement.review_and_select_method(
             actor=request.principal, indent_id=indent_id, notes=s.validated_data["notes"]
         )
-        return Response(ser.IndentReadSerializer(obj).data)
+        return Response(ser.IndentReadSerializer(obj, context=_indent_ctx(request, obj)).data)
 
 
 class IndentFinalDecisionView(APIView):
@@ -257,4 +296,4 @@ class IndentFinalDecisionView(APIView):
         obj = approvals.final_decision(
             actor=request.principal, indent_id=indent_id, **s.validated_data
         )
-        return Response(ser.IndentReadSerializer(obj).data)
+        return Response(ser.IndentReadSerializer(obj, context=_indent_ctx(request, obj)).data)

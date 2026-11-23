@@ -10,6 +10,7 @@ urlpatterns = [
     path("dashboard", vf.DashboardView.as_view(), name="psm-dashboard"),
     path("indents", vi.IndentListCreateView.as_view(), name="psm-indents"),
     path("indents/<int:indent_id>", vi.IndentDetailView.as_view(), name="psm-indent-detail"),
+    path("indents/<int:indent_id>/submit", vi.IndentSubmitView.as_view(), name="psm-indent-submit"),
     path(
         "indents/<int:indent_id>/withdraw",
         vi.IndentWithdrawView.as_view(),
@@ -123,6 +124,12 @@ urlpatterns = [
         vf.ReportScheduleUpdateView.as_view(),
         name="psm-report-schedule-update",
     ),
+    path(
+        "reports/schedules/<int:schedule_id>/run",
+        vf.ReportScheduleRunView.as_view(),
+        name="psm-report-schedule-run",
+    ),
+    path("reports/logs", vf.ReportGenerationLogListView.as_view(), name="psm-report-logs"),
     path("audit", vf.AuditLogListView.as_view(), name="psm-audit"),
     path("notifications", vf.NotificationListView.as_view(), name="psm-notifications"),
     path("policy", vf.PolicyListCreateView.as_view(), name="psm-policy"),

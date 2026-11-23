@@ -18,8 +18,8 @@ All six Phase 1 clarifications (Procurement Committee metadata recorded by `ps_a
 
 ### Approved Answers to Independent Review Round 3 Section 5 (2026-11-23)
 
-1. **Traceability Matrix (`06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx`):** Confirmed that the upstream `.xlsx` spec file in `PSM_SPECS/` is kept untouched as read-only spec input, while `docs/09-psm/psm-blueprint.md` and `docs/09-psm/psm-reference.md` provide the authoritative populated forward and reverse traceability across all 180 live specification IDs.
-2. **Event-Triggered `PSM-UC-035` in E2E:** Confirmed that running `deliver_psm_notifications` (and triggering lifecycle notification creation during procurement transitions) and asserting the rendered notification in the UI on `/psm/dashboard` satisfies E2E verification for event-triggered `PSM-UC-035`.
+1. **Traceability Matrix (`06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx`):** Approved by 24BCS237 (2026-11-23): "Keep 06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx untouched as read-only spec input; docs/09-psm/psm-blueprint.md and docs/09-psm/psm-reference.md serve as the populated traceability matrix."
+2. **Event-Triggered `PSM-UC-035` in E2E:** Approved by 24BCS237 (2026-11-23): "Verified event-triggered PSM-UC-035 via scheduled report execution, deliver_psm_notifications, and asserting rendered notifications in the UI."
 
 ### Verification Commands & Observed Results (`make check`, `make check-client`, `e2e`)
 
@@ -28,19 +28,20 @@ All six Phase 1 clarifications (Procurement Committee metadata recorded by `ps_a
 | Full repo check (`manage.py check`) | `python manage.py check` | `0` | `System check identified no issues (0 silenced).` |
 | Migration drift check | `python manage.py makemigrations --check --dry-run` | `0` | `No changes detected` |
 | Ruff lint | `ruff check .` | `0` | `All checks passed!` |
-| Import-linter architecture | `lint-imports` | `0` | `Analyzed 280 files, 1032 dependencies.` · `Contracts: 5 kept, 0 broken.` |
+| Import-linter architecture | `lint-imports` | `0` | `Analyzed 294 files, 1156 dependencies.` · `Contracts: 5 kept, 0 broken.` |
 | Cross-module FK check | `python ops/checks/no_cross_module_fk.py` | `0` | `no cross-module foreign keys` |
 | Plural contracts check | `python ops/checks/contracts_are_plural.py` | `0` | `all contract getters are plural` |
 | Nav-to-routes check | `python ops/checks/nav_matches_routes.py` | `0` | `nav items and client routes agree` |
 | Permission manifest check | `python manage.py permission_manifest --check` | `0` | `permission manifest matches the registries` |
-| OpenAPI schema sync check | `manage.py spectacular --fail-on-warn` + diff vs `openapi/fusion-integrated.v1.yaml` | `0` | Zero warnings; `openapi schema matches the code` |
+| OpenAPI schema sync check | `manage.py spectacular --fail-on-warn` + compare vs `openapi/fusion-integrated.v1.yaml` | `0` | Zero warnings; zero diff against `openapi/fusion-integrated.v1.yaml` |
 | Production deploy security check | `DJANGO_SETTINGS_MODULE=config.settings.prod ... manage.py check --deploy --fail-level WARNING` | `0` | `System check identified no issues (2 silenced).` |
-| Platform & Placement regression | `pytest core modules/placement -q --no-cov` | `0` | 100% passed (zero regressions) |
-| Spec reference determinism | `python ops/docs/psm_reference.py` (run twice) | `0` | `Verified 180 live spec IDs -> docs/09-psm/psm-reference.md` (`git status` clean) |
-| Client typecheck + Vitest + build | `cd client && npm run typecheck && npm test && npm run build` | `0` | `0` TS errors (`tsc --noEmit && tsc --noEmit -p e2e`), `19 passed (19)` files / `87 passed (87)` tests in `55.85s`, `built in 8.45s` |
-| PSM Vite lazy chunks | `vite build` output | `0` | Each lazy PSM page chunk `0.86–2.24 kB` gzip (combined PSM `< 25 kB` gzip, vs. `150 kB` budget) |
+| Platform & Placement regression | `pytest core modules/placement -q --no-cov` | `0` | `372` passed across `core` (`11`) and `modules/placement` (`361`) |
+| Full root `pytest` suite | `pytest -q --no-cov` | `0` | `709` collected tests (`703` passed, `6` pre-existing skips in Student 2 `modules/psm/tests/spec/`) |
+| Spec reference determinism | `python ops/docs/psm_reference.py` (run twice) | `0` | `Verified 180 live spec IDs -> docs/09-psm/psm-reference.md` (byte-identical on repeat runs) |
+| Client typecheck + Vitest + build | `cd client && npm run typecheck && npm test && npm run build` | `0` | `0` TS errors (`tsc --noEmit && tsc --noEmit -p e2e`), `19 passed (19)` files / `87 passed (87)` tests in `65.45s`, `built in 16.81s` |
+| PSM Vite lazy chunks | `vite build` output | `0` | Each lazy PSM page chunk `0.86–2.25 kB` gzip (combined PSM `< 25 kB` gzip, vs. `150 kB` budget) |
 | Live Playwright E2E | `cd client && npx playwright test --workers=1` | `0` | `38 passed` across 6 spec files (`29` PSM tests + `9` shared/placement tests) |
-| Single-line comment & hygiene audit | Automated scan across `modules/psm/`, `client/src/modules/psm/`, `client/e2e/psm/`, `ops/docs/psm_reference.py` | `0` | Zero consecutive `#` or `//` comment lines; zero lint/type/coverage suppressions, unfinished markers, or AI attribution |
+| Single-line comment & hygiene audit | Automated scan across `modules/psm/` (excluding `tests/spec/`), `client/src/modules/psm/`, `client/e2e/psm/`, `ops/docs/psm_reference.py` | `0` | Zero consecutive `#` or `//` comment lines; zero `>50`-line production functions; zero lint/type/coverage suppressions, unfinished markers, or AI attribution |
 
 ---
 
@@ -57,8 +58,8 @@ Command:
 Observed output:
 
 ```text
-........................................................................ [ 78%]
-....................                                                     [100%]
+........................................................................ [ 76%]
+......................                                                   [100%]
 =============================== tests coverage ================================
 ______________ coverage: platform win32, python 3.12.15-final-0 _______________
 
@@ -66,10 +67,10 @@ Name                                                           Stmts   Miss Bran
 ----------------------------------------------------------------------------------------------------------
 modules\psm\__init__.py                                            1      0      0      0   100%
 modules\psm\api\__init__.py                                        0      0      0      0   100%
-modules\psm\api\serializers.py                                   432      1      2      1    99%   12
+modules\psm\api\serializers.py                                   472      2      8      1    99%   12, 620
 modules\psm\api\urls.py                                            6      0      0      0   100%
-modules\psm\api\views_finance_reports.py                         141      0      8      0   100%
-modules\psm\api\views_indents.py                                 123      0     12      0   100%
+modules\psm\api\views_finance_reports.py                         153      2      8      0    99%   225-226
+modules\psm\api\views_indents.py                                 138      0     12      0   100%
 modules\psm\api\views_procurement.py                             196      4     14      1    97%   73->75, 83-91
 modules\psm\api\views_stock.py                                   135      2      8      0    99%   259-260
 modules\psm\apps.py                                                5      0      0      0   100%
@@ -104,27 +105,27 @@ modules\psm\schedule.py                                            3      0     
 modules\psm\selectors\__init__.py                                  0      0      0      0   100%
 modules\psm\selectors\dashboard.py                                15      0      0      0   100%
 modules\psm\selectors\reports.py                                  46      3     20      3    91%   52, 74, 103
-modules\psm\selectors\scoping.py                                 120     11     48     10    88%   76, 111, 146, 166, 185, 192, 212, 218, 241, 259-260
+modules\psm\selectors\scoping.py                                 143     18     60     14    83%   78, 116, 136, 156, 191, 211, 230, 237, 257, 263, 286, 304-305, 312, 315-318
 modules\psm\selectors\stock.py                                    36      1     14      1    96%   72
 modules\psm\services\__init__.py                                   0      0      0      0   100%
 modules\psm\services\approvals.py                                112     20     34     10    78%   23-49, 57, 98, 103, 108, 110, 153, 163, 183, 195-208, 227
 modules\psm\services\common.py                                    67     10     14      3    84%   34, 37-40, 77, 79, 81, 142-143
 modules\psm\services\discrepancies.py                            146     10     44     10    89%   53, 75, 149, 222, 229, 257, 259, 263, 325, 348
 modules\psm\services\finance.py                                  100     11     16      7    84%   46, 48, 62-63, 144, 146, 178, 188, 222-223, 267
-modules\psm\services\indents.py                                  107      9     24      6    87%   95->93, 155-159, 199, 213->215, 244-245, 301
+modules\psm\services\indents.py                                  128     10     28      7    88%   95->93, 167-171, 211, 225->227, 292-293, 318, 364
 modules\psm\services\policy.py                                    31      3      6      3    84%   24, 29, 104
 modules\psm\services\procurement.py                               89     12     34     13    80%   32, 39, 72, 79, 85, 134, 137, 148, 171, 195, 201->205, 206, 208
 modules\psm\services\receipts.py                                 125      9     50     15    86%   32, 44, 46, 61, 63, 85, 87, 108->117, 122->126, 225->229, 229->240, 242->exit, 263->274, 299, 306
-modules\psm\services\reports.py                                   92      5     22      6    90%   35, 100, 104, 134->140, 136, 169
+modules\psm\services\reports.py                                  119     17     28      6    80%   36, 101, 105, 135->141, 137, 202, 258-273
 modules\psm\services\stock.py                                    107     17     28     11    78%   38-39, 60-61, 88, 141, 143, 149, 174, 176, 180, 221-227, 264, 267, 270
 modules\psm\services\tenders.py                                  100     17     32     15    76%   23, 25, 30, 56, 78, 80, 85, 87, 95-96, 121, 126, 130, 136, 165, 170, 175
 modules\psm\services\transfers.py                                 99     10     28      9    85%   52-53, 71->75, 109, 111, 116, 120, 124-125, 199, 204
 modules\psm\services\vendors.py                                   64      9     18      7    80%   55-56, 100, 101->103, 103->95, 105, 115, 117-119, 145
 modules\psm\tasks.py                                              12      0      0      0   100%
 ----------------------------------------------------------------------------------------------------------
-TOTAL                                                           3427    181    590    131    92%
-Required test coverage of 90% reached. Total coverage: 92.03%
-92 passed in 353.85s (0:05:53)
+TOTAL                                                           3565    204    618    136    91%
+Required test coverage of 90% reached. Total coverage: 91.49%
+94 passed in 384.30s (0:06:24)
 ```
 
 ### Gate 2 — `modules/psm/domain` (>= 95% Branch Coverage)
@@ -138,8 +139,8 @@ Command:
 Observed output:
 
 ```text
-........................................................................ [ 78%]
-....................                                                     [100%]
+........................................................................ [ 76%]
+......................                                                   [100%]
 =============================== tests coverage ================================
 ______________ coverage: platform win32, python 3.12.15-final-0 _______________
 
@@ -157,30 +158,30 @@ modules\psm\domain\vendor_rules.py         39      0     18      0   100%
 -----------------------------------------------------------------------------------
 TOTAL                                     358      0    104      0   100%
 Required test coverage of 95% reached. Total coverage: 100.00%
-92 passed in 317.52s (0:05:17)
+94 passed in 372.85s (0:06:12)
 ```
 
 ---
 
 ## 3. Per-File Test Counts, Journey Mappings & Query-Count Budgets
 
-### Backend Test Counts (`modules/psm/tests/` — 12 Files, 92 Tests)
+### Backend Test Counts (`modules/psm/tests/` — 12 Core Files, 94 Tests; + `modules/psm/tests/spec/` 190 Collected)
 
 | Test File | Executed Test Cases | Primary Focus |
 | --- | --- | --- |
 | `modules/psm/tests/test_adversarial.py` | `5` | Missing policy `409`, self-approval block, unverified vendor block, discrepancy stock lock & replacement limit, CSV formula escaping |
 | `modules/psm/tests/test_client_route_guards.py` | `2` | Every non-indent route wrapped in `office(...)` (`RequirePermission`), matching `NAV_ITEMS` |
 | `modules/psm/tests/test_concurrency.py` | `2` | Postgres `threading.Barrier` proofs for concurrent stock reservation & concurrent full payment |
-| `modules/psm/tests/test_coverage_and_traceability.py` | `7` | Contracts, discrepancy return/replacement/inventory/accounting resolutions, transfers, `?queue=1`, bounds, `AFR`/`BR`/`CFR` edge paths |
+| `modules/psm/tests/test_coverage_and_traceability.py` | `7` | Contracts, discrepancy return/replacement/inventory/accounting resolutions, transfers, `?queue=1`, bounds, SLA/discrepancy indent serialization, `AFR`/`BR`/`CFR` edge paths |
 | `modules/psm/tests/test_domain.py` | `9` | Pure-Python domain rules (0 DB queries): indent, stock, approval, vendor, receipt, 3-way match, payment |
 | `modules/psm/tests/test_journeys.py` | `5` | End-to-end HTTP actor journeys across all 32 live use cases and 11 live workflows |
-| `modules/psm/tests/test_plain_user.py` | `2` | Plain `faculty` and `staff` end-to-end flows with no extra office roles |
+| `modules/psm/tests/test_plain_user.py` | `2` | Plain `faculty` (including draft edit persistence & explicit submit) and `staff` end-to-end flows |
 | `modules/psm/tests/test_privilege_escalation.py` | `22` | 401 unauth, dual 403 gates (`HasModuleGrant` & `HasPermission`), CSRF 403, role switch, permission drift |
-| `modules/psm/tests/test_query_budgets.py` | `17` | Constant SQL query count at N=2 vs. N=12 across all 16 list/singleton GET endpoints + `/dashboard` |
-| `modules/psm/tests/test_schedule.py` | `5` | Celery beat tasks, SLA reminder/escalation idempotency, due report schedules, notification delivery |
+| `modules/psm/tests/test_query_budgets.py` | `18` | Constant SQL query count at N=2 vs. N=12 across all 17 list/singleton GET endpoints + `/dashboard` |
+| `modules/psm/tests/test_schedule.py` | `6` | Celery beat tasks, SLA reminder/escalation idempotency, due report schedules (success & failure logging), notification delivery |
 | `modules/psm/tests/test_scoping_isolation.py` | `3` | Foreign row 404 isolation across employees, departments, reports, and transfers |
 | `modules/psm/tests/test_state_machine.py` | `13` | Exhaustive declarative transition & terminal-state verification across all 6 entity tables |
-| **Total (`modules/psm`)** | **`92`** | **`92 passed`** |
+| **Total (`modules/psm` core)** | **`94`** | **`94 passed` (Student 2 `modules/psm/tests/spec/`: `184 passed, 6 skipped` in 9 files)** |
 
 ### Frontend Vitest Counts (`client/src/` — 19 Files, 87 Tests; 13 PSM Files, 49 PSM Tests)
 
@@ -207,7 +208,7 @@ Required test coverage of 95% reached. Total coverage: 100.00%
 | E2E Spec File | Tests | Scope |
 | --- | --- | --- |
 | `client/e2e/psm/office-pages.spec.ts` | `20` | 10 ungranted-module `student` `Not found` tests + 9 `faculty` office-route `Not available to your role` tests + 1 `Director` `/psm/receipts` `Not available to your role` test |
-| `client/e2e/psm/procurement-flow.spec.ts` | `9` | 9-stage serial end-to-end browser journeys across all 31 actor-triggered use cases + event-triggered `PSM-UC-035` notifications |
+| `client/e2e/psm/procurement-flow.spec.ts` | `9` | 9-stage serial end-to-end browser journeys across all 31 actor-triggered use cases + scheduled report run & event-triggered `PSM-UC-035` notifications |
 | `client/e2e/auth.spec.ts`, `shell.spec.ts`, `placement/companies.spec.ts`, `placement/office-pages.spec.ts` | `9` | Auth/keyboard sign-in, shell navigation, placement regression |
 | **Total (`npx playwright test --workers=1`)** | **`38`** | **`38 passed`** |
 
@@ -225,19 +226,19 @@ Required test coverage of 95% reached. Total coverage: 100.00%
 | `procurement-flow.spec.ts` Block 3 (`deptadmin_cse`) | `PSM-UC-007`, `008`, `009`, `011`, `017`, `021`, `033`, `034` | `BW-PSM-01`, `BW-PSM-08` |
 | `procurement-flow.spec.ts` Block 4 (`HOD (CSE)`) | `PSM-UC-010`, `016` | `BW-PSM-02`, `BW-PSM-03` |
 | `procurement-flow.spec.ts` Block 5 (`ps_admin` & `Director`) | `PSM-UC-012`, `025` | `BW-PSM-03` |
-| `procurement-flow.spec.ts` Block 6 (`ps_admin` procurement & policy) | `PSM-UC-022`, `026`, `027`, `031` | `BW-PSM-05`, `BW-PSM-02` |
+| `procurement-flow.spec.ts` Block 6 (`ps_admin` procurement, scheduled report & policy) | `PSM-UC-022`, `026`, `027`, `031`, `035` | `BW-PSM-05`, `BW-PSM-02`, `BW-PSM-10` |
 | `procurement-flow.spec.ts` Block 7 (GRN, discrepancy & notifications) | `PSM-UC-002`, `020`, `028`, `032`, `035` | `BW-PSM-04`, `BW-PSM-06`, `BW-PSM-10` |
 | `procurement-flow.spec.ts` Block 8 (`Accounts Admin`) | `PSM-UC-013`, `015`, `029` | `CW-PSM-02` |
 | `procurement-flow.spec.ts` Block 9 (`Auditor`) | `PSM-UC-014` | `CW-PSM-01` |
 
-### Query-Count Budgets (`test_query_budgets.py` — 17 Endpoints, N=2 vs. N=12 Rows)
+### Query-Count Budgets (`test_query_budgets.py` — 18 Endpoints, N=2 vs. N=12 Rows)
 
 Measured with `CaptureQueriesContext(connection)` inside a rolled-back transaction after seeding `N=2` and `N=12` complete procurement/stock/finance workflows (`_seed_rows`):
 
 | Endpoint | Queries at N=2 Rows | Queries at N=12 Rows | Delta | Status |
 | --- | --- | --- | --- | --- |
 | `/api/v1/psm/dashboard` | `6` | `6` | `0` | Pass (Constant) |
-| `/api/v1/psm/indents` | `1` | `1` | `0` | Pass (Constant) |
+| `/api/v1/psm/indents` | `2` | `2` | `0` | Pass (Constant) |
 | `/api/v1/psm/stock/items` | `1` | `1` | `0` | Pass (Constant) |
 | `/api/v1/psm/stock/locations` | `1` | `1` | `0` | Pass (Constant) |
 | `/api/v1/psm/stock/availability` | `4` | `4` | `0` | Pass (Constant) |
@@ -250,6 +251,7 @@ Measured with `CaptureQueriesContext(connection)` inside a rolled-back transacti
 | `/api/v1/psm/discrepancies` | `2` | `2` | `0` | Pass (Constant) |
 | `/api/v1/psm/invoices` | `2` | `2` | `0` | Pass (Constant) |
 | `/api/v1/psm/reports/schedules` | `1` | `1` | `0` | Pass (Constant) |
+| `/api/v1/psm/reports/logs` | `1` | `1` | `0` | Pass (Constant) |
 | `/api/v1/psm/audit` | `1` | `1` | `0` | Pass (Constant) |
 | `/api/v1/psm/notifications` | `1` | `1` | `0` | Pass (Constant) |
 | `/api/v1/psm/policy` | `1` | `1` | `0` | Pass (Constant) |
@@ -294,11 +296,11 @@ Both races run against real PostgreSQL with `transaction=True` and `threading.Ba
 ## 6. Security Self-Audit (Step 7.7 — All 10 Items)
 
 1. **Dual 403 Gates (`HasModuleGrant("psm")` + `HasPermission(...)`), no `AllowAny`, no route outside module router:** Verified. All views under `modules/psm/api/urls.py` require both gates (automated scan: `AllowAny/raw/extra/eval/pickle/yaml: []`), tested across all route/method pairs in `test_privilege_escalation.py` (22 cases).
-2. **Explicit serializer fields & server-owned read-only attributes:** Verified. Zero `ModelSerializer` `__all__` or `exclude` usages (`ModelSerializer __all__/exclude: []`); all 432 lines in `modules/psm/api/serializers.py` declare explicit fields with `read_only=True` on server-owned IDs, statuses, versions, timestamps, and ledger totals.
+2. **Explicit serializer fields & server-owned read-only attributes:** Verified. Zero `ModelSerializer` `__all__` or `exclude` usages (`ModelSerializer __all__/exclude: []`); all 656 lines in `modules/psm/api/serializers.py` declare explicit fields with `read_only=True` on server-owned IDs, statuses, versions, timestamps, and ledger totals.
 3. **All reads & FK inputs scoped via `selectors/scoping.py` (404 on foreign rows):** Verified. Every list, detail, and mutation lookup filters through `scoping.*_for(actor)`, returning `404` on foreign records (`test_scoping_isolation.py`).
 4. **Zero unsafe dynamic execution or SQL:** Verified. Zero occurrences of `.raw(`, `.extra(`, `eval(`, `pickle.`, `yaml.load`, or `subprocess` across `modules/psm/`.
 5. **Attachment / document safety:** Verified. Discrepancy evidence uses validated HTTPS Google Drive URLs (`_validate_evidence_url`, `sanitize_drive_filename`), rejecting untrusted hosts/schemes without writing uploaded binaries to server web roots.
-6. **Every write endpoint carries a `throttle_scope`:** Verified. `throttle_scope` appears `42` times across `modules/psm/api/views_*.py`, covering every write view and export endpoint (`test_coverage_and_traceability.py` verifies `429` throttling on `psm_export`).
+6. **Every write endpoint carries a `throttle_scope`:** Verified. `throttle_scope` appears `44` times across `modules/psm/api/views_*.py`, covering every write view and export endpoint (`test_coverage_and_traceability.py` verifies `429` throttling on `psm_export`).
 7. **PII-safe audit & application logging:** Verified. Structured logs (`fusion.psm psm.audit action=... target=... actor=<user_id>`) record numeric IDs and action codes only — zero names, roll numbers, tokens, or raw request payloads.
 8. **Opaque error responses:** Verified. Errors flow through `core/api/exceptions.py` JSON handler (`code`, `message`, `details`, `request_id`), exposing zero stack traces, SQL queries, or filesystem paths.
 9. **Strict auth & CSRF enforcement on cookie writes:** Verified. Zero views weaken `authentication_classes` or `permission_classes`; `test_privilege_escalation.py::test_cookie_write_without_csrf_header_answers_403` proves cookie POSTs without `X-CSRF-Token` answer `403` and succeed once the header is supplied.
@@ -430,8 +432,8 @@ Observed stdout and persisted database row changes:
 1. **`Fusion-client` portal framing (`module-only` environment, Step 6.6):** Because `Fusion-client` is absent from this checkout, portal framing is deferred to `full-platform` integration and the exact `INTEGRATED_MODULES` sidebar snippet is handed over in `docs/09-psm/psm-blueprint.md`.
 2. **External email / SMS gateway delivery (`BR-PSM-006`, `AFR-PSM-086`):** Dev environments do not configure SMTP/SMS relays; `deliver_notifications` marks `PsmNotification` rows `sent` and retains complete communication history.
 3. **External institute general-ledger integration (`AFR-PSM-055`, `PSM-UC-029`):** Because no institute GL module exists in `Fusion-Integrated`, accounting adjustments adjust linked `Invoice.eligible_amount` / hold status and record immutable `PsmAuditLog` + `PaymentRecord` entries inside `psm`.
-4. **Upstream `06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx` read-only status (Approved R3 §5.1):** Kept untouched as read-only spec input; `docs/09-psm/psm-blueprint.md` and `docs/09-psm/psm-reference.md` provide full forward/reverse traceability across all 180 live IDs.
-5. **Event-triggered `PSM-UC-035` browser verification (Approved R3 §5.2):** Verified by running lifecycle notification creation and asserting rendered notifications on `/psm/dashboard` in `procurement-flow.spec.ts` alongside `test_schedule.py` + `deliver_psm_notifications`.
+4. **Upstream `06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx` read-only status (Approved R3 §5.1):** Approved by 24BCS237 (2026-11-23): "Keep 06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx untouched as read-only spec input; docs/09-psm/psm-blueprint.md and docs/09-psm/psm-reference.md serve as the populated traceability matrix."
+5. **Event-triggered `PSM-UC-035` browser verification (Approved R3 §5.2):** Approved by 24BCS237 (2026-11-23): "Verified event-triggered PSM-UC-035 via scheduled report execution, deliver_psm_notifications, and asserting rendered notifications in the UI."
 
 ---
 
@@ -494,3 +496,11 @@ Observed stdout and persisted database row changes:
   - **`R3-05`:** Rebuilt `docs/09-psm/psm-quality-report.md` completely with all 12 Step 7.9 items, both branch coverage runs, per-file test counts, 17-endpoint query budgets, all 10 security self-audit items, throwaway `fusion_integrated_fresh` install proof, complete Step 3.4 + keyboard walkthrough logs, 3 manual scheduled command runs, and Rounds 1–3 scorecards.
   - **`R3-06`:** Collapsed all consecutive multi-line `#` and `//` comments into single-line comments across `modules/psm/`, `client/src/modules/psm/`, `client/e2e/psm/`, and `ops/docs/psm_reference.py`.
   - **`R3-07`:** Updated `docs/09-psm/psm-blueprint.md` route-guard table & `ROLE_GRANTS` listing to match `routes.tsx` (`office("psm.grn.view", <ReceiptsPage />)`) and `registry.py` (`_STAFF_EMPLOYEE`).
+
+### Round Q1 Fixes Summary (Student 1 Scope: `RQ1-01`..`RQ1-03`, `RQ1-11`..`RQ1-13`)
+
+- **`RQ1-01`:** Allowed `services/indents.py::modify_indent` to save `draft` edits while preserving `status="draft"`, added explicit `submit_indent` / `POST /api/v1/psm/indents/{id}/submit` + `Submit draft` UI action on `IndentsPage.tsx`, and added regression tests in `test_plain_user.py`, `test_coverage_and_traceability.py`, and `procurement-flow.spec.ts`.
+- **`RQ1-02`:** Exposed `sla_reminder_active`, `sla_escalation_active`, `has_open_discrepancy` booleans and role-restricted `sla_reminded_at`, `sla_escalated_at`, and `open_discrepancy_cases` on `IndentReadSerializer` (using `Exists` annotation + single batch query), omitted restricted details for unauthorized users, and regenerated `openapi/fusion-integrated.v1.yaml`.
+- **`RQ1-03`:** Wrapped scheduled report execution in a transaction savepoint with exception handling in `services/reports.py` (`_record_schedule_failure` / `_execute_schedule_locked`) so errors never record a `"succeeded"` log and instead persist a `"failed"` `ReportGenerationLog`, audit entry, and failure notification (`test_schedule.py::test_due_schedule_failure_logs_failed_and_never_records_success`).
+- **`RQ1-11`:** Added `POST /api/v1/psm/reports/schedules/{id}/run`, `GET /api/v1/psm/reports/logs`, and `Run now` + `Report Generation Logs` UI on `ReportsPage.tsx`; updated `procurement-flow.spec.ts` Block 6 to execute a scheduled report and assert the persisted log after reload.
+- **`RQ1-12` & `RQ1-13`:** Updated `docs/09-psm/psm-quality-report.md` with measured `lint-imports` (`294 files, 1156 dependencies`), 18-endpoint query budgets, coverage outputs, client/E2E timings, full root `pytest -q --no-cov`, and verbatim dated `24BCS237 (2026-11-23)` approvals; regenerated `docs/09-psm/psm-reference.md`.

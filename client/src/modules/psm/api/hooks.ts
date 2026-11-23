@@ -18,6 +18,7 @@ import type {
   PsmNotification,
   PsmPolicy,
   PurchaseOrder,
+  ReportGenerationLog,
   ReportResult,
   ReportSchedule,
   StockAvailability,
@@ -46,6 +47,7 @@ export const psmKeys = {
   discrepancies: () => [KEY, "discrepancies"] as const,
   invoices: () => [KEY, "invoices"] as const,
   reportSchedules: () => [KEY, "report-schedules"] as const,
+  reportLogs: () => [KEY, "report-logs"] as const,
   audit: (f?: unknown) => [KEY, "audit", f] as const,
   notifications: () => [KEY, "notifications"] as const,
   policy: () => [KEY, "policy"] as const,
@@ -377,6 +379,22 @@ export function useCreateReportSchedule() {
     mutationFn: async (body: Record<string, unknown>) =>
       (await http.post<ReportSchedule>("/psm/reports/schedules", body)).data,
     onSuccess: () => invalidateAll(qc),
+  });
+}
+
+export function useRunReportSchedule() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) =>
+      (await http.post<ReportGenerationLog>(`/psm/reports/schedules/${id}/run`, {})).data,
+    onSuccess: () => invalidateAll(qc),
+  });
+}
+
+export function useReportLogs() {
+  return useQuery({
+    queryKey: psmKeys.reportLogs(),
+    queryFn: async () => (await http.get<Page<ReportGenerationLog>>("/psm/reports/logs")).data,
   });
 }
 

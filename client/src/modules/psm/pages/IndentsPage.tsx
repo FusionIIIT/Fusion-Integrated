@@ -130,6 +130,9 @@ export default function IndentsPage() {
                   {can("psm.procurement.approve") && r.status === "awaiting_final_approval" && (
                     <Button size="xs" onClick={() => runAction(r.id, "final-decision", { decision: "approve" })}>Final approve</Button>
                   )}
+                  {can("psm.indent.create") && r.user_id === session?.user.id && r.status === "draft" && (
+                    <Button size="xs" onClick={() => runAction(r.id, "submit")}>Submit draft</Button>
+                  )}
                   {can("psm.indent.create") && r.user_id === session?.user.id && (
                     <Button size="xs" variant="subtle" onClick={() => runAction(r.id, "repeat")}>Repeat</Button>
                   )}

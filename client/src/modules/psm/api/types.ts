@@ -40,6 +40,17 @@ export interface Indent {
   duplicate_reviewed: boolean;
   version: number;
   submitted_at: string | null;
+  sla_reminder_active?: boolean;
+  sla_escalation_active?: boolean;
+  has_open_discrepancy?: boolean;
+  sla_reminded_at?: string | null;
+  sla_escalated_at?: string | null;
+  open_discrepancy_cases?: Array<{
+    id: number;
+    case_number: string;
+    status: string;
+    discrepancy_type: string;
+  }>;
   rejection_reason: string;
   created_at: string;
 }
@@ -273,6 +284,19 @@ export interface ReportSchedule {
   is_active: boolean;
   last_run_at: string | null;
   next_run_at: string;
+}
+
+export interface ReportGenerationLog {
+  id: number;
+  report_type: string;
+  trigger_type: "interactive" | "scheduled";
+  schedule_id: number | null;
+  schedule_name: string | null;
+  export_format: string;
+  row_count: number;
+  status: "succeeded" | "failed" | "blocked";
+  error_message: string;
+  created_at: string;
 }
 
 export interface AuditLog {

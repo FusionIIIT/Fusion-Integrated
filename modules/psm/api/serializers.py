@@ -57,6 +57,17 @@ class IndentTransitionSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField(read_only=True)
 
 
+_SLA_DETAIL_PERMS = (
+    "psm.indent.review",
+    "psm.indent.approve",
+    "psm.procurement.review",
+    "psm.procurement.approve",
+    "psm.audit.view",
+    "psm.sla.review",
+)
+_DISC_DETAIL_PERMS = ("psm.grn.view", "psm.discrepancy.update", "psm.audit.view")
+
+
 class IndentReadSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     indent_number = serializers.CharField(read_only=True, allow_null=True)
@@ -75,8 +86,38 @@ class IndentReadSerializer(serializers.Serializer):
     duplicate_reviewed = serializers.BooleanField(read_only=True)
     version = serializers.IntegerField(read_only=True)
     submitted_at = serializers.DateTimeField(read_only=True, allow_null=True)
+    sla_reminder_active = serializers.SerializerMethodField()
+    sla_escalation_active = serializers.SerializerMethodField()
+    has_open_discrepancy = serializers.SerializerMethodField()
+    sla_reminded_at = serializers.DateTimeField(read_only=True, allow_null=True, required=False)
+    sla_escalated_at = serializers.DateTimeField(read_only=True, allow_null=True, required=False)
+    open_discrepancy_cases = serializers.SerializerMethodField()
     rejection_reason = serializers.CharField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
+
+    def get_sla_reminder_active(self, obj) -> bool:
+        return obj.sla_reminded_at is not None
+
+    def get_sla_escalation_active(self, obj) -> bool:
+        return obj.sla_escalated_at is not None
+
+    def get_has_open_discrepancy(self, obj) -> bool:
+        if hasattr(obj, "has_open_discrepancy"):
+            return bool(obj.has_open_discrepancy)
+        return bool(self.context.get("open_discrepancies_by_indent", {}).get(obj.pk))
+
+    def get_open_discrepancy_cases(self, obj) -> list[dict]:
+        return list(self.context.get("open_discrepancies_by_indent", {}).get(obj.pk, []))
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        actor = self.context.get("actor")
+        if not (actor and any(actor.has_permission(p) for p in _SLA_DETAIL_PERMS)):
+            data.pop("sla_reminded_at", None)
+            data.pop("sla_escalated_at", None)
+        if not (actor and any(actor.has_permission(p) for p in _DISC_DETAIL_PERMS)):
+            data.pop("open_discrepancy_cases", None)
+        return data
 
 
 class IndentDetailSerializer(IndentReadSerializer):
@@ -561,6 +602,22 @@ class ReportScheduleCreateSerializer(serializers.Serializer):
 class ReportSchedulePatchSerializer(serializers.Serializer):
     is_active = serializers.BooleanField(required=False)
     cadence = serializers.ChoiceField(choices=["daily", "weekly", "monthly"], required=False)
+
+
+class ReportGenerationLogSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    report_type = serializers.CharField(read_only=True)
+    trigger_type = serializers.CharField(read_only=True)
+    schedule_id = serializers.IntegerField(read_only=True, allow_null=True)
+    schedule_name = serializers.SerializerMethodField()
+    export_format = serializers.CharField(read_only=True)
+    row_count = serializers.IntegerField(read_only=True)
+    status = serializers.CharField(read_only=True)
+    error_message = serializers.CharField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+
+    def get_schedule_name(self, obj) -> str | None:
+        return obj.schedule.name if obj.schedule else None
 
 
 class AuditLogSerializer(serializers.Serializer):

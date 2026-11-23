@@ -239,7 +239,7 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
       await page.reload();
       await expect(page.getByRole("row").filter({ hasText: withdrawDesc }).first()).toContainText("v2");
 
-      // PSM-UC-024: Repeat / Duplicate a Previous Indent via UI button.
+      // PSM-UC-024: Repeat Previous Indent as Draft, edit draft in place (RQ1-01), then submit draft.
       const repeated = page.waitForResponse(
         (r) => r.url().includes("/repeat") && r.request().method() === "POST",
       );
@@ -248,11 +248,38 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
       await page.reload();
       await expect(page.getByRole("row").filter({ hasText: withdrawDesc })).toHaveCount(2);
 
+      const draftRow = page.getByRole("row").filter({ hasText: withdrawDesc }).filter({ hasText: "draft" });
+      const draftModified = page.waitForResponse(
+        (r) => r.url().includes("/api/v1/psm/indents/") && r.request().method() === "PATCH",
+      );
+      await draftRow.getByRole("button", { name: "Modify" }).click();
+      expect((await draftModified).status()).toBe(200);
+      await page.reload();
+      await expect(
+        page.getByRole("row").filter({ hasText: withdrawDesc }).filter({ hasText: "draft" }),
+      ).toContainText("v2");
+
+      const draftSubmitted = page.waitForResponse(
+        (r) => r.url().includes("/submit") && r.request().method() === "POST",
+      );
+      await page
+        .getByRole("row")
+        .filter({ hasText: withdrawDesc })
+        .filter({ hasText: "draft" })
+        .getByRole("button", { name: "Submit draft" })
+        .click();
+      expect((await draftSubmitted).status()).toBe(200);
+      await page.reload();
+      await expect(
+        page.getByRole("row").filter({ hasText: withdrawDesc }).filter({ hasText: "submitted" }),
+      ).toHaveCount(2);
+
       // PSM-UC-005: Withdraw or Cancel Pending Indent via UI button.
       const submittedRow = page
         .getByRole("row")
         .filter({ hasText: withdrawDesc })
-        .filter({ hasText: "submitted" });
+        .filter({ hasText: "submitted" })
+        .first();
       const withdrawn = page.waitForResponse(
         (r) => r.url().includes("/withdraw") && r.request().method() === "POST",
       );
@@ -596,7 +623,7 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
         "in_transit",
       );
 
-      // PSM-UC-031: Configure and Receive Scheduled Reports on /psm/reports.
+      // PSM-UC-031 & PSM-UC-035: Configure and Execute Scheduled Report on /psm/reports.
       await sidebar(page).getByRole("link", { name: "Reports", exact: true }).click();
       await page.getByRole("button", { name: "Schedule report" }).click();
       const sDialog = page.getByRole("dialog");
@@ -608,7 +635,19 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
       expect((await sCreated).status()).toBe(201);
       await expect(sDialog).toBeHidden();
       await page.reload();
-      await expect(page.getByRole("row").filter({ hasText: scheduleName })).toContainText("Active");
+      const schedRow = page.getByRole("row").filter({ hasText: scheduleName });
+      await expect(schedRow).toContainText("Active");
+
+      const schedRun = page.waitForResponse(
+        (r) => r.url().includes("/reports/schedules/") && r.url().includes("/run") && r.request().method() === "POST",
+      );
+      await schedRow.getByRole("button", { name: "Run now" }).click();
+      expect((await schedRun).status()).toBe(200);
+      await page.reload();
+      await expect(page.getByRole("heading", { name: "Report Generation Logs" })).toBeVisible();
+      const logRow = page.getByRole("row").filter({ hasText: scheduleName }).filter({ hasText: "scheduled" });
+      await expect(logRow).toContainText("succeeded");
+      await expect(page.getByRole("row").filter({ hasText: scheduleName }).filter({ hasText: "Active" })).not.toContainText("—");
 
       // Publish new policy version on /psm/policy (BR-PSM-028).
       await sidebar(page).getByRole("link", { name: "Policy", exact: true }).click();

@@ -13,7 +13,7 @@ from modules.psm import registry
 from modules.psm.models import ReportGenerationLog, ReportSchedule
 from modules.psm.selectors import reports as report_sel
 from modules.psm.selectors import scoping
-from modules.psm.services.common import audit_record
+from modules.psm.services.common import audit_record, enqueue_notification
 
 VALID_REPORT_TYPES = frozenset({"operational", "procurement", "stock", "financial"})
 VALID_CADENCES = {
@@ -22,6 +22,7 @@ VALID_CADENCES = {
     "monthly": timedelta(days=30),
 }
 _FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+_REPORT_RUN_ERRORS = (Exception,)
 
 
 def _escape_csv_cell(value) -> str:
@@ -161,46 +162,115 @@ class _ScheduledActor:
         return code in self._perms
 
 
-def _execute_one_schedule(pk: int, now) -> int:
-    """Execute a single due report schedule under lock and log its outcome."""
-    with transaction.atomic():
-        sched = ReportSchedule.objects.select_for_update().get(pk=pk)
-        if not sched.is_active or sched.next_run_at > now:
-            return 0
-        actor = _ScheduledActor(sched.created_by_user_id, sched.created_by_role)
-        needed = (
-            "psm.financial_report.view" if sched.report_type == "financial" else "psm.report.view"
-        )
-        if not actor.has_permission(needed):
-            ReportGenerationLog.objects.create(
-                report_type=sched.report_type,
-                trigger_type="scheduled",
-                schedule=sched,
-                filters=sched.filters,
-                status="blocked",
-                actor_user_id=sched.created_by_user_id,
-                error_message=f"Role '{sched.created_by_role}' no longer holds {needed}.",
-            )
-            sched.is_active = False
-            sched.save(update_fields=["is_active", "updated_at"])
-            return 0
-        _, rows = report_sel.build_report_rows(
-            actor, report_type=sched.report_type, filters=sched.filters
-        )
-        ReportGenerationLog.objects.create(
+def _record_schedule_failure(sched: ReportSchedule, now, exc: Exception) -> ReportGenerationLog:
+    """Persist an auditable failure log and notification when scheduled generation fails."""
+    err_text = str(exc).strip()[:500] or exc.__class__.__name__
+    log_row = ReportGenerationLog.objects.create(
+        report_type=sched.report_type,
+        trigger_type="scheduled",
+        schedule=sched,
+        filters=sched.filters,
+        export_format="json",
+        row_count=0,
+        status="failed",
+        actor_user_id=sched.created_by_user_id,
+        error_message=err_text,
+    )
+    audit_record(
+        actor=None,
+        action="report.schedule_failed",
+        target_type="report_schedule",
+        target_id=sched.pk,
+        details={"report_type": sched.report_type, "log_id": log_row.pk, "error": err_text[:200]},
+    )
+    enqueue_notification(
+        topic="report.schedule_failed",
+        dedupe_key=f"report.failed:{sched.pk}:{log_row.pk}",
+        recipient_user_id=sched.created_by_user_id,
+        subject=f"Scheduled report '{sched.name}' failed",
+        body=f"Scheduled {sched.report_type} report failed: {err_text[:200]}",
+        payload={"schedule_id": sched.pk, "log_id": log_row.pk, "at": now.isoformat()},
+    )
+    return log_row
+
+
+def _execute_schedule_locked(
+    sched: ReportSchedule, now, *, forced: bool = False
+) -> ReportGenerationLog | None:
+    """Execute one locked report schedule, recording blocked, failed, or succeeded logs."""
+    if not sched.is_active or (not forced and sched.next_run_at > now):
+        return None
+    actor = _ScheduledActor(sched.created_by_user_id, sched.created_by_role)
+    needed = "psm.financial_report.view" if sched.report_type == "financial" else "psm.report.view"
+    if not actor.has_permission(needed):
+        sched.is_active = False
+        sched.save(update_fields=["is_active", "updated_at"])
+        return ReportGenerationLog.objects.create(
             report_type=sched.report_type,
             trigger_type="scheduled",
             schedule=sched,
             filters=sched.filters,
-            export_format="json",
-            row_count=len(rows),
-            status="succeeded",
+            status="blocked",
             actor_user_id=sched.created_by_user_id,
+            error_message=f"Role '{sched.created_by_role}' no longer holds {needed}.",
         )
-        sched.last_run_at = now
-        sched.next_run_at = now + VALID_CADENCES.get(sched.cadence, timedelta(days=1))
-        sched.save(update_fields=["last_run_at", "next_run_at", "updated_at"])
-        return 1
+    try:
+        # Isolate report query failures in a savepoint so the failure log commits safely.
+        with transaction.atomic():
+            _, rows = report_sel.build_report_rows(
+                actor, report_type=sched.report_type, filters=sched.filters
+            )
+    except _REPORT_RUN_ERRORS as exc:
+        return _record_schedule_failure(sched, now, exc)
+    log_row = ReportGenerationLog.objects.create(
+        report_type=sched.report_type,
+        trigger_type="scheduled",
+        schedule=sched,
+        filters=sched.filters,
+        export_format="json",
+        row_count=len(rows),
+        status="succeeded",
+        actor_user_id=sched.created_by_user_id,
+    )
+    sched.last_run_at = now
+    sched.next_run_at = now + VALID_CADENCES.get(sched.cadence, timedelta(days=1))
+    sched.save(update_fields=["last_run_at", "next_run_at", "updated_at"])
+    audit_record(
+        actor=None,
+        action="report.scheduled",
+        target_type="report_log",
+        target_id=log_row.pk,
+        details={"schedule_id": sched.pk, "report_type": sched.report_type, "rows": len(rows)},
+    )
+    return log_row
+
+
+def _execute_one_schedule(pk: int, now) -> int:
+    """Execute a single due report schedule under lock and return 1 only on success."""
+    with transaction.atomic():
+        sched = ReportSchedule.objects.select_for_update().get(pk=pk)
+        log_row = _execute_schedule_locked(sched, now, forced=False)
+        return 1 if log_row is not None and log_row.status == "succeeded" else 0
+
+
+def run_schedule_now(*, actor, schedule_id: int) -> ReportGenerationLog:
+    """Trigger an active visible report schedule immediately (PSM-UC-031, PSM-UC-035)."""
+    with transaction.atomic():
+        sched = (
+            scoping.report_schedules_for(actor).select_for_update().filter(pk=schedule_id).first()
+        )
+        if sched is None:
+            raise NotFoundError("Report schedule not found.")
+        _require_report_permission(actor, sched.report_type)
+        if not sched.is_active:
+            raise DomainError(
+                "Enable this report schedule before running it.", code="schedule_paused"
+            )
+        log_row = _execute_schedule_locked(sched, timezone.now(), forced=True)
+    if log_row is None or log_row.status != "succeeded":
+        msg = log_row.error_message if log_row else "Scheduled report could not be executed."
+        raise DomainError(msg, code="scheduled_report_failed")
+    return log_row
 
 
 def run_due_schedules(*, now=None) -> int:
