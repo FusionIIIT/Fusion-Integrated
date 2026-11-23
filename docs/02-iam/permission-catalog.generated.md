@@ -13,6 +13,40 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `patents`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `patents.application.create` | Submit a new patent application | `faculty`, `staff`, `student` |
+| `patents.application.view_self` | View one's own patent applications and reports | `faculty`, `staff`, `student` |
+| `patents.application.view` | View patent applications within authorized scope | `Director`, `attorney`, `pcc_admin` |
+| `patents.application.update` | Revise and update an application | `faculty`, `staff`, `student` |
+| `patents.application.withdraw` | Withdraw an application before filing | `faculty`, `staff`, `student` |
+| `patents.application.assign_director` | Assign submitted application to Director | `pcc_admin` |
+| `patents.application.review` | Review technical merit and decide application | `Director` |
+| `patents.application.appeal` | File an appeal against a rejection | `faculty`, `staff`, `student` |
+| `patents.application.decide_appeal` | Adjudicate an appeal | `Director` |
+| `patents.attorney.assign` | Assign attorney to approved application | `pcc_admin` |
+| `patents.attorney.respond_assignment` | Accept or decline attorney assignment | `attorney` |
+| `patents.assessment.perform` | Conduct patentability and prior-art assessment | `attorney` |
+| `patents.filing.record` | Record external patent office filing details | `attorney` |
+| `patents.office_action.record` | Record external office actions | `attorney` |
+| `patents.office_action.respond` | Prepare and submit office action responses | `attorney` |
+| `patents.office_action.approve` | Review and approve office action response | `faculty`, `staff`, `student` |
+| `patents.budget.approve` | Review and approve patent filing and prosecution budgets | `Director` |
+| `patents.budget.view` | View patent budget and expenditure records | `Director`, `pcc_admin` |
+| `patents.maintenance.track` | Track post-grant maintenance schedules and fees | `attorney` |
+| `patents.maintenance.decide` | Make patent maintenance renewal decisions | `Director` |
+| `patents.tech_transfer.create` | Submit technology transfer or licensing request | `faculty`, `staff`, `student` |
+| `patents.tech_transfer.review` | Review technology transfer agreements | `Director` |
+| `patents.prior_art.search` | Search and attach prior-art references | `attorney`, `faculty`, `staff`, `student` |
+| `patents.panel.manage` | Manage attorney panel roster and expertise mappings | `pcc_admin` |
+| `patents.workflow.handle_exceptions` | Handle and route escalated and exceptional cases | `pcc_admin` |
+| `patents.audit.view` | View audit trail and compliance logs | `pcc_admin` |
+| `patents.report.view` | Generate and view reports and analytics | `Director`, `pcc_admin` |
+| `patents.application.expire` | System revision expiration | _service only_ |
+| `patents.maintenance.sweep` | System maintenance deadline sweep | _service only_ |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |

@@ -1,0 +1,245 @@
+[
+  {
+    "test_id": "WF-T001",
+    "source_id": "BW-PMS-01 initial review approval path",
+    "purpose": "Exercise the full successful path Draft/Not Submitted -> Submitted -> Under Review -> Approved.",
+    "preconditions": "Applicant, PCC_ADMIN and an eligible Director (matching expertise, not listed as an inventor) exist; application is not yet submitted.",
+    "action_or_input": "1) Applicant submits application with title, abstract, detailed description, claims, inventor information and a malware-free PDF under 50 MB. 2) PCC_ADMIN assigns the application to the eligible Director. 3) Director, within 15 business days of assignment, records decision Approve with a justification of at least 50 characters.",
+    "expected_result": "After step 1 the application has a unique application ID and status Submitted; after step 2 status is Under Review and the Director is notified; after step 3 status is Approved; each status change is audit-logged with previous and new state.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T002",
+    "source_id": "BW-PMS-01 row 3 guard-false (justification < 50 characters)",
+    "purpose": "Verify the Under Review -> Approved transition is blocked when the justification guard fails.",
+    "preconditions": "Application in status Under Review assigned to an eligible Director within the review period.",
+    "action_or_input": "Director records decision Approve with a 20-character justification.",
+    "expected_result": "Decision is rejected with a validation error; application remains Under Review; no Approved status is recorded.",
+    "test_type": "workflow-guard-negative"
+  },
+  {
+    "test_id": "WF-T003",
+    "source_id": "BW-PMS-02 revision and re-approval path",
+    "purpose": "Exercise one revision loop: Under Review -> Needs Revision -> Resubmitted -> Under Review -> Approved.",
+    "preconditions": "Application in status Under Review assigned to an eligible Director.",
+    "action_or_input": "1) Director records Needs Revision with justification of at least 50 characters. 2) Applicant, within 60 days of that decision, revises the application addressing the Director feedback and resubmits. 3) PCC_ADMIN assigns/reassigns to an eligible Director. 4) Director records Approve with valid justification.",
+    "expected_result": "Statuses progress Needs Revision -> Resubmitted -> Under Review -> Approved; Applicant receives feedback after step 1; a new application version is retained after step 2 and a new review cycle starts after step 3.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T004",
+    "source_id": "BW-PMS-02 row 2 guard-false (resubmission after 60 days)",
+    "purpose": "Verify Needs Revision -> Resubmitted is blocked when the 60-day resubmission guard fails.",
+    "preconditions": "Application in status Needs Revision whose revision decision date is more than 60 days in the past.",
+    "action_or_input": "Applicant attempts to resubmit a revised application.",
+    "expected_result": "Resubmission is refused; application does not reach Resubmitted (it is not returned to review).",
+    "test_type": "workflow-guard-negative"
+  },
+  {
+    "test_id": "WF-T005",
+    "source_id": "BW-PMS-03 appeal remand path",
+    "purpose": "Exercise Under Review -> Rejected -> Appeal Submitted -> Remanded for Amendment.",
+    "preconditions": "Application in status Under Review assigned to an eligible Director; appeal period configured.",
+    "action_or_input": "1) Director records Reject with justification of at least 50 characters. 2) Applicant files an appeal within the allowed period with grounds and justification. 3) Director reviews the appeal and selects Remand for Amendment.",
+    "expected_result": "Statuses progress Rejected -> Appeal Submitted -> Remanded for Amendment; Applicant receives rejection feedback; the appeal outcome is recorded.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T006",
+    "source_id": "BW-PMS-04 appeal rejection-upheld path",
+    "purpose": "Exercise the appeal outcome Uphold Rejection.",
+    "preconditions": "Application in status Rejected with an appeal filed within the allowed period with grounds (status Appeal Submitted).",
+    "action_or_input": "Director reviews the appeal and selects Uphold Rejection.",
+    "expected_result": "Application status becomes Rejection Upheld and the appeal outcome is recorded.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T007",
+    "source_id": "BW-PMS-05 appeal modified-decision path",
+    "purpose": "Exercise the appeal outcome Modify Decision.",
+    "preconditions": "Application in status Rejected with an appeal filed within the allowed period with grounds (status Appeal Submitted).",
+    "action_or_input": "Director reviews the appeal and selects Modify Decision.",
+    "expected_result": "Application status becomes Decision Modified and the appeal outcome is recorded.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T008",
+    "source_id": "BW-PMS-06 attorney assignment acceptance path",
+    "purpose": "Exercise Approved -> Assignment Offered -> Attorney Assigned.",
+    "preconditions": "Application in status Approved; an approved-panel Attorney with matching expertise and no conflict of interest exists.",
+    "action_or_input": "1) PCC_ADMIN assigns the Attorney to the application. 2) Attorney accepts the assignment.",
+    "expected_result": "After step 1 the assignment is offered to the Attorney and the Attorney is notified; after step 2 application status is Attorney Assigned.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T009",
+    "source_id": "BW-PMS-07 decline-reassign-accept path",
+    "purpose": "Exercise one decline/reassignment loop: Assignment Offered -> Pending Review -> Assignment Offered -> Attorney Assigned.",
+    "preconditions": "Application in status Approved; two distinct eligible approved-panel Attorneys A and B exist.",
+    "action_or_input": "1) PCC_ADMIN assigns Attorney A. 2) Attorney A declines. 3) PCC_ADMIN reassigns to Attorney B. 4) Attorney B accepts.",
+    "expected_result": "After step 2 status is Pending Review; after step 3 the assignment is offered to Attorney B; after step 4 status is Attorney Assigned with Attorney B as the assigned Attorney.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T010",
+    "source_id": "BW-PMS-08 budget approval path",
+    "purpose": "Exercise Approved -> Budget Approved for a within-threshold budget.",
+    "preconditions": "Application in status Approved; budget with filing, attorney and administrative fees totalling below the configured threshold; budget available.",
+    "action_or_input": "Director reviews the budget and records Approve.",
+    "expected_result": "Budget outcome Budget Approved is recorded; financial transaction record and authorization level are logged; budget approval notification is issued.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T011",
+    "source_id": "BW-PMS-09 budget rejection path",
+    "purpose": "Exercise Approved -> Budget Rejected.",
+    "preconditions": "Application in status Approved with a budget submitted for review.",
+    "action_or_input": "Director reviews the budget and records Reject.",
+    "expected_result": "Budget outcome Budget Rejected is recorded with no further escalation; budget rejection notification is issued.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T012",
+    "source_id": "BW-PMS-10 budget escalation path",
+    "purpose": "Exercise Approved -> Escalated -> Escalation Tracked / External Decision Pending.",
+    "preconditions": "Application in status Approved; budget total cost exceeds the configured threshold.",
+    "action_or_input": "1) Director reviews the budget. 2) PCC_ADMIN handles/routes the escalated case within PMS scope.",
+    "expected_result": "After step 1 the budget is Escalated (not Budget Approved); after step 2 the case is recorded as Escalation Tracked / External Decision Pending; no PMS-internal higher-authority decision is recorded.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T013",
+    "source_id": "BW-PMS-11 external filing path (international filing with justification)",
+    "purpose": "Exercise Pre-Filing Preconditions Satisfied -> Filed, including the international-justification condition.",
+    "preconditions": "Application is Approved with Attorney Assigned, Budget Approved and all inventor agreements completed.",
+    "action_or_input": "Attorney records an international filing with additional justification, external filing ID, filing date and confirmation details.",
+    "expected_result": "Application status becomes Filed; external filing ID, filing date, confirmation and justification are stored; filing confirmation notification is issued.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T014",
+    "source_id": "BW-PMS-11 guard-false (inventor agreements incomplete)",
+    "purpose": "Verify filing is blocked when a stated filing prerequisite is not satisfied.",
+    "preconditions": "Application is Approved with Attorney Assigned and Budget Approved, but at least one inventor agreement is not completed.",
+    "action_or_input": "Attorney attempts to record the external filing.",
+    "expected_result": "Filing is refused; application status does not become Filed.",
+    "test_type": "workflow-guard-negative"
+  },
+  {
+    "test_id": "WF-T015",
+    "source_id": "BW-PMS-12 office-action response with Applicant review path",
+    "purpose": "Exercise Filed -> Office Action Recorded -> Awaiting Applicant Approval -> Applicant Approved -> Response Submitted.",
+    "preconditions": "Application in status Filed with an assigned Attorney; process requires Applicant review; response deadline is in the future.",
+    "action_or_input": "1) Attorney records an office action. 2) Attorney prepares a draft response. 3) Applicant approves the response. 4) Attorney finalizes and records submission before the deadline.",
+    "expected_result": "States progress Office Action Recorded -> Awaiting Applicant Approval -> Applicant Approved -> Response Submitted; office-action notification is issued and response submission is tracked.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T016",
+    "source_id": "BW-PMS-13 office-action response without Applicant review path",
+    "purpose": "Exercise Filed -> Office Action Recorded -> Response Ready -> Response Submitted.",
+    "preconditions": "Application in status Filed with an assigned Attorney; process does not require Applicant review; response deadline is in the future.",
+    "action_or_input": "1) Attorney records an office action. 2) Attorney finalizes the draft response. 3) Attorney records submission before the deadline.",
+    "expected_result": "States progress Office Action Recorded -> Response Ready -> Response Submitted without any Awaiting Applicant Approval state.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T017",
+    "source_id": "BW-PMS-14 maintenance renewal path",
+    "purpose": "Exercise Granted -> Renewal Decision Requested -> Renewal Approved -> Renewed / Next Cycle Scheduled.",
+    "preconditions": "Patent in status Granted with a maintenance deadline due; assigned Attorney and Director exist.",
+    "action_or_input": "1) Attorney requests a renewal decision. 2) Director decides Renew. 3) Attorney records the maintenance action.",
+    "expected_result": "States progress Renewal Decision Requested -> Renewal Approved -> Renewed / Next Cycle Scheduled; renewal history entry exists and the next maintenance cycle is scheduled.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T018",
+    "source_id": "BW-PMS-15 maintenance non-renewal path",
+    "purpose": "Exercise Granted -> Renewal Decision Requested -> Do Not Renew.",
+    "preconditions": "Patent in status Granted with a maintenance deadline due.",
+    "action_or_input": "1) Attorney requests a renewal decision. 2) Director decides Do Not Renew.",
+    "expected_result": "Outcome Do Not Renew is recorded in renewal history; no maintenance action is recorded and no next cycle is scheduled.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T019",
+    "source_id": "BW-PMS-16 withdrawal path (Submitted origin; CW-PMS-05 row 1)",
+    "purpose": "Exercise the generic pre-filing withdrawal transition with reason and co-inventor consent.",
+    "preconditions": "Application in status Submitted (configured withdrawal-eligible); co-inventor consent required and provided.",
+    "action_or_input": "Applicant withdraws the application providing a withdrawal reason.",
+    "expected_result": "Application status becomes Withdrawn; it is removed from the active queue; reason and co-inventor consent are stored in withdrawal history; action is audit-logged.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T020",
+    "source_id": "BW-PMS-16 guard-false (application already Filed)",
+    "purpose": "Verify withdrawal is blocked after the filing stage.",
+    "preconditions": "Application in status Filed.",
+    "action_or_input": "Applicant attempts to withdraw the application with a reason.",
+    "expected_result": "Withdrawal is refused; application status remains Filed.",
+    "test_type": "workflow-guard-negative"
+  },
+  {
+    "test_id": "WF-T021",
+    "source_id": "CW-PMS-05 row 2 (Under Review -> Withdrawn)",
+    "purpose": "Exercise the withdrawal transition from candidate origin state Under Review.",
+    "preconditions": "Application in status Under Review, not yet filed, and Under Review configured as withdrawal-eligible.",
+    "action_or_input": "Applicant withdraws the application providing a withdrawal reason.",
+    "expected_result": "Application status becomes Withdrawn and is removed from the active queue; withdrawal history records the previous state Under Review.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T022",
+    "source_id": "CW-PMS-05 row 3 (Needs Revision -> Withdrawn)",
+    "purpose": "Exercise the withdrawal transition from candidate origin state Needs Revision.",
+    "preconditions": "Application in status Needs Revision, not yet filed, and Needs Revision configured as withdrawal-eligible.",
+    "action_or_input": "Applicant withdraws the application providing a withdrawal reason.",
+    "expected_result": "Application status becomes Withdrawn and is removed from the active queue; withdrawal history records the previous state Needs Revision.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T023",
+    "source_id": "CW-PMS-05 row 4 (Rejected -> Withdrawn)",
+    "purpose": "Exercise the withdrawal transition from candidate origin state Rejected.",
+    "preconditions": "Application in status Rejected, not yet filed, and Rejected configured as withdrawal-eligible.",
+    "action_or_input": "Applicant withdraws the application providing a withdrawal reason.",
+    "expected_result": "Application status becomes Withdrawn and is removed from the active queue; withdrawal history records the previous state Rejected.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T024",
+    "source_id": "CW-PMS-05 row 5 (Approved -> Withdrawn)",
+    "purpose": "Exercise the withdrawal transition from candidate origin state Approved.",
+    "preconditions": "Application in status Approved, not yet filed, and Approved configured as withdrawal-eligible.",
+    "action_or_input": "Applicant withdraws the application providing a withdrawal reason.",
+    "expected_result": "Application status becomes Withdrawn and is removed from the active queue; withdrawal history records the previous state Approved.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T025",
+    "source_id": "CW-PMS-05 row 6 (Attorney Assigned -> Withdrawn)",
+    "purpose": "Exercise the withdrawal transition from candidate origin state Attorney Assigned.",
+    "preconditions": "Application in status Attorney Assigned, not yet filed, and Attorney Assigned configured as withdrawal-eligible.",
+    "action_or_input": "Applicant withdraws the application providing a withdrawal reason.",
+    "expected_result": "Application status becomes Withdrawn and is removed from the active queue; withdrawal history records the previous state Attorney Assigned.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T026",
+    "source_id": "CW-PMS-05 row 7 (Pending Review -> Withdrawn)",
+    "purpose": "Exercise the withdrawal transition from candidate origin state Pending Review.",
+    "preconditions": "Application in status Pending Review, not yet filed, and Pending Review configured as withdrawal-eligible.",
+    "action_or_input": "Applicant withdraws the application providing a withdrawal reason.",
+    "expected_result": "Application status becomes Withdrawn and is removed from the active queue; withdrawal history records the previous state Pending Review.",
+    "test_type": "workflow-path"
+  },
+  {
+    "test_id": "WF-T027",
+    "source_id": "CW-PMS-02 row 9 integrated pre-filing governance to filing",
+    "purpose": "Verify the composite pre-filing branches (attorney acceptance and budget approval) jointly enable filing.",
+    "preconditions": "Application in status Approved; eligible Attorney; within-threshold available budget; inventor agreements completed.",
+    "action_or_input": "1) PCC_ADMIN assigns Attorney and Attorney accepts. 2) Director approves the budget. 3) Attorney records domestic (Indian Patent Office) filing with filing ID, date and confirmation.",
+    "expected_result": "Attorney Assigned and Budget Approved are both recorded; filing is accepted and application status becomes Filed.",
+    "test_type": "workflow-path"
+  }
+]

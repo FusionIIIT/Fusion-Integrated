@@ -1,0 +1,1 @@
+"""Patents management commands package."""

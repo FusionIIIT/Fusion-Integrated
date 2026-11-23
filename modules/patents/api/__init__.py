@@ -1,0 +1,1 @@
+"""Patents API package."""

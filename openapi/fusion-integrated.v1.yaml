@@ -105,6 +105,904 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/patents/applications:
+    get:
+      operationId: v1_patents_applications_list
+      description: GET /api/v1/patents/applications | POST /api/v1/patents/applications
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPatentApplicationSummaryList'
+          description: ''
+    post:
+      operationId: v1_patents_applications_create
+      description: GET /api/v1/patents/applications | POST /api/v1/patents/applications
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateApplication'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}:
+    get:
+      operationId: v1_patents_applications_retrieve
+      description: GET /api/v1/patents/applications/<pk> | PUT /api/v1/patents/applications/<pk>
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+    put:
+      operationId: v1_patents_applications_update
+      description: GET /api/v1/patents/applications/<pk> | PUT /api/v1/patents/applications/<pk>
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatentApplicationDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatentApplicationDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatentApplicationDetail'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+    patch:
+      operationId: v1_patents_applications_partial_update
+      description: GET /api/v1/patents/applications/<pk> | PUT /api/v1/patents/applications/<pk>
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPatentApplicationDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPatentApplicationDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPatentApplicationDetail'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}/appeal:
+    post:
+      operationId: v1_patents_applications_appeal_create
+      description: POST /api/v1/patents/applications/<pk>/appeal
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppealInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AppealInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppealInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppealRecord'
+          description: ''
+  /api/v1/patents/applications/{id}/appeal-decision:
+    post:
+      operationId: v1_patents_applications_appeal_decision_create
+      description: POST /api/v1/patents/applications/<pk>/appeal-decision
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppealDecisionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AppealDecisionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AppealDecisionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppealRecord'
+          description: ''
+  /api/v1/patents/applications/{id}/assessment:
+    post:
+      operationId: v1_patents_applications_assessment_create
+      description: POST /api/v1/patents/applications/<pk>/assessment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssessmentInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssessmentInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssessmentInput'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}/assign-attorney:
+    post:
+      operationId: v1_patents_applications_assign_attorney_create
+      description: POST /api/v1/patents/applications/<pk>/assign-attorney
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignAttorney'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssignAttorney'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssignAttorney'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}/assign-director:
+    post:
+      operationId: v1_patents_applications_assign_director_create
+      description: POST /api/v1/patents/applications/<pk>/assign-director
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignDirector'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AssignDirector'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssignDirector'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}/budget-decision:
+    post:
+      operationId: v1_patents_applications_budget_decision_create
+      description: POST /api/v1/patents/applications/<pk>/budget-decision
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetDecisionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BudgetDecisionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BudgetDecisionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentBudgetLedger'
+          description: ''
+  /api/v1/patents/applications/{id}/budget-escalation:
+    post:
+      operationId: v1_patents_applications_budget_escalation_create
+      description: POST /api/v1/patents/applications/<pk>/budget-escalation
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalationTrackInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EscalationTrackInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EscalationTrackInput'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentBudgetLedger'
+          description: ''
+  /api/v1/patents/applications/{id}/co-inventors/{ci_pk}/consent-token:
+    post:
+      operationId: v1_patents_applications_co_inventors_consent_token_create
+      description: POST /api/v1/patents/applications/<pk>/co-inventors/<ci_pk>/consent-token.
+      parameters:
+      - in: path
+        name: ci_pk
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentTokenIssued'
+          description: ''
+  /api/v1/patents/applications/{id}/consent:
+    post:
+      operationId: v1_patents_applications_consent_create
+      description: POST /api/v1/patents/applications/<pk>/consent
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentResponse'
+          description: ''
+  /api/v1/patents/applications/{id}/documents:
+    post:
+      operationId: v1_patents_applications_documents_create
+      description: POST /api/v1/patents/applications/<pk>/documents
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUploadInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DocumentUploadInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DocumentUploadInput'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationDocument'
+          description: ''
+  /api/v1/patents/applications/{id}/filing:
+    post:
+      operationId: v1_patents_applications_filing_create
+      description: POST /api/v1/patents/applications/<pk>/filing
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FilingInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FilingInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FilingInput'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}/maintenance-action:
+    post:
+      operationId: v1_patents_applications_maintenance_action_create
+      description: POST /api/v1/patents/applications/<pk>/maintenance-action
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceActionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MaintenanceActionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MaintenanceActionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}/office-actions:
+    post:
+      operationId: v1_patents_applications_office_actions_create
+      description: POST /api/v1/patents/applications/<pk>/office-actions
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfficeActionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfficeActionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfficeActionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficeActionRecord'
+          description: ''
+  /api/v1/patents/applications/{id}/renewal-decision:
+    post:
+      operationId: v1_patents_applications_renewal_decision_create
+      description: POST /api/v1/patents/applications/<pk>/renewal-decision
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewalDecisionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RenewalDecisionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RenewalDecisionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}/renewal-request:
+    post:
+      operationId: v1_patents_applications_renewal_request_create
+      description: POST /api/v1/patents/applications/<pk>/renewal-request
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewalRequestInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RenewalRequestInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RenewalRequestInput'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}/respond-assignment:
+    post:
+      operationId: v1_patents_applications_respond_assignment_create
+      description: POST /api/v1/patents/applications/<pk>/respond-assignment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RespondAssignmentInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RespondAssignmentInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RespondAssignmentInput'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/applications/{id}/review-decision:
+    post:
+      operationId: v1_patents_applications_review_decision_create
+      description: POST /api/v1/patents/applications/<pk>/review-decision
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewDecisionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewDecisionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewDecisionInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewDecision'
+          description: ''
+  /api/v1/patents/applications/{id}/withdraw:
+    post:
+      operationId: v1_patents_applications_withdraw_create
+      description: POST /api/v1/patents/applications/<pk>/withdraw
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatentWithdraw'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatentWithdraw'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatentWithdraw'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatentApplicationDetail'
+          description: ''
+  /api/v1/patents/attorney-panel:
+    get:
+      operationId: v1_patents_attorney_panel_list
+      description: GET /api/v1/patents/attorney-panel
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAttorneyPanelMemberList'
+          description: ''
+  /api/v1/patents/audit-logs:
+    get:
+      operationId: v1_patents_audit_logs_retrieve
+      description: GET /api/v1/patents/audit-logs
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogsResponse'
+          description: ''
+  /api/v1/patents/consent/confirm:
+    post:
+      operationId: v1_patents_consent_confirm_create
+      description: POST /api/v1/patents/consent/confirm.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConsentConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConsentConfirm'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentResponse'
+          description: ''
+  /api/v1/patents/office-actions/{id}/approve:
+    post:
+      operationId: v1_patents_office_actions_approve_create
+      description: POST /api/v1/patents/office-actions/<pk>/approve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficeActionRecord'
+          description: ''
+  /api/v1/patents/office-actions/{id}/response:
+    post:
+      operationId: v1_patents_office_actions_response_create
+      description: POST /api/v1/patents/office-actions/<pk>/response
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfficeActionResponseInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfficeActionResponseInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfficeActionResponseInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficeActionRecord'
+          description: ''
+  /api/v1/patents/prior-art/search:
+    post:
+      operationId: v1_patents_prior_art_search_create
+      description: POST /api/v1/patents/prior-art/search
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriorArtInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PriorArtInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PriorArtInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriorArtResult'
+          description: ''
+  /api/v1/patents/reports:
+    get:
+      operationId: v1_patents_reports_retrieve
+      description: GET /api/v1/patents/reports
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsResponse'
+          description: ''
+  /api/v1/patents/tech-transfer:
+    post:
+      operationId: v1_patents_tech_transfer_create
+      description: POST /api/v1/patents/tech-transfer
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TechTransferInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TechTransferInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TechTransferInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TechnologyTransferRecord'
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -1763,6 +2661,14 @@ components:
       - semester
       - semester_type
       - user_id
+    ActionEnum:
+      enum:
+      - accept
+      - decline
+      type: string
+      description: |-
+        * `accept` - accept
+        * `decline` - decline
     AddCandidates:
       type: object
       properties:
@@ -1827,6 +2733,68 @@ components:
       - title
       - topic
       - withdrawn_reason
+    AppealDecisionInput:
+      type: object
+      properties:
+        outcome:
+          $ref: '#/components/schemas/AppealDecisionInputOutcomeEnum'
+        notes:
+          type: string
+          default: ''
+      required:
+      - outcome
+    AppealDecisionInputOutcomeEnum:
+      enum:
+      - REMAND
+      - UPHOLD
+      - MODIFY
+      type: string
+      description: |-
+        * `REMAND` - REMAND
+        * `UPHOLD` - UPHOLD
+        * `MODIFY` - MODIFY
+    AppealInput:
+      type: object
+      properties:
+        grounds:
+          type: string
+      required:
+      - grounds
+    AppealRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        applicant_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        grounds:
+          type: string
+        status:
+          type: string
+          maxLength: 30
+        director_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        decision_notes:
+          type: string
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - applicant_user_id
+      - grounds
+      - id
+      - submitted_at
     Application:
       type: object
       properties:
@@ -1898,6 +2866,48 @@ components:
       - status
       - user_id
       - withdrawn_reason
+    ApplicationDocument:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        document_type:
+          type: string
+          maxLength: 50
+        file_name:
+          type: string
+          maxLength: 255
+        file_format:
+          type: string
+          maxLength: 10
+        file_size_bytes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        sensitivity_level:
+          type: string
+          maxLength: 30
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        uploaded_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - document_type
+      - file_name
+      - file_size_bytes
+      - id
+      - uploaded_by_user_id
     ApplicationStatusEnum:
       enum:
       - draft
@@ -1981,6 +2991,50 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    AssessmentInput:
+      type: object
+      properties:
+        action:
+          type: string
+          default: start
+    AssignAttorney:
+      type: object
+      properties:
+        attorney_id:
+          type: integer
+      required:
+      - attorney_id
+    AssignDirector:
+      type: object
+      properties:
+        director_id:
+          type: integer
+      required:
+      - director_id
+    AttorneyPanelMember:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        firm_name:
+          type: string
+          maxLength: 255
+        expertise_domains: {}
+        active_workload:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_approved_panel:
+          type: boolean
+      required:
+      - firm_name
+      - id
+      - user_id
     AudienceEnum:
       enum:
       - students
@@ -1993,6 +3047,33 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AuditLogsResponse:
+      type: object
+      properties:
+        audit_logs:
+          type: array
+          items:
+            type: string
+      required:
+      - audit_logs
+    BudgetDecisionInput:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/BudgetDecisionInputDecisionEnum'
+        notes:
+          type: string
+          default: ''
+      required:
+      - decision
+    BudgetDecisionInputDecisionEnum:
+      enum:
+      - APPROVE
+      - REJECT
+      type: string
+      description: |-
+        * `APPROVE` - APPROVE
+        * `REJECT` - REJECT
     BulkOutcome:
       type: object
       properties:
@@ -2101,6 +3182,59 @@ components:
       - cleared
       - message
       - user_id
+    CoInventor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        name:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        share_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        consent_granted:
+          type: boolean
+        consent_timestamp:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - email
+      - id
+      - name
+      - share_percentage
+    CoInventorInput:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+        share_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+      required:
+      - email
+      - name
+      - share_percentage
     Company:
       type: object
       properties:
@@ -2315,6 +3449,57 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    ConsentConfirm:
+      type: object
+      properties:
+        token:
+          type: string
+          maxLength: 200
+      required:
+      - token
+    ConsentResponse:
+      type: object
+      properties:
+        consent_recorded:
+          type: boolean
+      required:
+      - consent_recorded
+    ConsentTokenIssued:
+      type: object
+      properties:
+        sent:
+          type: boolean
+      required:
+      - sent
+    CreateApplication:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 500
+        abstract:
+          type: string
+        description:
+          type: string
+        claims:
+          type: string
+        domain_category:
+          type: string
+          default: ''
+          maxLength: 100
+        jurisdiction:
+          type: string
+          default: IN
+          maxLength: 50
+        co_inventors:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoInventorInput'
+      required:
+      - abstract
+      - claims
+      - description
+      - title
     Detail:
       type: object
       properties:
@@ -2350,6 +3535,17 @@ components:
         * `certificate` - certificate
         * `offer_letter` - offer_letter
         * `other` - other
+    DocumentUploadInput:
+      type: object
+      properties:
+        document_type:
+          type: string
+          default: specification
+          maxLength: 50
+        file_name:
+          type: string
+          default: document.pdf
+          maxLength: 255
     EligibilityFailure:
       type: object
       properties:
@@ -2407,6 +3603,14 @@ components:
       - season_decision
       - semester
       - standing
+    EscalationTrackInput:
+      type: object
+      properties:
+        budget_entry_id:
+          type: integer
+        notes:
+          type: string
+          default: ''
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2423,6 +3627,36 @@ components:
       - fee_reference
       - season
       - user_id
+    FilingInput:
+      type: object
+      properties:
+        external_filing_id:
+          type: string
+          maxLength: 100
+        filing_date:
+          type: string
+          format: date
+        jurisdiction:
+          type: string
+          maxLength: 50
+        filing_type:
+          $ref: '#/components/schemas/FilingTypeEnum'
+        filing_office:
+          type: string
+          maxLength: 100
+        confirmation:
+          type: string
+          maxLength: 200
+        justification:
+          type: string
+    FilingTypeEnum:
+      enum:
+      - national
+      - international
+      type: string
+      description: |-
+        * `national` - national
+        * `international` - international
     IncidentRecorded:
       type: object
       properties:
@@ -2663,6 +3897,21 @@ components:
       required:
       - password
       - username
+    MaintenanceActionInput:
+      type: object
+      properties:
+        reference:
+          type: string
+          maxLength: 200
+        next_due_date:
+          type: string
+          format: date
+          nullable: true
+        notes:
+          type: string
+          default: ''
+      required:
+      - reference
     ModeEnum:
       enum:
       - online
@@ -2864,6 +4113,71 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfficeActionInput:
+      type: object
+      properties:
+        action_code:
+          type: string
+          maxLength: 100
+        issuing_authority:
+          type: string
+          maxLength: 100
+        issued_date:
+          type: string
+          format: date
+        response_deadline:
+          type: string
+          format: date
+        requires_applicant_review:
+          type: boolean
+          default: false
+      required:
+      - action_code
+      - issued_date
+      - issuing_authority
+      - response_deadline
+    OfficeActionRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        action_code:
+          type: string
+          maxLength: 100
+        issuing_authority:
+          type: string
+          maxLength: 100
+        issued_date:
+          type: string
+          format: date
+        response_deadline:
+          type: string
+          format: date
+        status:
+          type: string
+          maxLength: 30
+        requires_applicant_review:
+          type: boolean
+        response_summary:
+          type: string
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - action_code
+      - id
+      - issued_date
+      - issuing_authority
+      - response_deadline
+    OfficeActionResponseInput:
+      type: object
+      properties:
+        response_summary:
+          type: string
+      required:
+      - response_summary
     Ok:
       type: object
       properties:
@@ -2924,6 +4238,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
+    PaginatedAttorneyPanelMemberList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttorneyPanelMember'
     PaginatedCompanyList:
       type: object
       required:
@@ -3000,6 +4333,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedPatentApplicationSummaryList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatentApplicationSummary'
     PatchedJobPosting:
       type: object
       properties:
@@ -3080,11 +4432,384 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedPatentApplicationDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_number:
+          type: string
+          maxLength: 32
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        title:
+          type: string
+          maxLength: 500
+        abstract:
+          type: string
+        description:
+          type: string
+        claims:
+          type: string
+        status:
+          type: string
+          maxLength: 32
+        domain_category:
+          type: string
+          maxLength: 100
+        assigned_director_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        assigned_attorney_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        external_filing_id:
+          type: string
+          maxLength: 100
+        filing_date:
+          type: string
+          format: date
+          nullable: true
+        filing_office:
+          type: string
+          maxLength: 100
+        filing_confirmation:
+          type: string
+          maxLength: 200
+        filing_justification:
+          type: string
+        grant_date:
+          type: string
+          format: date
+          nullable: true
+        renewal_decision:
+          type: string
+          maxLength: 20
+        maintenance_state:
+          type: string
+          maxLength: 24
+        renewal_requested_at:
+          type: string
+          format: date-time
+          nullable: true
+        renewal_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/RenewalHistory'
+          readOnly: true
+        jurisdiction:
+          type: string
+          maxLength: 50
+        decision_date:
+          type: string
+          format: date-time
+          nullable: true
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        co_inventors:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoInventor'
+          readOnly: true
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationDocument'
+          readOnly: true
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewDecision'
+          readOnly: true
+        appeals:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppealRecord'
+          readOnly: true
+        budget_entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatentBudgetLedger'
+          readOnly: true
+        office_actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OfficeActionRecord'
+          readOnly: true
+        licensing_records:
+          type: array
+          items:
+            $ref: '#/components/schemas/TechnologyTransferRecord'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedRole:
       type: object
       properties:
         active_role:
           type: string
+    PatentApplicationDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_number:
+          type: string
+          maxLength: 32
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        title:
+          type: string
+          maxLength: 500
+        abstract:
+          type: string
+        description:
+          type: string
+        claims:
+          type: string
+        status:
+          type: string
+          maxLength: 32
+        domain_category:
+          type: string
+          maxLength: 100
+        assigned_director_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        assigned_attorney_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        external_filing_id:
+          type: string
+          maxLength: 100
+        filing_date:
+          type: string
+          format: date
+          nullable: true
+        filing_office:
+          type: string
+          maxLength: 100
+        filing_confirmation:
+          type: string
+          maxLength: 200
+        filing_justification:
+          type: string
+        grant_date:
+          type: string
+          format: date
+          nullable: true
+        renewal_decision:
+          type: string
+          maxLength: 20
+        maintenance_state:
+          type: string
+          maxLength: 24
+        renewal_requested_at:
+          type: string
+          format: date-time
+          nullable: true
+        renewal_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/RenewalHistory'
+          readOnly: true
+        jurisdiction:
+          type: string
+          maxLength: 50
+        decision_date:
+          type: string
+          format: date-time
+          nullable: true
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        co_inventors:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoInventor'
+          readOnly: true
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationDocument'
+          readOnly: true
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewDecision'
+          readOnly: true
+        appeals:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppealRecord'
+          readOnly: true
+        budget_entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatentBudgetLedger'
+          readOnly: true
+        office_actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OfficeActionRecord'
+          readOnly: true
+        licensing_records:
+          type: array
+          items:
+            $ref: '#/components/schemas/TechnologyTransferRecord'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - abstract
+      - appeals
+      - application_number
+      - budget_entries
+      - claims
+      - co_inventors
+      - created_at
+      - description
+      - documents
+      - id
+      - licensing_records
+      - office_actions
+      - renewal_history
+      - reviews
+      - title
+      - updated_at
+      - user_id
+    PatentApplicationSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        application_number:
+          type: string
+          maxLength: 32
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        title:
+          type: string
+          maxLength: 500
+        status:
+          type: string
+          maxLength: 32
+        domain_category:
+          type: string
+          maxLength: 100
+        assigned_director_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        assigned_attorney_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        external_filing_id:
+          type: string
+          maxLength: 100
+        jurisdiction:
+          type: string
+          maxLength: 50
+        version:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - application_number
+      - created_at
+      - id
+      - title
+      - updated_at
+      - user_id
+    PatentBudgetLedger:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        entry_type:
+          type: string
+          maxLength: 30
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 3
+        category:
+          type: string
+          maxLength: 50
+        status:
+          type: string
+          maxLength: 30
+        authorized_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - authorized_by_user_id
+      - category
+      - created_at
+      - entry_type
+      - id
+    PatentWithdraw:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3145,6 +4870,25 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    PriorArtInput:
+      type: object
+      properties:
+        query:
+          type: string
+      required:
+      - query
+    PriorArtResult:
+      type: object
+      properties:
+        query:
+          type: string
+        results:
+          type: array
+          items:
+            type: string
+      required:
+      - query
+      - results
     ProfileDocument:
       type: object
       description: |-
@@ -3466,6 +5210,131 @@ components:
       - message
       - reason
       - route
+    RenewalDecisionInput:
+      type: object
+      properties:
+        renew:
+          type: boolean
+        notes:
+          type: string
+          default: ''
+      required:
+      - renew
+    RenewalHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cycle_due_date:
+          type: string
+          format: date
+          nullable: true
+        requested_at:
+          type: string
+          format: date-time
+          nullable: true
+        decision:
+          type: string
+          maxLength: 20
+        decided_by_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        decided_at:
+          type: string
+          format: date-time
+        action_reference:
+          type: string
+          maxLength: 200
+        action_recorded_at:
+          type: string
+          format: date-time
+          nullable: true
+        next_due_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - decided_at
+      - decided_by_user_id
+      - decision
+      - id
+    RenewalRequestInput:
+      type: object
+      properties:
+        notes:
+          type: string
+          default: ''
+    ReportsResponse:
+      type: object
+      properties:
+        total_applications:
+          type: integer
+        filed_count:
+          type: integer
+        granted_count:
+          type: integer
+      required:
+      - filed_count
+      - granted_count
+      - total_applications
+    RespondAssignmentInput:
+      type: object
+      properties:
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+          default: accept
+    ReviewDecision:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        director_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        decision:
+          type: string
+          maxLength: 20
+        justification:
+          type: string
+        assigned_at:
+          type: string
+          format: date-time
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - decided_at
+      - decision
+      - director_user_id
+      - id
+      - justification
+    ReviewDecisionInput:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/ReviewDecisionInputDecisionEnum'
+        justification:
+          type: string
+      required:
+      - decision
+      - justification
+    ReviewDecisionInputDecisionEnum:
+      enum:
+      - APPROVE
+      - REJECT
+      - NEEDS_REVISION
+      type: string
+      description: |-
+        * `APPROVE` - APPROVE
+        * `REJECT` - REJECT
+        * `NEEDS_REVISION` - NEEDS_REVISION
     RoundOutcome:
       type: object
       properties:
@@ -3698,6 +5567,58 @@ components:
           type: integer
       required:
       - document_id
+    TechTransferInput:
+      type: object
+      properties:
+        application_id:
+          type: integer
+        request_type:
+          type: string
+          maxLength: 50
+        partner_name:
+          type: string
+          maxLength: 255
+        terms_summary:
+          type: string
+          default: ''
+      required:
+      - application_id
+      - partner_name
+      - request_type
+    TechnologyTransferRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        applicant_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        request_type:
+          type: string
+          maxLength: 50
+        partner_name:
+          type: string
+          maxLength: 255
+        status:
+          type: string
+          maxLength: 30
+        confidentiality_level:
+          type: string
+          maxLength: 30
+        terms_summary:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - applicant_user_id
+      - created_at
+      - id
+      - partner_name
+      - request_type
     TopicEnum:
       enum:
       - drive

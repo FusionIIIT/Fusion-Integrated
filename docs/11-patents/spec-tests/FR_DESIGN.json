@@ -1,0 +1,2000 @@
+[
+ {
+  "test_id": "FR-T001",
+  "source_id": "PMS-AFR-010 main obligation",
+  "purpose": "Applicant can track status and progress of own application",
+  "preconditions": "Applicant with valid Applicant role owns an application in status Under Review",
+  "action_or_input": "Applicant requests the status/progress view of the application",
+  "expected_result": "Current status Under Review and progress/history of the application are returned to the Applicant",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T002",
+  "source_id": "PMS-AFR-016 main obligation",
+  "purpose": "Applicant can view reports for own applications",
+  "preconditions": "Applicant owns two applications; another Applicant owns a third",
+  "action_or_input": "Applicant requests personal application report",
+  "expected_result": "Report is returned and contains only the Applicant's own two applications",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T003",
+  "source_id": "PMS-AFR-023 main obligation",
+  "purpose": "Director receives oversight information for workflows in own domain",
+  "preconditions": "Director assigned to expertise domain D; applications exist in domain D",
+  "action_or_input": "Director requests workflow oversight view",
+  "expected_result": "Oversight information for domain-D application workflows (status/progress) is returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T004",
+  "source_id": "PMS-AFR-026 main obligation",
+  "purpose": "PCC_ADMIN monitors workflows and resolves a conflict-of-interest case",
+  "preconditions": "Active PCC_ADMIN; an application has a flagged conflict-of-interest case",
+  "action_or_input": "PCC_ADMIN opens workflow monitor and records resolution of the conflict case",
+  "expected_result": "Workflow status is visible to PCC_ADMIN and the conflict case is recorded as resolved",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T005",
+  "source_id": "PMS-AFR-027 main obligation",
+  "purpose": "PCC_ADMIN manages PMS configuration and user-role assignments",
+  "preconditions": "Active PCC_ADMIN; a user without PMS role",
+  "action_or_input": "PCC_ADMIN assigns the Director role to the user and updates a PMS configuration value",
+  "expected_result": "User now holds the Director PMS role and configuration value is persisted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T006",
+  "source_id": "PMS-AFR-029 main obligation",
+  "purpose": "PCC_ADMIN handles an escalation/exceptional case",
+  "preconditions": "Active PCC_ADMIN; an escalated case exists in PMS",
+  "action_or_input": "PCC_ADMIN records handling action on the escalated case",
+  "expected_result": "Escalation handling is recorded against the case",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T007",
+  "source_id": "PMS-AFR-030 main obligation",
+  "purpose": "PCC_ADMIN maintains attorney panels and expertise mappings",
+  "preconditions": "Active PCC_ADMIN; Attorney user exists",
+  "action_or_input": "PCC_ADMIN adds the Attorney to the approved panel with expertise domain D",
+  "expected_result": "Attorney is listed on the approved panel with expertise mapping D",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T008",
+  "source_id": "PMS-AFR-037 main obligation",
+  "purpose": "Attorney records legal advice for an application",
+  "preconditions": "Attorney assigned to an application",
+  "action_or_input": "Attorney submits a legal advice record for the application",
+  "expected_result": "Legal advice record is stored and linked to the application and Attorney",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T009",
+  "source_id": "PMS-AFR-038 main obligation",
+  "purpose": "Applicant submits a complete patent application",
+  "preconditions": "Applicant with valid role",
+  "action_or_input": "Submit title, abstract, detailed description, claims, inventor information and a valid PDF supporting document (<50 MB, malware-free)",
+  "expected_result": "Application is accepted and stored with all supplied fields and document",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T010",
+  "source_id": "PMS-AFR-039 condition-false (non-PDF)",
+  "purpose": "Non-PDF application document is rejected",
+  "preconditions": "Applicant with valid role",
+  "action_or_input": "Submit otherwise complete application with a .docx supporting document",
+  "expected_result": "Submission/upload rejected with format validation error; no application or document created",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T011",
+  "source_id": "PMS-AFR-040 boundary (>50 MB)",
+  "purpose": "Document larger than 50 MB is rejected",
+  "preconditions": "Applicant with valid role",
+  "action_or_input": "Submit complete application with a PDF of 50 MB + 1 byte",
+  "expected_result": "Document rejected with size validation error; no document accepted",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T012",
+  "source_id": "PMS-AFR-040 condition-false (<50 MB)",
+  "purpose": "Document below 50 MB is accepted",
+  "preconditions": "Applicant with valid role",
+  "action_or_input": "Submit complete application with a 49 MB malware-free PDF",
+  "expected_result": "Document accepted",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T013",
+  "source_id": "PMS-AFR-041 condition-false (malware detected)",
+  "purpose": "Document failing malware validation is rejected",
+  "preconditions": "Applicant with valid role; malware scanner reports the file as infected",
+  "action_or_input": "Submit complete application with the infected PDF",
+  "expected_result": "Document not accepted; malware validation error returned",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T014",
+  "source_id": "PMS-AFR-042 condition-false (incomplete)",
+  "purpose": "Incomplete application is not accepted",
+  "preconditions": "Applicant with valid role",
+  "action_or_input": "Submit application missing the claims field",
+  "expected_result": "Submission rejected with completeness validation error; no application ID assigned",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T015",
+  "source_id": "PMS-AFR-043 main obligation",
+  "purpose": "Submitted document is classified by sensitivity",
+  "preconditions": "Applicant with valid role",
+  "action_or_input": "Submit a valid application document",
+  "expected_result": "Stored document carries a sensitivity classification value",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T016",
+  "source_id": "PMS-AFR-044 main obligation",
+  "purpose": "Each accepted application gets a unique ID",
+  "preconditions": "Applicant with valid role",
+  "action_or_input": "Submit two valid applications",
+  "expected_result": "Each accepted application has an application ID and the two IDs differ",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T017",
+  "source_id": "PMS-AFR-045 main obligation",
+  "purpose": "Status set to Submitted after successful submission",
+  "preconditions": "Applicant with valid role",
+  "action_or_input": "Submit a valid application",
+  "expected_result": "Application status is Submitted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T018",
+  "source_id": "PMS-AFR-046 condition-false (agreements incomplete)",
+  "purpose": "Filing blocked until inventor agreements completed",
+  "preconditions": "Application otherwise eligible for filing; one inventor agreement not completed",
+  "action_or_input": "Attorney attempts to record external filing",
+  "expected_result": "Filing rejected; status not changed to Filed",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T019",
+  "source_id": "PMS-AFR-047 main obligation",
+  "purpose": "Application history is recorded",
+  "preconditions": "Submitted application",
+  "action_or_input": "Application is assigned to a Director (status change)",
+  "expected_result": "Application history contains the submission and the status change entries",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T020",
+  "source_id": "PMS-AFR-048 main obligation",
+  "purpose": "Stakeholders notified on submission/status update",
+  "preconditions": "Applicant with valid role; email backend captures messages",
+  "action_or_input": "Submit a valid application",
+  "expected_result": "Notification to relevant stakeholder(s) (at least the Applicant) is triggered for the submission",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T021",
+  "source_id": "PMS-AFR-049 main obligation",
+  "purpose": "PCC_ADMIN assigns submitted application to Director",
+  "preconditions": "Submitted application; eligible Director without conflict",
+  "action_or_input": "PCC_ADMIN assigns the application to the Director",
+  "expected_result": "Application is assigned to the Director",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T022",
+  "source_id": "PMS-AFR-049 authorization",
+  "purpose": "Non-PCC_ADMIN cannot perform manual Director assignment",
+  "preconditions": "Submitted application; Applicant user",
+  "action_or_input": "Applicant attempts to assign the application to a Director",
+  "expected_result": "Request denied (permission error); no assignment recorded",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T023",
+  "source_id": "PMS-AFR-050 condition-true (rules configured)",
+  "purpose": "Automatic Director assignment when rules configured",
+  "preconditions": "Assignment rules configured; eligible Director exists",
+  "action_or_input": "Valid application is submitted / auto-routing executed",
+  "expected_result": "Application is automatically assigned to an eligible Director",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T024",
+  "source_id": "PMS-AFR-051 main obligation",
+  "purpose": "Director expertise matching used in assignment",
+  "preconditions": "Application in domain D; Director X expertise D, Director Y expertise E, equal workload, no conflicts",
+  "action_or_input": "Run Director assignment",
+  "expected_result": "Director X (matching domain) is selected",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T025",
+  "source_id": "PMS-AFR-052 main obligation",
+  "purpose": "Director workload balance used in assignment",
+  "preconditions": "Two Directors with matching expertise, no conflicts; X has 1 active review, Y has 5",
+  "action_or_input": "Run Director assignment",
+  "expected_result": "Director X (lower workload) is selected",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T026",
+  "source_id": "PMS-AFR-053 main obligation",
+  "purpose": "Conflict-of-interest check before Director assignment",
+  "preconditions": "Application; Director with a recorded conflict of interest for it",
+  "action_or_input": "Attempt to assign the application to that Director",
+  "expected_result": "Assignment rejected / Director excluded due to conflict of interest",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T027",
+  "source_id": "PMS-AFR-054 authorization (Director is inventor)",
+  "purpose": "Director listed as inventor cannot review",
+  "preconditions": "Application lists Director X as an inventor",
+  "action_or_input": "Assign to or have Director X submit a review decision",
+  "expected_result": "Action rejected; Director X cannot review the application",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T028",
+  "source_id": "PMS-AFR-055 authorization (PCC_ADMIN is inventor)",
+  "purpose": "PCC_ADMIN listed as inventor cannot review",
+  "preconditions": "Application lists the PCC_ADMIN user as an inventor",
+  "action_or_input": "PCC_ADMIN attempts to review/decide the application",
+  "expected_result": "Action rejected; PCC_ADMIN cannot review the application",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T029",
+  "source_id": "PMS-AFR-056 main obligation",
+  "purpose": "Status becomes Under Review on Director assignment",
+  "preconditions": "Submitted application",
+  "action_or_input": "Assign application to eligible Director",
+  "expected_result": "Application status is Under Review",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T030",
+  "source_id": "PMS-AFR-057 main obligation",
+  "purpose": "Director notified and review timeline initiated on assignment",
+  "preconditions": "Submitted application; email backend captures messages",
+  "action_or_input": "Assign application to Director",
+  "expected_result": "Notification to the assigned Director triggered; review deadline/timeline recorded from assignment date",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T031",
+  "source_id": "PMS-AFR-058 main obligation",
+  "purpose": "Director views details, documents and materials of assigned application",
+  "preconditions": "Application Under Review assigned to Director X",
+  "action_or_input": "Director X requests application detail",
+  "expected_result": "Details, documents and supporting materials are returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T032",
+  "source_id": "PMS-AFR-059 main obligation",
+  "purpose": "Director records each allowed decision value",
+  "preconditions": "Three applications Under Review assigned to Director X",
+  "action_or_input": "Record Approve, Reject and Needs Revision respectively with 50+ char justifications",
+  "expected_result": "Each decision is accepted and recorded; statuses become Approved, Rejected, Needs Revision",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T033",
+  "source_id": "PMS-AFR-059 validation (invalid decision)",
+  "purpose": "Decision outside the allowed set is rejected",
+  "preconditions": "Application Under Review assigned to Director X",
+  "action_or_input": "Submit decision value 'Defer' with valid justification",
+  "expected_result": "Decision rejected with validation error; status unchanged",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T034",
+  "source_id": "PMS-AFR-060 boundary (49 characters)",
+  "purpose": "Justification shorter than 50 characters rejected",
+  "preconditions": "Application Under Review assigned to Director X",
+  "action_or_input": "Submit Approve with a 49-character justification",
+  "expected_result": "Decision rejected with validation error; status unchanged",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T035",
+  "source_id": "PMS-AFR-060 boundary (50 characters)",
+  "purpose": "Justification of exactly 50 characters accepted",
+  "preconditions": "Application Under Review assigned to Director X",
+  "action_or_input": "Submit Approve with a 50-character justification",
+  "expected_result": "Decision accepted and recorded",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T036",
+  "source_id": "PMS-AFR-061 main obligation",
+  "purpose": "Review deadline set to 15 business days from assignment",
+  "preconditions": "Application assigned to Director on a known date (e.g., Monday)",
+  "action_or_input": "Read the recorded review deadline",
+  "expected_result": "Deadline equals assignment date plus 15 business days (weekends excluded)",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T037",
+  "source_id": "PMS-AFR-061 condition-false (deadline passed)",
+  "purpose": "Review not completed within 15 business days is flagged/escalated",
+  "preconditions": "Application Under Review; 16 business days elapsed since assignment without decision; escalation chain configured",
+  "action_or_input": "Run deadline monitoring",
+  "expected_result": "Review is identified as overdue and escalation is triggered per configured chain",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T038",
+  "source_id": "PMS-AFR-062 main obligation",
+  "purpose": "Applicant notified with feedback on rejection",
+  "preconditions": "Application Under Review; email backend captures messages",
+  "action_or_input": "Director records Reject with justification",
+  "expected_result": "Applicant receives notification containing the Director's feedback/justification",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T039",
+  "source_id": "PMS-AFR-063 main obligation",
+  "purpose": "Applicant notified with feedback on revision request",
+  "preconditions": "Application Under Review; email backend captures messages",
+  "action_or_input": "Director records Needs Revision with justification",
+  "expected_result": "Applicant receives notification containing the Director's feedback/justification",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T040",
+  "source_id": "PMS-AFR-064 main obligation",
+  "purpose": "Approved application routed to attorney assignment",
+  "preconditions": "Application Under Review",
+  "action_or_input": "Director records Approve",
+  "expected_result": "Application status is Approved and appears in the attorney-assignment queue",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T041",
+  "source_id": "PMS-AFR-065 main obligation",
+  "purpose": "Director review process audited",
+  "preconditions": "Application Under Review",
+  "action_or_input": "Director records a decision",
+  "expected_result": "Audit entry exists for the review decision with Director, decision and timestamp",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T042",
+  "source_id": "PMS-AFR-066 main obligation",
+  "purpose": "Applicant can revise Needs Revision application",
+  "preconditions": "Applicant's application in status Needs Revision within 60 days of decision",
+  "action_or_input": "Applicant submits revision",
+  "expected_result": "Revision accepted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T043",
+  "source_id": "PMS-AFR-067 main obligation",
+  "purpose": "Applicant can revise Rejected application",
+  "preconditions": "Applicant's application in status Rejected within 60 days of decision",
+  "action_or_input": "Applicant submits revision",
+  "expected_result": "Revision accepted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T044",
+  "source_id": "PMS-AFR-066 condition-false (ineligible status)",
+  "purpose": "Revision not allowed for status other than Needs Revision/Rejected",
+  "preconditions": "Applicant's application in status Under Review",
+  "action_or_input": "Applicant attempts to revise the application",
+  "expected_result": "Revision rejected; application unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T045",
+  "source_id": "PMS-AFR-068 boundary (day 60)",
+  "purpose": "Resubmission on day 60 accepted",
+  "preconditions": "Application Needs Revision; decision date 60 days ago",
+  "action_or_input": "Applicant resubmits revised application",
+  "expected_result": "Resubmission accepted",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T046",
+  "source_id": "PMS-AFR-068 boundary (day 61)",
+  "purpose": "Resubmission after 60 days rejected",
+  "preconditions": "Application Needs Revision; decision date 61 days ago",
+  "action_or_input": "Applicant resubmits revised application",
+  "expected_result": "Resubmission rejected as out of period",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T047",
+  "source_id": "PMS-AFR-069 validation (feedback not addressed)",
+  "purpose": "Revision that does not address feedback rejected",
+  "preconditions": "Application Needs Revision with Director feedback recorded",
+  "action_or_input": "Applicant resubmits without addressing the feedback (no response to feedback / unchanged content)",
+  "expected_result": "Resubmission rejected with validation error",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T048",
+  "source_id": "PMS-AFR-070 main obligation",
+  "purpose": "New review cycle starts after resubmission",
+  "preconditions": "Application Needs Revision",
+  "action_or_input": "Applicant resubmits valid revision",
+  "expected_result": "A new review cycle is started (application re-enters review with new review timeline)",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T049",
+  "source_id": "PMS-AFR-071 main obligation",
+  "purpose": "Version control maintained for revisions",
+  "preconditions": "Application version 1 in Needs Revision",
+  "action_or_input": "Applicant resubmits revision",
+  "expected_result": "Application has version 2; version 1 retained in history",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T050",
+  "source_id": "PMS-AFR-072 main obligation",
+  "purpose": "Status set to Expired when resubmission deadline expires",
+  "preconditions": "Application Needs Revision; 61 days since decision; not resubmitted",
+  "action_or_input": "Run deadline processing",
+  "expected_result": "Application status is Expired",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T051",
+  "source_id": "PMS-AFR-074 main obligation",
+  "purpose": "PCC_ADMIN assigns Attorney to approved application",
+  "preconditions": "Approved application; panel Attorney without conflict",
+  "action_or_input": "PCC_ADMIN assigns the Attorney",
+  "expected_result": "Assignment recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T052",
+  "source_id": "PMS-AFR-074 authorization",
+  "purpose": "Non-PCC_ADMIN cannot assign attorneys",
+  "preconditions": "Approved application; Director user",
+  "action_or_input": "Director attempts to assign an Attorney",
+  "expected_result": "Request denied; no assignment recorded",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T053",
+  "source_id": "PMS-AFR-075 condition-false (off-panel, no exception)",
+  "purpose": "Off-panel attorney rejected without exception",
+  "preconditions": "Approved application; Attorney not on approved panel; no exception",
+  "action_or_input": "PCC_ADMIN assigns that Attorney",
+  "expected_result": "Assignment rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T054",
+  "source_id": "PMS-AFR-075 condition-true (exception granted)",
+  "purpose": "Off-panel attorney allowed with recorded exception",
+  "preconditions": "Approved application; Attorney not on panel; exception recorded",
+  "action_or_input": "PCC_ADMIN assigns that Attorney",
+  "expected_result": "Assignment accepted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T055",
+  "source_id": "PMS-AFR-076 main obligation",
+  "purpose": "Attorney expertise considered",
+  "preconditions": "Application domain D; panel Attorneys P (expertise D) and Q (expertise E), equal workload, no conflict",
+  "action_or_input": "Request attorney assignment recommendation/selection",
+  "expected_result": "Attorney P is selected/ranked first",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T056",
+  "source_id": "PMS-AFR-077 main obligation",
+  "purpose": "Attorney workload considered",
+  "preconditions": "Two panel Attorneys with matching expertise; P has lower workload",
+  "action_or_input": "Request attorney assignment recommendation/selection",
+  "expected_result": "Attorney P is selected/ranked first",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T057",
+  "source_id": "PMS-AFR-078 main obligation",
+  "purpose": "Conflict-of-interest check before attorney assignment",
+  "preconditions": "Approved application; panel Attorney with recorded conflict",
+  "action_or_input": "PCC_ADMIN assigns that Attorney",
+  "expected_result": "Assignment rejected due to conflict of interest",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T058",
+  "source_id": "PMS-AFR-079 condition-true (preferred in panel)",
+  "purpose": "Applicant preference considered when attorney on panel",
+  "preconditions": "Applicant preferred Attorney P is on panel, eligible",
+  "action_or_input": "Request attorney assignment recommendation",
+  "expected_result": "Preference for P is taken into account (P selected/ranked first)",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T059",
+  "source_id": "PMS-AFR-079 condition-false (preferred not in panel)",
+  "purpose": "Applicant preference ignored when attorney not on panel",
+  "preconditions": "Applicant preferred Attorney R not on panel",
+  "action_or_input": "Request attorney assignment recommendation",
+  "expected_result": "R is not selected on the basis of preference",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T060",
+  "source_id": "PMS-AFR-080 main obligation",
+  "purpose": "Assigned Attorney accepts or declines",
+  "preconditions": "Attorney assigned to application, awaiting response",
+  "action_or_input": "Attorney accepts (case 1) / declines (case 2)",
+  "expected_result": "Acceptance or decline is recorded for the assignment",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T061",
+  "source_id": "PMS-AFR-081 main obligation",
+  "purpose": "Assignment outcome status recorded",
+  "preconditions": "Attorney assigned to approved application",
+  "action_or_input": "Attorney accepts the assignment",
+  "expected_result": "Application status is Attorney Assigned (an allowed outcome of Attorney Assigned / Pending Review)",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T062",
+  "source_id": "PMS-AFR-082 main obligation",
+  "purpose": "Attorney records legal/patentability analysis",
+  "preconditions": "Attorney assigned and accepted",
+  "action_or_input": "Attorney submits analysis",
+  "expected_result": "Analysis stored on the application",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T063",
+  "source_id": "PMS-AFR-083 main obligation",
+  "purpose": "Attorney records prior-art search",
+  "preconditions": "Attorney assigned",
+  "action_or_input": "Attorney records prior-art search with database and query",
+  "expected_result": "Prior-art search record stored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T064",
+  "source_id": "PMS-AFR-084 main obligation",
+  "purpose": "Attorney records novelty, non-obviousness, utility evaluations",
+  "preconditions": "Attorney assigned",
+  "action_or_input": "Attorney submits the three evaluations",
+  "expected_result": "All three evaluations stored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T065",
+  "source_id": "PMS-AFR-085 main obligation",
+  "purpose": "Opinion with valid recommendation accepted",
+  "preconditions": "Attorney assigned",
+  "action_or_input": "Submit opinion with recommendation File Patent / Do Not File / Needs Amendment",
+  "expected_result": "Opinion accepted for each allowed value",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T066",
+  "source_id": "PMS-AFR-085 validation (invalid recommendation)",
+  "purpose": "Opinion with invalid or missing recommendation rejected",
+  "preconditions": "Attorney assigned",
+  "action_or_input": "Submit opinion with recommendation 'Maybe' (and with none)",
+  "expected_result": "Opinion rejected with validation error",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T067",
+  "source_id": "PMS-AFR-086 main obligation",
+  "purpose": "Attorney requests additional information",
+  "preconditions": "Attorney assigned",
+  "action_or_input": "Attorney submits information request",
+  "expected_result": "Information request recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T068",
+  "source_id": "PMS-AFR-087 main obligation",
+  "purpose": "Attorney requests extension",
+  "preconditions": "Attorney assigned",
+  "action_or_input": "Attorney submits extension request",
+  "expected_result": "Extension request recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T069",
+  "source_id": "PMS-AFR-088 main obligation",
+  "purpose": "Patentability opinion recorded",
+  "preconditions": "Attorney assigned",
+  "action_or_input": "Submit valid opinion",
+  "expected_result": "Opinion persisted with recommendation, Attorney and timestamp",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T070",
+  "source_id": "PMS-AFR-089 main obligation",
+  "purpose": "Stakeholders notified after opinion",
+  "preconditions": "Attorney assigned; email backend captures",
+  "action_or_input": "Submit valid opinion",
+  "expected_result": "Notification to relevant stakeholders (e.g., Applicant) triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T071",
+  "source_id": "PMS-AFR-090 main obligation",
+  "purpose": "Director reviews budget costs",
+  "preconditions": "Approved application with proposed budget",
+  "action_or_input": "Director views the budget",
+  "expected_result": "Budget cost details returned to Director",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T072",
+  "source_id": "PMS-AFR-091 main obligation",
+  "purpose": "Director approves budget",
+  "preconditions": "Approved application with budget within threshold and available funds",
+  "action_or_input": "Director approves budget",
+  "expected_result": "Budget recorded as approved",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T073",
+  "source_id": "PMS-AFR-092 main obligation",
+  "purpose": "Filing fees included in budget",
+  "preconditions": "Approved application",
+  "action_or_input": "Create budget with filing fees",
+  "expected_result": "Stored budget includes filing fee component",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T074",
+  "source_id": "PMS-AFR-093 main obligation",
+  "purpose": "Attorney fees included in budget",
+  "preconditions": "Approved application",
+  "action_or_input": "Create budget with attorney fees",
+  "expected_result": "Stored budget includes attorney fee component",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T075",
+  "source_id": "PMS-AFR-094 main obligation",
+  "purpose": "Administrative costs included in budget",
+  "preconditions": "Approved application",
+  "action_or_input": "Create budget with administrative costs",
+  "expected_result": "Stored budget includes administrative cost component",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T076",
+  "source_id": "PMS-AFR-095 condition-true (exceeds threshold)",
+  "purpose": "Budget above threshold escalated",
+  "preconditions": "Configured threshold T; budget total T+1",
+  "action_or_input": "Director submits approval",
+  "expected_result": "Case escalated to higher authority; not finalized as approved by Director alone",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T077",
+  "source_id": "PMS-AFR-095 boundary (equal to threshold)",
+  "purpose": "Budget equal to threshold not escalated",
+  "preconditions": "Configured threshold T; budget total T",
+  "action_or_input": "Director approves",
+  "expected_result": "No escalation; approval recorded",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T078",
+  "source_id": "PMS-AFR-096 condition-false (status not Approved)",
+  "purpose": "Budget approval blocked when application not Approved",
+  "preconditions": "Application Under Review with budget",
+  "action_or_input": "Director approves budget",
+  "expected_result": "Approval rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T079",
+  "source_id": "PMS-AFR-097 condition-false (insufficient availability)",
+  "purpose": "Approval blocked when budget not available",
+  "preconditions": "Budget-availability data available showing insufficient funds",
+  "action_or_input": "Director approves budget",
+  "expected_result": "Approval rejected with availability error",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T080",
+  "source_id": "PMS-AFR-098 main obligation",
+  "purpose": "Financial transactions logged with authorization level",
+  "preconditions": "Approved budget decision",
+  "action_or_input": "Director approves budget",
+  "expected_result": "Financial log entry includes transaction details and authorization level",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T081",
+  "source_id": "PMS-AFR-099 main obligation",
+  "purpose": "Attorney prepares filing package",
+  "preconditions": "Application with approvals and budget complete",
+  "action_or_input": "Attorney creates filing package",
+  "expected_result": "Filing package recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T082",
+  "source_id": "PMS-AFR-100 condition-false (non-compliant format)",
+  "purpose": "Non-compliant filing package rejected",
+  "preconditions": "Patent-office format validation rules configured",
+  "action_or_input": "Submit package violating a rule",
+  "expected_result": "Package rejected with format compliance error",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T083",
+  "source_id": "PMS-AFR-101 main obligation",
+  "purpose": "Record Indian Patent Office filing",
+  "preconditions": "Filing-eligible application",
+  "action_or_input": "Attorney records filing to Indian Patent Office",
+  "expected_result": "Filing recorded with office = Indian Patent Office",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T084",
+  "source_id": "PMS-AFR-102 main obligation",
+  "purpose": "Record international filing",
+  "preconditions": "Filing-eligible application",
+  "action_or_input": "Attorney records international filing with justification",
+  "expected_result": "International filing recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T085",
+  "source_id": "PMS-AFR-103 validation (missing justification)",
+  "purpose": "International filing without justification rejected",
+  "preconditions": "Filing-eligible application",
+  "action_or_input": "Record international filing without justification",
+  "expected_result": "Rejected with validation error",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T086",
+  "source_id": "PMS-AFR-104 main obligation",
+  "purpose": "Filing ID, date and confirmation captured",
+  "preconditions": "Filing-eligible application",
+  "action_or_input": "Record filing with filing ID, filing date, confirmation",
+  "expected_result": "All three values stored on filing record",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T087",
+  "source_id": "PMS-AFR-104 validation (missing filing data)",
+  "purpose": "Filing without filing ID/date/confirmation rejected",
+  "preconditions": "Filing-eligible application",
+  "action_or_input": "Record filing omitting filing ID",
+  "expected_result": "Rejected with validation error",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T088",
+  "source_id": "PMS-AFR-105 main obligation",
+  "purpose": "Status Filed after filing recorded",
+  "preconditions": "Filing-eligible application",
+  "action_or_input": "Record valid filing",
+  "expected_result": "Application status is Filed",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T089",
+  "source_id": "PMS-AFR-106 main obligation",
+  "purpose": "Official patent-office communication logged",
+  "preconditions": "Filed application",
+  "action_or_input": "Record an official communication from patent office",
+  "expected_result": "Communication log entry stored with application, date and content",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T090",
+  "source_id": "PMS-AFR-107 condition-true (Granted)",
+  "purpose": "Post-grant tracking activates for Granted patent",
+  "preconditions": "Application status Granted",
+  "action_or_input": "Activate post-grant tracking",
+  "expected_result": "Tracking activated",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T091",
+  "source_id": "PMS-AFR-107 condition-false (not Granted)",
+  "purpose": "Post-grant tracking not activated for non-Granted",
+  "preconditions": "Application status Filed",
+  "action_or_input": "Activate post-grant tracking",
+  "expected_result": "Rejected; no tracking created",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T092",
+  "source_id": "PMS-AFR-108 main obligation",
+  "purpose": "Maintenance schedule calculated from grant date and jurisdiction",
+  "preconditions": "Granted patent with grant date and jurisdiction; schedule rules configured",
+  "action_or_input": "Calculate maintenance schedule",
+  "expected_result": "Schedule dates computed per configured rule from grant date",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T093",
+  "source_id": "PMS-AFR-109 main obligation",
+  "purpose": "Attorney manages maintenance reminders/deadlines",
+  "preconditions": "Granted patent under tracking",
+  "action_or_input": "Attorney creates/updates maintenance reminder",
+  "expected_result": "Reminder and deadline stored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T094",
+  "source_id": "PMS-AFR-110 condition-false (no renewal decision)",
+  "purpose": "Maintenance action blocked without explicit renewal decision",
+  "preconditions": "Upcoming maintenance deadline; no renewal decision",
+  "action_or_input": "Attorney records maintenance action",
+  "expected_result": "Rejected; renewal decision required",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T095",
+  "source_id": "PMS-AFR-111 main obligation",
+  "purpose": "Attorney seeks renewal decision from Director",
+  "preconditions": "Granted patent with upcoming deadline",
+  "action_or_input": "Attorney submits renewal decision request",
+  "expected_result": "Request recorded and routed to Director",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T096",
+  "source_id": "PMS-AFR-112 main obligation",
+  "purpose": "Director decides Renew or Do Not Renew",
+  "preconditions": "Pending renewal decision request",
+  "action_or_input": "Director records Renew (case 1) / Do Not Renew (case 2)",
+  "expected_result": "Decision recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T097",
+  "source_id": "PMS-AFR-112 validation (invalid decision)",
+  "purpose": "Renewal decision outside allowed set rejected",
+  "preconditions": "Pending renewal decision request",
+  "action_or_input": "Director records 'Postpone'",
+  "expected_result": "Rejected with validation error",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T098",
+  "source_id": "PMS-AFR-113 condition-true (renewal approved)",
+  "purpose": "Maintenance action recorded after Renew",
+  "preconditions": "Renew decision recorded",
+  "action_or_input": "Attorney records maintenance action, transaction info and status",
+  "expected_result": "Maintenance action, transaction and status stored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T099",
+  "source_id": "PMS-AFR-113 condition-false (Do Not Renew)",
+  "purpose": "Maintenance action not recordable after Do Not Renew",
+  "preconditions": "Do Not Renew decision recorded",
+  "action_or_input": "Attorney records maintenance action",
+  "expected_result": "Rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T100",
+  "source_id": "PMS-AFR-114 main obligation",
+  "purpose": "Renewal history maintained",
+  "preconditions": "Two completed renewal cycles",
+  "action_or_input": "Retrieve renewal history",
+  "expected_result": "Both cycles listed",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T101",
+  "source_id": "PMS-AFR-115 main obligation",
+  "purpose": "Next maintenance cycle scheduled after renewal",
+  "preconditions": "Renewal cycle completed (maintenance recorded)",
+  "action_or_input": "Complete cycle",
+  "expected_result": "Next maintenance cycle/deadline created",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T102",
+  "source_id": "PMS-AFR-116 main obligation",
+  "purpose": "Office action recorded",
+  "preconditions": "Filed application",
+  "action_or_input": "Record office action received",
+  "expected_result": "Office action stored against application",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T103",
+  "source_id": "PMS-AFR-117 main obligation",
+  "purpose": "Attorney reviews office action",
+  "preconditions": "Recorded office action; assigned Attorney",
+  "action_or_input": "Attorney retrieves office action",
+  "expected_result": "Office action details returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T104",
+  "source_id": "PMS-AFR-118 main obligation",
+  "purpose": "Attorney prepares draft response",
+  "preconditions": "Recorded office action",
+  "action_or_input": "Attorney saves draft response",
+  "expected_result": "Draft response stored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T105",
+  "source_id": "PMS-AFR-119 condition-true (Applicant review required)",
+  "purpose": "Applicant approves response",
+  "preconditions": "Draft response; process requires Applicant review",
+  "action_or_input": "Applicant approves the response",
+  "expected_result": "Applicant approval recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T106",
+  "source_id": "PMS-AFR-120 main obligation",
+  "purpose": "Attorney finalizes response",
+  "preconditions": "Draft response (approved if required)",
+  "action_or_input": "Attorney finalizes",
+  "expected_result": "Response marked final",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T107",
+  "source_id": "PMS-AFR-121 main obligation",
+  "purpose": "Attorney records response submission within deadline",
+  "preconditions": "Finalized response; deadline in future",
+  "action_or_input": "Attorney records submission",
+  "expected_result": "Submission recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T108",
+  "source_id": "PMS-AFR-122 condition-true (extension allowed)",
+  "purpose": "Extension request recorded when allowed",
+  "preconditions": "Office action whose process allows extension",
+  "action_or_input": "Attorney records extension request",
+  "expected_result": "Extension request recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T109",
+  "source_id": "PMS-AFR-122 condition-false (extension not allowed)",
+  "purpose": "Extension rejected when process disallows",
+  "preconditions": "Office action whose process does not allow extension",
+  "action_or_input": "Attorney records extension request",
+  "expected_result": "Rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T110",
+  "source_id": "PMS-AFR-123 main obligation",
+  "purpose": "Response submission status tracked",
+  "preconditions": "Office action with response",
+  "action_or_input": "Record submission",
+  "expected_result": "Response status updated to submitted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T111",
+  "source_id": "PMS-AFR-124 main obligation",
+  "purpose": "Office-action response deadline tracked automatically",
+  "preconditions": "Office action recorded with deadline data",
+  "action_or_input": "Record office action",
+  "expected_result": "Response deadline automatically tracked",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T112",
+  "source_id": "PMS-AFR-125 main obligation",
+  "purpose": "Applicant withdraws pre-filing application",
+  "preconditions": "Applicant's application Under Review",
+  "action_or_input": "Applicant withdraws with reason",
+  "expected_result": "Withdrawal accepted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T113",
+  "source_id": "PMS-AFR-126 condition-false (status disallows)",
+  "purpose": "Withdrawal rejected after filing stage",
+  "preconditions": "Applicant's application status Filed",
+  "action_or_input": "Applicant withdraws with reason",
+  "expected_result": "Rejected; status unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T114",
+  "source_id": "PMS-AFR-127 validation (missing reason)",
+  "purpose": "Withdrawal without reason rejected",
+  "preconditions": "Applicant's application Under Review",
+  "action_or_input": "Withdraw with empty reason",
+  "expected_result": "Rejected with validation error",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T115",
+  "source_id": "PMS-AFR-128 condition-true (consent required)",
+  "purpose": "Co-inventor consent recorded for withdrawal",
+  "preconditions": "Application with co-inventors; consent required",
+  "action_or_input": "Record co-inventor consent and withdraw",
+  "expected_result": "Consent recorded with withdrawal",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T116",
+  "source_id": "PMS-AFR-129 main obligation",
+  "purpose": "Status Withdrawn after permitted withdrawal",
+  "preconditions": "Withdrawal-eligible application",
+  "action_or_input": "Withdraw with reason",
+  "expected_result": "Status is Withdrawn",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T117",
+  "source_id": "PMS-AFR-130 main obligation",
+  "purpose": "Withdrawn application removed from active queue",
+  "preconditions": "Withdrawal-eligible application in active queue",
+  "action_or_input": "Withdraw",
+  "expected_result": "Application absent from active queue",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T118",
+  "source_id": "PMS-AFR-131 main obligation",
+  "purpose": "Withdrawal history maintained",
+  "preconditions": "Withdrawn application",
+  "action_or_input": "Retrieve history",
+  "expected_result": "Withdrawal entry with reason, user and date present",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T119",
+  "source_id": "PMS-AFR-132 main obligation",
+  "purpose": "Applicant manages multiple inventors",
+  "preconditions": "Applicant's application",
+  "action_or_input": "Add two co-inventors",
+  "expected_result": "Application lists all inventors",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T120",
+  "source_id": "PMS-AFR-133 main obligation",
+  "purpose": "Applicant manages ownership shares",
+  "preconditions": "Application with inventors",
+  "action_or_input": "Set ownership shares 60/40",
+  "expected_result": "Shares stored per inventor",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T121",
+  "source_id": "PMS-AFR-134 validation (invalid inventor info)",
+  "purpose": "Invalid inventor information rejected",
+  "preconditions": "Applicant's application",
+  "action_or_input": "Add inventor missing required identity info (e.g., name)",
+  "expected_result": "Rejected with validation error",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T122",
+  "source_id": "PMS-AFR-135 validation (invalid ownership)",
+  "purpose": "Invalid ownership percentages rejected",
+  "preconditions": "Application with inventors",
+  "action_or_input": "Set shares totaling over 100% or a negative share",
+  "expected_result": "Rejected with validation error",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T123",
+  "source_id": "PMS-AFR-136 condition-false (consent missing)",
+  "purpose": "Filing blocked without inventor consent",
+  "preconditions": "Filing-eligible application; one inventor has not consented",
+  "action_or_input": "Record filing",
+  "expected_result": "Rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T124",
+  "source_id": "PMS-AFR-137 condition-true (configured)",
+  "purpose": "E-signature collected for consent",
+  "preconditions": "E-signature configured and permitted",
+  "action_or_input": "Inventor signs consent electronically",
+  "expected_result": "Electronic signature stored with consent",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T125",
+  "source_id": "PMS-AFR-138 validation (invalid signature)",
+  "purpose": "Invalid e-signature rejected",
+  "preconditions": "E-signature configured and permitted",
+  "action_or_input": "Submit invalid/tampered signature",
+  "expected_result": "Rejected; consent not recorded as signed",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T126",
+  "source_id": "PMS-AFR-140 main obligation",
+  "purpose": "Affected parties notified on inventor change",
+  "preconditions": "Application with inventors; email backend captures",
+  "action_or_input": "Change inventor information",
+  "expected_result": "Notifications triggered to affected parties",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T127",
+  "source_id": "PMS-AFR-141 main obligation",
+  "purpose": "Applicant searches prior art",
+  "preconditions": "Applicant; search source available",
+  "action_or_input": "Run search",
+  "expected_result": "Results returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T128",
+  "source_id": "PMS-AFR-142 main obligation",
+  "purpose": "Attorney searches prior art",
+  "preconditions": "Attorney; search source available",
+  "action_or_input": "Run search",
+  "expected_result": "Results returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T129",
+  "source_id": "PMS-AFR-143 main obligation",
+  "purpose": "Patent database queried",
+  "preconditions": "Patent database source configured (stub)",
+  "action_or_input": "Run search",
+  "expected_result": "Patent database queried; its results included",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T130",
+  "source_id": "PMS-AFR-144 main obligation",
+  "purpose": "Publication database queried",
+  "preconditions": "Publication database source configured (stub)",
+  "action_or_input": "Run search",
+  "expected_result": "Publication database queried; its results included",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T131",
+  "source_id": "PMS-AFR-145 main obligation",
+  "purpose": "Results displayed with relevance ranking",
+  "preconditions": "Search source returns several results",
+  "action_or_input": "Run search",
+  "expected_result": "Results ordered by relevance with ranking shown",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T132",
+  "source_id": "PMS-AFR-146 main obligation",
+  "purpose": "Selected references attached to application",
+  "preconditions": "Search results; user's application",
+  "action_or_input": "Attach selected reference",
+  "expected_result": "Reference linked to application",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T133",
+  "source_id": "PMS-AFR-147 main obligation",
+  "purpose": "Search sessions logged",
+  "preconditions": "User runs search",
+  "action_or_input": "Run search",
+  "expected_result": "Search session log entry with user, query and timestamp",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T134",
+  "source_id": "PMS-AFR-148 main obligation",
+  "purpose": "Keyword optimization supported",
+  "preconditions": "Search available",
+  "action_or_input": "Request keyword optimization for a query",
+  "expected_result": "Optimized/suggested keywords returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T135",
+  "source_id": "PMS-AFR-149 main obligation",
+  "purpose": "Classification mapping supported",
+  "preconditions": "Search available",
+  "action_or_input": "Request classification mapping for a query",
+  "expected_result": "Mapped classification(s) returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T136",
+  "source_id": "PMS-AFR-150 main obligation",
+  "purpose": "Document version history maintained",
+  "preconditions": "Document with two versions",
+  "action_or_input": "Retrieve version history",
+  "expected_result": "Both versions listed",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T137",
+  "source_id": "PMS-AFR-151 condition-true (permitted)",
+  "purpose": "Permitted upload of new version",
+  "preconditions": "Applicant; status Needs Revision",
+  "action_or_input": "Upload new version",
+  "expected_result": "Upload accepted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T138",
+  "source_id": "PMS-AFR-151 condition-false (not permitted)",
+  "purpose": "Upload rejected when role/status not permitted",
+  "preconditions": "Applicant; status Under Review",
+  "action_or_input": "Upload new version",
+  "expected_result": "Rejected",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T139",
+  "source_id": "PMS-AFR-152 main obligation",
+  "purpose": "Automatic version numbering",
+  "preconditions": "Document at version 1",
+  "action_or_input": "Upload new version",
+  "expected_result": "New version numbered 2 automatically",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T140",
+  "source_id": "PMS-AFR-153 main obligation",
+  "purpose": "Previous versions archived",
+  "preconditions": "Document at version 1",
+  "action_or_input": "Upload version 2",
+  "expected_result": "Version 1 archived, still retrievable",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T141",
+  "source_id": "PMS-AFR-154 main obligation",
+  "purpose": "Previous versions accessible per rules",
+  "preconditions": "Archived version; authorized user",
+  "action_or_input": "Access archived version",
+  "expected_result": "Returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T142",
+  "source_id": "PMS-AFR-154 authorization",
+  "purpose": "Previous version access denied to unauthorized role",
+  "preconditions": "Archived version; unrelated Applicant",
+  "action_or_input": "Access archived version",
+  "expected_result": "Access denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T143",
+  "source_id": "PMS-AFR-155 main obligation",
+  "purpose": "Document modifications logged",
+  "preconditions": "Document",
+  "action_or_input": "Upload new version",
+  "expected_result": "Log entry with user and timestamp",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T144",
+  "source_id": "PMS-AFR-156 authorization",
+  "purpose": "Document access controlled by role and status",
+  "preconditions": "Application document; user without access role",
+  "action_or_input": "Access document",
+  "expected_result": "Access denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T145",
+  "source_id": "PMS-AFR-157 condition-true (Needs Revision)",
+  "purpose": "Applicant edits documents in Needs Revision",
+  "preconditions": "Status Needs Revision",
+  "action_or_input": "Applicant edits document",
+  "expected_result": "Edit accepted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T146",
+  "source_id": "PMS-AFR-157 condition-false (other status)",
+  "purpose": "Applicant edit blocked in other status",
+  "preconditions": "Status Under Review",
+  "action_or_input": "Applicant edits document",
+  "expected_result": "Rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T147",
+  "source_id": "PMS-AFR-158 main obligation",
+  "purpose": "Applicant submits licensing request",
+  "preconditions": "Applicant",
+  "action_or_input": "Submit licensing request",
+  "expected_result": "Request recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T148",
+  "source_id": "PMS-AFR-159 main obligation",
+  "purpose": "Applicant submits technology-transfer request",
+  "preconditions": "Applicant",
+  "action_or_input": "Submit tech-transfer request",
+  "expected_result": "Request recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T149",
+  "source_id": "PMS-AFR-160 main obligation",
+  "purpose": "Request routed to committee/Director",
+  "preconditions": "Routing process configured",
+  "action_or_input": "Submit request",
+  "expected_result": "Request routed to configured committee or Director",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T150",
+  "source_id": "PMS-AFR-161 main obligation",
+  "purpose": "Negotiation information tracked",
+  "preconditions": "Routed request",
+  "action_or_input": "Record negotiation update",
+  "expected_result": "Negotiation info stored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T151",
+  "source_id": "PMS-AFR-162 main obligation",
+  "purpose": "Final agreement documented",
+  "preconditions": "Request under negotiation",
+  "action_or_input": "Record final agreement",
+  "expected_result": "Agreement stored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T152",
+  "source_id": "PMS-AFR-163 condition-true (integration available)",
+  "purpose": "Financial info shared via integration",
+  "preconditions": "Financial integration configured (stub)",
+  "action_or_input": "Record final agreement with financials",
+  "expected_result": "Financial information sent/updated through integration",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T153",
+  "source_id": "PMS-AFR-164 authorization",
+  "purpose": "License records confidentiality enforced",
+  "preconditions": "License record; unauthorized user",
+  "action_or_input": "Access license record",
+  "expected_result": "Access denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T154",
+  "source_id": "PMS-AFR-165 main obligation",
+  "purpose": "Applicant files appeal against rejection",
+  "preconditions": "Rejected application; within period",
+  "action_or_input": "File appeal with grounds",
+  "expected_result": "Appeal recorded",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T155",
+  "source_id": "PMS-AFR-166 condition-false (period elapsed)",
+  "purpose": "Late appeal rejected",
+  "preconditions": "Rejected application; allowed period configured and elapsed",
+  "action_or_input": "File appeal",
+  "expected_result": "Rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T156",
+  "source_id": "PMS-AFR-167 validation (missing grounds)",
+  "purpose": "Appeal without grounds/justification rejected",
+  "preconditions": "Rejected application; within period",
+  "action_or_input": "File appeal without grounds",
+  "expected_result": "Rejected with validation error",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T157",
+  "source_id": "PMS-AFR-168 main obligation",
+  "purpose": "Director reviews appeal",
+  "preconditions": "Filed appeal",
+  "action_or_input": "Director retrieves appeal",
+  "expected_result": "Appeal and supporting docs returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T158",
+  "source_id": "PMS-AFR-169 main obligation",
+  "purpose": "Director chooses allowed appeal outcome",
+  "preconditions": "Filed appeal",
+  "action_or_input": "Record Uphold Rejection / Remand for Amendment / Modify Decision",
+  "expected_result": "Each accepted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T159",
+  "source_id": "PMS-AFR-169 validation (invalid outcome)",
+  "purpose": "Invalid appeal outcome rejected",
+  "preconditions": "Filed appeal",
+  "action_or_input": "Record outcome 'Dismiss'",
+  "expected_result": "Rejected with validation error",
+  "test_type": "validation"
+ },
+ {
+  "test_id": "FR-T160",
+  "source_id": "PMS-AFR-170 main obligation",
+  "purpose": "Appeal outcome recorded",
+  "preconditions": "Filed appeal",
+  "action_or_input": "Director records outcome",
+  "expected_result": "Outcome persisted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T161",
+  "source_id": "PMS-AFR-171 main obligation",
+  "purpose": "Next step initiated after outcome",
+  "preconditions": "Filed appeal",
+  "action_or_input": "Director records Remand for Amendment",
+  "expected_result": "Next applicable process step initiated (application enters amendment/revision step)",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T162",
+  "source_id": "PMS-AFR-172 main obligation",
+  "purpose": "Review deadline calculated and monitored",
+  "preconditions": "Director assignment",
+  "action_or_input": "Assign application",
+  "expected_result": "Review deadline computed and monitored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T163",
+  "source_id": "PMS-AFR-173 main obligation",
+  "purpose": "Revision deadline calculated and monitored",
+  "preconditions": "Needs Revision decision",
+  "action_or_input": "Record decision",
+  "expected_result": "Resubmission deadline = decision date + 60 days and monitored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T164",
+  "source_id": "PMS-AFR-174 main obligation",
+  "purpose": "Office-action deadline monitored",
+  "preconditions": "Office action with deadline data",
+  "action_or_input": "Record office action",
+  "expected_result": "Response deadline monitored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T165",
+  "source_id": "PMS-AFR-175 main obligation",
+  "purpose": "Maintenance-fee deadline monitored",
+  "preconditions": "Granted patent; schedule rules configured",
+  "action_or_input": "Activate tracking",
+  "expected_result": "Maintenance deadline computed and monitored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T166",
+  "source_id": "PMS-AFR-176 boundary (30 days)",
+  "purpose": "Alert generated 30 days before deadline",
+  "preconditions": "Tracked deadline 30 days ahead",
+  "action_or_input": "Run deadline monitoring",
+  "expected_result": "30-day alert generated",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T167",
+  "source_id": "PMS-AFR-177 boundary (15 days)",
+  "purpose": "Alert generated 15 days before deadline",
+  "preconditions": "Tracked deadline 15 days ahead",
+  "action_or_input": "Run deadline monitoring",
+  "expected_result": "15-day alert generated",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T168",
+  "source_id": "PMS-AFR-178 boundary (5 days)",
+  "purpose": "Alert generated 5 days before deadline",
+  "preconditions": "Tracked deadline 5 days ahead",
+  "action_or_input": "Run deadline monitoring",
+  "expected_result": "5-day alert generated",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T169",
+  "source_id": "PMS-AFR-179 main obligation",
+  "purpose": "Deadline notification sent to stakeholders",
+  "preconditions": "Alert due",
+  "action_or_input": "Run deadline monitoring",
+  "expected_result": "Notifications to relevant stakeholders triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T170",
+  "source_id": "PMS-AFR-180 condition-true (missed)",
+  "purpose": "Missed deadline escalated per chain",
+  "preconditions": "Deadline passed; escalation chain configured",
+  "action_or_input": "Run deadline monitoring",
+  "expected_result": "Escalation to next level in configured chain",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T171",
+  "source_id": "PMS-AFR-181 main obligation",
+  "purpose": "Deadline tracking logged",
+  "preconditions": "Tracked deadline",
+  "action_or_input": "Run deadline monitoring",
+  "expected_result": "Deadline tracking log entry created",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T172",
+  "source_id": "PMS-AFR-182 main obligation",
+  "purpose": "PCC_ADMIN and Director generate application status and progress reports",
+  "preconditions": "PCC_ADMIN and Director users; data present",
+  "action_or_input": "Each generates the application status and progress report",
+  "expected_result": "Report generated for both roles",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T173",
+  "source_id": "PMS-AFR-183 main obligation",
+  "purpose": "PCC_ADMIN and Director generate financial and budget reports",
+  "preconditions": "PCC_ADMIN and Director users; data present",
+  "action_or_input": "Each generates the financial and budget report",
+  "expected_result": "Report generated for both roles",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T174",
+  "source_id": "PMS-AFR-184 main obligation",
+  "purpose": "PCC_ADMIN and Director generate deadline and pending action reports",
+  "preconditions": "PCC_ADMIN and Director users; data present",
+  "action_or_input": "Each generates the deadline and pending action report",
+  "expected_result": "Report generated for both roles",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T175",
+  "source_id": "PMS-AFR-185 main obligation",
+  "purpose": "PCC_ADMIN and Director generate inventor and co-inventor reports",
+  "preconditions": "PCC_ADMIN and Director users; data present",
+  "action_or_input": "Each generates the inventor and co-inventor report",
+  "expected_result": "Report generated for both roles",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T176",
+  "source_id": "PMS-AFR-186 main obligation",
+  "purpose": "PCC_ADMIN and Director generate patent portfolio analysis reports",
+  "preconditions": "PCC_ADMIN and Director users; data present",
+  "action_or_input": "Each generates the patent portfolio analysis report",
+  "expected_result": "Report generated for both roles",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T177",
+  "source_id": "PMS-AFR-187 main obligation",
+  "purpose": "PCC_ADMIN and Director generate workload and assignment reports",
+  "preconditions": "PCC_ADMIN and Director users; data present",
+  "action_or_input": "Each generates the workload and assignment report",
+  "expected_result": "Report generated for both roles",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T178",
+  "source_id": "PMS-AFR-182 authorization (Applicant)",
+  "purpose": "System-wide reports restricted to PCC_ADMIN/Director",
+  "preconditions": "Applicant user",
+  "action_or_input": "Generate system-wide application status report",
+  "expected_result": "Access denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T179",
+  "source_id": "PMS-AFR-188 main obligation",
+  "purpose": "Authorized user schedules report",
+  "preconditions": "PCC_ADMIN",
+  "action_or_input": "Schedule report",
+  "expected_result": "Schedule stored",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T180",
+  "source_id": "PMS-AFR-189 main obligation",
+  "purpose": "Authorized user exports report",
+  "preconditions": "PCC_ADMIN",
+  "action_or_input": "Export report",
+  "expected_result": "Export file returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T181",
+  "source_id": "PMS-AFR-190 main obligation",
+  "purpose": "Authorized user customizes report",
+  "preconditions": "PCC_ADMIN",
+  "action_or_input": "Customize fields/filters",
+  "expected_result": "Customized report returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T182",
+  "source_id": "PMS-AFR-191 main obligation",
+  "purpose": "Report access logged",
+  "preconditions": "PCC_ADMIN",
+  "action_or_input": "Generate report",
+  "expected_result": "Access log entry created",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T183",
+  "source_id": "PMS-AFR-192 main obligation",
+  "purpose": "Email triggered for application submission",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the application submission event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T184",
+  "source_id": "PMS-AFR-193 main obligation",
+  "purpose": "Email triggered for application status change",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the application status change event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T185",
+  "source_id": "PMS-AFR-194 main obligation",
+  "purpose": "Email triggered for assignment to Director",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the assignment to Director event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T186",
+  "source_id": "PMS-AFR-195 main obligation",
+  "purpose": "Email triggered for assignment to Attorney",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the assignment to Attorney event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T187",
+  "source_id": "PMS-AFR-196 main obligation",
+  "purpose": "Email triggered for review decision",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the review decision event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T188",
+  "source_id": "PMS-AFR-197 main obligation",
+  "purpose": "Email triggered for budget approval or rejection",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the budget approval or rejection event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T189",
+  "source_id": "PMS-AFR-198 main obligation",
+  "purpose": "Email triggered for filing confirmation",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the filing confirmation event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T190",
+  "source_id": "PMS-AFR-199 main obligation",
+  "purpose": "Email triggered for office action",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the office action event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T191",
+  "source_id": "PMS-AFR-200 main obligation",
+  "purpose": "Email triggered for deadline reminder",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the deadline reminder event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T192",
+  "source_id": "PMS-AFR-201 main obligation",
+  "purpose": "Email triggered for deadline escalation",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the deadline escalation event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T193",
+  "source_id": "PMS-AFR-202 main obligation",
+  "purpose": "Email triggered for maintenance-fee reminder",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the maintenance-fee reminder event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T194",
+  "source_id": "PMS-AFR-203 main obligation",
+  "purpose": "Email triggered for document update",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the document update event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T195",
+  "source_id": "PMS-AFR-204 main obligation",
+  "purpose": "Email triggered for document version change",
+  "preconditions": "Email backend captures outgoing messages",
+  "action_or_input": "Perform the document version change event",
+  "expected_result": "System-generated email triggered to relevant recipients",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T196",
+  "source_id": "PMS-AFR-207 main obligation",
+  "purpose": "Audit trail of PMS actions",
+  "preconditions": "User",
+  "action_or_input": "Perform PMS action",
+  "expected_result": "Audit entry created",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T197",
+  "source_id": "PMS-AFR-208 main obligation",
+  "purpose": "User actions logged",
+  "preconditions": "User",
+  "action_or_input": "Perform user action",
+  "expected_result": "Log entry for action",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T198",
+  "source_id": "PMS-AFR-209 main obligation",
+  "purpose": "Status changes logged",
+  "preconditions": "Application",
+  "action_or_input": "Change status",
+  "expected_result": "Log entry for change",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T199",
+  "source_id": "PMS-AFR-210 main obligation",
+  "purpose": "Document modifications logged",
+  "preconditions": "Document",
+  "action_or_input": "Modify document",
+  "expected_result": "Log entry for modification",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T200",
+  "source_id": "PMS-AFR-211 main obligation",
+  "purpose": "Audit log has required attributes",
+  "preconditions": "Application Submitted",
+  "action_or_input": "Assign to Director",
+  "expected_result": "Entry has user ID, action type, timestamp, application ID, previous state Submitted, new state Under Review",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T201",
+  "source_id": "PMS-AFR-212 main obligation",
+  "purpose": "Critical audit records immutable",
+  "preconditions": "Audit record of critical op",
+  "action_or_input": "Attempt to update/delete record",
+  "expected_result": "Modification rejected; record unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T202",
+  "source_id": "PMS-AFR-213 main obligation",
+  "purpose": "Audit logs retrievable for compliance",
+  "preconditions": "Authorized auditor (PCC_ADMIN)",
+  "action_or_input": "Retrieve audit logs for application",
+  "expected_result": "Logs returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T203",
+  "source_id": "PMS-AFR-216 authorization",
+  "purpose": "User without valid PMS role denied",
+  "preconditions": "Authenticated user without role",
+  "action_or_input": "Access PMS function",
+  "expected_result": "Access denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T204",
+  "source_id": "PMS-AFR-217 condition-false (no approval)",
+  "purpose": "Attorney assignment blocked before Director approval",
+  "preconditions": "Application Under Review",
+  "action_or_input": "PCC_ADMIN assigns Attorney",
+  "expected_result": "Rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T205",
+  "source_id": "PMS-AFR-218 condition-false (budget incomplete)",
+  "purpose": "Filing blocked before approvals and budget",
+  "preconditions": "Approved application; budget not approved",
+  "action_or_input": "Record filing",
+  "expected_result": "Rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T206",
+  "source_id": "PMS-AFR-220 authorization",
+  "purpose": "Confidential info RBAC enforced",
+  "preconditions": "Confidential document; unauthorized role",
+  "action_or_input": "Access document",
+  "expected_result": "Access denied",
+  "test_type": "authorization"
+ },
+ {
+  "test_id": "FR-T207",
+  "source_id": "PMS-AFR-221 condition-false (second PCC_ADMIN)",
+  "purpose": "Only one active PCC_ADMIN",
+  "preconditions": "One active PCC_ADMIN",
+  "action_or_input": "Activate a second PCC_ADMIN",
+  "expected_result": "Rejected",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T208",
+  "source_id": "PMS-AFR-222 main obligation",
+  "purpose": "Multiple Directors handle reviews by domain",
+  "preconditions": "Two Directors with different domains",
+  "action_or_input": "Assign applications in both domains",
+  "expected_result": "Each assigned to the matching Director",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T209",
+  "source_id": "PMS-AFR-223 main obligation",
+  "purpose": "Multiple panel Attorneys conduct assessments",
+  "preconditions": "Two panel Attorneys",
+  "action_or_input": "Assign each to an application",
+  "expected_result": "Both conduct assessments",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T210",
+  "source_id": "PMS-AFR-224 main obligation",
+  "purpose": "Multiple Applicants submit applications",
+  "preconditions": "Two Applicants",
+  "action_or_input": "Each submits valid application",
+  "expected_result": "Both accepted",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T211",
+  "source_id": "PMS-AFR-225 condition-false (invalid transition)",
+  "purpose": "Invalid status transition rejected",
+  "preconditions": "Application Submitted",
+  "action_or_input": "Set status Filed directly",
+  "expected_result": "Rejected; status unchanged",
+  "test_type": "negative"
+ },
+ {
+  "test_id": "FR-T212",
+  "source_id": "PMS-AFR-226 main obligation",
+  "purpose": "Escalation for delayed actions",
+  "preconditions": "Delayed action past deadline",
+  "action_or_input": "Run escalation",
+  "expected_result": "Escalation triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T213",
+  "source_id": "PMS-AFR-236 main obligation",
+  "purpose": "Director rejects budget",
+  "preconditions": "Approved application with budget",
+  "action_or_input": "Director rejects budget",
+  "expected_result": "Rejection recorded; rejection notification triggered",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T214",
+  "source_id": "PMS-AFR-237 main obligation",
+  "purpose": "Dashboards provided",
+  "preconditions": "PCC_ADMIN",
+  "action_or_input": "Open dashboard",
+  "expected_result": "Dashboard returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T215",
+  "source_id": "PMS-AFR-238 main obligation",
+  "purpose": "Historical data analysis provided",
+  "preconditions": "PCC_ADMIN",
+  "action_or_input": "Request historical analysis",
+  "expected_result": "Analysis returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T216",
+  "source_id": "PMS-AFR-239 main obligation",
+  "purpose": "Trend reporting provided",
+  "preconditions": "PCC_ADMIN",
+  "action_or_input": "Request trend report",
+  "expected_result": "Trend report returned",
+  "test_type": "positive"
+ },
+ {
+  "test_id": "FR-T217",
+  "source_id": "PMS-AFR-206 boundary (trigger only)",
+  "purpose": "PMS triggers the notification email and does not itself own or report email delivery",
+  "preconditions": "Application submission possible; email backend captures outgoing messages (no external delivery infrastructure)",
+  "action_or_input": "Applicant submits a valid application",
+  "expected_result": "A system-generated email for the submission is handed to the email backend; PMS does not record a delivery outcome (delivered/bounced) for that email",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T218",
+  "source_id": "PMS-AFR-228 boundary (records patent-office data)",
+  "purpose": "PMS records patent-office filing, status and communication data while the patent-office system stays external",
+  "preconditions": "Filing-eligible application; no patent-office system integration configured",
+  "action_or_input": "Attorney records the filing (ID, date, confirmation) and an official patent-office communication",
+  "expected_result": "Filing data and the communication are stored as PMS records and status becomes Filed, with no call to an external patent-office system needed",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T219",
+  "source_id": "PMS-AFR-229 boundary (records financial metadata)",
+  "purpose": "PMS records budget, authorization and transaction metadata while the financial system stays external",
+  "preconditions": "Approved application with budget within threshold; no financial-system integration configured",
+  "action_or_input": "Director approves the budget",
+  "expected_result": "Budget decision, authorization level and transaction metadata are stored in PMS; no payment is executed by PMS",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T220",
+  "source_id": "PMS-AFR-230 boundary (stores version/access/audit metadata)",
+  "purpose": "PMS stores document versions, access and audit metadata while the document-management system stays external",
+  "preconditions": "Application document at version 1; no document-management-system integration configured",
+  "action_or_input": "Authorized user uploads version 2 and then reads it",
+  "expected_result": "PMS holds version 2 metadata with an automatic version number, the archived version 1, and audit entries for the modification and access",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T221",
+  "source_id": "PMS-AFR-231 boundary (query source, not repository)",
+  "purpose": "External prior-art results are not stored as PMS-owned records unless attached",
+  "preconditions": "Prior-art search source (stub) returns results R1 and R2; Applicant owns an application",
+  "action_or_input": "Applicant runs a search and attaches only R1 to the application",
+  "expected_result": "Only R1 is stored as a reference on the application; R2 is not persisted as a PMS reference record (the search session is still logged)",
+  "test_type": "boundary"
+ },
+ {
+  "test_id": "FR-T222",
+  "source_id": "PMS-AFR-232 condition-false (no filing details)",
+  "purpose": "PMS does not record an application as Filed without the recorded filing details/confirmation",
+  "preconditions": "Filing-eligible application",
+  "action_or_input": "Attorney attempts to mark the application Filed without filing ID, filing date and confirmation",
+  "expected_result": "Request rejected; application status is not Filed and no filing record is created",
+  "test_type": "negative"
+ }
+]
