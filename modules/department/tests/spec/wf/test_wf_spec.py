@@ -166,23 +166,3 @@ def test_wf_009_02_official_change_composite_rejected(spec_client):
     hod, _ = spec_client("HOD (CSE)", user_id=13)
     rej = hod.post(f"{BASE}/proposals/{prop['id']}/action", {"action": "reject"}, format="json").json()
     assert rej["status"] == "rejected"
-
-
-def test_wf_010_01_hod_reassignment_sync():
-    """WF-010-01 | BW-DEPT-07 HOD Reassignment and Headship Synchronization Path."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_wf_011_01_deptadmin_reassignment_transition():
-    """WF-011-01 | BW-DEPT-08 Dept_Admin Role Reassignment and Access Transition Path."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_wf_012_01_composite_role_reassignment_hod():
-    """WF-012-01 | CW-DEPT-04 Department Role Reassignment Composite Lifecycle HOD Path."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_wf_012_02_composite_role_reassignment_admin():
-    """WF-012-02 | CW-DEPT-04 Department Role Reassignment Composite Lifecycle Dept_Admin Path."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")

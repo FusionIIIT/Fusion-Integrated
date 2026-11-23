@@ -375,36 +375,6 @@ def test_uc_014_02_hod_oversight_non_terminal(spec_client):
     assert any(f["id"] == fb["id"] and f["status"] == "reviewed" for f in res.json()["results"])
 
 
-def test_uc_015_01_view_profiles_student():
-    """UC-015-01 | UC-DEPT-015 Main Success Scenario Student Peer View."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_uc_015_02_view_profiles_faculty_course():
-    """UC-015-02 | UC-DEPT-015 Main Success Scenario Faculty Course View."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_uc_015_03_view_profiles_faculty_mismatch():
-    """UC-015-03 | UC-DEPT-015 Alternative Flow Faculty Non-Course Student Mismatch."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_uc_015_04_view_profiles_hod_masking():
-    """UC-015-04 | UC-DEPT-015 Alternative Flow HOD/Admin Privacy Masking."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_uc_016_01_manage_profiles_main():
-    """UC-016-01 | UC-DEPT-016 Main Success Scenario."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_uc_016_02_manage_profiles_validation_failure():
-    """UC-016-02 | UC-DEPT-016 Alternative Flow Validation Failure."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
 def test_uc_017_01_manage_lab_profiles_main(spec_client):
     """UC-017-01 | UC-DEPT-017 Main Success Scenario."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
@@ -458,23 +428,3 @@ def test_uc_019_02_manage_inventory_invalid_data(spec_client):
         "name": "Broken Item",
         "quantity": -5}, format="json")
     assert res.status_code == 400
-
-
-def test_uc_020_01_maintain_role_assignments():
-    """UC-020-01 | UC-DEPT-020 Main Success Scenario."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_uc_020_02_maintain_role_cardinality():
-    """UC-020-02 | UC-DEPT-020 Alternative Flow Cardinality Violation."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_uc_022_01_effective_role_transition():
-    """UC-022-01 | UC-DEPT-022 Main Success Scenario Role Transition."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_uc_022_02_initial_role_assignment():
-    """UC-022-02 | UC-DEPT-022 Alternative Flow Initial Assignment."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")

@@ -19,7 +19,7 @@
 
 ## Follow-up verification
 
-These historical runs used the same local implementation snapshot with repaired tests. On 23 November 2026, Student 2 asked to defer the 39 skipped cases and keep the inventory for follow-up. Their executable tests and frozen designs are preserved. The two additional design-to-test questions remain open.
+These historical runs used the same local implementation snapshot with repaired tests. The shared-commit rerun at `fcce66a` reproduced these results.
 
 | Run | Strategy | Cases | Passed | Failed | Skipped | Line % | Branch % |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -28,9 +28,13 @@ These historical runs used the same local implementation snapshot with repaired 
 | Follow-up verification | UC | 44 | 34 | 0 | 10 | 83.79% | 44.93% |
 | Follow-up verification | WF | 16 | 12 | 0 | 4 | 72.56% | 28.26% |
 
+After removing the deferred tests, the active suite returned 36 BR, 45 FR, 34 UC and 12 WF passes, with zero failures and zero runtime skips. The 39 cases listed below were outside that run.
+
 ## Deferred skip inventory
 
-The 39 skipped cases below are the rows marked `Unresolved` for Profiles or Time-bounded IAM role assignments and Headship. Each row retains the frozen case ID, source, expected behavior and next action. Resume with the profile field and relationship contract, or the effective IAM assignment and Headship contract, as applicable.
+On 23 November 2026, Student 2 directed that the 39 skipped tests be removed from the active suite and kept for follow-up. The full test functions are preserved in commit `fcce66a`. To retrieve one, use `git show fcce66a:modules/department/tests/spec/<strategy>/test_<strategy>_spec.py`, with the strategy in lowercase, then copy the case into the current suite. The frozen designs retain all 166 cases.
+
+Each `Unresolved` row records the deferred case ID, source, expected behavior and next action. Those rows and the two design-to-test questions remain open under Step 9. Q1 is deferred and still needs an independent scorecard.
 
 | Strategy | Deferred skips |
 | --- | ---: |
@@ -151,4 +155,4 @@ The 39 skipped cases below are the rows marked `Unresolved` for Profiles or Time
 
 - `UC-014-02` expects an oversight record and describes adding notes. UC-DEPT-014 says, “HOD reviews without changing terminal status: feedback remains in its existing reviewed state,” and its success postcondition says, “HOD oversight is recorded.” The current test checks the reviewed state and visibility. The pair needs to agree what observable record is required. The current API has no non-terminal HOD write action.
 - `FR-060` tests refusal of an independent Headship proposal. It cannot verify that the displayed Headship retains the effective assignment while the Headship projection is deferred. Resolve with the IAM group (`AFR-DEPT-052` and `AFR-DEPT-053`).
-- The [quality report](../department-quality-report.md) records Student 2’s written instruction to defer the skips and the earlier relayed approvals. Preserve the skipped cases until Student 1 implements the behavior or the pair records a Step 9 disposition with the governing spec sentence and, where applicable, a covering test.
+- The [quality report](../department-quality-report.md) records Student 2’s written instruction to defer the skips and the earlier relayed approvals. Revisit the deferred cases after Student 1 implements the behavior or the pair records a Step 9 disposition with the governing spec sentence and, where applicable, a covering test.

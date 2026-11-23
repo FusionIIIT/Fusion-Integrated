@@ -534,41 +534,6 @@ def test_fr_032_submitter_notified_on_disposition(spec_client):
         ]
 
 
-def test_fr_033_department_profile_management():
-    """FR-033 | AFR-DEPT-024 Department profile management (CFR-DEPT-009)."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_fr_034_management_stays_in_department():
-    """FR-034 | AFR-DEPT-024 Management stays within the department (CFR-DEPT-009)."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_fr_035_student_profile_basic():
-    """FR-035 | AFR-DEPT-025 Student profile visibility is basic (CFR-DEPT-010)."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_fr_036_faculty_detailed_profile_course():
-    """FR-036 | AFR-DEPT-026 Faculty sees detailed profiles for Students in their courses (CFR-DEPT-010)."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_fr_037_detailed_access_scoped_to_relationship():
-    """FR-037 | AFR-DEPT-026 Detailed access is scoped to the Faculty course relationship (CFR-DEPT-010)."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_fr_038_faculty_alumni_visibility_limited():
-    """FR-038 | AFR-DEPT-027 Faculty and Alumni visibility is limited (CFR-DEPT-010)."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
-def test_fr_039_full_view_excludes_protected():
-    """FR-039 | AFR-DEPT-028 Full department view excludes protected data (CFR-DEPT-010)."""
-    pytest.skip("NOT_AUTOMATED: External profile contract deferred per specification Phase 0 decision")
-
-
 def test_fr_040_upload_timetables(spec_client):
     """FR-040 | AFR-DEPT-029 Upload class and lab timetables (CFR-DEPT-011)."""
     admin, _ = spec_client("deptadmin_cse", user_id=14)
@@ -774,46 +739,6 @@ def test_fr_051_rejected_official_change_retains_data(spec_client):
 
     det = admin.get(f"{BASE}/details").json()
     assert det["official_name"] == "Original department name"
-
-
-def test_fr_052_central_authority_assigns_roles():
-    """FR-052 | AFR-DEPT-047 Central authority assigns both department roles (CFR-DEPT-016)."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_fr_053_department_roles_require_central_authority():
-    """FR-053 | AFR-DEPT-047 Department roles require central assignment authority (CFR-DEPT-016)."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_fr_054_validity_interval_tenure():
-    """FR-054 | AFR-DEPT-048 Each assignment has a validity interval (CFR-DEPT-016)."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_fr_055_revoke_outgoing_access():
-    """FR-055 | AFR-DEPT-049 Revoke outgoing access at the effective transition (CFR-DEPT-016)."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_fr_056_grant_incoming_access():
-    """FR-056 | AFR-DEPT-050 Grant incoming access at the effective transition (CFR-DEPT-016)."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_fr_057_exactly_one_active_hod():
-    """FR-057 | AFR-DEPT-051 Exactly one active HOD (CFR-DEPT-016)."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_fr_058_exactly_one_active_deptadmin():
-    """FR-058 | AFR-DEPT-052 Exactly one active Dept_Admin (CFR-DEPT-016)."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
-
-
-def test_fr_059_displayed_headship_effective():
-    """FR-059 | AFR-DEPT-053 Displayed Headship follows effective HOD (CFR-DEPT-016)."""
-    pytest.skip("NOT_AUTOMATED: External IAM role assignment contract deferred per specification Phase 0 decision")
 
 
 def test_fr_060_headship_cannot_be_independently_edited(spec_client):
