@@ -105,6 +105,1182 @@ paths:
               schema:
                 $ref: '#/components/schemas/Session'
           description: ''
+  /api/v1/phc/advisories:
+    get:
+      operationId: v1_phc_advisories_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAdvisoryList'
+              examples:
+                Advisory:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 2
+                      title: Dengue precautions
+                      body: Remove standing water.
+                      published_at: '2026-11-23T09:00:00+05:30'
+          description: ''
+    post:
+      operationId: v1_phc_advisories_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Advisory'
+            examples:
+              Publish:
+                value:
+                  title: Dengue precautions
+                  body: Remove standing water.
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Advisory'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Advisory'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advisory'
+              examples:
+                Advisory:
+                  value:
+                    id: 2
+                    title: Dengue precautions
+                    body: Remove standing water.
+                    published_at: '2026-11-23T09:00:00+05:30'
+          description: ''
+  /api/v1/phc/ambulance:
+    get:
+      operationId: v1_phc_ambulance_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAmbulanceLogList'
+              examples:
+                Entry:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 1
+                      used_at: '2026-11-23T08:40:00+05:30'
+                      patient_name: Hostel 4 resident
+                      destination: District Hospital
+                      created_at: '2026-11-23T09:00:00+05:30'
+          description: ''
+    post:
+      operationId: v1_phc_ambulance_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AmbulanceLog'
+            examples:
+              Log:
+                value:
+                  used_at: '2026-11-23T08:40:00+05:30'
+                  patient_name: Hostel 4 resident
+                  destination: District Hospital
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AmbulanceLog'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AmbulanceLog'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AmbulanceLog'
+              examples:
+                Entry:
+                  value:
+                    id: 1
+                    used_at: '2026-11-23T08:40:00+05:30'
+                    patient_name: Hostel 4 resident
+                    destination: District Hospital
+                    created_at: '2026-11-23T09:00:00+05:30'
+          description: ''
+  /api/v1/phc/claims:
+    get:
+      operationId: v1_phc_claims_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedClaimList'
+              examples:
+                Claim:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 7
+                      user_id: 4021
+                      prescription: 17
+                      prescription_label: Paracetamol 500mg (2026-11-21)
+                      expense_date: '2026-11-21'
+                      amount: '450.00'
+                      description: Pharmacy bill
+                      status: pending_phc_review
+                      status_label: Pending PHC review
+                      submitted_at: '2026-11-22T11:00:00+05:30'
+                      actions:
+                      - event: submit
+                        from_status: ''
+                        to_status: pending_phc_review
+                        note: ''
+                        created_at: '2026-11-22T11:00:00+05:30'
+                      allowed_events: []
+          description: ''
+    post:
+      operationId: v1_phc_claims_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimWrite'
+            examples:
+              Submit:
+                value:
+                  prescription_id: 17
+                  expense_date: '2026-11-21'
+                  amount: '450.00'
+                  description: Pharmacy bill
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClaimWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClaimWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+              examples:
+                Claim:
+                  value:
+                    id: 7
+                    user_id: 4021
+                    prescription: 17
+                    prescription_label: Paracetamol 500mg (2026-11-21)
+                    expense_date: '2026-11-21'
+                    amount: '450.00'
+                    description: Pharmacy bill
+                    status: pending_phc_review
+                    status_label: Pending PHC review
+                    submitted_at: '2026-11-22T11:00:00+05:30'
+                    actions:
+                    - event: submit
+                      from_status: ''
+                      to_status: pending_phc_review
+                      note: ''
+                      created_at: '2026-11-22T11:00:00+05:30'
+                    allowed_events: []
+          description: ''
+  /api/v1/phc/claims/{id}:
+    get:
+      operationId: v1_phc_claims_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+              examples:
+                Claim:
+                  value:
+                    id: 7
+                    user_id: 4021
+                    prescription: 17
+                    prescription_label: Paracetamol 500mg (2026-11-21)
+                    expense_date: '2026-11-21'
+                    amount: '450.00'
+                    description: Pharmacy bill
+                    status: pending_phc_review
+                    status_label: Pending PHC review
+                    submitted_at: '2026-11-22T11:00:00+05:30'
+                    actions:
+                    - event: submit
+                      from_status: ''
+                      to_status: pending_phc_review
+                      note: ''
+                      created_at: '2026-11-22T11:00:00+05:30'
+                    allowed_events: []
+          description: ''
+  /api/v1/phc/claims/{id}/transition:
+    post:
+      operationId: v1_phc_claims_transition_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimTransition'
+            examples:
+              Forward:
+                value:
+                  event: forward
+                  note: ''
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClaimTransition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClaimTransition'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Claim'
+              examples:
+                Claim:
+                  value:
+                    id: 7
+                    user_id: 4021
+                    prescription: 17
+                    prescription_label: Paracetamol 500mg (2026-11-21)
+                    expense_date: '2026-11-21'
+                    amount: '450.00'
+                    description: Pharmacy bill
+                    status: pending_accounts_verification
+                    status_label: Pending PHC review
+                    submitted_at: '2026-11-22T11:00:00+05:30'
+                    actions:
+                    - event: submit
+                      from_status: ''
+                      to_status: pending_phc_review
+                      note: ''
+                      created_at: '2026-11-22T11:00:00+05:30'
+                    allowed_events: []
+          description: ''
+  /api/v1/phc/claims/prescriptions:
+    get:
+      operationId: v1_phc_claims_prescriptions_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EligiblePrescription'
+              examples:
+                Prescriptions:
+                  value:
+                  - - id: 17
+                      medicine: Paracetamol 500mg
+                      dosage: 1-0-1
+                      visit_date: '2026-11-21'
+          description: ''
+  /api/v1/phc/inventory:
+    get:
+      operationId: v1_phc_inventory_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInventoryItemList'
+              examples:
+                Item:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 5
+                      name: Paracetamol 500mg
+                      unit: strip
+                      stock_level: '40.00'
+                      reorder_threshold: '50.00'
+                      is_low: true
+          description: ''
+    post:
+      operationId: v1_phc_inventory_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItemWrite'
+            examples:
+              AddItem:
+                value:
+                  name: Paracetamol 500mg
+                  unit: strip
+                  stock_level: '100'
+                  reorder_threshold: '50'
+                summary: Add item
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryItemWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryItemWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+              examples:
+                Item:
+                  value:
+                    id: 5
+                    name: Paracetamol 500mg
+                    unit: strip
+                    stock_level: '40.00'
+                    reorder_threshold: '50.00'
+                    is_low: true
+          description: ''
+  /api/v1/phc/inventory/{id}/adjust:
+    post:
+      operationId: v1_phc_inventory_adjust_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockAdjustmentWrite'
+            examples:
+              Deduct:
+                value:
+                  delta: '-60'
+                  reason: Dispensed
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockAdjustmentWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockAdjustmentWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockAdjustment'
+              examples:
+                Adjustment:
+                  value:
+                    id: 9
+                    item: 5
+                    delta: '-60.00'
+                    level_after: '40.00'
+                    reason: Dispensed
+                    created_at: '2026-11-23T12:00:00+05:30'
+                    low_stock_alert: true
+          description: ''
+  /api/v1/phc/inventory/alerts:
+    get:
+      operationId: v1_phc_inventory_alerts_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLowStockAlertList'
+              examples:
+                Alert:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 2
+                      item: 5
+                      item_name: Paracetamol 500mg
+                      level: '40.00'
+                      threshold: '50.00'
+                      created_at: '2026-11-23T12:00:00+05:30'
+          description: ''
+  /api/v1/phc/notifications:
+    get:
+      operationId: v1_phc_notifications_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNotificationList'
+              examples:
+                Notification:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 8
+                      kind: claim_status
+                      message: 'Your reimbursement claim #7 is now reimbursed.'
+                      resource_type: reimbursement_claim
+                      resource_id: 7
+                      created_at: '2026-11-23T15:00:00+05:30'
+          description: ''
+  /api/v1/phc/patients:
+    get:
+      operationId: v1_phc_patients_list
+      parameters:
+      - in: query
+        name: q
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Patient'
+              examples:
+                Match:
+                  value:
+                  - - user_id: 4021
+                      display_name: A. Sharma
+                      kind: staff
+          description: ''
+  /api/v1/phc/records:
+    get:
+      operationId: v1_phc_records_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisitList'
+              examples:
+                Visit:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 11
+                      patient_user_id: 4021
+                      visit_date: '2026-11-21'
+                      complaint: Fever
+                      diagnosis: Viral fever
+                      prescriptions:
+                      - id: 17
+                        medicine: Paracetamol 500mg
+                        dosage: 1-0-1
+                        duration_days: 3
+                        instructions: After food
+                      created_at: '2026-11-21T10:15:00+05:30'
+          description: ''
+    post:
+      operationId: v1_phc_records_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitWrite'
+            examples:
+              Record:
+                value:
+                  patient_user_id: 4021
+                  visit_date: '2026-11-21'
+                  complaint: Fever
+                  diagnosis: Viral fever
+                  prescriptions:
+                  - medicine: Paracetamol 500mg
+                    dosage: 1-0-1
+                    duration_days: 3
+                    instructions: After food
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VisitWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VisitWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visit'
+              examples:
+                Visit:
+                  value:
+                    id: 11
+                    patient_user_id: 4021
+                    visit_date: '2026-11-21'
+                    complaint: Fever
+                    diagnosis: Viral fever
+                    prescriptions:
+                    - id: 17
+                      medicine: Paracetamol 500mg
+                      dosage: 1-0-1
+                      duration_days: 3
+                      instructions: After food
+                    created_at: '2026-11-21T10:15:00+05:30'
+          description: ''
+  /api/v1/phc/records/{id}:
+    get:
+      operationId: v1_phc_records_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visit'
+              examples:
+                Visit:
+                  value:
+                    id: 11
+                    patient_user_id: 4021
+                    visit_date: '2026-11-21'
+                    complaint: Fever
+                    diagnosis: Viral fever
+                    prescriptions:
+                    - id: 17
+                      medicine: Paracetamol 500mg
+                      dosage: 1-0-1
+                      duration_days: 3
+                      instructions: After food
+                    created_at: '2026-11-21T10:15:00+05:30'
+          description: ''
+  /api/v1/phc/records/pdf:
+    get:
+      operationId: v1_phc_records_pdf_retrieve
+      parameters:
+      - in: query
+        name: ids
+        schema:
+          type: string
+        description: Comma-separated visit ids
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/phc/reports:
+    get:
+      operationId: v1_phc_reports_retrieve
+      parameters:
+      - in: query
+        name: category
+        schema:
+          enum:
+          - demographics
+          - utilization
+          - inventory
+          type: string
+          minLength: 1
+        description: |-
+          * `demographics` - demographics
+          * `utilization` - utilization
+          * `inventory` - inventory
+        required: true
+      - in: query
+        name: end
+        schema:
+          type: string
+          format: date
+        required: true
+      - in: query
+        name: start
+        schema:
+          type: string
+          format: date
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+              examples:
+                Utilization:
+                  value:
+                    category: utilization
+                    start: '2026-11-01'
+                    end: '2026-11-30'
+                    data:
+                      visits_by_month:
+                      - month: 2026-11
+                        visits: 42
+                      claims_by_status:
+                        reimbursed: 6
+          description: ''
+  /api/v1/phc/requisitions:
+    get:
+      operationId: v1_phc_requisitions_list
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRequisitionList'
+              examples:
+                Requisition:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 4
+                      originator_user_id: 3001
+                      purpose: Monthly restock
+                      status: pending_approval
+                      status_label: Pending approval
+                      lines:
+                      - item: 5
+                        item_name: Paracetamol 500mg
+                        unit: strip
+                        quantity: '200.00'
+                      decision_note: ''
+                      decided_at: null
+                      fulfilled_at: null
+                      created_at: '2026-11-23T12:30:00+05:30'
+                      allowed_events: []
+          description: ''
+    post:
+      operationId: v1_phc_requisitions_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisitionWrite'
+            examples:
+              Raise:
+                value:
+                  purpose: Monthly restock
+                  lines:
+                  - item_id: 5
+                    quantity: '200'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RequisitionWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RequisitionWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisition'
+              examples:
+                Requisition:
+                  value:
+                    id: 4
+                    originator_user_id: 3001
+                    purpose: Monthly restock
+                    status: pending_approval
+                    status_label: Pending approval
+                    lines:
+                    - item: 5
+                      item_name: Paracetamol 500mg
+                      unit: strip
+                      quantity: '200.00'
+                    decision_note: ''
+                    decided_at: null
+                    fulfilled_at: null
+                    created_at: '2026-11-23T12:30:00+05:30'
+                    allowed_events: []
+          description: ''
+  /api/v1/phc/requisitions/{id}/transition:
+    post:
+      operationId: v1_phc_requisitions_transition_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisitionTransition'
+            examples:
+              Approve:
+                value:
+                  event: approve
+                  note: ''
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RequisitionTransition'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RequisitionTransition'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Requisition'
+              examples:
+                Requisition:
+                  value:
+                    id: 4
+                    originator_user_id: 3001
+                    purpose: Monthly restock
+                    status: approved
+                    status_label: Pending approval
+                    lines:
+                    - item: 5
+                      item_name: Paracetamol 500mg
+                      unit: strip
+                      quantity: '200.00'
+                    decision_note: ''
+                    decided_at: null
+                    fulfilled_at: null
+                    created_at: '2026-11-23T12:30:00+05:30'
+                    allowed_events: []
+          description: ''
+  /api/v1/phc/schedules:
+    get:
+      operationId: v1_phc_schedules_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Schedule'
+              examples:
+                Schedule:
+                  value:
+                  - id: 3
+                    doctor_name: Dr. R. Iyer
+                    specialization: General Medicine
+                    is_published: true
+                    published_at: '2026-11-20T09:00:00+05:30'
+                    slots:
+                    - day_of_week: 0
+                      day_label: Monday
+                      start_time: '10:00:00'
+                      end_time: '13:00:00'
+                    today_status: available
+          description: ''
+    post:
+      operationId: v1_phc_schedules_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleWrite'
+            examples:
+              Create:
+                value:
+                  doctor_name: Dr. R. Iyer
+                  specialization: General Medicine
+                  slots:
+                  - day_of_week: 0
+                    start_time: '10:00'
+                    end_time: '13:00'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ScheduleWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScheduleWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+              examples:
+                Schedule:
+                  value:
+                    id: 3
+                    doctor_name: Dr. R. Iyer
+                    specialization: General Medicine
+                    is_published: true
+                    published_at: '2026-11-20T09:00:00+05:30'
+                    slots:
+                    - day_of_week: 0
+                      day_label: Monday
+                      start_time: '10:00:00'
+                      end_time: '13:00:00'
+                    today_status: available
+          description: ''
+  /api/v1/phc/schedules/{id}:
+    put:
+      operationId: v1_phc_schedules_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleWrite'
+            examples:
+              Update:
+                value:
+                  doctor_name: Dr. R. Iyer
+                  specialization: General Medicine
+                  slots:
+                  - day_of_week: 0
+                    start_time: '10:00'
+                    end_time: '13:00'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ScheduleWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScheduleWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+              examples:
+                Schedule:
+                  value:
+                    id: 3
+                    doctor_name: Dr. R. Iyer
+                    specialization: General Medicine
+                    is_published: true
+                    published_at: '2026-11-20T09:00:00+05:30'
+                    slots:
+                    - day_of_week: 0
+                      day_label: Monday
+                      start_time: '10:00:00'
+                      end_time: '13:00:00'
+                    today_status: available
+          description: ''
+  /api/v1/phc/schedules/{id}/attendance:
+    post:
+      operationId: v1_phc_schedules_attendance_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttendanceWrite'
+            examples:
+              Arrived:
+                value:
+                  status: available
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AttendanceWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttendanceWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attendance'
+              examples:
+                Attendance:
+                  value:
+                    schedule: 3
+                    attendance_date: '2026-11-23'
+                    status: available
+          description: ''
+  /api/v1/phc/schedules/{id}/publish:
+    post:
+      operationId: v1_phc_schedules_publish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+              examples:
+                Published:
+                  value:
+                    id: 3
+                    doctor_name: Dr. R. Iyer
+                    specialization: General Medicine
+                    is_published: true
+                    published_at: '2026-11-20T09:00:00+05:30'
+                    slots:
+                    - day_of_week: 0
+                      day_label: Monday
+                      start_time: '10:00:00'
+                      end_time: '13:00:00'
+                    today_status: available
+          description: ''
   /api/v1/placement/announcements:
     get:
       operationId: v1_placement_announcements_list
@@ -1774,6 +2950,51 @@ components:
           minItems: 1
       required:
       - application_ids
+    Advisory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 180
+        body:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - id
+      - published_at
+      - title
+    AmbulanceLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        used_at:
+          type: string
+          format: date-time
+        patient_name:
+          type: string
+          maxLength: 160
+        destination:
+          type: string
+          maxLength: 300
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - destination
+      - id
+      - patient_name
+      - used_at
     Announcement:
       type: object
       properties:
@@ -1981,6 +3202,38 @@ components:
         * `pending` - Pending institute approval
         * `approved` - Approved
         * `rejected` - Rejected
+    Attendance:
+      type: object
+      properties:
+        schedule:
+          type: integer
+          readOnly: true
+        attendance_date:
+          type: string
+          format: date
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+      required:
+      - attendance_date
+      - schedule
+      - status
+    AttendanceWrite:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/AttendanceWriteStatusEnum'
+      required:
+      - status
+    AttendanceWriteStatusEnum:
+      enum:
+      - available
+      - departed
+      type: string
+      description: |-
+        * `available` - Available
+        * `departed` - Departed
     AudienceEnum:
       enum:
       - students
@@ -2082,6 +3335,137 @@ components:
       - resume_link
       - roll_no
       - user_id
+    Claim:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        prescription:
+          type: integer
+          readOnly: true
+        prescription_label:
+          type: string
+          readOnly: true
+        expense_date:
+          type: string
+          format: date
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        status_label:
+          type: string
+          readOnly: true
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClaimAction'
+          readOnly: true
+        allowed_events:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - actions
+      - allowed_events
+      - amount
+      - description
+      - expense_date
+      - id
+      - prescription
+      - prescription_label
+      - status
+      - status_label
+      - submitted_at
+      - user_id
+    ClaimAction:
+      type: object
+      properties:
+        event:
+          type: string
+          readOnly: true
+        from_status:
+          type: string
+          readOnly: true
+        to_status:
+          type: string
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - event
+      - from_status
+      - note
+      - to_status
+    ClaimTransition:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ClaimTransitionEventEnum'
+        note:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - event
+    ClaimTransitionEventEnum:
+      enum:
+      - approve
+      - forward
+      - pay
+      - reject
+      - verify
+      type: string
+      description: |-
+        * `approve` - approve
+        * `forward` - forward
+        * `pay` - pay
+        * `reject` - reject
+        * `verify` - verify
+    ClaimWrite:
+      type: object
+      properties:
+        prescription_id:
+          type: integer
+          minimum: 1
+        expense_date:
+          type: string
+          format: date
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        description:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - amount
+      - expense_date
+      - prescription_id
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3699,24 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DayOfWeekEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      description: |-
+        * `0` - Monday
+        * `1` - Tuesday
+        * `2` - Wednesday
+        * `3` - Thursday
+        * `4` - Friday
+        * `5` - Saturday
+        * `6` - Sunday
     Detail:
       type: object
       properties:
@@ -2407,6 +3809,27 @@ components:
       - season_decision
       - semester
       - standing
+    EligiblePrescription:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        medicine:
+          type: string
+          readOnly: true
+        dosage:
+          type: string
+          readOnly: true
+        visit_date:
+          type: string
+          format: date
+          readOnly: true
+      required:
+      - dosage
+      - id
+      - medicine
+      - visit_date
     FeeApproval:
       type: object
       description: Rules 20 and 21 both require the challan or receipt to be produced.
@@ -2508,6 +3931,60 @@ components:
         * `tech` - Technical interview
         * `hr` - HR interview
         * `other` - Other
+    InventoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        unit:
+          type: string
+          readOnly: true
+        stock_level:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        reorder_threshold:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        is_low:
+          type: boolean
+          readOnly: true
+      required:
+      - id
+      - is_low
+      - name
+      - reorder_threshold
+      - stock_level
+      - unit
+    InventoryItemWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 160
+        unit:
+          type: string
+          maxLength: 40
+        stock_level:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        reorder_threshold:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - name
+      - reorder_threshold
+      - stock_level
+      - unit
     JobPosting:
       type: object
       properties:
@@ -2663,6 +4140,39 @@ components:
       required:
       - password
       - username
+    LowStockAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        level:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        threshold:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - item
+      - item_name
+      - level
+      - threshold
     ModeEnum:
       enum:
       - online
@@ -2732,6 +4242,35 @@ components:
       - is_late
       - message
       - record
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        resource_type:
+          type: string
+          readOnly: true
+        resource_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - kind
+      - message
+      - resource_id
+      - resource_type
     OffCampusRecord:
       type: object
       properties:
@@ -2886,6 +4425,44 @@ components:
           maxLength: 300
       required:
       - season
+    PaginatedAdvisoryList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Advisory'
+    PaginatedAmbulanceLogList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AmbulanceLog'
     PaginatedAnnouncementList:
       type: object
       required:
@@ -2924,6 +4501,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Application'
+    PaginatedClaimList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Claim'
     PaginatedCompanyList:
       type: object
       required:
@@ -2962,6 +4558,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InterviewRound'
+    PaginatedInventoryItemList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryItem'
     PaginatedJobPostingList:
       type: object
       required:
@@ -2981,6 +4596,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+    PaginatedLowStockAlertList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LowStockAlert'
+    PaginatedNotificationList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
     PaginatedOfferList:
       type: object
       required:
@@ -3000,6 +4653,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PaginatedRequisitionList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Requisition'
+    PaginatedVisitList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Visit'
     PatchedJobPosting:
       type: object
       properties:
@@ -3085,6 +4776,22 @@ components:
       properties:
         active_role:
           type: string
+    Patient:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+      required:
+      - display_name
+      - kind
+      - user_id
     PlacementRecordDetail:
       type: object
       description: A student's own record, with what rules 22 and 24 still want from
@@ -3145,6 +4852,29 @@ components:
       - offer_letter_submitted
       - offer_letter_submitted_at
       - source
+    Prescription:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        medicine:
+          type: string
+          maxLength: 160
+        dosage:
+          type: string
+          maxLength: 120
+        duration_days:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          nullable: true
+        instructions:
+          type: string
+      required:
+      - dosage
+      - id
+      - medicine
     ProfileDocument:
       type: object
       description: |-
@@ -3466,6 +5196,155 @@ components:
       - message
       - reason
       - route
+    Report:
+      type: object
+      properties:
+        category:
+          type: string
+          readOnly: true
+        start:
+          type: string
+          format: date
+          readOnly: true
+        end:
+          type: string
+          format: date
+          readOnly: true
+        data:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+      required:
+      - category
+      - data
+      - end
+      - start
+    Requisition:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        originator_user_id:
+          type: integer
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        status_label:
+          type: string
+          readOnly: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequisitionLine'
+          readOnly: true
+        decision_note:
+          type: string
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        fulfilled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        allowed_events:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - allowed_events
+      - created_at
+      - decided_at
+      - decision_note
+      - fulfilled_at
+      - id
+      - lines
+      - originator_user_id
+      - purpose
+      - status
+      - status_label
+    RequisitionLine:
+      type: object
+      properties:
+        item:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        unit:
+          type: string
+          readOnly: true
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - item
+      - item_name
+      - quantity
+      - unit
+    RequisitionLineWrite:
+      type: object
+      properties:
+        item_id:
+          type: integer
+          minimum: 1
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - item_id
+      - quantity
+    RequisitionTransition:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/RequisitionTransitionEventEnum'
+        note:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - event
+    RequisitionTransitionEventEnum:
+      enum:
+      - approve
+      - fulfill
+      - reject
+      type: string
+      description: |-
+        * `approve` - approve
+        * `fulfill` - fulfill
+        * `reject` - reject
+    RequisitionWrite:
+      type: object
+      properties:
+        purpose:
+          type: string
+          maxLength: 500
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/RequisitionLineWrite'
+      required:
+      - lines
+      - purpose
     RoundOutcome:
       type: object
       properties:
@@ -3551,6 +5430,60 @@ components:
         * `deregister` - deregister
         * `bar_season` - bar_season
         * `bar_permanent` - bar_permanent
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doctor_name:
+          type: string
+          readOnly: true
+        specialization:
+          type: string
+          readOnly: true
+        is_published:
+          type: boolean
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slot'
+          readOnly: true
+        today_status:
+          type: string
+          nullable: true
+          readOnly: true
+      required:
+      - doctor_name
+      - id
+      - is_published
+      - published_at
+      - slots
+      - specialization
+      - today_status
+    ScheduleWrite:
+      type: object
+      properties:
+        doctor_name:
+          type: string
+          maxLength: 160
+        specialization:
+          type: string
+          default: ''
+          maxLength: 120
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slot'
+      required:
+      - doctor_name
+      - slots
     ScheduledCount:
       type: object
       properties:
@@ -3655,6 +5588,28 @@ components:
       - id
       - kind
       - username
+    Slot:
+      type: object
+      properties:
+        day_of_week:
+          allOf:
+          - $ref: '#/components/schemas/DayOfWeekEnum'
+          minimum: 0
+          maximum: 32767
+        day_label:
+          type: string
+          readOnly: true
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+      required:
+      - day_label
+      - day_of_week
+      - end_time
+      - start_time
     SourceEnum:
       enum:
       - campus
@@ -3691,6 +5646,56 @@ components:
       required:
       - available
       - season
+    StockAdjustment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item:
+          type: integer
+          readOnly: true
+        delta:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        level_after:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        low_stock_alert:
+          type: boolean
+          readOnly: true
+      required:
+      - created_at
+      - delta
+      - id
+      - item
+      - level_after
+      - low_stock_alert
+      - reason
+    StockAdjustmentWrite:
+      type: object
+      properties:
+        delta:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        reason:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - delta
     SubmitOfferLetter:
       type: object
       properties:
@@ -3814,6 +5819,65 @@ components:
             $ref: '#/components/schemas/UserRef'
       required:
       - results
+    Visit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient_user_id:
+          type: integer
+          readOnly: true
+        visit_date:
+          type: string
+          format: date
+          readOnly: true
+        complaint:
+          type: string
+          readOnly: true
+        diagnosis:
+          type: string
+          readOnly: true
+        prescriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Prescription'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - complaint
+      - created_at
+      - diagnosis
+      - id
+      - patient_user_id
+      - prescriptions
+      - visit_date
+    VisitWrite:
+      type: object
+      properties:
+        patient_user_id:
+          type: integer
+          minimum: 1
+        visit_date:
+          type: string
+          format: date
+        complaint:
+          type: string
+        diagnosis:
+          type: string
+          default: ''
+        prescriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Prescription'
+      required:
+      - complaint
+      - patient_user_id
+      - prescriptions
+      - visit_date
     WaiveIncident:
       type: object
       properties:
