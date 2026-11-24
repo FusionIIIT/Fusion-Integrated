@@ -453,3 +453,224 @@ def test_role_governance_api(stub_iam, cse_dept):
     )
     assert res_rev.status_code == 200
     assert res_rev.json()["status"] == "REVOKED"
+
+
+def test_auxiliary_endpoints_and_coverage(stub_iam, cse_dept):
+    import modules.dept.registry as reg
+    import modules.dept.schedule as sched
+
+    assert reg.MODULE["code"] == "dept"
+    assert "dept.evaluate-role-transitions" in sched.BEAT_SCHEDULE
+
+    # 1. Inventory add stock and transactions
+    admin_c = _client(
+        stub_iam,
+        user_id=999,
+        modules=("dept",),
+        permissions=(
+            "dept.announcement.view",
+            "dept.announcement.create",
+            "dept.announcement.manage",
+            "dept.inventory.view",
+            "dept.inventory.create",
+            "dept.stock_request.view",
+            "dept.feedback.view",
+            "dept.timetable.view",
+            "dept.timetable.manage",
+            "dept.lab_resource.view",
+            "dept.lab_resource.manage",
+            "dept.role_assignment.view",
+            "dept.role_assignment.manage",
+            "dept.detail.view",
+            "dept.detail.update",
+            "dept.detail.approve",
+        ),
+        roles=("Dept_Admin",),
+    )
+    res_item = admin_c.post(
+        "/api/v1/dept/inventory/?department=CSE",
+        {"item_code": "AUX-01", "name": "Aux Item", "initial_quantity": 5},
+        format="json",
+    )
+    assert res_item.status_code == 201
+    item_id = res_item.json()["id"]
+
+    res_add = admin_c.post(
+        f"/api/v1/dept/inventory/{item_id}/add-stock/?department=CSE",
+        {"quantity": 5, "notes": "restock"},
+        format="json",
+    )
+    assert res_add.status_code == 200
+
+    res_tx = admin_c.get(f"/api/v1/dept/inventory/{item_id}/transactions/?department=CSE")
+    assert res_tx.status_code == 200
+    assert len(res_tx.json()) >= 1
+
+    # 2. Stock requests query params
+    res_sr_list = admin_c.get(
+        "/api/v1/dept/stock-requests/?department=CSE&mine=true&status=SUBMITTED"
+    )
+    assert res_sr_list.status_code == 200
+
+    # 3. Timetable filter and delete
+    res_tt = admin_c.post(
+        "/api/v1/dept/timetables/?department=CSE",
+        {
+            "program": "BTech",
+            "academic_year": 2026,
+            "semester": 1,
+            "day_of_week": 4,
+            "start_time": "09:00:00",
+            "end_time": "10:00:00",
+            "course_code": "CS999",
+            "course_name": "Aux Course",
+            "instructor_id": "prof_aux",
+            "room_or_lab": "Room 999",
+        },
+        format="json",
+    )
+    tt_id = res_tt.json()["id"]
+
+    res_tt_filter = admin_c.get(
+        "/api/v1/dept/timetables/?department=CSE&program=BTech&year=2026&semester=1"
+    )
+    assert res_tt_filter.status_code == 200
+
+    res_del_tt = admin_c.delete(f"/api/v1/dept/timetables/{tt_id}/?department=CSE")
+    assert res_del_tt.status_code == 204
+
+    # 4. Lab detail patch
+    res_lab = admin_c.post(
+        "/api/v1/dept/labs/?department=CSE",
+        {"lab_name": "Aux Lab", "location": "Room 888"},
+        format="json",
+    )
+    lab_id = res_lab.json()["id"]
+
+    res_patch_lab = admin_c.patch(
+        f"/api/v1/dept/labs/{lab_id}/?department=CSE",
+        {"description": "Updated aux description"},
+        format="json",
+    )
+    assert res_patch_lab.status_code == 200
+
+    # 5. Announcement patch and delete
+    res_ann = admin_c.post(
+        "/api/v1/dept/announcements/?department=CSE",
+        {"title": "Aux Announce", "content": "Notice content", "target_role": "ALL"},
+        format="json",
+    )
+    ann_id = res_ann.json()["id"]
+
+    hod_c = _client(
+        stub_iam,
+        user_id=301,
+        modules=("dept",),
+        permissions=(
+            "dept.announcement.manage",
+            "dept.detail.approve",
+            "dept.detail.view",
+        ),
+        roles=("HOD",),
+    )
+    res_patch_ann = hod_c.patch(
+        f"/api/v1/dept/announcements/{ann_id}/?department=CSE",
+        {"title": "Updated Aux Announce", "content": "Updated content", "status": "HIDDEN"},
+        format="json",
+    )
+    assert res_patch_ann.status_code == 200
+
+    res_del_ann = hod_c.delete(f"/api/v1/dept/announcements/{ann_id}/?department=CSE")
+    assert res_del_ann.status_code == 204
+
+    # 6. Official changes rejection path
+    admin_c = _client(
+        stub_iam,
+        user_id=999,
+        modules=("dept",),
+        permissions=("dept.detail.update",),
+        roles=("Dept_Admin",),
+    )
+    res_prop = admin_c.post(
+        "/api/v1/dept/details/propose-change/?department=CSE",
+        {"field_name": "core_policies", "new_value": "Rejected policy", "justification": "Test"},
+        format="json",
+    )
+    ch_id = res_prop.json()["id"]
+
+    hod_c = _client(
+        stub_iam,
+        user_id=301,
+        modules=("dept",),
+        permissions=("dept.detail.approve",),
+        roles=("HOD",),
+    )
+    res_rej = hod_c.post(
+        f"/api/v1/dept/details/pending-changes/{ch_id}/decision/?department=CSE",
+        {"decision": "REJECT", "reason": "Not suitable"},
+        format="json",
+    )
+    assert res_rej.status_code == 200
+    assert res_rej.json()["status"] == "REJECTED"
+
+    # 7. Role filter query param
+    inst_admin = _client(
+        stub_iam,
+        user_id=1,
+        modules=("dept",),
+        permissions=("dept.role_assignment.view",),
+        roles=("Institute Admin",),
+    )
+    res_roles = inst_admin.get("/api/v1/dept/roles/?department=CSE&active_only=true")
+    assert res_roles.status_code == 200
+
+    # 8. Feedback query params
+    admin_c = _client(
+        stub_iam,
+        user_id=999,
+        modules=("dept",),
+        permissions=("dept.feedback.view",),
+        roles=("Dept_Admin",),
+    )
+    res_fb_list = admin_c.get("/api/v1/dept/feedback/?department=CSE&mine=true&status=NEW")
+    assert res_fb_list.status_code == 200
+
+    # 9. Scoping helpers & timetable service entry_id update
+    from modules.dept.selectors.scoping import assert_department_access, resolve_department_code
+    from modules.dept.services import timetable as tt_svc
+
+    class MockUser:
+        is_authenticated = True
+        department = "ECE"
+
+    assert resolve_department_code(MockUser()) == "ECE"
+    assert resolve_department_code(object()) == "CSE"
+    assert_department_access(MockUser(), "ECE")
+
+    tt_updated = tt_svc.save_timetable_entry(
+        department_code="CSE",
+        program="BTech",
+        academic_year=2026,
+        semester=1,
+        day_of_week=5,
+        start_time=datetime.time(11, 0),
+        end_time=datetime.time(12, 0),
+        course_code="CS100",
+        course_name="Intro",
+        instructor_id="prof_intro",
+        room_or_lab="Room 100",
+    )
+    tt_svc.save_timetable_entry(
+        entry_id=str(tt_updated.id),
+        department_code="CSE",
+        program="BTech",
+        academic_year=2026,
+        semester=1,
+        day_of_week=5,
+        start_time=datetime.time(11, 0),
+        end_time=datetime.time(12, 0),
+        course_code="CS100",
+        course_name="Intro Updated",
+        instructor_id="prof_intro",
+        room_or_lab="Room 101",
+    )
