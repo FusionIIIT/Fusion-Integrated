@@ -3,7 +3,7 @@
 Student 1 (git author name): Divyansh Dixit
 Student 2 (git author name): Arjun2508
 Design commit (hash and subject): 5a4e0321a5cebe57786aefeded5be4a6a2f7dfea test(dept): freeze spec test designs for FR, UC, BR, WF
-Baseline commit (hash and subject): PENDING_BASELINE_COMMIT
+Baseline commit (hash and subject): 5be29a472ff3422e37294aae6ee0c80a6801b499 test(dept): add spec test suites and baseline triage log
 Student 1's 10/10 commit the baseline ran on (hash): bd0f5f4bded1492a278015576b01895561607768
 
 ## Results
