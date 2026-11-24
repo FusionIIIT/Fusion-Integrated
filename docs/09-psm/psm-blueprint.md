@@ -13,90 +13,90 @@ Every live specification ID from Phase 0 mapped to its architecture layer and pl
 
 | Id | What it requires | Layer it belongs in | Enforcement point (planned) | Notes |
 |---|---|---|---|---|
-| `CFR-PSM-001` | Controlled indent creation, validation, duplicate detection, unique ID, timestamp, audit | `domain/` + `services/` + `models/` | `domain/indent_rules.py`, `services/indents.py::create_and_submit`, `models/indent.py` | Rolls up `AFR-PSM-001`..`007` |
-| `CFR-PSM-002` | Permissible-state indent modification, withdrawal/cancel, repeat-as-draft, versioning, history | `domain/` + `services/` + `selectors/` | `domain/state_machine.py`, `services/indents.py::{modify,withdraw,repeat_as_draft}`, `selectors/indents.py` | Rolls up `AFR-PSM-008`..`012` |
+| `CFR-PSM-001` | Controlled indent creation, validation, duplicate detection, unique ID, timestamp, audit | `domain/` + `services/` + `models/` | `domain/indent_rules.py`, `services/indents.py::create_indent`, `models/indent.py` | Rolls up `AFR-PSM-001`..`007` |
+| `CFR-PSM-002` | Permissible-state indent modification, withdrawal/cancel, repeat-as-draft, versioning, history | `domain/` + `services/` + `selectors/` | `domain/state_machine.py`, `services/indents.py::{modify_indent,withdraw_indent,repeat_as_draft}`, `selectors/scoping.py::indents_for` | Rolls up `AFR-PSM-008`..`012` |
 | `CFR-PSM-003` | Departmental & central stock check, requestor notification, reservation, anti-overcommit | `domain/` + `services/` + `models/` | `domain/stock_rules.py`, `services/stock.py::check_and_reserve`, `models/stock.py` | Rolls up `AFR-PSM-013`..`016` |
-| `CFR-PSM-004` | Internal stock issue pick/dispatch, requestor receipt ack, final posting gated on confirmation & no discrepancy | `domain/` + `services/` | `services/stock.py::schedule_and_dispatch_issue`, `services/receipts.py::{record_grn,confirm_receipt}` | Rolls up `AFR-PSM-017`..`021` |
+| `CFR-PSM-004` | Internal stock issue pick/dispatch, requestor receipt ack, final posting gated on confirmation & no discrepancy | `domain/` + `services/` | `services/stock.py::{schedule_picking,dispatch_internal_issue}`, `services/receipts.py::{record_grn,confirm_receipt}` | Rolls up `AFR-PSM-017`..`021` |
 | `CFR-PSM-005` | Configurable approval hierarchy, priority direct path, criticality, SLA reminders/escalations, rejection justification, audit | `domain/` + `services/` + `tasks.py` | `domain/approval_policy.py`, `services/approvals.py`, `tasks.py::check_approval_slas` | Rolls up `AFR-PSM-022`..`029` |
 | `CFR-PSM-006` | External procurement routing when stock insufficient & direct vs. tender selection by threshold | `domain/` + `services/` | `domain/approval_policy.py::select_procurement_method`, `services/procurement.py::review_and_select_method` | Rolls up `AFR-PSM-030`..`031` |
-| `CFR-PSM-007` | Tender publication, bid receipt, evaluation against criteria, committee approval, traceable retention | `services/` + `models/` | `services/tenders.py::{publish,record_bid,evaluate_and_award}`, `models/tender.py` | Rolls up `AFR-PSM-032`..`036` |
+| `CFR-PSM-007` | Tender publication, bid receipt, evaluation against criteria, committee approval, traceable retention | `services/` + `models/` | `services/tenders.py::{publish_tender,record_bid,evaluate_bids,award_tender}`, `models/tender.py` | Rolls up `AFR-PSM-032`..`036` |
 | `CFR-PSM-008` | PO creation only after required approvals, linked to indent & verified vendor | `domain/` + `services/` + `models/` | `services/procurement.py::create_and_issue_po`, `models/procurement.py::PurchaseOrder` | Rolls up `AFR-PSM-037`..`040` |
-| `CFR-PSM-009` | Central tracking of PO status and planned/actual delivery schedules | `services/` + `selectors/` + `models/` | `services/procurement.py::update_po_schedule`, `selectors/procurement.py::purchase_orders_for` | Rolls up `AFR-PSM-041`..`042` |
+| `CFR-PSM-009` | Central tracking of PO status and planned/actual delivery schedules | `services/` + `selectors/` + `models/` | `services/procurement.py::update_po_schedule`, `selectors/scoping.py::purchase_orders_for` | Rolls up `AFR-PSM-041`..`042` |
 | `CFR-PSM-010` | Authorized delivery inspection, GRN creation, partial receipt & rejection, accepted-only stock posting | `domain/` + `services/` | `domain/receipt_rules.py`, `services/receipts.py::{record_grn,confirm_receipt}` | Rolls up `AFR-PSM-043`..`047` |
 | `CFR-PSM-011` | Discrepancy/damage logging with evidence & case status tracking | `services/` + `models/` + `core/files/` | `services/discrepancies.py::report_discrepancy`, `models/procurement.py::DiscrepancyCase` | Rolls up `AFR-PSM-048`..`049`, `053` |
 | `CFR-PSM-012` | Return/replacement/warranty initiation, vendor comms, inventory & accounting adjustments on resolution | `domain/` + `services/` | `services/discrepancies.py::resolve_case`, `services/stock.py::record_adjustment` | Rolls up `AFR-PSM-050`..`052`, `054`..`055` |
 | `CFR-PSM-013` | Three-way PO-GRN-Invoice match, payment release gate, mismatch hold, partial payment rules | `domain/` + `services/` + `models/` | `domain/finance_rules.py::three_way_match`, `services/finance.py::{verify_invoice,process_payment}` | Rolls up `AFR-PSM-056`..`059` |
-| `CFR-PSM-014` | Vendor onboarding, master maintenance, GST/bank/compliance validation, unverified block, versioning & audit | `domain/` + `services/` + `models/` | `domain/vendor_rules.py`, `services/vendors.py::{onboard,update_vendor,verify_vendor}`, `models/vendor.py` | Rolls up `AFR-PSM-060`..`066` |
+| `CFR-PSM-014` | Vendor onboarding, master maintenance, GST/bank/compliance validation, unverified block, versioning & audit | `domain/` + `services/` + `models/` | `domain/vendor_rules.py`, `services/vendors.py::{onboard_vendor,update_vendor,verify_vendor}`, `models/vendor.py` | Rolls up `AFR-PSM-060`..`066` |
 | `CFR-PSM-015` | Inter-departmental stock transfer request, reserve, dispatch, receipt confirm, dual-ledger posting, audit | `domain/` + `services/` + `models/` | `services/transfers.py::{request_transfer,dispatch_transfer,confirm_transfer}`, `models/stock.py` | Rolls up `AFR-PSM-067`..`073` |
 | `CFR-PSM-016` | Operational, procurement, stock, and financial reports | `selectors/` + `services/` | `services/reports.py::generate_report` | Rolls up `AFR-PSM-074`..`077` |
 | `CFR-PSM-017` | Report filtering, export, scheduled generation, and mandatory generation logging | `services/` + `tasks.py` + `models/` | `services/reports.py::{generate_report,create_schedule,run_due_schedules}`, `tasks.py::run_scheduled_reports` | Rolls up `AFR-PSM-078`..`080`, `082` |
 | `CFR-PSM-018` | Real-time authorized P&S dashboards | `selectors/` | `selectors/dashboard.py::dashboard_summary` | Rolls up `AFR-PSM-081` |
-| `CFR-PSM-019` | Automated lifecycle/SLA notifications and retained communication history | `services/` + `tasks.py` + `models/` | `services/notifications.py::enqueue`, `tasks.py::deliver_notifications`, `models/reporting.py::PsmNotification` | Rolls up `AFR-PSM-083`..`086` |
-| `CFR-PSM-020` | Complete audit trail, internal & statutory audit support, RBAC, policy compliance | `services/` + `selectors/` + `api/` | `services/audit.py::record`, `selectors/scoping.py`, `registry.py`, `domain/approval_policy.py` | Rolls up `AFR-PSM-087`..`092` |
+| `CFR-PSM-019` | Automated lifecycle/SLA notifications and retained communication history | `services/` + `tasks.py` + `models/` | `services/common.py::enqueue_notification`, `tasks.py::deliver_notifications`, `models/reporting.py::PsmNotification` | Rolls up `AFR-PSM-083`..`086` |
+| `CFR-PSM-020` | Complete audit trail, internal & statutory audit support, RBAC, policy compliance | `services/` + `selectors/` + `api/` | `services/common.py::audit_record`, `selectors/scoping.py`, `registry.py`, `domain/approval_policy.py` | Rolls up `AFR-PSM-087`..`092` |
 
 ### Atomic Requirements (`AFR-PSM-001` – `AFR-PSM-092`)
 
 | Id | What it requires | Layer it belongs in | Enforcement point (planned) | Notes |
 |---|---|---|---|---|
-| `AFR-PSM-001` | Authenticated employee creates & submits purchase indent | `services/` + `api/` | `services/indents.py::create_and_submit`, `api/views/indents.py` | `PSM-UC-001` |
-| `AFR-PSM-002` | Capture item details, quantity, estimated cost, justification | `models/` + `api/` | `models/indent.py::Indent`, `api/serializers/indents.py` | `BR-PSM-001` |
+| `AFR-PSM-001` | Authenticated employee creates & submits purchase indent | `services/` + `api/` | `services/indents.py::create_indent`, `api/views_indents.py::IndentListCreateView` | `PSM-UC-001` |
+| `AFR-PSM-002` | Capture item details, quantity, estimated cost, justification | `models/` + `api/` | `models/indent.py::Indent`, `api/serializers.py::IndentCreateSerializer` | `BR-PSM-001` |
 | `AFR-PSM-003` | Validate mandatory indent fields before submission | `domain/` | `domain/indent_rules.py::validate_indent_completeness` | `BR-PSM-001` |
-| `AFR-PSM-004` | Detect potential duplicate indents and flag for review | `domain/` + `services/` | `domain/indent_rules.py::is_potential_duplicate`, `services/indents.py::create_and_submit` | `BR-PSM-015` |
-| `AFR-PSM-005` | Assign unique indent identifier to every submitted indent | `models/` + `services/` | `models/indent.py::Indent.indent_number` (unique), `services/indents.py::_next_indent_number` | `PSM-UC-001` |
-| `AFR-PSM-006` | Record submission timestamp for every submitted indent | `models/` + `services/` | `models/indent.py::Indent.submitted_at`, `services/indents.py::create_and_submit` | `PSM-UC-001` |
-| `AFR-PSM-007` | Log indent creation and subsequent indent actions in audit trail | `services/` | `services/audit.py::record`, `models/indent.py::IndentTransition` | `BR-PSM-021` |
+| `AFR-PSM-004` | Detect potential duplicate indents and flag for review | `domain/` + `services/` | `domain/indent_rules.py::find_potential_duplicate`, `services/indents.py::_check_duplicate` | `BR-PSM-015` |
+| `AFR-PSM-005` | Assign unique indent identifier to every submitted indent | `models/` + `services/` | `models/indent.py::Indent.indent_number` (unique), `services/common.py::next_number` | `PSM-UC-001` |
+| `AFR-PSM-006` | Record submission timestamp for every submitted indent | `models/` + `services/` | `models/indent.py::Indent.submitted_at`, `services/indents.py::_finalize_indent_submission` | `PSM-UC-001` |
+| `AFR-PSM-007` | Log indent creation and subsequent indent actions in audit trail | `services/` | `services/common.py::audit_record`, `models/indent.py::IndentTransition` | `BR-PSM-021` |
 | `AFR-PSM-008` | Employee modifies indent only in permissible state | `domain/` + `services/` | `domain/state_machine.py`, `services/indents.py::modify_indent` | `BR-PSM-007`, `PSM-UC-023` |
 | `AFR-PSM-009` | Employee withdraws/cancels indent only in permissible state | `domain/` + `services/` | `domain/state_machine.py`, `services/indents.py::withdraw_indent` | `BR-PSM-007`, `PSM-UC-005` |
 | `AFR-PSM-010` | Retain each indent modification as a distinct version | `models/` + `services/` | `models/indent.py::IndentVersion`, `services/indents.py::modify_indent` | `BR-PSM-021` |
 | `AFR-PSM-011` | Repeat previous indent as new editable draft | `services/` | `services/indents.py::repeat_as_draft` | `PSM-UC-024` |
-| `AFR-PSM-012` | Expose logged indent actions to authorized stakeholders | `selectors/` | `selectors/indents.py::indent_history_for` | `PSM-UC-003`, `BR-PSM-020` |
+| `AFR-PSM-012` | Expose logged indent actions to authorized stakeholders | `selectors/` + `api/` | `selectors/scoping.py::indents_for`, `api/views_indents.py::IndentDetailView` | `PSM-UC-003`, `BR-PSM-020` |
 | `AFR-PSM-013` | Check departmental & central stock before external procurement | `services/` | `services/stock.py::check_and_reserve` | `BR-PSM-003`, `PSM-UC-007` |
-| `AFR-PSM-014` | Inform requestor when requested items exist in stock records | `services/` | `services/stock.py::check_and_reserve` -> `notifications.enqueue` | `PSM-UC-001`, `PSM-UC-007` |
+| `AFR-PSM-014` | Inform requestor when requested items exist in stock records | `services/` | `services/stock.py::check_and_reserve`, `services/common.py::enqueue_notification` | `PSM-UC-001`, `PSM-UC-007` |
 | `AFR-PSM-015` | Reserve available stock allocated to an indent before internal issue | `services/` + `models/` | `services/stock.py::check_and_reserve`, `models/stock.py::StockReservation` | `BR-PSM-013` |
 | `AFR-PSM-016` | Account for reservations in available stock so stock is not over-committed | `domain/` + `services/` | `domain/stock_rules.py::allocable_quantity`, `services/stock.py::check_and_reserve` (`select_for_update`) | `BR-PSM-013` |
 | `AFR-PSM-017` | Dept Admin schedules picking for approved internal issue | `services/` | `services/stock.py::schedule_picking` | `PSM-UC-009` |
 | `AFR-PSM-018` | Dept Admin schedules/records dispatch for approved internal issue | `services/` | `services/stock.py::dispatch_internal_issue` | `PSM-UC-009` |
 | `AFR-PSM-019` | Requestor acknowledges receipt of internally issued goods | `services/` | `services/receipts.py::confirm_receipt` | `PSM-UC-002` |
-| `AFR-PSM-020` | Final stock posting only after delivery confirmation | `domain/` + `services/` | `domain/receipt_rules.py::can_post_stock`, `services/receipts.py::confirm_receipt` | `BR-PSM-009`, `BR-PSM-026` |
-| `AFR-PSM-021` | Block final stock posting when receipt has unresolved discrepancy | `domain/` + `services/` | `domain/receipt_rules.py::can_post_stock`, `services/receipts.py::confirm_receipt` | `BR-PSM-009`, `BR-PSM-026` |
-| `AFR-PSM-022` | Route indents through configured approval hierarchy by cost thresholds | `domain/` + `services/` | `domain/approval_policy.py::next_approval_stage`, `services/approvals.py` | `BR-PSM-004` |
-| `AFR-PSM-023` | Support more direct approval path for higher-priority indents per policy | `domain/` + `services/` | `domain/approval_policy.py::next_approval_stage`, `services/approvals.py::dept_admin_review` | `BR-PSM-004`, `BR-PSM-014` |
+| `AFR-PSM-020` | Final stock posting only after delivery confirmation | `domain/` + `services/` | `domain/receipt_rules.py::ensure_can_post_stock`, `services/receipts.py::confirm_receipt` | `BR-PSM-009`, `BR-PSM-026` |
+| `AFR-PSM-021` | Block final stock posting when receipt has unresolved discrepancy | `domain/` + `services/` | `domain/receipt_rules.py::ensure_can_post_stock`, `services/receipts.py::confirm_receipt` | `BR-PSM-009`, `BR-PSM-026` |
+| `AFR-PSM-022` | Route indents through configured approval hierarchy by cost thresholds | `domain/` + `services/` | `domain/approval_policy.py::requires_final_approval`, `services/approvals.py` | `BR-PSM-004` |
+| `AFR-PSM-023` | Support more direct approval path for higher-priority indents per policy | `domain/` + `services/` | `domain/approval_policy.py::allows_high_priority_direct_path`, `services/approvals.py::dept_admin_review` | `BR-PSM-004`, `BR-PSM-014` |
 | `AFR-PSM-024` | Dept Admin records criticality/priority of an indent | `services/` | `services/approvals.py::dept_admin_review` | `PSM-UC-011`, `BR-PSM-014` |
-| `AFR-PSM-025` | Use recorded criticality/priority in SLA notifications & queue ordering | `selectors/` + `domain/` | `selectors/indents.py::approval_queue_for`, `domain/approval_policy.py::evaluate_sla` | `BR-PSM-014` |
-| `AFR-PSM-026` | Require justification when any approver rejects an indent | `domain/` + `services/` | `domain/state_machine.py` (`has_reason` guard), `services/approvals.py` | `BR-PSM-005` |
+| `AFR-PSM-025` | Use recorded criticality/priority in SLA notifications & queue ordering | `selectors/` + `domain/` | `api/views_indents.py::IndentListCreateView`, `domain/approval_policy.py::evaluate_sla` | `BR-PSM-014` |
+| `AFR-PSM-026` | Require justification when any approver rejects an indent | `domain/` + `services/` | `domain/state_machine.py`, `domain/approval_policy.py::ensure_rejection_reason`, `services/approvals.py` | `BR-PSM-005` |
 | `AFR-PSM-027` | Issue SLA-based reminders for pending approval actions | `tasks.py` + `services/` | `tasks.py::check_approval_slas`, `services/approvals.py::sweep_slas` | `BR-PSM-014` |
 | `AFR-PSM-028` | Issue SLA-based escalation notifications when conditions met | `tasks.py` + `services/` | `tasks.py::check_approval_slas`, `services/approvals.py::sweep_slas` | `BR-PSM-014` |
-| `AFR-PSM-029` | Record every approval decision in the audit trail | `services/` | `services/approvals.py` -> `IndentTransition` + `audit.record` | `BR-PSM-021` |
+| `AFR-PSM-029` | Record every approval decision in the audit trail | `services/` | `services/approvals.py`, `services/indents.py::transition_indent`, `services/common.py::audit_record` | `BR-PSM-021` |
 | `AFR-PSM-030` | Route indent for external procurement when sufficient stock unavailable | `services/` | `services/stock.py::check_and_reserve` | `BR-PSM-003` |
 | `AFR-PSM-031` | Determine direct vs. tender procurement using configured value thresholds | `domain/` + `services/` | `domain/approval_policy.py::select_procurement_method`, `services/procurement.py::review_and_select_method` | `BR-PSM-008` |
 | `AFR-PSM-032` | Publish bids/tender invitations for tender procurements | `services/` | `services/tenders.py::publish_tender` | `PSM-UC-022` |
 | `AFR-PSM-033` | Receive and record bids for a tender | `services/` | `services/tenders.py::record_bid` | `PSM-UC-022` |
 | `AFR-PSM-034` | Evaluate submitted bids against defined tender criteria | `services/` | `services/tenders.py::evaluate_bids` | `BR-PSM-023`, `PSM-UC-022` |
 | `AFR-PSM-035` | Record committee approval of tender selection | `services/` | `services/tenders.py::award_tender` | `BR-PSM-023`, `PSM-UC-022` |
-| `AFR-PSM-036` | Retain procurement decisions and supporting records traceably | `models/` + `services/` | `models/tender.py`, `services/tenders.py`, `services/audit.py` | `BR-PSM-021`, `BR-PSM-023` |
+| `AFR-PSM-036` | Retain procurement decisions and supporting records traceably | `models/` + `services/` | `models/tender.py`, `services/tenders.py`, `services/common.py::audit_record` | `BR-PSM-021`, `BR-PSM-023` |
 | `AFR-PSM-037` | Allow PO creation only after required approvals complete | `domain/` + `services/` | `domain/state_machine.py`, `services/procurement.py::create_and_issue_po` | `BR-PSM-004`, `BR-PSM-010`, `PSM-UC-026` |
-| `AFR-PSM-038` | Link each PO to its originating indent | `models/` | `models/procurement.py::PurchaseOrder.indent` (FK) | `PSM-UC-026` |
-| `AFR-PSM-039` | Link each PO to the selected vendor | `models/` | `models/procurement.py::PurchaseOrder.vendor` (FK) | `PSM-UC-026` |
+| `AFR-PSM-038` | Link each PO to its originating indent | `models/` | `models/procurement.py::PurchaseOrder` (`indent` FK) | `PSM-UC-026` |
+| `AFR-PSM-039` | Link each PO to the selected vendor | `models/` | `models/procurement.py::PurchaseOrder` (`vendor` FK) | `PSM-UC-026` |
 | `AFR-PSM-040` | Validate vendor master before PO issuance | `domain/` + `services/` | `domain/vendor_rules.py::ensure_vendor_verified`, `services/procurement.py::create_and_issue_po` | `BR-PSM-012` |
-| `AFR-PSM-041` | Track current status of each PO centrally | `models/` + `services/` | `models/procurement.py::PurchaseOrder.status`, `services/procurement.py::update_po_schedule` | `PSM-UC-027` |
-| `AFR-PSM-042` | Track planned & actual delivery schedule per PO centrally | `models/` + `services/` | `models/procurement.py::PurchaseOrder.{planned_delivery_date,actual_delivery_date}` | `PSM-UC-027` |
+| `AFR-PSM-041` | Track current status of each PO centrally | `models/` + `services/` | `models/procurement.py::PurchaseOrder`, `services/procurement.py::update_po_schedule` | `PSM-UC-027` |
+| `AFR-PSM-042` | Track planned & actual delivery schedule per PO centrally | `models/` + `services/` | `models/procurement.py::PurchaseOrder` (`planned_delivery_date`, `actual_delivery_date`) | `PSM-UC-027` |
 | `AFR-PSM-043` | Allow Requestor, Dept Admin, or Dept Head to record delivery inspection | `api/` + `services/` | `services/receipts.py::record_grn`, `registry.py` (`psm.grn.create`) | `PSM-UC-028` |
 | `AFR-PSM-044` | Create GRN for recorded deliveries | `models/` + `services/` | `models/procurement.py::GoodsReceiptNote`, `services/receipts.py::record_grn` | `PSM-UC-028` |
 | `AFR-PSM-045` | Support partial receipt against a PO | `domain/` + `services/` | `domain/receipt_rules.py::validate_grn_quantities`, `services/receipts.py::record_grn` | `BR-PSM-022` |
 | `AFR-PSM-046` | Support rejection of delivered goods during receipt & inspection | `services/` | `services/receipts.py::record_grn` (`rejected_quantity > 0`) | `PSM-UC-028` |
-| `AFR-PSM-047` | Update stock for externally procured goods only after accepted & confirmed receipt | `domain/` + `services/` | `domain/receipt_rules.py::can_post_stock`, `services/receipts.py::confirm_receipt` | `BR-PSM-009`, `BR-PSM-026` |
+| `AFR-PSM-047` | Update stock for externally procured goods only after accepted & confirmed receipt | `domain/` + `services/` | `domain/receipt_rules.py::ensure_can_post_stock`, `services/receipts.py::confirm_receipt` | `BR-PSM-009`, `BR-PSM-026` |
 | `AFR-PSM-048` | Log discrepancy or damage against a delivery | `services/` | `services/discrepancies.py::report_discrepancy` | `PSM-UC-020` |
-| `AFR-PSM-049` | Retain evidence attached to a logged discrepancy/damage | `core/files/` + `services/` | `services/discrepancies.py::report_discrepancy` (validated via `core/files/validators.py`) | `PSM-UC-020` |
+| `AFR-PSM-049` | Retain evidence attached to a logged discrepancy/damage | `core/files/` + `services/` | `services/discrepancies.py::report_discrepancy` (`core/files/drive.py`, `core/files/validators.py`) | `PSM-UC-020` |
 | `AFR-PSM-050` | Support initiation of return when required by policy | `services/` | `services/discrepancies.py::report_discrepancy` (`requested_resolution="return"`) | `BR-PSM-019` |
 | `AFR-PSM-051` | Support initiation of replacement when required by policy | `services/` | `services/discrepancies.py::{report_discrepancy,resolve_case}` | `BR-PSM-019`, `BW-PSM-10` |
 | `AFR-PSM-052` | Record vendor communication for discrepancy/return/replacement/warranty | `models/` + `services/` | `models/procurement.py::DiscrepancyCommunication`, `services/discrepancies.py::add_communication` | `PSM-UC-032` |
-| `AFR-PSM-053` | Track current status & resolution of discrepancy/return/replacement/warranty case | `models/` + `selectors/` | `models/procurement.py::DiscrepancyCase`, `selectors/procurement.py::discrepancies_for` | `PSM-UC-020`, `PSM-UC-032` |
+| `AFR-PSM-053` | Track current status & resolution of discrepancy/return/replacement/warranty case | `models/` + `selectors/` | `models/procurement.py::DiscrepancyCase`, `selectors/scoping.py::discrepancies_for` | `PSM-UC-020`, `PSM-UC-032` |
 | `AFR-PSM-054` | Apply inventory adjustments required by resolved discrepancy/return/replacement | `services/` | `services/discrepancies.py::resolve_case`, `services/stock.py::record_adjustment` | `BR-PSM-019`, `PSM-UC-008` |
 | `AFR-PSM-055` | Apply accounting adjustments required by resolved discrepancy/return/replacement | `services/` | `services/discrepancies.py::resolve_case` (updates invoice eligible amount / hold) | `BR-PSM-019`, `PSM-UC-032` |
 | `AFR-PSM-056` | Support three-way matching of PO, GRN, and Invoice | `domain/` + `services/` | `domain/finance_rules.py::three_way_match`, `services/finance.py::verify_invoice` | `BR-PSM-017`, `PSM-UC-013` |
-| `AFR-PSM-057` | Permit payment release only after delivery confirmation & invoice verification | `domain/` + `services/` | `domain/finance_rules.py::can_release_payment`, `services/finance.py::process_payment` | `BR-PSM-009`, `BR-PSM-017` |
+| `AFR-PSM-057` | Permit payment release only after delivery confirmation & invoice verification | `domain/` + `services/` | `domain/finance_rules.py::validate_payment_release`, `services/finance.py::process_payment` | `BR-PSM-009`, `BR-PSM-017` |
 | `AFR-PSM-058` | Place mismatched invoice on hold | `domain/` + `services/` | `domain/finance_rules.py::three_way_match`, `services/finance.py::verify_invoice` | `BR-PSM-018` |
-| `AFR-PSM-059` | Support partial payments according to configured payment rules | `domain/` + `services/` | `domain/finance_rules.py::payable_amount`, `services/finance.py::process_payment` | `BR-PSM-022` |
+| `AFR-PSM-059` | Support partial payments according to configured payment rules | `domain/` + `services/` | `domain/finance_rules.py::validate_payment_release`, `services/finance.py::process_payment` | `BR-PSM-022` |
 | `AFR-PSM-060` | Support onboarding of new vendors | `services/` | `services/vendors.py::onboard_vendor` | `PSM-UC-019` |
 | `AFR-PSM-061` | Support maintenance of vendor master data | `services/` | `services/vendors.py::update_vendor` | `PSM-UC-019` |
 | `AFR-PSM-062` | Validate GST details, bank details, and compliance documents | `domain/` | `domain/vendor_rules.py::validate_vendor_master` | `BR-PSM-012` |
@@ -116,17 +116,17 @@ Every live specification ID from Phase 0 mapped to its architecture layer and pl
 | `AFR-PSM-076` | Provide stock reports | `services/` | `services/reports.py::generate_report(report_type="stock")` | `PSM-UC-010` |
 | `AFR-PSM-077` | Provide financial reports related to procurement & payments | `services/` | `services/reports.py::generate_report(report_type="financial")` | `PSM-UC-015` |
 | `AFR-PSM-078` | Allow report data to be filtered by supported criteria | `services/` + `selectors/` | `services/reports.py::generate_report` (department, status, date range) | `PSM-UC-010`, `PSM-UC-015` |
-| `AFR-PSM-079` | Allow generated reports to be exported (CSV with formula-injection escaping) | `services/` + `api/` | `services/reports.py::export_csv` (prefixes `= + - @ \t \r` with `'`) | `PSM-UC-010`, `PSM-UC-015` |
+| `AFR-PSM-079` | Allow generated reports to be exported (CSV with formula-injection escaping) | `services/` + `api/` | `services/reports.py::export_report_csv` (prefixes `= + - @ \t \r` with `'`) | `PSM-UC-010`, `PSM-UC-015` |
 | `AFR-PSM-080` | Support scheduled report generation | `services/` + `tasks.py` | `services/reports.py::{create_schedule,run_due_schedules}`, `tasks.py::run_scheduled_reports` | `PSM-UC-031`, `PSM-UC-035` |
-| `AFR-PSM-081` | Provide dashboards showing real-time process status & key metrics | `selectors/` + `api/` | `selectors/dashboard.py::dashboard_summary`, `api/views/reports.py::DashboardView` | `PSM-UC-030` |
+| `AFR-PSM-081` | Provide dashboards showing real-time process status & key metrics | `selectors/` + `api/` | `selectors/dashboard.py::dashboard_summary`, `api/views_finance_reports.py::DashboardView` | `PSM-UC-030` |
 | `AFR-PSM-082` | Log every report generation event | `models/` + `services/` | `models/reporting.py::ReportGenerationLog`, `services/reports.py::generate_report` | `BR-PSM-024` |
-| `AFR-PSM-083` | Automated notifications for indent submission & approval events | `services/` | `services/indents.py`, `services/approvals.py` -> `notifications.enqueue` | `BR-PSM-006` |
-| `AFR-PSM-084` | Alerts for dispatch, receipt, invoice, and payment status events | `services/` | `services/stock.py`, `services/procurement.py`, `services/receipts.py`, `services/finance.py` -> `notifications.enqueue` | `BR-PSM-006` |
+| `AFR-PSM-083` | Automated notifications for indent submission & approval events | `services/` | `services/indents.py`, `services/approvals.py`, `services/common.py::enqueue_notification` | `BR-PSM-006` |
+| `AFR-PSM-084` | Alerts for dispatch, receipt, invoice, and payment status events | `services/` | `services/stock.py`, `services/procurement.py`, `services/receipts.py`, `services/finance.py`, `services/common.py::enqueue_notification` | `BR-PSM-006` |
 | `AFR-PSM-085` | SLA reminder and escalation notifications | `tasks.py` + `services/` | `tasks.py::check_approval_slas`, `services/approvals.py::sweep_slas` | `BR-PSM-014` |
-| `AFR-PSM-086` | Retain communication history generated by the module | `models/` + `selectors/` | `models/reporting.py::PsmNotification`, `selectors/notifications.py` | `BR-PSM-006` |
-| `AFR-PSM-087` | Maintain complete audit trail of module actions | `models/` + `services/` | `models/reporting.py::PsmAuditLog`, `services/audit.py::record` | `BR-PSM-021` |
-| `AFR-PSM-088` | Support internal audit of P&S records | `selectors/` + `api/` | `selectors/audit.py::audit_records_for`, `api/views/audit.py` | `PSM-UC-014` |
-| `AFR-PSM-089` | Support statutory audit of P&S records | `selectors/` + `api/` | `selectors/audit.py::audit_records_for` (audit scope + export) | `PSM-UC-014` |
+| `AFR-PSM-086` | Retain communication history emitted by PSM module | `models/` + `selectors/` | `models/reporting.py::PsmNotification`, `selectors/scoping.py::notifications_for` | `BR-PSM-006` |
+| `AFR-PSM-087` | Maintain complete audit trail of module actions | `models/` + `services/` | `models/reporting.py::PsmAuditLog`, `services/common.py::audit_record` | `BR-PSM-021` |
+| `AFR-PSM-088` | Support internal audit of P&S records | `selectors/` + `api/` | `selectors/scoping.py::audit_logs_for`, `api/views_finance_reports.py::AuditLogListView` | `PSM-UC-014` |
+| `AFR-PSM-089` | Support statutory audit of P&S records | `selectors/` + `api/` | `selectors/scoping.py::audit_logs_for`, `api/views_finance_reports.py::AuditLogListView` | `PSM-UC-014` |
 | `AFR-PSM-090` | Enforce role-based access control for module functions & information | `api/` + `selectors/` + `registry.py` | `HasModuleGrant("psm")` + `HasPermission(...)` + `selectors/scoping.py` | `BR-PSM-020` |
 | `AFR-PSM-091` | Enforce applicable procurement-policy constraints via configured rules | `domain/` + `services/` | `domain/approval_policy.py`, `models/policy.py::PsmPolicy` | `BR-PSM-028` |
 | `AFR-PSM-092` | Enforce applicable financial-policy constraints via configured rules | `domain/` + `services/` | `domain/finance_rules.py`, `models/policy.py::PsmPolicy` | `BR-PSM-028` |
@@ -137,49 +137,49 @@ Every live specification ID from Phase 0 mapped to its architecture layer and pl
 |---|---|---|---|---|
 | `BR-PSM-001` | Indent completeness (item details, quantity, estimated cost, justification) | `domain/` | `domain/indent_rules.py::validate_indent_completeness` | Also enforces `quantity > 0`, `estimated_cost > 0` |
 | `BR-PSM-003` | Departmental & central stock checked before external procurement | `domain/` + `services/` | `services/stock.py::check_and_reserve`, `domain/state_machine.py` | Prevents skipping stock check |
-| `BR-PSM-004` | Configurable approval hierarchy by cost thresholds | `domain/` + `services/` | `domain/approval_policy.py::next_approval_stage`, `services/approvals.py` | Driven by active `PsmPolicy` |
-| `BR-PSM-005` | Mandatory rejection justification + requestor notification + audit | `domain/` + `services/` | `domain/state_machine.py` (`has_reason`), `services/approvals.py::reject_indent` | Rejects blank reason with 422 |
-| `BR-PSM-006` | Lifecycle notifications & retained communication history | `services/` + `models/` | `services/notifications.py::enqueue`, `models/reporting.py::PsmNotification` | Idempotent via `dedupe_key` |
-| `BR-PSM-007` | Indent modify/withdraw/cancel only in policy-permissible states; modify creates version & re-reviews | `domain/` + `services/` | `domain/indent_rules.py::can_modify_or_withdraw`, `services/indents.py::{modify_indent,withdraw_indent}` | Configurable state lists in `PsmPolicy` |
+| `BR-PSM-004` | Configurable approval hierarchy by cost thresholds | `domain/` + `services/` | `domain/approval_policy.py::requires_final_approval`, `services/approvals.py` | Driven by active `PsmPolicy` |
+| `BR-PSM-005` | Mandatory rejection justification + requestor notification + audit | `domain/` + `services/` | `domain/state_machine.py`, `domain/approval_policy.py::ensure_rejection_reason`, `services/approvals.py` | Rejects blank reason with 422 |
+| `BR-PSM-006` | Lifecycle notifications & retained communication history | `services/` + `models/` | `services/common.py::enqueue_notification`, `models/reporting.py::PsmNotification` | Idempotent via `dedupe_key` |
+| `BR-PSM-007` | Indent modify/withdraw/cancel only in policy-permissible states; modify creates version & re-reviews | `domain/` + `services/` | `domain/indent_rules.py::ensure_state_permissible`, `services/indents.py::{modify_indent,withdraw_indent}` | Configurable state lists in `PsmPolicy` |
 | `BR-PSM-008` | Procurement method (direct vs. tender) by configured value threshold | `domain/` + `services/` | `domain/approval_policy.py::select_procurement_method`, `services/procurement.py::review_and_select_method` | Driven by `PsmPolicy.direct_limit` |
-| `BR-PSM-009` | Delivery confirmation required before final stock posting & payment; unresolved discrepancy blocks both | `domain/` + `services/` | `domain/receipt_rules.py::can_post_stock`, `domain/finance_rules.py::can_release_payment` | Enforced in both `receipts.py` and `finance.py` |
-| `BR-PSM-010` | High-value final-approval routing: PS Admin -> Director/Registrar -> back to PS Admin | `domain/` + `services/` | `domain/approval_policy.py::requires_final_approval`, `services/approvals.py::final_approve` | Driven by `PsmPolicy.final_approval_threshold` |
+| `BR-PSM-009` | Delivery confirmation required before final stock posting & payment; unresolved discrepancy blocks both | `domain/` + `services/` | `domain/receipt_rules.py::ensure_can_post_stock`, `domain/finance_rules.py::validate_payment_release` | Enforced in both `receipts.py` and `finance.py` |
+| `BR-PSM-010` | High-value final-approval routing: PS Admin -> Director/Registrar -> back to PS Admin | `domain/` + `services/` | `domain/approval_policy.py::requires_final_approval`, `services/approvals.py::final_decision` | Driven by `PsmPolicy.final_approval_threshold` |
 | `BR-PSM-012` | Vendor master verification gate (GST, bank, compliance docs) before PO or payment | `domain/` + `services/` | `domain/vendor_rules.py::ensure_vendor_verified`, `services/procurement.py`, `services/finance.py` | Blocks unverified vendors with 409 |
 | `BR-PSM-013` | Reserved stock excluded from allocable stock; retained until consumed/released | `domain/` + `services/` | `domain/stock_rules.py::allocable_quantity`, `services/stock.py`, `services/transfers.py` | Concurrency locked via `select_for_update` |
-| `BR-PSM-014` | SLA reminders, escalations & priority queue ordering (no auto-cancel/auto-reassign) | `domain/` + `tasks.py` + `selectors/` | `domain/approval_policy.py::evaluate_sla`, `tasks.py::check_approval_slas`, `selectors/indents.py` | Idempotent via `sla_reminded_at`/`sla_escalated_at` |
-| `BR-PSM-015` | Duplicate indent detection flags likely duplicates for Dept Admin review (no silent merge/cancel) | `domain/` + `services/` | `domain/indent_rules.py::is_potential_duplicate`, `services/indents.py` | Flagged on `Indent.is_duplicate_flagged` |
-| `BR-PSM-017` | Payment eligibility: PO + accepted GRN + delivery confirmed + verified invoice + verified vendor | `domain/` + `services/` | `domain/finance_rules.py::can_release_payment`, `services/finance.py::process_payment` | All 5 conditions checked atomically |
+| `BR-PSM-014` | SLA reminders, escalations & priority queue ordering (no auto-cancel/auto-reassign) | `domain/` + `tasks.py` + `api/` | `domain/approval_policy.py::evaluate_sla`, `tasks.py::check_approval_slas`, `api/views_indents.py::IndentListCreateView` | Idempotent via `sla_reminded_at`/`sla_escalated_at` |
+| `BR-PSM-015` | Duplicate indent detection flags likely duplicates for Dept Admin review (no silent merge/cancel) | `domain/` + `services/` | `domain/indent_rules.py::find_potential_duplicate`, `services/indents.py::_check_duplicate` | Flagged on `Indent.is_duplicate_flagged` |
+| `BR-PSM-017` | Payment eligibility: PO + accepted GRN + delivery confirmed + verified invoice + verified vendor | `domain/` + `services/` | `domain/finance_rules.py::validate_payment_release`, `services/finance.py::process_payment` | All 5 conditions checked atomically |
 | `BR-PSM-018` | Invoice mismatch places invoice on hold and blocks payment until resolved | `domain/` + `services/` | `domain/finance_rules.py::three_way_match`, `services/finance.py::verify_invoice` | Sets `status="on_hold"` with reason |
 | `BR-PSM-019` | Resolved return/replacement/warranty triggers policy inventory & accounting adjustments | `services/` | `services/discrepancies.py::resolve_case` | Emits stock adjustment + updates invoice hold |
 | `BR-PSM-020` | Role-based access control across all module functions & data | `api/` + `selectors/` + `registry.py` | `HasModuleGrant("psm")` + `HasPermission` + `selectors/scoping.py` | Out-of-scope IDs yield 404 |
-| `BR-PSM-021` | Audit trail for all material actions + version history for indents & vendors | `services/` + `models/` | `services/audit.py::record`, `IndentVersion`, `VendorVersion`, `PsmAuditLog` | Append-only |
-| `BR-PSM-022` | Partial receipt & partial payment up to verified accepted-GRN proportion | `domain/` + `services/` | `domain/receipt_rules.py`, `domain/finance_rules.py::payable_amount`, `services/finance.py` | Tracks remaining open balance |
+| `BR-PSM-021` | Audit trail for all material actions + version history for indents & vendors | `services/` + `models/` | `services/common.py::audit_record`, `IndentVersion`, `VendorVersion`, `PsmAuditLog` | Append-only |
+| `BR-PSM-022` | Partial receipt & partial payment up to verified accepted-GRN proportion | `domain/` + `services/` | `domain/receipt_rules.py`, `domain/finance_rules.py::validate_payment_release`, `services/finance.py` | Tracks remaining open balance |
 | `BR-PSM-023` | Tender bid evaluation against defined criteria & committee approval before PO | `domain/` + `services/` | `services/tenders.py::{evaluate_bids,award_tender}` | Records committee members & minutes |
 | `BR-PSM-024` | Report/dashboard authorization and mandatory generation logging (interactive & scheduled) | `services/` + `api/` | `services/reports.py::{generate_report,run_due_schedules}`, `ReportGenerationLog` | Logs succeeded, failed, and blocked runs |
 | `BR-PSM-025` | Vendor master versioning on create and every update | `models/` + `services/` | `models/vendor.py::VendorVersion`, `services/vendors.py` | Full prior/new snapshot retained |
-| `BR-PSM-026` | Accepted-receipt-only stock posting (rejected/discrepant quantities never posted) | `domain/` + `services/` | `domain/receipt_rules.py::can_post_stock`, `services/receipts.py::confirm_receipt` | Append-only `StockLedgerEntry` |
+| `BR-PSM-026` | Accepted-receipt-only stock posting (rejected/discrepant quantities never posted) | `domain/` + `services/` | `domain/receipt_rules.py::ensure_can_post_stock`, `services/receipts.py::confirm_receipt` | Append-only `StockLedgerEntry` |
 | `BR-PSM-027` | Stock-transfer dual-ledger posting (source out + destination in) on destination receipt confirmation | `services/` | `services/transfers.py::confirm_transfer` | Atomic pair of `StockLedgerEntry` rows |
-| `BR-PSM-028` | Enforce configured procurement & financial policy constraints | `domain/` + `services/` | `services/policy.py::active_policy`, `domain/approval_policy.py`, `domain/finance_rules.py` | Fails clearly if no policy seeded |
+| `BR-PSM-028` | Enforce configured procurement & financial policy constraints | `domain/` + `services/` | `services/common.py::require_active_policy`, `domain/approval_policy.py`, `domain/finance_rules.py` | Fails clearly if no policy seeded |
 
 ### Use Cases (`PSM-UC-001` – `PSM-UC-035`, 32 Active)
 
 | Id | What it requires | Layer it belongs in | Enforcement point (planned) | Notes |
 |---|---|---|---|---|
-| `PSM-UC-001` | Submit Indent | `services/` + `api/` | `services/indents.py::create_and_submit`, `POST /api/v1/psm/indents` | Employee |
+| `PSM-UC-001` | Submit Indent | `services/` + `api/` | `services/indents.py::{create_indent,submit_indent}`, `POST /api/v1/psm/indents` | Employee |
 | `PSM-UC-002` | Confirm Delivery Receipt | `services/` + `api/` | `services/receipts.py::confirm_receipt`, `POST /api/v1/psm/grns/{id}/confirm` | Employee (Requestor) |
-| `PSM-UC-003` | Track Procurement Status | `selectors/` + `api/` | `selectors/indents.py::indent_detail_for`, `GET /api/v1/psm/indents/{id}` | Employee (own scope) |
+| `PSM-UC-003` | Track Procurement Status | `selectors/` + `api/` | `selectors/scoping.py::indents_for`, `api/views_indents.py::IndentDetailView` (`GET /api/v1/psm/indents/{id}`) | Employee (own scope) |
 | `PSM-UC-005` | Withdraw or Cancel Pending Indent | `services/` + `api/` | `services/indents.py::withdraw_indent`, `POST /api/v1/psm/indents/{id}/withdraw` | Employee (own scope) |
 | `PSM-UC-007` | Check and Reserve Stock | `services/` + `api/` | `services/stock.py::check_and_reserve`, `POST /api/v1/psm/indents/{id}/stock-check` | Dept Admin |
 | `PSM-UC-008` | Record Authorized Stock Adjustment | `services/` + `api/` | `services/stock.py::record_adjustment`, `POST /api/v1/psm/stock/adjustments` | Dept Admin / PS Admin |
 | `PSM-UC-009` | Process Internal Stock Issue | `services/` + `api/` | `services/stock.py::{schedule_picking,dispatch_internal_issue}`, `POST /api/v1/psm/internal-issues/{id}/dispatch` | Dept Admin |
 | `PSM-UC-010` | Generate Operational, Procurement and Stock Reports | `services/` + `api/` | `services/reports.py::generate_report`, `POST /api/v1/psm/reports/generate` | Authorized P&S / Dept user |
 | `PSM-UC-011` | Review Indent | `services/` + `api/` | `services/approvals.py::dept_admin_review`, `POST /api/v1/psm/indents/{id}/review` | Dept Admin |
-| `PSM-UC-012` | Final Review and Approval | `services/` + `api/` | `services/approvals.py::final_approve`, `POST /api/v1/psm/indents/{id}/final-decision` | Director / Registrar |
+| `PSM-UC-012` | Final Review and Approval | `services/` + `api/` | `services/approvals.py::final_decision`, `POST /api/v1/psm/indents/{id}/final-decision` | Director / Registrar |
 | `PSM-UC-013` | Verify Invoice | `services/` + `api/` | `services/finance.py::verify_invoice`, `POST /api/v1/psm/invoices/{id}/verify` | Accounts Admin |
-| `PSM-UC-014` | Audit Procurement and Financial Records | `selectors/` + `api/` | `selectors/audit.py::audit_records_for`, `GET /api/v1/psm/audit` | Accounts Admin / Auditor |
+| `PSM-UC-014` | Audit Procurement and Financial Records | `selectors/` + `api/` | `selectors/scoping.py::audit_logs_for`, `api/views_finance_reports.py::AuditLogListView` (`GET /api/v1/psm/audit`) | Accounts Admin / Auditor |
 | `PSM-UC-015` | Generate Financial Reports | `services/` + `api/` | `services/reports.py::generate_report(report_type="financial")`, `POST /api/v1/psm/reports/generate` | Accounts Admin |
 | `PSM-UC-016` | Review and Recommend Indent | `services/` + `api/` | `services/approvals.py::hod_recommend`, `POST /api/v1/psm/indents/{id}/recommend` | Department Head |
-| `PSM-UC-017` | Check Stock During Department Head Review | `selectors/` + `api/` | `selectors/stock.py::stock_availability_for`, `GET /api/v1/psm/stock/availability` | Department Head (read-only) |
+| `PSM-UC-017` | Check Stock During Department Head Review | `selectors/` + `api/` | `selectors/stock.py::availability_rows`, `GET /api/v1/psm/stock/availability` | Department Head (read-only) |
 | `PSM-UC-019` | Vendor Onboarding and Master Data Management | `services/` + `api/` | `services/vendors.py::{onboard_vendor,update_vendor,verify_vendor}`, `/api/v1/psm/vendors` | PS Admin |
 | `PSM-UC-020` | Report Goods Discrepancy and Initiate Return/Replacement | `services/` + `api/` | `services/discrepancies.py::report_discrepancy`, `POST /api/v1/psm/discrepancies` | Requestor / Dept Admin / Dept Head |
 | `PSM-UC-021` | Request Inter-Departmental Stock Transfer | `services/` + `api/` | `services/transfers.py::request_transfer`, `POST /api/v1/psm/transfers` | Requesting Dept Admin |
@@ -642,6 +642,7 @@ All endpoints sit behind `[HasModuleGrant("psm"), HasPermission(...)]` (never `A
 | `POST /indents` | `psm.indent.create` | Created & submitted (or draft) indent + duplicate flag | `PSM-UC-001`, `BR-PSM-001`, `BR-PSM-015`, `BR-PSM-021` |
 | `GET /indents/{id}` | `psm.indent.view` | Scoped indent detail + versions + transitions + notifications | `PSM-UC-003`, `AFR-PSM-012`, `BR-PSM-020` |
 | `PATCH /indents/{id}` | `psm.indent.update` | Updated indent + new `IndentVersion` | `PSM-UC-023`, `BR-PSM-001`, `BR-PSM-007`, `BR-PSM-015` |
+| `POST /indents/{id}/submit` | `psm.indent.create` | Submit an own draft indent | `PSM-UC-001`, `AFR-PSM-011` |
 | `POST /indents/{id}/withdraw` | `psm.indent.delete` | Withdrawn indent | `PSM-UC-005`, `BR-PSM-007`, `BR-PSM-021` |
 | `POST /indents/{id}/repeat` | `psm.indent.create` | New editable draft copied from prior indent | `PSM-UC-024`, `AFR-PSM-011` |
 | `POST /indents/{id}/stock-check` | `psm.stock.update` | Stock availability result; reserves if sufficient else marks external | `PSM-UC-007`, `BR-PSM-003`, `BR-PSM-013` |
@@ -690,9 +691,11 @@ All endpoints sit behind `[HasModuleGrant("psm"), HasPermission(...)]` (never `A
 | `POST /invoices/{id}/hold` | `psm.invoice.review` | Placed invoice on hold with reason | `PSM-UC-029`, `BR-PSM-018` |
 | `POST /reports/generate` | `psm.report.view` (or `psm.financial_report.view` for financial) | Generated report rows + logged `ReportGenerationLog` | `PSM-UC-010`, `PSM-UC-015`, `BR-PSM-024` |
 | `POST /reports/export` | `psm.report.export` | CSV download (formula-escaped) + logged `ReportGenerationLog` | `PSM-UC-010`, `PSM-UC-015`, `AFR-PSM-079`, `BR-PSM-024` |
-| `GET /reports/schedules` | `psm.report.view` | Report schedules + generation logs | `PSM-UC-031`, `BR-PSM-024` |
+| `GET /reports/schedules` | `psm.report.view` | Scoped report schedules | `PSM-UC-031`, `BR-PSM-024` |
 | `POST /reports/schedules` | `psm.report.create` | Created active report schedule | `PSM-UC-031`, `BR-PSM-024` |
 | `PATCH /reports/schedules/{id}` | `psm.report.create` | Enable/disable or update schedule | `PSM-UC-031`, `PSM-UC-035` |
+| `POST /reports/schedules/{id}/run` | `psm.report.create` | Execute visible active scheduled report immediately + write log | `PSM-UC-035`, `BR-PSM-024` |
+| `GET /reports/logs` | `psm.report.view` | Scoped interactive & scheduled `ReportGenerationLog` list | `BR-PSM-024`, `PSM-UC-035` |
 | `GET /audit` | `psm.audit.view` | Cursor-paginated `PsmAuditLog` + audit export | `PSM-UC-014`, `AFR-PSM-087`..`089`, `BR-PSM-021` |
 | `GET /notifications` | `psm.dashboard.view` | Caller's own retained communication history | `BR-PSM-006`, `AFR-PSM-086` |
 | `GET /policy` | `psm.policy.view` | Active policy + historical versions | `BR-PSM-028`, Step 2.8 |

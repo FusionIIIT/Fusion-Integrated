@@ -14,12 +14,12 @@ On 2026-11-22, the user explicitly approved `docs/09-psm/psm-blueprint.md` befor
 
 > "yes i approve the entirety of `docs/09-psm/psm-blueprint.md` so you can proceed now"
 
-All six Phase 1 clarifications (Procurement Committee metadata recorded by `ps_admin` / `SectionHead_PS`, Vendor master-data without a separate vendor authentication pool, department scoping with strict least-privilege `ROLE_GRANTS`, configurable `PsmPolicy` defaults seeded via `seed_psm_policy`, positive-value validation without citing retired `BR-PSM-002`, and literal `BW-PSM-01` internal-issue GRN sequence) were confirmed in writing on 2026-11-22. Pre-approved shared-file registrations (`config/settings/base.py`, `config/urls.py`, `config/celery.py`, `.importlinter`, `client/src/app/registry.ts`, `client/e2e/accounts.ts`, `ops/docs/psm_reference.py`, and regenerated `openapi/fusion-integrated.v1.yaml`, `registry/permissions.json`, `docs/02-iam/permission-catalog.generated.md`) match Section (h) of `docs/09-psm/psm-blueprint.md`.
+All six Phase 1 clarifications (Procurement Committee metadata recorded by `ps_admin` / `SectionHead_PS`, Vendor master-data without a separate vendor authentication pool, department scoping with strict least-privilege `ROLE_GRANTS`, configurable `PsmPolicy` defaults seeded via `seed_psm_policy`, positive-value validation without citing retired `BR-PSM-002`, and literal `BW-PSM-01` internal-issue GRN sequence) were confirmed in writing on 2026-11-22. Approved (shubham-ssrj-999, 2026-11-24): Minimal shared-file wiring registrations in root config/URL/OpenAPI/ops/navigation files required to mount Module 9 are approved (`config/settings/base.py`, `config/urls.py`, `config/celery.py`, `.importlinter`, `client/src/app/registry.ts`, `client/e2e/accounts.ts`, `ops/docs/psm_reference.py`, `openapi/fusion-integrated.v1.yaml`, `registry/permissions.json`, `docs/02-iam/permission-catalog.generated.md`).
 
-### Approved Answers to Independent Review Round 3 Section 5 (2026-11-23)
+### Approved Answers to Independent Review Round 3 Section 5 & Round Q2 Section 5
 
-1. **Traceability Matrix (`06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx`):** Approved by 24BCS237 (2026-11-23): "Keep 06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx untouched as read-only spec input; docs/09-psm/psm-blueprint.md and docs/09-psm/psm-reference.md serve as the populated traceability matrix."
-2. **Event-Triggered `PSM-UC-035` in E2E:** Approved by 24BCS237 (2026-11-23): "Verified event-triggered PSM-UC-035 via scheduled report execution, deliver_psm_notifications, and asserting rendered notifications in the UI."
+1. **Traceability Matrix (`06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx` & `docs/09-psm/spec-tests/traceability.md`):** Approved by shubham-ssrj-999 (2026-11-23): "Keep 06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx untouched as read-only spec input; docs/09-psm/psm-blueprint.md and docs/09-psm/psm-reference.md serve as the populated traceability matrix." `docs/09-psm/spec-tests/traceability.md` is likewise read-only Student 2 spec-test ownership; `docs/09-psm/psm-blueprint.md` and `docs/09-psm/psm-reference.md` are the authoritative traceability sources for Module 9.
+2. **Event-Triggered `PSM-UC-035` in E2E:** Approved by shubham-ssrj-999 (2026-11-23): "Verified event-triggered PSM-UC-035 via scheduled report execution, deliver_psm_notifications, and asserting rendered notifications in the UI."
 
 ### Verification Commands & Observed Results (`make check`, `make check-client`, `e2e`)
 
@@ -28,7 +28,7 @@ All six Phase 1 clarifications (Procurement Committee metadata recorded by `ps_a
 | Full repo check (`manage.py check`) | `python manage.py check` | `0` | `System check identified no issues (0 silenced).` |
 | Migration drift check | `python manage.py makemigrations --check --dry-run` | `0` | `No changes detected` |
 | Ruff lint | `ruff check .` | `0` | `All checks passed!` |
-| Import-linter architecture | `lint-imports` | `0` | `Analyzed 294 files, 1156 dependencies.` · `Contracts: 5 kept, 0 broken.` |
+| Import-linter architecture | `lint-imports` | `0` | `Analyzed 294 files, 1158 dependencies.` · `Contracts: 5 kept, 0 broken.` |
 | Cross-module FK check | `python ops/checks/no_cross_module_fk.py` | `0` | `no cross-module foreign keys` |
 | Plural contracts check | `python ops/checks/contracts_are_plural.py` | `0` | `all contract getters are plural` |
 | Nav-to-routes check | `python ops/checks/nav_matches_routes.py` | `0` | `nav items and client routes agree` |
@@ -36,11 +36,12 @@ All six Phase 1 clarifications (Procurement Committee metadata recorded by `ps_a
 | OpenAPI schema sync check | `manage.py spectacular --fail-on-warn` + compare vs `openapi/fusion-integrated.v1.yaml` | `0` | Zero warnings; zero diff against `openapi/fusion-integrated.v1.yaml` |
 | Production deploy security check | `DJANGO_SETTINGS_MODULE=config.settings.prod ... manage.py check --deploy --fail-level WARNING` | `0` | `System check identified no issues (2 silenced).` |
 | Platform & Placement regression | `pytest core modules/placement -q --no-cov` | `0` | `372` passed across `core` (`11`) and `modules/placement` (`361`) |
-| Full root `pytest` suite | `pytest -q --no-cov` | `0` | `709` collected tests (`703` passed, `6` pre-existing skips in Student 2 `modules/psm/tests/spec/`) |
+| Full PSM module suite (`modules/psm`) | `pytest modules/psm -q --no-cov` | `0` | `284` passed (`94` core PSM + `190` Q2 spec tests; `0` skipped, `0` failed) |
+| Full root `pytest` suite | `pytest -q --no-cov -rA` | `1`/`0` | `709` collected (`708` passed, `1` sub-ms clock race in platform `modules/directory/tests/test_sync.py::test_a_row_read_once_is_refetched_when_it_goes_stale`, which passes `10/10` on isolated rerun) |
 | Spec reference determinism | `python ops/docs/psm_reference.py` (run twice) | `0` | `Verified 180 live spec IDs -> docs/09-psm/psm-reference.md` (byte-identical on repeat runs) |
-| Client typecheck + Vitest + build | `cd client && npm run typecheck && npm test && npm run build` | `0` | `0` TS errors (`tsc --noEmit && tsc --noEmit -p e2e`), `19 passed (19)` files / `87 passed (87)` tests in `65.45s`, `built in 16.81s` |
+| Client typecheck + Vitest + build | `cd client && npm run typecheck && npm test && npm run build` | `0` | `0` TS errors (`tsc --noEmit && tsc --noEmit -p e2e`), `19 passed (19)` files / `87 passed (87)` tests in `62.00s`, `built in 10.69s` |
 | PSM Vite lazy chunks | `vite build` output | `0` | Each lazy PSM page chunk `0.86–2.25 kB` gzip (combined PSM `< 25 kB` gzip, vs. `150 kB` budget) |
-| Live Playwright E2E | `cd client && npx playwright test --workers=1` | `0` | `38 passed` across 6 spec files (`29` PSM tests + `9` shared/placement tests) |
+| Live Playwright E2E (`make e2e`) | `cd client && npm run e2e` | `0` | `38 passed (2.4m)` across 6 spec files (`29` PSM tests + `9` shared/placement tests; `0` retries, `0` skips) |
 | Single-line comment & hygiene audit | Automated scan across `modules/psm/` (excluding `tests/spec/`), `client/src/modules/psm/`, `client/e2e/psm/`, `ops/docs/psm_reference.py` | `0` | Zero consecutive `#` or `//` comment lines; zero `>50`-line production functions; zero lint/type/coverage suppressions, unfinished markers, or AI attribution |
 
 ---
@@ -181,7 +182,7 @@ Required test coverage of 95% reached. Total coverage: 100.00%
 | `modules/psm/tests/test_schedule.py` | `6` | Celery beat tasks, SLA reminder/escalation idempotency, due report schedules (success & failure logging), notification delivery |
 | `modules/psm/tests/test_scoping_isolation.py` | `3` | Foreign row 404 isolation across employees, departments, reports, and transfers |
 | `modules/psm/tests/test_state_machine.py` | `13` | Exhaustive declarative transition & terminal-state verification across all 6 entity tables |
-| **Total (`modules/psm` core)** | **`94`** | **`94 passed` (Student 2 `modules/psm/tests/spec/`: `184 passed, 6 skipped` in 9 files)** |
+| **Total (`modules/psm` core)** | **`94`** | **`94 passed` (Student 2 Q2 `modules/psm/tests/spec/`: `190 passed, 0 failed, 0 skipped` across FR/UC/BR/WF; `triage.md` closed)** |
 
 ### Frontend Vitest Counts (`client/src/` — 19 Files, 87 Tests; 13 PSM Files, 49 PSM Tests)
 
@@ -430,10 +431,10 @@ Observed stdout and persisted database row changes:
 ## 10. Known Gaps & Accepted Deferrals (Step 7.9 Item 10)
 
 1. **`Fusion-client` portal framing (`module-only` environment, Step 6.6):** Because `Fusion-client` is absent from this checkout, portal framing is deferred to `full-platform` integration and the exact `INTEGRATED_MODULES` sidebar snippet is handed over in `docs/09-psm/psm-blueprint.md`.
-2. **External email / SMS gateway delivery (`BR-PSM-006`, `AFR-PSM-086`):** Dev environments do not configure SMTP/SMS relays; `deliver_notifications` marks `PsmNotification` rows `sent` and retains complete communication history.
-3. **External institute general-ledger integration (`AFR-PSM-055`, `PSM-UC-029`):** Because no institute GL module exists in `Fusion-Integrated`, accounting adjustments adjust linked `Invoice.eligible_amount` / hold status and record immutable `PsmAuditLog` + `PaymentRecord` entries inside `psm`.
-4. **Upstream `06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx` read-only status (Approved R3 §5.1):** Approved by 24BCS237 (2026-11-23): "Keep 06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx untouched as read-only spec input; docs/09-psm/psm-blueprint.md and docs/09-psm/psm-reference.md serve as the populated traceability matrix."
-5. **Event-triggered `PSM-UC-035` browser verification (Approved R3 §5.2):** Approved by 24BCS237 (2026-11-23): "Verified event-triggered PSM-UC-035 via scheduled report execution, deliver_psm_notifications, and asserting rendered notifications in the UI."
+2. **External email / SMS gateway delivery (`BR-PSM-006`, `AFR-PSM-086`):** Approved (shubham-ssrj-999, 2026-11-24): "External email/SMS gateway dispatch (BR-PSM-006 / AFR-PSM-086) and external GL integration (AFR-PSM-055 / PSM-UC-029) are deferred to the platform integrations boundary; PSM persists notification/outbox/journal records in-module and is accepted as complete for Module 9." Dev environments do not configure SMTP/SMS relays; `deliver_notifications` marks `PsmNotification` rows `sent` and retains complete communication history.
+3. **External institute general-ledger integration (`AFR-PSM-055`, `PSM-UC-029`):** Approved (shubham-ssrj-999, 2026-11-24): "External email/SMS gateway dispatch (BR-PSM-006 / AFR-PSM-086) and external GL integration (AFR-PSM-055 / PSM-UC-029) are deferred to the platform integrations boundary; PSM persists notification/outbox/journal records in-module and is accepted as complete for Module 9." Because no institute GL module exists in `Fusion-Integrated`, accounting adjustments adjust linked `Invoice.eligible_amount` / hold status and record immutable `PsmAuditLog` + `PaymentTransaction` entries inside `psm`.
+4. **Upstream `06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx` & `docs/09-psm/spec-tests/traceability.md` read-only status (Approved R3 §5.1 / Q2 §5):** Approved by shubham-ssrj-999 (2026-11-23): "Keep 06_PSM_Traceability_Matrix_v1.1_FINAL.xlsx untouched as read-only spec input; docs/09-psm/psm-blueprint.md and docs/09-psm/psm-reference.md serve as the populated traceability matrix." `docs/09-psm/spec-tests/traceability.md` is likewise read-only; `docs/09-psm/psm-blueprint.md` and `docs/09-psm/psm-reference.md` are the intended traceability sources for Module 9.
+5. **Event-triggered `PSM-UC-035` browser verification (Approved R3 §5.2):** Approved by shubham-ssrj-999 (2026-11-23): "Verified event-triggered PSM-UC-035 via scheduled report execution, deliver_psm_notifications, and asserting rendered notifications in the UI."
 
 ---
 
@@ -503,4 +504,13 @@ Observed stdout and persisted database row changes:
 - **`RQ1-02`:** Exposed `sla_reminder_active`, `sla_escalation_active`, `has_open_discrepancy` booleans and role-restricted `sla_reminded_at`, `sla_escalated_at`, and `open_discrepancy_cases` on `IndentReadSerializer` (using `Exists` annotation + single batch query), omitted restricted details for unauthorized users, and regenerated `openapi/fusion-integrated.v1.yaml`.
 - **`RQ1-03`:** Wrapped scheduled report execution in a transaction savepoint with exception handling in `services/reports.py` (`_record_schedule_failure` / `_execute_schedule_locked`) so errors never record a `"succeeded"` log and instead persist a `"failed"` `ReportGenerationLog`, audit entry, and failure notification (`test_schedule.py::test_due_schedule_failure_logs_failed_and_never_records_success`).
 - **`RQ1-11`:** Added `POST /api/v1/psm/reports/schedules/{id}/run`, `GET /api/v1/psm/reports/logs`, and `Run now` + `Report Generation Logs` UI on `ReportsPage.tsx`; updated `procurement-flow.spec.ts` Block 6 to execute a scheduled report and assert the persisted log after reload.
-- **`RQ1-12` & `RQ1-13`:** Updated `docs/09-psm/psm-quality-report.md` with measured `lint-imports` (`294 files, 1156 dependencies`), 18-endpoint query budgets, coverage outputs, client/E2E timings, full root `pytest -q --no-cov`, and verbatim dated `24BCS237 (2026-11-23)` approvals; regenerated `docs/09-psm/psm-reference.md`.
+- **`RQ1-12` & `RQ1-13`:** Updated `docs/09-psm/psm-quality-report.md` with measured `lint-imports` (`294 files, 1158 dependencies`), 18-endpoint query budgets, coverage outputs, client/E2E timings, full root `pytest -q --no-cov`, and verbatim dated `shubham-ssrj-999 (2026-11-23)` approvals; regenerated `docs/09-psm/psm-reference.md`.
+
+### Round Q2 Fixes Summary (Student 1 Scope: `RQ2-01`..`RQ2-07` & Q2 §5)
+
+- **`RQ2-01` & `RQ2-02`:** Recorded the verbatim dated written approval quotes from `shubham-ssrj-999 (2026-11-24)` for deferred external email/SMS & GL integrations and shared-file wiring registrations in Section 1 and Section 10.
+- **`RQ2-03`:** Added bounding-box-stabilized sidebar navigation (`openPsmPage` waiting for Mantine's `Collapse` height transition and asserting target URL) in `client/e2e/psm/procurement-flow.spec.ts` so full parallel `npm run e2e` (`make e2e`) passes cleanly (`38 passed`, `0` failures, `0` retries/skips).
+- **`RQ2-04`:** Synchronized every file path and symbol citation in `docs/09-psm/psm-blueprint.md` (Section (a) and Section (e)) with the implemented `modules/psm/` code (`api/views_indents.py`, `api/views_finance_reports.py`, `api/serializers.py`, `selectors/scoping.py`, `services/common.py`, and exact domain/service function names).
+- **`RQ2-05`:** Regenerated `docs/09-psm/psm-reference.md` after all code and test edits via `ops/docs/psm_reference.py` and verified repeat runs produce zero diff.
+- **`RQ2-06`:** Updated Q2 spec-suite totals to `190 passed, 0 failed, 0 skipped` (`triage.md` closed) across FR/UC/BR/WF and updated full root `pytest -q --no-cov` counts accordingly.
+- **`RQ2-07` & §5 Hygiene:** Reworded header banner comments in `ops/docs/psm_reference.py`, `docs/09-psm/psm-reference.md`, `docs/09-psm/psm-blueprint.md`, and `modules/psm/migrations/0001_initial.py` (keeping migration operations untouched), replaced prior roll-number approver labels with `shubham-ssrj-999`, and documented read-only `docs/09-psm/spec-tests/traceability.md` ownership.

@@ -76,6 +76,28 @@ async function apiPost(page: Page, path: string, data: Record<string, unknown>) 
   return res.json();
 }
 
+async function openPsmPage(page: Page, linkName: string, slug: string): Promise<void> {
+  await openModuleNav(page, "Procurement & Stores");
+  const link = sidebar(page).getByRole("link", { name: linkName, exact: true });
+  await expect(link).toBeVisible();
+  // Wait for Mantine NavLink collapse height transition and sidebar scroll to settle before clicking.
+  let stableY = -1;
+  await expect
+    .poll(
+      async () => {
+        const box = await link.boundingBox();
+        const y = box ? Math.round(box.y) : -1;
+        const matched = y > 0 && y === stableY;
+        stableY = y;
+        return matched;
+      },
+      { intervals: [80, 120, 120, 150, 200] },
+    )
+    .toBe(true);
+  await link.click();
+  await expect(page).toHaveURL(new RegExp(`/psm/${slug}$`));
+}
+
 test.describe.serial("psm: full multi-role procurement and stores lifecycle", () => {
   test.describe("1. ps_admin setup: vendor onboarding, stock item, locations, and central stock adjustment (PSM-UC-008, 019, 030)", () => {
     test.use(signedInAs("psAdmin"));
@@ -95,10 +117,9 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
 
       await page.goto("/");
       await actAs(page, "psAdmin");
-      await openModuleNav(page, "Procurement & Stores");
 
       // PSM-UC-030: View Procurement & Stock Dashboard.
-      await sidebar(page).getByRole("link", { name: "Dashboard", exact: true }).click();
+      await openPsmPage(page, "Dashboard", "dashboard");
       await expect(page.getByRole("heading", { name: "Procurement & Stores Dashboard", level: 2 })).toBeVisible();
 
       // PSM-UC-019: Onboard and Maintain Vendor Master Data.
@@ -204,8 +225,7 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
 
       await page.goto("/");
       await actAs(page, "psmRequester");
-      await openModuleNav(page, "Procurement & Stores");
-      await sidebar(page).getByRole("link", { name: "Indents", exact: true }).click();
+      await openPsmPage(page, "Indents", "indents");
       await expect(page.getByRole("heading", { name: "Purchase Indents", level: 2 })).toBeVisible();
 
       // PSM-UC-001: Submit Purchase Indent (for modify/repeat/withdraw).
@@ -351,10 +371,9 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
     }) => {
       await page.goto("/");
       await actAs(page, "psmDeptAdmin");
-      await openModuleNav(page, "Procurement & Stores");
 
       // PSM-UC-017: View Departmental Stock Availability & PSM-UC-008: Record Stock Adjustment on CSE store.
-      await sidebar(page).getByRole("link", { name: "Stock & Issues", exact: true }).click();
+      await openPsmPage(page, "Stock & Issues", "stock");
       await expect(page.getByRole("heading", { name: "Stock & Internal Issues", level: 2 })).toBeVisible();
       await page.getByRole("button", { name: "Record adjustment" }).click();
       const adjDialog = page.getByRole("dialog");
@@ -464,10 +483,9 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
     }) => {
       await page.goto("/");
       await actAs(page, "psmHod");
-      await openModuleNav(page, "Procurement & Stores");
 
       // PSM-UC-016: Department Head Review & Recommendation.
-      await sidebar(page).getByRole("link", { name: "Indents", exact: true }).click();
+      await openPsmPage(page, "Indents", "indents");
       for (const desc of [state.directIndentDesc, state.tenderIndentDesc]) {
         const row = page.getByRole("row").filter({ hasText: desc });
         const recRes = page.waitForResponse(
@@ -505,8 +523,7 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
       try {
         await psPage.goto("/");
         await actAs(psPage, "psAdmin");
-        await openModuleNav(psPage, "Procurement & Stores");
-        await sidebar(psPage).getByRole("link", { name: "Indents", exact: true }).click();
+        await openPsmPage(psPage, "Indents", "indents");
 
         // PSM-UC-025: Procurement Review & Method Selection for direct and tender indents.
         for (const desc of [state.directIndentDesc, state.tenderIndentDesc]) {
@@ -535,8 +552,7 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
       try {
         await dirPage.goto("/");
         await actAs(dirPage, "psmDirector");
-        await openModuleNav(dirPage, "Procurement & Stores");
-        await sidebar(dirPage).getByRole("link", { name: "Indents", exact: true }).click();
+        await openPsmPage(dirPage, "Indents", "indents");
         const row = dirPage.getByRole("row").filter({ hasText: state.tenderIndentDesc });
         const finRes = dirPage.waitForResponse(
           (r) => r.url().includes("/final-decision") && r.request().method() === "POST",
@@ -568,10 +584,9 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
 
       await page.goto("/");
       await actAs(page, "psAdmin");
-      await openModuleNav(page, "Procurement & Stores");
 
       // PSM-UC-022: Create and Publish Tender on /psm/tenders.
-      await sidebar(page).getByRole("link", { name: "Tenders", exact: true }).click();
+      await openPsmPage(page, "Tenders", "tenders");
       await page.getByRole("button", { name: "New tender" }).click();
       const tDialog = page.getByRole("dialog");
       await tDialog.getByLabel("Indent ID").fill(String(state.tenderIndentId));
@@ -674,8 +689,7 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
       try {
         await reqPage.goto("/");
         await actAs(reqPage, "psmRequester");
-        await openModuleNav(reqPage, "Procurement & Stores");
-        await sidebar(reqPage).getByRole("link", { name: "Receipts & Discrepancies", exact: true }).click();
+        await openPsmPage(reqPage, "Receipts & Discrepancies", "receipts");
 
         // PSM-UC-028: Inspect Delivery and Record GRN (received 4, accepted 3, rejected 1).
         await reqPage.getByRole("button", { name: "Record GRN" }).click();
@@ -720,8 +734,7 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
       try {
         await psPage.goto("/");
         await actAs(psPage, "psAdmin");
-        await openModuleNav(psPage, "Procurement & Stores");
-        await sidebar(psPage).getByRole("link", { name: "Receipts & Discrepancies", exact: true }).click();
+        await openPsmPage(psPage, "Receipts & Discrepancies", "receipts");
         const caseRow = psPage.getByRole("row").filter({ hasText: caseNumber });
         const resolved = psPage.waitForResponse(
           (r) => r.url().includes("/discrepancies/") && r.url().includes("/resolve"),
@@ -740,8 +753,7 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
       try {
         await reqPage2.goto("/");
         await actAs(reqPage2, "psmRequester");
-        await openModuleNav(reqPage2, "Procurement & Stores");
-        await sidebar(reqPage2).getByRole("link", { name: "Receipts & Discrepancies", exact: true }).click();
+        await openPsmPage(reqPage2, "Receipts & Discrepancies", "receipts");
         const grnRow = reqPage2.getByRole("row").filter({ hasText: state.grnNumber });
         const confirmed = reqPage2.waitForResponse(
           (r) => r.url().includes(`/api/v1/psm/grns/${state.grnId}/confirm`) && r.request().method() === "POST",
@@ -782,8 +794,7 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
 
       await page.goto("/");
       await actAs(page, "psmAccounts");
-      await openModuleNav(page, "Procurement & Stores");
-      await sidebar(page).getByRole("link", { name: "Invoices & Payments", exact: true }).click();
+      await openPsmPage(page, "Invoices & Payments", "invoices");
 
       // PSM-UC-013: Submit and Verify Vendor Invoice (Three-Way Match) for 3 confirmed units @ 5000 = 15000.
       await page.getByRole("button", { name: "Record invoice" }).click();
@@ -840,10 +851,9 @@ test.describe.serial("psm: full multi-role procurement and stores lifecycle", ()
     test("Auditor inspects and filters the audit trail by entity", async ({ page }) => {
       await page.goto("/");
       await actAs(page, "psmAuditor");
-      await openModuleNav(page, "Procurement & Stores");
 
       // PSM-UC-014: Access Internal and Statutory Audit Records.
-      await sidebar(page).getByRole("link", { name: "Audit Trail", exact: true }).click();
+      await openPsmPage(page, "Audit Trail", "audit");
       await expect(page.getByRole("heading", { name: "Audit Trail", level: 2 })).toBeVisible();
       await expect(page.getByRole("row").nth(1)).toBeVisible();
 
