@@ -1,0 +1,106 @@
+[
+  {
+    "test_id": "PSM-WF-01",
+    "source_id": "BW-PSM-01 transitions 1–6",
+    "purpose": "Exercise internal stock fulfilment through accepted receipt and stock posting.",
+    "preconditions": [
+      "An employee has a draft indent with required item details.",
+      "Sufficient allocable departmental or central stock is available.",
+      "An authorized receiving actor can inspect delivery."
+    ],
+    "action_or_input": "Submit the indent; have the Department Admin reserve stock, approve internal issue, and record picking and dispatch; record an accepted full receipt; have the employee confirm receipt.",
+    "expected_result": "The indent progresses through Submitted, Stock Reserved, Internal Issue Approved, Dispatched / Ready for Receipt, GRN Accepted, and Receipt Confirmed / Stock Posted. The accepted receipt is posted after confirmation with no unresolved discrepancy.",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "PSM-WF-02",
+    "source_id": "BW-PSM-01 transition 5; BW-PSM-02 transitions 1–5; BW-PSM-04 transitions 1–6",
+    "purpose": "Exercise the insufficient-stock external procurement standard path, direct method, and partial accepted receipt.",
+    "preconditions": [
+      "An employee has a draft indent with required item details.",
+      "Insufficient allocable stock is available.",
+      "Configured policy does not require final Director / Registrar review and selects direct procurement.",
+      "The vendor is verified and required approvals are complete.",
+      "The delivery supports an accepted partial receipt."
+    ],
+    "action_or_input": "Submit the indent; have the Department Admin check stock and approve further processing; have the Department Head recommend onward; have the Procurement & Stores Admin select direct procurement, issue a PO, and record delivery. Inspect and record a partial accepted GRN, confirm delivery, verify an invoice that matches the eligible amount, and process payment.",
+    "expected_result": "The indent reaches External Procurement Required, Department Reviewed, Department Head Recommended, and Procurement Authorized / Method Selected. The PO is issued only after approvals and vendor verification. Delivery progresses through Delivered, GRN Accepted, Receipt Confirmed, Invoice Verified, and Paid / Partially Paid for the eligible amount.",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "PSM-WF-03",
+    "source_id": "BW-PSM-03 transitions 1–6; BW-PSM-05 transitions 1–7",
+    "purpose": "Exercise the final authority approval path followed by tender procurement to payment.",
+    "preconditions": [
+      "An employee has a draft indent with required item details.",
+      "Insufficient allocable stock is available.",
+      "Configured policy requires final Director / Registrar review and selects tender procurement.",
+      "A committee-approved tender selection and a verified vendor are available."
+    ],
+    "action_or_input": "Submit the indent; have the Department Admin check stock and approve further processing; have the Department Head recommend onward; have the Procurement & Stores Admin record the recommendation for final authority. Have the Director / Registrar approve; record the committee-approved tender selection; issue the PO and record delivery. Accept the receipt, confirm delivery, verify a matching invoice, and process payment.",
+    "expected_result": "The indent reaches Awaiting Final Approval and, upon approval, Procurement Authorized / Method Selected. The committee-approved tender selection produces Tender Vendor Selected; the verified vendor and completed approvals permit PO issuance. The flow proceeds through Delivered, GRN Accepted, Receipt Confirmed, Invoice Verified, and Paid / Partially Paid.",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "PSM-WF-04",
+    "source_id": "BW-PSM-04 transition 5; BW-PSM-06 transitions 1–5; CW-PSM-02 transitions 2, 4, 5, 8, 9",
+    "purpose": "Exercise discrepancy reporting, return / adjustment resolution without replacement, and downstream invoice and payment handling.",
+    "preconditions": [
+      "A delivered procurement has a discrepancy identified during inspection.",
+      "The discrepancy is resolved by return / adjustment without replacement.",
+      "An eligible remaining invoice amount exists after resolution."
+    ],
+    "action_or_input": "Record the discrepancy during inspection; report it and open a discrepancy case; have the Procurement & Stores Admin resolve it through return / adjustment and post adjustments. Verify the remaining invoice and process payment for the eligible amount.",
+    "expected_result": "The flow progresses through Discrepancy Identified, Discrepancy Case Open, and Case Resolved / Adjustments Posted without a replacement traversal. The invoice becomes Invoice Verified or Closed as applicable; payment reaches Paid / Closed only when an eligible amount exists.",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "PSM-WF-05",
+    "source_id": "BW-PSM-10 transitions 1–5; CW-PSM-02 transitions 2, 4, 6–9",
+    "purpose": "Exercise exactly one replacement traversal for a discrepancy through payment.",
+    "preconditions": [
+      "A delivered procurement has a discrepancy identified during inspection.",
+      "The open discrepancy case is resolved by replacement.",
+      "The replacement is delivered and accepted."
+    ],
+    "action_or_input": "Report the discrepancy and open a case; have the Procurement & Stores Admin record replacement. Inspect and accept the replacement, confirm its receipt, verify the invoice / adjustment match, and process payment.",
+    "expected_result": "The case progresses through Replacement Awaited, Replacement GRN Accepted, Replacement Confirmed, Invoice Verified, and Paid / Partially Paid when an eligible amount exists. Exactly one replacement traversal is recorded.",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "PSM-WF-06",
+    "source_id": "BW-PSM-07 transitions 1–3",
+    "purpose": "Exercise modification of a pending indent in a permissible state and its return to review.",
+    "preconditions": [
+      "An employee has a submitted indent in a permissible modifiable state.",
+      "The proposed modification validates."
+    ],
+    "action_or_input": "Modify the pending indent; have the Department Admin complete review and, where required, have the Department Head record a recommendation.",
+    "expected_result": "A distinct modified version is retained and the indent progresses through Modified / Awaiting Re-review, Department Reviewed, and Department Head Recommended when Department Head review is required.",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "PSM-WF-07",
+    "source_id": "BW-PSM-08 transitions 1–3",
+    "purpose": "Exercise inter-departmental stock transfer through destination receipt and ledger update.",
+    "preconditions": [
+      "A Department Admin can submit a valid transfer request.",
+      "Sufficient allocable stock is available at the source department."
+    ],
+    "action_or_input": "Submit the transfer request; have the source Department Admin / Stores process and dispatch it; have the destination Department Admin confirm receipt.",
+    "expected_result": "The transfer progresses through Transfer Requested and Transfer Dispatched to Transfer Completed / Ledgers Updated, with source and destination stock ledgers updated upon completion.",
+    "test_type": "Workflow"
+  },
+  {
+    "test_id": "PSM-WF-08",
+    "source_id": "BW-PSM-04 transition 5; CW-PSM-02 transition 8",
+    "purpose": "Verify that an invoice mismatch is held rather than verified for payment.",
+    "preconditions": [
+      "A delivered procurement has an accepted GRN and confirmed delivery.",
+      "The submitted invoice does not match the PO and GRN."
+    ],
+    "action_or_input": "Submit the mismatched invoice for three-way verification, then attempt payment processing.",
+    "expected_result": "The invoice is placed on hold and payment is not released while the mismatch remains.",
+    "test_type": "Workflow"
+  }
+]

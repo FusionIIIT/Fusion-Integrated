@@ -38,3 +38,51 @@ For the intended taxonomy of modules not yet built, see
 | `placement_cell.registration.self` | Register yourself for a placement season | `student` |
 | `placement_cell.record.manage` | Record off-campus placements and chase offer letters | `placement_officer` |
 | `placement_cell.academic_directory.view` | Browse every student's declared CPI | `Dean Academic`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
+## `psm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `psm.dashboard.view` | View Procurement & Stores dashboard | `Accounts Admin`, `Auditor`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_PS`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty`, `ps_admin`, `staff` |
+| `psm.indent.view` | View indents within authorized scope | `Accounts Admin`, `Auditor`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_PS`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty`, `ps_admin`, `staff` |
+| `psm.indent.create` | Create, submit, and repeat purchase indents | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty`, `staff` |
+| `psm.indent.update` | Modify own pending indents in permissible states | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty`, `staff` |
+| `psm.indent.delete` | Withdraw or cancel own pending indents | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty`, `staff` |
+| `psm.indent.review` | Review indents, set priority, and approve internal issue | `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm` |
+| `psm.indent.approve` | Recommend, request changes on, or reject departmental indents | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)` |
+| `psm.stock.view` | View departmental and central stock availability | `Auditor`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `SectionHead_PS`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `ps_admin` |
+| `psm.stock.update` | Reserve stock, dispatch internal issues, and post adjustments | `SectionHead_PS`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `ps_admin` |
+| `psm.transfer.view` | View inter-departmental stock transfers | `Auditor`, `SectionHead_PS`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `ps_admin` |
+| `psm.transfer.create` | Request an inter-departmental stock transfer | `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm` |
+| `psm.transfer.update` | Reserve and dispatch an outgoing stock transfer | `SectionHead_PS`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `ps_admin` |
+| `psm.transfer.approve` | Confirm receipt of an incoming stock transfer | `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm` |
+| `psm.transfer.delete` | Cancel a pending stock transfer request | `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm` |
+| `psm.vendor.view` | View vendor master records and version history | `Accounts Admin`, `Auditor`, `SectionHead_PS`, `ps_admin` |
+| `psm.vendor.create` | Onboard new vendors | `SectionHead_PS`, `ps_admin` |
+| `psm.vendor.update` | Update vendor master data and verification status | `SectionHead_PS`, `ps_admin` |
+| `psm.procurement.review` | Review external procurements and select procurement method | `SectionHead_PS`, `ps_admin` |
+| `psm.procurement.approve` | Grant final Director/Registrar approval on high-value indents | `Director`, `Registrar` |
+| `psm.tender.view` | View tenders and recorded bids | `Auditor`, `SectionHead_PS`, `ps_admin` |
+| `psm.tender.create` | Create tenders and record vendor bids | `SectionHead_PS`, `ps_admin` |
+| `psm.tender.publish` | Publish tender invitations | `SectionHead_PS`, `ps_admin` |
+| `psm.tender.approve` | Record bid evaluations and committee tender award | `SectionHead_PS`, `ps_admin` |
+| `psm.purchase_order.view` | View purchase orders and delivery schedules | `Accounts Admin`, `Auditor`, `Director`, `Registrar`, `SectionHead_PS`, `ps_admin` |
+| `psm.purchase_order.create` | Create and issue purchase orders | `SectionHead_PS`, `ps_admin` |
+| `psm.purchase_order.update` | Update purchase order status and delivery schedules | `SectionHead_PS`, `ps_admin` |
+| `psm.grn.view` | View goods receipt notes and delivery discrepancies | `Accounts Admin`, `Auditor`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `SectionHead_PS`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty`, `ps_admin` |
+| `psm.grn.create` | Inspect deliveries, record GRNs, and report discrepancies | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty` |
+| `psm.grn.approve` | Confirm delivery receipt and trigger final stock posting | `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `faculty` |
+| `psm.discrepancy.update` | Record vendor communications and resolve discrepancy cases | `SectionHead_PS`, `ps_admin` |
+| `psm.invoice.view` | View vendor invoices and payment status | `Accounts Admin`, `Auditor`, `SectionHead_PS`, `ps_admin` |
+| `psm.invoice.create` | Record vendor invoices against purchase orders | `Accounts Admin`, `SectionHead_PS`, `ps_admin` |
+| `psm.invoice.review` | Perform three-way invoice matching and place/release holds | `Accounts Admin` |
+| `psm.payment.approve` | Process and release eligible vendor payments | `Accounts Admin` |
+| `psm.report.view` | Generate and view operational, procurement, and stock reports | `Accounts Admin`, `Auditor`, `Director`, `HOD (CSE)`, `HOD (Design)`, `HOD (ECE)`, `HOD (Liberal Arts)`, `HOD (ME)`, `HOD (NS)`, `Registrar`, `SectionHead_PS`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `ps_admin` |
+| `psm.report.export` | Export reports and audit extracts | `Accounts Admin`, `Auditor`, `SectionHead_PS`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `ps_admin` |
+| `psm.report.create` | Create and manage scheduled report definitions | `Accounts Admin`, `SectionHead_PS`, `dept_admin`, `deptadmin_cse`, `deptadmin_design`, `deptadmin_ece`, `deptadmin_liberalarts`, `deptadmin_me`, `deptadmin_ns`, `deptadmin_sm`, `ps_admin` |
+| `psm.financial_report.view` | Generate and view financial procurement reports | `Accounts Admin`, `Auditor`, `Director`, `Registrar` |
+| `psm.audit.view` | Access internal and statutory audit records | `Accounts Admin`, `Auditor` |
+| `psm.policy.view` | View active and historical PSM policy versions | `Auditor`, `Director`, `Registrar`, `SectionHead_PS`, `ps_admin` |
+| `psm.policy.create` | Publish a new effective-dated PSM policy version | `SectionHead_PS`, `ps_admin` |
+| `psm.sla.review` | System SLA reminder and escalation sweep | _service only_ |
+| `psm.report.publish` | System scheduled report execution | _service only_ |
