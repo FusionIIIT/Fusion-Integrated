@@ -155,7 +155,7 @@ def test_wf_005_bw_dept_03_admin_disposition_path(auth_client, cse_dept):
     stu_c = auth_client(role="student", user_id=501, username="stud_501")
     res_fb = stu_c.post(
         "/api/v1/dept/feedback/?department=CSE",
-        {"title": "BW Feedback 1", "description": "Need lab access", "category": "FACILITY"},
+        {"title": "BW Feedback 1", "description": "Need lab access", "category": "INFRASTRUCTURE"},
         format="json",
     )
     fb_id = res_fb.json()["id"]
@@ -376,7 +376,7 @@ def test_wf_014_bw_dept_08_admin_reassignment_access_transition(auth_client, cse
     res = inst_c.post(
         "/api/v1/dept/roles/?department=CSE",
         {
-            "role_name": "Dept_Admin",
+            "role_name": "DEPT_ADMIN",
             "user_id": "admin_wf_trans",
             "start_date": now.isoformat(),
             "end_date": (now + datetime.timedelta(days=365)).isoformat(),
@@ -415,7 +415,7 @@ def test_wf_016_cw_dept_04_composite_admin_reassignment_path(auth_client, cse_de
     res = inst_c.post(
         "/api/v1/dept/roles/?department=CSE",
         {
-            "role_name": "Dept_Admin",
+            "role_name": "DEPT_ADMIN",
             "user_id": "admin_cw_trans",
             "start_date": now.isoformat(),
             "end_date": (now + datetime.timedelta(days=365)).isoformat(),
