@@ -63,6 +63,167 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/elm/applications:
+    get:
+      operationId: v1_elm_applications_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+    post:
+      operationId: v1_elm_applications_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitLeaveInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmitLeaveInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmitLeaveInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/applications/{id}/cancel:
+    post:
+      operationId: v1_elm_applications_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/applications/{id}/decide:
+    post:
+      operationId: v1_elm_applications_decide_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewLeaveInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewLeaveInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewLeaveInput'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/applications/{id}/withdraw:
+    post:
+      operationId: v1_elm_applications_withdraw_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/approvals:
+    get:
+      operationId: v1_elm_approvals_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+          description: ''
+  /api/v1/elm/balances:
+    get:
+      operationId: v1_elm_balances_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveBalance'
+          description: ''
+  /api/v1/elm/types:
+    get:
+      operationId: v1_elm_types_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveType'
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2315,6 +2476,14 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DecisionEnum:
+      enum:
+      - APPROVE
+      - REJECT
+      type: string
+      description: |-
+        * `APPROVE` - APPROVE
+        * `REJECT` - REJECT
     Detail:
       type: object
       properties:
@@ -2637,6 +2806,155 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LeaveBalance:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        employee_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        leave_type:
+          type: integer
+        leave_type_code:
+          type: string
+          readOnly: true
+        leave_type_name:
+          type: string
+          readOnly: true
+        year:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        total_allocated:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        used_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        remaining_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          readOnly: true
+      required:
+      - employee_id
+      - id
+      - leave_type
+      - leave_type_code
+      - leave_type_name
+      - remaining_days
+      - year
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        employee_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        leave_type:
+          type: integer
+        leave_type_code:
+          type: string
+          readOnly: true
+        leave_type_name:
+          type: string
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        total_days:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        is_half_day:
+          type: boolean
+        reason:
+          type: string
+        contact_address:
+          type: string
+          maxLength: 255
+        substitute_employee_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        status:
+          $ref: '#/components/schemas/LeaveRequestStatusEnum'
+        reviewer_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        review_comment:
+          type: string
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - employee_id
+      - end_date
+      - id
+      - leave_type
+      - leave_type_code
+      - leave_type_name
+      - reason
+      - start_date
+      - total_days
+    LeaveRequestStatusEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      - WITHDRAWN
+      - CANCELLED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `WITHDRAWN` - Withdrawn
+        * `CANCELLED` - Cancelled
+    LeaveType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 100
+        annual_quota:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+        requires_attachment:
+          type: boolean
+        is_active:
+          type: boolean
+      required:
+      - code
+      - id
+      - name
     LiftSanction:
       type: object
       properties:
@@ -3466,6 +3784,16 @@ components:
       - message
       - reason
       - route
+    ReviewLeaveInput:
+      type: object
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        review_comment:
+          type: string
+          default: ''
+      required:
+      - decision
     RoundOutcome:
       type: object
       properties:
@@ -3691,6 +4019,33 @@ components:
       required:
       - available
       - season
+    SubmitLeaveInput:
+      type: object
+      properties:
+        leave_type:
+          type: integer
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_half_day:
+          type: boolean
+          default: false
+        reason:
+          type: string
+        contact_address:
+          type: string
+          default: ''
+        substitute_employee_id:
+          type: integer
+          nullable: true
+      required:
+      - end_date
+      - leave_type
+      - reason
+      - start_date
     SubmitOfferLetter:
       type: object
       properties:
