@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from modules.department.domain.roles import ActorContext
+from modules.department.domain.roles import FACULTY, ActorContext
 from modules.department.domain.rules import TIER_FIELDS, tier_for
-from modules.department.models import Department, ProfileRecord
+from modules.department.models import Department, ProfileRecord, TimetableSlot
 from modules.department.selectors.actors import current_holders
 from modules.directory import contracts as directory
 
@@ -32,11 +32,38 @@ def _full_row(record: ProfileRecord, user) -> dict:
     }
 
 
+def taught_cohorts(ctx: ActorContext) -> set[tuple[str, int]]:
+    """Q2: the (programme, batch year) pairs of the slots this Faculty member teaches here."""
+    if ctx.role != FACULTY or ctx.user_id is None or ctx.department is None:
+        return set()
+    rows = (
+        TimetableSlot.objects.filter(
+            department__code=ctx.department, instructor_user_id=ctx.user_id
+        )
+        .exclude(programme="")
+        .exclude(batch_year=None)
+        .values_list("programme", "batch_year")
+        .distinct()
+    )
+    return set(rows)
+
+
+def _in_course(ctx: ActorContext, record: ProfileRecord, user, cohorts) -> bool:
+    if not cohorts or record.kind != "student" or user is None:
+        return False
+    if record.department.code != ctx.department:
+        return False
+    return (getattr(user, "programme", ""), getattr(user, "batch_year", None)) in cohorts
+
+
 def profile_views(ctx: ActorContext, records: Sequence[ProfileRecord]) -> list[dict]:
     users = directory.get_users([r.user_id for r in records if r.user_id is not None])
+    cohorts = taught_cohorts(ctx)
     out = []
     for record in records:
-        tier = tier_for(ctx.role, record.kind)
+        tier = tier_for(
+            ctx.role, record.kind, _in_course(ctx, record, users.get(record.user_id), cohorts)
+        )
         if tier is None:
             continue
         row = _full_row(record, users.get(record.user_id))

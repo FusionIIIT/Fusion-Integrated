@@ -34,14 +34,14 @@ Written by `ops/docs/department_reference.py`; do not edit by hand.
 | UC-DEPT-006 | [modules/department/services/inventory.py:127](../../modules/department/services/inventory.py#L127) | issue stock |
 | UC-DEPT-007 | [modules/department/services/feedback.py:27](../../modules/department/services/feedback.py#L27) | submit feedback |
 | UC-DEPT-008 | [modules/department/services/feedback.py:69](../../modules/department/services/feedback.py#L69) | initial review and disposition |
-| UC-DEPT-009 | [modules/department/services/resources.py:66](../../modules/department/services/resources.py#L66) | manage timetable |
+| UC-DEPT-009 | [modules/department/services/resources.py:82](../../modules/department/services/resources.py#L82) | manage timetable |
 | UC-DEPT-010 | [modules/department/services/departments.py:23](../../modules/department/services/departments.py#L23) | update details |
 | UC-DEPT-011 | [modules/department/selectors/scoping.py:107](../../modules/department/selectors/scoping.py#L107) | view department resources |
 | UC-DEPT-012 | [modules/department/services/departments.py:62](../../modules/department/services/departments.py#L62) | approve official changes |
 | UC-DEPT-014 | [modules/department/services/feedback.py:108](../../modules/department/services/feedback.py#L108) | HOD oversight |
-| UC-DEPT-015 | [modules/department/selectors/profiles.py:35](../../modules/department/selectors/profiles.py#L35) | view profiles at tier |
-| UC-DEPT-016 | [modules/department/services/resources.py:126](../../modules/department/services/resources.py#L126) | manage profiles |
-| UC-DEPT-017 | [modules/department/services/resources.py:103](../../modules/department/services/resources.py#L103) | manage lab profiles |
+| UC-DEPT-015 | [modules/department/selectors/profiles.py:59](../../modules/department/selectors/profiles.py#L59) | view profiles at tier |
+| UC-DEPT-016 | [modules/department/services/resources.py:144](../../modules/department/services/resources.py#L144) | manage profiles |
+| UC-DEPT-017 | [modules/department/services/resources.py:121](../../modules/department/services/resources.py#L121) | manage lab profiles |
 | UC-DEPT-018 | [modules/department/selectors/scoping.py:97](../../modules/department/selectors/scoping.py#L97) | student timetable and programme view |
 | UC-DEPT-019 | [modules/department/services/inventory.py:25](../../modules/department/services/inventory.py#L25) | manage inventory records |
 | UC-DEPT-020 | [modules/department/services/roles.py:93](../../modules/department/services/roles.py#L93) | maintain role assignments |
@@ -66,10 +66,10 @@ Written by `ops/docs/department_reference.py`; do not edit by hand.
 | CFR-DEPT-006 | [modules/department/selectors/scoping.py:75](../../modules/department/selectors/scoping.py#L75) | Faculty issued-stock history |
 | CFR-DEPT-007 | [modules/department/services/feedback.py:27](../../modules/department/services/feedback.py#L27) | confidential feedback |
 | CFR-DEPT-008 | [modules/department/services/feedback.py:95](../../modules/department/services/feedback.py#L95) | review and resolve |
-| CFR-DEPT-009 | [modules/department/services/resources.py:172](../../modules/department/services/resources.py#L172) | manage profiles |
-| CFR-DEPT-010 | [modules/department/domain/rules.py:222](../../modules/department/domain/rules.py#L222) | profile visibility |
-| CFR-DEPT-011 | [modules/department/services/resources.py:51](../../modules/department/services/resources.py#L51) | conflict-free timetables |
-| CFR-DEPT-012 | [modules/department/services/resources.py:103](../../modules/department/services/resources.py#L103) | lab resource profiles |
+| CFR-DEPT-009 | [modules/department/services/resources.py:190](../../modules/department/services/resources.py#L190) | manage profiles |
+| CFR-DEPT-010 | [modules/department/domain/rules.py:224](../../modules/department/domain/rules.py#L224) | profile visibility |
+| CFR-DEPT-011 | [modules/department/services/resources.py:52](../../modules/department/services/resources.py#L52) | conflict-free timetables |
+| CFR-DEPT-012 | [modules/department/services/resources.py:121](../../modules/department/services/resources.py#L121) | lab resource profiles |
 | CFR-DEPT-013 | [modules/department/selectors/scoping.py:97](../../modules/department/selectors/scoping.py#L97) | student academic information |
 | CFR-DEPT-014 | [modules/department/domain/rules.py:147](../../modules/department/domain/rules.py#L147) | general information only |
 | CFR-DEPT-015 | [modules/department/domain/rules.py:132](../../modules/department/domain/rules.py#L132) | official changes controlled |
@@ -97,15 +97,15 @@ Written by `ops/docs/department_reference.py`; do not edit by hand.
 | AFR-DEPT-021 | [modules/department/services/feedback.py:88](../../modules/department/services/feedback.py#L88) | close a simple issue during review |
 | AFR-DEPT-022 | [modules/department/services/feedback.py:54](../../modules/department/services/feedback.py#L54) | Resolved or Closed |
 | AFR-DEPT-023 | [modules/department/selectors/scoping.py:93](../../modules/department/selectors/scoping.py#L93) | HOD sees feedback after initial review |
-| AFR-DEPT-024 | [modules/department/services/resources.py:126](../../modules/department/services/resources.py#L126) | manage profile records |
-| AFR-DEPT-025 | [modules/department/domain/rules.py:217](../../modules/department/domain/rules.py#L217) | Students: basic |
-| AFR-DEPT-026 | [modules/department/domain/rules.py:216](../../modules/department/domain/rules.py#L216) | Faculty on students: basic until rosters exist (Q2) |
+| AFR-DEPT-024 | [modules/department/services/resources.py:144](../../modules/department/services/resources.py#L144) | manage profile records |
+| AFR-DEPT-025 | [modules/department/domain/rules.py:219](../../modules/department/domain/rules.py#L219) | Students: basic |
+| AFR-DEPT-026 | [modules/department/selectors/profiles.py:35](../../modules/department/selectors/profiles.py#L35) | Faculty on Students in a slot they teach: detailed (Q2) |
 | AFR-DEPT-027 | [modules/department/domain/rules.py:216](../../modules/department/domain/rules.py#L216) | Faculty on Faculty/Alumni: limited |
 | AFR-DEPT-028 | [modules/department/domain/rules.py:213](../../modules/department/domain/rules.py#L213) | HOD/Dept_Admin: full, no sensitive fields |
-| AFR-DEPT-029 | [modules/department/services/resources.py:66](../../modules/department/services/resources.py#L66) | upload |
-| AFR-DEPT-030 | [modules/department/services/resources.py:82](../../modules/department/services/resources.py#L82) | modify |
-| AFR-DEPT-031 | [modules/department/services/resources.py:51](../../modules/department/services/resources.py#L51) | detect and block overlaps |
-| AFR-DEPT-034 | [modules/department/services/resources.py:103](../../modules/department/services/resources.py#L103) | update lab details |
+| AFR-DEPT-029 | [modules/department/services/resources.py:82](../../modules/department/services/resources.py#L82) | upload |
+| AFR-DEPT-030 | [modules/department/services/resources.py:99](../../modules/department/services/resources.py#L99) | modify |
+| AFR-DEPT-031 | [modules/department/services/resources.py:52](../../modules/department/services/resources.py#L52) | detect and block overlaps |
+| AFR-DEPT-034 | [modules/department/services/resources.py:121](../../modules/department/services/resources.py#L121) | update lab details |
 | AFR-DEPT-035 | [modules/department/selectors/scoping.py:107](../../modules/department/selectors/scoping.py#L107) | Faculty view labs |
 | AFR-DEPT-036 | [modules/department/api/views.py:93](../../modules/department/api/views.py#L93) | programme information (Q9) |
 | AFR-DEPT-037 | [modules/department/selectors/scoping.py:97](../../modules/department/selectors/scoping.py#L97) | applicable timetable |
@@ -124,4 +124,4 @@ Written by `ops/docs/department_reference.py`; do not edit by hand.
 | AFR-DEPT-050 | [modules/department/selectors/actors.py:27](../../modules/department/selectors/actors.py#L27) | incoming access starts at valid_from |
 | AFR-DEPT-051 | [modules/department/services/roles.py:88](../../modules/department/services/roles.py#L88) | one HOD in effect |
 | AFR-DEPT-052 | [modules/department/services/roles.py:88](../../modules/department/services/roles.py#L88) | one Dept_Admin in effect |
-| AFR-DEPT-053 | [modules/department/selectors/profiles.py:47](../../modules/department/selectors/profiles.py#L47) | headship derived from the HOD tenure |
+| AFR-DEPT-053 | [modules/department/selectors/profiles.py:74](../../modules/department/selectors/profiles.py#L74) | headship derived from the HOD tenure |

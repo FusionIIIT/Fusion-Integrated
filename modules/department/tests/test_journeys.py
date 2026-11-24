@@ -494,11 +494,55 @@ def test_uc_dept_015_profile_tiers_by_viewer(world, act):
         as_faculty["alumni"]["tier"] == "limited"
         and as_faculty["alumni"]["current_position"] == "Engineer"
     )
-    assert as_faculty["student"]["tier"] == "basic"  # Q2: no course roster, never detailed
+    assert as_faculty["student"]["tier"] == "basic"  # not in any course faculty2 teaches
     as_hod = {p["kind"]: p for p in act("hod").get(f"{API}/profiles").json()["results"]}
     assert as_hod["student"]["tier"] == "full" and as_hod["student"]["batch_year"] == 2023
     for row in as_hod.values():
         assert not {"date_of_birth", "phone", "address", "category", "gender"} & set(row)
+
+
+def test_afr_dept_026_faculty_see_their_course_students_in_detail(world, act):
+    # AFR-DEPT-026, BR-DEPT-019, UC-DEPT-015 (Q2): a course is a slot the Faculty member teaches
+    for body in (
+        {"kind": "faculty", "user_id": uid("faculty")},
+        {"kind": "student", "user_id": uid("student")},
+        {"kind": "student", "user_id": uid("student2")},
+    ):
+        assert act("admin").post(f"{API}/profiles", body, format="json").status_code == 201
+    slot = {
+        "kind": "class",
+        "programme": "B.Tech",
+        "batch_year": 2024,
+        "course_code": "CS2003",
+        "day_of_week": 0,
+        "starts_at": "09:00",
+        "ends_at": "10:00",
+        "instructor_user_id": uid("faculty2"),
+    }
+    refused = act("admin").post(f"{API}/timetable-slots", {"slots": [slot]}, format="json")
+    assert refused.status_code == 422 and refused.json()["error"]["code"] == "instructor_unknown"
+    assert not TimetableSlot.objects.exists()
+    slot["instructor_user_id"] = uid("faculty")
+    made = act("admin").post(f"{API}/timetable-slots", {"slots": [slot]}, format="json")
+    assert made.status_code == 201 and made.json()[0]["instructor_user_id"] == uid("faculty")
+
+    def tiers(name):
+        rows = act(name).get(f"{API}/profiles").json()["results"]
+        return {p.get("batch_year") or p["display_name"]: p for p in rows if p["kind"] == "student"}
+
+    mine = tiers("faculty")
+    assert mine[2024]["tier"] == "detailed" and mine[2024]["username"] == f"u{uid('student')}"
+    assert "bio" not in mine[2024] and "user_id" not in mine[2024]
+    others = [p for p in mine.values() if p.get("batch_year") != 2024]
+    assert [p["tier"] for p in others] == ["basic"] and "batch_year" not in others[0]
+    assert {p["tier"] for p in tiers("faculty2").values()} == {"basic"}
+
+    slot_id = made.json()[0]["id"]
+    moved = act("admin").patch(
+        f"{API}/timetable-slots/{slot_id}", {"instructor_user_id": None}, format="json"
+    )
+    assert moved.status_code == 200
+    assert {p["tier"] for p in tiers("faculty").values()} == {"basic"}
 
 
 # -- role tenures ---------------------------------------------------------------------------

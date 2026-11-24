@@ -582,7 +582,7 @@ one `role.effective` notice is queued per tenure (`test_role_transition_task_twi
 |---|---|---|---|
 | BR-DEPT-024, AFR-DEPT-049, AFR-DEPT-050 | Inside DEPT the switch-over is immediate. The IAM designation, and so the sidebar link, is changed separately with `assign_role`. | The IAM has no write endpoint, and a module may not write the ERP (blueprint Q1). | Q1, below |
 | BR-DEPT-022, AFR-DEPT-051, AFR-DEPT-052 | Never more than one holder. Zero is possible before the first tenure or after one ends with no successor. | Only the central authority can record a successor (Q1). | Q1, below |
-| AFR-DEPT-026 | Faculty see students at the basic tier, never detailed. | No course-roster endpoint on the IAM's `main` (Q2). Dependency: an IAM roster projection. | Q2, below |
+| AFR-DEPT-026 | Course membership comes from the timetable: a Student whose programme and batch year match a slot the Faculty member teaches. There is no real roster. | No course-roster endpoint on the IAM's `main` (Q2). Change to Q2 in the blueprint. | Q2 and its change, below |
 | BR-DEPT-022 (SM), HOD-gated ids for SM | SM has no HOD. | `HOD (SM)` does not exist in `globals_designation` (Q4). | Q4, below |
 
 ## 11. Approvals
@@ -613,6 +613,12 @@ After review round 6, from Student 2, on WhatsApp, 2026-11-23 18:05 IST:
 
 This is the written fix-or-waive decision after six rounds: every round 6 finding is fixed, none is
 waived, and the three round 6 questions are answered as proposed (§12).
+
+After the spec-test baseline, from Student 2, in writing, 2026-11-24: he agreed to the change to
+Q2 in the blueprint. Timetable slots name an instructor, and a Faculty member sees a Student whose
+programme and batch year match a slot they teach at the DETAILED tier (AFR-DEPT-026). This ends
+the three `NOT_AUTOMATED` spec tests (`triage.md`). It adds the migration
+`0002_timetable_slot_instructor` and changes the regenerated `openapi/fusion-integrated.v1.yaml`.
 
 No dependency was added.
 

@@ -142,6 +142,7 @@ export interface TimetableSlotInput {
   starts_at: string;
   ends_at: string;
   room?: string;
+  instructor_user_id?: number | null;
 }
 
 export interface TimetableSlot extends Required<TimetableSlotInput> {
@@ -162,7 +163,7 @@ export interface LabResource {
 export type LabInput = Partial<Omit<LabResource, "id" | "updated_at">>;
 
 export interface Profile {
-  tier: "basic" | "limited" | "full";
+  tier: "basic" | "limited" | "detailed" | "full";
   id: number;
   kind: "faculty" | "student" | "alumni";
   display_name: string;

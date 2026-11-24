@@ -149,13 +149,13 @@ LINKS: dict[str, tuple[str, str, str]] = {
     "AFR-DEPT-024": (RES, "def create_profile", "manage profile records"),
     "AFR-DEPT-025": (DOMAIN_RULES, "if viewer_role == STUDENT:", "Students: basic"),
     "AFR-DEPT-026": (
-        DOMAIN_RULES,
-        'return BASIC if target_kind == "student" else LIMITED',
-        "Faculty on students: basic until rosters exist (Q2)",
+        PROFILES,
+        "def taught_cohorts",
+        "Faculty on Students in a slot they teach: detailed (Q2)",
     ),
     "AFR-DEPT-027": (
         DOMAIN_RULES,
-        'return BASIC if target_kind == "student" else LIMITED',
+        'if target_kind != "student":',
         "Faculty on Faculty/Alumni: limited",
     ),
     "AFR-DEPT-028": (

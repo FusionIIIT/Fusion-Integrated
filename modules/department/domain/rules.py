@@ -204,16 +204,18 @@ def check_shortening(
 
 
 # -- profiles (BR-DEPT-019, Q2, Q8) ----------------------------------------------
-BASIC, LIMITED, FULL = "basic", "limited", "full"
+BASIC, LIMITED, DETAILED, FULL = "basic", "limited", "detailed", "full"
 PROFILE_KINDS = ("faculty", "student", "alumni")
 
 
-def tier_for(viewer_role: str | None, target_kind: str) -> str | None:
-    """None means the viewer may not see this profile at all."""
+def tier_for(viewer_role: str | None, target_kind: str, in_my_course: bool = False) -> str | None:
+    """None: no view at all. AFR-DEPT-026: Faculty see their course Students in detail (Q2)."""
     if viewer_role in (HOD, DEPT_ADMIN):
         return FULL
     if viewer_role == FACULTY:
-        return BASIC if target_kind == "student" else LIMITED
+        if target_kind != "student":
+            return LIMITED
+        return DETAILED if in_my_course else BASIC
     if viewer_role == STUDENT:
         return BASIC if target_kind in ("student", "faculty") else None
     return None
@@ -231,6 +233,20 @@ TIER_FIELDS = {
         "office",
         "research_interests",
         "current_position",
+    ),
+    DETAILED: (
+        "id",
+        "kind",
+        "display_name",
+        "programme",
+        "department",
+        "email",
+        "office",
+        "research_interests",
+        "current_position",
+        "username",
+        "discipline",
+        "batch_year",
     ),
     FULL: (
         "id",

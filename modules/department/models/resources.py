@@ -19,6 +19,8 @@ class TimetableSlot(TimeStampedModel):
     starts_at = models.TimeField()
     ends_at = models.TimeField()
     room = models.CharField(max_length=40, blank=True)
+    # Who teaches the slot; a Student whose programme and batch match is in this course (Q2).
+    instructor_user_id = models.IntegerField(null=True, blank=True)
     updated_by = models.IntegerField()
 
     class Meta:
@@ -32,7 +34,10 @@ class TimetableSlot(TimeStampedModel):
         indexes = [
             models.Index(
                 fields=["department", "day_of_week", "starts_at"], name="dept_slot_week_idx"
-            )
+            ),
+            models.Index(
+                fields=["department", "instructor_user_id"], name="dept_slot_instructor_idx"
+            ),
         ]
 
 

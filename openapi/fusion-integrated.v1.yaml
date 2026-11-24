@@ -1383,6 +1383,7 @@ paths:
                     starts_at: 09:00
                     ends_at: '10:00'
                     room: L-104
+                    instructor_user_id: 3011
           description: ''
     post:
       operationId: v1_department_timetable_slots_create
@@ -1407,6 +1408,7 @@ paths:
                     starts_at: 09:00
                     ends_at: '10:00'
                     room: L-104
+                    instructor_user_id: 3011
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/DeptTimetableUpload'
@@ -1435,6 +1437,7 @@ paths:
                     starts_at: 09:00
                     ends_at: '10:00'
                     room: L-104
+                    instructor_user_id: 3011
           description: ''
   /api/v1/department/timetable-slots/{id}:
     patch:
@@ -1484,6 +1487,7 @@ paths:
                     starts_at: 09:00
                     ends_at: '10:00'
                     room: L-104
+                    instructor_user_id: 3011
           description: ''
     delete:
       operationId: v1_department_timetable_slots_destroy
@@ -4698,6 +4702,10 @@ components:
         room:
           type: string
           readOnly: true
+        instructor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
         updated_at:
           type: string
           format: date-time
@@ -4708,6 +4716,7 @@ components:
       - day_of_week
       - ends_at
       - id
+      - instructor_user_id
       - kind
       - programme
       - room
@@ -4745,6 +4754,10 @@ components:
           type: string
           default: ''
           maxLength: 40
+        instructor_user_id:
+          type: integer
+          minimum: 1
+          nullable: true
       required:
       - course_code
       - day_of_week
@@ -5584,6 +5597,10 @@ components:
         room:
           type: string
           maxLength: 40
+        instructor_user_id:
+          type: integer
+          minimum: 1
+          nullable: true
     PatchedJobPosting:
       type: object
       properties:

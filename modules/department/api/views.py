@@ -539,6 +539,7 @@ SLOT_EXAMPLE = {
     "starts_at": "09:00",
     "ends_at": "10:00",
     "room": "L-104",
+    "instructor_user_id": 3011,
 }
 
 

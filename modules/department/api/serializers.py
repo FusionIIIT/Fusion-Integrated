@@ -282,6 +282,7 @@ class DeptTimetableSlotSerializer(serializers.ModelSerializer):
             "starts_at",
             "ends_at",
             "room",
+            "instructor_user_id",
             "updated_at",
         ]
         # A response shape only: every field is always sent, so the schema marks each required.
@@ -299,6 +300,9 @@ class DeptTimetableSlotWriteSerializer(serializers.Serializer):
     starts_at = serializers.TimeField()
     ends_at = serializers.TimeField()
     room = serializers.CharField(required=False, allow_blank=True, max_length=40, default="")
+    instructor_user_id = serializers.IntegerField(
+        required=False, allow_null=True, default=None, min_value=1
+    )
 
 
 class DeptTimetableUploadSerializer(serializers.Serializer):
@@ -324,6 +328,7 @@ class DeptTimetableSlotEditSerializer(serializers.Serializer):
     starts_at = serializers.TimeField(required=False)
     ends_at = serializers.TimeField(required=False)
     room = serializers.CharField(required=False, allow_blank=True, max_length=40)
+    instructor_user_id = serializers.IntegerField(required=False, allow_null=True, min_value=1)
 
 
 class DeptLabResourceSerializer(serializers.ModelSerializer):

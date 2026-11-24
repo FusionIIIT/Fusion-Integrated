@@ -1,7 +1,7 @@
 """Pure rules and state tables, no database (Steps 5.3 and 5.4)."""
 
 from datetime import UTC, datetime, time, timedelta
-from itertools import product
+from itertools import pairwise, product
 
 import pytest
 
@@ -220,26 +220,30 @@ def test_q1_shortening_without_successor_is_refused():
 
 # -- profile tiers (BR-DEPT-019) ---------------------------------------------------------------
 @pytest.mark.parametrize(
-    ("viewer", "target", "tier"),
+    ("viewer", "target", "tier", "in_my_course"),
     [
-        (roles.HOD, "student", r.FULL),
-        (roles.DEPT_ADMIN, "alumni", r.FULL),
-        (roles.FACULTY, "student", r.BASIC),
-        (roles.FACULTY, "faculty", r.LIMITED),
-        (roles.FACULTY, "alumni", r.LIMITED),
-        (roles.STUDENT, "student", r.BASIC),
-        (roles.STUDENT, "faculty", r.BASIC),
-        (roles.STUDENT, "alumni", None),
-        (roles.CENTRAL, "faculty", None),
-        (None, "faculty", None),
+        (roles.HOD, "student", r.FULL, False),
+        (roles.DEPT_ADMIN, "alumni", r.FULL, False),
+        (roles.FACULTY, "student", r.BASIC, False),
+        (roles.FACULTY, "student", r.DETAILED, True),
+        (roles.FACULTY, "faculty", r.LIMITED, True),
+        (roles.STUDENT, "student", r.BASIC, True),
+        (roles.FACULTY, "faculty", r.LIMITED, False),
+        (roles.FACULTY, "alumni", r.LIMITED, False),
+        (roles.STUDENT, "student", r.BASIC, False),
+        (roles.STUDENT, "faculty", r.BASIC, False),
+        (roles.STUDENT, "alumni", None, False),
+        (roles.CENTRAL, "faculty", None, False),
+        (None, "faculty", None, False),
     ],
 )
-def test_br_dept_019_tiers(viewer, target, tier):
-    assert r.tier_for(viewer, target) == tier
+def test_br_dept_019_tiers(viewer, target, tier, in_my_course):
+    assert r.tier_for(viewer, target, in_my_course) == tier
 
 
 def test_br_dept_019_tiers_only_grow_and_never_carry_sensitive_fields():
-    assert set(r.TIER_FIELDS[r.BASIC]) < set(r.TIER_FIELDS[r.LIMITED]) < set(r.TIER_FIELDS[r.FULL])
+    tiers = [set(r.TIER_FIELDS[t]) for t in (r.BASIC, r.LIMITED, r.DETAILED, r.FULL)]
+    assert all(a < b for a, b in pairwise(tiers))
     sensitive = {"date_of_birth", "phone", "address", "category", "gender", "medical"}
     assert not sensitive & set(r.TIER_FIELDS[r.FULL])
 

@@ -600,9 +600,9 @@ Field tiers:
 
 | Tier | Who sees it | Fields |
 |---|---|---|
-| BASIC | Student viewing a peer or faculty; Faculty viewing a student (see Q2) | name, kind, programme, department |
+| BASIC | Student viewing a peer or faculty; Faculty viewing a student not in their course | name, kind, programme, department |
 | LIMITED | Faculty viewing faculty/alumni | BASIC + email, office, research interests, current position |
-| DETAILED | Faculty viewing their course students (blocked by Q2) | LIMITED + username, discipline, batch year |
+| DETAILED | Faculty viewing their course students (see "Change to Q2" below) | LIMITED + username, discipline, batch year |
 | FULL | HOD or Dept_Admin, anyone in the department | every stored field |
 
 **Q9. "Academic program information" (AFR-036).** *Proposal:* the programme list for the
@@ -703,3 +703,23 @@ These enforce what was approved; none changes a ruling.
 - **A successor never cuts the incumbent short.** A tenure that starts inside the current one and
   ends before it is refused (`would_cut_short`), so BR-DEPT-022 holds for the rest of the term.
 - A timetable upload takes at most 500 slots.
+
+## Change to Q2 (spec tests), approved by Student 2 on 2026-11-24
+
+This changes the Q2 ruling. Student 2 agreed to it in writing (quality report, §11).
+
+Three spec tests (TC-DEPT-056, UC TC-DEPT-029, TC-DEPT-BR-037) could not run under Q2, and no spec
+test may stay skipped. AFR-DEPT-026 reads: "The system shall allow Faculty to view detailed profile
+information for Students in the Faculty member's courses."
+
+- **Change.** A timetable slot may name an instructor (`instructor_user_id`), set by the
+  Dept_Admin. The instructor must be an active Faculty profile of the department, otherwise the
+  upload or edit is refused (`instructor_unknown`). A Student is in a Faculty member's course
+  when the Student's programme and batch year match a slot that Faculty member teaches in the
+  department. That Faculty member then sees the Student at the DETAILED tier (BASIC + email,
+  office, research interests, current position, username, discipline, batch year). Every other
+  Faculty view of a Student stays BASIC.
+- **Reading.** Course membership comes from the timetable, not from a roster; the IAM still has
+  no roster endpoint. A slot with no programme or no batch year links no Students.
+- **Shared files.** A migration (`0002_timetable_slot_instructor`) and the regenerated
+  `openapi/fusion-integrated.v1.yaml`.

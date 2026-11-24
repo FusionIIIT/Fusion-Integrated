@@ -2,7 +2,7 @@ import { Button, Group, NumberInput, Select, SimpleGrid, Table, TextInput } from
 
 import { FormModal } from "../../../ui/components/FormModal";
 import { PageHeader } from "../../../ui/components/PageHeader";
-import { useDeleteSlot, useEditSlot, useTimetable, useUploadSlots } from "../api/hooks";
+import { useDeleteSlot, useEditSlot, useProfiles, useTimetable, useUploadSlots } from "../api/hooks";
 import type { TimetableSlot, TimetableSlotInput } from "../api/types";
 import { ActionError, PageBody, useDialog } from "../components/PageBody";
 import { useCanAct } from "../components/acting";
@@ -10,7 +10,7 @@ import { useCanAct } from "../components/acting";
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const BLANK: TimetableSlotInput = {
   kind: "class", programme: "", batch_year: null, course_code: "", day_of_week: 0,
-  starts_at: "09:00", ends_at: "10:00", room: "",
+  starts_at: "09:00", ends_at: "10:00", room: "", instructor_user_id: null,
 };
 
 type SlotForm = TimetableSlotInput & { id?: number };
@@ -79,9 +79,22 @@ function SlotDialog({ form, opened, setForm }: {
             onChange={(e) => setForm({ ...form, programme: e.currentTarget.value })} />
           <NumberInput label="Batch year" value={form.batch_year ?? ""}
             onChange={(v) => setForm({ ...form, batch_year: typeof v === "number" ? v : null })} />
+          <InstructorSelect value={form.instructor_user_id ?? null}
+            onChange={(id) => setForm({ ...form, instructor_user_id: id })} />
         </SimpleGrid>
       )}
     </FormModal>
+  );
+}
+
+// AFR-DEPT-026 (Q2): the Students of this programme and batch are this Faculty member's course.
+function InstructorSelect({ value, onChange }: { value: number | null; onChange: (id: number | null) => void }) {
+  const { data } = useProfiles();
+  const faculty = (data?.results ?? []).filter((p) => p.kind === "faculty" && p.user_id != null && p.is_active);
+  return (
+    <Select label="Instructor" placeholder="Not set" clearable value={value == null ? null : String(value)}
+      data={faculty.map((p) => ({ value: String(p.user_id), label: p.display_name }))}
+      onChange={(v) => onChange(v ? Number(v) : null)} />
   );
 }
 

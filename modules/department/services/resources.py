@@ -26,6 +26,7 @@ SLOT_FIELDS = (
     "starts_at",
     "ends_at",
     "room",
+    "instructor_user_id",
 )
 
 
@@ -62,11 +63,27 @@ def _check(candidates: list[rules.Slot], saved: list[rules.Slot]) -> None:
             )
 
 
+def _check_instructors(dept, user_ids) -> None:
+    """Q2: an instructor is an active Faculty profile of this department."""
+    wanted = {u for u in user_ids if u is not None}
+    known = set(
+        ProfileRecord.objects.filter(
+            department=dept, kind="faculty", is_active=True, user_id__in=wanted
+        ).values_list("user_id", flat=True)
+    )
+    if wanted - known:
+        raise DomainError(
+            "The instructor must be an active Faculty member of this department.",
+            code="instructor_unknown",
+        )
+
+
 @transaction.atomic
 def upload(ctx: ActorContext, slots: list[dict]) -> list[TimetableSlot]:
     """AFR-DEPT-029: the whole batch is saved, or none of it."""
     require_acting(ctx, DEPT_ADMIN)
     dept = own_department(ctx, lock=True)
+    _check_instructors(dept, [s.get("instructor_user_id") for s in slots])
     _check([_as_slot(f"new:{i}", s) for i, s in enumerate(slots)], _saved(dept))
     return [
         TimetableSlot.objects.create(
@@ -85,6 +102,7 @@ def modify(ctx: ActorContext, slot_id: int, **changes) -> TimetableSlot:
     own_department(ctx, lock=True)
     slot = get_scoped(scoping.timetable_for(ctx), slot_id, lock=True, what="timetable slot")
     merged = {f: changes.get(f, getattr(slot, f)) for f in SLOT_FIELDS}
+    _check_instructors(slot.department, [changes.get("instructor_user_id")])
     _check([_as_slot(f"saved:{slot.pk}", merged)], _saved(slot.department, exclude_pk=slot.pk))
     for field, value in merged.items():
         setattr(slot, field, value)
