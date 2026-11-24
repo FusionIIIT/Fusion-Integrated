@@ -87,16 +87,116 @@ def test_tc_dept_br_036_student_viewer_scope(world, act):
         assert not (keys & SENSITIVE_FIELDS)
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: No course-teaching or course-enrollment interface, model, or IAM "
-        "projection exists in Fusion-Integrated A8_BASE to associate a Faculty member with "
-        "enrolled Students (Q2), so the enrolled-Student detailed-view portion of BR-DEPT-019 "
-        "cannot be set up or verified."
-    )
-)
 def test_tc_dept_br_037_faculty_viewer_scope(world, act):
     """TC-DEPT-BR-037 | BR-DEPT-019 faculty-viewer-scope"""
+    ids = _seed_profiles(act)
+    enrolled_student_resp = act("admin").post(
+        f"{API}/profiles",
+        {
+            "kind": "student",
+            "user_id": uid("student"),
+            "bio": "First-year CSE student.",
+            "research_interests": "Systems",
+        },
+        format="json",
+    )
+    assert enrolled_student_resp.status_code == 201
+    enrolled_student_id = enrolled_student_resp.json()["id"]
+
+    other_faculty_resp = act("admin").post(
+        f"{API}/profiles",
+        {
+            "kind": "faculty",
+            "user_id": uid("faculty2"),
+            "office": "C-202",
+            "research_interests": "Databases",
+            "bio": "Associate Professor of CSE.",
+        },
+        format="json",
+    )
+    assert other_faculty_resp.status_code == 201
+    other_faculty_id = other_faculty_resp.json()["id"]
+
+    slot_resp = act("admin").post(
+        f"{API}/timetable-slots",
+        {
+            "slots": [
+                {
+                    "kind": "class",
+                    "programme": "B.Tech",
+                    "batch_year": 2024,
+                    "course_code": "CS2001",
+                    "day_of_week": 0,
+                    "starts_at": "09:00",
+                    "ends_at": "10:00",
+                    "instructor_user_id": uid("faculty"),
+                }
+            ]
+        },
+        format="json",
+    )
+    assert slot_resp.status_code == 201
+
+    full_only_fields = {"user_id", "bio", "graduation_year", "is_active"}
+    detailed_and_full_only = {"username", "discipline", "batch_year"} | full_only_fields
+    non_basic_fields = (
+        {"email", "office", "research_interests", "current_position"} | detailed_and_full_only
+    )
+    expected_detailed_fields = {
+        "id",
+        "kind",
+        "display_name",
+        "programme",
+        "department",
+        "email",
+        "office",
+        "research_interests",
+        "current_position",
+        "username",
+        "discipline",
+        "batch_year",
+    }
+    expected_limited_fields = {
+        "id",
+        "kind",
+        "display_name",
+        "programme",
+        "department",
+        "email",
+        "office",
+        "research_interests",
+        "current_position",
+    }
+
+    enrolled = act("faculty").get(f"{API}/profiles/{enrolled_student_id}")
+    assert enrolled.status_code == 200
+    enrolled_data = enrolled.json()
+    assert enrolled_data["tier"] == "detailed"
+    assert expected_detailed_fields.issubset(set(enrolled_data.keys()))
+    assert enrolled_data["username"] == f"u{uid('student')}"
+    assert enrolled_data["email"] == f"u{uid('student')}@example.test"
+    assert enrolled_data["programme"] == "B.Tech"
+    assert enrolled_data["discipline"] == "CSE"
+    assert enrolled_data["batch_year"] == 2024
+    assert enrolled_data["research_interests"] == "Systems"
+    assert not (set(enrolled_data.keys()) & full_only_fields)
+    assert not (set(enrolled_data.keys()) & SENSITIVE_FIELDS)
+
+    non_enrolled = act("faculty").get(f"{API}/profiles/{ids['student']}")
+    assert non_enrolled.status_code == 200
+    non_enrolled_data = non_enrolled.json()
+    assert non_enrolled_data["tier"] == "basic"
+    assert not (set(non_enrolled_data.keys()) & non_basic_fields)
+    assert not (set(non_enrolled_data.keys()) & SENSITIVE_FIELDS)
+
+    for target_id in (other_faculty_id, ids["alumni"]):
+        resp = act("faculty").get(f"{API}/profiles/{target_id}")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["tier"] == "limited"
+        assert expected_limited_fields.issubset(set(data.keys()))
+        assert not (set(data.keys()) & detailed_and_full_only)
+        assert not (set(data.keys()) & SENSITIVE_FIELDS)
 
 
 def test_tc_dept_br_038_hod_and_dept_admin_viewer_scope(world, act):

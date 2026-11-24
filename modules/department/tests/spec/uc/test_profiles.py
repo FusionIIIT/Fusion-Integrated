@@ -60,15 +60,57 @@ def _seed_profiles(act) -> dict[str, int]:
     return {"faculty": faculty_id, "student": student_id, "alumni": alumni_id}
 
 
-@pytest.mark.skip(
-    reason=(
-        "NOT_AUTOMATED: No course-teaching or course-enrollment interface, model, or IAM "
-        "projection exists in Fusion-Integrated A8_BASE to associate a Faculty member with "
-        "enrolled Students (Q2)."
-    )
-)
 def test_tc_dept_029_faculty_view_student_profile_in_course(world, act):
     """TC-DEPT-029 | UC-DEPT-015 Main Success Scenario"""
+    ids = _seed_profiles(act)
+    slot_resp = act("admin").post(
+        f"{API}/timetable-slots",
+        {
+            "slots": [
+                {
+                    "kind": "class",
+                    "programme": "B.Tech",
+                    "batch_year": 2023,
+                    "course_code": "CS3001",
+                    "day_of_week": 0,
+                    "starts_at": "09:00",
+                    "ends_at": "10:00",
+                    "instructor_user_id": uid("faculty"),
+                }
+            ]
+        },
+        format="json",
+    )
+    assert slot_resp.status_code == 201
+
+    resp = act("faculty").get(f"{API}/profiles/{ids['student']}")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["tier"] == "detailed"
+    expected_detailed_fields = {
+        "id",
+        "kind",
+        "display_name",
+        "programme",
+        "department",
+        "email",
+        "office",
+        "research_interests",
+        "current_position",
+        "username",
+        "discipline",
+        "batch_year",
+    }
+    full_only_fields = {"user_id", "bio", "graduation_year", "is_active"}
+    assert expected_detailed_fields.issubset(set(data.keys()))
+    assert data["username"] == f"u{uid('student2')}"
+    assert data["email"] == f"u{uid('student2')}@example.test"
+    assert data["programme"] == "B.Tech"
+    assert data["discipline"] == "CSE"
+    assert data["batch_year"] == 2023
+    assert data["research_interests"] == "Compilers"
+    assert not (set(data.keys()) & full_only_fields)
+    assert not (set(data.keys()) & SENSITIVE_FIELDS)
 
 
 def test_tc_dept_030_faculty_restricted_for_student_not_in_courses(world, act):
