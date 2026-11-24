@@ -13,6 +13,16 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave_elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave_elm.application.view` | View own leave applications | `Employee`, `Leave Admin`, `Leave Approver` |
+| `leave_elm.application.apply` | Apply for or withdraw leave | `Employee` |
+| `leave_elm.application.approve` | Review assigned leave applications | `Leave Approver` |
+| `leave_elm.balance.view` | View own leave balances | `Employee`, `Leave Admin`, `Leave Approver` |
+| `leave_elm.policy.manage` | Configure ELM employee profiles and balances | `Leave Admin` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
