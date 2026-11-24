@@ -17,10 +17,16 @@ Student 1's 10/10 commit the baseline ran on (hash): 34b8ab5
 | Q1 | UC | 44 | 44 | 0 | 0 | 86.3 | 62.1 |
 | Q1 | BR | 45 | 45 | 0 | 0 | 85.0 | 59.6 |
 | Q1 | WF | 22 | 22 | 0 | 0 | 73.1 | 33.3 |
+| Q2 | FR | 89 | 89 | 0 | 0 | 86.6 | 62.1 |
+| Q2 | UC | 44 | 44 | 0 | 0 | 86.3 | 62.1 |
+| Q2 | BR | 45 | 45 | 0 | 0 | 85.0 | 59.6 |
+| Q2 | WF | 22 | 22 | 0 | 0 | 73.1 | 33.3 |
 
 Repair prompts used: 0 for every strategy. Coverage is of `modules/department`, measured per
 strategy with `--cov-branch`. The baseline ran on `bc152bc`. The Q1 run is on Student 1's Q2
-change (`20cfafb`) with the three tests automated: the commit review Q1 reads.
+change (`20cfafb`) with the three tests automated: the commit review Q1 reads. The Q2 run is on
+Student 1's fixes for review Q1 (one migration, a bounded instructor id): the commit review Q2 reads.
+No spec test changed between Q1 and Q2.
 
 ## Failures and skips
 | Test id | Source id | Strategies | Category | Evidence | Outcome (fixing commit, covering test, or agreed reading with the spec sentence) | Open? |
