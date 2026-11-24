@@ -3,7 +3,7 @@
 Student 1 (git author name): Siddharth-Ilayaraja24
 Student 2 (git author name): Shubham Kulkarni
 Design commit (hash and subject): c7f7bf4 Department spec tests: freeze the FR, UC, BR and WF designs
-Baseline commit (hash and subject): the commit that adds this file, "Department spec tests: add the FR, UC, BR and WF suites at baseline" (hash recorded in the next update)
+Baseline commit (hash and subject): bc152bc Department spec tests: add the FR, UC, BR and WF suites at baseline
 Student 1's 10/10 commit the baseline ran on (hash): 34b8ab5
 
 ## Results
@@ -20,4 +20,4 @@ strategy with `--cov-branch`.
 ## Failures and skips
 | Test id | Source id | Strategies | Category | Evidence | Outcome (fixing commit, covering test, or agreed reading with the spec sentence) | Open? |
 |---------|-----------|------------|----------|----------|-----------------------------------------------------------------------------------|-------|
-| TC-DEPT-056 (FR), TC-DEPT-029 (UC), TC-DEPT-BR-037 (BR) | AFR-DEPT-026; UC-DEPT-015; BR-DEPT-019 | FR, UC, BR | Unresolved | All three are skipped `NOT_AUTOMATED`: no interface links a Faculty member to the Students in their courses. The IAM's `main` has no course-roster endpoint (blueprint Q2). Spec: "The system shall allow Faculty to view detailed profile information for Students in the Faculty member's courses." | To be sorted at step 6. | yes |
+| TC-DEPT-056 (FR), TC-DEPT-029 (UC), TC-DEPT-BR-037 (BR) | AFR-DEPT-026; UC-DEPT-015; BR-DEPT-019 | FR, UC, BR | Specification ambiguity | All three are skipped `NOT_AUTOMATED`: no interface links a Faculty member to the Students in their courses. The IAM's `main` has no course-roster endpoint (blueprint Q2). Spec: "The system shall allow Faculty to view detailed profile information for Students in the Faculty member's courses." | Agreed reading, 2026-11-24: the spec does not say where a Faculty member's courses come from, and the IAM has no roster. A Student is in a Faculty member's course when the Student's programme and batch year match a timetable slot that Faculty member teaches in the department (blueprint, "Change to Q2"). Student 1 builds the instructor on timetable slots; Student 2 then automates the three tests without changing their expected results. | yes, until the three tests run and pass |
