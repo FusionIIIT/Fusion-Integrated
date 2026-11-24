@@ -46,6 +46,761 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ok'
           description: ''
+  /api/v1/dept/announcements/:
+    get:
+      operationId: v1_dept_announcements_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepartmentAnnouncement'
+          description: ''
+    post:
+      operationId: v1_dept_announcements_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentAnnouncement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DepartmentAnnouncement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepartmentAnnouncement'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentAnnouncement'
+          description: ''
+  /api/v1/dept/announcements/{id}/:
+    patch:
+      operationId: v1_dept_announcements_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDepartmentAnnouncement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDepartmentAnnouncement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDepartmentAnnouncement'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentAnnouncement'
+          description: ''
+    delete:
+      operationId: v1_dept_announcements_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/dept/details/:
+    get:
+      operationId: v1_dept_details_retrieve
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+          description: ''
+    patch:
+      operationId: v1_dept_details_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDepartment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDepartment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDepartment'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+          description: ''
+  /api/v1/dept/details/pending-changes/:
+    get:
+      operationId: v1_dept_details_pending_changes_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OfficialDetailChangeRequest'
+          description: ''
+  /api/v1/dept/details/pending-changes/{id}/decision/:
+    post:
+      operationId: v1_dept_details_pending_changes_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfficialChangeDecisionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfficialChangeDecisionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfficialChangeDecisionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficialDetailChangeRequest'
+          description: ''
+  /api/v1/dept/details/propose-change/:
+    post:
+      operationId: v1_dept_details_propose_change_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfficialDetailChangeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OfficialDetailChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OfficialDetailChangeRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfficialDetailChangeRequest'
+          description: ''
+  /api/v1/dept/feedback/:
+    get:
+      operationId: v1_dept_feedback_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feedback'
+          description: ''
+    post:
+      operationId: v1_dept_feedback_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+  /api/v1/dept/feedback/{id}/resolve/:
+    post:
+      operationId: v1_dept_feedback_resolve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackResolveRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeedbackResolveRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeedbackResolveRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+  /api/v1/dept/feedback/{id}/review/:
+    post:
+      operationId: v1_dept_feedback_review_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackReviewRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeedbackReviewRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeedbackReviewRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+          description: ''
+  /api/v1/dept/inventory/:
+    get:
+      operationId: v1_dept_inventory_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+          description: ''
+    post:
+      operationId: v1_dept_inventory_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+  /api/v1/dept/inventory/{id}/add-stock/:
+    post:
+      operationId: v1_dept_inventory_add_stock_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddStockRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddStockRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AddStockRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+  /api/v1/dept/inventory/{id}/transactions/:
+    get:
+      operationId: v1_dept_inventory_transactions_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StockTransaction'
+          description: ''
+  /api/v1/dept/labs/:
+    get:
+      operationId: v1_dept_labs_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LabResource'
+          description: ''
+    post:
+      operationId: v1_dept_labs_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabResource'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LabResource'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LabResource'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabResource'
+          description: ''
+  /api/v1/dept/labs/{id}/:
+    patch:
+      operationId: v1_dept_labs_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLabResource'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLabResource'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLabResource'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabResource'
+          description: ''
+  /api/v1/dept/profiles/:
+    get:
+      operationId: v1_dept_profiles_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserProfileExtension'
+          description: ''
+    post:
+      operationId: v1_dept_profiles_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileExtension'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserProfileExtension'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserProfileExtension'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileExtension'
+          description: ''
+  /api/v1/dept/roles/:
+    get:
+      operationId: v1_dept_roles_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepartmentRoleAssignment'
+          description: ''
+    post:
+      operationId: v1_dept_roles_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentRoleAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DepartmentRoleAssignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepartmentRoleAssignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentRoleAssignment'
+          description: ''
+  /api/v1/dept/roles/{id}/revoke/:
+    post:
+      operationId: v1_dept_roles_revoke_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentRoleAssignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DepartmentRoleAssignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DepartmentRoleAssignment'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartmentRoleAssignment'
+          description: ''
+  /api/v1/dept/stock-requests/:
+    get:
+      operationId: v1_dept_stock_requests_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StockRequest'
+          description: ''
+    post:
+      operationId: v1_dept_stock_requests_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockRequest'
+          description: ''
+  /api/v1/dept/stock-requests/{id}/decision/:
+    post:
+      operationId: v1_dept_stock_requests_decision_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockDecisionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockDecisionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockDecisionRequest'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockRequest'
+          description: ''
+  /api/v1/dept/stock-requests/{id}/issue/:
+    post:
+      operationId: v1_dept_stock_requests_issue_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockIssueRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockIssueRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockIssueRequest'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockRequest'
+          description: ''
+  /api/v1/dept/timetables/:
+    get:
+      operationId: v1_dept_timetables_list
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimetableEntry'
+          description: ''
+    post:
+      operationId: v1_dept_timetables_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimetableEntry'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TimetableEntry'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TimetableEntry'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimetableEntry'
+          description: ''
+  /api/v1/dept/timetables/{id}/:
+    delete:
+      operationId: v1_dept_timetables_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
   /api/v1/directory/users:
     get:
       operationId: v1_directory_users_retrieve
@@ -1774,6 +2529,15 @@ components:
           minItems: 1
       required:
       - application_ids
+    AddStockRequest:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          default: 1
+        notes:
+          type: string
+          default: ''
     Announcement:
       type: object
       properties:
@@ -2315,6 +3079,173 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DayOfWeekEnum:
+      enum:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      type: integer
+      description: |-
+        * `0` - Monday
+        * `1` - Tuesday
+        * `2` - Wednesday
+        * `3` - Thursday
+        * `4` - Friday
+        * `5` - Saturday
+        * `6` - Sunday
+    Department:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 32
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        core_policies:
+          type: string
+        head_of_department_id:
+          type: string
+          nullable: true
+        department_admin_id:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - code
+      - created_at
+      - name
+      - updated_at
+    DepartmentAnnouncement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        title:
+          type: string
+          maxLength: 255
+        content:
+          type: string
+        author_id:
+          type: string
+          readOnly: true
+        author_role:
+          type: string
+          readOnly: true
+        target_role:
+          type: string
+          maxLength: 32
+        target_program:
+          type: string
+          maxLength: 64
+        target_academic_year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        status:
+          $ref: '#/components/schemas/DepartmentAnnouncementStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_id
+      - author_role
+      - content
+      - created_at
+      - department
+      - id
+      - title
+      - updated_at
+    DepartmentAnnouncementStatusEnum:
+      enum:
+      - ACTIVE
+      - HIDDEN
+      - DELETED
+      type: string
+      description: |-
+        * `ACTIVE` - Active
+        * `HIDDEN` - Hidden
+        * `DELETED` - Deleted
+    DepartmentRoleAssignment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        role_name:
+          $ref: '#/components/schemas/RoleNameEnum'
+        user_id:
+          type: string
+          maxLength: 64
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DepartmentRoleAssignmentStatusEnum'
+          default: SCHEDULED
+        assigned_by_id:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_by_id
+      - created_at
+      - department
+      - end_date
+      - id
+      - role_name
+      - start_date
+      - updated_at
+      - user_id
+    DepartmentRoleAssignmentStatusEnum:
+      enum:
+      - SCHEDULED
+      - ACTIVE
+      - REVOKED
+      - EXPIRED
+      type: string
+      description: |-
+        * `SCHEDULED` - Scheduled
+        * `ACTIVE` - Active
+        * `REVOKED` - Revoked
+        * `EXPIRED` - Expired
     Detail:
       type: object
       properties:
@@ -2423,6 +3354,121 @@ components:
       - fee_reference
       - season
       - user_id
+    Feedback:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        submitted_by_id:
+          type: string
+          readOnly: true
+        submitter_role:
+          type: string
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/FeedbackCategoryEnum'
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FeedbackStatusEnum'
+          readOnly: true
+        admin_remarks:
+          type: string
+          readOnly: true
+        reviewed_by_admin_id:
+          type: string
+          readOnly: true
+        reviewed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        terminal_by_id:
+          type: string
+          readOnly: true
+        terminal_by_role:
+          type: string
+          readOnly: true
+        terminal_remarks:
+          type: string
+          readOnly: true
+        terminal_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - admin_remarks
+      - created_at
+      - department
+      - description
+      - id
+      - reviewed_at
+      - reviewed_by_admin_id
+      - status
+      - submitted_by_id
+      - submitter_role
+      - terminal_at
+      - terminal_by_id
+      - terminal_by_role
+      - terminal_remarks
+      - title
+      - updated_at
+    FeedbackCategoryEnum:
+      enum:
+      - ACADEMIC
+      - INFRASTRUCTURE
+      - ADMINISTRATIVE
+      - OTHER
+      type: string
+      description: |-
+        * `ACADEMIC` - Academic
+        * `INFRASTRUCTURE` - Infrastructure
+        * `ADMINISTRATIVE` - Administrative
+        * `OTHER` - Other
+    FeedbackResolveRequest:
+      type: object
+      properties:
+        action:
+          type: string
+          default: RESOLVE
+        remarks:
+          type: string
+          default: ''
+    FeedbackReviewRequest:
+      type: object
+      properties:
+        admin_remarks:
+          type: string
+          default: ''
+    FeedbackStatusEnum:
+      enum:
+      - NEW
+      - UNDER_REVIEW
+      - RESOLVED
+      - CLOSED
+      type: string
+      description: |-
+        * `NEW` - New
+        * `UNDER_REVIEW` - Under Review
+        * `RESOLVED` - Resolved
+        * `CLOSED` - Closed
     IncidentRecorded:
       type: object
       properties:
@@ -2508,6 +3554,57 @@ components:
         * `tech` - Technical interview
         * `hr` - HR interview
         * `other` - Other
+    InventoryItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        item_code:
+          type: string
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 255
+        category:
+          $ref: '#/components/schemas/InventoryItemCategoryEnum'
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        unit:
+          type: string
+          maxLength: 32
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - department
+      - id
+      - item_code
+      - name
+      - updated_at
+    InventoryItemCategoryEnum:
+      enum:
+      - EQUIPMENT
+      - CONSUMABLE
+      - FURNITURE
+      - OTHER
+      type: string
+      description: |-
+        * `EQUIPMENT` - Equipment
+        * `CONSUMABLE` - Consumable
+        * `FURNITURE` - Furniture
+        * `OTHER` - Other
     JobPosting:
       type: object
       properties:
@@ -2637,6 +3734,43 @@ components:
         * `in_progress` - Selection in progress
         * `completed` - Completed
         * `cancelled` - Cancelled
+    LabResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        lab_name:
+          type: string
+          maxLength: 150
+        location:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        equipment_details: {}
+        in_charge_id:
+          type: string
+          maxLength: 64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - department
+      - id
+      - in_charge_id
+      - lab_name
+      - location
+      - updated_at
     LiftSanction:
       type: object
       properties:
@@ -2864,6 +3998,85 @@ components:
         * `revoked` - Revoked
         * `superseded` - Superseded
         * `expired` - Expired
+    OfficialChangeDecisionRequest:
+      type: object
+      properties:
+        decision:
+          type: string
+        reason:
+          type: string
+          default: ''
+      required:
+      - decision
+    OfficialDetailChangeRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        proposed_by_id:
+          type: string
+          readOnly: true
+        field_name:
+          type: string
+          maxLength: 64
+        old_value:
+          type: string
+          readOnly: true
+        new_value:
+          type: string
+        justification:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/OfficialDetailChangeRequestStatusEnum'
+          readOnly: true
+        reviewed_by_id:
+          type: string
+          readOnly: true
+        review_reason:
+          type: string
+          readOnly: true
+        reviewed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - department
+      - field_name
+      - id
+      - justification
+      - new_value
+      - old_value
+      - proposed_by_id
+      - review_reason
+      - reviewed_at
+      - reviewed_by_id
+      - status
+      - updated_at
+    OfficialDetailChangeRequestStatusEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
     Ok:
       type: object
       properties:
@@ -3000,6 +4213,74 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedDepartment:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 32
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        core_policies:
+          type: string
+        head_of_department_id:
+          type: string
+          nullable: true
+        department_admin_id:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedDepartmentAnnouncement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        title:
+          type: string
+          maxLength: 255
+        content:
+          type: string
+        author_id:
+          type: string
+          readOnly: true
+        author_role:
+          type: string
+          readOnly: true
+        target_role:
+          type: string
+          maxLength: 32
+        target_program:
+          type: string
+          maxLength: 64
+        target_academic_year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        status:
+          $ref: '#/components/schemas/DepartmentAnnouncementStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedJobPosting:
       type: object
       properties:
@@ -3077,6 +4358,35 @@ components:
           type: boolean
           readOnly: true
         created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedLabResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        lab_name:
+          type: string
+          maxLength: 150
+        location:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        equipment_details: {}
+        in_charge_id:
+          type: string
+          maxLength: 64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
           type: string
           format: date-time
           readOnly: true
@@ -3201,6 +4511,16 @@ components:
         * `certificate` - Certificate
         * `offer_letter` - Offer letter
         * `other` - Other
+    ProfileTypeEnum:
+      enum:
+      - STUDENT
+      - FACULTY
+      - ALUMNI
+      type: string
+      description: |-
+        * `STUDENT` - Student
+        * `FACULTY` - Faculty
+        * `ALUMNI` - Alumni
     Recommendation:
       type: object
       description: |-
@@ -3466,6 +4786,14 @@ components:
       - message
       - reason
       - route
+    RoleNameEnum:
+      enum:
+      - HOD
+      - DEPT_ADMIN
+      type: string
+      description: |-
+        * `HOD` - Head of Department
+        * `DEPT_ADMIN` - Department Administrator
     RoundOutcome:
       type: object
       properties:
@@ -3691,6 +5019,148 @@ components:
       required:
       - available
       - season
+    StockDecisionRequest:
+      type: object
+      properties:
+        decision:
+          type: string
+        remarks:
+          type: string
+          default: ''
+      required:
+      - decision
+    StockIssueRequest:
+      type: object
+      properties:
+        notes:
+          type: string
+          default: ''
+    StockRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        inventory_item:
+          type: string
+          format: uuid
+        item_name:
+          type: string
+          readOnly: true
+        item_code:
+          type: string
+          readOnly: true
+        requested_by_id:
+          type: string
+          readOnly: true
+        requested_quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        purpose:
+          type: string
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StockRequestStatusEnum'
+          readOnly: true
+        hod_decision_by_id:
+          type: string
+          readOnly: true
+        hod_decision_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        hod_remarks:
+          type: string
+        issued_by_id:
+          type: string
+          readOnly: true
+        issued_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - department
+      - hod_decision_at
+      - hod_decision_by_id
+      - id
+      - inventory_item
+      - issued_at
+      - issued_by_id
+      - item_code
+      - item_name
+      - purpose
+      - requested_by_id
+      - requested_quantity
+      - status
+      - updated_at
+    StockRequestStatusEnum:
+      enum:
+      - SUBMITTED
+      - APPROVED
+      - REJECTED
+      - ISSUED
+      type: string
+      description: |-
+        * `SUBMITTED` - Submitted
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+        * `ISSUED` - Issued
+    StockTransaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        inventory_item:
+          type: string
+          format: uuid
+        transaction_type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        quantity_delta:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        balance_after:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        performed_by_id:
+          type: string
+          maxLength: 64
+        related_request_id:
+          type: string
+          format: uuid
+          nullable: true
+        notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - balance_after
+      - created_at
+      - id
+      - inventory_item
+      - performed_by_id
+      - quantity_delta
+      - transaction_type
     SubmitOfferLetter:
       type: object
       properties:
@@ -3698,6 +5168,76 @@ components:
           type: integer
       required:
       - document_id
+    TimetableEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        program:
+          type: string
+          maxLength: 64
+        academic_year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        semester:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        day_of_week:
+          allOf:
+          - $ref: '#/components/schemas/DayOfWeekEnum'
+          minimum: -2147483648
+          maximum: 2147483647
+        day_name:
+          type: string
+          readOnly: true
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+        course_code:
+          type: string
+          maxLength: 32
+        course_name:
+          type: string
+          maxLength: 255
+        instructor_id:
+          type: string
+          maxLength: 64
+        room_or_lab:
+          type: string
+          maxLength: 64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - academic_year
+      - course_code
+      - course_name
+      - created_at
+      - day_name
+      - day_of_week
+      - department
+      - end_time
+      - id
+      - instructor_id
+      - program
+      - room_or_lab
+      - semester
+      - start_time
+      - updated_at
     TopicEnum:
       enum:
       - drive
@@ -3714,6 +5254,16 @@ components:
         * `workshop` - Workshop
         * `internship` - Internship programme
         * `general` - General
+    TransactionTypeEnum:
+      enum:
+      - INSERTION
+      - ISSUANCE
+      - ADJUSTMENT
+      type: string
+      description: |-
+        * `INSERTION` - Insertion
+        * `ISSUANCE` - Issuance
+        * `ADJUSTMENT` - Adjustment
     Transition:
       type: object
       properties:
@@ -3769,6 +5319,55 @@ components:
       - application_id
       - redacted
       - results
+    UserProfileExtension:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        department:
+          type: string
+        user_id:
+          type: string
+          maxLength: 64
+        profile_type:
+          $ref: '#/components/schemas/ProfileTypeEnum'
+        office_room:
+          type: string
+          maxLength: 64
+        research_interests:
+          type: string
+        contact_phone:
+          type: string
+          maxLength: 32
+        emergency_contact:
+          type: string
+          maxLength: 128
+        courses_taught: {}
+        batch_or_roll:
+          type: string
+          maxLength: 32
+        graduation_year:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - department
+      - id
+      - profile_type
+      - updated_at
+      - user_id
     UserRef:
       type: object
       properties:

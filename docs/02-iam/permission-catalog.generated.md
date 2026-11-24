@@ -7,6 +7,35 @@ guards on, and every designation column is one the IAM can grant.
 For the intended taxonomy of modules not yet built, see
 [permission-catalog.md](permission-catalog.md).
 
+## `dept`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `dept.announcement.view` | View relevant department announcements | `Dept_Admin`, `HOD`, `faculty`, `student` |
+| `dept.announcement.create` | Create and publish department announcements | `Dept_Admin`, `HOD`, `faculty` |
+| `dept.announcement.manage` | Edit, hide, or delete active announcements (HOD) | `HOD` |
+| `dept.inventory.view` | View department stock catalog and transaction history | `Dept_Admin`, `HOD` |
+| `dept.inventory.create` | Insert stock catalog items and stock quantities | `Dept_Admin` |
+| `dept.stock_request.view` | View department stock requests | `Dept_Admin`, `HOD`, `faculty` |
+| `dept.stock_request.create` | Submit department stock requests (Faculty) | `faculty` |
+| `dept.stock_request.approve` | Approve or reject stock requests (HOD) | `HOD` |
+| `dept.stock_request.issue` | Issue approved stock and decrement inventory (Dept_Admin) | `Dept_Admin` |
+| `dept.feedback.view` | View feedback within authorized departmental scope | `Dept_Admin`, `HOD` |
+| `dept.feedback.create` | Submit confidential feedback | `faculty`, `student` |
+| `dept.feedback.review` | Initial review and categorization of feedback (Dept_Admin) | `Dept_Admin` |
+| `dept.feedback.resolve` | Resolve or close department feedback (Dept_Admin / HOD) | `Dept_Admin`, `HOD` |
+| `dept.timetable.view` | View department timetables | `Dept_Admin`, `HOD`, `faculty`, `student` |
+| `dept.timetable.manage` | Upload and modify conflict-free timetables (Dept_Admin) | `Dept_Admin` |
+| `dept.lab_resource.view` | View department lab resource profiles | `Dept_Admin`, `HOD`, `faculty` |
+| `dept.lab_resource.manage` | Manage lab resource records and equipment (Dept_Admin) | `Dept_Admin` |
+| `dept.profile.view` | View department directory profiles governed by privacy matrix | `Dept_Admin`, `HOD`, `faculty`, `student` |
+| `dept.profile.manage` | Manage department user profiles (Dept_Admin) | `Dept_Admin` |
+| `dept.detail.view` | View department details and policies | `Dept_Admin`, `HOD`, `Institute Admin`, `faculty`, `student` |
+| `dept.detail.update` | Update general details and propose official changes (Dept_Admin) | `Dept_Admin` |
+| `dept.detail.approve` | Approve or reject official department changes (HOD) | `HOD` |
+| `dept.role_assignment.view` | View department HOD and Dept_Admin assignments | `Dept_Admin`, `HOD`, `Institute Admin` |
+| `dept.role_assignment.manage` | Assign or revoke department roles (Institute Admin) | `Institute Admin` |
+
 ## `directory`
 
 | Code | What it allows | Held by |

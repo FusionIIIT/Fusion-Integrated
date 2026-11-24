@@ -1,0 +1,1 @@
+"""Department tests package."""

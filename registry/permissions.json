@@ -1,5 +1,266 @@
 {
   "modules": {
+    "dept": {
+      "grants": {
+        "Dept_Admin": [
+          "dept.announcement.create",
+          "dept.announcement.view",
+          "dept.detail.update",
+          "dept.detail.view",
+          "dept.feedback.resolve",
+          "dept.feedback.review",
+          "dept.feedback.view",
+          "dept.inventory.create",
+          "dept.inventory.view",
+          "dept.lab_resource.manage",
+          "dept.lab_resource.view",
+          "dept.profile.manage",
+          "dept.profile.view",
+          "dept.role_assignment.view",
+          "dept.stock_request.issue",
+          "dept.stock_request.view",
+          "dept.timetable.manage",
+          "dept.timetable.view"
+        ],
+        "HOD": [
+          "dept.announcement.create",
+          "dept.announcement.manage",
+          "dept.announcement.view",
+          "dept.detail.approve",
+          "dept.detail.view",
+          "dept.feedback.resolve",
+          "dept.feedback.view",
+          "dept.inventory.view",
+          "dept.lab_resource.view",
+          "dept.profile.view",
+          "dept.role_assignment.view",
+          "dept.stock_request.approve",
+          "dept.stock_request.view",
+          "dept.timetable.view"
+        ],
+        "Institute Admin": [
+          "dept.detail.view",
+          "dept.role_assignment.manage",
+          "dept.role_assignment.view"
+        ],
+        "faculty": [
+          "dept.announcement.create",
+          "dept.announcement.view",
+          "dept.detail.view",
+          "dept.feedback.create",
+          "dept.lab_resource.view",
+          "dept.profile.view",
+          "dept.stock_request.create",
+          "dept.stock_request.view",
+          "dept.timetable.view"
+        ],
+        "student": [
+          "dept.announcement.view",
+          "dept.detail.view",
+          "dept.feedback.create",
+          "dept.profile.view",
+          "dept.timetable.view"
+        ]
+      },
+      "module_grants": [
+        "Dept_Admin",
+        "HOD",
+        "Institute Admin",
+        "faculty",
+        "student"
+      ],
+      "nav": {
+        "base_path": "/dept",
+        "icon": "Building",
+        "items": [
+          {
+            "code": "dept.announcements",
+            "icon": "Megaphone",
+            "label": "Announcements",
+            "required_permission": "dept.announcement.view",
+            "sort_order": 10,
+            "to": "/dept/announcements"
+          },
+          {
+            "code": "dept.inventory",
+            "icon": "Package",
+            "label": "Inventory",
+            "required_permission": "dept.inventory.view",
+            "sort_order": 20,
+            "to": "/dept/inventory"
+          },
+          {
+            "code": "dept.stock_requests",
+            "icon": "ClipboardText",
+            "label": "Stock Requests",
+            "required_permission": "dept.stock_request.view",
+            "sort_order": 30,
+            "to": "/dept/stock-requests"
+          },
+          {
+            "code": "dept.feedback",
+            "icon": "ChatCircleText",
+            "label": "Feedback",
+            "required_permission": "dept.feedback.view",
+            "sort_order": 40,
+            "to": "/dept/feedback"
+          },
+          {
+            "code": "dept.timetables",
+            "icon": "CalendarBlank",
+            "label": "Timetables",
+            "required_permission": "dept.timetable.view",
+            "sort_order": 50,
+            "to": "/dept/timetables"
+          },
+          {
+            "code": "dept.labs",
+            "icon": "Desktop",
+            "label": "Lab Resources",
+            "required_permission": "dept.lab_resource.view",
+            "sort_order": 60,
+            "to": "/dept/labs"
+          },
+          {
+            "code": "dept.profiles",
+            "icon": "Users",
+            "label": "Profiles",
+            "required_permission": "dept.profile.view",
+            "sort_order": 70,
+            "to": "/dept/profiles"
+          },
+          {
+            "code": "dept.details",
+            "icon": "Building",
+            "label": "Department Details",
+            "required_permission": "dept.detail.view",
+            "sort_order": 80,
+            "to": "/dept/details"
+          },
+          {
+            "code": "dept.roles",
+            "icon": "IdentificationBadge",
+            "label": "Role Governance",
+            "required_permission": "dept.role_assignment.view",
+            "sort_order": 90,
+            "to": "/dept/roles"
+          }
+        ],
+        "label": "Department",
+        "nav_section": "Academics",
+        "sort_order": 20,
+        "status": "active"
+      },
+      "permissions": [
+        {
+          "code": "dept.announcement.view",
+          "label": "View relevant department announcements"
+        },
+        {
+          "code": "dept.announcement.create",
+          "label": "Create and publish department announcements"
+        },
+        {
+          "code": "dept.announcement.manage",
+          "label": "Edit, hide, or delete active announcements (HOD)"
+        },
+        {
+          "code": "dept.inventory.view",
+          "label": "View department stock catalog and transaction history"
+        },
+        {
+          "code": "dept.inventory.create",
+          "label": "Insert stock catalog items and stock quantities"
+        },
+        {
+          "code": "dept.stock_request.view",
+          "label": "View department stock requests"
+        },
+        {
+          "code": "dept.stock_request.create",
+          "label": "Submit department stock requests (Faculty)"
+        },
+        {
+          "code": "dept.stock_request.approve",
+          "label": "Approve or reject stock requests (HOD)"
+        },
+        {
+          "code": "dept.stock_request.issue",
+          "label": "Issue approved stock and decrement inventory (Dept_Admin)"
+        },
+        {
+          "code": "dept.feedback.view",
+          "label": "View feedback within authorized departmental scope"
+        },
+        {
+          "code": "dept.feedback.create",
+          "label": "Submit confidential feedback"
+        },
+        {
+          "code": "dept.feedback.review",
+          "label": "Initial review and categorization of feedback (Dept_Admin)"
+        },
+        {
+          "code": "dept.feedback.resolve",
+          "label": "Resolve or close department feedback (Dept_Admin / HOD)"
+        },
+        {
+          "code": "dept.timetable.view",
+          "label": "View department timetables"
+        },
+        {
+          "code": "dept.timetable.manage",
+          "label": "Upload and modify conflict-free timetables (Dept_Admin)"
+        },
+        {
+          "code": "dept.lab_resource.view",
+          "label": "View department lab resource profiles"
+        },
+        {
+          "code": "dept.lab_resource.manage",
+          "label": "Manage lab resource records and equipment (Dept_Admin)"
+        },
+        {
+          "code": "dept.profile.view",
+          "label": "View department directory profiles governed by privacy matrix"
+        },
+        {
+          "code": "dept.profile.manage",
+          "label": "Manage department user profiles (Dept_Admin)"
+        },
+        {
+          "code": "dept.detail.view",
+          "label": "View department details and policies"
+        },
+        {
+          "code": "dept.detail.update",
+          "label": "Update general details and propose official changes (Dept_Admin)"
+        },
+        {
+          "code": "dept.detail.approve",
+          "label": "Approve or reject official department changes (HOD)"
+        },
+        {
+          "code": "dept.role_assignment.view",
+          "label": "View department HOD and Dept_Admin assignments"
+        },
+        {
+          "code": "dept.role_assignment.manage",
+          "label": "Assign or revoke department roles (Institute Admin)"
+        }
+      ],
+      "scope_permissions": [
+        "dept.announcement.view",
+        "dept.detail.view",
+        "dept.feedback.view",
+        "dept.inventory.view",
+        "dept.lab_resource.view",
+        "dept.profile.view",
+        "dept.stock_request.view",
+        "dept.timetable.view"
+      ],
+      "system_permissions": []
+    },
     "directory": {
       "grants": {
         "Dean Academic": [
