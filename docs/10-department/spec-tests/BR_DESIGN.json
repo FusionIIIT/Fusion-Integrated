@@ -1,0 +1,407 @@
+[
+  {
+    "test_id": "TC-DEPT-BR-001",
+    "source_id": "BR-DEPT-001 permitted-roles",
+    "purpose": "Verify that Faculty, Dept_Admin, and HOD are permitted to create and publish department announcements.",
+    "preconditions": "Department exists with authenticated users holding Faculty, Dept_Admin, and HOD roles.",
+    "action_or_input": "Each authorized actor (Faculty, Dept_Admin, HOD) submits a valid department announcement with content and target-scope criteria.",
+    "expected_result": "Each announcement creation is permitted and published in the department.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-002",
+    "source_id": "BR-DEPT-001 prohibited-role",
+    "purpose": "Verify that roles other than Faculty, Dept_Admin, and HOD (such as Student) are denied from creating department announcements.",
+    "preconditions": "Department exists with an authenticated Student user.",
+    "action_or_input": "Student attempts to create and publish a department announcement.",
+    "expected_result": "The request is denied and no announcement is created or published.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-003",
+    "source_id": "BR-DEPT-002 matching-criteria",
+    "purpose": "Verify that an announcement is shown when the viewer matches its applicable role, program, and academic-year targeting criteria.",
+    "preconditions": "An active announcement exists targeting a specific Role, Program, and Academic Year; an authenticated viewer matches all three targeting criteria.",
+    "action_or_input": "The matching viewer retrieves the department announcement list and views the announcement details.",
+    "expected_result": "The announcement is included in the returned list and its details are accessible to the viewer.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-004",
+    "source_id": "BR-DEPT-002 non-matching-criteria",
+    "purpose": "Verify that an announcement is filtered out when the viewer does not match its applicable role, program, or academic-year targeting criteria.",
+    "preconditions": "An active announcement exists targeting a specific Role, Program, and Academic Year; authenticated viewers exist who mismatch on Role, on Program, or on Academic Year.",
+    "action_or_input": "Each non-matching viewer retrieves the department announcement list and attempts to view the announcement details.",
+    "expected_result": "The announcement is excluded from the announcement list and not shown to non-matching viewers.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-005",
+    "source_id": "BR-DEPT-003 valid-complete-submission",
+    "purpose": "Verify that an announcement with required content and sufficient target-scope information is published without requiring a validity period.",
+    "preconditions": "An authenticated Faculty, Dept_Admin, or HOD user exists in the department.",
+    "action_or_input": "The authorized actor submits an announcement containing valid content and valid target-scope criteria (Role, Program, Academic Year) with no validity-period field.",
+    "expected_result": "Validation succeeds and the announcement is published.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-006",
+    "source_id": "BR-DEPT-003 missing-or-invalid-fields",
+    "purpose": "Verify that announcement publication is blocked when required content or target-scope information is missing or invalid.",
+    "preconditions": "An authenticated Faculty, Dept_Admin, or HOD user exists in the department.",
+    "action_or_input": "The authorized actor submits an announcement with empty/missing content, or with missing/invalid target-scope information.",
+    "expected_result": "Publication is blocked with a validation error and no announcement is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-007",
+    "source_id": "BR-DEPT-004 permitted-hod",
+    "purpose": "Verify that the HOD can edit, hide, and delete active department announcements.",
+    "preconditions": "Active department announcements exist and an authenticated HOD user is active for the department.",
+    "action_or_input": "HOD edits one active announcement, hides a second active announcement, and deletes a third active announcement.",
+    "expected_result": "All three operations succeed: the edited announcement reflects updated content, the hidden announcement is no longer visible as active, and the deleted announcement is removed.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-008",
+    "source_id": "BR-DEPT-004 prohibited-non-hod",
+    "purpose": "Verify that non-HOD actors are denied from editing, hiding, or deleting an active department announcement.",
+    "preconditions": "An active department announcement exists; authenticated non-HOD users (Faculty including the announcement author, Dept_Admin, and Student) exist.",
+    "action_or_input": "Each non-HOD actor attempts to edit, hide, and delete the active announcement.",
+    "expected_result": "Every attempt is denied and the active announcement remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-009",
+    "source_id": "BR-DEPT-005 permitted-faculty",
+    "purpose": "Verify that Faculty can submit a stock request for a department inventory item.",
+    "preconditions": "A department inventory item exists with available stock; an authenticated Faculty user belongs to the department.",
+    "action_or_input": "Faculty submits a stock request for the inventory item with a valid available quantity.",
+    "expected_result": "The stock request is accepted and created.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-010",
+    "source_id": "BR-DEPT-005 prohibited-non-faculty",
+    "purpose": "Verify that non-Faculty actors are denied from submitting stock requests.",
+    "preconditions": "A department inventory item exists with available stock; authenticated Student, Dept_Admin, and HOD users exist.",
+    "action_or_input": "Each non-Faculty actor attempts to submit a stock request for the inventory item.",
+    "expected_result": "Each request is denied and no stock request record is created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-011",
+    "source_id": "BR-DEPT-006 permitted-hod-decision",
+    "purpose": "Verify that the HOD can approve or reject a pending Faculty stock request.",
+    "preconditions": "Two pending Faculty stock requests exist awaiting HOD decision; an authenticated active HOD exists for the department.",
+    "action_or_input": "HOD approves the first pending stock request and rejects the second pending stock request.",
+    "expected_result": "Both decisions are accepted; the first request transitions to Approved and the second transitions to Rejected.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-012",
+    "source_id": "BR-DEPT-006 prohibited-non-hod-decision",
+    "purpose": "Verify that non-HOD actors cannot approve or reject a pending Faculty stock request.",
+    "preconditions": "A pending Faculty stock request exists; authenticated Dept_Admin, Faculty, and Student users exist.",
+    "action_or_input": "Each non-HOD actor attempts to approve or reject the pending stock request.",
+    "expected_result": "Each decision attempt is denied and the stock request remains in pending status.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-013",
+    "source_id": "BR-DEPT-007 permitted-approved-by-dept-admin",
+    "purpose": "Verify that Dept_Admin can issue stock for an HOD-approved stock request and that inventory is decremented.",
+    "preconditions": "A Faculty stock request for a department inventory item has been approved by the HOD; an authenticated active Dept_Admin exists.",
+    "action_or_input": "Dept_Admin marks the HOD-approved stock request as Issued.",
+    "expected_result": "Issuance succeeds, the request status becomes Issued, and the item's inventory quantity is automatically decremented by the issued quantity.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-014",
+    "source_id": "BR-DEPT-007 prohibited-unapproved-request",
+    "purpose": "Verify that Dept_Admin cannot issue stock when the stock request has not been approved by the HOD.",
+    "preconditions": "A pending stock request and a rejected stock request exist in the department; an authenticated active Dept_Admin exists.",
+    "action_or_input": "Dept_Admin attempts to issue stock for the pending request and for the rejected request.",
+    "expected_result": "Both issuance attempts are denied, neither request becomes Issued, and inventory quantity remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-015",
+    "source_id": "BR-DEPT-007 prohibited-non-dept-admin",
+    "purpose": "Verify that actors other than Dept_Admin cannot issue stock even when the request is HOD-approved.",
+    "preconditions": "A Faculty stock request has been approved by the HOD; authenticated HOD, Faculty, and Student users exist.",
+    "action_or_input": "Each non-Dept_Admin actor attempts to mark the HOD-approved stock request as Issued.",
+    "expected_result": "Each issuance attempt is denied, the request remains Approved (not Issued), and inventory quantity remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-016",
+    "source_id": "BR-DEPT-008 permitted-student-and-faculty",
+    "purpose": "Verify that authenticated Students and Faculty can submit department feedback.",
+    "preconditions": "Authenticated Student and Faculty users belong to the department.",
+    "action_or_input": "Both the Student and the Faculty user each submit department feedback.",
+    "expected_result": "Both feedback submissions succeed and are stored as new confidential feedback records.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-017",
+    "source_id": "BR-DEPT-008 prohibited-unauthorized-or-unauthenticated",
+    "purpose": "Verify that unauthenticated users and non-eligible department actors (Dept_Admin, HOD) are denied from submitting feedback.",
+    "preconditions": "An unauthenticated client and authenticated Dept_Admin and HOD users exist.",
+    "action_or_input": "The unauthenticated user, Dept_Admin, and HOD each attempt to submit department feedback.",
+    "expected_result": "All attempts are denied and no feedback records are created.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-018",
+    "source_id": "BR-DEPT-009 permitted-dept-admin-and-hod",
+    "purpose": "Verify that Dept_Admin (including closing simple issues during initial review) and HOD (after initial review) can mark feedback as Resolved or Closed.",
+    "preconditions": "Feedback items exist: a simple new feedback item for Dept_Admin initial review, and an initially reviewed feedback item available for HOD oversight.",
+    "action_or_input": "Dept_Admin closes the simple feedback issue during initial review (or marks feedback Resolved/Closed), and HOD marks the initially reviewed feedback as Resolved or Closed.",
+    "expected_result": "Both terminal status transitions succeed and the feedback records reflect Resolved or Closed status.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-019",
+    "source_id": "BR-DEPT-009 prohibited-other-roles",
+    "purpose": "Verify that actors other than Dept_Admin and HOD cannot mark feedback as Resolved or Closed.",
+    "preconditions": "A submitted feedback item exists; authenticated Student (including the submitter) and Faculty users exist.",
+    "action_or_input": "Student and Faculty each attempt to mark the feedback item as Resolved or Closed.",
+    "expected_result": "Both attempts are denied and the feedback status remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-020",
+    "source_id": "BR-DEPT-010 conflict-free-permitted",
+    "purpose": "Verify that a conflict-free timetable upload or modification by Dept_Admin is allowed to save.",
+    "preconditions": "An authenticated active Dept_Admin exists; existing department timetable slots do not overlap with the submitted candidate slots.",
+    "action_or_input": "Dept_Admin submits a conflict-free class/lab timetable upload or modification.",
+    "expected_result": "Conflict validation passes and the timetable update is saved.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-021",
+    "source_id": "BR-DEPT-010 overlapping-slots-blocked",
+    "purpose": "Verify that a timetable upload or modification with overlapping slots is blocked from saving.",
+    "preconditions": "An authenticated active Dept_Admin exists and a timetable schedule is present in the department.",
+    "action_or_input": "Dept_Admin submits a timetable upload or modification containing overlapping slots.",
+    "expected_result": "The system detects the overlap, blocks saving with a conflict validation error, and preserves the prior saved timetable unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-022",
+    "source_id": "BR-DEPT-011 official-change-pending-until-hod-approval",
+    "purpose": "Verify that a Dept_Admin proposal to change an official department detail remains pending and does not take effect before HOD approval.",
+    "preconditions": "Department has published official details (such as Name and Core Policies); an authenticated active Dept_Admin exists.",
+    "action_or_input": "Dept_Admin proposes a change to an official department detail (e.g., department Name or Core Policies).",
+    "expected_result": "The proposed change is recorded in pending HOD-approval status, and the currently published official department detail remains unchanged prior to HOD approval.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-023",
+    "source_id": "BR-DEPT-011 headship-identity-exclusion",
+    "purpose": "Verify that Headship identity is excluded from the official department-detail proposal path and cannot be independently edited there.",
+    "preconditions": "Department has an active HOD assigned by the central authority; authenticated Dept_Admin and HOD users exist.",
+    "action_or_input": "Dept_Admin (or HOD) attempts to submit an official department-detail change to alter the department Headship identity.",
+    "expected_result": "The edit/proposal is rejected; displayed Headship identity remains derived exclusively from the active central HOD role assignment.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-024",
+    "source_id": "BR-DEPT-012 in-scope-faculty-resources",
+    "purpose": "Verify that Faculty can view department resource information within Faculty scope, including lab resource profiles and relevant issued-stock history.",
+    "preconditions": "Department lab equipment/resource profiles and issued-stock history relevant to the Faculty user exist; the Faculty user is authenticated.",
+    "action_or_input": "Faculty requests the department lab resource profiles and issued-stock history views.",
+    "expected_result": "The system displays the lab resource profiles and the Faculty user's relevant issued-stock history.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-025",
+    "source_id": "BR-DEPT-012 out-of-scope-resources-excluded",
+    "purpose": "Verify that Faculty resource views exclude resource information outside Faculty scope.",
+    "preconditions": "Department contains resource/issued-stock records outside the viewing Faculty user's scope (e.g., unrelated issued-stock history of another Faculty member or restricted administrative inventory data).",
+    "action_or_input": "Authenticated Faculty requests department resource and issued-stock history views.",
+    "expected_result": "Only resource information within Faculty scope is returned; out-of-scope records are excluded.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-026",
+    "source_id": "BR-DEPT-013 permitted-hod-decision",
+    "purpose": "Verify that the HOD can approve or reject pending official department-detail changes.",
+    "preconditions": "Two pending official department-detail change proposals exist; an authenticated active HOD exists for the department.",
+    "action_or_input": "HOD approves the first pending official change proposal and rejects the second pending proposal.",
+    "expected_result": "Both decisions succeed: the approved change becomes effective in published department details, and the rejected change does not take effect.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-027",
+    "source_id": "BR-DEPT-013 prohibited-non-hod-decision",
+    "purpose": "Verify that non-HOD actors cannot approve or reject a pending official department-detail change.",
+    "preconditions": "A pending official department-detail change proposal exists; authenticated Dept_Admin, Faculty, and Student users exist.",
+    "action_or_input": "Each non-HOD actor attempts to approve or reject the pending official change proposal.",
+    "expected_result": "Each attempt is denied, the proposal remains pending, and published official department details remain unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-028",
+    "source_id": "BR-DEPT-015 sufficient-inventory-at-threshold",
+    "purpose": "Verify that a Faculty stock request enters the HOD-approval state when requested quantity equals (or is within) current inventory at submission time.",
+    "preconditions": "A department inventory item has current available quantity N (e.g., N = 5); an authenticated Faculty user exists.",
+    "action_or_input": "Faculty submits a stock request for quantity equal to N (5).",
+    "expected_result": "Availability validation passes and the stock request enters the pending HOD-approval state.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-DEPT-BR-029",
+    "source_id": "BR-DEPT-015 insufficient-inventory-above-threshold",
+    "purpose": "Verify that a Faculty stock request is blocked from entering the HOD-approval state when requested quantity exceeds current inventory at submission time.",
+    "preconditions": "A department inventory item has current available quantity N (e.g., N = 5); an authenticated Faculty user exists.",
+    "action_or_input": "Faculty submits a stock request for quantity N + 1 (6).",
+    "expected_result": "Availability validation fails, the request is blocked from entering HOD-approval state, and a validation error is returned.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-DEPT-BR-030",
+    "source_id": "BR-DEPT-016 log-created-on-insertion-and-issuance",
+    "purpose": "Verify that every successful stock insertion and stock issuance appends a stock-movement audit log entry.",
+    "preconditions": "An authenticated active Dept_Admin exists; an HOD-approved stock request exists for an inventory item.",
+    "action_or_input": "Dept_Admin performs a stock insertion for the inventory item and then issues stock for the HOD-approved request.",
+    "expected_result": "Two stock-movement log entries are appended to the audit trail: one recording the stock insertion and one recording the stock issuance.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-031",
+    "source_id": "BR-DEPT-016 log-immutability-enforced",
+    "purpose": "Verify that existing stock-movement audit log entries cannot be modified or deleted through normal module operations.",
+    "preconditions": "At least one stock-movement log entry exists from a prior stock insertion or issuance; authenticated Dept_Admin and HOD users exist.",
+    "action_or_input": "Dept_Admin or HOD attempts to edit or delete the existing stock-movement log entry through module operations.",
+    "expected_result": "The modification and deletion attempts are rejected/disallowed and the original stock-movement log entry remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-032",
+    "source_id": "BR-DEPT-017 permitted-confidential-access",
+    "purpose": "Verify that feedback content is accessible to its submitter (as applicable) and to authorized Dept_Admin and HOD users handling the feedback.",
+    "preconditions": "A Student or Faculty user has submitted feedback, and Dept_Admin has completed initial review so HOD may also access it for oversight.",
+    "action_or_input": "The submitter (as applicable), Dept_Admin, and HOD each retrieve the feedback record.",
+    "expected_result": "Authorized actors can view the feedback content according to their handling/submitter role.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-033",
+    "source_id": "BR-DEPT-017 prohibited-unauthorized-exposure",
+    "purpose": "Verify that feedback content is not exposed to unauthorized users or as general department information.",
+    "preconditions": "Confidential feedback submitted by a Student or Faculty user exists; another Student and an unrelated Faculty user exist in the same department.",
+    "action_or_input": "The unrelated Student and unrelated Faculty user attempt to access the feedback directly and query general department information views.",
+    "expected_result": "Direct access is denied and the feedback content does not appear in general department information views.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-034",
+    "source_id": "BR-DEPT-018 dept-admin-initial-review-then-hod-access",
+    "purpose": "Verify that new feedback is routed to Dept_Admin for initial review, after which HOD may perform oversight or resolution.",
+    "preconditions": "A newly submitted feedback item exists in New status; authenticated Dept_Admin and HOD users exist.",
+    "action_or_input": "Dept_Admin performs initial review and categorization on the new feedback, and subsequently HOD accesses the feedback for oversight/resolution.",
+    "expected_result": "Dept_Admin's initial review is recorded and HOD is then able to view and act on the feedback.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-035",
+    "source_id": "BR-DEPT-018 bypass-initial-review-blocked",
+    "purpose": "Verify that HOD oversight/resolution cannot bypass Dept_Admin initial review while feedback is still unreviewed in New status.",
+    "preconditions": "A newly submitted feedback item exists in New status and has not undergone Dept_Admin initial review; an authenticated HOD exists.",
+    "action_or_input": "HOD attempts to perform oversight or resolve/close the feedback before Dept_Admin completes initial review.",
+    "expected_result": "The action is blocked or unavailable until Dept_Admin completes initial review.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-036",
+    "source_id": "BR-DEPT-019 student-viewer-scope",
+    "purpose": "Verify that Students viewing peer and Faculty profiles receive only basic permitted profile information.",
+    "preconditions": "Department contains peer Student and Faculty profiles with basic, detailed, and privacy-protected sensitive personal data; an authenticated Student exists.",
+    "action_or_input": "Student requests profile views for a peer Student and a Faculty member.",
+    "expected_result": "Only basic permitted profile fields are returned; detailed administrative/academic and privacy-protected sensitive fields are omitted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-037",
+    "source_id": "BR-DEPT-019 faculty-viewer-scope",
+    "purpose": "Verify that Faculty receive detailed information for Students in their courses and limited permitted information for Faculty/Alumni.",
+    "preconditions": "Department contains a Student enrolled in the Faculty member's course, a Student not in the Faculty member's course, another Faculty member, and an Alumni profile; the Faculty user is authenticated.",
+    "action_or_input": "Faculty requests profiles for the enrolled Student, the non-enrolled Student, another Faculty member, and an Alumni member.",
+    "expected_result": "Faculty receives detailed permitted information for the Student in their course and limited permitted information for Faculty and Alumni, while excluding out-of-scope detailed data for non-enrolled Students and privacy-protected sensitive personal data.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-038",
+    "source_id": "BR-DEPT-019 hod-and-dept-admin-viewer-scope",
+    "purpose": "Verify that HOD and Dept_Admin receive full department user profiles excluding privacy-protected sensitive personal data.",
+    "preconditions": "Department contains Faculty, Student, and Alumni profiles including privacy-protected sensitive personal data; authenticated HOD and Dept_Admin users exist.",
+    "action_or_input": "HOD and Dept_Admin each request profiles for Faculty, Student, and Alumni users in the department.",
+    "expected_result": "Full department profile data is returned to both HOD and Dept_Admin, while privacy-protected sensitive personal data is excluded.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-039",
+    "source_id": "BR-DEPT-021 permitted-central-admin-and-headship-sync",
+    "purpose": "Verify that the central Institute Admin (or equivalent central authority) can assign or reassign HOD and Dept_Admin roles and that displayed department Headship reflects the active HOD assignment.",
+    "preconditions": "A department and eligible institute employees exist; an authenticated central Institute Admin user exists.",
+    "action_or_input": "Central Institute Admin assigns or reassigns the HOD role and Dept_Admin role for the department with valid tenure intervals, then department details are viewed.",
+    "expected_result": "The role assignments succeed and the department Headship identity displayed by the module matches the newly active HOD assignment.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-040",
+    "source_id": "BR-DEPT-021 prohibited-non-central-actor",
+    "purpose": "Verify that non-central department actors are denied from assigning or reassigning HOD or Dept_Admin roles.",
+    "preconditions": "Department has active HOD and Dept_Admin assignments; authenticated HOD, Dept_Admin, Faculty, and Student users exist.",
+    "action_or_input": "Each department-level actor attempts to assign or reassign the HOD or Dept_Admin role.",
+    "expected_result": "All attempts are denied and existing HOD and Dept_Admin role assignments remain unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-041",
+    "source_id": "BR-DEPT-022 duplicate-active-role-blocked",
+    "purpose": "Verify that a department cannot have more than one active HOD assignment or more than one active Dept_Admin assignment concurrently.",
+    "preconditions": "Department already has one active HOD assignment and one active Dept_Admin assignment; an authenticated central Institute Admin exists.",
+    "action_or_input": "Central Institute Admin attempts to create an additional concurrent active HOD assignment (and separately an additional concurrent active Dept_Admin assignment) without ending/replacing the existing active assignment.",
+    "expected_result": "Both attempts are blocked so the department maintains exactly one active HOD and one active Dept_Admin.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-DEPT-BR-042",
+    "source_id": "BR-DEPT-022 zero-active-role-blocked",
+    "purpose": "Verify that a department cannot be left with zero active HOD assignments or zero active Dept_Admin assignments.",
+    "preconditions": "Department has one active HOD assignment and one active Dept_Admin assignment; an authenticated central Institute Admin exists.",
+    "action_or_input": "Central Institute Admin attempts to deactivate or remove the sole active HOD assignment (and separately the sole active Dept_Admin assignment) without an active replacement.",
+    "expected_result": "Both attempts are blocked so the department never has zero active HOD or zero active Dept_Admin.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "TC-DEPT-BR-043",
+    "source_id": "BR-DEPT-023 valid-tenure-interval",
+    "purpose": "Verify that HOD and Dept_Admin role assignments with a valid time-bound validity interval are accepted and recorded.",
+    "preconditions": "A department and eligible institute employees exist; an authenticated central Institute Admin exists.",
+    "action_or_input": "Central Institute Admin creates or updates an HOD assignment and a Dept_Admin assignment specifying a valid effective validity interval (start before end).",
+    "expected_result": "Both assignments succeed and their effective validity intervals are recorded and enforced.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "TC-DEPT-BR-044",
+    "source_id": "BR-DEPT-023 missing-or-invalid-tenure-interval",
+    "purpose": "Verify that HOD or Dept_Admin role assignments missing a validity interval or specifying an invalid interval are rejected.",
+    "preconditions": "A department and eligible institute employee exist; an authenticated central Institute Admin exists.",
+    "action_or_input": "Central Institute Admin attempts to create or update an HOD or Dept_Admin assignment without a validity interval, or with an invalid interval (e.g., end date/time on or before start date/time).",
+    "expected_result": "The assignment is rejected with a validation error and no invalid role assignment is saved.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-BR-045",
+    "source_id": "BR-DEPT-024 immediate-transition-revoke-and-grant",
+    "purpose": "Verify that when an HOD or Dept_Admin reassignment takes effect, the outgoing user's role access is immediately revoked (no grace period) and the incoming user's role access is immediately granted.",
+    "preconditions": "Department has an active outgoing HOD (or Dept_Admin) and an eligible incoming employee; central Institute Admin performs a role reassignment that takes effect immediately.",
+    "action_or_input": "Immediately after the reassignment becomes effective, both the outgoing user and the incoming user attempt a role-restricted operation (e.g., HOD approving a pending stock request or Dept_Admin issuing an HOD-approved stock request).",
+    "expected_result": "The outgoing user is immediately denied role-restricted access with no grace/overlap period, and the incoming user is immediately permitted to perform the role-restricted operation.",
+    "test_type": "positive"
+  }
+]

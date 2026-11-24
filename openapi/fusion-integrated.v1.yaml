@@ -46,6 +46,1467 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ok'
           description: ''
+  /api/v1/department/announcements:
+    get:
+      operationId: v1_department_announcements_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptAnnouncement'
+              examples:
+                Feed:
+                  value:
+                  - id: 7
+                    title: Lab closed Friday
+                    audience_role: student
+                    status: active
+          description: ''
+    post:
+      operationId: v1_department_announcements_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptAnnouncementWrite'
+            examples:
+              Publish:
+                value:
+                  title: Lab closed Friday
+                  body: Maintenance.
+                  audience_role: student
+                  programme: B.Tech
+                  batch_year: 2024
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptAnnouncementWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptAnnouncementWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptAnnouncement'
+              examples:
+                Published:
+                  value:
+                    id: 7
+                    title: Lab closed Friday
+                    audience_role: student
+                    status: active
+          description: ''
+  /api/v1/department/announcements/{id}:
+    patch:
+      operationId: v1_department_announcements_partial_update
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptAnnouncementEdit'
+            examples:
+              Edit:
+                value:
+                  title: Lab closed Saturday
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptAnnouncementEdit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptAnnouncementEdit'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptAnnouncement'
+              examples:
+                Edited:
+                  value:
+                    id: 7
+                    title: Lab closed Friday
+                    audience_role: student
+                    status: active
+          description: ''
+    delete:
+      operationId: v1_department_announcements_destroy
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/department/announcements/{id}/hide:
+    post:
+      operationId: v1_department_announcements_hide_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptAnnouncement'
+              examples:
+                Hidden:
+                  value:
+                    id: 7
+                    title: Lab closed Friday
+                    audience_role: student
+                    status: hidden
+          description: ''
+  /api/v1/department/context:
+    get:
+      operationId: v1_department_context_retrieve
+      description: The acting role and department, so the client shows only that role's
+        controls.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptActing'
+              examples:
+                HOD:
+                  value:
+                    role: hod
+                    department: CSE
+          description: ''
+  /api/v1/department/departments:
+    get:
+      operationId: v1_department_departments_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptDepartment'
+              examples:
+                Department:
+                  value:
+                  - id: 1
+                    code: CSE
+                    name: Computer Science and Engineering
+                    headship:
+                      user_id: 49
+                      display_name: Head
+          description: ''
+  /api/v1/department/departments/{code}:
+    get:
+      operationId: v1_department_departments_retrieve
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptDepartment'
+              examples:
+                Details:
+                  value:
+                    code: CSE
+                    name: Computer Science and Engineering
+                    programmes:
+                    - B.Tech
+                    headship: null
+          description: ''
+    patch:
+      operationId: v1_department_departments_partial_update
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptGeneralUpdate'
+            examples:
+              GeneralUpdate:
+                value:
+                  contact_email: cse@iiitdmj.ac.in
+                summary: General update
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptGeneralUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptGeneralUpdate'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptDepartment'
+              examples:
+                Updated:
+                  value:
+                    code: CSE
+                    contact_email: cse@iiitdmj.ac.in
+          description: ''
+  /api/v1/department/feedback:
+    get:
+      operationId: v1_department_feedback_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptFeedback'
+              examples:
+                Feedback:
+                  value:
+                  - id: 4
+                    subject: Projector broken
+                    status: new
+                    category: ''
+                    notes: []
+          description: ''
+    post:
+      operationId: v1_department_feedback_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackWrite'
+            examples:
+              Submit:
+                value:
+                  subject: Projector broken
+                  body: Room L-104
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptFeedback'
+              examples:
+                Submitted:
+                  value:
+                    id: 4
+                    subject: Projector broken
+                    status: new
+                    category: ''
+                    notes: []
+          description: ''
+  /api/v1/department/feedback/{id}:
+    get:
+      operationId: v1_department_feedback_retrieve
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptFeedback'
+              examples:
+                Feedback:
+                  value:
+                    id: 4
+                    subject: Projector broken
+                    status: new
+                    category: ''
+                    notes: []
+          description: ''
+  /api/v1/department/feedback/{id}/dispose:
+    post:
+      operationId: v1_department_feedback_dispose_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackDispose'
+            examples:
+              Resolve:
+                value:
+                  outcome: resolved
+                  note: Replaced
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackDispose'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackDispose'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptFeedback'
+              examples:
+                Resolved:
+                  value:
+                    id: 4
+                    subject: Projector broken
+                    status: resolved
+                    category: ''
+                    notes: []
+          description: ''
+  /api/v1/department/feedback/{id}/notes:
+    post:
+      operationId: v1_department_feedback_notes_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackNoteWrite'
+            examples:
+              Note:
+                value:
+                  body: Following up with IWD.
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackNoteWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackNoteWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptFeedbackNote'
+              examples:
+                Saved:
+                  value:
+                    id: 1
+                    body: Following up with IWD.
+          description: ''
+  /api/v1/department/feedback/{id}/review:
+    post:
+      operationId: v1_department_feedback_review_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackReview'
+            examples:
+              Review:
+                value:
+                  category: facilities
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptFeedbackReview'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptFeedback'
+              examples:
+                Reviewed:
+                  value:
+                    id: 4
+                    subject: Projector broken
+                    status: under_review
+                    category: facilities
+                    notes: []
+          description: ''
+  /api/v1/department/inventory-items:
+    get:
+      operationId: v1_department_inventory_items_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptInventoryItem'
+              examples:
+                Items:
+                  value:
+                  - id: 2
+                    name: Arduino Uno
+                    unit: board
+                    current_quantity: 18
+          description: ''
+    post:
+      operationId: v1_department_inventory_items_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptInventoryItemWrite'
+            examples:
+              Add:
+                value:
+                  name: Arduino Uno
+                  unit: board
+                  quantity: 20
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptInventoryItemWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptInventoryItemWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptInventoryItem'
+              examples:
+                Added:
+                  value:
+                    id: 2
+                    name: Arduino Uno
+                    unit: board
+                    current_quantity: 18
+          description: ''
+  /api/v1/department/inventory-items/{id}/receipts:
+    post:
+      operationId: v1_department_inventory_items_receipts_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptReceipt'
+            examples:
+              Receipt:
+                value:
+                  quantity: 10
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptReceipt'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptReceipt'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptInventoryItem'
+              examples:
+                Item:
+                  value:
+                    id: 2
+                    name: Arduino Uno
+                    unit: board
+                    current_quantity: 18
+          description: ''
+  /api/v1/department/lab-resources:
+    get:
+      operationId: v1_department_lab_resources_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptLabResource'
+              examples:
+                Labs:
+                  value:
+                  - id: 1
+                    name: IoT Lab
+                    location: Block C
+                    equipment: Oscilloscopes x10
+                    capacity: 30
+                    status: available
+          description: ''
+    post:
+      operationId: v1_department_lab_resources_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptLabResourceEdit'
+            examples:
+              Add:
+                value:
+                  name: IoT Lab
+                  capacity: 30
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptLabResourceEdit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptLabResourceEdit'
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptLabResource'
+              examples:
+                Added:
+                  value:
+                    id: 1
+                    name: IoT Lab
+                    location: Block C
+                    equipment: Oscilloscopes x10
+                    capacity: 30
+                    status: available
+          description: ''
+  /api/v1/department/lab-resources/{id}:
+    patch:
+      operationId: v1_department_lab_resources_partial_update
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptLabResourceEdit'
+            examples:
+              Update:
+                value:
+                  status: maintenance
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptLabResourceEdit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptLabResourceEdit'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptLabResource'
+              examples:
+                Updated:
+                  value:
+                    id: 1
+                    name: IoT Lab
+                    location: Block C
+                    equipment: Oscilloscopes x10
+                    capacity: 30
+                    status: available
+          description: ''
+  /api/v1/department/official-changes:
+    get:
+      operationId: v1_department_official_changes_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptOfficialChange'
+              examples:
+                Pending:
+                  value:
+                  - id: 3
+                    field: name
+                    status: pending
+          description: ''
+    post:
+      operationId: v1_department_official_changes_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptOfficialChangeWrite'
+            examples:
+              Propose:
+                value:
+                  field: name
+                  value: CSE Department
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptOfficialChangeWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptOfficialChangeWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptOfficialChange'
+              examples:
+                Pending:
+                  value:
+                    id: 3
+                    field: name
+                    status: pending
+          description: ''
+  /api/v1/department/official-changes/{id}/decide:
+    post:
+      operationId: v1_department_official_changes_decide_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptDecision'
+            examples:
+              Approve:
+                value:
+                  approve: true
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptOfficialChange'
+              examples:
+                Approved:
+                  value:
+                    id: 3
+                    status: approved
+          description: ''
+  /api/v1/department/profiles:
+    get:
+      operationId: v1_department_profiles_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptProfileView'
+              examples:
+                People:
+                  value:
+                  - tier: basic
+                    id: 9
+                    kind: faculty
+                    display_name: A. Rao
+                    programme: ''
+                    department: CSE
+          description: ''
+    post:
+      operationId: v1_department_profiles_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptProfileWrite'
+            examples:
+              Add:
+                value:
+                  kind: alumni
+                  display_name: B. Sen
+                  graduation_year: 2019
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptProfileWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptProfileWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptProfileView'
+              examples:
+                Added:
+                  value:
+                    tier: full
+                    id: 9
+                    kind: faculty
+                    display_name: A. Rao
+                    programme: ''
+                    department: CSE
+          description: ''
+  /api/v1/department/profiles/{id}:
+    get:
+      operationId: v1_department_profiles_retrieve
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptProfileView'
+              examples:
+                Profile:
+                  value:
+                    tier: basic
+                    id: 9
+                    kind: faculty
+                    display_name: A. Rao
+                    programme: ''
+                    department: CSE
+          description: ''
+    patch:
+      operationId: v1_department_profiles_partial_update
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptProfileEdit'
+            examples:
+              Edit:
+                value:
+                  office: C-210
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptProfileEdit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptProfileEdit'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptProfileView'
+              examples:
+                Edited:
+                  value:
+                    tier: full
+                    id: 9
+                    kind: faculty
+                    display_name: A. Rao
+                    programme: ''
+                    department: CSE
+          description: ''
+  /api/v1/department/role-assignments:
+    get:
+      operationId: v1_department_role_assignments_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptRoleTenure'
+              examples:
+                Tenures:
+                  value:
+                  - id: 1
+                    department: CSE
+                    role: hod
+                    user_id: 49
+                    valid_from: '2026-12-01T00:00:00+05:30'
+                    valid_to: '2029-11-30T00:00:00+05:30'
+                    in_effect: false
+          description: ''
+    post:
+      operationId: v1_department_role_assignments_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptRoleTenureWrite'
+            examples:
+              Assign:
+                value:
+                  department: CSE
+                  role: hod
+                  user_id: 49
+                  valid_from: '2026-12-01T00:00:00+05:30'
+                  valid_to: '2029-11-30T00:00:00+05:30'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptRoleTenureWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptRoleTenureWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptRoleTenure'
+              examples:
+                Recorded:
+                  value:
+                    id: 1
+                    department: CSE
+                    role: hod
+                    user_id: 49
+                    valid_from: '2026-12-01T00:00:00+05:30'
+                    valid_to: '2029-11-30T00:00:00+05:30'
+                    in_effect: false
+          description: ''
+  /api/v1/department/role-assignments/{id}:
+    patch:
+      operationId: v1_department_role_assignments_partial_update
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptRoleTenureEdit'
+            examples:
+              Extend:
+                value:
+                  valid_to: '2030-11-30T00:00:00+05:30'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptRoleTenureEdit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptRoleTenureEdit'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptRoleTenure'
+              examples:
+                Changed:
+                  value:
+                    id: 1
+                    department: CSE
+                    role: hod
+                    user_id: 49
+                    valid_from: '2026-12-01T00:00:00+05:30'
+                    valid_to: '2029-11-30T00:00:00+05:30'
+                    in_effect: false
+          description: ''
+  /api/v1/department/role-assignments/vacancies:
+    get:
+      operationId: v1_department_role_assignments_vacancies_list
+      description: 'Q1 mitigation for BR-DEPT-022: vacant or ending roles in the departments
+        you can see.'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptRoleWarning'
+              examples:
+                Vacant:
+                  value:
+                  - department: SM
+                    role: hod
+                    problem: vacant
+                    message: SM has no HOD in effect.
+          description: ''
+  /api/v1/department/stock-movements:
+    get:
+      operationId: v1_department_stock_movements_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptStockMovement'
+              examples:
+                Ledger:
+                  value:
+                  - id: 5
+                    item: 2
+                    kind: issue
+                    quantity: 4
+          description: ''
+  /api/v1/department/stock-requests:
+    get:
+      operationId: v1_department_stock_requests_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptStockRequest'
+              examples:
+                Requests:
+                  value:
+                  - id: 11
+                    item: 2
+                    item_name: Arduino Uno
+                    quantity: 4
+                    status: pending_hod
+          description: ''
+    post:
+      operationId: v1_department_stock_requests_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptStockRequestWrite'
+            examples:
+              Request:
+                value:
+                  item: 2
+                  quantity: 4
+                  purpose: IoT lab
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptStockRequestWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptStockRequestWrite'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptStockRequest'
+              examples:
+                Pending:
+                  value:
+                    id: 11
+                    item: 2
+                    item_name: Arduino Uno
+                    quantity: 4
+                    status: pending_hod
+          description: ''
+  /api/v1/department/stock-requests/{id}/decide:
+    post:
+      operationId: v1_department_stock_requests_decide_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptDecision'
+            examples:
+              Approve:
+                value:
+                  approve: true
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptDecision'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptStockRequest'
+              examples:
+                Approved:
+                  value:
+                    id: 11
+                    item: 2
+                    item_name: Arduino Uno
+                    quantity: 4
+                    status: approved
+          description: ''
+  /api/v1/department/stock-requests/{id}/issue:
+    post:
+      operationId: v1_department_stock_requests_issue_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptStockRequest'
+              examples:
+                Issued:
+                  value:
+                    id: 11
+                    item: 2
+                    item_name: Arduino Uno
+                    quantity: 4
+                    status: issued
+          description: ''
+  /api/v1/department/timetable-slots:
+    get:
+      operationId: v1_department_timetable_slots_list
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptTimetableSlot'
+              examples:
+                Slots:
+                  value:
+                  - kind: class
+                    programme: B.Tech
+                    batch_year: 2024
+                    course_code: CS2003
+                    day_of_week: 0
+                    starts_at: 09:00
+                    ends_at: '10:00'
+                    room: L-104
+                    instructor_user_id: 3011
+          description: ''
+    post:
+      operationId: v1_department_timetable_slots_create
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeptTimetableUpload'
+            examples:
+              Upload:
+                value:
+                  slots:
+                  - kind: class
+                    programme: B.Tech
+                    batch_year: 2024
+                    course_code: CS2003
+                    day_of_week: 0
+                    starts_at: 09:00
+                    ends_at: '10:00'
+                    room: L-104
+                    instructor_user_id: 3011
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeptTimetableUpload'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeptTimetableUpload'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeptTimetableSlot'
+              examples:
+                Saved:
+                  value:
+                  - kind: class
+                    programme: B.Tech
+                    batch_year: 2024
+                    course_code: CS2003
+                    day_of_week: 0
+                    starts_at: 09:00
+                    ends_at: '10:00'
+                    room: L-104
+                    instructor_user_id: 3011
+          description: ''
+  /api/v1/department/timetable-slots/{id}:
+    patch:
+      operationId: v1_department_timetable_slots_partial_update
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptTimetableSlotEdit'
+            examples:
+              Move:
+                value:
+                  room: L-105
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptTimetableSlotEdit'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDeptTimetableSlotEdit'
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptTimetableSlot'
+              examples:
+                Moved:
+                  value:
+                    kind: class
+                    programme: B.Tech
+                    batch_year: 2024
+                    course_code: CS2003
+                    day_of_week: 0
+                    starts_at: 09:00
+                    ends_at: '10:00'
+                    room: L-104
+                    instructor_user_id: 3011
+          description: ''
+    delete:
+      operationId: v1_department_timetable_slots_destroy
+      description: Each HTTP method names its permission; writes are throttled, reads
+        are not.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9]{1,9}$
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '204':
+          description: No response body
   /api/v1/directory/users:
     get:
       operationId: v1_directory_users_retrieve
@@ -1993,6 +3454,23 @@ components:
         * `registered` - Registered students
         * `alumni` - Alumni
         * `all` - Everyone
+    AudienceRoleEnum:
+      enum:
+      - student
+      - faculty
+      - dept_admin
+      - hod
+      - all
+      type: string
+      description: |-
+        * `student` - student
+        * `faculty` - faculty
+        * `dept_admin` - dept_admin
+        * `hod` - hod
+        * `all` - all
+    BlankEnum:
+      enum:
+      - ''
     BulkOutcome:
       type: object
       properties:
@@ -2082,6 +3560,20 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      enum:
+      - academic
+      - infrastructure
+      - administrative
+      - facilities
+      - other
+      type: string
+      description: |-
+        * `academic` - academic
+        * `infrastructure` - infrastructure
+        * `administrative` - administrative
+        * `facilities` - facilities
+        * `other` - other
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2315,6 +3807,973 @@ components:
         * `consent_failure` - Did not appear after consenting (r19)
         * `code_of_conduct` - Code of conduct (r21)
         * `misrepresentation` - False resume or unfair means (r18)
+    DeptActing:
+      type: object
+      properties:
+        role:
+          type: string
+          readOnly: true
+          nullable: true
+        department:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - department
+      - role
+    DeptAnnouncement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        audience_role:
+          allOf:
+          - $ref: '#/components/schemas/AudienceRoleEnum'
+          readOnly: true
+        programme:
+          type: string
+          readOnly: true
+        batch_year:
+          type: integer
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DeptAnnouncementStatusEnum'
+          readOnly: true
+        author_id:
+          type: integer
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+        edited_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - audience_role
+      - author_id
+      - batch_year
+      - body
+      - department
+      - edited_at
+      - id
+      - programme
+      - published_at
+      - status
+      - title
+    DeptAnnouncementStatusEnum:
+      enum:
+      - active
+      - hidden
+      - deleted
+      type: string
+      description: |-
+        * `active` - Active
+        * `hidden` - Hidden
+        * `deleted` - Deleted
+    DeptAnnouncementWrite:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+          maxLength: 10000
+        audience_role:
+          type: string
+          maxLength: 10
+        programme:
+          type: string
+          default: ''
+          maxLength: 40
+        batch_year:
+          type: integer
+          maximum: 2100
+          minimum: 2000
+          nullable: true
+      required:
+      - audience_role
+      - body
+      - title
+    DeptDecision:
+      type: object
+      properties:
+        approve:
+          type: boolean
+        reason:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - approve
+    DeptDepartment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        core_policies:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        contact_email:
+          type: string
+          format: email
+          readOnly: true
+        contact_phone:
+          type: string
+          readOnly: true
+        office_location:
+          type: string
+          readOnly: true
+        website:
+          type: string
+          format: uri
+          readOnly: true
+        headship:
+          allOf:
+          - $ref: '#/components/schemas/DeptHeadship'
+          nullable: true
+          readOnly: true
+        programmes:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - code
+      - contact_email
+      - contact_phone
+      - core_policies
+      - description
+      - headship
+      - id
+      - name
+      - office_location
+      - programmes
+      - website
+    DeptFeedback:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        subject:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CategoryEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DeptFeedbackStatusEnum'
+          readOnly: true
+        submitter_id:
+          type: integer
+          readOnly: true
+        submitter_kind:
+          type: string
+          readOnly: true
+        reviewed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        disposed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        resolution_note:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeptFeedbackNote'
+          readOnly: true
+      required:
+      - body
+      - category
+      - created_at
+      - disposed_at
+      - id
+      - notes
+      - resolution_note
+      - reviewed_at
+      - status
+      - subject
+      - submitter_id
+      - submitter_kind
+    DeptFeedbackDispose:
+      type: object
+      properties:
+        outcome:
+          type: string
+          maxLength: 8
+        note:
+          type: string
+          default: ''
+          maxLength: 5000
+      required:
+      - outcome
+    DeptFeedbackNote:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author_id:
+          type: integer
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_id
+      - body
+      - created_at
+      - id
+    DeptFeedbackNoteWrite:
+      type: object
+      properties:
+        body:
+          type: string
+          maxLength: 5000
+      required:
+      - body
+    DeptFeedbackReview:
+      type: object
+      properties:
+        category:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/CategoryEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        disposition:
+          type: string
+          default: ''
+          maxLength: 8
+        note:
+          type: string
+          default: ''
+          maxLength: 5000
+    DeptFeedbackStatusEnum:
+      enum:
+      - new
+      - under_review
+      - resolved
+      - closed
+      type: string
+      description: |-
+        * `new` - New
+        * `under_review` - Under review
+        * `resolved` - Resolved
+        * `closed` - Closed
+    DeptFeedbackWrite:
+      type: object
+      properties:
+        subject:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+          maxLength: 10000
+      required:
+      - body
+      - subject
+    DeptHeadship:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+      required:
+      - display_name
+      - user_id
+    DeptInventoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        unit:
+          type: string
+          readOnly: true
+        current_quantity:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - current_quantity
+      - id
+      - name
+      - unit
+      - updated_at
+    DeptInventoryItemWrite:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        unit:
+          type: string
+          default: unit
+          maxLength: 20
+        quantity:
+          type: integer
+          maximum: 1000000
+          minimum: 1
+        note:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - name
+      - quantity
+    DeptLabResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        location:
+          type: string
+          readOnly: true
+        equipment:
+          type: string
+          readOnly: true
+        capacity:
+          type: integer
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DeptLabResourceStatusEnum'
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - capacity
+      - equipment
+      - id
+      - location
+      - name
+      - status
+      - updated_at
+    DeptLabResourceEdit:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        location:
+          type: string
+          maxLength: 120
+        equipment:
+          type: string
+          maxLength: 5000
+        capacity:
+          type: integer
+          maximum: 100000
+          minimum: 0
+          nullable: true
+        status:
+          $ref: '#/components/schemas/DeptLabResourceEditStatusEnum'
+    DeptLabResourceEditStatusEnum:
+      enum:
+      - available
+      - maintenance
+      - retired
+      type: string
+      description: |-
+        * `available` - available
+        * `maintenance` - maintenance
+        * `retired` - retired
+    DeptLabResourceStatusEnum:
+      enum:
+      - available
+      - maintenance
+      - retired
+      type: string
+      description: |-
+        * `available` - Available
+        * `maintenance` - Under maintenance
+        * `retired` - Retired
+    DeptOfficialChange:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        field:
+          allOf:
+          - $ref: '#/components/schemas/FieldEnum'
+          readOnly: true
+        proposed_value:
+          type: string
+          readOnly: true
+        previous_value:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DeptOfficialChangeStatusEnum'
+          readOnly: true
+        proposed_by:
+          type: integer
+          readOnly: true
+        decided_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        reason:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - decided_at
+      - decided_by
+      - department
+      - field
+      - id
+      - previous_value
+      - proposed_by
+      - proposed_value
+      - reason
+      - status
+    DeptOfficialChangeStatusEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending HOD approval
+        * `approved` - Approved
+        * `rejected` - Rejected
+    DeptOfficialChangeWrite:
+      type: object
+      properties:
+        field:
+          $ref: '#/components/schemas/FieldEnum'
+        value:
+          type: string
+          maxLength: 10000
+      required:
+      - field
+      - value
+    DeptProfileView:
+      type: object
+      description: Output only. Fields beyond the viewer's tier are absent, not null
+        (BR-DEPT-019).
+      properties:
+        tier:
+          type: string
+        id:
+          type: integer
+        kind:
+          type: string
+        display_name:
+          type: string
+        programme:
+          type: string
+        department:
+          type: string
+        email:
+          type: string
+        office:
+          type: string
+        research_interests:
+          type: string
+        current_position:
+          type: string
+        user_id:
+          type: integer
+          nullable: true
+        username:
+          type: string
+        discipline:
+          type: string
+        batch_year:
+          type: integer
+          nullable: true
+        bio:
+          type: string
+        graduation_year:
+          type: integer
+          nullable: true
+        is_active:
+          type: boolean
+      required:
+      - department
+      - display_name
+      - id
+      - kind
+      - programme
+      - tier
+    DeptProfileWrite:
+      type: object
+      properties:
+        kind:
+          type: string
+          maxLength: 7
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+          nullable: true
+        display_name:
+          type: string
+          default: ''
+          maxLength: 150
+        office:
+          type: string
+          default: ''
+          maxLength: 120
+        research_interests:
+          type: string
+          default: ''
+          maxLength: 5000
+        bio:
+          type: string
+          default: ''
+          maxLength: 5000
+        graduation_year:
+          type: integer
+          maximum: 2100
+          minimum: 1990
+          nullable: true
+        current_position:
+          type: string
+          default: ''
+          maxLength: 150
+      required:
+      - kind
+    DeptReceipt:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          maximum: 1000000
+          minimum: 1
+        note:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - quantity
+    DeptRoleTenure:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        department:
+          type: string
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/DeptRoleTenureRoleEnum'
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        valid_from:
+          type: string
+          format: date-time
+          readOnly: true
+        valid_to:
+          type: string
+          format: date-time
+          readOnly: true
+        assigned_by:
+          type: integer
+          readOnly: true
+        transition_applied_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        in_effect:
+          type: boolean
+          readOnly: true
+      required:
+      - assigned_by
+      - department
+      - id
+      - in_effect
+      - role
+      - transition_applied_at
+      - user_id
+      - valid_from
+      - valid_to
+    DeptRoleTenureRoleEnum:
+      enum:
+      - hod
+      - dept_admin
+      type: string
+      description: |-
+        * `hod` - HOD
+        * `dept_admin` - Dept_Admin
+    DeptRoleTenureWrite:
+      type: object
+      properties:
+        department:
+          type: string
+          maxLength: 12
+        role:
+          $ref: '#/components/schemas/DeptRoleTenureWriteRoleEnum'
+        user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        valid_from:
+          type: string
+          format: date-time
+        valid_to:
+          type: string
+          format: date-time
+      required:
+      - department
+      - role
+      - user_id
+      - valid_from
+      - valid_to
+    DeptRoleTenureWriteRoleEnum:
+      enum:
+      - hod
+      - dept_admin
+      type: string
+      description: |-
+        * `hod` - hod
+        * `dept_admin` - dept_admin
+    DeptRoleWarning:
+      type: object
+      properties:
+        department:
+          type: string
+          readOnly: true
+        role:
+          type: string
+          readOnly: true
+        problem:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+      required:
+      - department
+      - message
+      - problem
+      - role
+    DeptStockMovement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        quantity:
+          type: integer
+          readOnly: true
+        actor_id:
+          type: integer
+          readOnly: true
+        stock_request:
+          type: integer
+          readOnly: true
+          nullable: true
+        note:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor_id
+      - created_at
+      - id
+      - item
+      - item_name
+      - kind
+      - note
+      - quantity
+      - stock_request
+    DeptStockRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        item:
+          type: integer
+          readOnly: true
+        item_name:
+          type: string
+          readOnly: true
+        unit:
+          type: string
+          readOnly: true
+        requester_id:
+          type: integer
+          readOnly: true
+        quantity:
+          type: integer
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DeptStockRequestStatusEnum'
+          readOnly: true
+        decided_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        reason:
+          type: string
+          readOnly: true
+        issued_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        issued_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - decided_at
+      - decided_by
+      - id
+      - issued_at
+      - issued_by
+      - item
+      - item_name
+      - purpose
+      - quantity
+      - reason
+      - requester_id
+      - status
+      - unit
+    DeptStockRequestStatusEnum:
+      enum:
+      - pending_hod
+      - approved
+      - rejected
+      - issued
+      type: string
+      description: |-
+        * `pending_hod` - Pending HOD approval
+        * `approved` - Approved for issuance
+        * `rejected` - Rejected
+        * `issued` - Issued
+    DeptStockRequestWrite:
+      type: object
+      properties:
+        item:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        quantity:
+          type: integer
+          maximum: 1000000
+          minimum: 1
+        purpose:
+          type: string
+          default: ''
+          maxLength: 300
+      required:
+      - item
+      - quantity
+    DeptTimetableSlot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        programme:
+          type: string
+          readOnly: true
+        batch_year:
+          type: integer
+          readOnly: true
+          nullable: true
+        course_code:
+          type: string
+          readOnly: true
+        day_of_week:
+          type: integer
+          readOnly: true
+        starts_at:
+          type: string
+          format: time
+          readOnly: true
+        ends_at:
+          type: string
+          format: time
+          readOnly: true
+        room:
+          type: string
+          readOnly: true
+        instructor_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - batch_year
+      - course_code
+      - day_of_week
+      - ends_at
+      - id
+      - instructor_user_id
+      - kind
+      - programme
+      - room
+      - starts_at
+      - updated_at
+    DeptTimetableSlotWrite:
+      type: object
+      properties:
+        kind:
+          type: string
+          maxLength: 5
+        programme:
+          type: string
+          default: ''
+          maxLength: 40
+        batch_year:
+          type: integer
+          maximum: 2100
+          minimum: 2000
+          nullable: true
+        course_code:
+          type: string
+          maxLength: 20
+        day_of_week:
+          type: integer
+          maximum: 6
+          minimum: 0
+        starts_at:
+          type: string
+          format: time
+        ends_at:
+          type: string
+          format: time
+        room:
+          type: string
+          default: ''
+          maxLength: 40
+        instructor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+          nullable: true
+      required:
+      - course_code
+      - day_of_week
+      - ends_at
+      - kind
+      - starts_at
+    DeptTimetableUpload:
+      type: object
+      properties:
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeptTimetableSlotWrite'
+      required:
+      - slots
     Detail:
       type: object
       properties:
@@ -2423,6 +4882,14 @@ components:
       - fee_reference
       - season
       - user_id
+    FieldEnum:
+      enum:
+      - name
+      - core_policies
+      type: string
+      description: |-
+        * `name` - name
+        * `core_policies` - core_policies
     IncidentRecorded:
       type: object
       properties:
@@ -3000,6 +5467,142 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+    PatchedDeptAnnouncementEdit:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+          maxLength: 10000
+        audience_role:
+          type: string
+          maxLength: 10
+        programme:
+          type: string
+          maxLength: 40
+        batch_year:
+          type: integer
+          maximum: 2100
+          minimum: 2000
+          nullable: true
+    PatchedDeptGeneralUpdate:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 5000
+        contact_email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        contact_phone:
+          type: string
+          maxLength: 30
+        office_location:
+          type: string
+          maxLength: 120
+        website:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        name:
+          type: string
+          maxLength: 120
+        core_policies:
+          type: string
+    PatchedDeptLabResourceEdit:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        location:
+          type: string
+          maxLength: 120
+        equipment:
+          type: string
+          maxLength: 5000
+        capacity:
+          type: integer
+          maximum: 100000
+          minimum: 0
+          nullable: true
+        status:
+          $ref: '#/components/schemas/DeptLabResourceEditStatusEnum'
+    PatchedDeptProfileEdit:
+      type: object
+      properties:
+        display_name:
+          type: string
+          maxLength: 150
+        office:
+          type: string
+          maxLength: 120
+        research_interests:
+          type: string
+          maxLength: 5000
+        bio:
+          type: string
+          maxLength: 5000
+        graduation_year:
+          type: integer
+          maximum: 2100
+          minimum: 1990
+          nullable: true
+        current_position:
+          type: string
+          maxLength: 150
+        is_active:
+          type: boolean
+    PatchedDeptRoleTenureEdit:
+      type: object
+      properties:
+        valid_to:
+          type: string
+          format: date-time
+    PatchedDeptTimetableSlotEdit:
+      type: object
+      properties:
+        kind:
+          type: string
+          maxLength: 5
+        programme:
+          type: string
+          maxLength: 40
+        batch_year:
+          type: integer
+          maximum: 2100
+          minimum: 2000
+          nullable: true
+        course_code:
+          type: string
+          maxLength: 20
+        day_of_week:
+          type: integer
+          maximum: 6
+          minimum: 0
+        starts_at:
+          type: string
+          format: time
+        ends_at:
+          type: string
+          format: time
+        room:
+          type: string
+          maxLength: 40
+        instructor_user_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+          nullable: true
     PatchedJobPosting:
       type: object
       properties:

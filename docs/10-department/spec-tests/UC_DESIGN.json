@@ -1,0 +1,398 @@
+[
+  {
+    "test_id": "TC-DEPT-001",
+    "source_id": "UC-DEPT-001 Main Success Scenario",
+    "purpose": "Verify an authenticated department user views only active announcements relevant to their role, program, and academic year.",
+    "preconditions": "User is authenticated as a Student in a specific department, program, and academic year. Active announcements exist both matching and not matching the user's role, program, and academic year, along with a hidden announcement.",
+    "action_or_input": "Authenticated Student requests the department announcement list.",
+    "expected_result": "System retrieves active announcements, applies relevance filtering by role, program, and academic year, and returns only matching active announcements without exposing out-of-scope or hidden announcements; no announcement state is changed.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-002",
+    "source_id": "UC-DEPT-001 Alternative Flow: No relevant active announcement exists",
+    "purpose": "Verify the system displays an empty-state message when no active announcements match the user's relevance scope.",
+    "preconditions": "User is authenticated and authorized for the department context. No active announcements match the user's role, program, and academic year.",
+    "action_or_input": "Authenticated user requests the department announcement list.",
+    "expected_result": "System returns an empty announcement list and displays an empty-state message without exposing out-of-scope announcements or modifying announcement state.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-003",
+    "source_id": "UC-DEPT-002 Main Success Scenario",
+    "purpose": "Verify an authorized actor (Faculty, Dept_Admin, or HOD) can create and publish a complete announcement and notify relevant Students/Faculty.",
+    "preconditions": "Actor is authenticated with a permitted role (Faculty, Dept_Admin, or HOD) in the department. Relevant Students and Faculty exist in the target role, program, and academic year scope.",
+    "action_or_input": "Actor submits a new announcement with valid required content and target-scope information (role, program, academic year).",
+    "expected_result": "System validates completeness, publishes the announcement as active for the defined target audience, and triggers notifications to relevant Students/Faculty within the target scope.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-004",
+    "source_id": "UC-DEPT-002 Alternative Flow: Required content or target information is invalid/missing",
+    "purpose": "Verify announcement publication is blocked with validation feedback when required content or target-scope information is missing or invalid.",
+    "preconditions": "Actor is authenticated with a permitted role (Faculty, Dept_Admin, or HOD) in the department.",
+    "action_or_input": "Actor submits an announcement creation request with missing required content or missing/invalid target-scope information.",
+    "expected_result": "System blocks publication, returns validation feedback, does not persist or publish the announcement, and does not send publication notifications.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-005",
+    "source_id": "UC-DEPT-003 Main Success Scenario / Alternative Flow: Edit",
+    "purpose": "Verify HOD can edit an active department announcement with valid revised content and target information.",
+    "preconditions": "HOD is authenticated for the department. An active department announcement exists.",
+    "action_or_input": "HOD selects the active announcement, chooses Edit, and submits valid revised content and target-scope information.",
+    "expected_result": "System verifies HOD authority, validates required announcement information, and saves the updated content and target-scope information on the announcement.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-006",
+    "source_id": "UC-DEPT-003 Alternative Flow: Hide",
+    "purpose": "Verify HOD can hide an active department announcement so it is no longer shown in normal viewing.",
+    "preconditions": "HOD is authenticated for the department. An active department announcement exists and is visible in normal announcement viewing.",
+    "action_or_input": "HOD selects the active announcement and chooses Hide.",
+    "expected_result": "System verifies HOD authority, updates the announcement state to hidden, and excludes the announcement from normal user viewing.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-007",
+    "source_id": "UC-DEPT-003 Alternative Flow: Delete",
+    "purpose": "Verify HOD can delete an active department announcement.",
+    "preconditions": "HOD is authenticated for the department. An active department announcement exists.",
+    "action_or_input": "HOD selects the active announcement and chooses Delete.",
+    "expected_result": "System verifies HOD authority and deletes the announcement so it is no longer active or displayed in normal announcement viewing.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-008",
+    "source_id": "UC-DEPT-004 Main Success Scenario",
+    "purpose": "Verify Faculty can submit a valid stock request within available inventory, placing it in Pending HOD Approval and notifying Dept_Admin and HOD.",
+    "preconditions": "Faculty is authenticated and authorized to request stock. A department inventory item exists with sufficient current quantity. Active Dept_Admin and HOD exist for the department.",
+    "action_or_input": "Faculty submits a stock request selecting the inventory item and a requested quantity less than or equal to current inventory.",
+    "expected_result": "System validates requested quantity against current inventory, creates the stock request in Pending HOD Approval state, notifies Dept_Admin of the new request, and notifies HOD that authorization is required.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-009",
+    "source_id": "UC-DEPT-004 Alternative Flow: Current inventory is insufficient",
+    "purpose": "Verify a stock request exceeding current inventory is rejected at request time and not advanced to HOD approval.",
+    "preconditions": "Faculty is authenticated and authorized to request stock. A department inventory item exists with a known current quantity.",
+    "action_or_input": "Faculty submits a stock request for the inventory item with a requested quantity greater than current inventory.",
+    "expected_result": "System detects insufficient inventory, informs Faculty, does not advance or create a request in Pending HOD Approval state, and does not send HOD authorization notifications.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-010",
+    "source_id": "UC-DEPT-005 Main Success Scenario / Alternative Flow: Approved outcome",
+    "purpose": "Verify HOD can approve a pending Faculty stock request so it transitions to Approved for Issuance and becomes available to Dept_Admin.",
+    "preconditions": "HOD is authenticated for the department. A Faculty stock request exists in Pending HOD Approval state.",
+    "action_or_input": "HOD opens the pending stock request and chooses Approve.",
+    "expected_result": "System verifies HOD decision authority, transitions the request to Approved for Issuance, and makes it available to Dept_Admin for issuance without sending a final Issued/Rejected notification to Faculty.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-011",
+    "source_id": "UC-DEPT-005 Alternative Flow: Rejected outcome",
+    "purpose": "Verify HOD can reject a pending Faculty stock request, terminating it in Rejected state and notifying the requesting Faculty.",
+    "preconditions": "HOD is authenticated for the department. A Faculty stock request exists in Pending HOD Approval state.",
+    "action_or_input": "HOD opens the pending stock request and chooses Reject.",
+    "expected_result": "System verifies HOD decision authority, transitions the request to terminal Rejected state, does not make it available for Dept_Admin issuance, and notifies the requesting Faculty member of the Rejected outcome.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-012",
+    "source_id": "UC-DEPT-006 Main Success Scenario",
+    "purpose": "Verify Dept_Admin can issue stock for a HOD-approved request, decrementing inventory, appending an immutable issuance log, and notifying Faculty.",
+    "preconditions": "Dept_Admin is authenticated for the department. A stock request exists in Approved for Issuance state for an inventory item with a recorded current quantity.",
+    "action_or_input": "Dept_Admin selects the approved stock request and confirms issuance.",
+    "expected_result": "System verifies issuance eligibility and Dept_Admin authority, marks the request/item as Issued, automatically decrements the inventory item's current quantity by the issued amount, appends an immutable stock-issuance movement record, and notifies the requesting Faculty member of the final Issued outcome.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-013",
+    "source_id": "UC-DEPT-007 Main Success Scenario",
+    "purpose": "Verify an authenticated Student or Faculty member can submit confidential feedback in New state and trigger a Dept_Admin notification.",
+    "preconditions": "User is authenticated as a Student or Faculty member eligible to submit department feedback. Active Dept_Admin exists for the department.",
+    "action_or_input": "Actor submits valid feedback information.",
+    "expected_result": "System records the feedback in New state, enforces confidentiality access protections on the record, and notifies Dept_Admin of the new feedback submission.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-014",
+    "source_id": "UC-DEPT-007 Exception Flow: Submission fails",
+    "purpose": "Verify that when feedback submission fails, no partial feedback record is treated as submitted and the actor is informed of failure.",
+    "preconditions": "User is authenticated as a Student or Faculty member eligible to submit feedback. A submission/persistence failure condition is triggered during feedback creation.",
+    "action_or_input": "Actor submits feedback while the persistence/submission operation fails.",
+    "expected_result": "System informs the actor of submission failure, does not record a partial or New feedback entry as successfully submitted, and does not notify Dept_Admin.",
+    "test_type": "exception"
+  },
+  {
+    "test_id": "TC-DEPT-015",
+    "source_id": "UC-DEPT-008 Main Success Scenario",
+    "purpose": "Verify Dept_Admin can perform initial review, categorize New feedback, mark it Resolved, and notify the submitter.",
+    "preconditions": "Dept_Admin is authenticated for the department. Confidential feedback exists in New state and is accessible to Dept_Admin.",
+    "action_or_input": "Dept_Admin opens the New feedback, categorizes it, and marks it Resolved.",
+    "expected_result": "System records that initial review occurred, updates the feedback category and terminal status to Resolved, preserves confidentiality, and notifies the submitter of terminal resolution.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-016",
+    "source_id": "UC-DEPT-008 Alternative Flow: Simple issue closed during initial review",
+    "purpose": "Verify Dept_Admin can close a simple issue during initial review and notify the submitter.",
+    "preconditions": "Dept_Admin is authenticated for the department. Confidential feedback representing a simple issue exists in New state.",
+    "action_or_input": "Dept_Admin performs initial review of the New feedback, categorizes it as applicable, and marks it Closed.",
+    "expected_result": "System records initial review, transitions the feedback to terminal Closed status, preserves confidentiality, and notifies the submitter of closure.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-017",
+    "source_id": "UC-DEPT-008 Alternative Flow: Feedback remains non-terminal after initial review",
+    "purpose": "Verify Dept_Admin can complete initial review and categorization while leaving feedback non-terminal and available for further handling including HOD oversight.",
+    "preconditions": "Dept_Admin is authenticated for the department. Confidential feedback exists in New state.",
+    "action_or_input": "Dept_Admin reviews and categorizes the New feedback without marking it Resolved or Closed.",
+    "expected_result": "System records initial review and sets feedback to Under Review/Categorized (non-terminal), makes it accessible for further handling including HOD oversight under UC-DEPT-014, and does not send a terminal resolution/closure notification to the submitter.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-018",
+    "source_id": "UC-DEPT-009 Main Success Scenario",
+    "purpose": "Verify Dept_Admin can upload or modify a conflict-free class/lab timetable and save it directly without HOD approval.",
+    "preconditions": "Dept_Admin is authenticated for the department.",
+    "action_or_input": "Dept_Admin uploads a new timetable or modifies an existing timetable with non-overlapping class/lab slots.",
+    "expected_result": "System checks for overlapping slots, finds no conflicts, and saves the timetable directly.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-019",
+    "source_id": "UC-DEPT-009 Alternative Flow: Slot conflict detected",
+    "purpose": "Verify the system blocks saving a timetable upload or modification when overlapping slots are detected and displays conflict information.",
+    "preconditions": "Dept_Admin is authenticated for the department. Existing or candidate timetable contains slots that overlap with the submitted change.",
+    "action_or_input": "Dept_Admin submits a timetable upload or modification containing overlapping slots.",
+    "expected_result": "System detects the overlapping-slot conflict, blocks saving, displays conflict information, and leaves the persisted timetable unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-020",
+    "source_id": "UC-DEPT-010 Main Success Scenario (General/non-official detail update)",
+    "purpose": "Verify Dept_Admin can update general/non-official department information and have it saved directly.",
+    "preconditions": "Dept_Admin is authenticated for the department.",
+    "action_or_input": "Dept_Admin submits a valid edit to general/non-official department information.",
+    "expected_result": "System validates the entered data and saves the updated general department information immediately without requiring HOD approval.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-021",
+    "source_id": "UC-DEPT-010 Main Success Scenario (Official department detail proposal)",
+    "purpose": "Verify that when Dept_Admin edits an official department detail (such as Name or Core Policies), it is recorded as Pending HOD Approval and not published before approval.",
+    "preconditions": "Dept_Admin is authenticated for the department. Current effective official department details (e.g., Name or Core Policies) exist.",
+    "action_or_input": "Dept_Admin submits a valid edit to an official department detail (e.g., department Name or Core Policies, excluding Headship identity).",
+    "expected_result": "System validates the entered data, records the proposed change in Pending HOD Approval state, and retains the previous effective official department detail without publishing the unapproved change.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-022",
+    "source_id": "UC-DEPT-010 Alternative Flow: Validation failure",
+    "purpose": "Verify invalid department detail updates are not saved and return validation feedback.",
+    "preconditions": "Dept_Admin is authenticated for the department.",
+    "action_or_input": "Dept_Admin submits invalid department detail data in Department Settings.",
+    "expected_result": "System rejects the update, displays validation feedback, and neither saves general changes nor creates a Pending HOD Approval proposal.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-023",
+    "source_id": "UC-DEPT-011 Main Success Scenario",
+    "purpose": "Verify Faculty can view permitted department lab resource profiles and relevant issued-stock history.",
+    "preconditions": "Faculty is authenticated for the department. Department lab resource profiles and issued-stock history records within Faculty scope exist.",
+    "action_or_input": "Faculty opens Department Resources and selects the lab resources view and the issued-stock history view.",
+    "expected_result": "System retrieves and displays permitted lab resource profiles and relevant issued-stock history within Faculty scope without disclosing out-of-scope resource information.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-024",
+    "source_id": "UC-DEPT-011 Alternative Flow: No data exists in the selected view",
+    "purpose": "Verify the system displays an empty-state message when no resource data exists in the selected Faculty resource view.",
+    "preconditions": "Faculty is authenticated for the department. No lab resource profiles or relevant issued-stock history records exist in the selected view.",
+    "action_or_input": "Faculty opens Department Resources and selects the view that has no data.",
+    "expected_result": "System displays an empty-state message and does not disclose out-of-scope resource data.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-025",
+    "source_id": "UC-DEPT-012 Main Success Scenario (Approved outcome)",
+    "purpose": "Verify HOD can approve a pending official department-detail change so it is published and becomes effective.",
+    "preconditions": "HOD is authenticated for the department. A Dept_Admin-proposed official department-detail change (e.g., Name or Core Policies) exists in Pending HOD Approval state.",
+    "action_or_input": "HOD opens the pending official department change and chooses Approve.",
+    "expected_result": "System verifies HOD decision authority, marks the change approved/published, and updates the effective official department data to the proposed value.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-026",
+    "source_id": "UC-DEPT-012 Alternative Flow: Rejected outcome",
+    "purpose": "Verify HOD can reject a pending official department-detail change while retaining the current effective department data.",
+    "preconditions": "HOD is authenticated for the department. A Dept_Admin-proposed official department-detail change exists in Pending HOD Approval state.",
+    "action_or_input": "HOD opens the pending official department change and chooses Reject.",
+    "expected_result": "System verifies HOD decision authority, records the change as Rejected, and retains the existing effective official department data unchanged.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-027",
+    "source_id": "UC-DEPT-014 Main Success Scenario",
+    "purpose": "Verify HOD can oversee feedback that has undergone initial Dept_Admin review, apply a terminal status (Resolved or Closed), and notify the submitter.",
+    "preconditions": "HOD is authenticated for the department. Confidential feedback exists that has already undergone Dept_Admin initial review (non-terminal Under Review/Categorized state) and is accessible under confidentiality rules.",
+    "action_or_input": "HOD opens the reviewed feedback, performs oversight/resolution, and marks the feedback Resolved (or Closed).",
+    "expected_result": "System records HOD oversight, transitions the feedback to terminal Resolved (or Closed) state, preserves confidentiality, and notifies the submitter of terminal resolution/closure.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-028",
+    "source_id": "UC-DEPT-014 Alternative Flow: HOD reviews without changing terminal status",
+    "purpose": "Verify HOD can review initially-reviewed feedback without applying a terminal status, leaving it in its existing reviewed state.",
+    "preconditions": "HOD is authenticated for the department. Confidential feedback exists in a non-terminal state after Dept_Admin initial review.",
+    "action_or_input": "HOD opens and reviews the feedback without marking it Resolved or Closed.",
+    "expected_result": "Feedback remains in its existing reviewed non-terminal state, confidentiality is preserved, and no terminal resolution/closure notification is sent to the submitter.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-029",
+    "source_id": "UC-DEPT-015 Main Success Scenario",
+    "purpose": "Verify an authenticated actor viewing a department user profile sees only fields permitted for their role and relationship (e.g., Faculty viewing a Student in their course).",
+    "preconditions": "Actor is authenticated as Faculty in the department. A Student profile exists in the department for a Student enrolled in the Faculty member's course.",
+    "action_or_input": "Faculty opens the profile of the Student enrolled in their course.",
+    "expected_result": "System identifies the Faculty role and course relationship, applies the profile visibility matrix, and displays detailed permitted Student profile information without disclosing out-of-scope data.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-030",
+    "source_id": "UC-DEPT-015 Alternative Flow: Faculty requests a Student not in the Faculty member's courses",
+    "purpose": "Verify Faculty is not provided detailed Student profile information for a Student who is not enrolled in the Faculty member's courses.",
+    "preconditions": "Actor is authenticated as Faculty in the department. A department Student profile exists for a Student not enrolled in any of the Faculty member's courses.",
+    "action_or_input": "Faculty requests the profile of the Student not in their courses.",
+    "expected_result": "System applies the profile visibility matrix and does not provide the detailed Student view for that Student.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-DEPT-031",
+    "source_id": "UC-DEPT-015 Alternative Flow: Privacy-protected sensitive personal data excluded from HOD/Dept_Admin view",
+    "purpose": "Verify privacy-protected sensitive personal data is excluded when HOD or Dept_Admin views a full department user profile.",
+    "preconditions": "Actor is authenticated as HOD or Dept_Admin in the department. A department user profile exists containing both standard department profile fields and privacy-protected sensitive personal data.",
+    "action_or_input": "HOD (or Dept_Admin) opens the department user profile.",
+    "expected_result": "System displays the full permitted department profile fields while excluding privacy-protected sensitive personal data.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "TC-DEPT-032",
+    "source_id": "UC-DEPT-016 Main Success Scenario",
+    "purpose": "Verify Dept_Admin can perform an authorized profile-management update on a Faculty, Student, or Alumni profile within the department.",
+    "preconditions": "Dept_Admin is authenticated for the department. A Faculty, Student, or Alumni profile record exists within the department.",
+    "action_or_input": "Dept_Admin selects the department profile record and submits valid profile-management changes.",
+    "expected_result": "System validates the submitted profile data and applies the authorized change within department scope.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-033",
+    "source_id": "UC-DEPT-016 Alternative Flow: Validation fails",
+    "purpose": "Verify invalid profile-management changes submitted by Dept_Admin are rejected and not applied.",
+    "preconditions": "Dept_Admin is authenticated for the department. A department user profile record exists.",
+    "action_or_input": "Dept_Admin submits invalid profile data for the selected profile record.",
+    "expected_result": "System fails validation, does not apply the invalid change, and preserves the existing profile record unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-034",
+    "source_id": "UC-DEPT-017 Main Success Scenario",
+    "purpose": "Verify Dept_Admin can update department lab equipment and resource-profile details with valid data.",
+    "preconditions": "Dept_Admin is authenticated for the department. A department lab/resource profile exists.",
+    "action_or_input": "Dept_Admin selects the lab/resource profile and submits valid updated equipment/resource details.",
+    "expected_result": "System validates and saves the updated lab/resource profile details.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-035",
+    "source_id": "UC-DEPT-017 Alternative Flow: Validation fails",
+    "purpose": "Verify invalid lab/resource profile updates submitted by Dept_Admin are not saved.",
+    "preconditions": "Dept_Admin is authenticated for the department. A department lab/resource profile exists.",
+    "action_or_input": "Dept_Admin selects the lab/resource profile and submits invalid equipment/resource details.",
+    "expected_result": "System fails validation, does not save the update, and preserves the existing lab/resource profile details unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-036",
+    "source_id": "UC-DEPT-018 Main Success Scenario",
+    "purpose": "Verify an authenticated Student can view department academic program information and applicable timetable information.",
+    "preconditions": "Student is authenticated for the department. Academic program information and a timetable applicable to the Student's context are published.",
+    "action_or_input": "Student opens Academic Information/Timetable and selects the academic program information view and the timetable view.",
+    "expected_result": "System retrieves and displays the academic program information and applicable timetable for the Student's context without modifying any data.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-037",
+    "source_id": "UC-DEPT-018 Alternative Flow: No applicable timetable/program data is published",
+    "purpose": "Verify the system shows an empty/unavailable state when no academic program or timetable data is published for the Student's context.",
+    "preconditions": "Student is authenticated for the department. No academic program information or timetable is published for the Student's context.",
+    "action_or_input": "Student opens Academic Information/Timetable and selects the academic program information or timetable view.",
+    "expected_result": "System displays an empty/unavailable state message and modifies no data.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-038",
+    "source_id": "UC-DEPT-019 Main Success Scenario",
+    "purpose": "Verify Dept_Admin can insert a valid stock receipt record, updating current inventory, appending an immutable insertion movement record, and displaying updated inventory tracking.",
+    "preconditions": "Dept_Admin is authenticated for the department.",
+    "action_or_input": "Dept_Admin submits a valid stock insertion/receipt record in Inventory Management.",
+    "expected_result": "System creates or updates the inventory record and current quantity, appends an immutable stock-insertion movement record, and displays updated current inventory tracking information to Dept_Admin.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-039",
+    "source_id": "UC-DEPT-019 Alternative Flow: Invalid stock data",
+    "purpose": "Verify invalid stock insertion/update data is rejected with validation feedback without altering inventory or audit history.",
+    "preconditions": "Dept_Admin is authenticated for the department.",
+    "action_or_input": "Dept_Admin submits a stock insertion/receipt record containing invalid stock data (e.g., invalid/non-positive quantity or missing required item data).",
+    "expected_result": "System rejects the insertion/update with validation feedback and leaves current inventory quantities and the immutable movement log unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-040",
+    "source_id": "UC-DEPT-020 Main Success Scenario",
+    "purpose": "Verify central Institute Admin can record a valid time-bounded HOD or Dept_Admin role assignment/reassignment satisfying authority, tenure, and unique-active-role constraints.",
+    "preconditions": "Actor is authenticated as authorized central Institute Admin (or equivalent central authority). Target employee is an eligible institute employee for the department.",
+    "action_or_input": "Institute Admin selects the department, role (HOD or Dept_Admin), incoming employee, and a valid time-bounded validity interval that does not violate single-active-role uniqueness.",
+    "expected_result": "System validates central assignment authority, time-bounded tenure, and unique-active-role constraints, records the assignment/reassignment, and confirms the recorded assignment and its validity interval.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-041",
+    "source_id": "UC-DEPT-020 Alternative Flow: Proposed assignment violates unique active-role cardinality",
+    "purpose": "Verify the system blocks recording a department role assignment that would violate the exactly-one-active-role constraint.",
+    "preconditions": "Actor is authenticated as authorized central Institute Admin. An active HOD (or Dept_Admin) assignment already exists for the department covering the proposed validity interval without a valid transition.",
+    "action_or_input": "Institute Admin attempts to create a concurrent active assignment for the same department and role that would result in more than one active holder.",
+    "expected_result": "System blocks the inconsistent assignment, requires a valid transition, and does not persist a cardinality-violating role assignment.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "TC-DEPT-042",
+    "source_id": "UC-DEPT-022 Main Success Scenario",
+    "purpose": "Verify that when a recorded HOD (or Dept_Admin) reassignment becomes effective, outgoing role access is immediately revoked, incoming access is immediately granted, exactly one active holder exists, and Headship is synchronized for HOD.",
+    "preconditions": "A department has an existing active HOD. A valid time-bounded HOD reassignment to an incoming employee has been recorded via UC-DEPT-020.",
+    "action_or_input": "The recorded HOD reassignment reaches its effective time and triggers UC-DEPT-022.",
+    "expected_result": "System immediately revokes the outgoing HOD's department-role access, immediately grants HOD department-role access to the incoming employee, ensures exactly one active HOD exists for the department, and synchronizes the displayed department Headship to the incoming active HOD.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-043",
+    "source_id": "UC-DEPT-022 Alternative Flow: Initial assignment with no outgoing holder",
+    "purpose": "Verify that when an initial HOD or Dept_Admin assignment with no outgoing holder becomes effective, outgoing revocation is skipped and incoming role access is granted while preserving the single-active-role invariant.",
+    "preconditions": "A department has no outgoing holder for the selected role (HOD or Dept_Admin). A valid initial time-bounded assignment for an incoming employee has been recorded via UC-DEPT-020.",
+    "action_or_input": "The recorded initial assignment reaches its effective time and triggers UC-DEPT-022.",
+    "expected_result": "System skips outgoing revocation, grants the corresponding department-role access to the incoming employee, establishes exactly one active holder for that role, and synchronizes displayed Headship if the role is HOD.",
+    "test_type": "functional"
+  },
+  {
+    "test_id": "TC-DEPT-044",
+    "source_id": "UC-DEPT-022 Exception Flow: Transition must not authorize role state violating BR-DEPT-022 or BR-DEPT-024",
+    "purpose": "Verify an effective-time role transition failure or conflict does not leave an unauthorized active-role state violating unique-active-role or immediate-transition rules.",
+    "preconditions": "A department has an existing active role holder and a recorded reassignment triggers UC-DEPT-022 under a condition where revoking outgoing access or applying the transition atomically fails.",
+    "action_or_input": "UC-DEPT-022 executes when an error prevents completing both outgoing revocation and incoming grant consistently.",
+    "expected_result": "System does not accept or authorize a resulting role state with multiple active holders or with both outgoing and incoming holders simultaneously holding active role access.",
+    "test_type": "exception"
+  }
+]
