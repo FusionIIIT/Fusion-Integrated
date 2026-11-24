@@ -46,6 +46,7 @@ def review_feedback_initial(
     feedback_id: str,
     admin_principal: Any,
     admin_remarks: str = "",
+    category: str | None = None,
 ) -> Feedback:
     fb = Feedback.objects.get(id=feedback_id)
     next_state = transition_feedback(
@@ -56,6 +57,10 @@ def review_feedback_initial(
     user_id = str(getattr(admin_principal, "user_id", getattr(admin_principal, "id", "admin")))
     fb.status = next_state
     fb.admin_remarks = admin_remarks
+    if category is not None and category.strip():
+        cat_clean = category.strip().upper()
+        if cat_clean in dict(Feedback.CATEGORY_CHOICES):
+            fb.category = cat_clean
     fb.reviewed_by_admin_id = user_id
     fb.reviewed_at = timezone.now()
     fb.save()

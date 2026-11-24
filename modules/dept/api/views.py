@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 
+from django.core.exceptions import ValidationError as DjangoValidationError
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers as drf_s
 from rest_framework import status
@@ -22,6 +23,7 @@ from modules.dept.api.permissions import MODULE_GRANT as MODULE
 from modules.dept.domain.exceptions import AvailabilityError, DomainError
 from modules.dept.domain.exceptions import ConflictError as DomainConflictError
 from modules.dept.models.announcements import Announcement
+from modules.dept.models.profiles import UserProfileExtension
 from modules.dept.selectors.announcements import list_announcements_for_principal
 from modules.dept.selectors.department import (
     get_department_with_headship,
@@ -73,16 +75,19 @@ class AnnouncementListCreateView(APIView):
             raise PermissionDeniedError("Permission denied.")
         dept = resolve_department_code(_actor(request), request)
         data = request.data
-        ann = announcement_service.create_announcement(
-            department_code=dept,
-            author_principal=_actor(request),
-            title=data.get("title", ""),
-            content=data.get("content", ""),
-            target_role=data.get("target_role", "ALL"),
-            target_program=data.get("target_program", "ALL"),
-            target_academic_year=data.get("target_academic_year"),
-        )
-        return Response(s.AnnouncementSerializer(ann).data, status=status.HTTP_201_CREATED)
+        try:
+            ann = announcement_service.create_announcement(
+                department_code=dept,
+                author_principal=_actor(request),
+                title=data.get("title", ""),
+                content=data.get("content", ""),
+                target_role=data.get("target_role", "ALL"),
+                target_program=data.get("target_program", "ALL"),
+                target_academic_year=data.get("target_academic_year"),
+            )
+            return Response(s.AnnouncementSerializer(ann).data, status=status.HTTP_201_CREATED)
+        except (DjangoValidationError, DomainError) as e:
+            raise BadRequestError(str(e)) from e
 
 
 class AnnouncementDetailView(APIView):
@@ -138,16 +143,19 @@ class InventoryItemListCreateView(APIView):
             raise PermissionDeniedError("Permission denied.")
         dept = resolve_department_code(_actor(request), request)
         d = request.data
-        item = inventory_service.create_inventory_item(
-            department_code=dept,
-            item_code=d.get("item_code", ""),
-            name=d.get("name", ""),
-            category=d.get("category", "CONSUMABLE"),
-            initial_quantity=int(d.get("initial_quantity", d.get("quantity", 0))),
-            unit=d.get("unit", "units"),
-            actor_principal=_actor(request),
-        )
-        return Response(s.InventoryItemSerializer(item).data, status=status.HTTP_201_CREATED)
+        try:
+            item = inventory_service.create_inventory_item(
+                department_code=dept,
+                item_code=d.get("item_code", ""),
+                name=d.get("name", ""),
+                category=d.get("category", "CONSUMABLE"),
+                initial_quantity=int(d.get("initial_quantity", d.get("quantity", 0))),
+                unit=d.get("unit", "units"),
+                actor_principal=_actor(request),
+            )
+            return Response(s.InventoryItemSerializer(item).data, status=status.HTTP_201_CREATED)
+        except (DjangoValidationError, DomainError, ValueError) as e:
+            raise BadRequestError(str(e)) from e
 
 
 class InventoryItemAddStockView(APIView):
@@ -189,9 +197,14 @@ class StockRequestListCreateView(APIView):
     def get(self, request):
         HasPermission("dept.stock_request.view")().has_permission(request, self)
         dept = resolve_department_code(_actor(request), request)
+        actor = _actor(request)
+        roles = set(getattr(actor, "roles", []))
+        staff_roles = {"faculty", "HOD", "DEPT_ADMIN", "Dept_Admin", "Institute Admin"}
+        if "student" in roles and not (roles & staff_roles):
+            raise PermissionDeniedError("Only faculty may access stock request history.")
         mine = request.query_params.get("mine", "").lower() in {"1", "true"}
         st = request.query_params.get("status")
-        qs = list_stock_requests_for_principal(dept, _actor(request), mine_only=mine, status=st)
+        qs = list_stock_requests_for_principal(dept, actor, mine_only=mine, status=st)
         return Response(s.StockRequestSerializer(qs, many=True).data)
 
     @extend_schema(request=s.StockRequestSerializer, responses={201: s.StockRequestSerializer})
@@ -318,9 +331,10 @@ class FeedbackReviewView(APIView):
     )
     def post(self, request, pk):
         remarks = request.data.get("admin_remarks", "")
+        category = request.data.get("category")
         try:
             fb = feedback_service.review_feedback_initial(
-                pk, _actor(request), admin_remarks=remarks
+                pk, _actor(request), admin_remarks=remarks, category=category
             )
             return Response(s.FeedbackSerializer(fb).data)
         except DomainError as e:
@@ -425,10 +439,14 @@ class LabResourceListCreateView(APIView):
             raise PermissionDeniedError("Permission denied.")
         dept = resolve_department_code(_actor(request), request)
         d = request.data
+        lab_name = d.get("lab_name", "").strip()
+        location = d.get("location", "").strip()
+        if not lab_name or not location:
+            raise BadRequestError("lab_name and location cannot be empty.")
         lab = lab_service.save_lab_resource(
             department_code=dept,
-            lab_name=d.get("lab_name", ""),
-            location=d.get("location", ""),
+            lab_name=lab_name,
+            location=location,
             description=d.get("description", ""),
             equipment_details=d.get("equipment_details", []),
             in_charge_id=d.get("in_charge_id", ""),
@@ -482,10 +500,14 @@ class ProfileListCreateView(APIView):
             raise PermissionDeniedError("Permission denied.")
         dept = resolve_department_code(_actor(request), request)
         d = request.data
+        user_id = d.get("user_id", "").strip()
+        profile_type = d.get("profile_type", "STUDENT").strip().upper()
+        if not user_id or profile_type not in dict(UserProfileExtension.PROFILE_TYPE_CHOICES):
+            raise BadRequestError("Valid user_id and profile_type are required.")
         prof = profile_service.save_user_profile_extension(
             department_code=dept,
-            user_id=d.get("user_id", ""),
-            profile_type=d.get("profile_type", "STUDENT"),
+            user_id=user_id,
+            profile_type=profile_type,
             office_room=d.get("office_room", ""),
             research_interests=d.get("research_interests", ""),
             contact_phone=d.get("contact_phone", ""),
@@ -616,7 +638,9 @@ class RoleAssignmentListCreateView(APIView):
             )
             data = s.DepartmentRoleAssignmentSerializer(ra).data
             return Response(data, status=status.HTTP_201_CREATED)
-        except DomainError as e:
+        except DomainConflictError as e:
+            raise ConflictError(str(e)) from e
+        except (DomainError, ValueError, TypeError) as e:
             raise BadRequestError(str(e)) from e
 
 

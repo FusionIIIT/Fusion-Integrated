@@ -8,6 +8,7 @@ from typing import Any
 from django.db import transaction
 from django.utils import timezone
 
+from modules.dept.domain.exceptions import ConflictError as DomainConflictError
 from modules.dept.domain.roles import validate_role_tenure
 from modules.dept.models.department import Department
 from modules.dept.models.roles import DepartmentRoleAssignment
@@ -33,13 +34,14 @@ def assign_department_role(
     is_immediate = start_date <= now <= end_date
     status = "ACTIVE" if is_immediate else "SCHEDULED"
 
-    if status == "ACTIVE":
-        # Revoke outgoing active assignment for this (dept, role) (BR-DEPT-022, BR-DEPT-024)
-        DepartmentRoleAssignment.objects.filter(
-            department=dept,
-            role_name=role_name,
-            status="ACTIVE",
-        ).update(status="REVOKED", updated_at=now)
+    if status == "ACTIVE" and DepartmentRoleAssignment.objects.filter(
+        department=dept,
+        role_name=role_name,
+        status="ACTIVE",
+    ).exists():
+        raise DomainConflictError(
+            f"Active assignment for {role_name} already exists in {department_code} (BR-DEPT-022)."
+        )
 
     assigner_id = str(
         getattr(assigned_by_principal, "user_id", getattr(assigned_by_principal, "id", "admin"))
