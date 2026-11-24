@@ -470,6 +470,27 @@ def test_huge_receipt_and_huge_row_id_are_not_500(world, act):
     )
 
 
+def test_huge_instructor_id_is_400_on_upload_and_edit(world, act):
+    # RQ1-05: an instructor id that cannot be a user id is refused before any lookup
+    slot = {
+        "kind": "class",
+        "course_code": "CS2003",
+        "day_of_week": 0,
+        "starts_at": "09:00",
+        "ends_at": "10:00",
+    }
+    made = act("admin").post(f"{API}/timetable-slots", {"slots": [slot]}, format="json")
+    assert made.status_code == 201, made.content
+    huge = {"slots": [{**slot, "instructor_user_id": HUGE}]}
+    assert act("admin").post(f"{API}/timetable-slots", huge, format="json").status_code == 400
+    edit = act("admin").patch(
+        f"{API}/timetable-slots/{made.json()[0]['id']}",
+        {"instructor_user_id": HUGE},
+        format="json",
+    )
+    assert edit.status_code == 400, edit.content
+
+
 def test_every_accepted_string_fits_its_column():
     # R2-04: a value the API accepts must never be too long for the column it is saved in
     from rest_framework import serializers as drf

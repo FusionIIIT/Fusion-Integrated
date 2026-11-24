@@ -1,7 +1,7 @@
 # Department: quality report
 
 Branch `module/department`, cut from `main` at `5595be6`. Every number below came from runs made
-after the last code change (round 6 fixes included). Spec: `06-DEPT` v1.2.
+after the last code change (the change to Q2 and the review Q1 fixes included). Spec: `06-DEPT` v1.2.
 
 ## 1. Gates
 
@@ -15,13 +15,13 @@ all contract getters are plural
 nav items and client routes agree
 permission manifest matches the registries
 openapi schema matches the code
-987 passed, 27 subtests passed          (whole repository, .venv/bin/python -m pytest)
+1192 passed, 27 subtests passed         (whole repository, .venv/bin/python -m pytest; includes the 200 spec tests)
 ```
 
 `make check-client`, exit 0: `tsc --noEmit` (app and e2e) clean; `Test Files 15 passed (15)`,
-`Tests 105 passed (105)`; `✓ built in 2.13s`. The largest department chunk is `InventoryPage`, 2.00 kB gzip.
+`Tests 106 passed (106)`; `✓ built in 2.20s`. The largest department chunk is `InventoryPage`, 1.99 kB gzip.
 
-`make e2e`, exit 0: `28 passed (1.4m)`, run on the final code, with no 5xx and no 403 in the `runserver` log of that run (`grep -c '" 403 '` printed 0). This is 19 department tests and the 9 existing ones, with
+`make e2e`, exit 0: `28 passed (20.3s)`, run on the final code, with no 5xx and no 403 in the `runserver` log of that run (`grep -c '" 403 '` printed 0). This is 19 department tests and the 9 existing ones, with
 `E2E_IAM_DIR` set and the grants in §8.
 
 Deploy check, with the production settings exactly as Step 7.7 gives them:
@@ -32,36 +32,36 @@ Deploy check, with the production settings exactly as Step 7.7 gives them:
 ## 2. Coverage
 
 ```text
-pytest modules/department --cov=modules/department --cov-branch --cov-fail-under=90
-TOTAL  1817 stmts  23 miss  272 branches  17 partial  98%   Total coverage: 98.09%
+pytest modules/department --ignore=modules/department/tests/spec --cov=modules/department --cov-branch --cov-fail-under=90
+TOTAL  1841 stmts  24 miss  282 branches  18 partial  98%   Total coverage: 98.02%
 
-pytest modules/department --cov=modules/department/domain --cov-branch --cov-fail-under=95
-TOTAL   209 stmts   0 miss   72 branches   0 partial  100%  Total coverage: 100.00%
+pytest modules/department --ignore=modules/department/tests/spec --cov=modules/department/domain --cov-branch --cov-fail-under=95
+TOTAL   211 stmts   0 miss   74 branches   0 partial  100%  Total coverage: 100.00%
 ```
 
 `pyproject.toml` excludes `tests/` and `migrations/` from coverage, and neither appears in the report.
 
 ## 3. Tests
 
-562 department backend tests:
+567 department backend tests, without `tests/spec/` (the 200 spec tests are in `spec-tests/triage.md`):
 
 | File | Tests | What it covers |
 |---|---|---|
-| `test_domain.py` | 71 | Every rule branch, with no database. Every illegal transition is generated from the tables. |
+| `test_domain.py` | 74 | Every rule branch, with no database. Every illegal transition is generated from the tables. |
 | `test_acting_role.py` | 65 | Only the acting role counts. For all 21 office write endpoints: the HOD, Dept_Admin and central holder acting in a plain role are refused, and nothing in any table changes. An outgoing HOD or Dept_Admin is refused every write in their office role and in a plain one (BR-DEPT-024). The negative twin succeeds in the office role. `context` reports the acting role. |
-| `test_journeys.py` | 34 | Every live UC through HTTP only (below). A student never sees another programme's slots (R5-02). |
+| `test_journeys.py` | 35 | Every live UC through HTTP only (below). A student never sees another programme's slots (R5-02). |
 | `test_privilege_escalation.py` | 287 | Every one of the 25 write endpoints answers 429 on the repeat at a one-per-minute rate (R6-01). For each of the 41 endpoints, each view asks for exactly the permission its endpoint needs, and: module grant without the permission is 403; permission without the module grant is 403; no session is 401; a plain staff user gets nothing; a student is refused office endpoints. Also `HEAD` and `OPTIONS` need the read permission, an unmapped method is refused, the role switch, per-office verbs, central-only assignment, designation without tenure, CSRF, and that permission codes match the registry. |
 | `test_scoping_isolation.py` | 18 | A deleted announcement is gone from the HOD's list and detail, and faculty never see a deactivated profile (R6-02). Another department's rows are absent from lists and 404 by id. A principal holding student, faculty and both office designations, acting as a student or as faculty, gets an empty list from every office-only list (R4-02). Feedback is confidential. A status filter cannot widen scope. Students never see alumni or inactive profiles. Vacancy warnings follow the viewer's departments. |
-| `test_edge_cases.py` | 49 | A tenure that would cut the incumbent short is refused and saves nothing (R5-01); an ended tenure that overlaps nothing cannot be revived (R5-03); a timetable batch over 500 slots is 400 (R5-05). 404 for a department code the column could never hold (a NUL byte, a space, 13 letters), 400 for bad filters (a NUL byte included), out-of-range numbers and ids, and over-long strings (every string the write serializers accept, announcements, official changes and tenures included, is checked against its column, and a notice subject fits even with the longest department prefix), 409 for conflicts, 422 for rule refusals, 429 throttling, the ledger's immutability, and every adversarial question below. |
+| `test_edge_cases.py` | 50 | A tenure that would cut the incumbent short is refused and saves nothing (R5-01); an ended tenure that overlaps nothing cannot be revived (R5-03); a timetable batch over 500 slots is 400 (R5-05). 404 for a department code the column could never hold (a NUL byte, a space, 13 letters), 400 for bad filters (a NUL byte included), out-of-range numbers and ids, and over-long strings (every string the write serializers accept, announcements, official changes and tenures included, is checked against its column, and a notice subject fits even with the longest department prefix), 409 for conflicts, 422 for rule refusals, 429 throttling, the ledger's immutability, and every adversarial question below. |
 | `test_concurrency.py` | 8 | Real threads on a `Barrier`, with `transaction=True`: issue race, double issue, double decision, overlapping tenures, transitions twice, delivery twice. The database triggers refuse an overlapping tenure written around the service (raced) and a clashing slot written directly. |
 | `test_query_budgets.py` | 12 | The same query count with 2 rows and with 20, for all 11 list endpoints, plus prefetched notes. |
 | `test_schedule.py` | 16 | The same notice queued twice is stored once, and a failed send never stores an address (R6-05). Beat entries merged and routed; each task twice in a row; readiness, seeding and command output; vacant and ending roles named (Q1); the headship contract. |
 | `test_client_route_guards.py` | 2 | Every client route is guarded with its own nav item's permission. |
 
-Client: 59 department vitest tests. Each of the 8 pages tests loading, empty, a 500 error, a
+Client: 68 department vitest tests, 65 across the 8 pages and 3 for the hooks. Each page tests loading, empty, a 500 error, a
 missing control, its main action with the server's refusal, and an owning office that lacks the
 permission being shown no control. An HOD acting as faculty is shown no HOD control though the
-session holds the permissions. There are also 3 hook tests.
+session holds the permissions.
 
 Journeys mapped to use cases (`test_journeys.py`):
 
@@ -153,7 +153,7 @@ Round 6 breaks, each run against the whole module and copied back:
 |---|---|
 | Both gates on every view | Every view is a `DepartmentView`, and every write also checks the acting role (`test_acting_role.py`): `HasModuleGrant("department")` and then the method's permission. `HEAD` and `OPTIONS` need the read permission; a method with no permission named is refused. No `AllowAny`; no view overrides authentication (asserted by a test). |
 | Explicit serializer fields | Every serializer lists its `fields`; every server-owned field is read-only. |
-| Scope on every read and body id | Every list and detail read starts in `selectors/scoping.py`. Body ids (`item`, `department`) are resolved through scoping or a locked lookup, never used raw. Every integer input and URL id is bounded to its column, so an out-of-range value is a 400 or 404, never a 500. |
+| Scope on every read and body id | Every list and detail read starts in `selectors/scoping.py`. Body ids (`item`, `department`) are resolved through scoping or a locked lookup, never used raw. Every integer input (a timetable slot's `instructor_user_id` included) and URL id is bounded to its column, so an out-of-range value is a 400 or 404, never a 500. |
 | No raw SQL, `eval`, `pickle`, `subprocess` on input | None. |
 | Uploads | None in this module. |
 | Throttling | Every write carries `throttle_scope = "department_write"` (120/hour); 429 is tested. |
@@ -614,11 +614,16 @@ After review round 6, from Student 2, on WhatsApp, 2026-11-23 18:05 IST:
 This is the written fix-or-waive decision after six rounds: every round 6 finding is fixed, none is
 waived, and the three round 6 questions are answered as proposed (§12).
 
-After the spec-test baseline, from Student 2, in writing, 2026-11-24: he agreed to the change to
-Q2 in the blueprint. Timetable slots name an instructor, and a Faculty member sees a Student whose
+After the spec-test baseline, from Student 2, on WhatsApp, 2026-11-24 21:51 IST, in reply to the
+proposed change to Q2 (blueprint, "Change to Q2 (spec tests)"):
+
+> "Approved"
+
+This approves the change to Q2 in the blueprint. Timetable slots name an instructor, and a Faculty member sees a Student whose
 programme and batch year match a slot they teach at the DETAILED tier (AFR-DEPT-026). This ends
-the three `NOT_AUTOMATED` spec tests (`triage.md`). It adds the migration
-`0002_timetable_slot_instructor` and changes the regenerated `openapi/fusion-integrated.v1.yaml`.
+the three `NOT_AUTOMATED` spec tests (`triage.md`). It adds a column and
+an index to the module's single `0001_initial` migration and changes the regenerated
+`openapi/fusion-integrated.v1.yaml`.
 
 No dependency was added.
 
@@ -632,6 +637,8 @@ No dependency was added.
 | 4 | `6b52d64` | 10 | 10 | 8 | 7 | 7 | 10 | 10 | 10 | 10 | 4 (2 Major, 2 Minor) |
 | 5 | `ad7558e` | 7 | 10 | 9 | 9 | 4 | 10 | 7 | 8 | 10 | 8 (4 Major, 4 Minor) |
 | 6 | `c04569e` | 10 | 10 | 10 | 10 | 3 | 10 | 9 | 9 | 10 | 5 (2 Major, 3 Minor) |
+| 7 | `34b8ab5` | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 0 |
+| Q1 | `1c60e90` | 3 | 10 | 9 | 7 | 10 | 10 | 10 | 4 | 3 | 6 (2 Blocker, 3 Major, 1 Minor) |
 
 What round 1 found, and what changed:
 
@@ -730,3 +737,14 @@ approved this, and the answers below, in writing on 2026-11-23 18:05 IST (§11):
 
 The six approver questions from rounds 1, 2 and 3 were answered by Student 2 on 2026-11-23 (§11);
 every answer keeps the current behaviour.
+
+What review Q1 found (after the spec tests), and what changed:
+
+| Finding | Change |
+|---|---|
+| RQ1-01 | §11 quotes Student 2's written approval of the change to Q2, with its date. |
+| RQ1-02 | The migration header that matched the hygiene `grep` is gone with RQ1-03. |
+| RQ1-03 | `instructor_user_id` and `dept_slot_instructor_idx` are folded into the single `0001_initial`; `makemigrations --check` is green and a fresh `migrate` works. |
+| RQ1-04 | Every number in §1 to §3 was measured again after the last code change. |
+| RQ1-05 | `instructor_user_id` is bounded to its column on upload and edit; a test sends a huge id to both and gets 400. |
+| RQ1-06 | The `instructor_unknown` message tells the Dept_Admin to choose an active Faculty member of the department or leave the instructor empty. |

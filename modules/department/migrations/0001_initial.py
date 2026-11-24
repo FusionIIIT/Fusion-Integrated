@@ -280,6 +280,7 @@ class Migration(migrations.Migration):
                 ('ends_at', models.TimeField()),
                 ('room', models.CharField(blank=True, max_length=40)),
                 ('updated_by', models.IntegerField()),
+                ('instructor_user_id', models.IntegerField(blank=True, null=True)),
                 ('department', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='timetable_slots', to='department.department')),
             ],
             options={
@@ -441,6 +442,10 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name='timetableslot',
             index=models.Index(fields=['department', 'day_of_week', 'starts_at'], name='dept_slot_week_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='timetableslot',
+            index=models.Index(fields=['department', 'instructor_user_id'], name='dept_slot_instructor_idx'),
         ),
         migrations.AddConstraint(
             model_name='timetableslot',

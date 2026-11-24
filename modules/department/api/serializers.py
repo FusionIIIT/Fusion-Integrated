@@ -301,7 +301,7 @@ class DeptTimetableSlotWriteSerializer(serializers.Serializer):
     ends_at = serializers.TimeField()
     room = serializers.CharField(required=False, allow_blank=True, max_length=40, default="")
     instructor_user_id = serializers.IntegerField(
-        required=False, allow_null=True, default=None, min_value=1
+        required=False, allow_null=True, default=None, min_value=1, max_value=MAX_ID
     )
 
 
@@ -328,7 +328,9 @@ class DeptTimetableSlotEditSerializer(serializers.Serializer):
     starts_at = serializers.TimeField(required=False)
     ends_at = serializers.TimeField(required=False)
     room = serializers.CharField(required=False, allow_blank=True, max_length=40)
-    instructor_user_id = serializers.IntegerField(required=False, allow_null=True, min_value=1)
+    instructor_user_id = serializers.IntegerField(
+        required=False, allow_null=True, min_value=1, max_value=MAX_ID
+    )
 
 
 class DeptLabResourceSerializer(serializers.ModelSerializer):

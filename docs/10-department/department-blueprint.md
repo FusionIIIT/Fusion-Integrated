@@ -706,7 +706,8 @@ These enforce what was approved; none changes a ruling.
 
 ## Change to Q2 (spec tests), approved by Student 2 on 2026-11-24
 
-This changes the Q2 ruling. Student 2 agreed to it in writing (quality report, §11).
+This changes the Q2 ruling. Student 2 approved it on WhatsApp, 2026-11-24 21:51 IST, in reply to
+this proposal: "Approved" (quality report, §11).
 
 Three spec tests (TC-DEPT-056, UC TC-DEPT-029, TC-DEPT-BR-037) could not run under Q2, and no spec
 test may stay skipped. AFR-DEPT-026 reads: "The system shall allow Faculty to view detailed profile
@@ -721,5 +722,5 @@ information for Students in the Faculty member's courses."
   Faculty view of a Student stays BASIC.
 - **Reading.** Course membership comes from the timetable, not from a roster; the IAM still has
   no roster endpoint. A slot with no programme or no batch year links no Students.
-- **Shared files.** A migration (`0002_timetable_slot_instructor`) and the regenerated
-  `openapi/fusion-integrated.v1.yaml`.
+- **Shared files.** The regenerated `openapi/fusion-integrated.v1.yaml`. The new column and
+  its index are folded into the module's single `0001_initial` migration (the module is unmerged).

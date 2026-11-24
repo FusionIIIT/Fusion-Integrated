@@ -73,7 +73,8 @@ def _check_instructors(dept, user_ids) -> None:
     )
     if wanted - known:
         raise DomainError(
-            "The instructor must be an active Faculty member of this department.",
+            "Choose an active Faculty member of this department as the instructor, "
+            "or leave the instructor empty.",
             code="instructor_unknown",
         )
 
