@@ -1,0 +1,304 @@
+# Django 5.2.17 migration, created 2026-11-22 13:50
+
+import django.db.models.deletion
+import django.db.models.functions.text
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='AuditEvent',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('action', models.CharField(max_length=60)),
+                ('object_type', models.CharField(max_length=40)),
+                ('object_id', models.BigIntegerField()),
+                ('actor_user_id', models.IntegerField(blank=True, null=True)),
+                ('club_id', models.BigIntegerField(blank=True, null=True)),
+                ('details', models.JSONField(blank=True, default=dict)),
+                ('at', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'db_table': 'gymkhana_audit_event',
+            },
+        ),
+        migrations.CreateModel(
+            name='Club',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('name', models.CharField(max_length=120)),
+                ('category', models.CharField(choices=[('technical', 'Technical'), ('sports', 'Sports'), ('cultural', 'Cultural')], max_length=16)),
+                ('description', models.TextField(max_length=4000)),
+                ('status', models.CharField(choices=[('open', 'Open'), ('confirmed', 'Confirmed')], default='open', max_length=12)),
+                ('faculty_councillor_user_id', models.IntegerField()),
+                ('created_by_user_id', models.IntegerField()),
+                ('approved_by_user_id', models.IntegerField(blank=True, null=True)),
+                ('approved_at', models.DateTimeField(blank=True, null=True)),
+            ],
+            options={
+                'db_table': 'gymkhana_club',
+                'indexes': [models.Index(fields=['status', 'name'], name='gym_club_status_name_idx'), models.Index(fields=['faculty_councillor_user_id'], name='gym_club_councillor_idx')],
+                'constraints': [models.UniqueConstraint(django.db.models.functions.text.Lower('name'), name='gym_club_name_unique_ci'), models.CheckConstraint(condition=models.Q(('category__in', ('technical', 'sports', 'cultural'))), name='gym_club_category_valid'), models.CheckConstraint(condition=models.Q(('status__in', ('open', 'confirmed'))), name='gym_club_status_valid'), models.CheckConstraint(condition=models.Q(models.Q(('approved_at__isnull', True), ('approved_by_user_id__isnull', True), ('status', 'open')), models.Q(('approved_at__isnull', False), ('approved_by_user_id__isnull', False), ('status', 'confirmed')), _connector='OR'), name='gym_club_confirmed_has_approver')],
+            },
+        ),
+        migrations.CreateModel(
+            name='NotificationOutbox',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('topic', models.CharField(max_length=60)),
+                ('dedupe_key', models.CharField(max_length=200, unique=True)),
+                ('recipient_user_id', models.IntegerField(blank=True, null=True)),
+                ('is_broadcast', models.BooleanField(default=False)),
+                ('subject', models.CharField(max_length=200)),
+                ('body', models.TextField()),
+                ('payload', models.JSONField(blank=True, default=dict)),
+                ('status', models.CharField(choices=[('pending', 'Pending'), ('sending', 'Sending'), ('sent', 'Sent'), ('failed', 'Failed')], default='pending', max_length=12)),
+                ('attempts', models.PositiveSmallIntegerField(default=0)),
+                ('last_error', models.CharField(blank=True, max_length=300)),
+                ('sent_at', models.DateTimeField(blank=True, null=True)),
+                ('claimed_at', models.DateTimeField(blank=True, null=True)),
+            ],
+            options={
+                'db_table': 'gymkhana_notification_outbox',
+                'indexes': [models.Index(fields=['status', 'created_at'], name='gym_outbox_pending_idx')],
+            },
+        ),
+        migrations.CreateModel(
+            name='Poll',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('title', models.CharField(max_length=200)),
+                ('description', models.TextField(max_length=4000)),
+                ('expires_on', models.DateField()),
+                ('created_by_user_id', models.IntegerField()),
+                ('club', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='polls', to='gymkhana.club')),
+            ],
+            options={
+                'db_table': 'gymkhana_poll',
+            },
+        ),
+        migrations.CreateModel(
+            name='PollChoice',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('label', models.CharField(max_length=200)),
+                ('position', models.PositiveSmallIntegerField()),
+                ('poll', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='choices', to='gymkhana.poll')),
+            ],
+            options={
+                'db_table': 'gymkhana_poll_choice',
+            },
+        ),
+        migrations.CreateModel(
+            name='PollTarget',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('batch_year', models.PositiveSmallIntegerField()),
+                ('discipline', models.CharField(blank=True, max_length=40)),
+                ('poll', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='targets', to='gymkhana.poll')),
+            ],
+            options={
+                'db_table': 'gymkhana_poll_target',
+            },
+        ),
+        migrations.CreateModel(
+            name='VenueDay',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('venue_name', models.CharField(max_length=120)),
+                ('date', models.DateField()),
+            ],
+            options={
+                'db_table': 'gymkhana_venue_day',
+                'constraints': [models.UniqueConstraint(fields=('venue_name', 'date'), name='gym_venueday_unique')],
+            },
+        ),
+        migrations.CreateModel(
+            name='VenueList',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('effective_from', models.DateTimeField()),
+                ('created_by_label', models.CharField(max_length=120)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'db_table': 'gymkhana_venue_list',
+                'constraints': [models.UniqueConstraint(fields=('effective_from',), name='gym_venuelist_effective_unique')],
+            },
+        ),
+        migrations.CreateModel(
+            name='Venue',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=120)),
+                ('venue_list', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='venues', to='gymkhana.venuelist')),
+            ],
+            options={
+                'db_table': 'gymkhana_venue',
+            },
+        ),
+        migrations.CreateModel(
+            name='Vote',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('user_id', models.IntegerField()),
+                ('cast_at', models.DateTimeField(auto_now_add=True)),
+                ('choice', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='votes', to='gymkhana.pollchoice')),
+                ('poll', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='votes', to='gymkhana.poll')),
+            ],
+            options={
+                'db_table': 'gymkhana_vote',
+            },
+        ),
+        migrations.CreateModel(
+            name='BudgetRequest',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('purpose', models.CharField(max_length=200)),
+                ('description', models.TextField(max_length=4000)),
+                ('amount', models.DecimalField(decimal_places=2, max_digits=12)),
+                ('document_link', models.CharField(max_length=300)),
+                ('document_file_id', models.CharField(max_length=200)),
+                ('status', models.CharField(default='open', max_length=8)),
+                ('submitted_by_user_id', models.IntegerField()),
+                ('club', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='budget_requests', to='gymkhana.club')),
+            ],
+            options={
+                'db_table': 'gymkhana_budget_request',
+                'indexes': [models.Index(fields=['club', 'created_at'], name='gym_budget_club_created_idx')],
+                'constraints': [models.CheckConstraint(condition=models.Q(('amount__gte', 0)), name='gym_budget_amount_non_negative'), models.CheckConstraint(condition=models.Q(('document_file_id', ''), _negated=True), name='gym_budget_document_present'), models.CheckConstraint(condition=models.Q(('status', 'open')), name='gym_budget_status_open')],
+            },
+        ),
+        migrations.CreateModel(
+            name='Booking',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('kind', models.CharField(choices=[('session', 'Session'), ('event', 'Event')], max_length=8)),
+                ('venue_name', models.CharField(max_length=120)),
+                ('date', models.DateField()),
+                ('start_time', models.TimeField()),
+                ('end_time', models.TimeField()),
+                ('description', models.TextField(max_length=4000)),
+                ('poster_link', models.CharField(blank=True, max_length=300)),
+                ('poster_file_id', models.CharField(blank=True, max_length=200)),
+                ('event_name', models.CharField(blank=True, max_length=200)),
+                ('faculty_user_id', models.IntegerField(blank=True, null=True)),
+                ('created_by_user_id', models.IntegerField()),
+                ('club', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='bookings', to='gymkhana.club')),
+            ],
+            options={
+                'db_table': 'gymkhana_booking',
+                'indexes': [models.Index(fields=['venue_name', 'date', 'start_time'], name='gym_booking_venue_date_idx'), models.Index(fields=['club', 'date'], name='gym_booking_club_date_idx')],
+                'constraints': [models.CheckConstraint(condition=models.Q(('start_time__lt', models.F('end_time'))), name='gym_booking_start_before_end'), models.CheckConstraint(condition=models.Q(('kind__in', ('session', 'event'))), name='gym_booking_kind_valid'), models.CheckConstraint(condition=models.Q(('kind', 'session'), models.Q(models.Q(('event_name', ''), _negated=True), models.Q(('poster_file_id', ''), _negated=True), ('faculty_user_id__isnull', False)), _connector='OR'), name='gym_booking_event_complete')],
+            },
+        ),
+        migrations.CreateModel(
+            name='EventReport',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('student_incharge_user_id', models.IntegerField()),
+                ('event_name', models.CharField(max_length=200)),
+                ('event_at', models.DateTimeField()),
+                ('description', models.TextField(max_length=4000)),
+                ('report_link', models.CharField(max_length=300)),
+                ('report_file_id', models.CharField(max_length=200)),
+                ('submitted_by_user_id', models.IntegerField()),
+                ('club', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='reports', to='gymkhana.club')),
+            ],
+            options={
+                'db_table': 'gymkhana_event_report',
+                'indexes': [models.Index(fields=['club', 'created_at'], name='gym_report_club_created_idx')],
+                'constraints': [models.CheckConstraint(condition=models.Q(('report_file_id', ''), _negated=True), name='gym_report_file_present')],
+            },
+        ),
+        migrations.CreateModel(
+            name='LeadershipAssignment',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('user_id', models.IntegerField()),
+                ('role', models.CharField(choices=[('coordinator', 'Coordinator'), ('co_coordinator', 'Co-coordinator')], max_length=16)),
+                ('valid_from', models.DateTimeField()),
+                ('valid_to', models.DateTimeField(blank=True, null=True)),
+                ('assigned_by_user_id', models.IntegerField()),
+                ('club', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='leaders', to='gymkhana.club')),
+            ],
+            options={
+                'db_table': 'gymkhana_leadership_assignment',
+                'indexes': [models.Index(condition=models.Q(('valid_to__isnull', True)), fields=['user_id'], name='gym_leader_current_user_idx')],
+                'constraints': [models.UniqueConstraint(condition=models.Q(('valid_to__isnull', True)), fields=('club', 'role'), name='gym_leader_one_current_per_role'), models.UniqueConstraint(condition=models.Q(('valid_to__isnull', True)), fields=('club', 'user_id'), name='gym_leader_distinct_people'), models.CheckConstraint(condition=models.Q(('role__in', ('coordinator', 'co_coordinator'))), name='gym_leader_role_valid'), models.CheckConstraint(condition=models.Q(('valid_to__isnull', True), ('valid_to__gte', models.F('valid_from')), _connector='OR'), name='gym_leader_valid_range')],
+            },
+        ),
+        migrations.CreateModel(
+            name='Membership',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('user_id', models.IntegerField()),
+                ('description', models.TextField(max_length=4000)),
+                ('status', models.CharField(choices=[('open', 'Open'), ('confirmed', 'Confirmed')], default='open', max_length=12)),
+                ('remarks', models.TextField(blank=True, max_length=1000)),
+                ('approved_by_user_id', models.IntegerField(blank=True, null=True)),
+                ('approved_at', models.DateTimeField(blank=True, null=True)),
+                ('club', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='memberships', to='gymkhana.club')),
+            ],
+            options={
+                'db_table': 'gymkhana_membership',
+                'indexes': [models.Index(fields=['club', 'status', 'created_at'], name='gym_membership_club_status_idx'), models.Index(fields=['user_id', 'created_at'], name='gym_membership_user_idx')],
+                'constraints': [models.UniqueConstraint(fields=('club', 'user_id'), name='gym_membership_one_per_club'), models.CheckConstraint(condition=models.Q(('status__in', ('open', 'confirmed'))), name='gym_membership_status_valid')],
+            },
+        ),
+        migrations.AddIndex(
+            model_name='poll',
+            index=models.Index(fields=['club', 'expires_on'], name='gym_poll_club_expiry_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='poll',
+            index=models.Index(fields=['expires_on'], name='gym_poll_expiry_idx'),
+        ),
+        migrations.AddConstraint(
+            model_name='pollchoice',
+            constraint=models.UniqueConstraint(fields=('poll', 'position'), name='gym_choice_position_unique'),
+        ),
+        migrations.AddIndex(
+            model_name='polltarget',
+            index=models.Index(fields=['batch_year', 'discipline'], name='gym_target_cohort_idx'),
+        ),
+        migrations.AddConstraint(
+            model_name='polltarget',
+            constraint=models.UniqueConstraint(fields=('poll', 'batch_year', 'discipline'), name='gym_target_unique'),
+        ),
+        migrations.AddConstraint(
+            model_name='venue',
+            constraint=models.UniqueConstraint(models.F('venue_list'), django.db.models.functions.text.Lower('name'), name='gym_venue_unique_in_list'),
+        ),
+        migrations.AddIndex(
+            model_name='vote',
+            index=models.Index(fields=['choice'], name='gym_vote_choice_idx'),
+        ),
+        migrations.AddConstraint(
+            model_name='vote',
+            constraint=models.UniqueConstraint(fields=('poll', 'user_id'), name='gym_vote_one_per_student'),
+        ),
+    ]

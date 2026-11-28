@@ -63,6 +63,1039 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSearchResult'
           description: ''
+  /api/v1/gymkhana/bookings:
+    get:
+      operationId: v1_gymkhana_bookings_list
+      description: Bookings of clubs the caller leads or belongs to.
+      parameters:
+      - in: query
+        name: club
+        schema:
+          type: integer
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - in: query
+        name: from
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: to
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGymkhanaBookingList'
+              examples:
+                Booking:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 9
+                      club: 7
+                      club_name: Robotics Club
+                      kind: session
+                      venue_name: LHTC 101
+                      date: '2026-12-01'
+                      start_time: '10:00:00'
+                      end_time: '11:00:00'
+                      description: Weekly build
+                      poster_link: ''
+                      event_name: ''
+                      faculty_user_id: null
+                      created_at: '2026-11-22T10:00:00+05:30'
+                  summary: booking
+          description: ''
+  /api/v1/gymkhana/budget-requests:
+    get:
+      operationId: v1_gymkhana_budget_requests_list
+      parameters:
+      - in: query
+        name: club
+        schema:
+          type: integer
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGymkhanaBudgetRequestList'
+              examples:
+                Budget:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 2
+                      club: 7
+                      club_name: Robotics Club
+                      purpose: Parts
+                      description: Motors
+                      amount: '4500.00'
+                      document_link: https://drive.google.com/file/d/1AbCdEfGhIjK/view
+                      status: open
+                      submitted_by_user_id: 1001
+                      created_at: '2026-11-22T10:00:00+05:30'
+                  summary: budget
+          description: ''
+  /api/v1/gymkhana/budget-requests/create:
+    post:
+      operationId: v1_gymkhana_budget_requests_create_create
+      description: UC-GYM-009.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymkhanaBudgetCreate'
+            examples:
+              Submit:
+                value:
+                  club_id: 7
+                  purpose: Parts
+                  description: Motors
+                  amount: '4500.00'
+                  document_url: https://drive.google.com/file/d/1AbCdEfGhIjK/view
+                summary: submit
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GymkhanaBudgetCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GymkhanaBudgetCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaBudgetRequest'
+              examples:
+                Budget:
+                  value:
+                    id: 2
+                    club: 7
+                    club_name: Robotics Club
+                    purpose: Parts
+                    description: Motors
+                    amount: '4500.00'
+                    document_link: https://drive.google.com/file/d/1AbCdEfGhIjK/view
+                    status: open
+                    submitted_by_user_id: 1001
+                    created_at: '2026-11-22T10:00:00+05:30'
+                  summary: budget
+          description: ''
+  /api/v1/gymkhana/clubs:
+    get:
+      operationId: v1_gymkhana_clubs_list
+      description: Clubs in scope; Student Admin sees open ones too.
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGymkhanaClubList'
+              examples:
+                Club:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 7
+                      name: Robotics Club
+                      category: technical
+                      description: Builds robots.
+                      status: open
+                      faculty_councillor_user_id: 2001
+                      approved_at: null
+                      created_at: '2026-11-22T10:00:00+05:30'
+                      leaders:
+                        coordinator: 1001
+                        co_coordinator: 1002
+                      my_membership: null
+                  summary: club
+          description: ''
+  /api/v1/gymkhana/clubs/{id}/approve:
+    post:
+      operationId: v1_gymkhana_clubs_approve_create
+      description: UC-GYM-011.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaClub'
+              examples:
+                Club:
+                  value:
+                    id: 7
+                    name: Robotics Club
+                    category: technical
+                    description: Builds robots.
+                    status: open
+                    faculty_councillor_user_id: 2001
+                    approved_at: null
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    leaders:
+                      coordinator: 1001
+                      co_coordinator: 1002
+                    my_membership: null
+                  summary: club
+                Refused:
+                  value:
+                    error:
+                      code: venue_slot_taken
+                      message: LHTC 101 is already booked from 10:00 to 11:00.
+                      details: []
+                      request_id: …
+                  summary: refused
+          description: ''
+  /api/v1/gymkhana/clubs/{id}/leadership:
+    post:
+      operationId: v1_gymkhana_clubs_leadership_create
+      description: UC-GYM-008.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymkhanaLeadership'
+            examples:
+              Change:
+                value:
+                  coordinator_user_id: 1003
+                  co_coordinator_user_id: 1004
+                summary: change
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GymkhanaLeadership'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GymkhanaLeadership'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaLeadersOut'
+              examples:
+                Leaders:
+                  value:
+                    coordinator: 1003
+                    co_coordinator: 1004
+                  summary: leaders
+          description: ''
+  /api/v1/gymkhana/clubs/create:
+    post:
+      operationId: v1_gymkhana_clubs_create_create
+      description: UC-GYM-001.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymkhanaClubCreate'
+            examples:
+              Create:
+                value:
+                  name: Robotics Club
+                  category: technical
+                  description: Builds robots.
+                  coordinator_user_id: 1001
+                  co_coordinator_user_id: 1002
+                  faculty_councillor_user_id: 2001
+                summary: create
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GymkhanaClubCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GymkhanaClubCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaClub'
+              examples:
+                Club:
+                  value:
+                    id: 7
+                    name: Robotics Club
+                    category: technical
+                    description: Builds robots.
+                    status: open
+                    faculty_councillor_user_id: 2001
+                    approved_at: null
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    leaders:
+                      coordinator: 1001
+                      co_coordinator: 1002
+                    my_membership: null
+                  summary: club
+          description: ''
+  /api/v1/gymkhana/event-reports:
+    get:
+      operationId: v1_gymkhana_event_reports_list
+      description: UC-GYM-012 and the club's own reports.
+      parameters:
+      - in: query
+        name: club
+        schema:
+          type: integer
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGymkhanaEventReportList'
+              examples:
+                Report:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 5
+                      club: 7
+                      club_name: Robotics Club
+                      student_incharge_user_id: 1001
+                      event_name: RoboWars
+                      event_at: '2026-11-20T16:00:00+05:30'
+                      description: Went well
+                      report_link: https://drive.google.com/file/d/1AbCdEfGhIjK/view
+                      submitted_by_user_id: 1001
+                      created_at: '2026-11-22T10:00:00+05:30'
+                  summary: report
+          description: ''
+  /api/v1/gymkhana/event-reports/{id}:
+    get:
+      operationId: v1_gymkhana_event_reports_retrieve
+      description: 'BR-GYM-021: any other club''s report is a 404.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaEventReport'
+              examples:
+                Report:
+                  value:
+                    id: 5
+                    club: 7
+                    club_name: Robotics Club
+                    student_incharge_user_id: 1001
+                    event_name: RoboWars
+                    event_at: '2026-11-20T16:00:00+05:30'
+                    description: Went well
+                    report_link: https://drive.google.com/file/d/1AbCdEfGhIjK/view
+                    submitted_by_user_id: 1001
+                    created_at: '2026-11-22T10:00:00+05:30'
+                  summary: report
+          description: ''
+  /api/v1/gymkhana/event-reports/create:
+    post:
+      operationId: v1_gymkhana_event_reports_create_create
+      description: UC-GYM-010.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymkhanaEventReportCreate'
+            examples:
+              Submit:
+                value:
+                  club_id: 7
+                  student_incharge_user_id: 1001
+                  event_name: RoboWars
+                  event_at: '2026-11-20T16:00:00+05:30'
+                  description: Went well
+                  report_url: https://drive.google.com/file/d/1AbCdEfGhIjK/view
+                summary: submit
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GymkhanaEventReportCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GymkhanaEventReportCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaEventReport'
+              examples:
+                Report:
+                  value:
+                    id: 5
+                    club: 7
+                    club_name: Robotics Club
+                    student_incharge_user_id: 1001
+                    event_name: RoboWars
+                    event_at: '2026-11-20T16:00:00+05:30'
+                    description: Went well
+                    report_link: https://drive.google.com/file/d/1AbCdEfGhIjK/view
+                    submitted_by_user_id: 1001
+                    created_at: '2026-11-22T10:00:00+05:30'
+                  summary: report
+          description: ''
+  /api/v1/gymkhana/events:
+    post:
+      operationId: v1_gymkhana_events_create
+      description: UC-GYM-003.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymkhanaEventCreate'
+            examples:
+              Event:
+                value:
+                  club_id: 7
+                  event_name: RoboWars
+                  venue: Open Air Theatre
+                  date: '2026-12-05'
+                  start_time: '16:00'
+                  end_time: '19:00'
+                  description: Annual contest
+                  poster_url: https://drive.google.com/file/d/1AbCdEfGhIjK/view
+                summary: event
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GymkhanaEventCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GymkhanaEventCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaBooking'
+              examples:
+                Booking:
+                  value:
+                    id: 9
+                    club: 7
+                    club_name: Robotics Club
+                    kind: session
+                    venue_name: LHTC 101
+                    date: '2026-12-01'
+                    start_time: '10:00:00'
+                    end_time: '11:00:00'
+                    description: Weekly build
+                    poster_link: ''
+                    event_name: ''
+                    faculty_user_id: null
+                    created_at: '2026-11-22T10:00:00+05:30'
+                  summary: booking
+                Refused:
+                  value:
+                    error:
+                      code: venue_slot_taken
+                      message: LHTC 101 is already booked from 10:00 to 11:00.
+                      details: []
+                      request_id: …
+                  summary: refused
+          description: ''
+  /api/v1/gymkhana/me/clubs:
+    get:
+      operationId: v1_gymkhana_me_clubs_retrieve
+      description: Clubs the caller leads and confirmed clubs they belong to.
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaMyClubs'
+              examples:
+                Mine:
+                  value:
+                    leading: []
+                    member_of: []
+                  summary: mine
+          description: ''
+  /api/v1/gymkhana/memberships:
+    get:
+      operationId: v1_gymkhana_memberships_list
+      description: Own applications and applications to clubs the caller leads (AFR-GYM-020).
+      parameters:
+      - in: query
+        name: club
+        schema:
+          type: integer
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGymkhanaMembershipList'
+              examples:
+                Membership:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 3
+                      club: 7
+                      club_name: Robotics Club
+                      user_id: 1005
+                      description: I build drones.
+                      status: open
+                      remarks: ''
+                      approved_at: null
+                      created_at: '2026-11-22T10:00:00+05:30'
+                  summary: membership
+          description: ''
+  /api/v1/gymkhana/memberships/apply:
+    post:
+      operationId: v1_gymkhana_memberships_apply_create
+      description: UC-GYM-004.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymkhanaApply'
+            examples:
+              Apply:
+                value:
+                  club_id: 7
+                  description: I build drones.
+                summary: apply
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GymkhanaApply'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GymkhanaApply'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaMembership'
+              examples:
+                Membership:
+                  value:
+                    id: 3
+                    club: 7
+                    club_name: Robotics Club
+                    user_id: 1005
+                    description: I build drones.
+                    status: open
+                    remarks: ''
+                    approved_at: null
+                    created_at: '2026-11-22T10:00:00+05:30'
+                  summary: membership
+          description: ''
+  /api/v1/gymkhana/memberships/approve:
+    post:
+      operationId: v1_gymkhana_memberships_approve_create
+      description: 'UC-GYM-005: each id is decided independently.'
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymkhanaApprove'
+            examples:
+              Approve:
+                value:
+                  ids:
+                  - 3
+                  - 4
+                  remarks: Welcome
+                summary: approve
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GymkhanaApprove'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GymkhanaApprove'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GymkhanaApprovalOutcome'
+              examples:
+                Outcomes:
+                  value:
+                  - - id: 3
+                      outcome: approved
+                      code: approved
+                      message: Approved.
+                  summary: outcomes
+          description: ''
+  /api/v1/gymkhana/people:
+    get:
+      operationId: v1_gymkhana_people_list
+      description: For Student Admin and current Club Heads choosing a person.
+      parameters:
+      - in: query
+        name: kind
+        schema:
+          type: string
+      - in: query
+        name: q
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GymkhanaPerson'
+              examples:
+                People:
+                  value:
+                  - - user_id: 1001
+                      username: stu00001
+                      display_name: Student One
+                      kind: student
+                  summary: people
+          description: ''
+  /api/v1/gymkhana/polls:
+    get:
+      operationId: v1_gymkhana_polls_list
+      description: Unexpired polls whose audience includes the caller (AFR-GYM-026).
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGymkhanaPollList'
+              examples:
+                Poll:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 4
+                      club: 7
+                      club_name: Robotics Club
+                      title: Next workshop
+                      description: Pick a topic
+                      expires_on: '2026-12-10'
+                      created_at: '2026-11-22T10:00:00+05:30'
+                      choices:
+                      - id: 1
+                        label: Drones
+                      - id: 2
+                        label: ROS
+                      my_choice_id: null
+                  summary: poll
+          description: ''
+  /api/v1/gymkhana/polls/{id}/votes:
+    post:
+      operationId: v1_gymkhana_polls_votes_create
+      description: UC-GYM-007.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymkhanaVote'
+            examples:
+              Vote:
+                value:
+                  choice_id: 1
+                summary: vote
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GymkhanaVote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GymkhanaVote'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaVote'
+              examples:
+                Recorded:
+                  value:
+                    choice_id: 1
+                  summary: recorded
+          description: ''
+  /api/v1/gymkhana/polls/create:
+    post:
+      operationId: v1_gymkhana_polls_create_create
+      description: UC-GYM-006.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymkhanaPollCreate'
+            examples:
+              Poll:
+                value:
+                  club_id: 7
+                  title: Next workshop
+                  description: Pick a topic
+                  expires_on: '2026-12-10'
+                  choices:
+                  - Drones
+                  - ROS
+                  targets:
+                  - batch_year: 2023
+                    discipline: CSE
+                summary: poll
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GymkhanaPollCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GymkhanaPollCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaPoll'
+              examples:
+                Poll:
+                  value:
+                    id: 4
+                    club: 7
+                    club_name: Robotics Club
+                    title: Next workshop
+                    description: Pick a topic
+                    expires_on: '2026-12-10'
+                    created_at: '2026-11-22T10:00:00+05:30'
+                    choices:
+                    - id: 1
+                      label: Drones
+                    - id: 2
+                      label: ROS
+                    my_choice_id: null
+                  summary: poll
+          description: ''
+  /api/v1/gymkhana/polls/managed:
+    get:
+      operationId: v1_gymkhana_polls_managed_list
+      description: Polls of clubs the caller leads, with counts only (ruling R8).
+      parameters:
+      - in: query
+        name: club
+        schema:
+          type: integer
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGymkhanaManagedPollList'
+              examples:
+                Managed:
+                  value:
+                    next: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+                    previous: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+                    results:
+                    - id: 4
+                      title: Next workshop
+                      choices:
+                      - id: 1
+                        label: Drones
+                        votes: 3
+                      total_votes: 3
+                  summary: managed
+          description: ''
+  /api/v1/gymkhana/sessions:
+    post:
+      operationId: v1_gymkhana_sessions_create
+      description: UC-GYM-002.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GymkhanaSessionCreate'
+            examples:
+              Session:
+                value:
+                  club_id: 7
+                  venue: LHTC 101
+                  date: '2026-12-01'
+                  start_time: '10:00'
+                  end_time: '11:00'
+                  description: Weekly build
+                  poster_url: ''
+                summary: session
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GymkhanaSessionCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GymkhanaSessionCreate'
+        required: true
+      security:
+      - iamSession: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaBooking'
+              examples:
+                Booking:
+                  value:
+                    id: 9
+                    club: 7
+                    club_name: Robotics Club
+                    kind: session
+                    venue_name: LHTC 101
+                    date: '2026-12-01'
+                    start_time: '10:00:00'
+                    end_time: '11:00:00'
+                    description: Weekly build
+                    poster_link: ''
+                    event_name: ''
+                    faculty_user_id: null
+                    created_at: '2026-11-22T10:00:00+05:30'
+                  summary: booking
+                Refused:
+                  value:
+                    error:
+                      code: venue_slot_taken
+                      message: LHTC 101 is already booked from 10:00 to 11:00.
+                      details: []
+                      request_id: …
+                  summary: refused
+          description: ''
+  /api/v1/gymkhana/venues:
+    get:
+      operationId: v1_gymkhana_venues_retrieve
+      description: 'BR-GYM-020: the venues that can be booked now.'
+      tags:
+      - v1
+      security:
+      - iamSession: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GymkhanaVenueList'
+              examples:
+                Venues:
+                  value:
+                    venues:
+                    - LHTC 101
+                    - Open Air Theatre
+                  summary: venues
+          description: ''
   /api/v1/me:
     get:
       operationId: v1_me_retrieve
@@ -2082,6 +3115,12 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      type: string
+      enum:
+      - technical
+      - sports
+      - cultural
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -2423,6 +3462,726 @@ components:
       - fee_reference
       - season
       - user_id
+    GymkhanaApply:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        description:
+          type: string
+          maxLength: 4000
+      required:
+      - club_id
+      - description
+    GymkhanaApprovalOutcome:
+      type: object
+      properties:
+        id:
+          type: integer
+        outcome:
+          $ref: '#/components/schemas/GymkhanaApprovalOutcomeOutcomeEnum'
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - id
+      - message
+      - outcome
+    GymkhanaApprovalOutcomeOutcomeEnum:
+      type: string
+      enum:
+      - approved
+      - refused
+    GymkhanaApprove:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: integer
+          maxItems: 100
+        remarks:
+          type: string
+          default: ''
+          maxLength: 1000
+      required:
+      - ids
+    GymkhanaBooking:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaBookingKindEnum'
+          readOnly: true
+        venue_name:
+          type: string
+          readOnly: true
+        date:
+          type: string
+          format: date
+          readOnly: true
+        start_time:
+          type: string
+          format: time
+          readOnly: true
+        end_time:
+          type: string
+          format: time
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        poster_link:
+          type: string
+          readOnly: true
+        event_name:
+          type: string
+          readOnly: true
+        faculty_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - club
+      - club_name
+      - created_at
+      - date
+      - description
+      - end_time
+      - event_name
+      - faculty_user_id
+      - id
+      - kind
+      - poster_link
+      - start_time
+      - venue_name
+    GymkhanaBookingKindEnum:
+      type: string
+      enum:
+      - session
+      - event
+    GymkhanaBudgetCreate:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        purpose:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        document_url:
+          type: string
+          maxLength: 500
+      required:
+      - amount
+      - club_id
+      - description
+      - document_url
+      - purpose
+    GymkhanaBudgetRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        purpose:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        document_link:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaBudgetRequestStatusEnum'
+          readOnly: true
+        submitted_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - club
+      - club_name
+      - created_at
+      - description
+      - document_link
+      - id
+      - purpose
+      - status
+      - submitted_by_user_id
+    GymkhanaBudgetRequestStatusEnum:
+      type: string
+      enum:
+      - open
+    GymkhanaChoiceOut:
+      type: object
+      properties:
+        id:
+          type: integer
+        label:
+          type: string
+        votes:
+          type: integer
+      required:
+      - id
+      - label
+    GymkhanaClub:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CategoryEnum'
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaClubStatusEnum'
+          readOnly: true
+        faculty_councillor_user_id:
+          type: integer
+          readOnly: true
+        councillor_name:
+          type: string
+          readOnly: true
+        approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        leaders:
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaClubLeaders'
+          readOnly: true
+        leader_names:
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaClubLeaderNames'
+          readOnly: true
+        my_membership:
+          nullable: true
+          readOnly: true
+          oneOf:
+          - $ref: '#/components/schemas/MyMembershipEnum'
+          - $ref: '#/components/schemas/NullEnum'
+      required:
+      - approved_at
+      - category
+      - councillor_name
+      - created_at
+      - description
+      - faculty_councillor_user_id
+      - id
+      - leader_names
+      - leaders
+      - my_membership
+      - name
+      - status
+    GymkhanaClubCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        category:
+          type: string
+          maxLength: 16
+        description:
+          type: string
+          maxLength: 4000
+        coordinator_user_id:
+          type: integer
+        co_coordinator_user_id:
+          type: integer
+        faculty_councillor_user_id:
+          type: integer
+      required:
+      - category
+      - co_coordinator_user_id
+      - coordinator_user_id
+      - description
+      - faculty_councillor_user_id
+      - name
+    GymkhanaClubLeaderNames:
+      type: object
+      properties:
+        coordinator:
+          type: string
+        co_coordinator:
+          type: string
+    GymkhanaClubLeaders:
+      type: object
+      properties:
+        coordinator:
+          type: integer
+        co_coordinator:
+          type: integer
+    GymkhanaClubStatusEnum:
+      type: string
+      enum:
+      - open
+      - confirmed
+    GymkhanaEventCreate:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        venue:
+          type: string
+          maxLength: 120
+        date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+        description:
+          type: string
+          maxLength: 4000
+        poster_url:
+          type: string
+          maxLength: 500
+        event_name:
+          type: string
+          maxLength: 200
+      required:
+      - club_id
+      - date
+      - description
+      - end_time
+      - event_name
+      - poster_url
+      - start_time
+      - venue
+    GymkhanaEventReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        student_incharge_user_id:
+          type: integer
+          readOnly: true
+        student_incharge_name:
+          type: string
+          readOnly: true
+        event_name:
+          type: string
+          readOnly: true
+        event_at:
+          type: string
+          format: date-time
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        report_link:
+          type: string
+          readOnly: true
+        submitted_by_user_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - club
+      - club_name
+      - created_at
+      - description
+      - event_at
+      - event_name
+      - id
+      - report_link
+      - student_incharge_name
+      - student_incharge_user_id
+      - submitted_by_user_id
+    GymkhanaEventReportCreate:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        student_incharge_user_id:
+          type: integer
+        event_name:
+          type: string
+          maxLength: 200
+        event_at:
+          type: string
+          format: date-time
+        description:
+          type: string
+          maxLength: 4000
+        report_url:
+          type: string
+          maxLength: 500
+      required:
+      - club_id
+      - description
+      - event_at
+      - event_name
+      - report_url
+      - student_incharge_user_id
+    GymkhanaLeadersOut:
+      type: object
+      properties:
+        coordinator:
+          type: integer
+        co_coordinator:
+          type: integer
+      required:
+      - co_coordinator
+      - coordinator
+    GymkhanaLeadership:
+      type: object
+      properties:
+        coordinator_user_id:
+          type: integer
+        co_coordinator_user_id:
+          type: integer
+      required:
+      - co_coordinator_user_id
+      - coordinator_user_id
+    GymkhanaManagedPoll:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        expires_on:
+          type: string
+          format: date
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaChoiceOut'
+          readOnly: true
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaTargetOut'
+          readOnly: true
+        total_votes:
+          type: integer
+          readOnly: true
+      required:
+      - choices
+      - club
+      - club_name
+      - created_at
+      - description
+      - expires_on
+      - id
+      - targets
+      - title
+      - total_votes
+    GymkhanaMembership:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        applicant_name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaMembershipStatusEnum'
+          readOnly: true
+        remarks:
+          type: string
+          readOnly: true
+        approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - applicant_name
+      - approved_at
+      - club
+      - club_name
+      - created_at
+      - description
+      - id
+      - remarks
+      - status
+      - user_id
+    GymkhanaMembershipStatusEnum:
+      type: string
+      enum:
+      - open
+      - confirmed
+    GymkhanaMyClubs:
+      type: object
+      properties:
+        leading:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaClub'
+        member_of:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaClub'
+      required:
+      - leading
+      - member_of
+    GymkhanaPerson:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+        display_name:
+          type: string
+        kind:
+          $ref: '#/components/schemas/GymkhanaPersonKindEnum'
+      required:
+      - display_name
+      - kind
+      - user_id
+      - username
+    GymkhanaPersonKindEnum:
+      type: string
+      enum:
+      - student
+      - faculty
+    GymkhanaPoll:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        club:
+          type: integer
+          readOnly: true
+        club_name:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        expires_on:
+          type: string
+          format: date
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaChoiceOut'
+          readOnly: true
+        my_choice_id:
+          type: integer
+          nullable: true
+          readOnly: true
+      required:
+      - choices
+      - club
+      - club_name
+      - created_at
+      - description
+      - expires_on
+      - id
+      - my_choice_id
+      - title
+    GymkhanaPollCreate:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        expires_on:
+          type: string
+          format: date
+        choices:
+          type: array
+          items:
+            type: string
+            maxLength: 200
+          maxItems: 50
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaTarget'
+      required:
+      - choices
+      - club_id
+      - description
+      - expires_on
+      - targets
+      - title
+    GymkhanaSessionCreate:
+      type: object
+      properties:
+        club_id:
+          type: integer
+        venue:
+          type: string
+          maxLength: 120
+        date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+        description:
+          type: string
+          maxLength: 4000
+        poster_url:
+          type: string
+          default: ''
+          maxLength: 500
+      required:
+      - club_id
+      - date
+      - description
+      - end_time
+      - start_time
+      - venue
+    GymkhanaTarget:
+      type: object
+      properties:
+        batch_year:
+          type: integer
+        discipline:
+          type: string
+          default: ''
+          maxLength: 40
+      required:
+      - batch_year
+    GymkhanaTargetOut:
+      type: object
+      properties:
+        batch_year:
+          type: integer
+        discipline:
+          type: string
+      required:
+      - batch_year
+      - discipline
+    GymkhanaVenueList:
+      type: object
+      properties:
+        venues:
+          type: array
+          items:
+            type: string
+      required:
+      - venues
+    GymkhanaVote:
+      type: object
+      properties:
+        choice_id:
+          type: integer
+      required:
+      - choice_id
     IncidentRecorded:
       type: object
       properties:
@@ -2671,6 +4430,11 @@ components:
       description: |-
         * `online` - Online
         * `offline` - Offline
+    MyMembershipEnum:
+      type: string
+      enum:
+      - open
+      - confirmed
     NavGroup:
       type: object
       description: |-
@@ -2732,6 +4496,9 @@ components:
       - is_late
       - message
       - record
+    NullEnum:
+      enum:
+      - null
     OffCampusRecord:
       type: object
       properties:
@@ -2943,6 +4710,139 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Company'
+    PaginatedGymkhanaBookingList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaBooking'
+    PaginatedGymkhanaBudgetRequestList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaBudgetRequest'
+    PaginatedGymkhanaClubList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaClub'
+    PaginatedGymkhanaEventReportList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaEventReport'
+    PaginatedGymkhanaManagedPollList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaManagedPoll'
+    PaginatedGymkhanaMembershipList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaMembership'
+    PaginatedGymkhanaPollList:
+      type: object
+      required:
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cD00ODY%3D"
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?cursor=cj0xJnA9NDg3
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/GymkhanaPoll'
     PaginatedInterviewRoundList:
       type: object
       required:

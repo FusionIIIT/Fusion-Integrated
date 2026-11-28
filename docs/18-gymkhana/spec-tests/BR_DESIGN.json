@@ -1,0 +1,416 @@
+[
+  {
+    "test_id": "BR-GYM-001-01",
+    "source_id": "BR-GYM-001 valid student leadership",
+    "purpose": "Accept valid student assignments for coordinator, co-coordinator, and replacement leaders.",
+    "preconditions": "A club creation or leadership change is available; the selected coordinator, co-coordinator, and replacement leader are valid students.",
+    "action_or_input": "Create a club or change its leadership using valid student assignments.",
+    "expected_result": "The operation accepts the student leadership assignments.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-001-02",
+    "source_id": "BR-GYM-001 invalid student leadership",
+    "purpose": "Reject an invalid student leadership assignment.",
+    "preconditions": "A club creation or leadership change is available; at least one selected leader is not a valid student.",
+    "action_or_input": "Submit the operation with the invalid student assignment.",
+    "expected_result": "The operation is rejected or stopped.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-002-01",
+    "source_id": "BR-GYM-002 valid faculty councillor",
+    "purpose": "Accept a valid faculty member as Club Faculty Councillor.",
+    "preconditions": "A faculty councillor can be assigned; the selected person is a valid faculty member.",
+    "action_or_input": "Assign or use the valid faculty member as Club Faculty Councillor.",
+    "expected_result": "The assignment or use is accepted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-002-02",
+    "source_id": "BR-GYM-002 invalid faculty councillor",
+    "purpose": "Reject an invalid faculty councillor.",
+    "preconditions": "A faculty councillor can be assigned or used; the selected person is not a valid faculty member.",
+    "action_or_input": "Assign or use the invalid faculty member as Club Faculty Councillor.",
+    "expected_result": "The operation is rejected or stopped.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-003-01",
+    "source_id": "BR-GYM-003 allowed category",
+    "purpose": "Accept each allowed club category.",
+    "preconditions": "Club creation is available.",
+    "action_or_input": "Submit club creation using each of Technical, Sports, and Cultural as the category.",
+    "expected_result": "Each club category value is accepted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-003-02",
+    "source_id": "BR-GYM-003 disallowed category",
+    "purpose": "Reject a category outside the allowed values.",
+    "preconditions": "Club creation is available.",
+    "action_or_input": "Submit club creation with a category other than Technical, Sports, or Cultural.",
+    "expected_result": "The category is not accepted.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-004-01",
+    "source_id": "BR-GYM-004 creation transition",
+    "purpose": "Verify that a newly created club starts open.",
+    "preconditions": "A Student Admin can create a club with valid required assignments.",
+    "action_or_input": "Create a new club.",
+    "expected_result": "The created club has open status.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-GYM-004-02",
+    "source_id": "BR-GYM-004 approval transition",
+    "purpose": "Verify that Student Admin approval confirms an open club.",
+    "preconditions": "An open club exists and the actor is Student Admin.",
+    "action_or_input": "Approve the open club.",
+    "expected_result": "The club status changes to confirmed.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-GYM-005-01",
+    "source_id": "BR-GYM-005 valid time range",
+    "purpose": "Accept a booking whose start time is earlier than its end time.",
+    "preconditions": "A session or event can be booked at a configured venue and there is no conflicting booking.",
+    "action_or_input": "Submit a booking with start time earlier than end time.",
+    "expected_result": "The booking is accepted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-005-02",
+    "source_id": "BR-GYM-005 invalid time range",
+    "purpose": "Reject a booking whose start time is not earlier than its end time.",
+    "preconditions": "A session or event booking is available.",
+    "action_or_input": "Submit a booking with start time equal to or later than end time.",
+    "expected_result": "The booking is rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-006-01",
+    "source_id": "BR-GYM-006 no overlap",
+    "purpose": "Accept a booking that does not overlap another booking in the same venue on the same date.",
+    "preconditions": "An existing session or event is booked at a venue on a date; the proposed booking uses that venue and date but does not overlap its time window.",
+    "action_or_input": "Submit the non-overlapping session or event booking.",
+    "expected_result": "The booking is accepted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-006-02",
+    "source_id": "BR-GYM-006 session-session overlap",
+    "purpose": "Prevent overlapping sessions in the same venue on the same date.",
+    "preconditions": "A session exists at a venue on a date.",
+    "action_or_input": "Submit another session at the same venue and date with an overlapping time window.",
+    "expected_result": "The booking is rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-006-03",
+    "source_id": "BR-GYM-006 event-event overlap",
+    "purpose": "Prevent overlapping events in the same venue on the same date.",
+    "preconditions": "An event exists at a venue on a date.",
+    "action_or_input": "Submit another event at the same venue and date with an overlapping time window.",
+    "expected_result": "The booking is rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-006-04",
+    "source_id": "BR-GYM-006 session-event overlap",
+    "purpose": "Prevent an event from overlapping a session in the same venue on the same date.",
+    "preconditions": "A session exists at a venue on a date.",
+    "action_or_input": "Submit an event at the same venue and date with an overlapping time window.",
+    "expected_result": "The booking is rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-006-05",
+    "source_id": "BR-GYM-006 event-session overlap",
+    "purpose": "Prevent a session from overlapping an event in the same venue on the same date.",
+    "preconditions": "An event exists at a venue on a date.",
+    "action_or_input": "Submit a session at the same venue and date with an overlapping time window.",
+    "expected_result": "The booking is rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-007-01",
+    "source_id": "BR-GYM-007 confirmed club eligibility",
+    "purpose": "Allow a student to apply to a confirmed club.",
+    "preconditions": "The club is confirmed and the student has no application to that club.",
+    "action_or_input": "Submit a membership application to the confirmed club.",
+    "expected_result": "The application is permitted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-007-02",
+    "source_id": "BR-GYM-007 non-confirmed club eligibility",
+    "purpose": "Prevent a student from applying to a club that is not confirmed.",
+    "preconditions": "The club is open.",
+    "action_or_input": "Submit a membership application to the open club.",
+    "expected_result": "The application is not permitted.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-008-01",
+    "source_id": "BR-GYM-008 different-club application",
+    "purpose": "Allow applications to different clubs.",
+    "preconditions": "A student has an application or membership in one club; another club is confirmed and the student has no application to it.",
+    "action_or_input": "Apply to the other confirmed club.",
+    "expected_result": "The application is not blocked solely because of the student's application or membership in the first club.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-009-01",
+    "source_id": "BR-GYM-009 duplicate same-club application",
+    "purpose": "Reject a duplicate application to the same club without changing membership state.",
+    "preconditions": "A student already has an application to a confirmed club.",
+    "action_or_input": "Submit another membership application to that same club.",
+    "expected_result": "The duplicate is rejected and the existing membership state remains unchanged.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-010-01",
+    "source_id": "BR-GYM-010 coordinator authorization",
+    "purpose": "Authorize the club coordinator to perform Club Head operations for that club.",
+    "preconditions": "The actor is the coordinator of the club.",
+    "action_or_input": "Invoke a Club Head operation for that club.",
+    "expected_result": "The operation is authorized.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-GYM-010-02",
+    "source_id": "BR-GYM-010 co-coordinator authorization",
+    "purpose": "Authorize the club co-coordinator to perform Club Head operations for that club.",
+    "preconditions": "The actor is the co-coordinator of the club.",
+    "action_or_input": "Invoke a Club Head operation for that club.",
+    "expected_result": "The operation is authorized.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-GYM-010-03",
+    "source_id": "BR-GYM-010 non-Club Head authorization",
+    "purpose": "Deny Club Head operations to a person who is neither coordinator nor co-coordinator of that club.",
+    "preconditions": "The actor is not the coordinator or co-coordinator of the club.",
+    "action_or_input": "Invoke a Club Head operation for that club.",
+    "expected_result": "The operation is not authorized.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-GYM-011-01",
+    "source_id": "BR-GYM-011 approval transition with remarks",
+    "purpose": "Confirm a pending membership application and retain optional remarks when supplied.",
+    "preconditions": "A pending application has open status; the actor is an applicable Club Head.",
+    "action_or_input": "Approve the application and supply optional remarks.",
+    "expected_result": "The application status changes from open to confirmed and the remarks are retained.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-GYM-011-02",
+    "source_id": "BR-GYM-011 approval transition without remarks",
+    "purpose": "Confirm a pending membership application when optional remarks are omitted.",
+    "preconditions": "A pending application has open status; the actor is an applicable Club Head.",
+    "action_or_input": "Approve the application without remarks.",
+    "expected_result": "The application status changes from open to confirmed.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-GYM-012-01",
+    "source_id": "BR-GYM-012 minimum choice threshold met",
+    "purpose": "Accept a poll with at least two choices.",
+    "preconditions": "A Club Head can create a poll.",
+    "action_or_input": "Submit a poll with two choices.",
+    "expected_result": "The poll is accepted.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-GYM-012-02",
+    "source_id": "BR-GYM-012 minimum choice threshold unmet",
+    "purpose": "Reject a poll with fewer than two choices.",
+    "preconditions": "A Club Head can create a poll.",
+    "action_or_input": "Submit a poll with fewer than two choices.",
+    "expected_result": "The poll is not created.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-GYM-013-01",
+    "source_id": "BR-GYM-013 selected batch and branch targeting",
+    "purpose": "Route poll notification and access according to selected batch and branch groups.",
+    "preconditions": "A Club Head can create a poll and student groups can be selected by batch and branch.",
+    "action_or_input": "Create a poll targeting selected batch and branch groups, then evaluate notification and access for students in and outside those groups.",
+    "expected_result": "The selected groups determine the intended notification recipients and poll access audience; students outside the target audience are not treated as intended recipients or eligible for access.",
+    "test_type": "routing"
+  },
+  {
+    "test_id": "BR-GYM-013-02",
+    "source_id": "BR-GYM-013 all-branches selection exception",
+    "purpose": "Support a branch selection representing all branches where that option is supported.",
+    "preconditions": "Poll creation supports a branch selection representing all branches.",
+    "action_or_input": "Create a poll selecting the all-branches option for a batch.",
+    "expected_result": "The poll audience includes the selected batch across all branches.",
+    "test_type": "routing"
+  },
+  {
+    "test_id": "BR-GYM-014-01",
+    "source_id": "BR-GYM-014 active unexpired eligible poll",
+    "purpose": "Allow an eligible student to access or vote in an active, unexpired poll.",
+    "preconditions": "The poll is active and unexpired; the student belongs to its selected target audience.",
+    "action_or_input": "Request poll details or submit a vote.",
+    "expected_result": "Participation is allowed, subject to the one-vote-per-poll constraint.",
+    "test_type": "eligibility"
+  },
+  {
+    "test_id": "BR-GYM-014-02",
+    "source_id": "BR-GYM-014 inactive poll",
+    "purpose": "Prevent participation in an inactive poll.",
+    "preconditions": "The poll is inactive and the student belongs to its selected target audience.",
+    "action_or_input": "Request poll details or submit a vote.",
+    "expected_result": "Participation is not allowed.",
+    "test_type": "eligibility"
+  },
+  {
+    "test_id": "BR-GYM-014-03",
+    "source_id": "BR-GYM-014 expired poll",
+    "purpose": "Prevent participation in an expired poll.",
+    "preconditions": "The poll is expired and the student belongs to its selected target audience.",
+    "action_or_input": "Request poll details or submit a vote.",
+    "expected_result": "Participation is not allowed.",
+    "test_type": "eligibility"
+  },
+  {
+    "test_id": "BR-GYM-014-04",
+    "source_id": "BR-GYM-014 student outside target audience",
+    "purpose": "Prevent participation by a student outside the selected target audience.",
+    "preconditions": "The poll is active and unexpired; the student does not belong to its selected target audience.",
+    "action_or_input": "Request poll details or submit a vote.",
+    "expected_result": "Participation is not allowed.",
+    "test_type": "eligibility"
+  },
+  {
+    "test_id": "BR-GYM-015-01",
+    "source_id": "BR-GYM-015 first vote",
+    "purpose": "Allow a student to cast a vote in a poll.",
+    "preconditions": "The student is eligible for an active, unexpired poll and has not voted in it.",
+    "action_or_input": "Submit one vote in the poll.",
+    "expected_result": "The vote is accepted.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-015-02",
+    "source_id": "BR-GYM-015 second vote",
+    "purpose": "Reject a second vote by the same student in the same poll.",
+    "preconditions": "The student has already voted in the poll.",
+    "action_or_input": "Submit another vote in the same poll.",
+    "expected_result": "The second vote is rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-016-01",
+    "source_id": "BR-GYM-016 leadership succession",
+    "purpose": "Ensure superseded active leadership assignments no longer remain current after a leadership change.",
+    "preconditions": "A club has current coordinator and co-coordinator assignments; valid replacement leaders are available.",
+    "action_or_input": "Change the coordinator or co-coordinator assignment.",
+    "expected_result": "The new leaders are recorded as current and superseded current designations are retired or removed.",
+    "test_type": "lifecycle"
+  },
+  {
+    "test_id": "BR-GYM-017-01",
+    "source_id": "BR-GYM-017 zero budget boundary",
+    "purpose": "Accept a club budget request with an amount of zero.",
+    "preconditions": "The actor is an applicable Club Head and the required supporting file is included.",
+    "action_or_input": "Submit a budget request with amount zero.",
+    "expected_result": "The amount passes the non-negative amount rule.",
+    "test_type": "boundary"
+  },
+  {
+    "test_id": "BR-GYM-017-02",
+    "source_id": "BR-GYM-017 positive budget",
+    "purpose": "Accept a club budget request with a positive amount.",
+    "preconditions": "The actor is an applicable Club Head and the required supporting file is included.",
+    "action_or_input": "Submit a budget request with an amount greater than zero.",
+    "expected_result": "The amount passes the non-negative amount rule.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-017-03",
+    "source_id": "BR-GYM-017 negative budget",
+    "purpose": "Reject a club budget request with a negative amount.",
+    "preconditions": "The actor is an applicable Club Head and the required supporting file is included.",
+    "action_or_input": "Submit a budget request with an amount less than zero.",
+    "expected_result": "The request is rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-018-01",
+    "source_id": "BR-GYM-018 supporting file present",
+    "purpose": "Accept a budget request that includes its required supporting file.",
+    "preconditions": "The actor is an applicable Club Head and the budget amount is non-negative.",
+    "action_or_input": "Submit a budget request with the required supporting file.",
+    "expected_result": "The request passes the supporting-file rule.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-018-02",
+    "source_id": "BR-GYM-018 supporting file missing",
+    "purpose": "Reject a budget request missing its required supporting file.",
+    "preconditions": "The actor is an applicable Club Head and the budget amount is non-negative.",
+    "action_or_input": "Submit a budget request without the required supporting file.",
+    "expected_result": "The request is rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-019-01",
+    "source_id": "BR-GYM-019 report file present",
+    "purpose": "Accept an event report that includes its report/details file.",
+    "preconditions": "The actor is an applicable Club Head.",
+    "action_or_input": "Submit an event report with the required report/details file.",
+    "expected_result": "The report passes the required-file rule.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-019-02",
+    "source_id": "BR-GYM-019 report file missing",
+    "purpose": "Reject an event report missing its report/details file.",
+    "preconditions": "The actor is an applicable Club Head.",
+    "action_or_input": "Submit an event report without the required report/details file.",
+    "expected_result": "The report submission is rejected.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-020-01",
+    "source_id": "BR-GYM-020 configured venue",
+    "purpose": "Accept a booking at a venue configured for Gymkhana booking.",
+    "preconditions": "A session or event can be booked; the selected venue is configured for Gymkhana booking and has no conflicting booking.",
+    "action_or_input": "Submit the booking using the configured venue.",
+    "expected_result": "The venue passes the configured-venue rule.",
+    "test_type": "positive"
+  },
+  {
+    "test_id": "BR-GYM-020-02",
+    "source_id": "BR-GYM-020 unconfigured venue",
+    "purpose": "Reject a booking at a venue not configured for Gymkhana booking.",
+    "preconditions": "A session or event booking is available; the selected venue is not configured for Gymkhana booking.",
+    "action_or_input": "Submit the booking using the unconfigured venue.",
+    "expected_result": "The venue is not accepted.",
+    "test_type": "negative"
+  },
+  {
+    "test_id": "BR-GYM-021-01",
+    "source_id": "BR-GYM-021 assigned councillor access",
+    "purpose": "Allow the assigned Club Faculty Councillor to review or access submitted reports for the assigned club.",
+    "preconditions": "A report has been submitted for a club; the authenticated faculty member is that club's assigned Club Faculty Councillor.",
+    "action_or_input": "Open the submitted report for review.",
+    "expected_result": "Access to the report is allowed.",
+    "test_type": "authorization"
+  },
+  {
+    "test_id": "BR-GYM-021-02",
+    "source_id": "BR-GYM-021 unassigned faculty access",
+    "purpose": "Deny report review or access when the authenticated faculty member is not the assigned councillor for the report's club.",
+    "preconditions": "A report has been submitted for a club; the authenticated faculty member is not that club's assigned Club Faculty Councillor.",
+    "action_or_input": "Open the submitted report for review.",
+    "expected_result": "Access is not allowed.",
+    "test_type": "authorization"
+  }
+]

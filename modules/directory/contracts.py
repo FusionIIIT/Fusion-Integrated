@@ -83,6 +83,32 @@ def employee_projection_disagreement() -> tuple[list[int], list[int]] | None:
     return sorted(known - held), sorted(held - known)
 
 
+COHORT_PAGE = 200
+
+
+def students_in_cohorts(batch_years: Sequence[int],
+                        disciplines: Sequence[str]) -> list[int]:
+    """Active students in any of these batches and branches; no branches means every branch."""
+    # The IAM, not the local projection, which holds only people already looked up.
+    years = sorted({int(y) for y in batch_years if y is not None})
+    branches = sorted({d.strip() for d in disciplines if d and d.strip()}) or [""]
+    found: set[int] = set()
+    client = get_client()
+    for year in years:
+        for branch in branches:
+            offset = 0
+            while True:
+                page = client.academic_directory(batch_year=year, discipline=branch,
+                                                 limit=COHORT_PAGE, offset=offset)
+                rows = page.get("results", [])
+                found.update(int(r["user_id"]) for r in rows
+                             if r.get("user_id") is not None)
+                offset += len(rows)
+                if not rows or offset >= int(page.get("count", 0)):
+                    break
+    return sorted(found)
+
+
 def search(q: str = "", kind: str | None = None, limit: int = 25) -> list[UserDTO]:
     qs = UserRef.objects.filter(is_active=True)
     if kind:
