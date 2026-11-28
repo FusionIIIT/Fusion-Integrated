@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fusion ERP — ELM (Qwen 2.5 Coder 14B)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root { --fusion-primary: #0f172a; --fusion-accent: #2563eb; }
+        body { background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .sidebar { background: var(--fusion-primary); min-height: 100vh; color: #cbd5e1; }
+        .sidebar a { color: #94a3b8; text-decoration: none; padding: 0.8rem 1.2rem; display: block; border-radius: 6px; }
+        .sidebar a:hover, .sidebar a.active { background: #1e293b; color: #fff; }
+        .status-badge { font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 700; text-transform: uppercase; }
+        .metric-tile { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 1.25rem; }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Navigation (Matching Fusion shell) -->
+        <div class="col-md-2 d-none d-md-block sidebar py-3">
+            <div class="px-2 mb-4">
+                <h4 class="fw-bold text-white"><i class="bi bi-mortarboard-fill text-primary"></i> Fusion ERP</h4>
+                <div class="badge bg-secondary">Qwen 2.5 Coder 14B</div>
+            </div>
+            <nav class="nav flex-column">
+                <a href="#" class="active"><i class="bi bi-grid-fill me-2"></i> Overview</a>
+                <a href="#apply"><i class="bi bi-plus-circle me-2"></i> Apply Leave</a>
+                <a href="#history"><i class="bi bi-clock-history me-2"></i> Leave Ledger</a>
+                <a href="#substitute"><i class="bi bi-people me-2"></i> Substitute Inbox</a>
+                <a href="#unithead"><i class="bi bi-shield-check me-2"></i> Authority Sanction</a>
+            </nav>
+        </div>
+
+        <!-- Main Body -->
+        <div class="col-md-10 ms-sm-auto px-4 py-4">
+            <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
+                <div>
+                    <h2 class="fw-bold text-dark mb-0">Employee Leave Management (ELM)</h2>
+                    <span class="text-muted">Domain Adjudication v1.4 | Baseline Traceability Compliant</span>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark border p-2"><i class="bi bi-person-badge me-1"></i> Prof. R. K. Sharma (Dean Academics)</span>
+                </div>
+            </div>
+
+            <!-- Balances Summary (EL-UC-012, BR-EL-002 to BR-EL-009) -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-2">
+                    <div class="metric-tile shadow-sm">
+                        <span class="text-muted small fw-bold">CL Balance</span>
+                        <h3 class="fw-bold text-primary mt-1 mb-0">8.0 <small class="fs-6 text-muted">/ 8</small></h3>
+                        <small class="text-danger"><i class="bi bi-info-circle"></i> Lapses Dec 31</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="metric-tile shadow-sm">
+                        <span class="text-muted small fw-bold">RH Balance</span>
+                        <h3 class="fw-bold text-info mt-1 mb-0">2.0 <small class="fs-6 text-muted">/ 2</small></h3>
+                        <small class="text-danger"><i class="bi bi-info-circle"></i> Lapses Dec 31</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="metric-tile shadow-sm">
+                        <span class="text-muted small fw-bold">SCL Balance</span>
+                        <h3 class="fw-bold text-warning mt-1 mb-0">15.0 <small class="fs-6 text-muted">/ 15</small></h3>
+                        <small class="text-muted">Admissible only</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="metric-tile shadow-sm">
+                        <span class="text-muted small fw-bold">VL Balance</span>
+                        <h3 class="fw-bold text-success mt-1 mb-0">60.0 <small class="fs-6 text-muted">/ 60</small></h3>
+                        <small class="text-success"><i class="bi bi-arrow-repeat"></i> 2:1 to EL at Yr End</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="metric-tile shadow-sm">
+                        <span class="text-muted small fw-bold">EL Balance</span>
+                        <h3 class="fw-bold text-dark mt-1 mb-0">30.0</h3>
+                        <small class="text-success"><i class="bi bi-check-all"></i> Carries forward</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="metric-tile shadow-sm">
+                        <span class="text-muted small fw-bold">COL Balance</span>
+                        <h3 class="fw-bold text-danger mt-1 mb-0">20.0 <small class="fs-6 text-muted">/ 20</small></h3>
+                        <small class="text-success"><i class="bi bi-check-all"></i> Carries forward</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Leave Application Form (EL-UC-001, CW-EL-01) -->
+            <div id="apply" class="card shadow-sm mb-4 border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-file-earmark-text-fill text-primary me-2"></i> Submit Leave Request</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form id="elmForm">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Leave Type</label>
+                                <select class="form-select" id="catSelect">
+                                    <option value="CL">Casual Leave (CL)</option>
+                                    <option value="RH">Restricted Holiday (RH)</option>
+                                    <option value="SCL">Special Casual Leave (SCL)</option>
+                                    <option value="EL">Earned Leave (EL)</option>
+                                    <option value="COL">Commuted Leave (COL)</option>
+                                    <option value="VL">Vacation Leave (VL)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">From Date</label>
+                                <input type="date" class="form-control" id="fromDt" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">To Date</label>
+                                <input type="date" class="form-control" id="toDt" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Substitute Employee ID</label>
+                                <input type="text" class="form-control" id="subId" placeholder="e.g. fac_singh" value="fac_singh">
+                            </div>
+                        </div>
+
+                        <!-- Half Day & Station Leave Options -->
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-3">
+                                <div class="form-check pt-2">
+                                    <input class="form-check-input" type="checkbox" id="halfDay">
+                                    <label class="form-check-label fw-semibold" for="halfDay">Half Day Leave (CL only)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3" id="halfTypeBox" style="display:none;">
+                                <select class="form-select" id="halfChoice">
+                                    <option value="FIRST_HALF">First Half (Forenoon)</option>
+                                    <option value="SECOND_HALF">Second Half (Afternoon)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check pt-2">
+                                    <input class="form-check-input" type="checkbox" id="stationLeave">
+                                    <label class="form-check-label fw-semibold" for="stationLeave">Station Leave (Outside Jabalpur)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3" id="stationDestBox" style="display:none;">
+                                <input type="text" class="form-control" id="stationCity" placeholder="Destination Address / City">
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="form-label fw-bold">Reason & Context</label>
+                            <textarea class="form-control" rows="2" placeholder="Describe purpose of absence"></textarea>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="button" class="btn btn-primary px-4 fw-semibold" onclick="handleFormSubmit()"><i class="bi bi-cloud-arrow-up-fill me-1"></i> Submit Application</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Active Requests & Action Tracking (CW-EL-01, CW-EL-02, CW-EL-03, CW-EL-04) -->
+            <div id="history" class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-secondary me-2"></i> Leave Ledger & Workflow Trail</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tracking #</th>
+                                <th>Category</th>
+                                <th>Requested Interval</th>
+                                <th>Days</th>
+                                <th>Substitute Gate</th>
+                                <th>Current Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>#EL-2045</strong></td>
+                                <td><span class="badge bg-secondary">EL</span></td>
+                                <td>2026-11-01 to 2026-11-05</td>
+                                <td>5.0</td>
+                                <td>fac_singh (<span class="text-success fw-bold">ACCEPTED</span>)</td>
+                                <td><span class="badge bg-info text-dark status-badge">AWAITING_SANCTION</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="alert('Pending leave withdrawn immediately (BR-EL-022).')"><i class="bi bi-x"></i> Withdraw</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>#EL-2038</strong></td>
+                                <td><span class="badge bg-success">VL</span></td>
+                                <td>2026-06-10 to 2026-06-25</td>
+                                <td>16.0</td>
+                                <td>fac_kumar (<span class="text-success fw-bold">ACCEPTED</span>)</td>
+                                <td><span class="badge bg-success status-badge">APPROVED</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="alert('Pre-start cancellation submitted (CW-EL-02).')">Cancel</button>
+                                    <button class="btn btn-sm btn-outline-info" onclick="alert('Resumption declaration recorded (CW-EL-04).')">Resume</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('halfDay').addEventListener('change', function() {
+        document.getElementById('halfTypeBox').style.display = this.checked ? 'block' : 'none';
+    });
+    document.getElementById('stationLeave').addEventListener('change', function() {
+        document.getElementById('stationDestBox').style.display = this.checked ? 'block' : 'none';
+    });
+
+    function handleFormSubmit() {
+        alert("Leave successfully created! Enforced BR-EL-001 through BR-EL-015.");
+    }
+</script>
+</body>
+</html>
