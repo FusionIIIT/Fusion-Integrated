@@ -153,7 +153,8 @@ def check_targets(targets: Sequence[Target]) -> list[Target]:
                                 field="targets")
         if len(discipline) > MAX_DISCIPLINE_LENGTH:
             raise RuleViolation("invalid_target",
-                                "That branch name is too long.", field="targets")
+                                f"That branch name is too long. Enter at most "
+                                f"{MAX_DISCIPLINE_LENGTH} characters.", field="targets")
         key = (t.batch_year, discipline.casefold())
         if key in seen:
             raise RuleViolation("duplicate_target",

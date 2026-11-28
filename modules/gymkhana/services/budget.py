@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from django.db import transaction
 
-from core.api.exceptions import DomainError, NotFoundError
+from core.api.exceptions import NotFoundError
 from modules.gymkhana.domain import rules
 from modules.gymkhana.domain.rules import RuleViolation
 from modules.gymkhana.models import BudgetRequest
@@ -13,16 +13,9 @@ from modules.gymkhana.selectors import scoping
 from modules.gymkhana.services import audit, links
 from modules.gymkhana.services.authz import require
 from modules.gymkhana.services.errors import refused
+from modules.gymkhana.services.inputs import NOT_LED, required_text
 
 P_SUBMIT = "gymkhana.budget_request.create"
-
-
-def _text(value: str, field: str, message: str) -> str:
-    text = (value or "").strip()
-    if not text:
-        raise DomainError(message, code="missing_field",
-                          details=[{"field": field, "message": message}])
-    return text
 
 
 @transaction.atomic
@@ -31,9 +24,9 @@ def submit(*, actor, club_id: int, purpose: str, description: str, amount: Decim
     require(actor, P_SUBMIT)
     club = scoping.led_clubs(actor).filter(pk=club_id).first()
     if club is None:
-        raise NotFoundError("No such club among the clubs you lead.")
-    purpose = _text(purpose, "purpose", "Enter the purpose of the budget.")
-    description = _text(description, "description", "Describe the budget request.")
+        raise NotFoundError(NOT_LED)
+    purpose = required_text(purpose, "purpose", "Enter the purpose of the budget.")
+    description = required_text(description, "description", "Describe the budget request.")
     try:
         rules.check_amount(amount)
     except RuleViolation as exc:

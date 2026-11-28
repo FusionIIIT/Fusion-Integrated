@@ -16,16 +16,9 @@ from modules.gymkhana.selectors.venues import current_venue_names
 from modules.gymkhana.services import audit, links, notifications, people
 from modules.gymkhana.services.authz import require
 from modules.gymkhana.services.errors import refused
+from modules.gymkhana.services.inputs import NOT_LED, required_text
 
 P_BOOK = "gymkhana.booking.create"
-
-
-def _text(value: str, field: str, message: str) -> str:
-    text = (value or "").strip()
-    if not text:
-        raise DomainError(message, code="missing_field",
-                          details=[{"field": field, "message": message}])
-    return text
 
 
 def _venue(requested: str) -> str:
@@ -85,12 +78,12 @@ def _book(*, actor, kind: str, club_id: int, venue: str, day: date, start: time,
     require(actor, P_BOOK)
     club = scoping.led_clubs(actor).filter(pk=club_id).first()
     if club is None:
-        raise NotFoundError("No such club among the clubs you lead.")
+        raise NotFoundError(NOT_LED)
     is_event = kind == Booking.EVENT
     _check_slot(day, start, end)
-    description = _text(description, "description", "Describe the booking.")
+    description = required_text(description, "description", "Describe the booking.")
     if is_event:
-        event_name = _text(event_name, "event_name", "Enter the event's name.")
+        event_name = required_text(event_name, "event_name", "Enter the event's name.")
     poster = links.parse_link(
         poster_url, field="poster_url", missing_code="poster_required",
         missing_message="An event needs a poster. Paste its Google Drive link.",

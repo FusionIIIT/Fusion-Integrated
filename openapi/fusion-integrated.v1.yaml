@@ -3115,6 +3115,12 @@ components:
       - resume_link
       - roll_no
       - user_id
+    CategoryEnum:
+      type: string
+      enum:
+      - technical
+      - sports
+      - cultural
     Clearance:
       type: object
       description: Rule 24. `blocking` names each company, so a refusal is actionable.
@@ -3473,7 +3479,7 @@ components:
         id:
           type: integer
         outcome:
-          type: string
+          $ref: '#/components/schemas/GymkhanaApprovalOutcomeOutcomeEnum'
         code:
           type: string
         message:
@@ -3483,6 +3489,11 @@ components:
       - id
       - message
       - outcome
+    GymkhanaApprovalOutcomeOutcomeEnum:
+      type: string
+      enum:
+      - approved
+      - refused
     GymkhanaApprove:
       type: object
       properties:
@@ -3510,7 +3521,8 @@ components:
           type: string
           readOnly: true
         kind:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaBookingKindEnum'
           readOnly: true
         venue_name:
           type: string
@@ -3558,6 +3570,11 @@ components:
       - poster_link
       - start_time
       - venue_name
+    GymkhanaBookingKindEnum:
+      type: string
+      enum:
+      - session
+      - event
     GymkhanaBudgetCreate:
       type: object
       properties:
@@ -3609,7 +3626,8 @@ components:
           type: string
           readOnly: true
         status:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaBudgetRequestStatusEnum'
           readOnly: true
         submitted_by_user_id:
           type: integer
@@ -3629,6 +3647,10 @@ components:
       - purpose
       - status
       - submitted_by_user_id
+    GymkhanaBudgetRequestStatusEnum:
+      type: string
+      enum:
+      - open
     GymkhanaClub:
       type: object
       properties:
@@ -3639,13 +3661,15 @@ components:
           type: string
           readOnly: true
         category:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/CategoryEnum'
           readOnly: true
         description:
           type: string
           readOnly: true
         status:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaClubStatusEnum'
           readOnly: true
         faculty_councillor_user_id:
           type: integer
@@ -3671,9 +3695,11 @@ components:
           additionalProperties: {}
           readOnly: true
         my_membership:
-          type: string
           nullable: true
           readOnly: true
+          oneOf:
+          - $ref: '#/components/schemas/MyMembershipEnum'
+          - $ref: '#/components/schemas/NullEnum'
       required:
       - approved_at
       - category
@@ -3712,6 +3738,11 @@ components:
       - description
       - faculty_councillor_user_id
       - name
+    GymkhanaClubStatusEnum:
+      type: string
+      enum:
+      - open
+      - confirmed
     GymkhanaEventCreate:
       type: object
       properties:
@@ -3917,7 +3948,8 @@ components:
           type: string
           readOnly: true
         status:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaMembershipStatusEnum'
           readOnly: true
         remarks:
           type: string
@@ -3942,6 +3974,11 @@ components:
       - remarks
       - status
       - user_id
+    GymkhanaMembershipStatusEnum:
+      type: string
+      enum:
+      - open
+      - confirmed
     GymkhanaMyClubs:
       type: object
       properties:
@@ -3966,12 +4003,17 @@ components:
         display_name:
           type: string
         kind:
-          type: string
+          $ref: '#/components/schemas/GymkhanaPersonKindEnum'
       required:
       - display_name
       - kind
       - user_id
       - username
+    GymkhanaPersonKindEnum:
+      type: string
+      enum:
+      - student
+      - faculty
     GymkhanaPoll:
       type: object
       properties:
@@ -4355,6 +4397,11 @@ components:
       description: |-
         * `online` - Online
         * `offline` - Offline
+    MyMembershipEnum:
+      type: string
+      enum:
+      - open
+      - confirmed
     NavGroup:
       type: object
       description: |-
@@ -4416,6 +4463,9 @@ components:
       - is_late
       - message
       - record
+    NullEnum:
+      enum:
+      - null
     OffCampusRecord:
       type: object
       properties:

@@ -12,6 +12,7 @@ from modules.gymkhana.selectors import scoping
 from modules.gymkhana.services import audit, people
 from modules.gymkhana.services.authz import require
 from modules.gymkhana.services.errors import refused
+from modules.gymkhana.services.inputs import NOT_LED
 
 P_ASSIGN = "gymkhana.leadership.assign"
 
@@ -24,7 +25,7 @@ def change_leadership(*, actor, club_id: int, coordinator_user_id: int,
     club = (Club.objects.select_for_update()
             .filter(pk=club_id, pk__in=scoping.led_clubs(actor).values("pk")).first())
     if club is None:
-        raise NotFoundError("No such club among the clubs you lead.")
+        raise NotFoundError(NOT_LED)
     try:
         rules.check_distinct_leaders(coordinator_user_id, co_coordinator_user_id)
     except RuleViolation as exc:

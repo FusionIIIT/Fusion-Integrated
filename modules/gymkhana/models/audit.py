@@ -13,10 +13,6 @@ class AuditEvent(models.Model):
 
     class Meta:
         db_table = "gymkhana_audit_event"
-        indexes = [
-            models.Index(fields=["object_type", "object_id", "at"],
-                         name="gym_audit_object_idx"),
-        ]
 
     def __str__(self) -> str:
         return f"{self.action} {self.object_type}:{self.object_id}"

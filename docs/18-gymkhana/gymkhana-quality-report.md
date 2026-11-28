@@ -1,20 +1,24 @@
 # Gymkhana: quality report
 
-Every number below comes from a run made on 2026-11-22 after the last code change. "Not run"
-means not run, with the reason; nothing here is inferred.
+Sections 1, 2 and 3, the `make e2e` result in section 8, and the fresh-install and deploy
+re-run at the end of section 12 come from runs made on 2026-11-28 after the round-3 fixes, the
+last code change. Sections 4, 5 and 9, section 7's IAM seed and first HTTP action, and section
+8's hand walkthrough and server logs are from 2026-11-22 at `6d303c1`. "Not run" means not run,
+with the reason; nothing here is inferred.
 
 ## 1. `make check` and `make check-client`
 
 ```
-$ make check            # exit 0
+$ make check            # exit 2: only the 7 open spec-test failures (triage.md)
 Contracts: 5 kept, 0 broken.          (incl. "Layering inside gymkhana KEPT")
 no cross-module foreign keys
 all contract getters are plural
 nav items and client routes agree
 permission manifest matches the registries
 openapi schema matches the code
-$ .venv/bin/python -m pytest -q       # the suite make check runs
-698 passed, 27 subtests passed in 15.07s
+$ .venv/bin/python -m pytest -q --junitxml=…   # the suite make check runs
+839 cases: 830 passed, 7 failed, 2 skipped
+  all 9 non-passing cases are in modules/gymkhana/tests/spec/, the same 9 as the baseline
 
 $ make check-client     # exit 0
  Test Files  14 passed (14)
@@ -22,7 +26,7 @@ $ make check-client     # exit 0
 ✓ built in 3.64s
 
 $ make e2e              # exit 0, IAM on 8001 and make dev on 8002
-  25 passed (26.2s)
+  25 passed (31.0s)        0 responses of 5xx in the make dev log
 ```
 
 The module's largest chunk is `MyClubsPage` at 3.75 kB gzip; all six pages, `routes` and
@@ -31,13 +35,13 @@ The module's largest chunk is `MyClubsPage` at 3.75 kB gzip; all six pages, `rou
 ## 2. Coverage (Step 5.14)
 
 ```
-$ pytest modules/gymkhana --cov=modules/gymkhana --cov-branch --cov-fail-under=90
-modules/gymkhana/api/views.py   …    1  …   1  99%
-TOTAL                          1621  1 240  1  99%
+$ pytest modules/gymkhana --ignore=modules/gymkhana/tests/spec --cov=modules/gymkhana --cov-branch --cov-fail-under=90
+modules/gymkhana/api/views.py   300  1  26  1  99%
+TOTAL                          1638  1 234  1  99%
 Required test coverage of 90% reached. Total coverage: 99.89%
 
-$ pytest modules/gymkhana --cov=modules/gymkhana/domain --cov-branch --cov-fail-under=95
-TOTAL                           145  0  52  0 100%
+$ pytest modules/gymkhana --ignore=modules/gymkhana/tests/spec --cov=modules/gymkhana/domain --cov-branch --cov-fail-under=95
+TOTAL                           148  0  54  0 100%
 Required test coverage of 95% reached. Total coverage: 100.00%
 ```
 
@@ -48,9 +52,9 @@ generation reaches (and `make schema-check` exercises it). No `# pragma: no cove
 
 | File | Tests | Concern |
 |---|---|---|
-| test_domain.py | 31 | every branch of every pure rule |
+| test_domain.py | 32 | every branch of every pure rule |
 | test_state_machine.py | 54 | every illegal move and wrong actor, enumerated from the table |
-| test_journeys.py | 43 | each use case through HTTP, with its alternate and exception flows |
+| test_journeys.py | 44 | each use case through HTTP, with its alternate and exception flows |
 | test_privilege_escalation.py | 79 | both gates on all 22 endpoints, 401, role switch, CSRF, 429, 400 filters |
 | test_scoping_isolation.py | 10 | one club's or councillor's rows never reach another |
 | test_concurrency.py | 6 | real threads on a barrier: booking, application, vote, approvals, names |
@@ -59,20 +63,22 @@ generation reaches (and `make schema-check` exercises it). No `# pragma: no cove
 | test_schedule.py | 3 | beat entry merged, task registered and routed |
 | test_contracts.py | 4 | `get_club_affiliations`, `students_in_cohorts` |
 | test_commands.py | 9 | venue seeding, readiness, manual drain |
-| test_service_edges.py | 8 | refusals reachable only below the API |
+| test_service_edges.py | 10 | refusals reachable only below the API |
 | test_client_route_guards.py | 3 | every route guarded by its nav item's permission |
-| **Total** | **273** | |
+| **Total** | **277** | |
 
-Journey tests by the use case their name starts with (main flows that span two use cases
+Counted from the junit file of the run in section 1 (spec tests excluded). Journey tests by
+the use case their name starts with (main flows that span two use cases
 are named for both): UC-GYM-001 5, UC-GYM-001+011 1, UC-GYM-002 4, UC-GYM-003 3,
 UC-GYM-004 4, UC-GYM-004+005 1, UC-GYM-005 3, UC-GYM-006 2, UC-GYM-006+007 1,
-UC-GYM-007 4, UC-GYM-008 3, UC-GYM-009 2, UC-GYM-010 1, UC-GYM-010+012 1, UC-GYM-011 2,
+UC-GYM-007 4, UC-GYM-008 3, UC-GYM-009 2, UC-GYM-010 2, UC-GYM-010+012 1, UC-GYM-011 2,
 UC-GYM-012 1. The remaining 5 journey tests cover listing, My Clubs and the people picker. Every one of the 77 live ids is cited by at least one test
 (`grep -rn '<ID>' modules/gymkhana/tests`, test names normalised).
 
 ## 4. Five rules broken on purpose (Step 5.15)
 
-Each file was copied to the scratchpad, broken, the module suite run, and the copy restored.
+Run on 2026-11-22 at `6d303c1`. Each file was copied to the scratchpad, broken, the module
+suite run, and the copy restored.
 
 | Rule broken | How | Caught by (failing count) |
 |---|---|---|
@@ -173,7 +179,8 @@ The server was then stopped and the database dropped (`dropdb … fusion_integra
 ## 8. Browser walkthrough (Step 6.9)
 
 Automated in a real browser (Chromium, Playwright) against the real IAM and `make dev`:
-`make e2e` → **25 passed**, 15 of them Gymkhana's. The spec fails on any uncaught page
+`make e2e` → **25 passed** on 2026-11-28, 15 of them Gymkhana's. UC-GYM-003's main flow is
+completed in the browser: the Club Head books an event (201) and sees it in the schedule. The spec fails on any uncaught page
 error, console error or 5xx, so "passed" also means none of those happened.
 
 Walked by hand on 2026-11-22 by the person running this session, following a 10-step
@@ -418,3 +425,30 @@ Round 3, reviewing commit `518bfb6`:
 | 10 | 9 | 8 | 7 | 10 | 6 | 9 | 6 | 3 |
 
 Verdict: not yet, 10 findings.
+
+Fixes for round 3, at the working tree after `f52590b` (R3-01 and R3-04 were fixed in `6d303c1`):
+
+- R3-02: `journeys.spec.ts` now books an event at 12:00–13:00 after the refused overlap,
+  expects 201, and finds the event's row in the schedule. The run also showed the event
+  report step had gone stale with R3-04 (it was dated before its club); it is now dated today.
+- R3-03: sections 1, 2 and 3 and the `make e2e` result re-measured on 2026-11-28 after these
+  fixes.
+- R3-05: every message listed names the next step, for example "No such club among the
+  clubs you lead. Choose one of your clubs from My Clubs." and "That branch name is too long.
+  Enter at most 40 characters."
+- R3-06: one helper, `services/inputs.py::required_text`, and one `NOT_LED` message, used by
+  all six services.
+- R3-07: `gym_audit_object_idx` and `gym_outbox_recipient_idx` are dropped from the models and
+  from `0001_initial`; `gym_outbox_pending_idx` stays, for the drain's
+  `status="pending" … order_by("created_at")`.
+- R3-08: the serializers publish `category`, `status`, `kind`, `outcome`, `my_membership`,
+  `Person.kind` and the budget `status` as enums, each named after its own component, so no
+  shared `ENUM_NAME_OVERRIDES` is needed; the regenerated schema matches `api/types.ts`.
+- R3-09: each poll card is an `article` named by its title; the spec finds it by role and name.
+- R3-10: the blueprint's BR-GYM-001 row, needs table and model table describe departures 1
+  and 2 and the dropped indexes.
+
+Fresh install re-run on 2026-11-28 because the migration changed: `0001_initial` unapplied and
+reapplied OK; readiness refused with the venue-list message until `seed_gymkhana_venues`, then
+`gymkhana is ready.`; the database dropped (count 0). Deploy check with CI's environment:
+`System check identified no issues (2 silenced).`

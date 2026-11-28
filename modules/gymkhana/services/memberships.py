@@ -30,7 +30,8 @@ def apply(*, actor, club_id: int, description: str) -> Membership:
     # BR-GYM-007: an open club is not visible to a student, so it is not found.
     club = scoping.clubs_for(actor).filter(pk=club_id, status=sm.CONFIRMED).first()
     if club is None:
-        raise NotFoundError("No such club is open for membership.")
+        raise NotFoundError("No such club is open for membership. Choose a club from "
+                            "the club list.")
     text = (description or "").strip()
     if not text:
         raise DomainError("Describe why you want to join or list your achievements.",

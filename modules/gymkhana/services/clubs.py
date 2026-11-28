@@ -12,19 +12,12 @@ from modules.gymkhana.models import Club, LeadershipAssignment
 from modules.gymkhana.services import audit, people
 from modules.gymkhana.services.authz import require
 from modules.gymkhana.services.errors import refused
+from modules.gymkhana.services.inputs import required_text
 
 P_CREATE = "gymkhana.club.create"
 P_APPROVE = "gymkhana.club.approve"
 
 _NAME_TAKEN = "A club with this name already exists. Choose a different name."
-
-
-def _required_text(value: str, field: str, label: str) -> str:
-    text = (value or "").strip()
-    if not text:
-        raise DomainError(f"Enter the club's {label}.", code="missing_field",
-                          details=[{"field": field, "message": f"Enter the {label}."}])
-    return text
 
 
 def create_club(*, actor, name: str, category: str, description: str,
@@ -33,8 +26,9 @@ def create_club(*, actor, name: str, category: str, description: str,
     """UC-GYM-001: a new club, open, with its two student leaders and councillor."""
     require(actor, P_CREATE)
     sm.resolve(sm.CLUB, sm.NONE, sm.CREATE, sm.STUDENT_ADMIN)
-    name = _required_text(name, "name", "name")
-    description = _required_text(description, "description", "description")
+    name = required_text(name, "name", "Enter the club's name.", "Enter the name.")
+    description = required_text(description, "description",
+                                "Enter the club's description.", "Enter the description.")
     try:
         category = rules.check_category(category)
         rules.check_distinct_leaders(coordinator_user_id, co_coordinator_user_id)
@@ -84,11 +78,12 @@ def approve_club(*, actor, club_id: int) -> Club:
     require(actor, P_APPROVE)
     club = Club.objects.select_for_update().filter(pk=club_id).first()
     if club is None:
-        raise NotFoundError("No such club.")
+        raise NotFoundError("No such club. Choose one from the club list.")
     try:
         t = sm.resolve(sm.CLUB, club.status, sm.APPROVE, sm.STUDENT_ADMIN)
     except sm.InvalidTransition as exc:
-        raise ConflictError("This club is already confirmed.",
+        raise ConflictError("This club is already confirmed, so there is nothing to "
+                            "approve. Choose an open club from the list.",
                             code="club_already_confirmed") from exc
     club.status = t.to
     club.approved_by_user_id = actor.user_id

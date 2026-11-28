@@ -50,7 +50,7 @@ function PollCard({ poll }: { poll: Poll }) {
   }
 
   return (
-    <Card padding="lg" withBorder>
+    <Card component="article" aria-label={poll.title} padding="lg" withBorder>
       <Group justify="space-between" mb="xs">
         <Text fw={700}>{poll.title}</Text>
         <Badge variant="light">{poll.club_name} · open until {poll.expires_on}</Badge>

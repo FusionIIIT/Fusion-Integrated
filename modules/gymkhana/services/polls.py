@@ -15,19 +15,12 @@ from modules.gymkhana.selectors import scoping
 from modules.gymkhana.services import audit, notifications, people
 from modules.gymkhana.services.authz import require
 from modules.gymkhana.services.errors import refused
+from modules.gymkhana.services.inputs import NOT_LED, required_text
 
 P_CREATE = "gymkhana.poll.create"
 P_VOTE = "gymkhana.vote.create"
 
 _ALREADY_VOTED = "You have already voted in this poll. Your vote is unchanged."
-
-
-def _text(value: str, field: str, message: str) -> str:
-    text = (value or "").strip()
-    if not text:
-        raise DomainError(message, code="missing_field",
-                          details=[{"field": field, "message": message}])
-    return text
 
 
 @transaction.atomic
@@ -36,9 +29,9 @@ def create_poll(*, actor, club_id: int, title: str, description: str, expires_on
     require(actor, P_CREATE)
     club = scoping.led_clubs(actor).filter(pk=club_id).first()
     if club is None:
-        raise NotFoundError("No such club among the clubs you lead.")
-    title = _text(title, "title", "Enter the poll's title.")
-    description = _text(description, "description", "Describe what the poll is about.")
+        raise NotFoundError(NOT_LED)
+    title = required_text(title, "title", "Enter the poll's title.")
+    description = required_text(description, "description", "Describe what the poll is about.")
     try:
         labels = rules.check_choices(choices)
         groups = rules.check_targets(targets)
@@ -70,9 +63,10 @@ def cast_vote(*, actor, poll_id: int, choice_id: int) -> Vote:
     # Not in the audience: the poll is not theirs to see (BR-GYM-013), so not found.
     poll = scoping.polls_targeting(batch_year, discipline).filter(pk=poll_id).first()
     if poll is None:
-        raise NotFoundError("No such poll is open to you.")
+        raise NotFoundError("No such poll is open to you. Choose one from your poll list.")
     if not rules.poll_is_active(poll.expires_on, timezone.localdate()):
-        raise ConflictError("This poll has closed. Votes are no longer accepted.",
+        raise ConflictError("This poll has closed, so votes are no longer accepted. "
+                            "Choose an open poll from your list.",
                             code="poll_closed")
     choice = PollChoice.objects.filter(pk=choice_id, poll=poll).first()
     if choice is None:

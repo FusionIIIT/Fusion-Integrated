@@ -6,7 +6,7 @@ from datetime import datetime
 from django.db import transaction
 from django.utils import timezone
 
-from core.api.exceptions import DomainError, NotFoundError
+from core.api.exceptions import NotFoundError
 from modules.gymkhana.domain import rules
 from modules.gymkhana.domain.rules import RuleViolation
 from modules.gymkhana.models import EventReport
@@ -14,16 +14,9 @@ from modules.gymkhana.selectors import scoping
 from modules.gymkhana.services import audit, links, people
 from modules.gymkhana.services.authz import require
 from modules.gymkhana.services.errors import refused
+from modules.gymkhana.services.inputs import NOT_LED, required_text
 
 P_SUBMIT = "gymkhana.event_report.create"
-
-
-def _text(value: str, field: str, message: str) -> str:
-    text = (value or "").strip()
-    if not text:
-        raise DomainError(message, code="missing_field",
-                          details=[{"field": field, "message": message}])
-    return text
 
 
 @transaction.atomic
@@ -32,9 +25,9 @@ def submit(*, actor, club_id: int, student_incharge_user_id: int, event_name: st
     require(actor, P_SUBMIT)
     club = scoping.led_clubs(actor).filter(pk=club_id).first()
     if club is None:
-        raise NotFoundError("No such club among the clubs you lead.")
-    event_name = _text(event_name, "event_name", "Enter the event's name.")
-    description = _text(description, "description", "Describe the event.")
+        raise NotFoundError(NOT_LED)
+    event_name = required_text(event_name, "event_name", "Enter the event's name.")
+    description = required_text(description, "description", "Describe the event.")
     report = links.parse_link(
         report_url, field="report_url", missing_code="report_file_required",
         missing_message="An event report needs its report file. Paste the Google "

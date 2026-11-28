@@ -53,7 +53,7 @@ Layer legend: **D** domain (pure), **M** model/DB constraint, **Se** selector/sc
 
 | Id | What it requires | Layer | Enforcement point (planned) | Notes |
 |---|---|---|---|---|
-| BR-GYM-001 | Coordinator, co-coordinator and replacements are valid students | Sv | `services/people.py::require_students` (directory `kind == "student"`, `is_active`) called by `clubs.create_club` and `leadership.change_leadership` | Absent from the directory = invalid; message names the field |
+| BR-GYM-001 | Coordinator, co-coordinator and replacements are valid students | Sv | `services/people.py::require_students` (directory `kind == "student"` only; `is_active` is not checked, departure 2) called by `clubs.create_club` and `leadership.change_leadership` | Absent from the directory = invalid; message names the field |
 | BR-GYM-002 | Faculty councillor is a valid faculty member (creation; event context) | Sv | `people.require_faculty` in `clubs.create_club`; `bookings.book_event` re-validates the club's assigned councillor (R10) | |
 | BR-GYM-003 | Category ∈ {Technical, Sports, Cultural} | D + M | `domain/rules.py::CATEGORIES`; `CheckConstraint gym_club_category_valid` | |
 | BR-GYM-004 | New club is open; Student Admin approval → confirmed | D + Sv + M | `domain/state_machine.py::CLUB_TRANSITIONS`; `services/clubs.py::approve_club`; `CheckConstraint gym_club_status_valid` | No reject edge exists in the table |
@@ -166,8 +166,8 @@ foreign key. All indexes and constraints are named.
 | `Poll`, `PollChoice`, `PollTarget`, `Vote` (`models/polls.py`) | `Poll`: `club` FK, `title`, `description`, `expires_on` (date), `created_by_user_id`. `PollChoice`: `poll` FK, `label`, `position`. `PollTarget`: `poll` FK, `batch_year`, `discipline` (`""` = all branches). `Vote`: `poll` FK, `choice` FK, `user_id`, `cast_at` | `gym_choice_position_unique (poll, position)`; `gym_target_unique (poll, batch_year, discipline)`; `gym_vote_one_per_student (poll, user_id)`. Indexes: `gym_poll_club_expiry_idx (club, expires_on)`, `gym_poll_expiry_idx (expires_on)`, `gym_target_cohort_idx (batch_year, discipline)` — "polls targeting me", `gym_vote_choice_idx (choice)` — tally |
 | `BudgetRequest` (`models/budget.py`) | `club` FK, `purpose`, `description`, `amount` Decimal(12,2), `document_link`, `document_file_id`, `status` (`open`), `submitted_by_user_id`, timestamps | `gym_budget_amount_non_negative`; `gym_budget_document_present` (`document_file_id <> ''`); `gym_budget_status_open`. Index: `gym_budget_club_created_idx (club, created_at)` |
 | `EventReport` (`models/reports.py`) | `club` FK, `student_incharge_user_id`, `event_name`, `event_at`, `description`, `report_link`, `report_file_id`, `submitted_by_user_id`, timestamps | `gym_report_file_present`. Index: `gym_report_club_created_idx (club, created_at)` |
-| `AuditEvent` (`models/audit.py`) | `action`, `object_type`, `object_id`, `actor_user_id`, `club_id`, `details` (JSON of ids and codes only), `at` | Index: `gym_audit_object_idx (object_type, object_id, at)` |
-| `NotificationOutbox` (`models/notifications.py`) | Same shape as Placement's (`topic`, `dedupe_key` unique, recipient, subject, body, payload, status, attempts, `claimed_at`…), table `gymkhana_notification_outbox` | `dedupe_key` unique. Indexes: `gym_outbox_pending_idx (status, created_at)`, `gym_outbox_recipient_idx (recipient_user_id, created_at)` |
+| `AuditEvent` (`models/audit.py`) | `action`, `object_type`, `object_id`, `actor_user_id`, `club_id`, `details` (JSON of ids and codes only), `at` | No index: nothing queries the trail by object (R3-07) |
+| `NotificationOutbox` (`models/notifications.py`) | Same shape as Placement's (`topic`, `dedupe_key` unique, recipient, subject, body, payload, status, attempts, `claimed_at`…), table `gymkhana_notification_outbox` | `dedupe_key` unique. Index: `gym_outbox_pending_idx (status, created_at)`, for the drain |
 
 Design notes:
 
@@ -407,8 +407,8 @@ public surface until a consumer asks, I'll leave `contracts.py` with no function
 
 | Need | Call | Status |
 |---|---|---|
-| Valid student / faculty, active (BR-GYM-001, 002); voter's batch and branch (BR-GYM-013) | `directory.get_users(ids)` | exists |
-| People picker | `directory.search(q, kind, limit)` | exists |
+| Valid student / faculty, by kind only (BR-GYM-001, 002; departure 2); voter's batch and branch (BR-GYM-013) | `directory.get_users(ids)` | exists |
+| People picker | the IAM's `search_users` through `get_client()`, as Placement's `services/facts.py` does (departure 1; `directory.search` reads only the local projection) | exists |
 | Poll audience for notification (AFR-GYM-025) | `directory.students_in_cohorts(batch_years: Sequence[int], disciplines: Sequence[str]) -> list[int]` | **new, approved (R9)**. Pages `IamClient.academic_directory` (an existing IAM `main` endpoint, already in `FakeIam`) for each batch × discipline pair; empty `disciplines` = all branches. Raises `IamUnavailable` rather than returning a silently partial audience |
 
 No new `IamClient` method and no new IAM endpoint are needed. The module never touches `fusionlab`.

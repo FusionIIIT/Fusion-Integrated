@@ -11,6 +11,9 @@ const POLL = uniqueName("E2E Poll");
 // A slot far enough ahead that reruns never collide with an earlier booking.
 const DAY = new Date(Date.now() + (30 + Math.floor(Math.random() * 300)) * 86_400_000)
   .toISOString().slice(0, 10);
+const now = new Date();
+const TODAY = [now.getFullYear(), now.getMonth() + 1, now.getDate()]
+  .map((n) => String(n).padStart(2, "0")).join("-");
 
 test.describe.configure({ mode: "serial" });
 
@@ -89,10 +92,11 @@ test.describe("UC-GYM-005, 002, 003, 006, 009, 010: the Club Head", () => {
     await expect(page.getByText("1 approved.")).toBeVisible();
   });
 
-  test("books a session, and an overlapping event is refused", async ({ page }) => {
+  test("books a session and an event, and an overlapping event is refused", async ({ page }) => {
     await open(page, "gymCoordinator", "Club Schedule");
     for (const [button, start, end, status] of [
       ["Book session", "10:00", "11:00", 201], ["Book event", "10:30", "12:00", 409],
+      ["Book event", "12:00", "13:00", 201],
     ] as const) {
       await page.getByRole("button", { name: button }).click();
       const dialog = page.getByRole("dialog");
@@ -118,7 +122,9 @@ test.describe("UC-GYM-005, 002, 003, 006, 009, 010: the Club Head", () => {
         await dialog.getByRole("button", { name: "Cancel" }).click();
       }
     }
-    await expect(page.getByRole("row").filter({ hasText: DAY })).toHaveCount(1);
+    await expect(page.getByRole("row").filter({ hasText: DAY })).toHaveCount(2);
+    await expect(page.getByRole("row").filter({ hasText: DAY })
+      .filter({ hasText: "E2E Robo Race" })).toHaveCount(1);
   });
 
   test("creates a poll for 2021 CSE", async ({ page }) => {
@@ -153,7 +159,8 @@ test.describe("UC-GYM-005, 002, 003, 006, 009, 010: the Club Head", () => {
     dialog = page.getByRole("dialog");
     await pickPerson(page, "Student in charge", "stu00003");
     await dialog.getByRole("textbox", { name: "Event name" }).fill("E2E Robo Race");
-    await dialog.getByLabel("Held on").fill("2026-01-10T16:00");
+    // The club was created today, and a report may not predate its club.
+    await dialog.getByLabel("Held on").fill(`${TODAY}T00:00`);
     await dialog.getByRole("textbox", { name: "Description" }).fill("It went well.");
     await dialog.getByRole("textbox", { name: /report file/i }).fill(DRIVE);
     const report = posted(page, "event-reports/create");
@@ -167,7 +174,7 @@ test.describe("UC-GYM-007: a targeted student votes once", () => {
 
   test("votes and sees the vote recorded", async ({ page }) => {
     await open(page, "gymApplicant", "Polls");
-    const card = page.locator(".mantine-Card-root").filter({ hasText: POLL });
+    const card = page.getByRole("article", { name: POLL });
     await card.getByRole("radio", { name: "ROS" }).check();
     const voted = posted(page, "votes");
     await card.getByRole("button", { name: "Vote" }).click();

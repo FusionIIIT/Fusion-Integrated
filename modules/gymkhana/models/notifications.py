@@ -26,6 +26,4 @@ class NotificationOutbox(TimeStampedModel):
         db_table = "gymkhana_notification_outbox"
         indexes = [
             models.Index(fields=["status", "created_at"], name="gym_outbox_pending_idx"),
-            models.Index(fields=["recipient_user_id", "created_at"],
-                         name="gym_outbox_recipient_idx"),
         ]

@@ -1,6 +1,9 @@
 """Request and response shapes. Every server-owned field is read-only."""
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from modules.gymkhana.domain import rules
+from modules.gymkhana.domain import state_machine as sm
 from modules.gymkhana.models import (
     Booking,
     BudgetRequest,
@@ -9,11 +12,30 @@ from modules.gymkhana.models import (
     Membership,
     Poll,
 )
+from modules.gymkhana.models.bookings import BOOKING_KINDS
+from modules.gymkhana.services.people import FACULTY, STUDENT
+
+CATEGORY = rules.CATEGORIES
+STATUS = sm.STATES
+
+
+def _enum_schema(enum_id: str, values, nullable: bool = False) -> dict:
+    # A distinct id per field names each enum after its own component, with no shared override.
+    return {"type": "string", "enum": [*values, *([None] if nullable else [])],
+            "x-spec-enum-id": enum_id, **({"nullable": True} if nullable else {})}
+
+
+def enum_field(enum_id: str, values, **kwargs) -> serializers.ChoiceField:
+    """A choice field whose values the schema publishes, for the client's types to match."""
+    @extend_schema_field(_enum_schema(enum_id, values))
+    class EnumField(serializers.ChoiceField):
+        pass
+    return EnumField(choices=values, **kwargs)
 
 
 class GymkhanaClubSerializer(serializers.ModelSerializer):
-    category = serializers.CharField(read_only=True)
-    status = serializers.CharField(read_only=True)
+    category = enum_field("gymkhana.club.category", CATEGORY, read_only=True)
+    status = enum_field("gymkhana.club.status", STATUS, read_only=True)
     leaders = serializers.SerializerMethodField()
     leader_names = serializers.SerializerMethodField()
     councillor_name = serializers.SerializerMethodField()
@@ -36,6 +58,7 @@ class GymkhanaClubSerializer(serializers.ModelSerializer):
     def get_councillor_name(self, obj) -> str:
         return self.context.get("names", {}).get(obj.faculty_councillor_user_id, "")
 
+    @extend_schema_field(_enum_schema("gymkhana.club.my_membership", STATUS, nullable=True))
     def get_my_membership(self, obj) -> str | None:
         return self.context.get("own_status", {}).get(obj.pk)
 
@@ -65,7 +88,7 @@ class GymkhanaMyClubsSerializer(serializers.Serializer):
 
 
 class GymkhanaMembershipSerializer(serializers.ModelSerializer):
-    status = serializers.CharField(read_only=True)
+    status = enum_field("gymkhana.membership.status", STATUS, read_only=True)
     club_name = serializers.CharField(source="club.name", read_only=True)
     applicant_name = serializers.SerializerMethodField()
 
@@ -92,13 +115,13 @@ class GymkhanaApproveSerializer(serializers.Serializer):
 
 class GymkhanaApprovalOutcomeSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    outcome = serializers.CharField()
+    outcome = enum_field("gymkhana.approval.outcome", ("approved", "refused"))
     code = serializers.CharField()
     message = serializers.CharField()
 
 
 class GymkhanaBookingSerializer(serializers.ModelSerializer):
-    kind = serializers.CharField(read_only=True)
+    kind = enum_field("gymkhana.booking.kind", BOOKING_KINDS, read_only=True)
     club_name = serializers.CharField(source="club.name", read_only=True)
 
     class Meta:
@@ -197,7 +220,7 @@ class GymkhanaVoteSerializer(serializers.Serializer):
 
 
 class GymkhanaBudgetRequestSerializer(serializers.ModelSerializer):
-    status = serializers.CharField(read_only=True)
+    status = enum_field("gymkhana.budget.status", (BudgetRequest.OPEN,), read_only=True)
     club_name = serializers.CharField(source="club.name", read_only=True)
 
     class Meta:
@@ -243,4 +266,4 @@ class GymkhanaPersonSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()
     username = serializers.CharField()
     display_name = serializers.CharField()
-    kind = serializers.CharField()
+    kind = enum_field("gymkhana.person.kind", (STUDENT, FACULTY))
