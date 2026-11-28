@@ -33,6 +33,16 @@ def enum_field(enum_id: str, values, **kwargs) -> serializers.ChoiceField:
     return EnumField(choices=values, **kwargs)
 
 
+class GymkhanaClubLeadersSerializer(serializers.Serializer):
+    coordinator = serializers.IntegerField(required=False)
+    co_coordinator = serializers.IntegerField(required=False)
+
+
+class GymkhanaClubLeaderNamesSerializer(serializers.Serializer):
+    coordinator = serializers.CharField(required=False)
+    co_coordinator = serializers.CharField(required=False)
+
+
 class GymkhanaClubSerializer(serializers.ModelSerializer):
     category = enum_field("gymkhana.club.category", CATEGORY, read_only=True)
     status = enum_field("gymkhana.club.status", STATUS, read_only=True)
@@ -48,9 +58,11 @@ class GymkhanaClubSerializer(serializers.ModelSerializer):
                   "created_at", "leaders", "leader_names", "my_membership"]
         read_only_fields = fields
 
+    @extend_schema_field(GymkhanaClubLeadersSerializer)
     def get_leaders(self, obj) -> dict:
         return self.context.get("leaders", {}).get(obj.pk, {})
 
+    @extend_schema_field(GymkhanaClubLeaderNamesSerializer)
     def get_leader_names(self, obj) -> dict:
         names = self.context.get("names", {})
         return {role: names.get(uid, "") for role, uid in self.get_leaders(obj).items()}
@@ -164,6 +176,11 @@ class GymkhanaTargetSerializer(serializers.Serializer):
                                        default="")
 
 
+class GymkhanaTargetOutSerializer(serializers.Serializer):
+    batch_year = serializers.IntegerField()
+    discipline = serializers.CharField()
+
+
 class GymkhanaPollSerializer(serializers.ModelSerializer):
     club_name = serializers.CharField(source="club.name", read_only=True)
     choices = serializers.SerializerMethodField()
@@ -175,6 +192,7 @@ class GymkhanaPollSerializer(serializers.ModelSerializer):
                   "created_at", "choices", "my_choice_id"]
         read_only_fields = fields
 
+    @extend_schema_field(GymkhanaChoiceOutSerializer(many=True))
     def get_choices(self, obj) -> list[dict]:
         return [{"id": c.id, "label": c.label} for c in obj.choices.all()]
 
@@ -191,11 +209,13 @@ class GymkhanaManagedPollSerializer(GymkhanaPollSerializer):
                   "created_at", "choices", "targets", "total_votes"]
         read_only_fields = fields
 
+    @extend_schema_field(GymkhanaChoiceOutSerializer(many=True))
     def get_choices(self, obj) -> list[dict]:
         counts = self.context.get("tallies", {}).get(obj.pk, {})
         return [{"id": c.id, "label": c.label, "votes": counts.get(c.id, 0)}
                 for c in obj.choices.all()]
 
+    @extend_schema_field(GymkhanaTargetOutSerializer(many=True))
     def get_targets(self, obj) -> list[dict]:
         return [{"batch_year": t.batch_year, "discipline": t.discipline}
                 for t in obj.targets.all()]

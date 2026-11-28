@@ -13,6 +13,16 @@ export interface Leaders {
   co_coordinator?: number;
 }
 
+export interface LeaderNames {
+  coordinator?: string;
+  co_coordinator?: string;
+}
+
+export interface LeadersOut {
+  coordinator: number;
+  co_coordinator: number;
+}
+
 export interface Club {
   id: number;
   name: string;
@@ -24,7 +34,7 @@ export interface Club {
   approved_at: string | null;
   created_at: string;
   leaders: Leaders;
-  leader_names: { coordinator?: string; co_coordinator?: string };
+  leader_names: LeaderNames;
   my_membership: ClubStatus | null;
 }
 
@@ -112,6 +122,11 @@ export interface Target {
   discipline: string;
 }
 
+export interface TargetInput {
+  batch_year: number;
+  discipline?: string;
+}
+
 export interface ManagedPoll extends Omit<Poll, "my_choice_id"> {
   targets: Target[];
   total_votes: number;
@@ -123,7 +138,7 @@ export interface PollInput {
   description: string;
   expires_on: string;
   choices: string[];
-  targets: Target[];
+  targets: TargetInput[];
 }
 
 export interface BudgetRequest {

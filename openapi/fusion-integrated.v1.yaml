@@ -3651,6 +3651,18 @@ components:
       type: string
       enum:
       - open
+    GymkhanaChoiceOut:
+      type: object
+      properties:
+        id:
+          type: integer
+        label:
+          type: string
+        votes:
+          type: integer
+      required:
+      - id
+      - label
     GymkhanaClub:
       type: object
       properties:
@@ -3687,12 +3699,12 @@ components:
           format: date-time
           readOnly: true
         leaders:
-          type: object
-          additionalProperties: {}
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaClubLeaders'
           readOnly: true
         leader_names:
-          type: object
-          additionalProperties: {}
+          allOf:
+          - $ref: '#/components/schemas/GymkhanaClubLeaderNames'
           readOnly: true
         my_membership:
           nullable: true
@@ -3738,6 +3750,20 @@ components:
       - description
       - faculty_councillor_user_id
       - name
+    GymkhanaClubLeaderNames:
+      type: object
+      properties:
+        coordinator:
+          type: string
+        co_coordinator:
+          type: string
+    GymkhanaClubLeaders:
+      type: object
+      properties:
+        coordinator:
+          type: integer
+        co_coordinator:
+          type: integer
     GymkhanaClubStatusEnum:
       type: string
       enum:
@@ -3903,14 +3929,12 @@ components:
         choices:
           type: array
           items:
-            type: object
-            additionalProperties: {}
+            $ref: '#/components/schemas/GymkhanaChoiceOut'
           readOnly: true
         targets:
           type: array
           items:
-            type: object
-            additionalProperties: {}
+            $ref: '#/components/schemas/GymkhanaTargetOut'
           readOnly: true
         total_votes:
           type: integer
@@ -4043,8 +4067,7 @@ components:
         choices:
           type: array
           items:
-            type: object
-            additionalProperties: {}
+            $ref: '#/components/schemas/GymkhanaChoiceOut'
           readOnly: true
         my_choice_id:
           type: integer
@@ -4133,6 +4156,16 @@ components:
           maxLength: 40
       required:
       - batch_year
+    GymkhanaTargetOut:
+      type: object
+      properties:
+        batch_year:
+          type: integer
+        discipline:
+          type: string
+      required:
+      - batch_year
+      - discipline
     GymkhanaVenueList:
       type: object
       properties:

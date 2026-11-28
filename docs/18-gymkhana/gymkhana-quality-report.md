@@ -26,7 +26,7 @@ $ make check-client     # exit 0
 ✓ built in 3.64s
 
 $ make e2e              # exit 0, IAM on 8001 and make dev on 8002
-  25 passed (31.0s)        0 responses of 5xx in the make dev log
+  25 passed (25.7s)        0 responses of 5xx in the make dev log (after the R4-06 fixes; see section 12)
 ```
 
 The module's largest chunk is `MyClubsPage` at 3.75 kB gzip; all six pages, `routes` and
@@ -37,7 +37,7 @@ The module's largest chunk is `MyClubsPage` at 3.75 kB gzip; all six pages, `rou
 ```
 $ pytest modules/gymkhana --ignore=modules/gymkhana/tests/spec --cov=modules/gymkhana --cov-branch --cov-fail-under=90
 modules/gymkhana/api/views.py   300  1  26  1  99%
-TOTAL                          1638  1 234  1  99%
+TOTAL                          1652  1 234  1  99%
 Required test coverage of 90% reached. Total coverage: 99.89%
 
 $ pytest modules/gymkhana --ignore=modules/gymkhana/tests/spec --cov=modules/gymkhana/domain --cov-branch --cov-fail-under=95
@@ -443,7 +443,8 @@ Fixes for round 3, at the working tree after `f52590b` (R3-01 and R3-04 were fix
   `status="pending" … order_by("created_at")`.
 - R3-08: the serializers publish `category`, `status`, `kind`, `outcome`, `my_membership`,
   `Person.kind` and the budget `status` as enums, each named after its own component, so no
-  shared `ENUM_NAME_OVERRIDES` is needed; the regenerated schema matches `api/types.ts`.
+  shared `ENUM_NAME_OVERRIDES` is needed. The claim that the schema then matched `api/types.ts`
+  was not checked field by field, and round 4 found it wrong (R4-06).
 - R3-09: each poll card is an `article` named by its title; the spec finds it by role and name.
 - R3-10: the blueprint's BR-GYM-001 row, needs table and model table describe departures 1
   and 2 and the dropped indexes.
@@ -452,3 +453,36 @@ Fresh install re-run on 2026-11-28 because the migration changed: `0001_initial`
 reapplied OK; readiness refused with the venue-list message until `seed_gymkhana_venues`, then
 `gymkhana is ready.`; the database dropped (count 0). Deploy check with CI's environment:
 `System check identified no issues (2 silenced).`
+
+Round 4, reviewing commit `2f181f7`:
+
+| Spec | Arch | Code | Security | Backend tests | E2E | Frontend | Ops | Hygiene |
+|---|---|---|---|---|---|---|---|---|
+| 10 | 10 | 10 | 10 | 0 | 10 | 7 | 10 | 10 |
+
+Verdict: not yet, 6 findings. R4-01 to R4-05 are in the spec tests and `triage.md`, which are
+Student 2's (the 7 failures that keep `make check` red, 9 open triage rows, 2 skipped tests,
+and the WF design's source ids); they were handed to Student 2 with Student 1's evidence for
+each row. Fixed by Student 1:
+
+- R4-06: every `SerializerMethodField` that returned a plain `dict` or `list[dict]` now names
+  its shape for the schema: `leaders` (`GymkhanaClubLeaders`), `leader_names`
+  (`GymkhanaClubLeaderNames`), poll `choices` (`GymkhanaChoiceOut`) and managed-poll
+  `targets` (`GymkhanaTargetOut`, `discipline` required). `api/types.ts` adds `LeaderNames`,
+  `LeadersOut` (both fields required, returned by `useChangeLeadership`) and `TargetInput`
+  (`discipline` optional, for `PollInput`). Checked by a script that compares every interface
+  in `types.ts` with its schema component on names, optional fields, enums and nulls:
+  0 mismatches. The same script run against `2f181f7` reports the `Leaders` mismatch.
+- Round 4's question 2: the two per-application approval outcomes now say what to do next
+  ("… Refresh the membership requests and choose again." and "… already approved, so nothing
+  more is needed.").
+
+Gates after these fixes (2026-11-28): `make check` exits 2 on the same 7 spec failures only,
+with every earlier step passing; `make check-client` 82 passed; coverage 99.89%
+(`TOTAL 1652 1 234 1`) and domain 100%; spec suites unchanged (FR 34/0/0, UC 28/1/1,
+BR 42/3/1, WF 24/3/0); reference script 77 ids; AI-name grep prints nothing.
+`make e2e`: the first run had 1 failure ("approves the application": the click on the My Clubs
+link never navigated, with no `me/clubs` request in the server log, and the page stayed on the
+welcome screen) and 6 tests that did not run after it; the next run, with fresh servers, gave
+25 passed (25.7s), with 0 responses of 5xx. Both runs are reported; the first is treated as a
+flake, not fixed.

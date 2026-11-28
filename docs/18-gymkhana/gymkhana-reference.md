@@ -14,7 +14,7 @@ Written by `ops/docs/gymkhana_reference.py`; do not edit by hand.
 | BR-GYM-008 | Different clubs remain open | [modules/gymkhana/models/memberships.py:25](../../modules/gymkhana/models/memberships.py#L25) |
 | BR-GYM-009 | No duplicate same-club application | [modules/gymkhana/models/memberships.py:26](../../modules/gymkhana/models/memberships.py#L26) |
 | BR-GYM-010 | Only the club's current leaders act as Club Head | [modules/gymkhana/selectors/scoping.py:39](../../modules/gymkhana/selectors/scoping.py#L39) |
-| BR-GYM-011 | Approval moves open to confirmed with remarks | [modules/gymkhana/services/memberships.py:95](../../modules/gymkhana/services/memberships.py#L95) |
+| BR-GYM-011 | Approval moves open to confirmed with remarks | [modules/gymkhana/services/memberships.py:96](../../modules/gymkhana/services/memberships.py#L96) |
 | BR-GYM-012 | At least two choices | [modules/gymkhana/domain/rules.py:108](../../modules/gymkhana/domain/rules.py#L108) |
 | BR-GYM-013 | Poll audience by batch and branch | [modules/gymkhana/domain/rules.py:181](../../modules/gymkhana/domain/rules.py#L181) |
 | BR-GYM-014 | Only an active, unexpired poll | [modules/gymkhana/services/polls.py:67](../../modules/gymkhana/services/polls.py#L67) |
@@ -67,8 +67,8 @@ Written by `ops/docs/gymkhana_reference.py`; do not edit by hand.
 | AFR-GYM-018 | No duplicate application | [modules/gymkhana/services/memberships.py:43](../../modules/gymkhana/services/memberships.py#L43) |
 | AFR-GYM-019 | Application recorded open | [modules/gymkhana/services/memberships.py:47](../../modules/gymkhana/services/memberships.py#L47) |
 | AFR-GYM-020 | Club Head sees pending applications | [modules/gymkhana/selectors/scoping.py:72](../../modules/gymkhana/selectors/scoping.py#L72) |
-| AFR-GYM-021 | Approve with optional remarks | [modules/gymkhana/services/memberships.py:100](../../modules/gymkhana/services/memberships.py#L100) |
-| AFR-GYM-022 | Approved becomes confirmed | [modules/gymkhana/services/memberships.py:99](../../modules/gymkhana/services/memberships.py#L99) |
+| AFR-GYM-021 | Approve with optional remarks | [modules/gymkhana/services/memberships.py:102](../../modules/gymkhana/services/memberships.py#L102) |
+| AFR-GYM-022 | Approved becomes confirmed | [modules/gymkhana/services/memberships.py:101](../../modules/gymkhana/services/memberships.py#L101) |
 | AFR-GYM-023 | Create a poll | [modules/gymkhana/services/polls.py:27](../../modules/gymkhana/services/polls.py#L27) |
 | AFR-GYM-024 | At least two choices | [modules/gymkhana/domain/rules.py:15](../../modules/gymkhana/domain/rules.py#L15) |
 | AFR-GYM-025 | Notify target students | [modules/gymkhana/services/notifications.py:100](../../modules/gymkhana/services/notifications.py#L100) |

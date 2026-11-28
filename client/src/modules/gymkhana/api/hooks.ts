@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { http } from "../../../lib/http";
 import type {
   ApprovalOutcome, Booking, BookingInput, BudgetInput, BudgetRequest, Club, ClubInput,
-  EventReport, Leaders, ManagedPoll, Membership, MyClubs, Page, Person, Poll, PollInput,
+  EventReport, LeadersOut, ManagedPoll, Membership, MyClubs, Page, Person, Poll, PollInput,
   ReportInput,
 } from "./types";
 
@@ -61,7 +61,7 @@ export function useApproveClub() {
 
 export function useChangeLeadership() {
   return useWrite<{ clubId: number; coordinator_user_id: number;
-    co_coordinator_user_id: number }, Leaders>(
+    co_coordinator_user_id: number }, LeadersOut>(
     (i) => `clubs/${i.clubId}/leadership`,
     ({ coordinator_user_id, co_coordinator_user_id }) =>
       ({ coordinator_user_id, co_coordinator_user_id }));

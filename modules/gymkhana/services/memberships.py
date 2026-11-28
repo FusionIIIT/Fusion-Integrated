@@ -85,7 +85,8 @@ def _approve_one(actor, membership_id: int, remarks: str) -> ApprovalOutcome:
                           club__in=scoping.led_clubs(actor).values("pk")).first())
     if membership is None:
         return ApprovalOutcome(membership_id, "refused", "not_found",
-                               "No such application for a club you lead.")
+                               "No such application for a club you lead. Refresh the "
+                               "membership requests and choose again.")
     # H2: an applicant who also leads the club cannot approve themselves.
     if membership.user_id == actor.user_id:
         return ApprovalOutcome(membership_id, "refused", "self_approval",
@@ -95,7 +96,8 @@ def _approve_one(actor, membership_id: int, remarks: str) -> ApprovalOutcome:
         t = sm.resolve(sm.MEMBERSHIP, membership.status, sm.APPROVE, sm.CLUB_HEAD)
     except sm.InvalidTransition:
         return ApprovalOutcome(membership_id, "refused", "already_confirmed",
-                               "This application is already approved.")
+                               "This application is already approved, so nothing more "
+                               "is needed.")
     membership.status = t.to
     membership.remarks = remarks
     membership.approved_by_user_id = actor.user_id
