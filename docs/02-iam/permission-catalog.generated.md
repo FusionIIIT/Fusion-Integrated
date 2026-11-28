@@ -13,6 +13,16 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `leave`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `leave.request.view_self` | View own leave requests and balances | `Dean Academic`, `acadadmin`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff`, `student` |
+| `leave.request.create` | Submit leave requests | `Dean Academic`, `acadadmin`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff`, `student` |
+| `leave.request.cancel` | Cancel own pending leave requests | `Dean Academic`, `acadadmin`, `faculty`, `placement_chairman`, `placement_coordinator`, `placement_officer`, `staff`, `student` |
+| `leave.request.view` | View leave requests for managed employees | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+| `leave.request.review` | Approve or reject leave requests | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
