@@ -13,6 +13,22 @@ For the intended taxonomy of modules not yet built, see
 |---|---|---|
 | `directory.user.search` | Search the institute directory | `Dean Academic`, `acadadmin`, `placement_chairman`, `placement_coordinator`, `placement_officer` |
 
+## `elm`
+
+| Code | What it allows | Held by |
+|---|---|---|
+| `elm.leave_request.view_self` | View own leave and balances | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `dean`, `deputy_registrar_estt`, `director`, `establishment_officer`, `faculty`, `leave_administrator`, `registrar`, `staff`, `unit_head` |
+| `elm.leave_request.create` | Submit leave requests | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `dean`, `deputy_registrar_estt`, `director`, `establishment_officer`, `faculty`, `leave_administrator`, `registrar`, `staff`, `unit_head` |
+| `elm.leave_request.withdraw` | Withdraw pending leave requests | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `dean`, `deputy_registrar_estt`, `director`, `establishment_officer`, `faculty`, `leave_administrator`, `registrar`, `staff`, `unit_head` |
+| `elm.substitute.respond` | Respond to or replace a substitute assignment | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `dean`, `deputy_registrar_estt`, `director`, `establishment_officer`, `faculty`, `leave_administrator`, `registrar`, `staff`, `unit_head` |
+| `elm.workflow.view` | View assigned leave workflow tasks | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `dean`, `deputy_registrar_estt`, `director`, `establishment_officer`, `leave_administrator`, `registrar`, `unit_head` |
+| `elm.workflow.review` | Review leave requests as Unit Head | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `dean`, `deputy_registrar_estt`, `director`, `establishment_officer`, `registrar`, `unit_head` |
+| `elm.workflow.route` | Verify and route higher-sanction requests | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `dean`, `deputy_registrar_estt`, `director`, `establishment_officer`, `registrar` |
+| `elm.workflow.sanction` | Make final leave decisions | `Dean`, `Deputy Registrar (Estt.)`, `Director`, `Registrar`, `dean`, `deputy_registrar_estt`, `director`, `establishment_officer`, `registrar` |
+| `elm.configuration.manage` | Manage leave policy, employee units, and approval routes | `leave_administrator` |
+| `elm.calendar.manage` | Maintain and publish the holiday/RH calendar | `leave_administrator` |
+| `elm.record.manage` | Maintain authorized leave records | `leave_administrator` |
+
 ## `placement_cell`
 
 | Code | What it allows | Held by |
